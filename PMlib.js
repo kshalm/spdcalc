@@ -372,8 +372,20 @@ N = 100*100
 AA = new Array(N)
 var startTime = new Date();
 
+xtal = new BBO()
+
+// var i =N; while (i--) {
+// 	AA[i] = phasematch_Int_Phase(xtal, Type[1], lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM )
+
+// }
+// for (var i =N; --i !=0;) {
+// 	AA[i] = phasematch_Int_Phase(xtal, Type[1], lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM )
+
+// }
+
+// Interesting. Incrementing for loop is faster than the decrementing version.
 for (var i=0; i<N; i++){
-	AA[i] = phasematch_Int_Phase(new BBO(), Type[1], lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM )
+	AA[i] = phasematch_Int_Phase(xtal, Type[1], lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM )
 }
 
 var endTime = new Date();
