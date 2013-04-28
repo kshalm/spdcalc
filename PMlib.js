@@ -303,7 +303,7 @@ function phasematch (crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta
 	// Phasematching along transverse directions
 	var PMt = Math.exp(-.5*(Math.pow(delK[0],2) + Math.pow(delK[1],2))*Math.pow(W,2))
 
-	console.log(PMz_real, PMz_imag,delK[2])
+	// console.log(PMz_real, PMz_imag,delK[2])
 	// Calculate the Pump spectrum
 	var alpha = 1
 	// var alpha = calc_alpha_w(Type, crystal, lambda_p, lambda_s,lambda_i, p_bw,theta, phi, theta_s, theta_i, phi_s, phi_i)
@@ -359,13 +359,25 @@ function phasematch_Int_Phase(crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_
 		var PM = PMang * AP
 	}
 	else{
-		console.log	("calculating Intensity")
+		// console.log	("calculating Intensity")
 		var PM = Math.pow(PM[0],2) + Math.pow(PM[1],2)
 	}
-	console.log(PM)
+	// console.log(PM)
 	return PM
 }
 
-phasematch_Int_Phase(new BBO(), Type[1], lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM )
-	
+//Record a quick benchmark to test
+// N = Math.pow(1000,2)
+N = 100*100
+AA = new Array(N)
+var startTime = new Date();
+
+for (var i=0; i<N; i++){
+	AA[i] = phasematch_Int_Phase(new BBO(), Type[1], lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM )
+}
+
+var endTime = new Date();
+// time difference in ms
+var timeDiff = (endTime - startTime)/1000;
+console.log(timeDiff)
 
