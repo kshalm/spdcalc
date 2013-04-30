@@ -7,27 +7,20 @@ define(
     ){
         'use strict';
 
+        var scale = d3.scale.linear()
+            .domain([0, 1])
+            .range([0, 255])
+            .nice()
+            ;
+
         function defaultColorMap( val ){
 
-            var scale = d3.scale.linear()
-                .domain([0, 1])
-                .range([0, 255])
-                .nice()
+            var r = 255 - scale( val )
+                ,g = 255 - scale( val )/2
+                ,b = 255
                 ;
 
-            // override this function with this new function
-            // so that the scale is cached and we don't
-            // recreate it every time
-            defaultColorMap = function( val ){
-                var r = 255 - scale( val )
-                    ,g = 255 -scale( val )/2
-                    ,b = 255 //-scale( val ) //255 - r
-                    ;
-
-                return d3.rgb(r, g, b).toString();
-            };
-
-            return defaultColorMap( val );
+            return d3.rgb(r, g, b);
         }
 
         function HeatMap( options ){
@@ -51,6 +44,11 @@ define(
             this.canvas.height = this.height;
             this.ctx = this.canvas.getContext('2d');
 
+            this.hiddenCanvas = document.createElement('canvas');
+            this.hiddenCanvas.width = this.width;
+            this.hiddenCanvas.height = this.height;
+            this.hiddenCtx = this.hiddenCanvas.getContext('2d');
+
             this.setColorMap( options.colorMap );
         }
 
@@ -64,6 +62,31 @@ define(
             setColorMap: function( fn ){
 
                 this.colorMap = fn || defaultColorMap;
+            },
+
+            makeImageData: function( width, height, data ){
+
+                var img = this.hiddenCtx.getImageData(0, 0, width, height)
+                    ,colorMap = this.colorMap
+                    ,val
+                    ,idx
+                    ,color
+                    ;
+
+                // for every data point, get its color
+                // and write the pixel data
+                for ( var i = 0, l = data.length; i < l; ++i ){
+                            
+                    val = data[ i ];
+                    color = colorMap( val );
+                    idx = 4 * i;
+                    img.data[ idx ] = color.r; //red
+                    img.data[ idx + 1 ] = color.g; //green
+                    img.data[ idx + 2 ] = color.b; //blue
+                    img.data[ idx + 3 ] = 255; //alpha
+                }
+
+                return img;
             },
 
             plotData: function( data ){
@@ -82,23 +105,19 @@ define(
                 cols = Math.floor(cols);
                 rows = Math.floor(rows);
 
-                w = Math.floor(this.canvas.width / cols);
-                h = Math.floor(this.canvas.height / cols);
+                // write the image data to the hidden canvas
+                this.hiddenCtx.putImageData(this.makeImageData( cols, rows, data ), 0, 0);
 
-                for ( var i = 0; i < l; ++i ){
-                    
-                    this.drawPoint( (i % cols) * w, Math.floor(i / cols) * h, w, h, data[ i ] );
+                // draw to the visible canvas
+                this.ctx.save();
+                
+                if ( scale < 1 ){
+                    // scale it if necessary
+                    this.ctx.scale( 1/scale, 1/scale );
                 }
-            },
 
-            drawPoint: function( x, y, w, h, val ){
-
-                var ctx = this.ctx
-                    ,color = this.colorMap( val )
-                    ;
-
-                ctx.fillStyle = color;
-                ctx.fillRect( x, y, w, h );
+                this.ctx.drawImage(this.hiddenCanvas, 0, 0);
+                this.ctx.restore();
             }
         };
 
