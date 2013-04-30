@@ -30,10 +30,10 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var endTime = new Date();
         var timeDiff = (endTime - startTime)/1000;
     
-    $(function(){
-        
-        $('#viewport').append('<p>Timediff: '+timeDiff+'</p>');
-    });
+        $(function(){
+            
+            $('#viewport').append('<p>Timediff: '+timeDiff+'</p>');
+        });
     }
 
     //This is my test function that lets me calculate entanlged spectral properties
