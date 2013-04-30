@@ -14,6 +14,8 @@
     "globals" : {
         "module" : true,
         "exports" : true,
-        "PhaseMatch" : true
+        "PhaseMatch" : true,
+        "sq": true,
+        "numeric": true
     }
 }
