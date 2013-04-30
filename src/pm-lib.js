@@ -19,8 +19,8 @@ PhaseMatch.BBO = function BBO (temp) {
 PhaseMatch.BBO.prototype  = {
     indicies:function(lambda){
         lambda = lambda * Math.pow(10,6); //Convert for Sellmeir Coefficients
-        var no = Math.sqrt(2.7359 + 0.01878/ (Math.pow(lambda,2) - 0.01822) - 0.01354*Math.pow(lambda,2));
-        var ne = Math.sqrt(2.3753 + 0.01224 / (Math.pow(lambda,2) - 0.01667) - 0.01516*Math.pow(lambda,2));
+        var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
+        var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
 
         return [no, no, ne];
     }
@@ -53,7 +53,7 @@ PhaseMatch.GetIndices = function GetIndices (crystal, lambda, theta, phi, theta_
     // Normalambda_ize the unit vector
     // FIX ME: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
     // case I think the correct behaviour is for Norm = 1 ?
-    var Norm =  Math.sqrt(Math.pow(S_x,2) + Math.pow(S_y,2) + Math.pow(S_z,2));
+    var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
     var Sx = SR_x/(Norm);
     var Sy = SR_y/(Norm);
     var Sz = SR_z/(Norm);
@@ -65,9 +65,9 @@ PhaseMatch.GetIndices = function GetIndices (crystal, lambda, theta, phi, theta_
     var ny = ind[1];
     var nz = ind[2];
 
-    var B = Math.pow(Sx,2) * (1/Math.pow(ny,2) + 1/Math.pow(nz,2)) + Math.pow(Sy,2) *(1/Math.pow(nx,2) + 1/Math.pow(nz,2)) + Math.pow(Sz,2) *(1/Math.pow(nx,2) + 1/Math.pow(ny,2));
-    var C = Math.pow(Sx,2) / (Math.pow(ny,2) * Math.pow(nz,2)) + Math.pow(Sy,2) /(Math.pow(nx,2) * Math.pow(nz,2)) + Math.pow(Sz,2) / (Math.pow(nx,2) * Math.pow(ny,2));
-    var D = Math.pow(B,2) - 4 * C;
+    var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
+    var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
+    var D = sq(B) - 4 * C;
 
     var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
     var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
@@ -202,9 +202,9 @@ PhaseMatch.optimum_idler = function optimum_idler(crystal, Type,  lambda_p, lamb
     var n_s = ind[0];
     var n_i = ind[1];
     var n_p = ind[2];
-    var arg = Math.pow(n_s,2) + Math.pow(n_p*lambda_s/lambda_p,2);
+    var arg = sq(n_s) + sq(n_p*lambda_s/lambda_p);
     arg -= 2*n_s*n_p*(lambda_s/lambda_p)*Math.cos(theta_s) - 2*n_p*lambda_s/lambda_p*delKpp;
-    arg += 2*n_s*Math.cos(theta_s)*delKpp + Math.pow(delKpp,2);
+    arg += 2*n_s*Math.cos(theta_s)*delKpp + sq(delKpp);
     arg = Math.sqrt(arg);
 
     var arg2 = n_s*Math.sin(theta_s)/arg;
@@ -245,7 +245,7 @@ PhaseMatch.phasematch = function phasematch (crystal, Type, lambda_p, p_bw, W, l
     //More advanced calculation of phasematching in the z direction. Don't need it now.
 
     // var l_range = linspace(0,L,apodization+1)
-    // A = Math.exp(-Math.pow((l_range - L/2),2)/2/Math.pow(apodization_FWHM,2))
+    // A = Math.exp(-sq((l_range - L/2))/2/sq(apodization_FWHM))
 
 
     // PMz = 0
@@ -266,7 +266,7 @@ PhaseMatch.phasematch = function phasematch (crystal, Type, lambda_p, p_bw, W, l
     var PMz_imag = PMz * Math.sin(arg);
 
     // Phasematching along transverse directions
-    var PMt = Math.exp(-0.5*(Math.pow(delK[0],2) + Math.pow(delK[1],2))*Math.pow(W,2));
+    var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(W));
 
     // console.log(PMz_real, PMz_imag,delK[2])
     // Calculate the Pump spectrum
@@ -306,7 +306,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, l
     
     // PM is a complex array. First element is real part, second element is imaginary.
     var PM = PhaseMatch.phasematch(crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM );
-    // var PMInt = Math.pow(PM[0],2) + Math.pow(PM[1],2)
+    // var PMInt = sq(PM[0]) + sq(PM[1])
 
     if (phase){
         var PMang = Math.atan2(PM[1],PM[0]) + Math.PI;
@@ -320,7 +320,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, l
         // PM = PMang * AP;
     } else {
         // console.log  ("calculating Intensity")
-        PM = Math.pow(PM[0],2) + Math.pow(PM[1],2);
+        PM = sq(PM[0]) + sq(PM[1]);
     }
     // console.log(PM)
     return PM;

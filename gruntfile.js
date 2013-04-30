@@ -20,6 +20,7 @@ module.exports = function(grunt) {
         sources : [
             'build/intro.js',
             'src/constants.js',
+            'src/math-helpers.js',
             'src/pm-lib.js',
             'src/pm-properties.js',
             'src/pm-plothelpers.js',
