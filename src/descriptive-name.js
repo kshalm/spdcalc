@@ -8,11 +8,11 @@
  * for BBO. Eventually this will be called from the crystal database, but 
  * it is useful to have here for now.
  * @class BBO
- * @param {Array} Temp [description]
+ * @param {Array} temp [description]
  */
-PhaseMatch.BBO = function BBO (Temp) {
+PhaseMatch.BBO = function BBO (temp) {
     //Selmeir coefficients for nx, ny, nz
-    this.Temp = Temp;
+    this.temp = temp;
     // this.lambda = lambda
 
     this.indicies = function(lambda){

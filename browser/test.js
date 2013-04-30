@@ -1,6 +1,4 @@
-// self executing function to define scope
-// assures window and undefined words are set correctly
-(function( window, undefined ){
+require([ 'jquery', 'phasematch' ], function( $, PhaseMatch ){
 
     'use strict';
     // Initial variables for testing. Eventually these will be moved.
@@ -61,6 +59,10 @@
     var endTime = new Date();
     // time difference in ms
     var timeDiff = (endTime - startTime)/1000;
-    console.log(timeDiff);
+    
+    $(function(){
+        
+        $('#viewport').append('<p>Timediff: '+timeDiff+'</p>');
+    });
 
-})( this );
+});
