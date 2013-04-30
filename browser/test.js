@@ -36,7 +36,7 @@ require([ 'jquery', 'phasematch' ], function( $, PhaseMatch ){
 
     //Record a quick benchmark to test
     // N = Math.pow(1000,2)
-    var N = 100 * 100;
+    var N = 400 * 400;
     var AA = [];
     var startTime = new Date();
 
