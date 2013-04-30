@@ -12,4 +12,4 @@
 }(this, function( numeric ) {
 
 'use strict';
-var PhaseMatch = {};
+var PhaseMatch = { util: {} };

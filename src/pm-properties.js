@@ -4,10 +4,10 @@
 
 (function(){
 
-	var SPDCprop = function(){
-		this.init();
-
+	var SPDCprop = function( nameOrConfig ){
+		this.init( nameOrConfig );
 	};
+
 	SPDCprop.prototype = {
 		init:function(){
 			var con = PhaseMatch.constants;
@@ -37,6 +37,7 @@
             // }
 		}
 	};
+	
 	PhaseMatch.SPDCprop = SPDCprop;
 })();
 
