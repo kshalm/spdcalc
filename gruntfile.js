@@ -21,6 +21,8 @@ module.exports = function(grunt) {
             'build/intro.js',
             'src/constants.js',
             'src/descriptive-name.js',
+            'src/pm-properties.js',
+            'src/pm-plothelpers.js',
             // add more...
             // can use wildcards. eg: src/thing-*.js
             'build/outro.js'

@@ -14,14 +14,16 @@ PhaseMatch.BBO = function BBO (temp) {
     //Selmeir coefficients for nx, ny, nz
     this.temp = temp;
     // this.lambda = lambda
+};
 
-    this.indicies = function(lambda){
+PhaseMatch.BBO.prototype  = {
+    indicies:function(lambda){
         lambda = lambda * Math.pow(10,6); //Convert for Sellmeir Coefficients
         var no = Math.sqrt(2.7359 + 0.01878/ (Math.pow(lambda,2) - 0.01822) - 0.01354*Math.pow(lambda,2));
         var ne = Math.sqrt(2.3753 + 0.01224 / (Math.pow(lambda,2) - 0.01667) - 0.01516*Math.pow(lambda,2));
 
         return [no, no, ne];
-    };
+    }
 };
 
 /**
@@ -315,7 +317,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, l
         // var x = PMInt >0
         // var AP[x] = 1.
 
-        PM = PMang * AP;
+        // PM = PMang * AP;
     } else {
         // console.log  ("calculating Intensity")
         PM = Math.pow(PM[0],2) + Math.pow(PM[1],2);

@@ -38,61 +38,44 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
 
     //This is my test function that lets me calculate entanlged spectral properties
     //of the photons. dim is the dim of the matrix.
-    function calcJSA(ls_start, ls_stop, li_start,li_stop, dim){
-        var con = PhaseMatch.constants;
-        var lambda_p = 775 * con.nm;
-        var lambda_s = 1500 * con.nm;
-        var lambda_i = 1600 * con.nm;
-        var Type = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
-        var theta = 19.8371104525 *Math.PI / 180;
-        var phi = 0;
-        var theta_s = 0; // * Math.PI / 180;
-        var theta_i = 0;
-        var phi_s = 0;
-        var phi_i = 0;
-        var poling_period = 1000000;
-        var L = 20000 * con.um;
-        var W = 500 * con.um;
-        var p_bw = 1;
-        var phase = false;
-        var apodization = 1;
-        var apodization_FWHM = 1000 * con.um;
-        var xtal = new PhaseMatch.BBO();
-
-        var PM_test = PhaseMatch.phasematch_Int_Phase(xtal, Type[1], lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM );
-        console.log(PM_test)
+    function plotJSA(P,ls_start, ls_stop, li_start,li_stop, dim){
+        
+        var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
+        
+        // var PM_test = PhaseMatch.phasematch_Int_Phase(P.xtal, P.Type[1], P.lambda_p, P.p_bw, P.W, P.lambda_s,P.lambda_i,P.L,P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM );
+        // console.log(PM_test)
 
         var width = 500;
         var height = 500;
 
-        var lambda_s = new Float64Array(dim);
-        var lambda_i = new Float64Array(dim);
+        // var lambda_s = new Float64Array(dim);
+        // var lambda_i = new Float64Array(dim);
 
-        // Ugly. Create a linspace function.
-        // Calculate the parameters to loop over
-        for (var i = 0; i<dim; i++){
-            // lambda_s[i] = ls_start + (ls_stop - ls_start)/dim * i;
-            // lambda_i[i] = li_start + (li_stop - li_start)/dim * i;
-            lambda_s[i] = ls_start + (ls_stop - ls_start)/dim * i;
-            lambda_i[i] = li_stop - (li_stop - li_start)/dim * i;
-        }
-        // console.log(lambda_s)
+        // // Ugly. Create a linspace function.
+        // // Calculate the parameters to loop over
+        // for (var i = 0; i<dim; i++){
+        //     // lambda_s[i] = ls_start + (ls_stop - ls_start)/dim * i;
+        //     // lambda_i[i] = li_start + (li_stop - li_start)/dim * i;
+        //     lambda_s[i] = ls_start + (ls_stop - ls_start)/dim * i;
+        //     lambda_i[i] = li_stop - (li_stop - li_start)/dim * i;
+        // }
+        // // console.log(lambda_s)
 
-        var PM = new Float64Array(dim*dim);
-        var N = dim*dim;
+        // var PM = new Float64Array(dim*dim);
+        // var N = dim*dim;
 
-        var startTime = new Date();
-        for (var i=0; i<N; i++){
-            var index_s = i % dim;
-            var index_i = Math.floor(i / dim);
-            PM[i] = PhaseMatch.phasematch_Int_Phase(xtal, Type[1], lambda_p, p_bw, W, lambda_s[index_s],lambda_i[index_i],L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM );
-            // console.log(PM[i])
-            // console.log(lambda_s[index_s]/con.nm,lambda_i[index_i]/con.nm, PM[i])
-        }
-        var endTime = new Date();
-        var timeDiff = (endTime - startTime)/1000;
-        // console.log(PM)
-        console.log("Calcuation time = ", timeDiff)
+        // var startTime = new Date();
+        // for (var i=0; i<N; i++){
+        //     var index_s = i % dim;
+        //     var index_i = Math.floor(i / dim);
+        //     PM[i] = PhaseMatch.phasematch_Int_Phase(P.xtal, P.Type[1], P.lambda_p, P.p_bw, P.W, lambda_s[index_s], lambda_i[index_i] ,P.L,P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM );
+        //     // console.log(PM[i])
+        //     // console.log(lambda_s[index_s]/con.nm,lambda_i[index_i]/con.nm, PM[i])
+        // }
+        // var endTime = new Date();
+        // var timeDiff = (endTime - startTime)/1000;
+        // // console.log(PM)
+        // console.log("Calcuation time = ", timeDiff)
 
         var hm = new HeatMap({
             width: width,
@@ -116,7 +99,8 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var con = PhaseMatch.constants;
         var l_start = 1500 * con.nm;
         var l_stop = 1600 * con.nm; 
-        calcJSA(l_start,l_stop,l_start,l_stop, 100)
+        var P = new PhaseMatch.SPDCprop();
+        plotJSA(P,l_start,l_stop,l_start,l_stop, 100)
     });
  
 

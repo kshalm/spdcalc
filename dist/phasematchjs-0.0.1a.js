@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-04-29
+ * phasematchjs v0.0.1a - 2013-04-30
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -36,20 +36,22 @@ PhaseMatch.constants = {
  * for BBO. Eventually this will be called from the crystal database, but 
  * it is useful to have here for now.
  * @class BBO
- * @param {Array} Temp [description]
+ * @param {Array} temp [description]
  */
-PhaseMatch.BBO = function BBO (Temp) {
+PhaseMatch.BBO = function BBO (temp) {
     //Selmeir coefficients for nx, ny, nz
-    this.Temp = Temp;
+    this.temp = temp;
     // this.lambda = lambda
+};
 
-    this.indicies = function(lambda){
+PhaseMatch.BBO.prototype  = {
+    indicies:function(lambda){
         lambda = lambda * Math.pow(10,6); //Convert for Sellmeir Coefficients
         var no = Math.sqrt(2.7359 + 0.01878/ (Math.pow(lambda,2) - 0.01822) - 0.01354*Math.pow(lambda,2));
         var ne = Math.sqrt(2.3753 + 0.01224 / (Math.pow(lambda,2) - 0.01667) - 0.01516*Math.pow(lambda,2));
 
         return [no, no, ne];
-    };
+    }
 };
 
 /**
@@ -343,7 +345,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, l
         // var x = PMInt >0
         // var AP[x] = 1.
 
-        PM = PMang * AP;
+        // PM = PMang * AP;
     } else {
         // console.log  ("calculating Intensity")
         PM = Math.pow(PM[0],2) + Math.pow(PM[1],2);
@@ -352,6 +354,92 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, l
     return PM;
 };
 
+
+(function(){
+
+	var SPDCprop = function(){
+		this.init();
+
+	};
+	SPDCprop.prototype = {
+		init:function(){
+			var con = PhaseMatch.constants;
+			this.lambda_p = 775 * con.nm;
+			this.lambda_s = 1500 * con.nm;
+			this.lambda_i = 1600 * con.nm;
+			this.Type = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
+			this.theta = 19.8371104525 *Math.PI / 180;
+			this.phi = 0;
+			this.theta_s = 0; // * Math.PI / 180;
+			this.theta_i = 0;
+			this.phi_s = 0;
+			this.phi_i = 0;
+			this.poling_period = 1000000;
+			this.L = 20000 * con.um;
+			this.W = 500 * con.um;
+			this.p_bw = 1;
+			this.phase = false;
+			this.apodization = 1;
+			this.apodization_FWHM = 1000 * con.um;
+			this.xtal = new PhaseMatch.BBO();
+            // this.autocalcTheta = false;
+            // this.calc_theta= function(){
+            //     //unconstrained minimization
+            //     if this.autocalcTheta{}
+            //     return this.theta = answer
+            // }
+		}
+	};
+	PhaseMatch.SPDCprop = SPDCprop;
+})();
+
+
+
+
+PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim){
+
+    var lambda_s = new Float64Array(dim);
+    var lambda_i = new Float64Array(dim);
+
+    var i;
+    lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+    lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
+    // theta_s = PhaseMatch.linspace();
+
+    // lambda_i = 1/(1/lambda_s + 1/lambda_p)
+    // var ind = PhaseMatch.GetPMTypeIndices()
+    // theta_i = PhaseMatch.optimum_idler(ind )
+
+
+    // for (i = 0; i<dim; i++){
+    //     lambda_s[i] = ls_start + (ls_stop - ls_start)/dim * i;
+    //     lambda_i[i] = li_stop - (li_stop - li_start)/dim * i;
+    // }
+
+    var PM = new Float64Array(dim*dim);
+    var N = dim*dim;
+
+    var startTime = new Date();
+    for (i=0; i<N; i++){
+        var index_s = i % dim;
+        var index_i = Math.floor(i / dim);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P.xtal, P.Type[1], P.lambda_p, P.p_bw, P.W, lambda_s[index_s], lambda_i[index_i] ,P.L,P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM );
+    }
+    var endTime = new Date();
+    var timeDiff = (endTime - startTime)/1000;
+
+    return PM;
+
+};
+
+PhaseMatch.linspace = function(start, stop, n){
+    var diff = (stop - start)/n;
+    var A = new Float64Array(n);
+    for (var i = 0; i<n; i++){
+        A[i] = start + diff * i;
+    }
+    return A;
+};
 
 
 return PhaseMatch;
