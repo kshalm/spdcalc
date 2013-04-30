@@ -19,9 +19,9 @@ define(
             // so that the scale is cached and we don't
             // recreate it every time
             defaultColorMap = function( val ){
-                var r = scale( val )
-                    ,g = 0
-                    ,b = 255 - r
+                var r = 255 - scale( val )
+                    ,g = 255 -scale( val )/2
+                    ,b = 255 //-scale( val ) //255 - r
                     ;
 
                 return d3.rgb(r, g, b).toString();

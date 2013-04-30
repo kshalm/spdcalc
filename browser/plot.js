@@ -71,8 +71,10 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         // Ugly. Create a linspace function.
         // Calculate the parameters to loop over
         for (var i = 0; i<dim; i++){
+            // lambda_s[i] = ls_start + (ls_stop - ls_start)/dim * i;
+            // lambda_i[i] = li_start + (li_stop - li_start)/dim * i;
             lambda_s[i] = ls_start + (ls_stop - ls_start)/dim * i;
-            lambda_i[i] = li_start + (li_stop - li_start)/dim * i;
+            lambda_i[i] = li_stop - (li_stop - li_start)/dim * i;
         }
         // console.log(lambda_s)
 
@@ -114,7 +116,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var con = PhaseMatch.constants;
         var l_start = 1500 * con.nm;
         var l_stop = 1600 * con.nm; 
-        calcJSA(l_start,l_stop,l_start,l_stop, 200)
+        calcJSA(l_start,l_stop,l_start,l_stop, 100)
     });
  
 
