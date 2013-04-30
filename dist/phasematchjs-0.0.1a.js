@@ -8,15 +8,15 @@
 (function (root, factory) {
     if (typeof exports === 'object') {
         // Node.
-        module.exports = factory();
+        module.exports = factory(require('numeric'));
     } else if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(factory);
+        define(['numeric'], factory);
     } else {
         // Browser globals (root is window)
-        root.PhaseMatch = factory();
+        root.PhaseMatch = factory(root.numeric);
     }
-}(this, function() {
+}(this, function( numeric ) {
 
 'use strict';
 var PhaseMatch = {};

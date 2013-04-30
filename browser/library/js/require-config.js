@@ -14,7 +14,8 @@ require.config({
         // 3rd party libs
         'jquery': 'vendor/jquery',
         'd3': 'vendor/d3.v3',
-        'phasematch': '../../../dist/phasematchjs-0.0.1a'
+        'phasematch': '../../../dist/phasematchjs-0.0.1a',
+        'numeric': 'vendor/numeric-1.2.6'
     },
 
     map: {
