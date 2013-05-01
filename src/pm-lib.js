@@ -372,26 +372,3 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
     return PM;
 };
 
-// PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase (crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM ){
-    
-//     // PM is a complex array. First element is real part, second element is imaginary.
-//     var PM = PhaseMatch.phasematch(crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM );
-//     // var PMInt = sq(PM[0]) + sq(PM[1])
-
-//     if (phase){
-//         var PMang = Math.atan2(PM[1],PM[0]) + Math.PI;
-//         // need to figure out an elegant way to apodize the phase. Leave out for now
-//         // var x = PMInt<0.01
-//         // var AP = PMInt
-//         // var AP[x] = 0.
-//         // var x = PMInt >0
-//         // var AP[x] = 1.
-
-//         // PM = PMang * AP;
-//     } else {
-//         // console.log  ("calculating Intensity")
-//         PM = sq(PM[0]) + sq(PM[1]);
-//     }
-//     // console.log(PM)
-//     return PM;
-// };
