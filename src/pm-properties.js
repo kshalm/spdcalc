@@ -52,9 +52,10 @@
         init:function(){
             var con = PhaseMatch.constants;
             this.lambda_p = 775 * con.nm;
-            this.lambda_s = 1500 * con.nm;
-            this.lambda_i = 1600 * con.nm;
-            this.Type = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
+            this.lambda_s = 1550 * con.nm;
+            this.lambda_i = 1550 * con.nm;
+            this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
+            this.Type = this.Types[1];
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
@@ -69,7 +70,7 @@
             this.phase = false;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.xtal = new PhaseMatch.BBO();
+            this.crystal = new PhaseMatch.BBO();
             // this.autocalcTheta = false;
             // this.calc_theta= function(){
             //     //unconstrained minimization

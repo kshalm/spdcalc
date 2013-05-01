@@ -311,6 +311,51 @@ PhaseMatch.phasematch = function phasematch (crystal, Type, lambda_p, p_bw, W, l
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];
 };
 
+//@Todo: switch to this function eventually
+// PhaseMatch.phasematch = function phasematch (P){
+
+//     var lambda_p_c = 1/(1/P.lambda_s+1/P.lambda_i);
+//     var delK = PhaseMatch.calc_delK(P.crystal, P.Type, P.lambda_p_c, P.lambda_s,P.lambda_i,P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period);
+//     var arg = P.L/2*(delK[2]);
+
+//     //More advanced calculation of phasematching in the z direction. Don't need it now.
+
+//     // var l_range = linspace(0,L,apodization+1)
+//     // A = Math.exp(-sq((l_range - L/2))/2/sq(apodization_FWHM))
+
+
+//     // PMz = 0
+//     // for m in range(apodization):
+//     //  delL = Math.abs(l_range[m+1] - l_range[m])
+//     //  PMz = PMz + A[m]*1j*(Math.exp(1j*delKz*l_range[m]) - Math.exp(1j*delKz*l_range[m+1]))/delKz/(delL) #* Math.exp(1j*delKz*delL/2)
+
+//     // PMz = PMz/(apodization)#/L/delKz
+
+//     // PMz_ref = Math.sin(arg)/arg * Math.exp(-1j*arg)
+
+//     // norm = Math.max(Math.absolute(PMz_ref)) / Math.max(Math.absolute(PMz))
+//     // PMz = PMz*norm 
+
+//     // Phasematching along z dir
+//     var PMz = Math.sin(arg)/arg; //* Math.exp(1j*arg)
+//     var PMz_real =  PMz * Math.cos(arg);
+//     var PMz_imag = PMz * Math.sin(arg);
+
+//     // Phasematching along transverse directions
+//     var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
+
+//     // console.log(PMz_real, PMz_imag,delK[2])
+//     // Calculate the Pump spectrum
+//     var alpha = 1;
+//     // var alpha = calc_alpha_w(Type, crystal, lambda_p, lambda_s,lambda_i, p_bw,theta, phi, theta_s, theta_i, phi_s, phi_i)
+
+//     // var PM = alpha*PMz*PMt
+
+//     //return the real and imaginary parts of Phase matching function
+//     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];
+// };
+
+
 /*
  * phasematch()
  * Gets the index of refraction depending on phasematching type
@@ -334,13 +379,13 @@ PhaseMatch.phasematch = function phasematch (crystal, Type, lambda_p, p_bw, W, l
  * apodization = For periodically poled xtals this is the number of apodization steps
  * apodization_FWHM = Gaussian FWHM for the apodization function
  */
-PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM ){
+PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
     
     // PM is a complex array. First element is real part, second element is imaginary.
-    var PM = PhaseMatch.phasematch(crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM );
+    var PM = PhaseMatch.phasematch(P.crystal, P.Type, P.lambda_p, P.p_bw, P.W, P.lambda_s, P.lambda_i, P.L, P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM);
     // var PMInt = sq(PM[0]) + sq(PM[1])
 
-    if (phase){
+    if (P.phase){
         var PMang = Math.atan2(PM[1],PM[0]) + Math.PI;
         // need to figure out an elegant way to apodize the phase. Leave out for now
         // var x = PMInt<0.01
@@ -358,6 +403,29 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, l
     return PM;
 };
 
+// PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase (crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM ){
+    
+//     // PM is a complex array. First element is real part, second element is imaginary.
+//     var PM = PhaseMatch.phasematch(crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM );
+//     // var PMInt = sq(PM[0]) + sq(PM[1])
+
+//     if (phase){
+//         var PMang = Math.atan2(PM[1],PM[0]) + Math.PI;
+//         // need to figure out an elegant way to apodize the phase. Leave out for now
+//         // var x = PMInt<0.01
+//         // var AP = PMInt
+//         // var AP[x] = 0.
+//         // var x = PMInt >0
+//         // var AP[x] = 1.
+
+//         // PM = PMang * AP;
+//     } else {
+//         // console.log  ("calculating Intensity")
+//         PM = sq(PM[0]) + sq(PM[1]);
+//     }
+//     // console.log(PM)
+//     return PM;
+// };
 
 (function(){
 
@@ -409,9 +477,10 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, l
         init:function(){
             var con = PhaseMatch.constants;
             this.lambda_p = 775 * con.nm;
-            this.lambda_s = 1500 * con.nm;
-            this.lambda_i = 1600 * con.nm;
-            this.Type = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
+            this.lambda_s = 1550 * con.nm;
+            this.lambda_i = 1550 * con.nm;
+            this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
+            this.Type = this.Types[1];
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
@@ -426,7 +495,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, l
             this.phase = false;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.xtal = new PhaseMatch.BBO();
+            this.crystal = new PhaseMatch.BBO();
             // this.autocalcTheta = false;
             // this.calc_theta= function(){
             //     //unconstrained minimization
@@ -462,17 +531,6 @@ PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim
     var i;
     lambda_s = numeric.linspace(ls_start, ls_stop, dim);
     lambda_i = numeric.linspace(li_stop, li_start, dim); 
-    // theta_s = PhaseMatch.linspace();
-
-    // lambda_i = 1/(1/lambda_s + 1/lambda_p)
-    // var ind = PhaseMatch.GetPMTypeIndices()
-    // theta_i = PhaseMatch.optimum_idler(ind )
-
-
-    // for (i = 0; i<dim; i++){
-    //     lambda_s[i] = ls_start + (ls_stop - ls_start)/dim * i;
-    //     lambda_i[i] = li_stop - (li_stop - li_start)/dim * i;
-    // }
 
     var PM = new Float64Array(dim*dim);
     var N = dim*dim;
@@ -481,11 +539,15 @@ PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim
     for (i=0; i<N; i++){
         var index_s = i % dim;
         var index_i = Math.floor(i / dim);
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P.xtal, P.Type[1], P.lambda_p, P.p_bw, P.W, lambda_s[index_s], lambda_i[index_i] ,P.L,P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM );
+        P.lambda_s = lambda_s[index_s];
+        P.lambda_i = lambda_i[index_i];
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
     }
     var endTime = new Date();
     var timeDiff = (endTime - startTime)/1000;
-
+    // $(function(){
+    //         $('#viewport').append('<p>Calculation time =  '+timeDiff+'</p>');
+    //     });
     return PM;
 
 };
