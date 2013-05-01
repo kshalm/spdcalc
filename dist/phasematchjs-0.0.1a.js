@@ -21,7 +21,7 @@
 'use strict';
 var PhaseMatch = { util: {} };
 
-(function(window,PhaseMatch,undefined){
+(function(){
 
   /** Used as a safe reference for `undefined` in pre ES5 environments */
   var undefined;
@@ -1344,7 +1344,7 @@ var PhaseMatch = { util: {} };
 
   /*--------------------------------------------------------------------------*/
 
-;lodash.extend(PhaseMatch.util, lodash);}(this,PhaseMatch));
+;lodash.extend(PhaseMatch.util, lodash);}());
 var nm = Math.pow(10, -9);
 var um = Math.pow(10, -6);
 var lightspeed =  2.99792458 * Math.pow(10, 8);

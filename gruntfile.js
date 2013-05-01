@@ -64,7 +64,7 @@ module.exports = function(grunt) {
             // More information can be found in the [Lo-Dash custom builds section](http://lodash.com/#custom-builds)
             // category: ['collections', 'functions']
             exports: ['none'],
-            iife: '(function(window,PhaseMatch,undefined){%output%;lodash.extend(PhaseMatch.util, lodash);}(this,PhaseMatch));',
+            iife: '(function(){%output%;lodash.extend(PhaseMatch.util, lodash);}());',
             include: ['extend', 'bind']
             // minus: ['result', 'shuffle']
             // plus: ['random', 'template'],

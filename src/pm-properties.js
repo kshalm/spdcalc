@@ -4,8 +4,8 @@
 
 (function(){
 
-	var SPDCprop = function( nameOrConfig ){
-		this.init( nameOrConfig );
+	var SPDCprop = function(){
+		this.init();
 	};
 
 	SPDCprop.prototype = {
