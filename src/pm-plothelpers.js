@@ -2,7 +2,7 @@
  * Constants accessible to PhaseMatch internally
  */
 
-PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim){
+PhaseMatch.calcJSA = function calcJSA(P, ls_start, ls_stop, li_start, li_stop, dim){
 
     var lambda_s = new Float64Array(dim);
     var lambda_i = new Float64Array(dim);
@@ -22,14 +22,33 @@ PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim
     //     lambda_i[i] = li_stop - (li_stop - li_start)/dim * i;
     // }
 
-    var PM = new Float64Array(dim*dim);
-    var N = dim*dim;
-
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+    
     var startTime = new Date();
     for (i=0; i<N; i++){
         var index_s = i % dim;
         var index_i = Math.floor(i / dim);
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P.xtal, P.Type[1], P.lambda_p, P.p_bw, P.W, lambda_s[index_s], lambda_i[index_i] ,P.L,P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM );
+        PM[i] = PhaseMatch.phasematch_Int_Phase(
+            P.xtal, 
+            P.Type[1], 
+            P.lambda_p, 
+            P.p_bw, 
+            P.W,
+            lambda_s[index_s],
+            lambda_i[index_i],
+            P.L,
+            P.theta,
+            P.phi,
+            P.theta_s,
+            P.theta_i,
+            P.phi_s,
+            P.phi_i,
+            P.poling_period,
+            P.phase,
+            P.apodization,
+            P.apodization_FWHM
+        );
     }
     var endTime = new Date();
     var timeDiff = (endTime - startTime)/1000;
