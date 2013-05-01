@@ -47,6 +47,25 @@ PhaseMatch.GetIndices = function GetIndices (crystal, lambda, theta, phi, theta_
     var ny = ind[1];
     var nz = ind[2];
 
+    ///@Todo: remove this code. It will be moved to PM Properties
+    var S_x = Math.sin(theta_s)*Math.cos(phi_s);
+    var S_y = Math.sin(theta_s)*Math.sin(phi_s);
+    var S_z = Math.cos(theta_s);
+
+    // Transform from the lambda_p coordinates to crystal coordinates
+    var SR_x = Math.cos(theta)*Math.cos(phi)*S_x - Math.sin(phi)*S_y + Math.sin(theta)*Math.cos(phi)*S_z;
+    var SR_y = Math.cos(theta)*Math.sin(phi)*S_x + Math.cos(phi)*S_y + Math.sin(theta)*Math.sin(phi)*S_z;
+    var SR_z = -Math.sin(theta)*S_x  + Math.cos(theta)*S_z;
+    
+    // Normalambda_ize the unit vector
+    // FIX ME: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
+    // case I think the correct behaviour is for Norm = 1 ?
+    var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
+    var Sx = SR_x/(Norm);
+    var Sy = SR_y/(Norm);
+    var Sz = SR_z/(Norm);
+    ////////////////////
+
     var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
     var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
     var D = sq(B) - 4 * C;

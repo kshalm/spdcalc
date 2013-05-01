@@ -8,8 +8,8 @@ PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim
     var lambda_i = new Float64Array(dim);
 
     var i;
-    lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
-    lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
+    lambda_s = numeric.linspace(ls_start, ls_stop, dim);
+    lambda_i = numeric.linspace(li_stop, li_start, dim); 
     // theta_s = PhaseMatch.linspace();
 
     // lambda_i = 1/(1/lambda_s + 1/lambda_p)

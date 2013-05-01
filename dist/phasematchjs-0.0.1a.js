@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-04-30
+ * phasematchjs v0.0.1a - 2013-05-01
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -71,7 +71,14 @@ PhaseMatch.BBO.prototype  = {
  * phi_s = azimuthal angle of photon wrt to lambda_p direction
  */
 PhaseMatch.GetIndices = function GetIndices (crystal, lambda, theta, phi, theta_s, phi_s) {
-    // First get the ransfomration to lambda_p coordinates
+    // Get the crystal index of refraction
+    var ind = crystal.indicies(lambda);
+
+    var nx = ind[0];
+    var ny = ind[1];
+    var nz = ind[2];
+
+    ///@Todo: remove this code. It will be moved to PM Properties
     var S_x = Math.sin(theta_s)*Math.cos(phi_s);
     var S_y = Math.sin(theta_s)*Math.sin(phi_s);
     var S_z = Math.cos(theta_s);
@@ -88,13 +95,7 @@ PhaseMatch.GetIndices = function GetIndices (crystal, lambda, theta, phi, theta_
     var Sx = SR_x/(Norm);
     var Sy = SR_y/(Norm);
     var Sz = SR_z/(Norm);
-
-    // Get the crystal index of refraction
-    var ind = crystal.indicies(lambda);
-
-    var nx = ind[0];
-    var ny = ind[1];
-    var nz = ind[2];
+    ////////////////////
 
     var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
     var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
@@ -360,43 +361,97 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(crystal, Type, l
 
 (function(){
 
-	var SPDCprop = function(){
-		this.init();
+    /**
+     * Rotation object
+     */
+    var Rotation = function(){
 
-	};
-	SPDCprop.prototype = {
-		init:function(){
-			var con = PhaseMatch.constants;
-			this.lambda_p = 775 * con.nm;
-			this.lambda_s = 1500 * con.nm;
-			this.lambda_i = 1600 * con.nm;
-			this.Type = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
-			this.theta = 19.8371104525 *Math.PI / 180;
-			this.phi = 0;
-			this.theta_s = 0; // * Math.PI / 180;
-			this.theta_i = 0;
-			this.phi_s = 0;
-			this.phi_i = 0;
-			this.poling_period = 1000000;
-			this.L = 20000 * con.um;
-			this.W = 500 * con.um;
-			this.p_bw = 1;
-			this.phase = false;
-			this.apodization = 1;
-			this.apodization_FWHM = 1000 * con.um;
-			this.xtal = new PhaseMatch.BBO();
+        this.Sx = 0;
+        this.Sy = 0;
+        this.Sz = 0;
+    };
+
+    Rotation.prototype = {
+
+        set: function( theta, phi, theta_s, phi_s ){
+
+            // First get the ransfomration to lambda_p coordinates
+            var S_x = Math.sin(theta_s)*Math.cos(phi_s);
+            var S_y = Math.sin(theta_s)*Math.sin(phi_s);
+            var S_z = Math.cos(theta_s);
+
+            // Transform from the lambda_p coordinates to crystal coordinates
+            var SR_x = Math.cos(theta)*Math.cos(phi)*S_x - Math.sin(phi)*S_y + Math.sin(theta)*Math.cos(phi)*S_z;
+            var SR_y = Math.cos(theta)*Math.sin(phi)*S_x + Math.cos(phi)*S_y + Math.sin(theta)*Math.sin(phi)*S_z;
+            var SR_z = -Math.sin(theta)*S_x  + Math.cos(theta)*S_z;
+            
+            // Normalambda_ize the unit vector
+            // FIX ME: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
+            // case I think the correct behaviour is for Norm = 1 ?
+            var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
+            this.Sx = SR_x/(Norm);
+            this.Sy = SR_y/(Norm);
+            this.Sz = SR_z/(Norm);
+        }
+    };
+
+    PhaseMatch.Rotation = Rotation;
+
+    /**
+     * SPDCprop
+     */
+    var SPDCprop = function(){
+        this.init();
+
+    };
+
+    SPDCprop.prototype = {
+        init:function(){
+            var con = PhaseMatch.constants;
+            this.lambda_p = 775 * con.nm;
+            this.lambda_s = 1500 * con.nm;
+            this.lambda_i = 1600 * con.nm;
+            this.Type = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
+            this.theta = 19.8371104525 *Math.PI / 180;
+            // this.theta = 19.2371104525 *Math.PI / 180;
+            this.phi = 0;
+            this.theta_s = 0; // * Math.PI / 180;
+            this.theta_i = 0;
+            this.phi_s = 0;
+            this.phi_i = 0;
+            this.poling_period = 1000000;
+            this.L = 20000 * con.um;
+            this.W = 500 * con.um;
+            this.p_bw = 1;
+            this.phase = false;
+            this.apodization = 1;
+            this.apodization_FWHM = 1000 * con.um;
+            this.xtal = new PhaseMatch.BBO();
             // this.autocalcTheta = false;
             // this.calc_theta= function(){
             //     //unconstrained minimization
             //     if this.autocalcTheta{}
             //     return this.theta = answer
             // }
-		}
-	};
-	PhaseMatch.SPDCprop = SPDCprop;
+        },
+
+        set: function( name, val ){
+
+
+            switch ( name ){
+
+                case 'lambda_p':
+
+                    // this.updateSomethng();
+                break;
+            }
+
+            this[ name ] = val;
+        }
+    };
+
+    PhaseMatch.SPDCprop = SPDCprop;
 })();
-
-
 
 
 PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim){
@@ -405,8 +460,8 @@ PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim
     var lambda_i = new Float64Array(dim);
 
     var i;
-    lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
-    lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
+    lambda_s = numeric.linspace(ls_start, ls_stop, dim);
+    lambda_i = numeric.linspace(li_stop, li_start, dim); 
     // theta_s = PhaseMatch.linspace();
 
     // lambda_i = 1/(1/lambda_s + 1/lambda_p)
