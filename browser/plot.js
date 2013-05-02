@@ -9,7 +9,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
         var endTime = new Date();
         var timeDiff = (endTime - startTime)/1000;
-        console.log("Plot time = ", timeDiff)
+        console.log("Calc time = ", timeDiff)
         $(function(){
         
             $('#viewport').append('<p>Calculation time: '+timeDiff+'  Pump index = ' + P.n_p+', ' + P.n_s +'</p>');
@@ -23,8 +23,11 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
             height: height
         });
 
+        var startTime = new Date();
         hm.plotData( PM );
-        
+        var endTime = new Date();
+        var timeDiff = (endTime - startTime)/1000;
+        console.log("Plot time = ", timeDiff)
     }
 
     $(function(){
@@ -34,7 +37,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var l_start = 1500 * con.nm;
         var l_stop = 1600 * con.nm; 
         var P = new PhaseMatch.SPDCprop();
-        plotJSA(P,l_start,l_stop,l_start,l_stop, 600)
+        plotJSA(P,l_start,l_stop,l_start,l_stop, 2000)
     });
  
 

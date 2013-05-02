@@ -63,7 +63,6 @@ PhaseMatch.BBO.prototype  = {
  * Gets the index of refraction depending on phasematching type
  * All angles in radians.
  * P is SPDC Properties object
- * to be calculated.
  */
 
  PhaseMatch.calc_delK = function calc_delK (P){
@@ -164,7 +163,6 @@ PhaseMatch.phasematch = function phasematch (P){
     // Phasematching along transverse directions
     var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
 
-    // console.log(PMz_real, PMz_imag,delK[2])
     // Calculate the Pump spectrum
     var alpha = 1;
     // var alpha = calc_alpha_w(Type, crystal, lambda_p, lambda_s,lambda_i, p_bw,theta, phi, theta_s, theta_i, phi_s, phi_i)
@@ -276,87 +274,6 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.crystal = new PhaseMatch.BBO();
-            // this.autocalcTheta = false;
-            // this.calc_theta= function(){
-            //     //unconstrained minimization
-            //     if this.autocalcTheta{}
-            //     return this.theta = answer
-            // }
-            this.calc_Coordinate_Transform = function (theta, phi, theta_s, phi_s){
-                //Should save some calculation time by defining these variables.
-                var SIN_THETA = Math.sin(theta);
-                var COS_THETA = Math.cos(theta);
-                var SIN_THETA_S = Math.sin(theta_s);
-                var COS_THETA_S = Math.cos(theta_s);
-                var SIN_PHI = Math.sin(phi);
-                var COS_PHI = Math.cos(phi);
-                var SIN_PHI_S = Math.sin(phi_s);
-                var COS_PHI_S = Math.cos(phi_s);
-
-
-                var S_x = SIN_THETA_S*COS_PHI_S;
-                var S_y = SIN_THETA_S*SIN_PHI_S;
-                var S_z = COS_THETA_S;
-
-                // Transform from the lambda_p coordinates to crystal coordinates
-                var SR_x = COS_THETA*COS_PHI*S_x - SIN_PHI*S_y + SIN_THETA*COS_PHI*S_z;
-                var SR_y = COS_THETA*SIN_PHI*S_x + COS_PHI*S_y + SIN_THETA*SIN_PHI*S_z;
-                var SR_z = -SIN_THETA*S_x  + COS_THETA*S_z;
-                
-                // Normalambda_ize the unit vector
-                // @TODO: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
-                // case I think the correct behaviour is for Norm = 1 ?
-                var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
-                var Sx = SR_x/(Norm);
-                var Sy = SR_y/(Norm);
-                var Sz = SR_z/(Norm);
-
-                return [Sx, Sy, Sz];
-            };
-
-            this.calc_Index_PMType = function calc_Index_PMType(lambda, Type, S, photon){
-                var ind = this.crystal.indicies(lambda);
-
-                var nx = ind[0];
-                var ny = ind[1];
-                var nz = ind[2];
-
-                var Sx = S[0];
-                var Sy = S[1];
-                var Sz = S[2];
-
-                var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
-                var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
-                var D = sq(B) - 4 * C;
-
-                var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
-                var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
-                //nfast = o, nslow = e
-
-                var n = 1;
-
-                switch (Type){
-
-                    case "e -> o + o":
-                        if (photon === "pump") { n = nslow;}
-                        else { n = nfast;}
-                    break;
-                    case "e -> e + o":
-                        if (photon === "idler") { n = nfast;}
-                        else {n = nslow;}
-                    break;
-                    case "e -> o + e":
-                        if (photon === "signal") { n = nfast;}
-                        else {n = nslow;}
-                    break;
-                    default:
-                        throw "Error: bad PMType specified";
-                }
-
-                return n ;
-            };
-
-
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
             this.S_s = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_s, this.phi_s);
@@ -365,8 +282,87 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
             this.n_p = this.calc_Index_PMType(this.lambda_p, this.Type, this.S_p, "pump");
             this.n_s = this.calc_Index_PMType(this.lambda_s, this.Type, this.S_s, "signal");
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
-
         },
+            // this.autocalcTheta = false;
+            // this.calc_theta= function(){
+            //     //unconstrained minimization
+            //     if this.autocalcTheta{}
+            //     return this.theta = answer
+            // }
+        calc_Coordinate_Transform : function (theta, phi, theta_s, phi_s){
+            //Should save some calculation time by defining these variables.
+            var SIN_THETA = Math.sin(theta);
+            var COS_THETA = Math.cos(theta);
+            var SIN_THETA_S = Math.sin(theta_s);
+            var COS_THETA_S = Math.cos(theta_s);
+            var SIN_PHI = Math.sin(phi);
+            var COS_PHI = Math.cos(phi);
+            var SIN_PHI_S = Math.sin(phi_s);
+            var COS_PHI_S = Math.cos(phi_s);
+
+
+            var S_x = SIN_THETA_S*COS_PHI_S;
+            var S_y = SIN_THETA_S*SIN_PHI_S;
+            var S_z = COS_THETA_S;
+
+            // Transform from the lambda_p coordinates to crystal coordinates
+            var SR_x = COS_THETA*COS_PHI*S_x - SIN_PHI*S_y + SIN_THETA*COS_PHI*S_z;
+            var SR_y = COS_THETA*SIN_PHI*S_x + COS_PHI*S_y + SIN_THETA*SIN_PHI*S_z;
+            var SR_z = -SIN_THETA*S_x  + COS_THETA*S_z;
+            
+            // Normalambda_ize the unit vector
+            // @TODO: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
+            // case I think the correct behaviour is for Norm = 1 ?
+            var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
+            var Sx = SR_x/(Norm);
+            var Sy = SR_y/(Norm);
+            var Sz = SR_z/(Norm);
+
+            return [Sx, Sy, Sz];
+        },
+
+        calc_Index_PMType : function (lambda, Type, S, photon){
+            var ind = this.crystal.indicies(lambda);
+
+            var nx = ind[0];
+            var ny = ind[1];
+            var nz = ind[2];
+
+            var Sx = S[0];
+            var Sy = S[1];
+            var Sz = S[2];
+
+            var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
+            var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
+            var D = sq(B) - 4 * C;
+
+            var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
+            var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
+            //nfast = o, nslow = e
+
+            var n = 1;
+
+            switch (Type){
+
+                case "e -> o + o":
+                    if (photon === "pump") { n = nslow;}
+                    else { n = nfast;}
+                break;
+                case "e -> e + o":
+                    if (photon === "idler") { n = nfast;}
+                    else {n = nslow;}
+                break;
+                case "e -> o + e":
+                    if (photon === "signal") { n = nfast;}
+                    else {n = nslow;}
+                break;
+                default:
+                    throw "Error: bad PMType specified";
+            }
+
+            return n ;
+        },
+
 
         set: function( name, val ){
 
@@ -403,8 +399,10 @@ PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim
     for (i=0; i<N; i++){
         var index_s = i % dim;
         var index_i = Math.floor(i / dim);
+
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
+        
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
         
