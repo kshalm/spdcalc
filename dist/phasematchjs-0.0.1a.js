@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-01
+ * phasematchjs v0.0.1a - 2013-05-02
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -111,18 +111,6 @@ PhaseMatch.GetIndices = function GetIndices (crystal, lambda, theta, phi, theta_
 /**
  * GetPMTypeIndices()
  * Gets the index of refraction depending on phasematching type
- * All angles in radians.
- * crystal = crystal object
- * Type = String containg phasematching type
- * lambda_p = pump wavelength
- * lambda_s = signal wavelength
- * lambda_i = idler wavelength
- * theta = angle of lambda_p wrt to crystal axis
- * phi = azimuthal angle of lambda_p wrt to crystal axis
- * theta_s = angle of signal wrt to lambda_p direction
- * phi_s = azimuthal angle of signal wrt to lambda_p direction
- * theta_i = angle of idler wrt to lambda_p direction
- * phi_i = azimuthal angle of idler wrt to lambda_p direction
  */
 
 PhaseMatch.GetPMTypeIndices = function GetPMTypeIndices(P){
@@ -175,8 +163,7 @@ PhaseMatch.spdc_to_pump_coordinates = function spdc_to_pump_coordinates(theta,ph
  * calc_delK()
  * Gets the index of refraction depending on phasematching type
  * All angles in radians.
- * P = Properties
- * lambda_p = pump wavelength. This is passed in to allow the crystal phasematching properties
+ * P is SPDC Properties object
  * to be calculated.
  */
 
@@ -186,6 +173,10 @@ PhaseMatch.spdc_to_pump_coordinates = function spdc_to_pump_coordinates(theta,ph
     var n_s = ind[0];
     var n_i = ind[1];
     var n_p = ind[2];
+    // var n_p = P.n_p;
+    // var n_s = P.n_s;
+    // var n_i = P.n_i;
+
     // Directions of the signal and idler photons in the lambda_p coordinates
     // This is throwing an error. Can't seem to reference this global function. Weird.
     // var Ss = spdc_to_lambda_p_coordinates(theta_s,P.phi_s)
@@ -201,27 +192,6 @@ PhaseMatch.spdc_to_pump_coordinates = function spdc_to_pump_coordinates(theta,ph
 
     return [delKx, delKy, delKz];
 };
-// PhaseMatch.calc_delK = function calc_delK (crystal, Type, lambda_p, lambda_s,lambda_i,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period){
-
-//     var ind = PhaseMatch.GetPMTypeIndices(crystal, Type, lambda_p, lambda_s, lambda_i, theta, phi, theta_s, theta_i, phi_s, phi_i);
-//     var n_s = ind[0];
-//     var n_i = ind[1];
-//     var n_p = ind[2];
-//     // Directions of the signal and idler photons in the lambda_p coordinates
-//     // This is throwing an error. Can't seem to reference this global function. Weird.
-//     // var Ss = spdc_to_lambda_p_coordinates(theta_s,phi_s)
-//     // var Si = spdc_to_lambda_p_coordinates(theta_i,phi_i)
-//     var Ss = [Math.sin(theta_s)*Math.cos(phi_s), Math.sin(theta_s)*Math.sin(phi_s), Math.cos(theta_s)];
-//     var Si = [Math.sin(theta_i)*Math.cos(phi_i), Math.sin(theta_i)*Math.sin(phi_i), Math.cos(theta_i)];
-//     // console.log("SS, SI", Ss, Si)
-
-//     var delKx = (2*Math.PI*(n_s*Ss[0]/lambda_s + n_i*Si[0]/lambda_i));
-//     var delKy = (2*Math.PI*(n_s*Ss[1]/lambda_s + n_i*Si[1]/lambda_i));
-//     var delKz = (2*Math.PI*(n_p/lambda_p - n_s*Ss[2]/lambda_s - n_i*Si[2]/lambda_i));
-//     delKz = delKz -2*Math.PI/poling_period;
-
-//     return [delKx, delKy, delKz];
-// };
 
 /*
  * optimum_idler()
@@ -255,37 +225,24 @@ PhaseMatch.optimum_idler = function optimum_idler(crystal, Type,  lambda_p, lamb
     var arg2 = n_s*Math.sin(theta_s)/arg;
 
     var theta_i = Math.asin(arg2);
-    // console.log(theta_i*180/Math.PI);
     return theta_i;
 };
 
 /*
  * phasematch()
  * Gets the index of refraction depending on phasematching type
- * All angles in radians.
- * crystal = crystal object
- * Type = String containg phasematching type
- * lambda_p = pump wavelength
- * p_bw = Pump bandwidth
- * W = pump waist
- * lambda_s = signal wavelength
- * lambda_i = idler wavelength
- * L = crystal Length
- * theta = angle of lambda_p wrt to crystal axis
- * phi = azimuthal angle of lambda_p wrt to crystal axis
- * theta_s = angle of signal wrt to lambda_p direction
- * phi_s = azimuthal angle of signal wrt to lambda_p direction
- * theta_i = angle of idler wrt to lambda_p direction
- * phi_i = azimuthal angle of idler wrt to lambda_p direction
- * poling_period = Poling period of the crystal
- * apodization = For periodically poled xtals this is the number of apodization steps
- * apodization_FWHM = Gaussian FWHM for the apodization function
+ * P is SPDC Properties object
  */
-PhaseMatch.phasematch = function phasematch (P, crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM ){
+PhaseMatch.phasematch = function phasematch (P){
     var lambda_p = P.lambda_p; //store the original lambda_p
+    var n_p = P.n_p;
     P.lambda_p = 1/(1/P.lambda_s+1/P.lambda_i);
+    P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
+
     var delK = PhaseMatch.calc_delK(P);
-    P.lambda_p = lambda_p; //set back to the original lambda_p
+    
+    // P.lambda_p = lambda_p_tmp; //set back to the original lambda_p
+    // P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
     var arg = P.L/2*(delK[2]);
 
     //More advanced calculation of phasematching in the z direction. Don't need it now.
@@ -325,73 +282,10 @@ PhaseMatch.phasematch = function phasematch (P, crystal, Type, lambda_p, p_bw, W
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];
 };
 
-//@Todo: switch to this function eventually
-// PhaseMatch.phasematch = function phasematch (P){
-
-//     var lambda_p_c = 1/(1/P.lambda_s+1/P.lambda_i);
-//     var delK = PhaseMatch.calc_delK(P.crystal, P.Type, P.lambda_p_c, P.lambda_s,P.lambda_i,P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period);
-//     var arg = P.L/2*(delK[2]);
-
-//     //More advanced calculation of phasematching in the z direction. Don't need it now.
-
-//     // var l_range = linspace(0,L,apodization+1)
-//     // A = Math.exp(-sq((l_range - L/2))/2/sq(apodization_FWHM))
-
-
-//     // PMz = 0
-//     // for m in range(apodization):
-//     //  delL = Math.abs(l_range[m+1] - l_range[m])
-//     //  PMz = PMz + A[m]*1j*(Math.exp(1j*delKz*l_range[m]) - Math.exp(1j*delKz*l_range[m+1]))/delKz/(delL) #* Math.exp(1j*delKz*delL/2)
-
-//     // PMz = PMz/(apodization)#/L/delKz
-
-//     // PMz_ref = Math.sin(arg)/arg * Math.exp(-1j*arg)
-
-//     // norm = Math.max(Math.absolute(PMz_ref)) / Math.max(Math.absolute(PMz))
-//     // PMz = PMz*norm 
-
-//     // Phasematching along z dir
-//     var PMz = Math.sin(arg)/arg; //* Math.exp(1j*arg)
-//     var PMz_real =  PMz * Math.cos(arg);
-//     var PMz_imag = PMz * Math.sin(arg);
-
-//     // Phasematching along transverse directions
-//     var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
-
-//     // console.log(PMz_real, PMz_imag,delK[2])
-//     // Calculate the Pump spectrum
-//     var alpha = 1;
-//     // var alpha = calc_alpha_w(Type, crystal, lambda_p, lambda_s,lambda_i, p_bw,theta, phi, theta_s, theta_i, phi_s, phi_i)
-
-//     // var PM = alpha*PMz*PMt
-
-//     //return the real and imaginary parts of Phase matching function
-//     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];
-// };
-
-
 /*
  * phasematch()
  * Gets the index of refraction depending on phasematching type
- * All angles in radians.
- * crystal = crystal object
- * Type = String containg phasematching type
- * lambda_p = pump wavelength
- * p_bw = Pump bandwidth
- * W = pump waist
- * lambda_s = signal wavelength
- * lambda_i = idler wavelength
- * L = crystal Length
- * theta = angle of lambda_p wrt to crystal axis
- * phi = azimuthal angle of lambda_p wrt to crystal axis
- * theta_s = angle of signal wrt to lambda_p direction
- * phi_s = azimuthal angle of signal wrt to lambda_p direction
- * theta_i = angle of idler wrt to lambda_p direction
- * phi_i = azimuthal angle of idler wrt to lambda_p direction
- * poling_period = Poling period of the crystal
- * phase = Bool. True means the phase is calculated 
- * apodization = For periodically poled xtals this is the number of apodization steps
- * apodization_FWHM = Gaussian FWHM for the apodization function
+ * P is SPDC Properties object
  */
 PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
     
@@ -422,41 +316,41 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
 
 (function(){
 
-    /**
-     * Rotation object
-     */
-    var Rotation = function(){
+    // /**
+    //  * Rotation object
+    //  */
+    // var Rotation = function(){
 
-        this.Sx = 0;
-        this.Sy = 0;
-        this.Sz = 0;
-    };
+    //     this.Sx = 0;
+    //     this.Sy = 0;
+    //     this.Sz = 0;
+    // };
 
-    Rotation.prototype = {
+    // Rotation.prototype = {
 
-        set: function( theta, phi, theta_s, phi_s ){
+    //     set: function( theta, phi, theta_s, phi_s ){
 
-            // First get the ransfomration to lambda_p coordinates
-            var S_x = Math.sin(theta_s)*Math.cos(phi_s);
-            var S_y = Math.sin(theta_s)*Math.sin(phi_s);
-            var S_z = Math.cos(theta_s);
+    //         // First get the ransfomration to lambda_p coordinates
+    //         var S_x = Math.sin(theta_s)*Math.cos(phi_s);
+    //         var S_y = Math.sin(theta_s)*Math.sin(phi_s);
+    //         var S_z = Math.cos(theta_s);
 
-            // Transform from the lambda_p coordinates to crystal coordinates
-            var SR_x = Math.cos(theta)*Math.cos(phi)*S_x - Math.sin(phi)*S_y + Math.sin(theta)*Math.cos(phi)*S_z;
-            var SR_y = Math.cos(theta)*Math.sin(phi)*S_x + Math.cos(phi)*S_y + Math.sin(theta)*Math.sin(phi)*S_z;
-            var SR_z = -Math.sin(theta)*S_x  + Math.cos(theta)*S_z;
+    //         // Transform from the lambda_p coordinates to crystal coordinates
+    //         var SR_x = Math.cos(theta)*Math.cos(phi)*S_x - Math.sin(phi)*S_y + Math.sin(theta)*Math.cos(phi)*S_z;
+    //         var SR_y = Math.cos(theta)*Math.sin(phi)*S_x + Math.cos(phi)*S_y + Math.sin(theta)*Math.sin(phi)*S_z;
+    //         var SR_z = -Math.sin(theta)*S_x  + Math.cos(theta)*S_z;
             
-            // Normalambda_ize the unit vector
-            // FIX ME: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
-            // case I think the correct behaviour is for Norm = 1 ?
-            var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
-            this.Sx = SR_x/(Norm);
-            this.Sy = SR_y/(Norm);
-            this.Sz = SR_z/(Norm);
-        }
-    };
+    //         // Normalambda_ize the unit vector
+    //         // FIX ME: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
+    //         // case I think the correct behaviour is for Norm = 1 ?
+    //         var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
+    //         this.Sx = SR_x/(Norm);
+    //         this.Sy = SR_y/(Norm);
+    //         this.Sz = SR_z/(Norm);
+    //     }
+    // };
 
-    PhaseMatch.Rotation = Rotation;
+    // PhaseMatch.Rotation = Rotation;
 
     /**
      * SPDCprop
@@ -495,6 +389,90 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
             //     if this.autocalcTheta{}
             //     return this.theta = answer
             // }
+            this.calc_Coordinate_Transform = function (theta, phi, theta_s, phi_s){
+                //Should save some calculation time by defining these variables.
+                var SIN_THETA = Math.sin(theta);
+                var COS_THETA = Math.cos(theta);
+                var SIN_THETA_S = Math.sin(theta_s);
+                var COS_THETA_S = Math.cos(theta_s);
+                var SIN_PHI = Math.sin(phi);
+                var COS_PHI = Math.cos(phi);
+                var SIN_PHI_S = Math.sin(phi_s);
+                var COS_PHI_S = Math.cos(phi_s);
+
+
+                var S_x = SIN_THETA_S*COS_PHI_S;
+                var S_y = SIN_THETA_S*SIN_PHI_S;
+                var S_z = COS_THETA_S;
+
+                // Transform from the lambda_p coordinates to crystal coordinates
+                var SR_x = COS_THETA*COS_PHI*S_x - SIN_PHI*S_y + SIN_THETA*COS_PHI*S_z;
+                var SR_y = COS_THETA*SIN_PHI*S_x + COS_PHI*S_y + SIN_THETA*SIN_PHI*S_z;
+                var SR_z = -SIN_THETA*S_x  + COS_THETA*S_z;
+                
+                // Normalambda_ize the unit vector
+                // @TODO: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
+                // case I think the correct behaviour is for Norm = 1 ?
+                var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
+                var Sx = SR_x/(Norm);
+                var Sy = SR_y/(Norm);
+                var Sz = SR_z/(Norm);
+
+                return [Sx, Sy, Sz];
+            };
+
+            this.calc_Index_PMType = function calc_Index_PMType(lambda, Type, S, photon){
+                var ind = this.crystal.indicies(lambda);
+
+                var nx = ind[0];
+                var ny = ind[1];
+                var nz = ind[2];
+
+                var Sx = S[0];
+                var Sy = S[1];
+                var Sz = S[2];
+
+                var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
+                var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
+                var D = sq(B) - 4 * C;
+
+                var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
+                var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
+                //nfast = o, nslow = e
+
+                var n = 1;
+
+                switch (Type){
+
+                    case "e -> o + o":
+                        if (photon === "pump") { n = nslow;}
+                        else { n = nfast;}
+                    break;
+                    case "e -> e + o":
+                        if (photon === "idler") { n = nfast;}
+                        else {n = nslow;}
+                    break;
+                    case "e -> o + e":
+                        if (photon === "signal") { n = nfast;}
+                        else {n = nslow;}
+                    break;
+                    default:
+                        throw "Error: bad PMType specified";
+                }
+
+                return n ;
+            };
+
+
+            //Other functions that do not need to be included in the default init
+            this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
+            this.S_s = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_s, this.phi_s);
+            this.S_i = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_i, this.phi_i);
+
+            this.n_p = this.calc_Index_PMType(this.lambda_p, this.Type, this.S_p, "pump");
+            this.n_s = this.calc_Index_PMType(this.lambda_s, this.Type, this.S_s, "signal");
+            this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
+
         },
 
         set: function( name, val ){
@@ -534,6 +512,8 @@ PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim
         var index_i = Math.floor(i / dim);
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
     }
     var endTime = new Date();
@@ -545,14 +525,6 @@ PhaseMatch.calcJSA = function calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim
 
 };
 
-PhaseMatch.linspace = function(start, stop, n){
-    var diff = (stop - start)/n;
-    var A = new Float64Array(n);
-    for (var i = 0; i<n; i++){
-        A[i] = start + diff * i;
-    }
-    return A;
-};
 
 
 return PhaseMatch;

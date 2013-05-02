@@ -12,7 +12,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         console.log("Plot time = ", timeDiff)
         $(function(){
         
-            $('#viewport').append('<p>Calculation time: '+timeDiff+'</p>');
+            $('#viewport').append('<p>Calculation time: '+timeDiff+'  Pump index = ' + P.n_p+', ' + P.n_s +'</p>');
         });
 
         var width = 600;

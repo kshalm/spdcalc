@@ -80,18 +80,6 @@ PhaseMatch.GetIndices = function GetIndices (crystal, lambda, theta, phi, theta_
 /**
  * GetPMTypeIndices()
  * Gets the index of refraction depending on phasematching type
- * All angles in radians.
- * crystal = crystal object
- * Type = String containg phasematching type
- * lambda_p = pump wavelength
- * lambda_s = signal wavelength
- * lambda_i = idler wavelength
- * theta = angle of lambda_p wrt to crystal axis
- * phi = azimuthal angle of lambda_p wrt to crystal axis
- * theta_s = angle of signal wrt to lambda_p direction
- * phi_s = azimuthal angle of signal wrt to lambda_p direction
- * theta_i = angle of idler wrt to lambda_p direction
- * phi_i = azimuthal angle of idler wrt to lambda_p direction
  */
 
 PhaseMatch.GetPMTypeIndices = function GetPMTypeIndices(P){
@@ -154,6 +142,10 @@ PhaseMatch.spdc_to_pump_coordinates = function spdc_to_pump_coordinates(theta,ph
     var n_s = ind[0];
     var n_i = ind[1];
     var n_p = ind[2];
+    // var n_p = P.n_p;
+    // var n_s = P.n_s;
+    // var n_i = P.n_i;
+
     // Directions of the signal and idler photons in the lambda_p coordinates
     // This is throwing an error. Can't seem to reference this global function. Weird.
     // var Ss = spdc_to_lambda_p_coordinates(theta_s,P.phi_s)
@@ -210,11 +202,16 @@ PhaseMatch.optimum_idler = function optimum_idler(crystal, Type,  lambda_p, lamb
  * Gets the index of refraction depending on phasematching type
  * P is SPDC Properties object
  */
-PhaseMatch.phasematch = function phasematch (P, crystal, Type, lambda_p, p_bw, W, lambda_s,lambda_i,L,theta, phi, theta_s, theta_i, phi_s, phi_i, poling_period, phase, apodization ,apodization_FWHM ){
+PhaseMatch.phasematch = function phasematch (P){
     var lambda_p = P.lambda_p; //store the original lambda_p
+    var n_p = P.n_p;
     P.lambda_p = 1/(1/P.lambda_s+1/P.lambda_i);
+    P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
+
     var delK = PhaseMatch.calc_delK(P);
-    P.lambda_p = lambda_p; //set back to the original lambda_p
+    
+    // P.lambda_p = lambda_p_tmp; //set back to the original lambda_p
+    // P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
     var arg = P.L/2*(delK[2]);
 
     //More advanced calculation of phasematching in the z direction. Don't need it now.
