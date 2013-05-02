@@ -40,15 +40,41 @@
 
     // PhaseMatch.Rotation = Rotation;
 
+    var con = PhaseMatch.constants;
+    var spdcDefaults = {
+        lambda_p: 775 * con.nm,
+        lambda_s: 1500 * con.nm,
+        lambda_i: 1600 * con.nm,
+        Type: [
+            "o -> o + o", 
+            "e -> o + o", 
+            "e -> e + o", 
+            "e -> o + e"
+        ],
+        theta: 19.8371104525 * Math.PI / 180,
+        phi: 0,
+        theta_s: 0, // * Math.PI / 180,
+        theta_i: 0,
+        phi_s: 0,
+        phi_i: 0,
+        poling_period: 1000000,
+        L: 20000 * con.um,
+        W: 500 * con.um,
+        p_bw: 1,
+        phase: false,
+        apodization: 1,
+        apodization_FWHM: 1000 * con.um
+    };
+
     /**
      * SPDCprop
      */
-    var SPDCprop = function(){
-        this.init();
-
+    var SPDCprop = function( cfg ){
+        this.init( cfg || spdcDefaults );
     };
 
     SPDCprop.prototype = {
+
         init:function(){
             var con = PhaseMatch.constants;
             this.lambda_p = 775 * con.nm;
@@ -163,16 +189,23 @@
 
         set: function( name, val ){
 
+            // set the value
+            this[ name ] = val;
 
             switch ( name ){
 
-                case 'lambda_p':
+                case 'theta':
+                case 'phi':
+                case 'theta_s':
+                case 'phi_s':
 
-                    // this.updateSomethng();
+                    // update rotation object
+                    this.S.set( this.theta, this.phi, this.theta_s, this.phi_s );
                 break;
             }
 
-            this[ name ] = val;
+            // for chaining calls
+            return this;
         }
     };
 
