@@ -1,4 +1,6 @@
+//
 // documentation http://pivotal.github.io/jasmine/
+//
 describe("SPDCprop", function() {
 
     var props = new PhaseMatch.SPDCprop();
@@ -22,7 +24,7 @@ describe("SPDCprop", function() {
     props.apodization = 1;
     props.apodization_FWHM = 1000 * con.um;
     props.crystal = new PhaseMatch.BBO();
-
+    //Other functions that do not need to be included in the default init
     props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
     props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
     props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
@@ -31,11 +33,18 @@ describe("SPDCprop", function() {
     props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
     props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
-    it("Check expected PM index calculations", function() {
+    it("Check expected pump index calculation", function() {
 
         // assertion
-        var diff = Math.abs(props.n_p - 1.646611631296577)
+        var diff = Math.abs(props.n_p - 1.6465863905898237);
         expect( diff ).toBeLessThan( 1e-5 );
+    });
+
+    it("Check phase matching function", function() {
+
+        var pm = PhaseMatch.phasematch_Int_Phase( props );
+        // assertion
+        expect( pm ).toBeGreaterThan( 0.99 );
     });
 
 });

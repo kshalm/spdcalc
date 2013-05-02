@@ -21,6 +21,7 @@ PhaseMatch.calcJSA = function calcJSA(P, ls_start, ls_stop, li_start, li_stop, d
 
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
+        
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
         

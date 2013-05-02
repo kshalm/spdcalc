@@ -1,3 +1,6 @@
+//
+// documentation http://pivotal.github.io/jasmine/
+//
 describe("Dummy test suite", function() {
 
     it("First test", function() {
