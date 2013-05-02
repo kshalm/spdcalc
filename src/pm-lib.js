@@ -26,130 +26,22 @@ PhaseMatch.BBO.prototype  = {
     }
 };
 
-/**
- * GetIndicies(). This get the principla indices of refraction from the 
- * crystal and computes the index of the photons depending on the
- * angle they make with the optic axes.
- * All angles in radians.
- *
- * @param {[type]} [varname] [description]
- * lambda = photon wavelength
- * theta = angle of lambda_p wrt to crystal axis
- * phi = azimuthal angle of lambda_p wrt to crystal axis
- * theta_s = angle of photon wrt to lambda_p direction
- * phi_s = azimuthal angle of photon wrt to lambda_p direction
- */
-PhaseMatch.GetIndices = function GetIndices (crystal, lambda, theta, phi, theta_s, phi_s) {
-    // Get the crystal index of refraction
-    var ind = crystal.indicies(lambda);
-
-    var nx = ind[0];
-    var ny = ind[1];
-    var nz = ind[2];
-
-    ///@Todo: remove this code. It will be moved to PM Properties
-    var S_x = Math.sin(theta_s)*Math.cos(phi_s);
-    var S_y = Math.sin(theta_s)*Math.sin(phi_s);
-    var S_z = Math.cos(theta_s);
-
-    // Transform from the lambda_p coordinates to crystal coordinates
-    var SR_x = Math.cos(theta)*Math.cos(phi)*S_x - Math.sin(phi)*S_y + Math.sin(theta)*Math.cos(phi)*S_z;
-    var SR_y = Math.cos(theta)*Math.sin(phi)*S_x + Math.cos(phi)*S_y + Math.sin(theta)*Math.sin(phi)*S_z;
-    var SR_z = -Math.sin(theta)*S_x  + Math.cos(theta)*S_z;
-    
-    // Normalambda_ize the unit vector
-    // FIX ME: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
-    // case I think the correct behaviour is for Norm = 1 ?
-    var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
-    var Sx = SR_x/(Norm);
-    var Sy = SR_y/(Norm);
-    var Sz = SR_z/(Norm);
-    ////////////////////
-
-    var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
-    var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
-    var D = sq(B) - 4 * C;
-
-    var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
-    var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
-    // console.log(nslow, nfast)
-
-    return [nfast, nslow];
-};
-
-/**
- * GetPMTypeIndices()
- * Gets the index of refraction depending on phasematching type
- */
-
-PhaseMatch.GetPMTypeIndices = function GetPMTypeIndices(P){
-    var ind_s = PhaseMatch.GetIndices(P.crystal, P.lambda_s, P.theta, P.phi, P.theta_s, P.phi_s);
-    var ind_i = PhaseMatch.GetIndices(P.crystal, P.lambda_i, P.theta, P.phi, P.theta_i, P.phi_i);
-    var ind_p = PhaseMatch.GetIndices(P.crystal, P.lambda_p, P.theta, P.phi, 0.0, 0.0);
-    var n_s, n_i, n_p;
-
-    switch (P.Type){
-
-        case "e -> o + o":
-            n_s = ind_s[0];
-            n_i = ind_i[0];
-            n_p = ind_p[1];
-        break;
-        case "e -> e + o":
-            n_s = ind_s[1];
-            n_i = ind_i[0];
-            n_p = ind_p[1];
-        break;
-        case "e -> o + e":
-            n_s = ind_s[0];
-            n_i = ind_i[1];
-            n_p = ind_p[1];
-        break;
-        default:
-            throw "Error: bad PMType specified";
-    }
-
-    return [n_s, n_i, n_p];
-};
-
-/*
- * spdc_to_pump_coordinates()
- * Returns a vector that transforms signal/idler into pump coordinates
- * theta = angle of photon wrt to pump direction
- * phi = azimuthal angle of photon wrt to pump direction
- */
-PhaseMatch.spdc_to_pump_coordinates = function spdc_to_pump_coordinates(theta,phi){
-    return [
-        Math.sin(theta) * Math.cos(phi), 
-        Math.sin(theta) * Math.sin(phi), 
-        Math.cos(theta)
-    ];
-};
-// How do I declare this globally so other functions can call it?
-// var spdc_to_pump_coordinates = new spdc_to_pump_coordinates()
 
 /*
  * calc_delK()
  * Gets the index of refraction depending on phasematching type
  * All angles in radians.
  * P is SPDC Properties object
- * to be calculated.
  */
 
  PhaseMatch.calc_delK = function calc_delK (P){
-    // var ind = PhaseMatch.GetPMTypeIndices(P.crystal, P.Type, P.lambda_p, P.lambda_s, P.lambda_i, P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i);
-    var ind = PhaseMatch.GetPMTypeIndices(P);
-    var n_s = ind[0];
-    var n_i = ind[1];
-    var n_p = ind[2];
-    // var n_p = P.n_p;
-    // var n_s = P.n_s;
-    // var n_i = P.n_i;
+
+    var n_p = P.n_p;
+    var n_s = P.n_s;
+    var n_i = P.n_i;
 
     // Directions of the signal and idler photons in the lambda_p coordinates
-    // This is throwing an error. Can't seem to reference this global function. Weird.
-    // var Ss = spdc_to_lambda_p_coordinates(theta_s,P.phi_s)
-    // var Si = spdc_to_lambda_p_coordinates(P.theta_i,P.phi_i)
+    // Could speed this up by caching sin/cos values.
     var Ss = [Math.sin(P.theta_s)*Math.cos(P.phi_s), Math.sin(P.theta_s)*Math.sin(P.phi_s), Math.cos(P.theta_s)];
     var Si = [Math.sin(P.theta_i)*Math.cos(P.phi_i), Math.sin(P.theta_i)*Math.sin(P.phi_i), Math.cos(P.theta_i)];
     // console.log("SS, SI", Ss, Si)
@@ -206,7 +98,7 @@ PhaseMatch.phasematch = function phasematch (P){
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
     P.lambda_p = 1/(1/P.lambda_s+1/P.lambda_i);
-    P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
+    P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
 
     var delK = PhaseMatch.calc_delK(P);
     
@@ -240,7 +132,6 @@ PhaseMatch.phasematch = function phasematch (P){
     // Phasematching along transverse directions
     var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
 
-    // console.log(PMz_real, PMz_imag,delK[2])
     // Calculate the Pump spectrum
     var alpha = 1;
     // var alpha = calc_alpha_w(Type, crystal, lambda_p, lambda_s,lambda_i, p_bw,theta, phi, theta_s, theta_i, phi_s, phi_i)
