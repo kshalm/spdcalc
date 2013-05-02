@@ -5,6 +5,12 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
     //This is my test function that lets me calculate entanlged spectral properties
     //of the photons. dim is the dim of the matrix.
     function plotJSA(P,ls_start, ls_stop, li_start,li_stop, dim){
+
+         $(function(){
+        
+            $('#viewport').append('Pump, signal, idler index = ' + P.n_p+', ' + P.n_s + P.n_i+ '</p>');
+        
+
         var startTime = new Date();
         var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
         var endTime = new Date();
@@ -12,7 +18,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         console.log("Calc time = ", timeDiff)
         $(function(){
         
-            $('#viewport').append('<p>Calculation time: '+timeDiff+'  Pump index = ' + P.n_p+', ' + P.n_s +'</p>');
+            $('#viewport').append('<p>Calculation time: '+timeDiff+'</p>');
         });
 
         var width = 600;
@@ -28,6 +34,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var endTime = new Date();
         var timeDiff = (endTime - startTime)/1000;
         console.log("Plot time = ", timeDiff)
+        });
     }
 
     $(function(){
