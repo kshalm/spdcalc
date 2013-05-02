@@ -34,7 +34,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var l_start = 1500 * con.nm;
         var l_stop = 1600 * con.nm; 
         var P = new PhaseMatch.SPDCprop();
-        plotJSA(P,l_start,l_stop,l_start,l_stop, 2000)
+        plotJSA(P,l_start,l_stop,l_start,l_stop, 600)
     });
  
 
