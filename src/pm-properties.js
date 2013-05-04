@@ -105,6 +105,8 @@
             this.n_p = this.calc_Index_PMType(this.lambda_p, this.Type, this.S_p, "pump");
             this.n_s = this.calc_Index_PMType(this.lambda_s, this.Type, this.S_s, "signal");
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
+
+            this.msg = "";
         },
             // this.autocalcTheta = false;
             // this.calc_theta= function(){
@@ -210,5 +212,22 @@
     };
 
     PhaseMatch.SPDCprop = SPDCprop;
+
+    PhaseMatch.auto_calc_Theta = function auto_calc_Theta(props){
+        props.msg = "before min_delK";
+
+        var min_delK = function(x){
+            props.theta = x[0];
+            props.msg = "going in";
+            var delK =  PhaseMatch.calc_delK(props);
+            return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
+        };
+
+        // props.theta = min_delK(1); 
+        // var theta = numeric.uncmin(min_delK,props, [Math.PI/100]).solution[0];
+        // props.theta = theta;
+        var f = function(x) { return sq(-13+x[0]+((5-x[1])*x[1]-2)*x[1])+sq(-29+x[0]+((x[1]+1)*x[1]-14)*x[1]); };
+        props.msg =  numeric.uncmin(f,[0.5,-2]).solution[1];
+    };
 })();
 

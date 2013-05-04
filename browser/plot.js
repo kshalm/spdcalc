@@ -7,6 +7,8 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
     function plotJSA(P,ls_start, ls_stop, li_start,li_stop, dim){
 
          $(function(){
+            PhaseMatch.auto_calc_Theta(P);
+            $('#viewport').append('Theta and stuff = ' + P.theta+',  ' + P.msg + '</p>');
         
             $('#viewport').append('Pump, signal, idler index = ' + P.n_p+', ' + P.n_s + P.n_i+ '</p>');
         
@@ -44,7 +46,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var l_start = 1500 * con.nm;
         var l_stop = 1600 * con.nm; 
         var P = new PhaseMatch.SPDCprop();
-        plotJSA(P,l_start,l_stop,l_start,l_stop, 2000)
+        plotJSA(P,l_start,l_stop,l_start,l_stop, 600)
     });
  
 
