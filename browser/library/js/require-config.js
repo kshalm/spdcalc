@@ -5,6 +5,9 @@ require.config({
     shim: {
         'd3': {
             exports: 'd3'
+        },
+        'numeric': {
+            exports: 'numeric'
         }
     },
 

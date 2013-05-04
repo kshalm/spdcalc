@@ -1,22 +1,7 @@
-(function (root, factory) {
-    if (typeof exports === 'object') {
-        // Node.
-        module.exports = factory();
-    } else if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(factory);
-    } else {
-        // Browser globals (root is window)
-        root.numeric = factory();
-    }
-}(this, function() {
+"use strict";
 
-'use strict';
-var numeric = function numeric(){};
-function _fn( fn ){
-    fn.numeric = numeric;
-    return fn;
-}
+var numeric = (typeof exports === "undefined")?(function numeric() {}):(exports);
+if(typeof global !== "undefined") { global.numeric = numeric; }
 
 numeric.version = "1.2.6";
 
@@ -344,8 +329,7 @@ numeric.dim = function dim(x) {
 }
 
 numeric.mapreduce = function mapreduce(body,init) {
-    return _fn(Function('x','accum','_s','_k',
-            'var numeric = arguments.callee.numeric;\n'+
+    return Function('x','accum','_s','_k',
             'if(typeof accum === "undefined") accum = '+init+';\n'+
             'if(typeof x === "number") { var xi = x; '+body+'; return accum; }\n'+
             'if(typeof _s === "undefined") _s = numeric.dim(x);\n'+
@@ -369,11 +353,10 @@ numeric.mapreduce = function mapreduce(body,init) {
             '    '+body+'\n'+
             '}\n'+
             'return accum;'
-            ));
+            );
 }
 numeric.mapreduce2 = function mapreduce2(body,setup) {
-    return _fn(Function('x',
-            'var numeric = arguments.callee.numeric;\n'+
+    return Function('x',
             'var n = x.length;\n'+
             'var i,xi;\n'+setup+';\n'+
             'for(i=n-1;i!==-1;--i) { \n'+
@@ -381,7 +364,7 @@ numeric.mapreduce2 = function mapreduce2(body,setup) {
             '    '+body+';\n'+
             '}\n'+
             'return accum;'
-            ));
+            );
 }
 
 
@@ -560,7 +543,6 @@ numeric.pointwise = function pointwise(params,body,setup) {
     fun[params.length] = '_s';
     fun[params.length+1] = '_k';
     fun[params.length+2] = (
-            'var numeric = arguments.callee.numeric;\n'+
             'if(typeof _s === "undefined") _s = numeric.dim('+thevec+');\n'+
             'if(typeof _k === "undefined") _k = 0;\n'+
             'var _n = _s[_k];\n'+
@@ -575,7 +557,7 @@ numeric.pointwise = function pointwise(params,body,setup) {
             '}\n'+
             'return ret;'
             );
-    return _fn(Function.apply(null,fun));
+    return Function.apply(null,fun);
 }
 numeric.pointwise2 = function pointwise2(params,body,setup) {
     if(typeof setup === "undefined") { setup = ""; }
@@ -592,7 +574,6 @@ numeric.pointwise2 = function pointwise2(params,body,setup) {
         fun.push(p);
     }
     fun[params.length] = (
-            'var numeric = arguments.callee.numeric;\n'+
             'var _n = '+thevec+'.length;\n'+
             'var i'+(haveret?'':', ret = Array(_n)')+';\n'+
             setup+'\n'+
@@ -601,7 +582,7 @@ numeric.pointwise2 = function pointwise2(params,body,setup) {
             '}\n'+
             'return ret;'
             );
-    return _fn(Function.apply(null,fun));
+    return Function.apply(null,fun);
 }
 numeric._biforeach = (function _biforeach(x,y,s,k,f) {
     if(k === s.length-1) { f(x,y); return; }
@@ -712,8 +693,7 @@ numeric.mapreducers = {
             numeric[i+'VV'] = numeric.pointwise2(['x[i]','y[i]'],code('ret[i]','x[i]','y[i]'),setup);
             numeric[i+'SV'] = numeric.pointwise2(['x','y[i]'],code('ret[i]','x','y[i]'),setup);
             numeric[i+'VS'] = numeric.pointwise2(['x[i]','y'],code('ret[i]','x[i]','y'),setup);
-            numeric[i] = _fn(Function(
-                    'var numeric = arguments.callee.numeric;\n'+
+            numeric[i] = Function(
                     'var n = arguments.length, i, x = arguments[0], y;\n'+
                     'var VV = numeric.'+i+'VV, VS = numeric.'+i+'VS, SV = numeric.'+i+'SV;\n'+
                     'var dim = numeric.dim;\n'+
@@ -724,12 +704,11 @@ numeric.mapreducers = {
                     '      else x = numeric._biforeach2(x,y,dim(x),0,VS);\n'+
                     '  } else if(typeof y === "object") x = numeric._biforeach2(x,y,dim(y),0,SV);\n'+
                     '  else '+codeeq('x','y')+'\n'+
-                    '}\nreturn x;\n'));
+                    '}\nreturn x;\n');
             numeric[o] = numeric[i];
             numeric[i+'eqV'] = numeric.pointwise2(['ret[i]','x[i]'], codeeq('ret[i]','x[i]'),setup);
             numeric[i+'eqS'] = numeric.pointwise2(['ret[i]','x'], codeeq('ret[i]','x'),setup);
-            numeric[i+'eq'] = _fn(Function(
-                    'var numeric = arguments.callee.numeric;\n'+
+            numeric[i+'eq'] = Function(
                     'var n = arguments.length, i, x = arguments[0], y;\n'+
                     'var V = numeric.'+i+'eqV, S = numeric.'+i+'eqS\n'+
                     'var s = numeric.dim(x);\n'+
@@ -737,7 +716,7 @@ numeric.mapreducers = {
                     '  y = arguments[i];\n'+
                     '  if(typeof y === "object") numeric._biforeach(x,y,s,0,V);\n'+
                     '  else numeric._biforeach(x,y,s,0,S);\n'+
-                    '}\nreturn x;\n'));
+                    '}\nreturn x;\n');
         }
     }
     for(i=0;i<numeric.mathfuns2.length;++i) {
@@ -756,22 +735,20 @@ numeric.mapreducers = {
                 if(Math.hasOwnProperty(o)) setup = 'var '+o+' = Math.'+o+';\n';
             }
             numeric[i+'eqV'] = numeric.pointwise2(['ret[i]'],'ret[i] = '+o+'(ret[i]);',setup);
-            numeric[i+'eq'] = _fn(Function('x',
-                    'var numeric = arguments.callee.numeric;\n'+
+            numeric[i+'eq'] = Function('x',
                     'if(typeof x !== "object") return '+o+'x\n'+
                     'var i;\n'+
                     'var V = numeric.'+i+'eqV;\n'+
                     'var s = numeric.dim(x);\n'+
                     'numeric._foreach(x,s,0,V);\n'+
-                    'return x;\n'));
+                    'return x;\n');
             numeric[i+'V'] = numeric.pointwise2(['x[i]'],'ret[i] = '+o+'(x[i]);',setup);
-            numeric[i] = _fn(Function('x',
-                    'var numeric = arguments.callee.numeric;\n'+
+            numeric[i] = Function('x',
                     'if(typeof x !== "object") return '+o+'(x)\n'+
                     'var i;\n'+
                     'var V = numeric.'+i+'V;\n'+
                     'var s = numeric.dim(x);\n'+
-                    'return numeric._foreach2(x,s,0,V);\n'));
+                    'return numeric._foreach2(x,s,0,V);\n');
         }
     }
     for(i=0;i<numeric.mathfuns.length;++i) {
@@ -782,8 +759,7 @@ numeric.mapreducers = {
         if(numeric.mapreducers.hasOwnProperty(i)) {
             o = numeric.mapreducers[i];
             numeric[i+'V'] = numeric.mapreduce2(o[0],o[1]);
-            numeric[i] = _fn(Function('x','s','k',
-                    'var numeric = arguments.callee.numeric;\n'+
+            numeric[i] = Function('x','s','k',
                     o[1]+
                     'if(typeof x !== "object") {'+
                     '    xi = x;\n'+
@@ -799,7 +775,7 @@ numeric.mapreducers = {
                     '   xi = arguments.callee(x[i]);\n'+
                     o[0]+';\n'+
                     '}\n'+
-                    'return accum;\n'));
+                    'return accum;\n');
         }
     }
 }());
@@ -1056,8 +1032,7 @@ numeric.Tbinop = function Tbinop(rr,rc,cr,cc,setup) {
             }
         }
     }
-    return _fn(Function(['y'],
-            'var numeric = arguments.callee.numeric;\n'+
+    return Function(['y'],
             'var x = this;\n'+
             'if(!(y instanceof numeric.T)) { y = new numeric.T(y); }\n'+
             setup+'\n'+
@@ -1071,7 +1046,7 @@ numeric.Tbinop = function Tbinop(rr,rc,cr,cc,setup) {
             '  return new numeric.T('+rc+');\n'+
             '}\n'+
             'return new numeric.T('+rr+');\n'
-    ));
+    );
 }
 
 numeric.T.prototype.add = numeric.Tbinop(
@@ -1123,15 +1098,14 @@ numeric.T.prototype.transjugate = function transjugate() {
 }
 numeric.Tunop = function Tunop(r,c,s) {
     if(typeof s !== "string") { s = ''; }
-    return _fn(Function(
-            'var numeric = arguments.callee.numeric;\n'+
+    return Function(
             'var x = this;\n'+
             s+'\n'+
             'if(x.y) {'+
             '  '+c+';\n'+
             '}\n'+
             r+';\n'
-    ));
+    );
 }
 
 numeric.T.prototype.exp = numeric.Tunop(
@@ -1990,8 +1964,7 @@ numeric.ccsLUPSolve = function ccsLUPSolve(LUP,B) {
 
 numeric.ccsbinop = function ccsbinop(body,setup) {
     if(typeof setup === "undefined") setup='';
-    return _fn(Function('X','Y',
-            'var numeric = arguments.callee.numeric;\n'+
+    return Function('X','Y',
             'var Xi = X[0], Xj = X[1], Xv = X[2];\n'+
             'var Yi = Y[0], Yj = Y[1], Yv = Y[2];\n'+
             'var n = Xi.length-1,m = Math.max(numeric.sup(Xj),numeric.sup(Yj))+1;\n'+
@@ -2034,7 +2007,7 @@ numeric.ccsbinop = function ccsbinop(body,setup) {
             '  for(j=j0;j!==j1;++j) y[Yj[j]] = 0;\n'+
             '}\n'+
             'return [Zi,Zj,Zv];'
-            ));
+            );
 };
 
 (function() {
@@ -2047,12 +2020,11 @@ numeric.ccsbinop = function ccsbinop(body,setup) {
         if(isFinite(eval('1'+numeric.ops2[k]+'0')) && isFinite(eval('0'+numeric.ops2[k]+'1'))) C = 'numeric.ccs'+k+'MM(X,Y)';
         else C = 'NaN';
         numeric['ccs'+k+'MM'] = numeric.ccsbinop('zk = xk '+numeric.ops2[k]+'yk;');
-        numeric['ccs'+k] = _fn(Function('X','Y',
-                'var numeric = arguments.callee.numeric;\n'+
+        numeric['ccs'+k] = Function('X','Y',
                 'if(typeof X === "number") return '+A+';\n'+
                 'if(typeof Y === "number") return '+B+';\n'+
                 'return '+C+';\n'
-                ));
+                );
     }
 }());
 
@@ -3568,7 +3540,7 @@ mixkey(math.random(), pool);
   52    // significance: there are 52 significant digits in a double
   ));
 /* This file is a slightly modified version of quadprog.js from Alberto Santini.
- * It has been slightly modified by Sébastien Loisel to make sure that it handles
+ * It has been slightly modified by SÃ©bastien Loisel to make sure that it handles
  * 0-based Arrays instead of 1-based Arrays.
  * License is in resources/LICENSE.quadprog */
 (function(exports) {
@@ -4163,293 +4135,290 @@ It is apparently translated from http://stitchpanorama.sourceforge.net/Python/sv
 numeric.svd= function svd(A) {
     var temp;
 //Compute the thin SVD from G. H. Golub and C. Reinsch, Numer. Math. 14, 403-420 (1970)
-	var prec= numeric.epsilon; //Math.pow(2,-52) // assumes double prec
-	var tolerance= 1.e-64/prec;
-	var itmax= 50;
-	var c=0;
-	var i=0;
-	var j=0;
-	var k=0;
-	var l=0;
-	
-	var u= numeric.clone(A);
-	var m= u.length;
-	
-	var n= u[0].length;
-	
-	if (m < n) throw "Need more rows than columns"
-	
-	var e = new Array(n);
-	var q = new Array(n);
-	for (i=0; i<n; i++) e[i] = q[i] = 0.0;
-	var v = numeric.rep([n,n],0);
-//	v.zero();
-	
- 	function pythag(a,b)
- 	{
-		a = Math.abs(a)
-		b = Math.abs(b)
-		if (a > b)
-			return a*Math.sqrt(1.0+(b*b/a/a))
-		else if (b == 0.0) 
-			return a
-		return b*Math.sqrt(1.0+(a*a/b/b))
-	}
+    var prec= numeric.epsilon; //Math.pow(2,-52) // assumes double prec
+    var tolerance= 1.e-64/prec;
+    var itmax= 50;
+    var c=0;
+    var i=0;
+    var j=0;
+    var k=0;
+    var l=0;
+    
+    var u= numeric.clone(A);
+    var m= u.length;
+    
+    var n= u[0].length;
+    
+    if (m < n) throw "Need more rows than columns"
+    
+    var e = new Array(n);
+    var q = new Array(n);
+    for (i=0; i<n; i++) e[i] = q[i] = 0.0;
+    var v = numeric.rep([n,n],0);
+//  v.zero();
+    
+    function pythag(a,b)
+    {
+        a = Math.abs(a)
+        b = Math.abs(b)
+        if (a > b)
+            return a*Math.sqrt(1.0+(b*b/a/a))
+        else if (b == 0.0) 
+            return a
+        return b*Math.sqrt(1.0+(a*a/b/b))
+    }
 
-	//Householder's reduction to bidiagonal form
+    //Householder's reduction to bidiagonal form
 
-	var f= 0.0;
-	var g= 0.0;
-	var h= 0.0;
-	var x= 0.0;
-	var y= 0.0;
-	var z= 0.0;
-	var s= 0.0;
-	
-	for (i=0; i < n; i++)
-	{	
-		e[i]= g;
-		s= 0.0;
-		l= i+1;
-		for (j=i; j < m; j++) 
-			s += (u[j][i]*u[j][i]);
-		if (s <= tolerance)
-			g= 0.0;
-		else
-		{	
-			f= u[i][i];
-			g= Math.sqrt(s);
-			if (f >= 0.0) g= -g;
-			h= f*g-s
-			u[i][i]=f-g;
-			for (j=l; j < n; j++)
-			{
-				s= 0.0
-				for (k=i; k < m; k++) 
-					s += u[k][i]*u[k][j]
-				f= s/h
-				for (k=i; k < m; k++) 
-					u[k][j]+=f*u[k][i]
-			}
-		}
-		q[i]= g
-		s= 0.0
-		for (j=l; j < n; j++) 
-			s= s + u[i][j]*u[i][j]
-		if (s <= tolerance)
-			g= 0.0
-		else
-		{	
-			f= u[i][i+1]
-			g= Math.sqrt(s)
-			if (f >= 0.0) g= -g
-			h= f*g - s
-			u[i][i+1] = f-g;
-			for (j=l; j < n; j++) e[j]= u[i][j]/h
-			for (j=l; j < m; j++)
-			{	
-				s=0.0
-				for (k=l; k < n; k++) 
-					s += (u[j][k]*u[i][k])
-				for (k=l; k < n; k++) 
-					u[j][k]+=s*e[k]
-			}	
-		}
-		y= Math.abs(q[i])+Math.abs(e[i])
-		if (y>x) 
-			x=y
-	}
-	
-	// accumulation of right hand gtransformations
-	for (i=n-1; i != -1; i+= -1)
-	{	
-		if (g != 0.0)
-		{
-		 	h= g*u[i][i+1]
-			for (j=l; j < n; j++) 
-				v[j][i]=u[i][j]/h
-			for (j=l; j < n; j++)
-			{	
-				s=0.0
-				for (k=l; k < n; k++) 
-					s += u[i][k]*v[k][j]
-				for (k=l; k < n; k++) 
-					v[k][j]+=(s*v[k][i])
-			}	
-		}
-		for (j=l; j < n; j++)
-		{
-			v[i][j] = 0;
-			v[j][i] = 0;
-		}
-		v[i][i] = 1;
-		g= e[i]
-		l= i
-	}
-	
-	// accumulation of left hand transformations
-	for (i=n-1; i != -1; i+= -1)
-	{	
-		l= i+1
-		g= q[i]
-		for (j=l; j < n; j++) 
-			u[i][j] = 0;
-		if (g != 0.0)
-		{
-			h= u[i][i]*g
-			for (j=l; j < n; j++)
-			{
-				s=0.0
-				for (k=l; k < m; k++) s += u[k][i]*u[k][j];
-				f= s/h
-				for (k=i; k < m; k++) u[k][j]+=f*u[k][i];
-			}
-			for (j=i; j < m; j++) u[j][i] = u[j][i]/g;
-		}
-		else
-			for (j=i; j < m; j++) u[j][i] = 0;
-		u[i][i] += 1;
-	}
-	
-	// diagonalization of the bidiagonal form
-	prec= prec*x
-	for (k=n-1; k != -1; k+= -1)
-	{
-		for (var iteration=0; iteration < itmax; iteration++)
-		{	// test f splitting
-			var test_convergence = false
-			for (l=k; l != -1; l+= -1)
-			{	
-				if (Math.abs(e[l]) <= prec)
-				{	test_convergence= true
-					break 
-				}
-				if (Math.abs(q[l-1]) <= prec)
-					break 
-			}
-			if (!test_convergence)
-			{	// cancellation of e[l] if l>0
-				c= 0.0
-				s= 1.0
-				var l1= l-1
-				for (i =l; i<k+1; i++)
-				{	
-					f= s*e[i]
-					e[i]= c*e[i]
-					if (Math.abs(f) <= prec)
-						break
-					g= q[i]
-					h= pythag(f,g)
-					q[i]= h
-					c= g/h
-					s= -f/h
-					for (j=0; j < m; j++)
-					{	
-						y= u[j][l1]
-						z= u[j][i]
-						u[j][l1] =  y*c+(z*s)
-						u[j][i] = -y*s+(z*c)
-					} 
-				}	
-			}
-			// test f convergence
-			z= q[k]
-			if (l== k)
-			{	//convergence
-				if (z<0.0)
-				{	//q[k] is made non-negative
-					q[k]= -z
-					for (j=0; j < n; j++)
-						v[j][k] = -v[j][k]
-				}
-				break  //break out of iteration loop and move on to next k value
-			}
-			if (iteration >= itmax-1)
-				throw 'Error: no convergence.'
-			// shift from bottom 2x2 minor
-			x= q[l]
-			y= q[k-1]
-			g= e[k-1]
-			h= e[k]
-			f= ((y-z)*(y+z)+(g-h)*(g+h))/(2.0*h*y)
-			g= pythag(f,1.0)
-			if (f < 0.0)
-				f= ((x-z)*(x+z)+h*(y/(f-g)-h))/x
-			else
-				f= ((x-z)*(x+z)+h*(y/(f+g)-h))/x
-			// next QR transformation
-			c= 1.0
-			s= 1.0
-			for (i=l+1; i< k+1; i++)
-			{	
-				g= e[i]
-				y= q[i]
-				h= s*g
-				g= c*g
-				z= pythag(f,h)
-				e[i-1]= z
-				c= f/z
-				s= h/z
-				f= x*c+g*s
-				g= -x*s+g*c
-				h= y*s
-				y= y*c
-				for (j=0; j < n; j++)
-				{	
-					x= v[j][i-1]
-					z= v[j][i]
-					v[j][i-1] = x*c+z*s
-					v[j][i] = -x*s+z*c
-				}
-				z= pythag(f,h)
-				q[i-1]= z
-				c= f/z
-				s= h/z
-				f= c*g+s*y
-				x= -s*g+c*y
-				for (j=0; j < m; j++)
-				{
-					y= u[j][i-1]
-					z= u[j][i]
-					u[j][i-1] = y*c+z*s
-					u[j][i] = -y*s+z*c
-				}
-			}
-			e[l]= 0.0
-			e[k]= f
-			q[k]= x
-		} 
-	}
-		
-	//vt= transpose(v)
-	//return (u,q,vt)
-	for (i=0;i<q.length; i++) 
-	  if (q[i] < prec) q[i] = 0
-	  
-	//sort eigenvalues	
-	for (i=0; i< n; i++)
-	{	 
-	//writeln(q)
-	 for (j=i-1; j >= 0; j--)
-	 {
-	  if (q[j] < q[i])
-	  {
-	//  writeln(i,'-',j)
-	   c = q[j]
-	   q[j] = q[i]
-	   q[i] = c
-	   for(k=0;k<u.length;k++) { temp = u[k][i]; u[k][i] = u[k][j]; u[k][j] = temp; }
-	   for(k=0;k<v.length;k++) { temp = v[k][i]; v[k][i] = v[k][j]; v[k][j] = temp; }
-//	   u.swapCols(i,j)
-//	   v.swapCols(i,j)
-	   i = j	   
-	  }
-	 }	
-	}
-	
-	return {U:u,S:q,V:v}
+    var f= 0.0;
+    var g= 0.0;
+    var h= 0.0;
+    var x= 0.0;
+    var y= 0.0;
+    var z= 0.0;
+    var s= 0.0;
+    
+    for (i=0; i < n; i++)
+    {   
+        e[i]= g;
+        s= 0.0;
+        l= i+1;
+        for (j=i; j < m; j++) 
+            s += (u[j][i]*u[j][i]);
+        if (s <= tolerance)
+            g= 0.0;
+        else
+        {   
+            f= u[i][i];
+            g= Math.sqrt(s);
+            if (f >= 0.0) g= -g;
+            h= f*g-s
+            u[i][i]=f-g;
+            for (j=l; j < n; j++)
+            {
+                s= 0.0
+                for (k=i; k < m; k++) 
+                    s += u[k][i]*u[k][j]
+                f= s/h
+                for (k=i; k < m; k++) 
+                    u[k][j]+=f*u[k][i]
+            }
+        }
+        q[i]= g
+        s= 0.0
+        for (j=l; j < n; j++) 
+            s= s + u[i][j]*u[i][j]
+        if (s <= tolerance)
+            g= 0.0
+        else
+        {   
+            f= u[i][i+1]
+            g= Math.sqrt(s)
+            if (f >= 0.0) g= -g
+            h= f*g - s
+            u[i][i+1] = f-g;
+            for (j=l; j < n; j++) e[j]= u[i][j]/h
+            for (j=l; j < m; j++)
+            {   
+                s=0.0
+                for (k=l; k < n; k++) 
+                    s += (u[j][k]*u[i][k])
+                for (k=l; k < n; k++) 
+                    u[j][k]+=s*e[k]
+            }   
+        }
+        y= Math.abs(q[i])+Math.abs(e[i])
+        if (y>x) 
+            x=y
+    }
+    
+    // accumulation of right hand gtransformations
+    for (i=n-1; i != -1; i+= -1)
+    {   
+        if (g != 0.0)
+        {
+            h= g*u[i][i+1]
+            for (j=l; j < n; j++) 
+                v[j][i]=u[i][j]/h
+            for (j=l; j < n; j++)
+            {   
+                s=0.0
+                for (k=l; k < n; k++) 
+                    s += u[i][k]*v[k][j]
+                for (k=l; k < n; k++) 
+                    v[k][j]+=(s*v[k][i])
+            }   
+        }
+        for (j=l; j < n; j++)
+        {
+            v[i][j] = 0;
+            v[j][i] = 0;
+        }
+        v[i][i] = 1;
+        g= e[i]
+        l= i
+    }
+    
+    // accumulation of left hand transformations
+    for (i=n-1; i != -1; i+= -1)
+    {   
+        l= i+1
+        g= q[i]
+        for (j=l; j < n; j++) 
+            u[i][j] = 0;
+        if (g != 0.0)
+        {
+            h= u[i][i]*g
+            for (j=l; j < n; j++)
+            {
+                s=0.0
+                for (k=l; k < m; k++) s += u[k][i]*u[k][j];
+                f= s/h
+                for (k=i; k < m; k++) u[k][j]+=f*u[k][i];
+            }
+            for (j=i; j < m; j++) u[j][i] = u[j][i]/g;
+        }
+        else
+            for (j=i; j < m; j++) u[j][i] = 0;
+        u[i][i] += 1;
+    }
+    
+    // diagonalization of the bidiagonal form
+    prec= prec*x
+    for (k=n-1; k != -1; k+= -1)
+    {
+        for (var iteration=0; iteration < itmax; iteration++)
+        {   // test f splitting
+            var test_convergence = false
+            for (l=k; l != -1; l+= -1)
+            {   
+                if (Math.abs(e[l]) <= prec)
+                {   test_convergence= true
+                    break 
+                }
+                if (Math.abs(q[l-1]) <= prec)
+                    break 
+            }
+            if (!test_convergence)
+            {   // cancellation of e[l] if l>0
+                c= 0.0
+                s= 1.0
+                var l1= l-1
+                for (i =l; i<k+1; i++)
+                {   
+                    f= s*e[i]
+                    e[i]= c*e[i]
+                    if (Math.abs(f) <= prec)
+                        break
+                    g= q[i]
+                    h= pythag(f,g)
+                    q[i]= h
+                    c= g/h
+                    s= -f/h
+                    for (j=0; j < m; j++)
+                    {   
+                        y= u[j][l1]
+                        z= u[j][i]
+                        u[j][l1] =  y*c+(z*s)
+                        u[j][i] = -y*s+(z*c)
+                    } 
+                }   
+            }
+            // test f convergence
+            z= q[k]
+            if (l== k)
+            {   //convergence
+                if (z<0.0)
+                {   //q[k] is made non-negative
+                    q[k]= -z
+                    for (j=0; j < n; j++)
+                        v[j][k] = -v[j][k]
+                }
+                break  //break out of iteration loop and move on to next k value
+            }
+            if (iteration >= itmax-1)
+                throw 'Error: no convergence.'
+            // shift from bottom 2x2 minor
+            x= q[l]
+            y= q[k-1]
+            g= e[k-1]
+            h= e[k]
+            f= ((y-z)*(y+z)+(g-h)*(g+h))/(2.0*h*y)
+            g= pythag(f,1.0)
+            if (f < 0.0)
+                f= ((x-z)*(x+z)+h*(y/(f-g)-h))/x
+            else
+                f= ((x-z)*(x+z)+h*(y/(f+g)-h))/x
+            // next QR transformation
+            c= 1.0
+            s= 1.0
+            for (i=l+1; i< k+1; i++)
+            {   
+                g= e[i]
+                y= q[i]
+                h= s*g
+                g= c*g
+                z= pythag(f,h)
+                e[i-1]= z
+                c= f/z
+                s= h/z
+                f= x*c+g*s
+                g= -x*s+g*c
+                h= y*s
+                y= y*c
+                for (j=0; j < n; j++)
+                {   
+                    x= v[j][i-1]
+                    z= v[j][i]
+                    v[j][i-1] = x*c+z*s
+                    v[j][i] = -x*s+z*c
+                }
+                z= pythag(f,h)
+                q[i-1]= z
+                c= f/z
+                s= h/z
+                f= c*g+s*y
+                x= -s*g+c*y
+                for (j=0; j < m; j++)
+                {
+                    y= u[j][i-1]
+                    z= u[j][i]
+                    u[j][i-1] = y*c+z*s
+                    u[j][i] = -y*s+z*c
+                }
+            }
+            e[l]= 0.0
+            e[k]= f
+            q[k]= x
+        } 
+    }
+        
+    //vt= transpose(v)
+    //return (u,q,vt)
+    for (i=0;i<q.length; i++) 
+      if (q[i] < prec) q[i] = 0
+      
+    //sort eigenvalues  
+    for (i=0; i< n; i++)
+    {    
+    //writeln(q)
+     for (j=i-1; j >= 0; j--)
+     {
+      if (q[j] < q[i])
+      {
+    //  writeln(i,'-',j)
+       c = q[j]
+       q[j] = q[i]
+       q[i] = c
+       for(k=0;k<u.length;k++) { temp = u[k][i]; u[k][i] = u[k][j]; u[k][j] = temp; }
+       for(k=0;k<v.length;k++) { temp = v[k][i]; v[k][i] = v[k][j]; v[k][j] = temp; }
+//     u.swapCols(i,j)
+//     v.swapCols(i,j)
+       i = j       
+      }
+     }  
+    }
+    
+    return {U:u,S:q,V:v}
 };
 
-
-return numeric;
-}));
