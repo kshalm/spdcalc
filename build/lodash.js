@@ -1,7 +1,11 @@
 /**
  * @license
  * Lo-Dash 1.2.1 (Custom Build) <http://lodash.com/>
+<<<<<<< HEAD
  * Build: `lodash --silent --output /private/var/folders/cr/lj3qn6l12vl54ls7ws96l5hh0000gq/T/lodash11345-44408-1yglf4g exports="none" iife="(function(){%output%;lodash.extend(PhaseMatch.util, lodash);}());" include="extend, bind"`
+=======
+ * Build: `lodash --silent --output /private/var/folders/bj/m9vc0qfj1_31x_scf7r6nq6r0000gn/T/lodash11345-88900-808pat exports="none" iife="(function(){%output%;lodash.extend(PhaseMatch.util, lodash);}());" include="extend, bind"`
+>>>>>>> ff035b529d089b521e41b29db7d63257e6902930
  * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
  * Based on Underscore.js 1.4.4 <http://underscorejs.org/>
  * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
