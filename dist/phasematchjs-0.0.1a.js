@@ -1899,14 +1899,14 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
             props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
             props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
-            console.log(props.theta*180/Math.PI);
-            props.msg = "going in";
+            // console.log(props.theta*180/Math.PI);
+            // props.msg = "going in";
             var delK =  PhaseMatch.calc_delK(props);
-            console.log("in the function", delK)
+            // console.log("in the function", delK)
             return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
         };
 
-        console.log(JSON.stringify(PhaseMatch.nelderMead(min_delK, 10*Math.PI/180, 1000)));
+        props.theta = PhaseMatch.nelderMead(min_delK, 40*Math.PI/180, 1000);
 
         // console.log("del K", min_delK([props.theta/10]));
 
