@@ -9,13 +9,14 @@ require([ 'jquery', 'd3', 'phasematch' ], function( $, d3, PhaseMatch ){
         var l_start = 1500 * con.nm;
         var l_stop = 1600 * con.nm; 
         var props = new PhaseMatch.SPDCprop();
+        props.Type = props.Types[2];
 
         var sq = function sq (x) {
             return x * x;
         }
 
         var min_delK = function(x){
-
+            if (x>Math.PI/2 || x<0){return 10000000;}
             props.theta = x;
             props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
             props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
@@ -33,7 +34,14 @@ require([ 'jquery', 'd3', 'phasematch' ], function( $, d3, PhaseMatch ){
         };
 
         var guess = 0.4;
+        var guess = Math.PI/8;
+        // var startTime = new Date();
+        
         var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
+
+        // var endTime = new Date();
+        // var timeDiff = (endTime - startTime)/1000;
+        // console.log("Calc time = ", timeDiff);
 
 
         //
@@ -135,7 +143,16 @@ require([ 'jquery', 'd3', 'phasematch' ], function( $, d3, PhaseMatch ){
         $('#do-it').on('click', function(e){
             e.preventDefault();
             var guess = parseFloat($('#val').val());
-            var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
+
+            var startTime = new Date();
+
+            // var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
+            var ans = numeric.uncmin(min_delK, [guess]).solution[0];
+            var endTime = new Date();
+            
+
+            var timeDiff = (endTime - startTime)/1000;
+            console.log("Calc time = ", timeDiff);
             showPoint( ans )
         })
     });

@@ -1889,7 +1889,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         props.msg = "before min_delK";
 
         var min_delK = function(x){
-
+            if (x>Math.PI/2 || x<0){return 1e12;}
             props.theta = x;
             props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
             props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
@@ -1906,8 +1906,18 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
             return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
         };
 
+        var guess = Math.PI/8;
+        // var startTime = new Date();
+        var startTime = new Date();
 
-        var ans = PhaseMatch.nelderMead(min_delK, 0.4, 1000);
+        var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
+        // var ans = numeric.uncmin(min_delK, [guess]).solution[0];
+        var endTime = new Date();
+        
+
+        var timeDiff = (endTime - startTime)/1000;
+        console.log("Theta autocalc = ", timeDiff);
+        // var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
         props.theta = ans;
 
         // console.log("del K", min_delK([props.theta/10]));
