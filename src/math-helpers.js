@@ -132,6 +132,8 @@ function sq( x ){
                 }
             }
         }
+
+        return x;
     }
 
     //function that we are currently trying to minimize: 5(x^4) + 6x + 8
