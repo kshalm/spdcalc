@@ -8,7 +8,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
 
          $(function(){
             PhaseMatch.auto_calc_Theta(P);
-            $('#viewport').append('Theta and stuff = ' + P.theta+',  ' + P.msg + '</p>');
+            $('#viewport').append('Theta and stuff = ' + P.theta*180/Math.PI+',  ' + P.msg + '</p>');
         
             $('#viewport').append('Pump, signal, idler index = ' + P.n_p+', ' + P.n_s + P.n_i+ '</p>');
         

@@ -217,17 +217,32 @@
         props.msg = "before min_delK";
 
         var min_delK = function(x){
-            props.theta = x[0];
+
+            props.theta = Math.atan(x[0]);
+            props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
+            props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
+            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
+
+            props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
+            props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+
+            console.log(props.theta*180/Math.PI);
             props.msg = "going in";
             var delK =  PhaseMatch.calc_delK(props);
+            console.log("in the function", delK)
             return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
         };
 
-        // props.theta = min_delK(1); 
-        // var theta = numeric.uncmin(min_delK,props, [Math.PI/100]).solution[0];
-        // props.theta = theta;
-        var f = function(x) { return sq(-13+x[0]+((5-x[1])*x[1]-2)*x[1])+sq(-29+x[0]+((x[1]+1)*x[1]-14)*x[1]); };
-        props.msg =  numeric.uncmin(f,[0.5,-2]).solution[1];
+        console.log("del K", min_delK([props.theta/10]));
+
+        var res = numeric.uncmin(min_delK, [Math.tan(19.8*180/Math.PI)], 10e-15);
+        props.theta = Math.tan(res.solution[0]);
+        // props.msg = res.iterations + " " + res.message;
+        props.msg = JSON.stringify(res);
+        // props.msg =  theta;
+        // var f = function(x) { return sq(-13+x[0]+((5-x[1])*x[1]-2)*x[1])+sq(-29+x[0]+((x[1]+1)*x[1]-14)*x[1]); };
+        // props.theta =  numeric.uncmin(f,[0.5,-2]).solution[1];
     };
 })();
 
