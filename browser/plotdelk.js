@@ -147,7 +147,9 @@ require([ 'jquery', 'd3', 'phasematch' ], function( $, d3, PhaseMatch ){
             var startTime = new Date();
 
             // var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
-            var ans = numeric.uncmin(min_delK, [guess]).solution[0];
+            var ans2 = numeric.uncmin(min_delK, [guess], 10e-15);
+            console.log(JSON.stringify(ans2));
+            var ans = ans2.solution[0];
             var endTime = new Date();
             
 
