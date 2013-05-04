@@ -16,7 +16,7 @@ require([ 'jquery', 'd3', 'phasematch' ], function( $, d3, PhaseMatch ){
         }
 
         var min_delK = function(x){
-            if (x>Math.PI/2 || x<0){return 10000000;}
+            if (x>Math.PI/2 || x<0){return Number.Infinity;}
             props.theta = x;
             props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
             props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
