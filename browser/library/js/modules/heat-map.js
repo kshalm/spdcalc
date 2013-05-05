@@ -16,7 +16,7 @@ define(
         function defaultColorMap( val ){
 
             var r = 255 - scale( val )
-                ,g = 255 - scale( val )/1
+                ,g = 255 - scale( val )/2
                 ,b = 255
                 ;
 

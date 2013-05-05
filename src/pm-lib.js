@@ -39,12 +39,13 @@ PhaseMatch.BBO.prototype  = {
     var n_p = P.n_p;
     var n_s = P.n_s;
     var n_i = P.n_i;
-
-    // Directions of the signal and idler photons in the lambda_p coordinates
-    // Could speed this up by caching sin/cos values.
+    // console.log("going into calc_delK");
+    // console.log("Index of refraction inside calc_delk", P.lambda_s, n_s, n_i, n_p);
+    // Directions of the signal and idler photons in the pump coordinates
     var Ss = [Math.sin(P.theta_s)*Math.cos(P.phi_s), Math.sin(P.theta_s)*Math.sin(P.phi_s), Math.cos(P.theta_s)];
     var Si = [Math.sin(P.theta_i)*Math.cos(P.phi_i), Math.sin(P.theta_i)*Math.sin(P.phi_i), Math.cos(P.theta_i)];
-    // console.log("SS, SI", Ss, Si)
+    // console.log("SS, SI", Ss, Si);
+    // console.log("");
 
     var delKx = (2*Math.PI*((n_s*Ss[0]/P.lambda_s) + n_i*Si[0]/P.lambda_i));
     var delKy = (2*Math.PI*((n_s*Ss[1]/P.lambda_s) + n_i*Si[1]/P.lambda_i));
@@ -52,41 +53,33 @@ PhaseMatch.BBO.prototype  = {
     delKz = delKz -2*Math.PI/P.poling_period;
 
     return [delKx, delKy, delKz];
+
 };
 
 /*
  * optimum_idler()
  * Analytically calcualte optimum idler photon wavelength
  * All angles in radians.
- * crystal = crystal object
- * Type = String containg phasematching type
- * lambda_p = pump wavelength
- * lambda_s = signal wavelength
- * theta = angle of lambda_p wrt to crystal axis
- * phi = azimuthal angle of lambda_p wrt to crystal axis
- * theta_s = angle of signal wrt to lambda_p direction
- * phi_s = azimuthal angle of signal wrt to lambda_p direction
- * poling_period = Poling period of the crystal
  */
-PhaseMatch.optimum_idler = function optimum_idler(crystal, Type,  lambda_p, lambda_s, theta_s, phi_s, theta, phi, poling_period){
-    var lambda_i = 1/(1/lambda_p - 1/lambda_s);
-    var phi_i = phi_s + Math.PI;
+PhaseMatch.optimum_idler = function optimum_idler(P){//crystal, Type,  lambda_p, lambda_s, theta_s, phi_s, theta, phi, poling_period){
+    // var lambda_i = 1/(1/lambda_p - 1/lambda_s);
+    // P.phi_i = P.phi_s + Math.PI;
 
-    var delKpp = lambda_s/poling_period;
+    var delKpp = P.lambda_s/P.poling_period;
 
-    var ind = PhaseMatch.GetPMTypeIndices(crystal, Type,lambda_p, lambda_s,lambda_i, theta, phi, theta_s, theta_s, phi_s, phi_i);
-    var n_s = ind[0];
-    var n_i = ind[1];
-    var n_p = ind[2];
-    var arg = sq(n_s) + sq(n_p*lambda_s/lambda_p);
-    arg -= 2*n_s*n_p*(lambda_s/lambda_p)*Math.cos(theta_s) - 2*n_p*lambda_s/lambda_p*delKpp;
-    arg += 2*n_s*Math.cos(theta_s)*delKpp + sq(delKpp);
+    var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
+    arg -= 2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
+    arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
     arg = Math.sqrt(arg);
 
-    var arg2 = n_s*Math.sin(theta_s)/arg;
+    var arg2 = P.n_s*Math.sin(P.theta_s)/arg;
 
     var theta_i = Math.asin(arg2);
-    return theta_i;
+    // return theta_i;
+    P.theta_i = theta_i;
+    //Update the index of refraction for the idler
+    P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
 };
 
 /*
@@ -134,6 +127,7 @@ PhaseMatch.phasematch = function phasematch (P){
     var PMz_imag = PMz * Math.sin(arg);
 
     // Phasematching along transverse directions
+    // np.exp(-.5*(delKx**2 + delKy**2)*W**2)
     var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
 
     // Calculate the Pump spectrum
@@ -143,7 +137,7 @@ PhaseMatch.phasematch = function phasematch (P){
     // var alpha = 1;
     // PMt = 1;
     // PMz_real = 1;
-    // PMz_imag = 1;
+    // PMz_imag = 0;
 
     //return the real and imaginary parts of Phase matching function
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];

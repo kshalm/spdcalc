@@ -85,13 +85,13 @@
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
-            this.theta_s = 0 * Math.PI / 180;
+            this.theta_s = 1 * Math.PI / 180;
             this.theta_i = this.theta_s;
             this.phi_s = 0;
-            this.phi_i = 0;
+            this.phi_i = this.phi_s + Math.PI;
             this.poling_period = 1000000;
             this.L = 2000 * con.um;
-            this.W = 500 * con.um;
+            this.W = 500* con.um;
             this.p_bw = 15 * con.nm;
             this.phase = false;
             this.apodization = 1;
@@ -133,7 +133,7 @@
             // Transform from the lambda_p coordinates to crystal coordinates
             var SR_x = COS_THETA*COS_PHI*S_x - SIN_PHI*S_y + SIN_THETA*COS_PHI*S_z;
             var SR_y = COS_THETA*SIN_PHI*S_x + COS_PHI*S_y + SIN_THETA*SIN_PHI*S_z;
-            var SR_z = -SIN_THETA*S_x  + COS_THETA*S_z;
+            var SR_z = -SIN_THETA*S_x                      + COS_THETA*S_z;
             
             // Normalambda_ize the unit vector
             // @TODO: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
