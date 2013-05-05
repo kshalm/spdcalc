@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-03
+ * phasematchjs v0.0.1a - 2013-05-04
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -1595,14 +1595,18 @@ PhaseMatch.optimum_idler = function optimum_idler(crystal, Type,  lambda_p, lamb
  * P is SPDC Properties object
  */
 PhaseMatch.phasematch = function phasematch (P){
+    var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
+    var p_bw = 2*Math.PI*con.c/sq(lambda_p) *P.p_bw * n_p; //convert from wavelength to w 
+
     P.lambda_p = 1/(1/P.lambda_s+1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
 
     var delK = PhaseMatch.calc_delK(P);
     
-    // P.lambda_p = lambda_p_tmp; //set back to the original lambda_p
+    P.lambda_p = lambda_p; //set back to the original lambda_p
+    P.n_p = n_p;
     // P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
     var arg = P.L/2*(delK[2]);
 
@@ -1633,10 +1637,13 @@ PhaseMatch.phasematch = function phasematch (P){
     var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
 
     // Calculate the Pump spectrum
-    var alpha = 1;
-    // var alpha = calc_alpha_w(Type, crystal, lambda_p, lambda_s,lambda_i, p_bw,theta, phi, theta_s, theta_i, phi_s, phi_i)
-
-    // var PM = alpha*PMz*PMt
+    // convert pump bandwidth from FWHM to standard deviation
+    // p_bw = p_bw / 2.35482;
+    var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( P.n_s/P.lambda_s + P.n_i/P.lambda_i +1/P.poling_period - P.n_p/lambda_p) )/(p_bw)));
+    // var alpha = 1;
+    // PMt = 1;
+    // PMz_real = 1;
+    // PMz_imag = 1;
 
     //return the real and imaginary parts of Phase matching function
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];
@@ -1650,8 +1657,8 @@ PhaseMatch.phasematch = function phasematch (P){
 PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
     
     // PM is a complex array. First element is real part, second element is imaginary.
-    var PM = PhaseMatch.phasematch(P, P.crystal, P.Type, P.lambda_p, P.p_bw, P.W, P.lambda_s, P.lambda_i, P.L, P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM);
-    // var PM = PhaseMatch.phasematch(P);
+    // var PM = PhaseMatch.phasematch(P, P.crystal, P.Type, P.lambda_p, P.p_bw, P.W, P.lambda_s, P.lambda_i, P.L, P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM);
+    var PM = PhaseMatch.phasematch(P);
 
     // var PMInt = sq(PM[0]) + sq(PM[1])
 
@@ -1732,7 +1739,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         poling_period: 1000000,
         L: 20000 * con.um,
         W: 500 * con.um,
-        p_bw: 1,
+        p_bw: 1 * con.nm,
         phase: false,
         apodization: 1,
         apodization_FWHM: 1000 * con.um
@@ -1753,18 +1760,18 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1550 * con.nm;
             this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
-            this.Type = this.Types[1];
+            this.Type = this.Types[2];
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
-            this.theta_s = 0; // * Math.PI / 180;
-            this.theta_i = 0;
+            this.theta_s = 0 * Math.PI / 180;
+            this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = 0;
             this.poling_period = 1000000;
-            this.L = 20000 * con.um;
+            this.L = 2000 * con.um;
             this.W = 500 * con.um;
-            this.p_bw = 1;
+            this.p_bw = 15 * con.nm;
             this.phase = false;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;

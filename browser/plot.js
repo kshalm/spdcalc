@@ -13,7 +13,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
     //of the photons. dim is the dim of the matrix.
     function plotJSA(P,ls_start, ls_stop, li_start,li_stop, dim){
 
-    
+        console.log("BW = ", 2*Math.PI*PhaseMatch.constants.c/(P.lambda_p*P.lambda_p) *P.p_bw )
         PhaseMatch.auto_calc_Theta(P);
         console.log("theta ", P.theta);
         log('Theta and stuff = ', P.theta*180/Math.PI, ',  ', P.msg);
@@ -27,8 +27,8 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         
         log('Calculation time: ', timeDiff);
         
-        var width = 600;
-        var height = 600;
+        var width = 500;
+        var height = 500;
 
         var hm = new HeatMap({
             width: width,
@@ -50,6 +50,6 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var l_start = 1500 * con.nm;
         var l_stop = 1600 * con.nm; 
         var P = new PhaseMatch.SPDCprop();
-        plotJSA(P,l_start,l_stop,l_start,l_stop, 600)
+        plotJSA(P,l_start,l_stop,l_start,l_stop, 400)
     });
 });
