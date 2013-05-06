@@ -82,13 +82,63 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         console.log("Plot time = ", timeDiff)
     } 
 
+    //Plot the lambda_s vs theta_s
+    function plot_lambda_s_vs_theta_s(P,l_start, l_stop, t_start,t_stop, dim){
+        
+        var startTime = new Date();
+        var PM = PhaseMatch.calc_lambda_s_vs_theta_s(P,l_start, l_stop, t_start,t_stop, dim);
+        var endTime = new Date();
+        var timeDiff = (endTime - startTime);
+        console.log("Calc time = ", timeDiff)
+        
+        log('Calculation time: ', timeDiff);
+        
+        var width = 500;
+        var height = 500;
 
+        var hm = new HeatMap({
+            width: width,
+            height: height
+        });
+
+        var startTime = new Date();
+        hm.plotData( PM );
+        var endTime = new Date();
+        var timeDiff = (endTime - startTime);
+        console.log("Plot time = ", timeDiff)
+    } 
+
+    //Plot theta vs phi to determine phasematching angles
+    function plot_theta_phi(P, t_start, t_stop, p_start, p_stop, dim){
+        
+        var startTime = new Date();
+        var PM = PhaseMatch.calc_theta_phi(P,t_start, t_stop, p_start, p_stop, dim);
+        var endTime = new Date();
+        var timeDiff = (endTime - startTime);
+        console.log("Calc time = ", timeDiff);
+        
+        console.log('Calculation time: ', timeDiff);
+        
+        var width = 500;
+        var height = 500;
+
+        var hm = new HeatMap({
+            width: width,
+            height: height
+        });
+
+        var startTime = new Date();
+        hm.plotData( PM );
+        var endTime = new Date();
+        var timeDiff = (endTime - startTime);
+        console.log("Plot time = ", timeDiff)
+    } 
 
     // wait for domready
     $(function(){
         
         // createPlot(500, 500);
-        var npts = 50;
+        var npts = 200;
         var con = PhaseMatch.constants;
         var l_start = 1450 * con.nm;
         var l_stop = 1650 * con.nm; 
@@ -132,6 +182,22 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
             // P3.theta = P2.theta;
             plotXY(P3,x_start,x_stop,y_start,y_stop,npts);
         });
+
+        var P4 = new PhaseMatch.SPDCprop();
+        $(function(){
+            $('#viewport').append('<h2> Lambda_s vs Theta_s </h2>');
+            PhaseMatch.auto_calc_Theta(P4);
+            plot_lambda_s_vs_theta_s(P4,l_start, l_stop, 0,5*Math.PI/180, npts)
+        });
         
+        var P5 = new PhaseMatch.SPDCprop();
+        $(function(){
+            $('#viewport').append('<h2> Crystal phasematching (theta vs phi) </h2>');
+            PhaseMatch.auto_calc_Theta(P5);
+            plot_theta_phi(P5, 0, Math.PI/2, 0, Math.PI/2, npts);
+        });
+
+
+
     });
 });

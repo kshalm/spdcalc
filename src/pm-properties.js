@@ -58,7 +58,7 @@
         phi_s: 0,
         phi_i: 0,
         poling_period: 1000000,
-        L: 20000 * con.um,
+        L: 2000 * con.um,
         W: 500 * con.um,
         p_bw: 1 * con.nm,
         phase: false,
