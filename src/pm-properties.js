@@ -58,9 +58,9 @@
         phi_s: 0,
         phi_i: 0,
         poling_period: 1000000,
-        L: 20000 * con.um,
+        L: 2000 * con.um,
         W: 500 * con.um,
-        p_bw: 1,
+        p_bw: 1 * con.nm,
         phase: false,
         apodization: 1,
         apodization_FWHM: 1000 * con.um
@@ -81,18 +81,18 @@
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1550 * con.nm;
             this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
-            this.Type = this.Types[1];
+            this.Type = this.Types[2];
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
-            this.theta_s = 0; // * Math.PI / 180;
-            this.theta_i = 0;
+            this.theta_s = 1 * Math.PI / 180;
+            this.theta_i = this.theta_s;
             this.phi_s = 0;
-            this.phi_i = 0;
+            this.phi_i = this.phi_s + Math.PI;
             this.poling_period = 1000000;
-            this.L = 20000 * con.um;
-            this.W = 500 * con.um;
-            this.p_bw = 1;
+            this.L = 2000 * con.um;
+            this.W = 1* con.um;
+            this.p_bw = 15 * con.nm;
             this.phase = false;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
@@ -133,7 +133,7 @@
             // Transform from the lambda_p coordinates to crystal coordinates
             var SR_x = COS_THETA*COS_PHI*S_x - SIN_PHI*S_y + SIN_THETA*COS_PHI*S_z;
             var SR_y = COS_THETA*SIN_PHI*S_x + COS_PHI*S_y + SIN_THETA*SIN_PHI*S_z;
-            var SR_z = -SIN_THETA*S_x  + COS_THETA*S_z;
+            var SR_z = -SIN_THETA*S_x                      + COS_THETA*S_z;
             
             // Normalambda_ize the unit vector
             // @TODO: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
@@ -214,8 +214,6 @@
     PhaseMatch.SPDCprop = SPDCprop;
 
     PhaseMatch.auto_calc_Theta = function auto_calc_Theta(props){
-        props.msg = "before min_delK";
-
         var min_delK = function(x){
             if (x>Math.PI/2 || x<0){return 1e12;}
             props.theta = x;
@@ -227,15 +225,12 @@
             props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
             props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
-            // console.log(props.theta*180/Math.PI);
-            // props.msg = "going in";
             var delK =  PhaseMatch.calc_delK(props);
             // console.log("in the function", delK)
             return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
         };
 
         var guess = Math.PI/8;
-        // var startTime = new Date();
         var startTime = new Date();
 
         var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
@@ -245,18 +240,39 @@
 
         var timeDiff = (endTime - startTime)/1000;
         console.log("Theta autocalc = ", timeDiff);
-        // var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
         props.theta = ans;
+    };
 
-        // console.log("del K", min_delK([props.theta/10]));
+    PhaseMatch.brute_force_theta_i = function brute_force_theta_i(props){
+        var min_PM = function(x){
+            if (x>Math.PI/2 || x<0){return 1e12;}
+            props.theta_i = x;
+            // props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
+            // props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
+            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
 
-        // var res = numeric.uncmin(min_delK, [Math.tan(19.8*180/Math.PI)], 10e-15);
-        // props.theta = Math.tan(res.solution[0]);
-        // props.msg = res.iterations + " " + res.message;
-        // props.msg = JSON.stringify(res);
-        // props.msg =  theta;
-        // var f = function(x) { return sq(-13+x[0]+((5-x[1])*x[1]-2)*x[1])+sq(-29+x[0]+((x[1]+1)*x[1]-14)*x[1]); };
-        // props.theta =  numeric.uncmin(f,[0.5,-2]).solution[1];
+            // props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
+            // props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+
+            var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
+            // console.log("in the function", delK)
+            return 1-PMtmp;
+        };
+
+        //Initial guess
+        PhaseMatch.optimum_idler(props);
+        var guess = props.theta_i;
+        // var startTime = new Date();
+
+        var ans = PhaseMatch.nelderMead(min_PM, guess, 100);
+        // var ans = numeric.uncmin(min_delK, [guess]).solution[0];
+        // var endTime = new Date();
+        
+
+        // var timeDiff = (endTime - startTime)/1000;
+        // console.log("Theta autocalc = ", timeDiff);
+        // props.theta_i = ans;
     };
 })();
 
