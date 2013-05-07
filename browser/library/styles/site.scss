@@ -20,3 +20,6 @@ $phi: 1.61803398875;
 @import "compass/css3";
 @import "compass/typography";
 
+#pm-ui {
+    @import "_pm-ui";
+}

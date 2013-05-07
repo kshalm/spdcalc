@@ -44,6 +44,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var height = 500;
 
         var hm = new HeatMap({
+            el: '#viewport',
             width: width,
             height: height
         });
@@ -71,6 +72,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var height = 500;
 
         var hm = new HeatMap({
+            el: '#viewport',
             width: width,
             height: height
         });
@@ -97,6 +99,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var height = 500;
 
         var hm = new HeatMap({
+            el: '#viewport',
             width: width,
             height: height
         });
@@ -123,6 +126,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         var height = 500;
 
         var hm = new HeatMap({
+            el: '#viewport',
             width: width,
             height: height
         });

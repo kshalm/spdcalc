@@ -1,0 +1,101 @@
+//
+// Styles for the PhaseMatch UI
+//
+
+$sidePanel: 324px;
+$sidePanelCollapsed: 128px;
+
+& {
+    width: 100%;
+    background: $lightgray;
+    padding: 10px;
+    @include box-sizing(border-box);
+
+    > .inner {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid $gray;
+        @include border-radius( 10px );
+
+        > .upper,
+        > .lower {
+            position: relative;
+        }
+
+        > .lower {
+            border-top: 2px solid $gray;
+        }
+    }
+}
+
+#main {
+    @include clearfix;
+    padding-left: $sidePanelCollapsed;
+}
+
+.loading-msg {
+    color: $firm;
+    font-size: 3em;
+    height: 6em;
+    margin-top: 3em;
+    text-align: center;
+}
+
+#secondary-wrap {
+    width: 364px;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 20px;
+    border-right: 1px solid $gray;
+    border-color: $lightgray;
+    height: 100%;
+    background: #fff;
+    background: rgba(#fff, 0.3);
+    @include border-radius( 10px 0 0 10px );
+    @include box-sizing( border-box );
+    @include transition( all 250ms linear );
+
+    &:hover {
+        background: $lightgray;
+        border-color: $gray;
+    }
+
+    &.collapse {
+        width: $sidePanelCollapsed;
+        border-color: $gray;
+        
+        #secondary {
+            @include opacity( 0 );
+        }
+    }
+
+    .btn-wrap {
+        text-align: right;
+    }
+
+    #secondary {
+        width: $sidePanel;
+        margin-top: 1em;
+        @include transition( opacity 250ms linear );
+    }
+}
+
+.plot {
+    float: right;
+    // border: 1px solid $gray;
+}
+
+#logs {
+    height: 200px;
+    background: #fff;
+    padding: 2em 3em;
+    overflow: auto;
+    @include border-radius( 0 0 10px 10px );
+
+    p {
+        font-family: $monoFontFamily;
+        
+    }
+}

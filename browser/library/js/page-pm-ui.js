@@ -1,3 +1,3 @@
 require(['config/require-config'], function(){
-    require(['mediators/boilerplate']);
+    require(['mediators/pm-ui']);
 });

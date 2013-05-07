@@ -1,8 +1,10 @@
 define(
     [
+        'jquery',
         'd3'
     ],
     function(
+        $,
         d3
     ){
         'use strict';
@@ -28,31 +30,36 @@ define(
             options = options || {};
 
             // todo use extend
-            this.width = options.width || 300;
-            this.height = options.height || 300;
+            var width = options.width || 300;
+            var height = options.height || 300;
 
-            this.el = d3.select('#viewport')
-                .append('div')
-                .classed('plot', true)
-                .style('width', this.width+'px')
-                .style('height', this.height+'px')
-                .append('canvas')
-                ;
+            this.el = $('<div>').addClass('plot').appendTo( options.el );
 
-            this.canvas = this.el.node();
-            this.canvas.width = this.width;
-            this.canvas.height = this.height;
-            this.ctx = this.canvas.getContext('2d');
-
+            this.canvas = document.createElement('canvas');
+            this.el.append( this.canvas );
             this.hiddenCanvas = document.createElement('canvas');
-            this.hiddenCanvas.width = this.width;
-            this.hiddenCanvas.height = this.height;
-            this.hiddenCtx = this.hiddenCanvas.getContext('2d');
 
+            this.resize( width, height );
+            
+            this.hiddenCtx = this.hiddenCanvas.getContext('2d');
+            this.ctx = this.canvas.getContext('2d');
             this.setColorMap( options.colorMap );
         }
 
         HeatMap.prototype = {
+
+            resize: function( w, h ){
+
+                this.el
+                    .css('width', w+'px')
+                    .css('height', h+'px')
+                    ;
+
+                this.canvas.width = w;
+                this.canvas.height = h;
+                this.hiddenCanvas.width = w;
+                this.hiddenCanvas.height = h;
+            },
 
             getCanvas: function(){
 
