@@ -3,3 +3,6 @@ node_modules
 .sass-cache
 browser-dist
 *.css
+build/lodash.js
+dist/*
+_SpecRunner.html
