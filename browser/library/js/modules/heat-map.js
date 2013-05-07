@@ -39,7 +39,7 @@ define(
                 .append('canvas')
                 ;
 
-            this.canvas = this.el.node()
+            this.canvas = this.el.node();
             this.canvas.width = this.width;
             this.canvas.height = this.height;
             this.ctx = this.canvas.getContext('2d');

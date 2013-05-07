@@ -12,6 +12,8 @@
     "eqnull" : true,
     "browser" : true,
     "globals" : {
+        "define": true,
+        "require": true,
         "module" : true,
         "exports" : true,
         "PhaseMatch" : true,

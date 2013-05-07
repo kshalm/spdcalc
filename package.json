@@ -21,6 +21,7 @@
   "keywords": [],
   "dependencies": {},
   "devDependencies": {
+    "http-server": "*",
     "grunt": "0.4.x",
     "grunt-contrib-concat": "0.x.x",
     "grunt-contrib-uglify": "0.x.x",
@@ -28,6 +29,9 @@
     "grunt-contrib-clean": "0.x.x",
     "grunt-contrib-copy": "0.x.x",
     "grunt-contrib-jshint": "0.x.x",
+    "grunt-contrib-requirejs": "*",
+    "grunt-contrib-compass": "*",
+    "grunt-bg-shell": "*",
     "grunt-contrib-watch": "~0.3.1",
     "grunt-lodashbuilder": "~0.1.7"
   },

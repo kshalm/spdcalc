@@ -29,6 +29,10 @@ module.exports = function(grunt) {
             // can use wildcards. eg: src/thing-*.js
             'build/outro.js'
         ],
+
+        browserDir: 'browser',
+        browserDistDir: 'browser-dist',
+
         pkg : pkg,
         uglifyFiles : {}
     };
@@ -41,13 +45,15 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg : config.pkg,
+        config: config,
         // checks the coding conventions
         lint : {
             files : ['gruntfile.js', 'test/*.js', 'src/*']
         },
         // clean up temporary/build files
         clean : {
-            dist : ['dist/', 'build/lodash.js']
+            phasematch : ['dist/', 'build/lodash.js'],
+            browser: ['<%= config.browserDistDir %>']
         },
         // build a custom version of the lodash library for utility functions
         lodash: {
@@ -77,20 +83,65 @@ module.exports = function(grunt) {
                 stripBanners : true,
                 banner : config.banner
             },
-            dist : {
+            phasematch : {
                 src : config.sources,
                 dest : config.dist
+            }
+        },
+        copy: {
+            phasematch: {
+                flatten: true,
+                src: config.dist,
+                dest: '<%= config.browserDir %>/library/js/vendor/<%= config.pkg.name %>.js'
+            }
+        },
+        bgShell: {
+            _defaults: {
+                bg: false
+            },
+
+            watchCompass: {
+                cmd: 'compass watch',
+                bg: true
+            },
+
+            httpserver: {
+                cmd: 'node node_modules/http-server/bin/http-server -p 8080 <%= config.browserDir %>',
+                bg: true
+            },
+
+            cleanCompass: {
+                cmd: 'compass clean --config <%= compass.browser.options.config %>',
+                options: {
+                    stdout: true,
+                    stderr: true,
+                    failOnError: true
+                }
+            },
+        },
+        // r.js optimization task
+        requirejs: {
+            browser: {
+                options: require('./build/require-build')
+            }
+        },
+        compass: {
+            browser: {
+                options: {
+                    config: 'config.rb',
+                    force: true
+                }
             }
         },
         // watch a directory for changes and execute tasks when they change
         watch: {
           files: 'src/**/*.js',
-          tasks: ['concat']
+          tasks: ['concat:phasematch', 'copy:phasematch']
         },
         // minify the concatenated javascript
         uglify : {
             options : { mangle : true },
-            dist : {
+            phasematch : {
                 files : config.uglifyFiles
             }
         },
@@ -109,7 +160,8 @@ module.exports = function(grunt) {
             options : {
                 jshintrc : 'jshint.json'
             },
-            source : 'src/*.js'
+            phasematch : ['src/*.js'],
+            browser:  ['<%= config.browserDir %>/library/js/{.,modules,mediators}/*.js']
         }
     });
 
@@ -122,8 +174,17 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-compass');
+    grunt.loadNpmTasks('grunt-bg-shell');
+    grunt.loadNpmTasks('grunt-contrib-requirejs');
 
+
+    grunt.registerTask('cleanup', ['clean', 'bgShell:cleanCompass']);
+    grunt.registerTask('dev', [ 'bgShell:watchCompass', 'bgShell:httpserver', 'watch']);
+    grunt.registerTask('build-browser', ['cleanup', 'jshint:browser', 'compass', 'requirejs:browser']);
+
+    grunt.registerTask('build-phasematch', ['clean', 'lodash', 'concat:phasematch', 'copy:phasematch', 'jshint:phasematch', 'uglify', 'jasmine']);
 
     // Default task executes a build for phasematch library.
-    grunt.registerTask('default', ['clean', 'lodash', 'concat', 'jshint', 'uglify', 'jasmine']);
+    grunt.registerTask('default', ['build-phasematch']);
 };
