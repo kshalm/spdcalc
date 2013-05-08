@@ -247,16 +247,11 @@
         var min_PM = function(x){
             if (x>Math.PI/2 || x<0){return 1e12;}
             props.theta_i = x;
-            // props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
-            // props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
-            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
 
-            // props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-            // props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
             props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
             var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
-            // console.log("in the function", delK)
             return 1-PMtmp;
         };
 
@@ -266,13 +261,36 @@
         // var startTime = new Date();
 
         var ans = PhaseMatch.nelderMead(min_PM, guess, 100);
-        // var ans = numeric.uncmin(min_delK, [guess]).solution[0];
-        // var endTime = new Date();
-        
+    };
 
-        // var timeDiff = (endTime - startTime)/1000;
-        // console.log("Theta autocalc = ", timeDiff);
-        // props.theta_i = ans;
+    PhaseMatch.deepcopy = function deepcopy(props){
+        var P = new PhaseMatch.SPDCprop();
+        P.crystal = props.crystal;
+        P.lambda_p = PhaseMatch.util.clone(props.lambda_p,true);
+        P.lambda_s = PhaseMatch.util.clone(props.lambda_s,true);
+        P.lambda_i = PhaseMatch.util.clone(props.lambda_i,true);
+        P.Type = PhaseMatch.util.clone(props.Type,true);
+        P.theta = PhaseMatch.util.clone(props.theta,true);
+        P.phi = PhaseMatch.util.clone(props.phi,true);
+        P.theta_s = PhaseMatch.util.clone(props.theta_s,true);
+        P.theta_i = PhaseMatch.util.clone(props.theta_i,true);
+        P.phi_s = PhaseMatch.util.clone(props.phi_s,true);
+        P.phi_i = PhaseMatch.util.clone(props.phi_i,true);
+        P.poling_period = PhaseMatch.util.clone(props.poling_period,true);
+        P.L = PhaseMatch.util.clone(props.L,true);
+        P.W = PhaseMatch.util.clone(props.W,true);
+        P.p_bw = PhaseMatch.util.clone(props.p_bw,true);
+        P.phase = PhaseMatch.util.clone(props.phase,true);
+        P.apodization = PhaseMatch.util.clone(props.apodization,true);
+        P.apodization_FWHM = PhaseMatch.util.clone(props.apodization_FWHM,true);
+        P.S_p = PhaseMatch.util.clone(props.S_p,true);
+        P.S_s = PhaseMatch.util.clone(props.S_s,true);
+        P.S_i = PhaseMatch.util.clone(props.S_i,true);
+        P.n_p = PhaseMatch.util.clone(props.n_p,true);
+        P.n_s = PhaseMatch.util.clone(props.n_s,true);
+        P.n_i = PhaseMatch.util.clone(props.n_i,true);
+        
+        return P;
     };
 })();
 

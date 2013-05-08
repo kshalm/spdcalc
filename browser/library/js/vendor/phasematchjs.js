@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-06
+ * phasematchjs v0.0.1a - 2013-05-08
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -93,6 +93,14 @@ var PhaseMatch = { util: {} };
       regexpClass = '[object RegExp]',
       stringClass = '[object String]';
 
+  /** Used to identify object classifications that `_.clone` supports */
+  var cloneableClasses = {};
+  cloneableClasses[funcClass] = false;
+  cloneableClasses[argsClass] = cloneableClasses[arrayClass] =
+  cloneableClasses[boolClass] = cloneableClasses[dateClass] =
+  cloneableClasses[numberClass] = cloneableClasses[objectClass] =
+  cloneableClasses[regexpClass] = cloneableClasses[stringClass] = true;
+
   /** Used to determine if values are of the language type Object */
   var objectTypes = {
     'boolean': false,
@@ -154,6 +162,16 @@ var PhaseMatch = { util: {} };
   /** Detect various environments */
   var isIeOpera = reNative.test(window.attachEvent),
       isV8 = nativeBind && !/\n|true/.test(nativeBind + isIeOpera);
+
+  /** Used to lookup a built-in constructor by [[Class]] */
+  var ctorByClass = {};
+  ctorByClass[arrayClass] = Array;
+  ctorByClass[boolClass] = Boolean;
+  ctorByClass[dateClass] = Date;
+  ctorByClass[objectClass] = Object;
+  ctorByClass[numberClass] = Number;
+  ctorByClass[regexpClass] = RegExp;
+  ctorByClass[stringClass] = String;
 
   /*--------------------------------------------------------------------------*/
 
@@ -619,13 +637,13 @@ var PhaseMatch = { util: {} };
 
     // create the function factory
     var factory = Function(
-        'hasOwnProperty, isArguments, isArray, keys, ' +
+        'hasOwnProperty, isArguments, isArray, isString, keys, ' +
         'lodash, objectTypes',
       'return function(' + args + ') {\n' + iteratorTemplate(data) + '\n}'
     );
     // return the compiled function
     return factory(
-      hasOwnProperty, isArguments, isArray, keys,
+      hasOwnProperty, isArguments, isArray, isString, keys,
       lodash, objectTypes
     );
   }
@@ -804,6 +822,22 @@ var PhaseMatch = { util: {} };
   };
 
   /**
+   * A function compiled to iterate `arguments` objects, arrays, objects, and
+   * strings consistenly across environments, executing the `callback` for each
+   * element in the `collection`. The `callback` is bound to `thisArg` and invoked
+   * with three arguments; (value, index|key, collection). Callbacks may exit
+   * iteration early by explicitly returning `false`.
+   *
+   * @private
+   * @type Function
+   * @param {Array|Object|String} collection The collection to iterate over.
+   * @param {Function} [callback=identity] The function called per iteration.
+   * @param {Mixed} [thisArg] The `this` binding of `callback`.
+   * @returns {Array|Object|String} Returns `collection`.
+   */
+  var each = createIterator(eachIteratorOptions);
+
+  /**
    * Used to convert characters to HTML entities:
    *
    * Though the `>` character is escaped for symmetry, characters like `>` and `/`
@@ -866,6 +900,132 @@ var PhaseMatch = { util: {} };
       ),
     'loop': 'result[index] = callback ? callback(result[index], iterable[index]) : iterable[index]'
   });
+
+  /**
+   * Creates a clone of `value`. If `deep` is `true`, nested objects will also
+   * be cloned, otherwise they will be assigned by reference. If a `callback`
+   * function is passed, it will be executed to produce the cloned values. If
+   * `callback` returns `undefined`, cloning will be handled by the method instead.
+   * The `callback` is bound to `thisArg` and invoked with one argument; (value).
+   *
+   * @static
+   * @memberOf _
+   * @category Objects
+   * @param {Mixed} value The value to clone.
+   * @param {Boolean} [deep=false] A flag to indicate a deep clone.
+   * @param {Function} [callback] The function to customize cloning values.
+   * @param {Mixed} [thisArg] The `this` binding of `callback`.
+   * @param- {Array} [stackA=[]] Tracks traversed source objects.
+   * @param- {Array} [stackB=[]] Associates clones with source counterparts.
+   * @returns {Mixed} Returns the cloned `value`.
+   * @example
+   *
+   * var stooges = [
+   *   { 'name': 'moe', 'age': 40 },
+   *   { 'name': 'larry', 'age': 50 }
+   * ];
+   *
+   * var shallow = _.clone(stooges);
+   * shallow[0] === stooges[0];
+   * // => true
+   *
+   * var deep = _.clone(stooges, true);
+   * deep[0] === stooges[0];
+   * // => false
+   *
+   * _.mixin({
+   *   'clone': _.partialRight(_.clone, function(value) {
+   *     return _.isElement(value) ? value.cloneNode(false) : undefined;
+   *   })
+   * });
+   *
+   * var clone = _.clone(document.body);
+   * clone.childNodes.length;
+   * // => 0
+   */
+  function clone(value, deep, callback, thisArg, stackA, stackB) {
+    var result = value;
+
+    // allows working with "Collections" methods without using their `callback`
+    // argument, `index|key`, for this method's `callback`
+    if (typeof deep == 'function') {
+      thisArg = callback;
+      callback = deep;
+      deep = false;
+    }
+    if (typeof callback == 'function') {
+      callback = (typeof thisArg == 'undefined')
+        ? callback
+        : lodash.createCallback(callback, thisArg, 1);
+
+      result = callback(result);
+      if (typeof result != 'undefined') {
+        return result;
+      }
+      result = value;
+    }
+    // inspect [[Class]]
+    var isObj = isObject(result);
+    if (isObj) {
+      var className = toString.call(result);
+      if (!cloneableClasses[className] || (!support.nodeClass && isNode(result))) {
+        return result;
+      }
+      var isArr = isArray(result);
+    }
+    // shallow clone
+    if (!isObj || !deep) {
+      return isObj
+        ? (isArr ? slice(result) : assign({}, result))
+        : result;
+    }
+    var ctor = ctorByClass[className];
+    switch (className) {
+      case boolClass:
+      case dateClass:
+        return new ctor(+result);
+
+      case numberClass:
+      case stringClass:
+        return new ctor(result);
+
+      case regexpClass:
+        return ctor(result.source, reFlags.exec(result));
+    }
+    // check for circular references and return corresponding clone
+    stackA || (stackA = []);
+    stackB || (stackB = []);
+
+    var length = stackA.length;
+    while (length--) {
+      if (stackA[length] == value) {
+        return stackB[length];
+      }
+    }
+    // init cloned object
+    result = isArr ? ctor(result.length) : {};
+
+    // add array properties assigned by `RegExp#exec`
+    if (isArr) {
+      if (hasOwnProperty.call(value, 'index')) {
+        result.index = value.index;
+      }
+      if (hasOwnProperty.call(value, 'input')) {
+        result.input = value.input;
+      }
+    }
+    // add the source value to the stack of traversed objects
+    // and associate it with its clone
+    stackA.push(value);
+    stackB.push(result);
+
+    // recursively populate clone (susceptible to call stack limits)
+    (isArr ? forEach : forOwn)(value, function(objValue, key) {
+      result[key] = clone(objValue, deep, callback, undefined, stackA, stackB);
+    });
+
+    return result;
+  }
 
   /**
    * Iterates over `object`'s own and inherited enumerable properties, executing
@@ -1167,6 +1327,63 @@ var PhaseMatch = { util: {} };
     return value ? objectTypes[typeof value] : false;
   }
 
+  /**
+   * Checks if `value` is a string.
+   *
+   * @static
+   * @memberOf _
+   * @category Objects
+   * @param {Mixed} value The value to check.
+   * @returns {Boolean} Returns `true`, if the `value` is a string, else `false`.
+   * @example
+   *
+   * _.isString('moe');
+   * // => true
+   */
+  function isString(value) {
+    return typeof value == 'string' || toString.call(value) == stringClass;
+  }
+
+  /*--------------------------------------------------------------------------*/
+
+  /**
+   * Iterates over a `collection`, executing the `callback` for each element in
+   * the `collection`. The `callback` is bound to `thisArg` and invoked with three
+   * arguments; (value, index|key, collection). Callbacks may exit iteration early
+   * by explicitly returning `false`.
+   *
+   * @static
+   * @memberOf _
+   * @alias each
+   * @category Collections
+   * @param {Array|Object|String} collection The collection to iterate over.
+   * @param {Function} [callback=identity] The function called per iteration.
+   * @param {Mixed} [thisArg] The `this` binding of `callback`.
+   * @returns {Array|Object|String} Returns `collection`.
+   * @example
+   *
+   * _([1, 2, 3]).forEach(alert).join(',');
+   * // => alerts each number and returns '1,2,3'
+   *
+   * _.forEach({ 'one': 1, 'two': 2, 'three': 3 }, alert);
+   * // => alerts each number value (order is not guaranteed)
+   */
+  function forEach(collection, callback, thisArg) {
+    if (callback && typeof thisArg == 'undefined' && isArray(collection)) {
+      var index = -1,
+          length = collection.length;
+
+      while (++index < length) {
+        if (callback(collection[index], index, collection) === false) {
+          break;
+        }
+      }
+    } else {
+      each(collection, callback, thisArg);
+    }
+    return collection;
+  }
+
   /*--------------------------------------------------------------------------*/
 
   /**
@@ -1316,20 +1533,25 @@ var PhaseMatch = { util: {} };
   lodash.assign = assign;
   lodash.bind = bind;
   lodash.createCallback = createCallback;
+  lodash.forEach = forEach;
   lodash.forIn = forIn;
   lodash.forOwn = forOwn;
   lodash.keys = keys;
 
+  lodash.each = forEach;
   lodash.extend = assign;
 
   /*--------------------------------------------------------------------------*/
 
+  // add functions that return unwrapped values when chaining
+  lodash.clone = clone;
   lodash.identity = identity;
   lodash.isArguments = isArguments;
   lodash.isArray = isArray;
   lodash.isEqual = isEqual;
   lodash.isFunction = isFunction;
   lodash.isObject = isObject;
+  lodash.isString = isString;
 
   /*--------------------------------------------------------------------------*/
 
@@ -2195,16 +2417,11 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         var min_PM = function(x){
             if (x>Math.PI/2 || x<0){return 1e12;}
             props.theta_i = x;
-            // props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
-            // props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
-            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
 
-            // props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-            // props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
             props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
             var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
-            // console.log("in the function", delK)
             return 1-PMtmp;
         };
 
@@ -2214,18 +2431,50 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         // var startTime = new Date();
 
         var ans = PhaseMatch.nelderMead(min_PM, guess, 100);
-        // var ans = numeric.uncmin(min_delK, [guess]).solution[0];
-        // var endTime = new Date();
-        
+    };
 
-        // var timeDiff = (endTime - startTime)/1000;
-        // console.log("Theta autocalc = ", timeDiff);
-        // props.theta_i = ans;
+    PhaseMatch.deepcopy = function deepcopy(props){
+        var P = new PhaseMatch.SPDCprop();
+        P.crystal = props.crystal;
+        P.lambda_p = PhaseMatch.util.clone(props.lambda_p,true);
+        P.lambda_s = PhaseMatch.util.clone(props.lambda_s,true);
+        P.lambda_i = PhaseMatch.util.clone(props.lambda_i,true);
+        P.Type = PhaseMatch.util.clone(props.Type,true);
+        P.theta = PhaseMatch.util.clone(props.theta,true);
+        P.phi = PhaseMatch.util.clone(props.phi,true);
+        P.theta_s = PhaseMatch.util.clone(props.theta_s,true);
+        P.theta_i = PhaseMatch.util.clone(props.theta_i,true);
+        P.phi_s = PhaseMatch.util.clone(props.phi_s,true);
+        P.phi_i = PhaseMatch.util.clone(props.phi_i,true);
+        P.poling_period = PhaseMatch.util.clone(props.poling_period,true);
+        P.L = PhaseMatch.util.clone(props.L,true);
+        P.W = PhaseMatch.util.clone(props.W,true);
+        P.p_bw = PhaseMatch.util.clone(props.p_bw,true);
+        P.phase = PhaseMatch.util.clone(props.phase,true);
+        P.apodization = PhaseMatch.util.clone(props.apodization,true);
+        P.apodization_FWHM = PhaseMatch.util.clone(props.apodization_FWHM,true);
+        P.S_p = PhaseMatch.util.clone(props.S_p,true);
+        P.S_s = PhaseMatch.util.clone(props.S_s,true);
+        P.S_i = PhaseMatch.util.clone(props.S_i,true);
+        P.n_p = PhaseMatch.util.clone(props.n_p,true);
+        P.n_s = PhaseMatch.util.clone(props.n_s,true);
+        P.n_i = PhaseMatch.util.clone(props.n_i,true);
+        
+        return P;
     };
 })();
 
 
-PhaseMatch.calcJSA = function calcJSA(P, ls_start, ls_stop, li_start, li_stop, dim){
+PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_stop, dim){
+    var startTime = new Date();
+    var P = PhaseMatch.deepcopy(props);
+    var endTime = new Date();
+    var timeDiff = (endTime - startTime);
+    console.log("deep copy time = ", timeDiff);
+
+
+    // var P = props;
+    // P = new PhaseMatch.SPDCprop();
 
     var lambda_s = new Float64Array(dim);
     var lambda_i = new Float64Array(dim);
@@ -2264,7 +2513,9 @@ PhaseMatch.calcJSA = function calcJSA(P, ls_start, ls_stop, li_start, li_stop, d
 
 };
 
-PhaseMatch.calcXY = function calcXY(P, x_start, x_stop, y_start, y_stop, dim){
+PhaseMatch.calcXY = function calcXY(props, x_start, x_stop, y_start, y_stop, dim){
+
+    var P = PhaseMatch.deepcopy(props);
 
     var X = new Float64Array(dim);
     var Y = new Float64Array(dim);
@@ -2305,7 +2556,9 @@ PhaseMatch.calcXY = function calcXY(P, x_start, x_stop, y_start, y_stop, dim){
 
 };
 
-PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(P, l_start, l_stop, t_start, t_stop, dim){
+PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start, t_stop, dim){
+
+    var P = PhaseMatch.deepcopy(props);
 
     var lambda_s = new Float64Array(dim);
     var theta_s = new Float64Array(dim);
@@ -2341,8 +2594,9 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(P, l_sta
 
 };
 
-PhaseMatch.calc_theta_phi = function calc_theta_phi(P, t_start, t_stop, p_start, p_stop, dim){
+PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
+    var P = PhaseMatch.deepcopy(props);
     var theta = new Float64Array(dim);
     var phi = new Float64Array(dim);
 
@@ -2375,44 +2629,6 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(P, t_start, t_stop, p_start,
     return PM;
 
 };
-
-
-// def PM_theta_phi(P, x=[-1,-1], y=[-1,-1], initialize= False):
-
-//     pump_bw = 2*np.pi*con.c/(P.lambda_p**2) *P.pump_bw 
-
-//     n_thetas = P.npts
-//     n_phis = P.npts
-//     if initialize:
-//         astart = 0. *np.pi/180
-//         astop = 90. *np.pi/180
-
-//         aistart =0. *np.pi/180
-//         aistop = 90. *np.pi/180
-
-//     else:
-//         astart = x[0]
-//         astop = x[1]
-
-//         aistart = y[0]
-//         aistop = y[1]
-
-//     theta = np.linspace(astart, astop, n_thetas)
-//     phi = np.linspace(aistart, aistop, n_phis)
-//     [THETA, PHI] = np.meshgrid(theta,phi)
-
-//     # theta_s = np.arctan((X**2 + Y**2)**.5) 
-//     # phi_s = np.arctan(Y/X) 
-//     # neg_ind = X <0
-//     # phi_s[neg_ind] = phi_s[neg_ind]+np.pi
-//     # phi_i = (phi_s +np.pi)
-
-//     theta_i = optimum_idler(P, P.lambda_s, P.theta_s, P.phi_s, THETA,PHI, P.poling_period)
-//     PM = phasematch_Int_Phase(P.Type, P.crystal, P.lambda_p, pump_bw, P.W, P.lambda_s, P.lambda_i, P.L ,THETA, PHI, 
-//         P.theta_s, theta_i, P.phi_s, P.phi_i, P.calcPhase, P.poling_period, P.apodization, P.apodization_FWHM )
-//     # print "Theta s, i", P.theta_s*180/np.pi, P.theta_i*180/np.pi,  np.max(theta_i*180/np.pi)
-//     # print
-//     return [astart, astop], [aistart, aistop], PM
 
 
 
