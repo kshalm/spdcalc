@@ -2,29 +2,33 @@ define(
     [
         'jquery',
         'stapes',
+        'phasematch',
         'tpl!templates/pm-ui.tpl',
+        'tpl!templates/parameters-panel.tpl',
         'jquery-ui',
         'bootstrap-tooltip',
         'jquery.dropkick',
         'jquery.tagsinput',
         'custom-checkbox',
-        'custom-radio',
 
         // physics modules
+        'modules/parameters',
         'modules/jsa-ui'
     ],
     function(
         $,
         Stapes,
+        PhaseMatch,
         tplPMUI,
+        tplParametersPanel,
         _jqui,
         _bstt,
         _dk,
         _jqtags,
-        _cc,
-        _cr,
+        customCheckbox,
 
         // physics modules
+        Parameters,
         jsaUI
     ) {
 
@@ -45,8 +49,10 @@ define(
 
                 var self = this;
 
+                self.initParameters();
                 self.initUI();
                 self.initEvents();
+                self.initModules();
 
                 $(function(){
                     self.emit('domready');
@@ -60,20 +66,22 @@ define(
             initEvents : function(){
 
                 var self = this;
-                self.on('domready',self.onDomReady);
-
-                self.on('ready', function(){
-                    // append the main ui elements
-                    $('#pm-ui').empty().append( self.el );
-
-                    // default
-                    self.load('jsa');
-                    self.emit('resize');
-
-                    self.emit('info', 'Application Loaded');
-                });
-
+                
                 self.on({
+
+                    'domready': self.onDomReady,
+
+                    'ready': function(){
+                        // append the main ui elements
+                        $('#pm-ui').empty().append( self.el );
+                        customCheckbox( self.el );
+
+                        // default
+                        self.load('jsa');
+                        self.emit('resize');
+
+                        self.emit('info', 'Application Loaded');
+                    },
 
                     'resize': function(){
 
@@ -95,7 +103,22 @@ define(
 
                 self.el.on('click', '.collapse-ctrl', function(e){
                     e.preventDefault();
-                    self.elSecondary.parent().toggleClass('collapse');
+                    var target = self.elParameters.parent()
+                        ,text = target.is('.collapsed') ? 'collapse' : 'expand'
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('change', '#autocalc', function(){
+
+                    $('.ctrl-calc').prop('disabled', $(this).is(':checked'));
+                });
+
+                self.on('click', '.ctrl-calc', function(){
+
+                    self.emit('calculate');
                 });
 
                 var to;
@@ -119,8 +142,22 @@ define(
                 self.el = $(tplPMUI.render());
 
                 self.elMain = self.el.find('#main');
-                self.elSecondary = self.el.find('#secondary');
+                self.elParameters = self.el.find('#parameters');
                 self.elLogs = self.el.find('#logs');
+
+                // init parameters panel
+                self.elParameters.append( $(tplParametersPanel.render( self.parameters.getAll() )) );
+            },
+
+            initParameters: function(){
+                
+                var self = this;
+                self.parameters = Parameters();
+            },
+
+            initModules: function(){
+                
+                var self = this;
 
                 // JSA
                 self.set('jsa', jsaUI());
@@ -134,20 +171,22 @@ define(
             load: function( id ){
 
                 var self = this
-                    ,ui = self.get( id )
+                    ,mod = self.get( id )
                     ;
 
-                if (!ui){
+                if (!mod){
                     return this;
                 }
 
-                self._curr = ui;
+                if (self._curr){
+                    self._curr.disconnect( self );
+                }
+
+                self._curr = mod;
 
                 // inject containers
-                self.elMain.empty().append( ui.getMainPanel() );
-                self.elSecondary.empty().append( ui.getSecondaryPanel() );
-                ui.calc();
-                ui.draw();
+                self.elMain.empty().append( mod.getMainPanel() );
+                mod.connect( self );
 
                 return this;
             },

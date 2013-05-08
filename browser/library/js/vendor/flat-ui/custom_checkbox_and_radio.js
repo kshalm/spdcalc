@@ -1,53 +1,55 @@
-// Custom checkbox and radios
-function setupLabel() {
-    // Checkbox
-    var checkBox = ".checkbox";
-    var checkBoxInput = checkBox + " input[type='checkbox']";
-    var checkBoxChecked = "checked";
-    var checkBoxDisabled = "disabled";
+define(
+    [
+        'jquery'
+    ],
+    function(
+        $
+    ){
 
-    // Radio
-    var radio = ".radio";
-    var radioInput = radio + " input[type='radio']";
-    var radioOn = "checked";
-    var radioDisabled = "disabled";
+        var toggleHandler = function(toggle) {
+            var toggle = toggle;
+            var radio = $(toggle).find("input");
 
-    // Checkboxes
-    if ($(checkBoxInput).length) {
-        $(checkBox).each(function(){
-            $(this).removeClass(checkBoxChecked);
-        });
-        $(checkBoxInput + ":checked").each(function(){
-            $(this).parent(checkBox).addClass(checkBoxChecked);
-        });
-        $(checkBoxInput + ":disabled").each(function(){
-            $(this).parent(checkBox).addClass(checkBoxDisabled);
-        });
-    };
+            var checkToggleState = function() {
+                if (radio.eq(0).is(":checked")) {
+                    $(toggle).removeClass("toggle-off");
+                } else {
+                    $(toggle).addClass("toggle-off");
+                }
+            };
 
-    // Radios
-    if ($(radioInput).length) {
-        $(radio).each(function(){
-            $(this).removeClass(radioOn);
-        });
-        $(radioInput + ":checked").each(function(){
-            $(this).parent(radio).addClass(radioOn);
-        });
-        $(radioInput + ":disabled").each(function(){
-            $(this).parent(radio).addClass(radioDisabled);
-        });
-    };
-};
+            checkToggleState();
 
-$(document).ready(function(){
-    $("html").addClass("has-js");
+            radio.eq(0).click(function() {
+                $(toggle).toggleClass("toggle-off");
+            });
 
-    // First let's prepend icons (needed for effects)
-    $(".checkbox, .radio").prepend("<span class='icon'></span><span class='icon-to-fade'></span>");
+            radio.eq(1).click(function() {
+                $(toggle).toggleClass("toggle-off");
+            });
+        };
 
-    $(".checkbox, .radio").click(function(){
-        setupLabel();
-    });
-    setupLabel();
-});
+        function init( scope ){
+            scope = scope || $('body');
+
+            $("html").addClass("has-js");
+
+            // First let's prepend icons (needed for effects)
+            $(".checkbox, .radio", scope).prepend("<span class='icon'></span><span class='icon-to-fade'></span>");
+
+            scope.on('click', '.checkbox input[type="checkbox"], .radio input[type="radio"]', function(){
+                
+                var $this = $(this);
+                $this.parent().toggleClass('checked', $this.is(':checked'));
+                $this.parent().toggleClass('disabled', $this.is(':disabled'));
+            });
+
+            $(".toggle", scope).each(function(index, toggle) {
+                toggleHandler(toggle);
+            });
+        }
+
+        return init;
+    }
+);
 
