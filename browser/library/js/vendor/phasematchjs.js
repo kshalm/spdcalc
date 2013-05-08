@@ -2564,6 +2564,20 @@ PhaseMatch.Sum = function Sum(A){
 
     PhaseMatch.SPDCprop = SPDCprop;
 
+    //
+    // @TODO: Jasper suggests moving these into the props object
+    // itself ( thereby making this a more object oriented approach )
+    // 
+    // Ex: props.auto_calc_Theta();
+    // 
+    // inside functions you just need to change:
+    // function auto_calc_Theta( props )
+    // to
+    // function auto_calc_Theta(){
+    //     var props = this;
+    //     ...
+    // }
+    // 
     PhaseMatch.auto_calc_Theta = function auto_calc_Theta(props){
         var min_delK = function(x){
             if (x>Math.PI/2 || x<0){return 1e12;}

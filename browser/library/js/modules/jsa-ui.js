@@ -3,8 +3,7 @@ define(
         'jquery',
         'stapes',
         'phasematch',
-        'modules/heat-map',
-        'tpl!templates/jsa-sec-panel.tpl'
+        'modules/heat-map'
     ],
     function(
         $,
@@ -40,7 +39,6 @@ define(
                 self.options = $.extend({}, defaults, config);
 
                 self.initPhysics();
-                self.initEvents();
 
                 self.el = $('<div>');
 
@@ -50,24 +48,40 @@ define(
                 });
 
                 self.elPlot = $(self.plot.el);
-
-                // init secondary panel
-                self.elSecondary = $( tplJSASecondaryPanel.render( self.props ) );
             },
 
             initPhysics: function(){
 
-                var self = this;
-                self.props = new PhaseMatch.SPDCprop();
-                PhaseMatch.optimum_idler( self.props );
-                PhaseMatch.auto_calc_Theta( self.props );
+                // initialize physics if needed...
             },
 
             /**
-             * Initialize events
+             * Connect to main app
              * @return {void}
              */
-            initEvents : function(){
+            connect : function( app ){
+
+                var self = this
+                    ;
+
+                self.parameters = app.parameters;
+
+                // connect to the app events
+                app.on({
+
+                    calculate: self.refresh
+
+                }, self);
+
+                // auto draw
+                self.refresh();
+                
+            },
+
+            disconnect: function( app ){
+
+                // disconnect from app events
+                app.off( 'calculate', self.refresh );
             },
 
             resize: function(){
@@ -87,11 +101,14 @@ define(
                 return this.el;
             },
 
-            getSecondaryPanel: function(){
-                return this.elSecondary;
+            refresh: function( props ){
+
+                var self = this;
+                self.calc( self.parameters.getProps() );
+                self.draw();
             },
 
-            calc: function(){
+            calc: function( props ){
 
                 // @TODO: move this to a control bar
                 var dim = 200;
@@ -100,7 +117,7 @@ define(
 
                 var self = this
                     ,PM = PhaseMatch.calcJSA(
-                        self.props, 
+                        props, 
                         l_start, 
                         l_stop, 
                         l_start,

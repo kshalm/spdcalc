@@ -20,12 +20,6 @@ require.config({
         },
         'jquery.tagsinput': {
             deps: ['jquery']
-        },
-        'custom-checkbox': {
-            deps: ['jquery']
-        },
-        'custom-radio': {
-            deps: ['jquery']
         }
     },
 
@@ -45,7 +39,6 @@ require.config({
 
         'bootstrap-tooltip': 'vendor/bootstrap-tooltip',
         'custom-checkbox': 'vendor/flat-ui/custom_checkbox_and_radio',
-        'custom-radio': 'vendor/flat-ui/custom_radio',
 
         // Plugins
         'text': 'plugins/text',

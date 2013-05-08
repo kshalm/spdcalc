@@ -2,8 +2,7 @@
 // Styles for the PhaseMatch UI
 //
 
-$sidePanel: 324px;
-$sidePanelCollapsed: 128px;
+$sidePanelCollapsed: 70px;
 
 & {
     width: 100%;
@@ -28,9 +27,23 @@ $sidePanelCollapsed: 128px;
     }
 }
 
+.navbar {
+    .site-title {
+        float: left;
+        margin: 0 1em 0 0.2em;
+        padding: 5px;
+        color: $lightgray;
+        font-weight: normal;
+    }
+
+    .ui-module-wrap {
+        margin: 6px 0 -5px;
+    }
+}
+
 #main {
     @include clearfix;
-    padding-left: $sidePanelCollapsed;
+    padding: 1em 0;
 }
 
 .loading-msg {
@@ -41,50 +54,54 @@ $sidePanelCollapsed: 128px;
     text-align: center;
 }
 
-#secondary-wrap {
-    width: 364px;
+#parameters-wrap {
+    width: 100%;
     overflow: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
     padding: 20px;
-    border-right: 1px solid $gray;
-    border-color: $lightgray;
-    height: 100%;
+    border-bottom: 1px solid $gray;
     background: #fff;
     background: rgba(#fff, 0.3);
-    @include border-radius( 10px 0 0 10px );
     @include box-sizing( border-box );
-    @include transition( all 250ms linear );
 
-    &:hover {
-        background: $lightgray;
-        border-color: $gray;
+    .title {
+        margin: 0;
+        vertical-align: top;
     }
 
-    &.collapse {
-        width: $sidePanelCollapsed;
+    &.collapsed {
+        height: $sidePanelCollapsed;
         border-color: $gray;
+
+        .title:after {
+            content: '...';
+        }
         
-        #secondary {
+        #parameters {
             @include opacity( 0 );
         }
+    }
+
+    .ctrl-calc,
+    .ctrl-calc + label {
+        display: inline-block;
+        margin: 0;
+        vertical-align: middle;
+        margin-right: 0.5em;
     }
 
     .btn-wrap {
         text-align: right;
     }
 
-    #secondary {
-        width: $sidePanel;
+    #parameters {
         margin-top: 1em;
-        @include transition( opacity 250ms linear );
     }
 }
 
 .plot {
-    float: right;
-    // border: 1px solid $gray;
+    max-width: 900px;
+    margin: auto;
+    border: 1px solid lighten($gray, 10);
 }
 
 #logs {
