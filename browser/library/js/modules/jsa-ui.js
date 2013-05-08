@@ -52,7 +52,7 @@ define(
 
             initPhysics: function(){
 
-                
+                // initialize physics if needed...
             },
 
             /**
@@ -62,17 +62,26 @@ define(
             connect : function( app ){
 
                 var self = this
-                    ,parameters = app.parameters
                     ;
 
+                self.parameters = app.parameters;
 
-                self.calc( parameters.getProps() );
-                self.draw();
+                // connect to the app events
+                app.on({
+
+                    calculate: self.refresh
+
+                }, self);
+
+                // auto draw
+                self.refresh();
+                
             },
 
             disconnect: function( app ){
 
-
+                // disconnect from app events
+                app.off( 'calculate', self.refresh );
             },
 
             resize: function(){
@@ -90,6 +99,13 @@ define(
 
             getMainPanel: function(){
                 return this.el;
+            },
+
+            refresh: function( props ){
+
+                var self = this;
+                self.calc( self.parameters.getProps() );
+                self.draw();
             },
 
             calc: function( props ){

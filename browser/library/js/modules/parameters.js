@@ -30,10 +30,10 @@ define(
                 var self = this;
 
                 self.props = new PhaseMatch.SPDCprop();
-                console.log(self.props)
                 PhaseMatch.optimum_idler( self.props );
                 PhaseMatch.auto_calc_Theta( self.props );
 
+                self.set( self.props );
                 self.initEvents();
             },
 

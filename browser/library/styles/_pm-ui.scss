@@ -27,6 +27,20 @@ $sidePanelCollapsed: 70px;
     }
 }
 
+.navbar {
+    .site-title {
+        float: left;
+        margin: 0 1em 0 0.2em;
+        padding: 5px;
+        color: $lightgray;
+        font-weight: normal;
+    }
+
+    .ui-module-wrap {
+        margin: 6px 0 -5px;
+    }
+}
+
 #main {
     @include clearfix;
     padding: 1em 0;

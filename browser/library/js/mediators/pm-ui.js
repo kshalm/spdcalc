@@ -72,10 +72,7 @@ define(
                     'domready': self.onDomReady,
 
                     'ready': function(){
-                        // append the main ui elements
-                        $('#pm-ui').empty().append( self.el );
-                        customCheckbox( self.el );
-
+                        
                         // default
                         self.load('jsa');
                         self.emit('resize');
@@ -92,6 +89,11 @@ define(
                         }
                     },
 
+                    'calculate': function(){
+
+                        self.emit('info', 'recalculating...');
+                    },
+
                     'info': function( msg ){
                         if (!msg) {
                             return;
@@ -101,6 +103,16 @@ define(
                     }
                 });
 
+                self.parameters.on('change', function(){
+
+                    if (!self.autocalc){
+                        return;
+                    }
+
+                    self.emit('calculate');
+                });
+
+                // collapse button
                 self.el.on('click', '.collapse-ctrl', function(e){
                     e.preventDefault();
                     var target = self.elParameters.parent()
@@ -111,14 +123,30 @@ define(
                     target.toggleClass('collapsed');
                 });
 
+                // autocalc checkbox
                 self.el.on('change', '#autocalc', function(){
 
-                    $('.ctrl-calc').prop('disabled', $(this).is(':checked'));
+                    var enabled = $(this).is(':checked');
+                    $('.ctrl-calc').prop('disabled', enabled);
+                    self.autocalc = enabled;
                 });
 
-                self.on('click', '.ctrl-calc', function(){
+                // calculate button
+                self.el.on('click', '.ctrl-calc', function(){
 
                     self.emit('calculate');
+                });
+
+                // parameters fields
+                self.elParameters.on('change', 'input', function(){
+
+                    var $this = $(this)
+                        ,key = $this.attr('name')
+                        ,val = $this.val()
+                        ;
+
+                    // update the corresponding property in the parameters object
+                    self.parameters.set( key, val );
                 });
 
                 var to;
@@ -198,6 +226,10 @@ define(
             onDomReady : function(){
 
                 var self = this;
+
+                // append the main ui elements
+                $('#pm-ui').empty().append( self.el );
+                customCheckbox( self.el );
 
                 // Custom selects
                 $("select").dropkick();

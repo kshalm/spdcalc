@@ -2,25 +2,25 @@
     <div class="span3">
         <label>
             Pump Wavelength
-            <input type="text" value="{{= it.lambda_p || ''}}" />
+            <input type="text" name="lambda_p" value="{{= it.lambda_p || ''}}" />
         </label>
     </div>
     <div class="span3">
         <label>
-            Pump Wavelength
-            <input type="text" value="{{= it.lambda_p || ''}}" />
+            Other setting
+            <input type="text" value="" />
         </label>
     </div>
     <div class="span3">
         <label>
-            Pump Wavelength
-            <input type="text" value="{{= it.lambda_p || ''}}" />
+            Other setting
+            <input type="text" value="" />
         </label>
     </div>
     <div class="span3">
         <label>
-            Pump Wavelength
-            <input type="text" value="{{= it.lambda_p || ''}}" />
+            Other setting
+            <input type="text" value="" />
         </label>
     </div>
 </div>
