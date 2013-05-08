@@ -71,7 +71,7 @@ module.exports = function(grunt) {
             // category: ['collections', 'functions']
             exports: ['none'],
             iife: '(function(){%output%;lodash.extend(PhaseMatch.util, lodash);}());',
-            include: ['extend', 'bind']
+            include: ['extend', 'bind', 'clone']
             // minus: ['result', 'shuffle']
             // plus: ['random', 'template'],
             // template: './*.jst'

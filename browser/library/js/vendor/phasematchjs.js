@@ -885,16 +885,11 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         var min_PM = function(x){
             if (x>Math.PI/2 || x<0){return 1e12;}
             props.theta_i = x;
-            // props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
-            // props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
-            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
 
-            // props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-            // props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
             props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
             var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
-            // console.log("in the function", delK)
             return 1-PMtmp;
         };
 
@@ -904,18 +899,50 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         // var startTime = new Date();
 
         var ans = PhaseMatch.nelderMead(min_PM, guess, 100);
-        // var ans = numeric.uncmin(min_delK, [guess]).solution[0];
-        // var endTime = new Date();
-        
+    };
 
-        // var timeDiff = (endTime - startTime)/1000;
-        // console.log("Theta autocalc = ", timeDiff);
-        // props.theta_i = ans;
+    PhaseMatch.deepcopy = function deepcopy(props){
+        var P = new PhaseMatch.SPDCprop();
+        P.crystal = props.crystal;
+        P.lambda_p = PhaseMatch.util.clone(props.lambda_p,true);
+        P.lambda_s = PhaseMatch.util.clone(props.lambda_s,true);
+        P.lambda_i = PhaseMatch.util.clone(props.lambda_i,true);
+        P.Type = PhaseMatch.util.clone(props.Type,true);
+        P.theta = PhaseMatch.util.clone(props.theta,true);
+        P.phi = PhaseMatch.util.clone(props.phi,true);
+        P.theta_s = PhaseMatch.util.clone(props.theta_s,true);
+        P.theta_i = PhaseMatch.util.clone(props.theta_i,true);
+        P.phi_s = PhaseMatch.util.clone(props.phi_s,true);
+        P.phi_i = PhaseMatch.util.clone(props.phi_i,true);
+        P.poling_period = PhaseMatch.util.clone(props.poling_period,true);
+        P.L = PhaseMatch.util.clone(props.L,true);
+        P.W = PhaseMatch.util.clone(props.W,true);
+        P.p_bw = PhaseMatch.util.clone(props.p_bw,true);
+        P.phase = PhaseMatch.util.clone(props.phase,true);
+        P.apodization = PhaseMatch.util.clone(props.apodization,true);
+        P.apodization_FWHM = PhaseMatch.util.clone(props.apodization_FWHM,true);
+        P.S_p = PhaseMatch.util.clone(props.S_p,true);
+        P.S_s = PhaseMatch.util.clone(props.S_s,true);
+        P.S_i = PhaseMatch.util.clone(props.S_i,true);
+        P.n_p = PhaseMatch.util.clone(props.n_p,true);
+        P.n_s = PhaseMatch.util.clone(props.n_s,true);
+        P.n_i = PhaseMatch.util.clone(props.n_i,true);
+        
+        return P;
     };
 })();
 
 
-PhaseMatch.calcJSA = function calcJSA(P, ls_start, ls_stop, li_start, li_stop, dim){
+PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_stop, dim){
+    var startTime = new Date();
+    var P = PhaseMatch.deepcopy(props);
+    var endTime = new Date();
+    var timeDiff = (endTime - startTime);
+    console.log("deep copy time = ", timeDiff);
+
+
+    // var P = props;
+    // P = new PhaseMatch.SPDCprop();
 
     var lambda_s = new Float64Array(dim);
     var lambda_i = new Float64Array(dim);
@@ -954,7 +981,9 @@ PhaseMatch.calcJSA = function calcJSA(P, ls_start, ls_stop, li_start, li_stop, d
 
 };
 
-PhaseMatch.calcXY = function calcXY(P, x_start, x_stop, y_start, y_stop, dim){
+PhaseMatch.calcXY = function calcXY(props, x_start, x_stop, y_start, y_stop, dim){
+
+    var P = PhaseMatch.deepcopy(props);
 
     var X = new Float64Array(dim);
     var Y = new Float64Array(dim);
@@ -995,7 +1024,9 @@ PhaseMatch.calcXY = function calcXY(P, x_start, x_stop, y_start, y_stop, dim){
 
 };
 
-PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(P, l_start, l_stop, t_start, t_stop, dim){
+PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start, t_stop, dim){
+
+    var P = PhaseMatch.deepcopy(props);
 
     var lambda_s = new Float64Array(dim);
     var theta_s = new Float64Array(dim);
@@ -1031,8 +1062,9 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(P, l_sta
 
 };
 
-PhaseMatch.calc_theta_phi = function calc_theta_phi(P, t_start, t_stop, p_start, p_stop, dim){
+PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
+    var P = PhaseMatch.deepcopy(props);
     var theta = new Float64Array(dim);
     var phi = new Float64Array(dim);
 
@@ -1065,44 +1097,6 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(P, t_start, t_stop, p_start,
     return PM;
 
 };
-
-
-// def PM_theta_phi(P, x=[-1,-1], y=[-1,-1], initialize= False):
-
-//     pump_bw = 2*np.pi*con.c/(P.lambda_p**2) *P.pump_bw 
-
-//     n_thetas = P.npts
-//     n_phis = P.npts
-//     if initialize:
-//         astart = 0. *np.pi/180
-//         astop = 90. *np.pi/180
-
-//         aistart =0. *np.pi/180
-//         aistop = 90. *np.pi/180
-
-//     else:
-//         astart = x[0]
-//         astop = x[1]
-
-//         aistart = y[0]
-//         aistop = y[1]
-
-//     theta = np.linspace(astart, astop, n_thetas)
-//     phi = np.linspace(aistart, aistop, n_phis)
-//     [THETA, PHI] = np.meshgrid(theta,phi)
-
-//     # theta_s = np.arctan((X**2 + Y**2)**.5) 
-//     # phi_s = np.arctan(Y/X) 
-//     # neg_ind = X <0
-//     # phi_s[neg_ind] = phi_s[neg_ind]+np.pi
-//     # phi_i = (phi_s +np.pi)
-
-//     theta_i = optimum_idler(P, P.lambda_s, P.theta_s, P.phi_s, THETA,PHI, P.poling_period)
-//     PM = phasematch_Int_Phase(P.Type, P.crystal, P.lambda_p, pump_bw, P.W, P.lambda_s, P.lambda_i, P.L ,THETA, PHI, 
-//         P.theta_s, theta_i, P.phi_s, P.phi_i, P.calcPhase, P.poling_period, P.apodization, P.apodization_FWHM )
-//     # print "Theta s, i", P.theta_s*180/np.pi, P.theta_i*180/np.pi,  np.max(theta_i*180/np.pi)
-//     # print
-//     return [astart, astop], [aistart, aistop], PM
 
 
 
