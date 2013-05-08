@@ -23,7 +23,6 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
     var N = dim * dim;
     var PM = new Float64Array( N );
     
-    var startTime = new Date();
     for (i=0; i<N; i++){
         var index_s = i % dim;
         var index_i = Math.floor(i / dim);
@@ -43,8 +42,8 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
     }
-    var endTime = new Date();
-    var timeDiff = (endTime - startTime);
+    
+    // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     
     return PM;
 

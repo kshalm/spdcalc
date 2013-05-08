@@ -16,7 +16,8 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
 
     
         var startTime = new Date();
-        var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
+        // var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
+        var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, 410e-15, dim);
         var endTime = new Date();
         var timeDiff = (endTime - startTime);
         console.log("Calc time = ", timeDiff)
@@ -121,14 +122,42 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         console.log("Plot time = ", timeDiff)
     } 
 
+    // Plot 1D HOM
+    function plot_HOM(P, t_start, t_stop, ls_start, ls_stop, li_start,li_stop, dim){
+        
+        var startTime = new Date();
+        var HOM = PhaseMatch.calc_HOM_scan(P, t_start, t_stop, ls_start, ls_stop, li_start, li_stop, dim);
+        var endTime = new Date();
+        var timeDiff = (endTime - startTime);
+        console.log("Calc time  HOM= ", timeDiff);
+        
+        console.log('HOM dip values: ', HOM);
+        
+    //     var width = 500;
+    //     var height = 500;
+
+    //     var hm = new HeatMap({
+    //         el: '#viewport',
+    //         width: width,
+    //         height: height
+    //     });
+
+    //     var startTime = new Date();
+    //     hm.plotData( PM );
+    //     var endTime = new Date();
+    //     var timeDiff = (endTime - startTime);
+    //     console.log("Plot time = ", timeDiff)
+    } 
+
+
     // wait for domready
     $(function(){
         
         // createPlot(500, 500);
         var npts = 200;
         var con = PhaseMatch.constants;
-        var l_start = 1450 * con.nm;
-        var l_stop = 1650 * con.nm; 
+        var l_start = 1500 * con.nm;
+        var l_stop = 1600 * con.nm; 
         var P1 = new PhaseMatch.SPDCprop();
         PhaseMatch.optimum_idler(P1);
         PhaseMatch.auto_calc_Theta(P1);
@@ -148,12 +177,12 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         });
 
         
-        $(function(){
-            $('#viewport').append('<h2> XY idler </h2>');
-            P1.Type = P1.Types[3];
-            plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
-            P1.Type = P1.Types[2];
-        });
+        // $(function(){
+        //     $('#viewport').append('<h2> XY idler </h2>');
+        //     P1.Type = P1.Types[3];
+        //     plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
+        //     P1.Type = P1.Types[1];
+        // });
 
 
         $(function(){
@@ -164,6 +193,11 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         $(function(){
             $('#viewport').append('<h2> Crystal phasematching (theta vs phi) </h2>');
             plot_theta_phi(P1, 0, Math.PI/2, 0, Math.PI/2, npts);
+        });
+
+        $(function(){
+            $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
+            plot_HOM(P1, 0, 10000e-15, l_start,l_stop,l_start,l_stop, 100);
         });
 
 

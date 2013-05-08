@@ -81,7 +81,7 @@
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1550 * con.nm;
             this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
-            this.Type = this.Types[2];
+            this.Type = this.Types[1];
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
@@ -91,7 +91,7 @@
             this.phi_i = this.phi_s + Math.PI;
             this.poling_period = 1000000;
             this.L = 2000 * con.um;
-            this.W = 1* con.um;
+            this.W = 500* con.um;
             this.p_bw = 15 * con.nm;
             this.phase = false;
             this.apodization = 1;
