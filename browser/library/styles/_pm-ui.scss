@@ -104,6 +104,25 @@ $sidePanelCollapsed: 70px;
     border: 1px solid lighten($gray, 10);
 }
 
+.plot.line-plot {
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .x.axis path {
+      display: none;
+    }
+
+    .line {
+      fill: none;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    }
+}
+
 #logs {
     height: 200px;
     background: #fff;

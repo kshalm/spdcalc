@@ -3,13 +3,13 @@ define(
         'jquery',
         'stapes',
         'phasematch',
-        'modules/heat-map'
+        'modules/line-plot'
     ],
     function(
         $,
         Stapes,
         PhaseMatch,
-        HeatMap
+        LinePlot
     ) {
 
         'use strict';
@@ -24,7 +24,7 @@ define(
          * @module JSAUI
          * @implements {Stapes}
          */
-        var jsaUI = Stapes.subclass({
+        var homUI = Stapes.subclass({
 
             /**
              * Mediator Constructor
@@ -41,8 +41,14 @@ define(
                 self.el = $('<div>');
 
                 // init plot
-                self.plot = new HeatMap({
-                    el: self.el.get(0)
+                self.plot = new LinePlot({
+                    el: self.el.get(0),
+                    labels: {
+                        x: 'x-axis',
+                        y: 'y-axis'
+                    },
+                    domain: [ 0, 100 ],
+                    range: [ 0, 100 ]
                 });
 
                 self.elPlot = $(self.plot.el);
@@ -114,17 +120,19 @@ define(
                 var l_stop = 1650 * con.nm; 
 
                 var self = this
-                    ,PM = PhaseMatch.calcJSA(
-                        props, 
-                        l_start, 
-                        l_stop, 
-                        l_start,
-                        l_stop, 
-                        dim
-                    )
+                    ,data = []
                     ;
 
-                self.data = PM;
+                // get sin wave data
+                for ( var i = 0, l = 100; i < l; i += 0.1 ){
+                    
+                    data.push({
+                        x: i,
+                        y: 20 * (Math.sin( i )+1)
+                    });
+                }
+
+                self.data = data;
             },
 
             draw: function(){
@@ -143,7 +151,7 @@ define(
 
         return function( config ){
 
-            return new jsaUI( config );
+            return new homUI( config );
         };
     }
 );

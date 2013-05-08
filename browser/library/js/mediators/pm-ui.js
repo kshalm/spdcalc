@@ -13,7 +13,8 @@ define(
 
         // physics modules
         'modules/parameters',
-        'modules/jsa-ui'
+        'modules/jsa-ui',
+        'modules/hom-ui'
     ],
     function(
         $,
@@ -29,7 +30,8 @@ define(
 
         // physics modules
         Parameters,
-        jsaUI
+        jsaUI,
+        homUI
     ) {
 
         'use strict';
@@ -75,7 +77,6 @@ define(
                         
                         // default
                         self.load('jsa');
-                        self.emit('resize');
 
                         self.emit('info', 'Application Loaded');
                     },
@@ -189,6 +190,8 @@ define(
 
                 // JSA
                 self.set('jsa', jsaUI());
+                // HOM
+                self.set('hom', homUI());
             },
 
             /**
@@ -206,6 +209,8 @@ define(
                     return this;
                 }
 
+                self.emit('info', 'Loading ' + id + ' module');
+
                 if (self._curr){
                     self._curr.disconnect( self );
                 }
@@ -215,6 +220,8 @@ define(
                 // inject containers
                 self.elMain.empty().append( mod.getMainPanel() );
                 mod.connect( self );
+
+                self.emit('resize');
 
                 return this;
             },
@@ -231,8 +238,13 @@ define(
                 $('#pm-ui').empty().append( self.el );
                 customCheckbox( self.el );
 
-                // Custom selects
-                $("select").dropkick();
+                // display type select box
+                self.el.find('#ui-modules').dropkick({
+                    change: function (value, label) {
+
+                        self.load( value );
+                    }
+                });
 
                 // Init tags input
                 $("#tagsinput").tagsInput();
