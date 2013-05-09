@@ -1,4 +1,4 @@
-require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, PhaseMatch ){
+require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], function( $, HeatMap, PhaseMatch,LinePlot ){
 
     'use strict';
 
@@ -17,12 +17,13 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
     
         var startTime = new Date();
         // var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
-        var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, 410e-15, dim);
+        var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, 300e-15, dim);
+        // var PM = PhaseMatch.calc_JSA_Asymmetry(P,ls_start, ls_stop, li_start,li_stop, 4000e-15, dim);
         var endTime = new Date();
         var timeDiff = (endTime - startTime);
         console.log("Calc time = ", timeDiff)
         
-        log('Calculation time: ', timeDiff);
+        // PM = PhaseMatch.AntiTranspose(PM, dim);
         
         var width = 500;
         var height = 500;
@@ -32,6 +33,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
             width: width,
             height: height
         });
+
 
         var startTime = new Date();
         hm.plotData( PM );
@@ -132,18 +134,28 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         console.log("Calc time  HOM= ", timeDiff);
         
         console.log('HOM dip values: ', HOM);
+
+        var delT = numeric.linspace(t_start, t_stop, dim);
         
-    //     var width = 500;
-    //     var height = 500;
+        var width = 500;
+        var height = 500;
 
-    //     var hm = new HeatMap({
-    //         el: '#viewport',
-    //         width: width,
-    //         height: height
-    //     });
+        var lp = new LinePlot({
+            el: '#viewport',
+            width: width,
+            height: height
+        });
 
+        var data = [];
+        for ( var i = 0, l = HOM.length; i < l; i ++){
+            data.push({
+                x: delT[i]/1e-15,
+                y: HOM[i]
+            })
+        }
+        // var data = {x:numeric.linspace(t_start, t_stop, dim), y:HOM };
     //     var startTime = new Date();
-    //     hm.plotData( PM );
+        lp.plotData( data );
     //     var endTime = new Date();
     //     var timeDiff = (endTime - startTime);
     //     console.log("Plot time = ", timeDiff)
@@ -156,8 +168,8 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         // createPlot(500, 500);
         var npts = 200;
         var con = PhaseMatch.constants;
-        var l_start = 1500 * con.nm;
-        var l_stop = 1600 * con.nm; 
+        var l_start = 710 * con.nm;
+        var l_stop = 910 * con.nm; 
         var P1 = new PhaseMatch.SPDCprop();
         PhaseMatch.optimum_idler(P1);
         PhaseMatch.auto_calc_Theta(P1);
@@ -177,12 +189,13 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
         });
 
         
-        // $(function(){
-        //     $('#viewport').append('<h2> XY idler </h2>');
-        //     P1.Type = P1.Types[3];
-        //     plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
-        //     P1.Type = P1.Types[1];
-        // });
+        $(function(){
+            $('#viewport').append('<h2> XY idler </h2>');
+            // plotJSA(P1,l_start,l_stop,l_start,l_stop, npts);
+            var tmpType = P1.Type;
+            plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
+            P1.Type = tmpType;
+        });
 
 
         $(function(){
@@ -197,7 +210,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch' ], function( $, HeatMap, Ph
 
         $(function(){
             $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
-            plot_HOM(P1, 0, 10000e-15, l_start,l_stop,l_start,l_stop, 100);
+            plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
         });
 
 

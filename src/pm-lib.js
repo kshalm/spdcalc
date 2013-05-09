@@ -224,31 +224,15 @@ PhaseMatch.calc_HOM = function calc_HOM(P, delT){
     P.lambda_s = lambda_i;
     P.lambda_i = lambda_s;
     P.theta_i = theta_s;
+
     P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
     P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler"); 
-    //update index of refraction for signal
-    // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+
     //calculate the new optimum signal angle
     PhaseMatch.optimum_signal(P);
 
-
-    // //now swap role of signal and idler
-    // var Pswap = PhaseMatch.deepcopy(P);
-    // // var Pswap = P;
-    // Pswap.lambda_s = P.lambda_i;
-    // Pswap.lambda_i = P.lambda_s;
-    // Pswap.theta_i = P.theta_s;
-    // //update index of refraction for idler
-    // Pswap.S_i = Pswap.calc_Coordinate_Transform(Pswap.theta, Pswap.phi, Pswap.theta_i, Pswap.phi_i);
-    // Pswap.n_i = Pswap.calc_Index_PMType(Pswap.lambda_i, Pswap.Type, Pswap.S_i, "idler"); 
-    // //update index of refraction for signal
-    // // Pswap.n_s = Pswap.calc_Index_PMType(Pswap.lambda_s, Pswap.Type, Pswap.S_s, "signal");
-    // //calculate the new optimum signal angle
-    // PhaseMatch.optimum_signal(Pswap);
-
     // Calculate the phasematching function with signal/idler swapped
     var THETA2 = PhaseMatch.phasematch(P);
-    // var THETA2 = PhaseMatch.phasematch(Pswap);
 
     // Now reset all of the values of P
     P.lambda_s = lambda_s;
@@ -284,7 +268,8 @@ PhaseMatch.calc_HOM = function calc_HOM(P, delT){
  * ls_start ... li_stop are the signal/idler wavelength ranges to calculate over
  * delT is the time delay between signal and idler
  */
-PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
+ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
+    var con = PhaseMatch.constants;
     var P = PhaseMatch.deepcopy(props);
     var lambda_s = new Float64Array(dim);
     var lambda_i = new Float64Array(dim);
@@ -294,7 +279,16 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
     lambda_i = numeric.linspace(li_stop, li_start, dim); 
 
     var N = dim * dim;
+    var THETA1_real = new Float64Array( N );
+    var THETA1_imag = new Float64Array( N );
+    var THETA2_real  = new Float64Array( N ); // The transposed version of THETA1
+    var THETA2_imag  = new Float64Array( N ); 
+    var Tosc_real = new Float64Array( N ); // Real/Imag components of phase shift
+    var Tosc_imag = new Float64Array( N );
+    var ARG = 0;
+
     var PM = new Float64Array( N );
+
     
     for (i=0; i<N; i++){
         var index_s = i % dim;
@@ -304,12 +298,64 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         P.lambda_i = lambda_i[index_i];
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        PM[i] = PhaseMatch.calc_HOM(P, delT);
+        PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
+        var PMtmp = PhaseMatch.phasematch(P);
+        THETA1_real[i] = PMtmp[0];
+        THETA1_imag[i] = PMtmp[1];
+
+        // THETA2_real[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[0]; //Transpose
+        // THETA2_imag[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[1];
+
+        ARG = 2*Math.PI*con.c *(1/P.lambda_s - 1/P.lambda_i)*delT;
+        Tosc_real[i] = Math.cos(ARG);
+        Tosc_imag[i] = Math.sin(ARG);
+        // Tosc_real[i] = 1;
+        // Tosc_imag[i] = 0;
+    }
+
+    THETA2_real = PhaseMatch.AntiTranspose(THETA1_real,dim);
+    THETA2_imag = PhaseMatch.AntiTranspose(THETA1_imag,dim);
+
+    for (i=0; i<N; i++){
+        // arg2 = THETA2*Tosc. Split calculation to handle complex numbers
+        var arg2_real = Tosc_real[i]*THETA2_real[i] - Tosc_imag[i]*THETA2_imag[i];
+        var arg2_imag = Tosc_real[i]*THETA2_imag[i] + Tosc_imag[i]*THETA2_real[i];
+
+        var PM_real = (THETA1_real[i] - arg2_real)/Math.sqrt(2);
+        var PM_imag = (THETA1_imag[i] - arg2_imag)/Math.sqrt(2);
+
+        PM[i] = sq(PM_real) + sq(PM_imag);
     }
 
     return PM;
 };
+
+// PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
+//     var P = PhaseMatch.deepcopy(props);
+//     var lambda_s = new Float64Array(dim);
+//     var lambda_i = new Float64Array(dim);
+
+//     var i;
+//     lambda_s = numeric.linspace(ls_start, ls_stop, dim);
+//     lambda_i = numeric.linspace(li_stop, li_start, dim); 
+
+//     var N = dim * dim;
+//     var PM = new Float64Array( N );
+    
+//     for (i=0; i<N; i++){
+//         var index_s = i % dim;
+//         var index_i = Math.floor(i / dim);
+
+//         P.lambda_s = lambda_s[index_s];
+//         P.lambda_i = lambda_i[index_i];
+//         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+
+//         PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
+//         PM[i] = PhaseMatch.calc_HOM(P, delT);
+//     }
+
+//     return PM;
+// };
 
 /*
  * calc_HOM_scan()
@@ -321,7 +367,7 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 
     var delT = new Float64Array(dim);
     var HOM_values = new Float64Array(dim);
-    var npts = 50;  //number of points to pass to the calc_HOM_JSA
+    var npts = 100;  //number of points to pass to the calc_HOM_JSA
 
     var i;
     delT = numeric.linspace(t_start, t_stop, dim);
@@ -352,6 +398,123 @@ PhaseMatch.Sum = function Sum(A){
     return total;
 };
 
+PhaseMatch.Transpose = function Transpose(A, dim){
+    var Trans = new Float64Array(dim*dim)
+    var l = A.length;
+    for(var i=0; i<l; i++) { 
+        var index_c = i % dim;
+        var index_r = Math.floor(i / dim);
+        //swap rows with columns
+        Trans[index_c * dim + index_r] = A[i];
+
+    }
+    return Trans;
+};
+
+PhaseMatch.AntiTranspose = function Transpose(A, dim){
+    var Trans = new Float64Array(dim*dim)
+    var l = A.length;
+    for(var i=0; i<l; i++) { 
+        var index_c = i % dim;
+        var index_r = Math.floor(i / dim);
+        //swap rows with columns
+        Trans[(dim -1 - index_c) * dim + (dim - 1 -index_r)] = A[i];
+
+    }
+    return Trans;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/*
+ * TEST FUNCTION
+ * Calculates the Joint Spectra Amplitude of the HOM at a particluar time delay
+ * P is SPDC Properties object
+ * ls_start ... li_stop are the signal/idler wavelength ranges to calculate over
+ * delT is the time delay between signal and idler
+ */
+PhaseMatch.calc_JSA_Asymmetry = function calc_HOM_Asymmetry(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
+    var P = PhaseMatch.deepcopy(props);
+    var lambda_s = new Float64Array(dim);
+    var lambda_i = new Float64Array(dim);
+
+    var i;
+    lambda_s = numeric.linspace(ls_start, ls_stop, dim);
+    lambda_i = numeric.linspace(li_stop, li_start, dim); 
+
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+    
+    for (i=0; i<N; i++){
+        var index_s = i % dim;
+        var index_i = Math.floor(i / dim);
+
+        P.lambda_s = lambda_s[index_s];
+        P.lambda_i = lambda_i[index_i];
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+
+        PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
+        PM[i] = PhaseMatch.calc_JSA_Diff(P, delT);
+    }
+
+    return PM;
+};
 
 
+PhaseMatch.calc_JSA_Diff = function calc_JSA_Diff(P, delT){
+    var con = PhaseMatch.constants;
+
+    var THETA1 = PhaseMatch.phasematch(P);
+
+    // Other way
+    // P.Type = P.Types[3];
+    // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+    // PhaseMatch.optimum_idler(P);
+    // var THETA2 = PhaseMatch.phasematch(P);
+
+    // //Put back
+    // P.Type = P.Types[2];
+    // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+    // PhaseMatch.optimum_idler(P);
+
+    // first make copies of the parameters
+    var lambda_s = P.lambda_s;
+    var lambda_i = P.lambda_i;
+    var theta_s = P.theta_s;
+    var theta_i = P.theta_i;
+    var S_s = P.S_s;
+    var S_i = P.S_i;
+    var n_s = P.n_s;
+    var n_i = P.n_i;
+
+    // Now swap the signal and idler 
+    P.lambda_s = lambda_i;
+    P.lambda_i = lambda_s;
+    P.theta_i = theta_s;
+    
+    P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler"); 
+
+
+    PhaseMatch.optimum_signal(P);
+
+    var THETA2 = PhaseMatch.phasematch(P);
+
+    // Now reset all of the values of P
+    P.lambda_s = lambda_s;
+    P.lambda_i = lambda_i;
+    P.theta_s = theta_s;
+    P.theta_i = theta_i;
+    P.S_s = S_s;
+    P.S_i = S_i;
+    P.n_s = n_s;
+    P.n_i = n_i;
+
+   var PM_real = THETA1[0]-THETA2[0];
+   var PM_imag = THETA1[1]-THETA2[1];
+
+    var PMint = sq(PM_real)+sq(PM_imag);
+    return PMint;
+};
 
