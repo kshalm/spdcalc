@@ -172,8 +172,8 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         // createPlot(500, 500);
         var npts = 200;
         var con = PhaseMatch.constants;
-        var l_start = 1450 * con.nm;
-        var l_stop = 1650* con.nm; 
+        var l_start = 1500 * con.nm;
+        var l_stop = 1600* con.nm; 
         var P1 = new PhaseMatch.SPDCprop();
         PhaseMatch.optimum_idler(P1);
         PhaseMatch.auto_calc_Theta(P1);

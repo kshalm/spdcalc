@@ -57,6 +57,35 @@ PhaseMatch.BBO.prototype  = {
 };
 
 /*
+ * calc_delK()
+ * Gets the index of refraction depending on phasematching type
+ * All angles in radians.
+ * P is SPDC Properties object
+ */
+
+ PhaseMatch.calc_delK_w = function calc_delK_w (P, w_p){
+    var con = PhaseMatch.constants;
+
+    var n_s = P.n_s;
+    var n_i = P.n_i;
+    // console.log("going into calc_delK");
+    // console.log("Index of refraction inside calc_delk", P.lambda_s, n_s, n_i, n_p);
+    // Directions of the signal and idler photons in the pump coordinates
+    var Ss = [Math.sin(P.theta_s)*Math.cos(P.phi_s), Math.sin(P.theta_s)*Math.sin(P.phi_s), Math.cos(P.theta_s)];
+    var Si = [Math.sin(P.theta_i)*Math.cos(P.phi_i), Math.sin(P.theta_i)*Math.sin(P.phi_i), Math.cos(P.theta_i)];
+    // console.log("SS, SI", Ss, Si);
+    // console.log("");
+
+    var delKx = (2*Math.PI*((n_s*Ss[0]/P.lambda_s) + n_i*Si[0]/P.lambda_i));
+    var delKy = (2*Math.PI*((n_s*Ss[1]/P.lambda_s) + n_i*Si[1]/P.lambda_i));
+    var delKz = w_p/con.c - (2*Math.PI*((n_s*Ss[2]/P.lambda_s) + n_i*Si[2]/P.lambda_i));
+    delKz = delKz -2*Math.PI/P.poling_period;
+
+    return [delKx, delKy, delKz];
+
+};
+
+/*
  * optimum_idler()
  * Analytically calcualte optimum idler photon wavelength
  * All angles in radians.
@@ -116,13 +145,17 @@ PhaseMatch.phasematch = function phasematch (P){
     var n_p = P.n_p;
     var p_bw = 2*Math.PI*con.c/sq(lambda_p) *P.p_bw * n_p; //convert from wavelength to w 
 
-    P.lambda_p = 1/(1/P.lambda_s+1/P.lambda_i);
+    P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
 
+    // var w_p = 2*Math.PI *con.c * (P.n_s/P.lambda_s + P.n_i/P.lambda_i);
+
     var delK = PhaseMatch.calc_delK(P);
+    // var delK = PhaseMatch.calc_delK_w(P, w_p);
     
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
+
     // P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
     var arg = P.L/2*(delK[2]);
 
@@ -158,15 +191,21 @@ PhaseMatch.phasematch = function phasematch (P){
     // p_bw = p_bw / 2.35482;
     var w_s = 2*Math.PI*con.c *P.n_s/P.lambda_s;
     var w_i = 2*Math.PI*con.c *P.n_i/P.lambda_i;
+    p_bw = p_bw /(2 * Math.sqrt(2*Math.log(2)));
     var alpha = Math.exp(-sq(((w_s - P.wbar_s)+(w_i - P.wbar_i))/p_bw));
-    // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( P.n_s/P.lambda_s + P.n_i/P.lambda_i +1/P.poling_period - P.n_p/lambda_p) )/(p_bw)));
+    // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( P.n_s/P.lambda_s + P.n_i/P.lambda_i +1/P.poling_period - P.n_p/P.lambda_p) )/(p_bw)));
+   
+    // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i +1/P.poling_period - 1/P.lambda_p) )/(p_bw)));
+
     // var alpha = 1;
     // PMt = 1;
     // PMz_real = 1;
     // PMz_imag = 0;
 
+    
     //return the real and imaginary parts of Phase matching function
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];
+    // return [(delK[2]), 0];
 };
 
 /*

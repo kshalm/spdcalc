@@ -85,7 +85,7 @@
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
-            this.theta_s = 3 * Math.PI / 180;
+            this.theta_s = 0 * Math.PI / 180;
             this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
