@@ -17,7 +17,7 @@ define(
             var width = options.width || 600;
             var height = options.height || 400;
             
-            var margin = this.margin = options.margins || {top: 20, right: 20, bottom: 60, left: 50};
+            var margin = this.margin = options.margins ||  {top: 20, right: 20, bottom: 60, left: 50};
             this.labels = options.labels || {};
             this.domain = options.domain;
             this.range = options.range;
@@ -136,7 +136,7 @@ define(
                 .append("text")
                   .attr("transform", "rotate(-90)")
                   .attr("y", 6)
-                  .attr("dy", ".71em")
+                  .attr("dy", "-3em")
                   .style("text-anchor", "end")
                   .text( labels.y );
             },

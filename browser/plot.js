@@ -143,7 +143,11 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         var lp = new LinePlot({
             el: '#viewport',
             width: width,
-            height: height
+            height: height,
+            labels: {
+                        x: 'Time Delay (fs)',
+                        y: 'Coincidence Probability'
+                    }
         });
 
         var data = [];

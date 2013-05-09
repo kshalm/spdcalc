@@ -2101,31 +2101,6 @@ PhaseMatch.optimum_signal = function optimum_signal(P){
 };
 
 
-PhaseMatch.calc_alpha_w = function calc_alpha_w(P){
-
-};
-// def calc_alpha_w(Type, crystal, pump, ls,li, p_bw,theta, phi, theta_s, theta_i, phi_s, phi_i):
-//     # theta_s = np.absolute(theta_s)
-//     [n_s, n_i, n_p] = GetPMTypeIndices(crystal, Type, pump, ls, li, theta, phi, theta_s, theta_i, phi_s, phi_i)
-//     [gv_s, gv_i, gv_p] = GetGV(crystal, Type, pump, 2*pump, 2*pump, theta, phi, theta_s, theta_i, phi_s, phi_i)
-//     [n_s0, n_i0, n_p0] = GetPMTypeIndices(crystal, Type, pump, 2*pump,2*pump, theta, phi, theta_s, theta_i, phi_s, phi_i)
-
-//     p_bw = p_bw*n_p0
-//     w_s = 2*pi*con.c *n_s/ls
-//     w_i = 2*pi*con.c *n_i/li
-//     # w_p = 2*pi*con.c *n_p/pump
-
-//     [n_s0, n_i0, n_p0] = GetPMTypeIndices(crystal, Type, pump, 2*pump,2*pump, theta, phi, theta_s, theta_i, phi_s, phi_i)
-//     wbar = 2*pi*con.c *n_p0/pump
-//     wbar_s =  2*pi*con.c *n_s0/(2*pump)
-//     wbar_i = 2*pi*con.c *n_i0/(2*pump)
-
-//     alpha = 1*np.exp(-(((w_s - wbar_s)+(w_i - wbar_i))/p_bw)**2)
-//     # alpha = 1*np.exp(-((wbar -w_s -w_i)/p_bw)**2)
-
-
-//     return alpha
-
 
 /*
  * phasematch()
