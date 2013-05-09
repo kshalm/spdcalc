@@ -16,8 +16,8 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
 
     
         var startTime = new Date();
-        // var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
-        var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, 300e-15, dim);
+        var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
+        // var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, 300e-15, dim);
         // var PM = PhaseMatch.calc_JSA_Asymmetry(P,ls_start, ls_stop, li_start,li_stop, 4000e-15, dim);
         var endTime = new Date();
         var timeDiff = (endTime - startTime);
@@ -133,7 +133,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         var timeDiff = (endTime - startTime);
         console.log("Calc time  HOM= ", timeDiff);
         
-        console.log('HOM dip values: ', HOM);
+        // console.log('HOM dip values: ', HOM);
 
         var delT = numeric.linspace(t_start, t_stop, dim);
         
@@ -168,8 +168,8 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         // createPlot(500, 500);
         var npts = 200;
         var con = PhaseMatch.constants;
-        var l_start = 710 * con.nm;
-        var l_stop = 910 * con.nm; 
+        var l_start = 1450 * con.nm;
+        var l_stop = 1650* con.nm; 
         var P1 = new PhaseMatch.SPDCprop();
         PhaseMatch.optimum_idler(P1);
         PhaseMatch.auto_calc_Theta(P1);
@@ -183,10 +183,11 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         var x_stop = 10*Math.PI/180;
         var y_start = -10*Math.PI/180;
         var y_stop = 10*Math.PI/180;
-        $(function(){
-            $('#viewport').append('<h2> XY signal </h2>');
-            plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
-        });
+        // $(function(){
+        //     $('#viewport').append('<h2> XY signal </h2>');
+        //     var P2 = new PhaseMatch.SPDCprop();
+        //     plotXY(P2,x_start,x_stop,y_start,y_stop,npts);
+        // });
 
         
         $(function(){

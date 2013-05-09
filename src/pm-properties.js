@@ -77,22 +77,22 @@
 
         init:function(){
             var con = PhaseMatch.constants;
-            this.lambda_p = 405 * con.nm;
-            this.lambda_s = 810 * con.nm;
-            this.lambda_i = 810 * con.nm;
+            this.lambda_p = 775 * con.nm;
+            this.lambda_s = 1550 * con.nm;
+            this.lambda_i = 1550 * con.nm;
             this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
             this.Type = this.Types[2];
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
-            this.theta_s = 0* Math.PI / 180;
+            this.theta_s = 3 * Math.PI / 180;
             this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
             this.poling_period = 1000000;
-            this.L = 850 * con.um;
+            this.L = 2000 * con.um;
             this.W = 500* con.um;
-            this.p_bw = .1* con.nm;
+            this.p_bw = 1 * con.nm;
             this.phase = false;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
@@ -107,6 +107,16 @@
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
 
             this.msg = "";
+
+            this.wbar_pump = 2*Math.PI*con.c/this.lambda_p * this.n_p;
+            this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
+            this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
+
+            // wbar = 2*pi*con.c *n_p0/pump
+//     wbar_s =  2*pi*con.c *n_s0/(2*pump)
+//     wbar_i = 2*pi*con.c *n_i0/(2*pump)
+
+
         },
             // this.autocalcTheta = false;
             // this.calc_theta= function(){
@@ -186,6 +196,11 @@
             }
 
             return n ;
+        },
+
+        calc_wbar : function (){
+            this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
+            this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
         },
 
 

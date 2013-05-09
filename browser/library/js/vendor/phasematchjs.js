@@ -2058,9 +2058,7 @@ PhaseMatch.BBO.prototype  = {
  * Analytically calcualte optimum idler photon wavelength
  * All angles in radians.
  */
-PhaseMatch.optimum_idler = function optimum_idler(P){//crystal, Type,  lambda_p, lambda_s, theta_s, phi_s, theta, phi, poling_period){
-    // var lambda_i = 1/(1/lambda_p - 1/lambda_s);
-    // P.phi_i = P.phi_s + Math.PI;
+PhaseMatch.optimum_idler = function optimum_idler(P){
 
     var delKpp = P.lambda_s/P.poling_period;
 
@@ -2102,6 +2100,31 @@ PhaseMatch.optimum_signal = function optimum_signal(P){
     P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 };
 
+
+PhaseMatch.calc_alpha_w = function calc_alpha_w(P){
+
+};
+// def calc_alpha_w(Type, crystal, pump, ls,li, p_bw,theta, phi, theta_s, theta_i, phi_s, phi_i):
+//     # theta_s = np.absolute(theta_s)
+//     [n_s, n_i, n_p] = GetPMTypeIndices(crystal, Type, pump, ls, li, theta, phi, theta_s, theta_i, phi_s, phi_i)
+//     [gv_s, gv_i, gv_p] = GetGV(crystal, Type, pump, 2*pump, 2*pump, theta, phi, theta_s, theta_i, phi_s, phi_i)
+//     [n_s0, n_i0, n_p0] = GetPMTypeIndices(crystal, Type, pump, 2*pump,2*pump, theta, phi, theta_s, theta_i, phi_s, phi_i)
+
+//     p_bw = p_bw*n_p0
+//     w_s = 2*pi*con.c *n_s/ls
+//     w_i = 2*pi*con.c *n_i/li
+//     # w_p = 2*pi*con.c *n_p/pump
+
+//     [n_s0, n_i0, n_p0] = GetPMTypeIndices(crystal, Type, pump, 2*pump,2*pump, theta, phi, theta_s, theta_i, phi_s, phi_i)
+//     wbar = 2*pi*con.c *n_p0/pump
+//     wbar_s =  2*pi*con.c *n_s0/(2*pump)
+//     wbar_i = 2*pi*con.c *n_i0/(2*pump)
+
+//     alpha = 1*np.exp(-(((w_s - wbar_s)+(w_i - wbar_i))/p_bw)**2)
+//     # alpha = 1*np.exp(-((wbar -w_s -w_i)/p_bw)**2)
+
+
+//     return alpha
 
 
 /*
@@ -2155,7 +2178,10 @@ PhaseMatch.phasematch = function phasematch (P){
     // Calculate the Pump spectrum
     // convert pump bandwidth from FWHM to standard deviation
     // p_bw = p_bw / 2.35482;
-    var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( P.n_s/P.lambda_s + P.n_i/P.lambda_i +1/P.poling_period - P.n_p/lambda_p) )/(p_bw)));
+    var w_s = 2*Math.PI*con.c *P.n_s/P.lambda_s;
+    var w_i = 2*Math.PI*con.c *P.n_i/P.lambda_i;
+    var alpha = Math.exp(-sq(((w_s - P.wbar_s)+(w_i - P.wbar_i))/p_bw));
+    // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( P.n_s/P.lambda_s + P.n_i/P.lambda_i +1/P.poling_period - P.n_p/lambda_p) )/(p_bw)));
     // var alpha = 1;
     // PMt = 1;
     // PMz_real = 1;
@@ -2296,6 +2322,8 @@ PhaseMatch.calc_HOM = function calc_HOM(P, delT){
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
+        P.calc_wbar();
+        
         var PMtmp = PhaseMatch.phasematch(P);
         THETA1_real[i] = PMtmp[0];
         THETA1_imag[i] = PMtmp[1];
@@ -2396,7 +2424,7 @@ PhaseMatch.Sum = function Sum(A){
 };
 
 PhaseMatch.Transpose = function Transpose(A, dim){
-    var Trans = new Float64Array(dim*dim)
+    var Trans = new Float64Array(dim*dim);
     var l = A.length;
     for(var i=0; i<l; i++) { 
         var index_c = i % dim;
@@ -2409,7 +2437,7 @@ PhaseMatch.Transpose = function Transpose(A, dim){
 };
 
 PhaseMatch.AntiTranspose = function Transpose(A, dim){
-    var Trans = new Float64Array(dim*dim)
+    var Trans = new Float64Array(dim*dim);
     var l = A.length;
     for(var i=0; i<l; i++) { 
         var index_c = i % dim;
@@ -2591,22 +2619,22 @@ PhaseMatch.calc_JSA_Diff = function calc_JSA_Diff(P, delT){
 
         init:function(){
             var con = PhaseMatch.constants;
-            this.lambda_p = 405 * con.nm;
-            this.lambda_s = 810 * con.nm;
-            this.lambda_i = 810 * con.nm;
+            this.lambda_p = 775 * con.nm;
+            this.lambda_s = 1550 * con.nm;
+            this.lambda_i = 1550 * con.nm;
             this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
             this.Type = this.Types[2];
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
-            this.theta_s = 0* Math.PI / 180;
+            this.theta_s = 3 * Math.PI / 180;
             this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
             this.poling_period = 1000000;
-            this.L = 850 * con.um;
+            this.L = 2000 * con.um;
             this.W = 500* con.um;
-            this.p_bw = .1* con.nm;
+            this.p_bw = 1 * con.nm;
             this.phase = false;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
@@ -2621,6 +2649,16 @@ PhaseMatch.calc_JSA_Diff = function calc_JSA_Diff(P, delT){
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
 
             this.msg = "";
+
+            this.wbar_pump = 2*Math.PI*con.c/this.lambda_p * this.n_p;
+            this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
+            this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
+
+            // wbar = 2*pi*con.c *n_p0/pump
+//     wbar_s =  2*pi*con.c *n_s0/(2*pump)
+//     wbar_i = 2*pi*con.c *n_i0/(2*pump)
+
+
         },
             // this.autocalcTheta = false;
             // this.calc_theta= function(){
@@ -2700,6 +2738,11 @@ PhaseMatch.calc_JSA_Diff = function calc_JSA_Diff(P, delT){
             }
 
             return n ;
+        },
+
+        calc_wbar : function (){
+            this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
+            this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
         },
 
 
@@ -2856,6 +2899,7 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
+        P.calc_wbar();
         // P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
 
         //calcualte the correct idler angle analytically.
@@ -2891,6 +2935,11 @@ PhaseMatch.calcXY = function calcXY(props, x_start, x_stop, y_start, y_stop, dim
 
         P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
         P.phi_s = Math.atan2(Y[index_y],X[index_x]);
+
+        // if (X[index_x] < 0){ P.phi_s += Math.PI;}
+        // if (P.phi_s<0){ P.phi_s += 2*Math.PI;}
+
+        // console.log(P.theta_s /Math.PI * 180, P.phi_s /Math.PI * 180);
         P.phi_i = (P.phi_s + Math.PI);
         
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
@@ -2900,8 +2949,10 @@ PhaseMatch.calcXY = function calcXY(props, x_start, x_stop, y_start, y_stop, dim
         // PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
         // PhaseMatch.brute_force_theta_i(P); //use a search. could be time consuming.
 
-        //calcualte the correct idler angle analytically.
+        //calculate the correct idler angle analytically.
         PhaseMatch.optimum_idler(P);
+
+        P.calc_wbar();
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
         // PM[i] = PhaseMatch.calc_delK(P);
@@ -2940,7 +2991,8 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        
+        P.calc_wbar();
+
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
         // PM[i] = PhaseMatch.calc_delK(P);
 
@@ -2979,7 +3031,8 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
 
         //calcualte the correct idler angle analytically.
         PhaseMatch.optimum_idler(P);
-        
+        P.calc_wbar();
+
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
 
     }
