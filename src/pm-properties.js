@@ -94,6 +94,7 @@
             this.W = 500* con.um;
             this.p_bw = 3 * con.nm;
             this.phase = false;
+            this.autocalctheta = true;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.crystal = new PhaseMatch.BBO();

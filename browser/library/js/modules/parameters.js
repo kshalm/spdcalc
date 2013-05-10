@@ -31,7 +31,11 @@ define(
 
                 self.props = new PhaseMatch.SPDCprop();
                 PhaseMatch.optimum_idler( self.props );
-                PhaseMatch.auto_calc_Theta( self.props );
+
+                if (self.props.autocalctheta){
+                    PhaseMatch.auto_calc_Theta( self.props );
+                }   
+                
 
                 self.set( self.props );
                 self.initEvents();
@@ -48,6 +52,11 @@ define(
                         var val = self.get( key );
 
                         self.props[ key ] = val;
+
+                        if (self.props.autocalctheta){
+                            PhaseMatch.auto_calc_Theta( self.props );
+                        } 
+                        console.log(arguments);
                     }
                 });
             },

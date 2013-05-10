@@ -3,13 +3,15 @@ define(
         'jquery',
         'stapes',
         'phasematch',
-        'modules/heat-map'
+        'modules/heat-map',
+        'modules/line-plot'
     ],
     function(
         $,
         Stapes,
         PhaseMatch,
-        HeatMap
+        HeatMap,
+        LinePlot
     ) {
 
         'use strict';
@@ -46,6 +48,19 @@ define(
                 });
 
                 self.elPlot = $(self.plot.el);
+
+                // init plot
+                self.plot1d = new LinePlot({
+                    el: self.el.get(0),
+                    labels: {
+                        x: 'x-axis',
+                        y: 'y-axis'
+                    },
+                    domain: [ 0, 100 ],
+                    range: [ 0, 100 ]
+                });
+
+                self.elPlot1d = $(self.plot1d.el);
             },
 
             initPhysics: function(){
@@ -92,6 +107,7 @@ define(
                     ;
 
                 self.plot.resize( dim, dim );
+                self.plot1d.resize( dim, dim );
                 self.draw();
             },
 
@@ -110,8 +126,9 @@ define(
 
                 // @TODO: move this to a control bar
                 var dim = 200;
-                var l_start = 1450 * con.nm;
-                var l_stop = 1650 * con.nm; 
+                var l_start = 775 * con.nm;
+                var l_stop = 825 * con.nm; 
+                var data1d = [];
 
                 var self = this
                     ,PM = PhaseMatch.calcJSA(
@@ -125,6 +142,18 @@ define(
                     ;
 
                 self.data = PM;
+
+                // get sin wave data
+                for ( var i = 0, l = 100; i < l; i += 0.1 ){
+                    
+                    data1d.push({
+                        x: i,
+                        y: 20 * (Math.sin( i )+1)
+                    });
+                }
+
+                self.data1d = data1d;
+
             },
 
             draw: function(){
@@ -138,6 +167,15 @@ define(
                 }
 
                 self.plot.plotData( data );
+
+                //////// other plot
+                var data1d = self.data1d;
+
+                if (!data1d){
+                    return this;
+                }
+
+                self.plot1d.plotData( data1d );
             }
         });
 

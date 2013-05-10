@@ -7,14 +7,14 @@
     </div>
     <div class="span3">
         <label>
-            Other setting
-            <input type="text" value="" />
+            Pump angle
+            <input type="text" name="theta" value="{{= it.theta || ''}}" />
         </label>
     </div>
     <div class="span3">
         <label>
-            Other setting
-            <input type="text" value="" />
+            Calculate theta
+            <input type="checkbox" name="autocalctheta" {{? it.autocalctheta }} checked="checked" {{?}} />
         </label>
     </div>
     <div class="span3">
