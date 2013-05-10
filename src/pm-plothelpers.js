@@ -35,7 +35,7 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        P.calc_wbar();
+        // P.calc_wbar();
         // P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
 
         //calcualte the correct idler angle analytically.
@@ -83,12 +83,12 @@ PhaseMatch.calcXY = function calcXY(props, x_start, x_stop, y_start, y_stop, dim
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         // PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        // PhaseMatch.brute_force_theta_i(P); //use a search. could be time consuming.
+        PhaseMatch.brute_force_theta_i(P); //use a search. could be time consuming.
 
         //calculate the correct idler angle analytically.
-        PhaseMatch.optimum_idler(P);
+        // PhaseMatch.optimum_idler(P);
 
-        P.calc_wbar();
+        // P.calc_wbar();
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
         // PM[i] = PhaseMatch.calc_delK(P);
@@ -127,7 +127,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        P.calc_wbar();
+        // P.calc_wbar();
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
         // PM[i] = PhaseMatch.calc_delK(P);
@@ -167,7 +167,7 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
 
         //calcualte the correct idler angle analytically.
         PhaseMatch.optimum_idler(P);
-        P.calc_wbar();
+        // P.calc_wbar();
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
 

@@ -172,12 +172,12 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         // createPlot(500, 500);
         var npts = 200;
         var con = PhaseMatch.constants;
-        var l_start = 1500 * con.nm;
-        var l_stop = 1600* con.nm; 
+        var l_start = 775 * con.nm;
+        var l_stop = 825* con.nm; 
         var P1 = new PhaseMatch.SPDCprop();
         PhaseMatch.optimum_idler(P1);
         PhaseMatch.auto_calc_Theta(P1);
-        
+        console.log(P1.lambda_s);
          $(function(){
             $('#viewport').append('<h2> JSA </h2>');
             plotJSA(P1,l_start,l_stop,l_start,l_stop, npts);
@@ -198,6 +198,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
             $('#viewport').append('<h2> XY idler </h2>');
             // plotJSA(P1,l_start,l_stop,l_start,l_stop, npts);
             var tmpType = P1.Type;
+            console.log("goingin");
             plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
             P1.Type = tmpType;
         });
@@ -213,10 +214,10 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
             plot_theta_phi(P1, 0, Math.PI/2, 0, Math.PI/2, npts);
         });
 
-        $(function(){
-            $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
-            plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
-        });
+        // $(function(){
+        //     $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
+        //     plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
+        // });
 
 
 

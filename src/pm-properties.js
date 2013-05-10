@@ -77,9 +77,9 @@
 
         init:function(){
             var con = PhaseMatch.constants;
-            this.lambda_p = 775 * con.nm;
-            this.lambda_s = 1550 * con.nm;
-            this.lambda_i = 1550 * con.nm;
+            this.lambda_p = 400 * con.nm;
+            this.lambda_s = 800 * con.nm;
+            this.lambda_i = 800 * con.nm;
             this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
             this.Type = this.Types[2];
             this.theta = 19.8371104525 *Math.PI / 180;
@@ -90,9 +90,9 @@
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
             this.poling_period = 1000000;
-            this.L = 2000 * con.um;
-            this.W = 500* con.um;
-            this.p_bw = 1 * con.nm;
+            this.L = 1000 * con.um;
+            this.W = 100000* con.um;
+            this.p_bw = 3 * con.nm;
             this.phase = false;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
@@ -199,8 +199,8 @@
         },
 
         calc_wbar : function (){
-            this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
-            this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
+            // this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
+            // this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
         },
 
 
@@ -289,7 +289,7 @@
         var guess = props.theta_i;
         // var startTime = new Date();
 
-        var ans = PhaseMatch.nelderMead(min_PM, guess, 100);
+        var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
     };
 
     PhaseMatch.deepcopy = function deepcopy(props){

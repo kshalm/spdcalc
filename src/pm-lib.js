@@ -143,7 +143,6 @@ PhaseMatch.phasematch = function phasematch (P){
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
-    var p_bw = 2*Math.PI*con.c/sq(lambda_p) *P.p_bw * n_p; //convert from wavelength to w 
 
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
@@ -189,12 +188,15 @@ PhaseMatch.phasematch = function phasematch (P){
     // Calculate the Pump spectrum
     // convert pump bandwidth from FWHM to standard deviation
     // p_bw = p_bw / 2.35482;
-    var w_s = 2*Math.PI*con.c *P.n_s/P.lambda_s;
-    var w_i = 2*Math.PI*con.c *P.n_i/P.lambda_i;
-    p_bw = p_bw /(2 * Math.sqrt(2*Math.log(2)));
-    var alpha = Math.exp(-sq(((w_s - P.wbar_s)+(w_i - P.wbar_i))/p_bw));
+    // var w_s = 2*Math.PI*con.c *P.n_s/P.lambda_s;
+    // var w_i = 2*Math.PI*con.c *P.n_i/P.lambda_i;
+
+    var p_bw = 2*Math.PI*con.c/sq(lambda_p) *P.p_bw; //* n_p; //convert from wavelength to w 
+    p_bw = p_bw /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
+    // var alpha = Math.exp(-sq(((w_s - P.wbar_s)+(w_i - P.wbar_i))/(2*p_bw)));
     // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( P.n_s/P.lambda_s + P.n_i/P.lambda_i +1/P.poling_period - P.n_p/P.lambda_p) )/(p_bw)));
-   
+    var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(2*p_bw)));
+
     // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i +1/P.poling_period - 1/P.lambda_p) )/(p_bw)));
 
     // var alpha = 1;
