@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-09
+ * phasematchjs v0.0.1a - 2013-05-10
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2408,7 +2408,7 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 
     var delT = new Float64Array(dim);
     var HOM_values = new Float64Array(dim);
-    var npts = 100;  //number of points to pass to the calc_HOM_JSA
+    var npts = 75;  //number of points to pass to the calc_HOM_JSA
 
     var i;
     delT = numeric.linspace(t_start, t_stop, dim);
@@ -2649,7 +2649,7 @@ PhaseMatch.calc_JSA_Diff = function calc_JSA_Diff(P, delT){
             this.phi_i = this.phi_s + Math.PI;
             this.poling_period = 1000000;
             this.L = 1000 * con.um;
-            this.W = 100000* con.um;
+            this.W = 500* con.um;
             this.p_bw = 3 * con.nm;
             this.phase = false;
             this.apodization = 1;
@@ -2963,10 +2963,10 @@ PhaseMatch.calcXY = function calcXY(props, x_start, x_stop, y_start, y_stop, dim
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         // PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        PhaseMatch.brute_force_theta_i(P); //use a search. could be time consuming.
+        // PhaseMatch.brute_force_theta_i(P); //use a search. could be time consuming.
 
         //calculate the correct idler angle analytically.
-        // PhaseMatch.optimum_idler(P);
+        PhaseMatch.optimum_idler(P);
 
         // P.calc_wbar();
         

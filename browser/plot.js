@@ -214,10 +214,10 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
             plot_theta_phi(P1, 0, Math.PI/2, 0, Math.PI/2, npts);
         });
 
-        // $(function(){
-        //     $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
-        //     plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
-        // });
+        $(function(){
+            $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
+            plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
+        });
 
 
 

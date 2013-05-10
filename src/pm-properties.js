@@ -91,7 +91,7 @@
             this.phi_i = this.phi_s + Math.PI;
             this.poling_period = 1000000;
             this.L = 1000 * con.um;
-            this.W = 100000* con.um;
+            this.W = 500* con.um;
             this.p_bw = 3 * con.nm;
             this.phase = false;
             this.apodization = 1;

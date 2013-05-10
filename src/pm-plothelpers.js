@@ -83,10 +83,10 @@ PhaseMatch.calcXY = function calcXY(props, x_start, x_stop, y_start, y_stop, dim
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         // PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        PhaseMatch.brute_force_theta_i(P); //use a search. could be time consuming.
+        // PhaseMatch.brute_force_theta_i(P); //use a search. could be time consuming.
 
         //calculate the correct idler angle analytically.
-        // PhaseMatch.optimum_idler(P);
+        PhaseMatch.optimum_idler(P);
 
         // P.calc_wbar();
         
