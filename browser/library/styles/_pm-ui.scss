@@ -99,7 +99,7 @@ $sidePanelCollapsed: 70px;
 }
 
 .plot {
-    max-width: 900px;
+    max-width: 500px;
     margin: auto;
     border: 1px solid lighten($gray, 10);
 }
@@ -134,4 +134,11 @@ $sidePanelCollapsed: 70px;
         font-family: $monoFontFamily;
         
     }
+
+#parameters input,
+textarea,
+.uneditable-input{
+  width: 75px;
+}
+
 }

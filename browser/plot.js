@@ -17,7 +17,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
     
         var startTime = new Date();
         var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
-        // var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, 300e-15, dim);
+        // var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, -400-15, dim);
         // var PM = PhaseMatch.calc_JSA_Asymmetry(P,ls_start, ls_stop, li_start,li_stop, 4000e-15, dim);
         var endTime = new Date();
         var timeDiff = (endTime - startTime);
@@ -172,8 +172,8 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         // createPlot(500, 500);
         var npts = 200;
         var con = PhaseMatch.constants;
-        var l_start = 775 * con.nm;
-        var l_stop = 825* con.nm; 
+        var l_start = 700 * con.nm;
+        var l_stop = 900* con.nm; 
         var P1 = new PhaseMatch.SPDCprop();
         PhaseMatch.optimum_idler(P1);
         PhaseMatch.auto_calc_Theta(P1);

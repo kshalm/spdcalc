@@ -46,9 +46,7 @@ define(
                     labels: {
                         x: 'x-axis',
                         y: 'y-axis'
-                    },
-                    domain: [ 0, 100 ],
-                    range: [ 0, 100 ]
+                    }
                 });
 
                 self.elPlot = $(self.plot.el);
@@ -96,7 +94,7 @@ define(
                     ,height = $(window).height()
                     ,dim = Math.min( width, height )
                     ;
-
+                if (dim>480){ dim = 480;}
                 self.plot.resize( dim, dim );
                 self.draw();
             },
@@ -116,21 +114,32 @@ define(
 
                 // @TODO: move this to a control bar
                 var dim = 200;
-                var l_start = 1450 * con.nm;
-                var l_stop = 1650 * con.nm; 
+                var l_start = 775 * con.nm;
+                var l_stop = 825 * con.nm; 
+                var t_start = -500e-15;
+                var t_stop = 500e-15;
+
+                var delT = numeric.linspace(t_start, t_stop, dim);
 
                 var self = this
                     ,data = []
                     ;
 
-                // get sin wave data
-                for ( var i = 0, l = 100; i < l; i += 0.1 ){
-                    
+                var HOM = PhaseMatch.calc_HOM_scan(props, t_start, t_stop, l_start, l_stop, l_start, l_stop, dim);
+                for ( var i = 0, l = HOM.length; i < l; i ++){
                     data.push({
-                        x: i,
-                        y: 20 * (Math.sin( i )+1)
-                    });
+                        x: delT[i]/1e-15,
+                        y: HOM[i]
+                    })
                 }
+                // get sin wave data
+            //     for ( var i = 0, l = 100; i < l; i += 0.1 ){
+                    
+            //         data.push({
+            //             x: i,
+            //             y: 20 * (Math.sin( i )+1)
+            //         });
+            //     }
 
                 self.data = data;
             },

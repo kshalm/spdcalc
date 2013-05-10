@@ -105,7 +105,7 @@ define(
                     ,height = $(window).height()
                     ,dim = Math.min( width, height )
                     ;
-
+                if (dim>480){ dim = 480;}
                 self.plot.resize( dim, dim );
                 self.plot1d.resize( dim, dim );
                 self.draw();

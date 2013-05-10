@@ -79,9 +79,9 @@
             var con = PhaseMatch.constants;
             this.lambda_p = 400 * con.nm;
             this.lambda_s = 800 * con.nm;
-            this.lambda_i = 800 * con.nm;
+            this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
-            this.Type = this.Types[2];
+            this.Type = this.Types[1];
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;

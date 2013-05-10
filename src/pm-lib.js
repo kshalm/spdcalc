@@ -310,7 +310,7 @@ PhaseMatch.calc_HOM = function calc_HOM(P, delT){
  * ls_start ... li_stop are the signal/idler wavelength ranges to calculate over
  * delT is the time delay between signal and idler
  */
- PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
+PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
     var con = PhaseMatch.constants;
     var P = PhaseMatch.deepcopy(props);
     var lambda_s = new Float64Array(dim);
@@ -336,29 +336,38 @@ PhaseMatch.calc_HOM = function calc_HOM(P, delT){
         var index_s = i % dim;
         var index_i = Math.floor(i / dim);
 
+        //First calculate PM(ws,wi)
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-
         PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
-        P.calc_wbar();
         
         var PMtmp = PhaseMatch.phasematch(P);
         THETA1_real[i] = PMtmp[0];
         THETA1_imag[i] = PMtmp[1];
 
+        //Next calculate PM(wi,ws)
+        P.lambda_s = lambda_i[index_i];
+        P.lambda_i = lambda_s[index_s];
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
+        
+        PMtmp = PhaseMatch.phasematch(P);
+        THETA2_real[i] = PMtmp[0];
+        THETA2_imag[i] = PMtmp[1];
+
         // THETA2_real[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[0]; //Transpose
         // THETA2_imag[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[1];
 
-        ARG = 2*Math.PI*con.c *(1/P.lambda_s - 1/P.lambda_i)*delT;
+        ARG = 2*Math.PI*con.c *(1/lambda_s[index_s] - 1/lambda_i[index_i])*delT;
         Tosc_real[i] = Math.cos(ARG);
         Tosc_imag[i] = Math.sin(ARG);
         // Tosc_real[i] = 1;
         // Tosc_imag[i] = 0;
     }
 
-    THETA2_real = PhaseMatch.AntiTranspose(THETA1_real,dim);
-    THETA2_imag = PhaseMatch.AntiTranspose(THETA1_imag,dim);
+    // THETA2_real = PhaseMatch.AntiTranspose(THETA1_real,dim);
+    // THETA2_imag = PhaseMatch.AntiTranspose(THETA1_imag,dim);
 
     for (i=0; i<N; i++){
         // arg2 = THETA2*Tosc. Split calculation to handle complex numbers
@@ -373,6 +382,70 @@ PhaseMatch.calc_HOM = function calc_HOM(P, delT){
 
     return PM;
 };
+
+//  PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
+//     var con = PhaseMatch.constants;
+//     var P = PhaseMatch.deepcopy(props);
+//     var lambda_s = new Float64Array(dim);
+//     var lambda_i = new Float64Array(dim);
+
+//     var i;
+//     lambda_s = numeric.linspace(ls_start, ls_stop, dim);
+//     lambda_i = numeric.linspace(li_stop, li_start, dim); 
+
+//     var N = dim * dim;
+//     var THETA1_real = new Float64Array( N );
+//     var THETA1_imag = new Float64Array( N );
+//     var THETA2_real  = new Float64Array( N ); // The transposed version of THETA1
+//     var THETA2_imag  = new Float64Array( N ); 
+//     var Tosc_real = new Float64Array( N ); // Real/Imag components of phase shift
+//     var Tosc_imag = new Float64Array( N );
+//     var ARG = 0;
+
+//     var PM = new Float64Array( N );
+
+    
+//     for (i=0; i<N; i++){
+//         var index_s = i % dim;
+//         var index_i = Math.floor(i / dim);
+
+//         P.lambda_s = lambda_s[index_s];
+//         P.lambda_i = lambda_i[index_i];
+//         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+
+//         PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
+//         P.calc_wbar();
+        
+//         var PMtmp = PhaseMatch.phasematch(P);
+//         THETA1_real[i] = PMtmp[0];
+//         THETA1_imag[i] = PMtmp[1];
+
+//         // THETA2_real[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[0]; //Transpose
+//         // THETA2_imag[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[1];
+
+//         ARG = 2*Math.PI*con.c *(1/P.lambda_s - 1/P.lambda_i)*delT;
+//         Tosc_real[i] = Math.cos(ARG);
+//         Tosc_imag[i] = Math.sin(ARG);
+//         // Tosc_real[i] = 1;
+//         // Tosc_imag[i] = 0;
+//     }
+
+//     THETA2_real = PhaseMatch.AntiTranspose(THETA1_real,dim);
+//     THETA2_imag = PhaseMatch.AntiTranspose(THETA1_imag,dim);
+
+//     for (i=0; i<N; i++){
+//         // arg2 = THETA2*Tosc. Split calculation to handle complex numbers
+//         var arg2_real = Tosc_real[i]*THETA2_real[i] - Tosc_imag[i]*THETA2_imag[i];
+//         var arg2_imag = Tosc_real[i]*THETA2_imag[i] + Tosc_imag[i]*THETA2_real[i];
+
+//         var PM_real = (THETA1_real[i] - arg2_real)/Math.sqrt(2);
+//         var PM_imag = (THETA1_imag[i] - arg2_imag)/Math.sqrt(2);
+
+//         PM[i] = sq(PM_real) + sq(PM_imag);
+//     }
+
+//     return PM;
+// };
 
 // PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
 //     var P = PhaseMatch.deepcopy(props);
