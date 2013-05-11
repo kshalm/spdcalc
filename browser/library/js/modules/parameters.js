@@ -56,7 +56,7 @@ define(
                         if (self.props.autocalctheta){
                             PhaseMatch.auto_calc_Theta( self.props );
                         } 
-                        console.log(arguments);
+                        console.log(val);
                     }
                 });
             },

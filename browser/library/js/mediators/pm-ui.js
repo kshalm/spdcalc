@@ -145,10 +145,15 @@ define(
                         ,key = $this.attr('name')
                         ,val = $this.val()
                         ;
-
+                    console.log("in PM-ui", val);
                     // update the corresponding property in the parameters object
                     self.parameters.set( key, val );
                 });
+                // PM Type dropdown box
+                self.el.find('#PM-Type-Dropdown').change(function(){
+                    self.parameters.set("Type", self.el.find('#PM-Type-Dropdown').val() );  
+                });
+                
 
                 var to;
                 $(window).on('resize', function(){
@@ -245,6 +250,14 @@ define(
                         self.load( value );
                     }
                 });
+
+                //  // display Phasematch type select box
+                // self.el.find('#ui-modules-PMType').dropkick({
+                //     change: function (value, label) {
+
+                //         // self.load( value );
+                //     }
+                // });
 
                 // Init tags input
                 $("#tagsinput").tagsInput();

@@ -60,7 +60,7 @@ $sidePanelCollapsed: 70px;
 
 #parameters-wrap {
     /*width: 100%;*/
-    max-width: 300px;
+    width: 300px;
     float: left;
     overflow: hidden;
     padding: 20px;
@@ -189,6 +189,13 @@ label{
     /*padding-right:;*/
     width:90px;
 }
+
+.dropdown select {
+  position: relative;
+  top:0;
+  visibility: visible;
+}
+
 /*.inputbox {
     float:right;
     width:50px;

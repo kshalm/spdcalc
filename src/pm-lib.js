@@ -10,21 +10,21 @@
  * @class BBO
  * @param {Array} temp [description]
  */
-PhaseMatch.BBO = function BBO (temp) {
-    //Selmeir coefficients for nx, ny, nz
-    this.temp = temp;
-    // this.lambda = lambda
-};
+// PhaseMatch.BBO = function BBO (temp) {
+//     //Selmeir coefficients for nx, ny, nz
+//     this.temp = temp;
+//     // this.lambda = lambda
+// };
 
-PhaseMatch.BBO.prototype  = {
-    indicies:function(lambda){
-        lambda = lambda * Math.pow(10,6); //Convert for Sellmeir Coefficients
-        var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-        var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
+// PhaseMatch.BBO.prototype  = {
+//     indicies:function(lambda){
+//         lambda = lambda * Math.pow(10,6); //Convert for Sellmeir Coefficients
+//         var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
+//         var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
 
-        return [no, no, ne];
-    }
-};
+//         return [no, no, ne];
+//     }
+// };
 
 
 /*

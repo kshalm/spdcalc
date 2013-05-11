@@ -77,8 +77,8 @@
 
         init:function(){
             var con = PhaseMatch.constants;
-            this.lambda_p = 400 * con.nm;
-            this.lambda_s = 800 * con.nm;
+            this.lambda_p = 775 * con.nm;
+            this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
             this.Type = this.Types[1];
@@ -97,7 +97,8 @@
             this.autocalctheta = true;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.crystal = new PhaseMatch.BBO();
+            this.crystal = new PhaseMatch.KTP();
+            this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
             this.S_s = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_s, this.phi_s);
@@ -107,11 +108,13 @@
             this.n_s = this.calc_Index_PMType(this.lambda_s, this.Type, this.S_s, "signal");
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
 
+            console.log(this.n_p, this.n_s, this.n_i);
+
             this.msg = "";
 
-            this.wbar_pump = 2*Math.PI*con.c/this.lambda_p * this.n_p;
-            this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
-            this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
+            // this.wbar_pump = 2*Math.PI*con.c/this.lambda_p * this.n_p;
+            // this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
+            // this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
 
             // wbar = 2*pi*con.c *n_p0/pump
 //     wbar_s =  2*pi*con.c *n_s0/(2*pump)
@@ -158,7 +161,7 @@
         },
 
         calc_Index_PMType : function (lambda, Type, S, photon){
-            var ind = this.crystal.indicies(lambda);
+            var ind = this.crystal.indicies(lambda, this.temp);
 
             var nx = ind[0];
             var ny = ind[1];

@@ -14,6 +14,18 @@
         <div class="Form">
             <h4>Crystal Properties</h4>
         </div>
+
+        <div class="dropdown">
+            <select id="PM-Type-Dropdown">
+                {{~it.Types :value:index}}
+                    {{? index ==1}} <option value="{{=value}}" selected="selected">{{=value}}</option> {{?}}
+                    {{? index !==1}}
+                    <option value="{{=value}}">{{=value}}</option>
+                    {{?}}
+                {{~}}
+            </select>
+        </div>
+
         <div class="Form">
             <label>
                 Automatically calculate theta
@@ -44,7 +56,7 @@
                 Temperature
             </label>
             <div class="flatinputbox">
-                <input type="text" class="inputbox" name="Temp" value="{{= it.Temp || ''}}" />
+                <input type="text" class="inputbox" name="temp" value="{{= it.temp || ''}}" />
             </div>
         </div>
     </div>
