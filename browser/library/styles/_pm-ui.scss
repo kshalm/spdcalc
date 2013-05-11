@@ -13,16 +13,17 @@ $sidePanelCollapsed: 70px;
     > .inner {
         position: relative;
         overflow: hidden;
-        border: 1px solid $gray;
-        @include border-radius( 10px );
+        /*border: 1px solid $gray;
+        @include border-radius( 10px );*/
 
         > .upper,
         > .lower {
             position: relative;
+            /*float:left;*/
         }
 
         > .lower {
-            border-top: 2px solid $gray;
+           /* border-top: 2px solid $gray;*/
         }
     }
 }
@@ -44,6 +45,9 @@ $sidePanelCollapsed: 70px;
 #main {
     @include clearfix;
     padding: 1em 0;
+    /*max-width: 630px;*/
+    float: right;
+    margin-right:40px;
 }
 
 .loading-msg {
@@ -55,17 +59,24 @@ $sidePanelCollapsed: 70px;
 }
 
 #parameters-wrap {
-    width: 100%;
+    /*width: 100%;*/
+    max-width: 300px;
+    float: left;
     overflow: hidden;
     padding: 20px;
-    border-bottom: 1px solid $gray;
+    /*border-bottom: 1px solid $gray;*/
     background: #fff;
     background: rgba(#fff, 0.3);
     @include box-sizing( border-box );
 
     .title {
+        /*width:100%;*/
+        /*width:150px;*/
+        float:left;
         margin: 0;
+        /*margin-bottom: 2em;*/
         vertical-align: top;
+        clear:both;
     }
 
     &.collapsed {
@@ -73,7 +84,7 @@ $sidePanelCollapsed: 70px;
         border-color: $gray;
 
         .title:after {
-            content: '...';
+            content: '';
         }
         
         #parameters {
@@ -88,6 +99,13 @@ $sidePanelCollapsed: 70px;
         vertical-align: middle;
         margin-right: 0.5em;
     }
+    .collapse-ctrl{
+        float: right;
+        width:50px;
+        -webkit-border-radius: 25px;
+        -moz-border-radius: 25px;
+        border-radius: 25px;
+    }
 
     .btn-wrap {
         text-align: right;
@@ -99,9 +117,12 @@ $sidePanelCollapsed: 70px;
 }
 
 .plot {
-    max-width: 500px;
+    max-width: 460px;
     margin: auto;
     border: 1px solid lighten($gray, 10);
+    /*float:left;
+    margin-left:40px;
+    margin-right:40px;*/
 }
 
 .plot.line-plot {
@@ -124,6 +145,7 @@ $sidePanelCollapsed: 70px;
 }
 
 #logs {
+    width:100%;
     height: 200px;
     background: #fff;
     padding: 2em 3em;
@@ -134,11 +156,52 @@ $sidePanelCollapsed: 70px;
         font-family: $monoFontFamily;
         
     }
+}
 
-#parameters input,
+
+input,
 textarea,
 .uneditable-input{
   width: 75px;
+/*  line-height: 10px;
+*/}
+
+.flatinputbox{
+    float:right;
 }
 
+label{
+    width: 120px;
+    float:left;
+    margin-right: 20px;
 }
+
+.Form{
+    clear:both;
+}
+
+.calcbutton{
+    float:left;
+}
+
+.calccheckbox{
+    float:left;
+    /*padding-right:;*/
+    width:90px;
+}
+/*.inputbox {
+    float:right;
+    width:50px;
+}*/
+
+/*label, input[type="text"] {
+   vertical-align: middle;
+   margin-right: 1em;
+}
+
+input[type="text"]{
+    margin-left:2em;
+}*/
+
+
+

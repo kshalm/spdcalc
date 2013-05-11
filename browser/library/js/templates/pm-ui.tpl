@@ -49,16 +49,10 @@
     <div class="lower">
         <div id="parameters-wrap">
             <div class="row-fluid">
-                <h2 class="span6 title">Parameters</h2>
-                <div class="span4">
-                    <button class="btn btn-success ctrl-calc">Calculate</button>
-                    <label class="checkbox" for="autocalc">
-                        <input type="checkbox" value="" id="autocalc">
-                        Auto calculate
-                    </label>
-                </div>
-                <div class="btn-wrap span2">
-                    <button class="btn collapse-ctrl">collapse</button>
+                <h2 class="title">Options</h2>
+                
+                <div class="btn-wrap ">
+                    <button class="btn collapse-ctrl">-</button>
                 </div>
             </div>
             <div id="parameters"></div>

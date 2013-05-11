@@ -94,7 +94,7 @@ define(
                     ,height = $(window).height()
                     ,dim = Math.min( width, height )
                     ;
-                if (dim>480){ dim = 480;}
+                if (dim>800){ dim = 800;}
                 self.plot.resize( dim, dim );
                 self.draw();
             },

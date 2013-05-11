@@ -117,7 +117,7 @@ define(
                 self.el.on('click', '.collapse-ctrl', function(e){
                     e.preventDefault();
                     var target = self.elParameters.parent()
-                        ,text = target.is('.collapsed') ? 'collapse' : 'expand'
+                        ,text = target.is('.collapsed') ? '-' : '+'
                         ;
 
                     $(this).text( text );
