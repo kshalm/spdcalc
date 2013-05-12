@@ -3,7 +3,6 @@
  */
 
 
-
 /**
  * BBO indicies. 
  */
@@ -59,6 +58,21 @@ PhaseMatch.KTP.prototype  = {
 };
 
 
+/**
+* Create the Crystal DB
+**/
+
+// var BBO = new PhaseMatch.BBO();
+// var KTP = new PhaseMatch.KTP();
+PhaseMatch.CrystalDB = {"BBO Ref 1": new PhaseMatch.BBO(), 
+                        "KTP": new PhaseMatch.KTP()};
+
+PhaseMatch.CrystalDBKeys = [];
+
+for(var k in PhaseMatch.CrystalDB){
+    PhaseMatch.CrystalDBKeys.push(k);
+    console.log(k);
+}
 
 // class KTP(Crystal):
 //     Name = "KTP"

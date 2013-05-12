@@ -113,9 +113,9 @@ define(
             calc: function( props ){
 
                 // @TODO: move this to a control bar
-                var dim = 200;
-                var l_start = 775 * con.nm;
-                var l_stop = 825 * con.nm; 
+                var dim = 50;
+                var l_start = 1500 * con.nm;
+                var l_stop = 1600 * con.nm; 
                 var t_start = -500e-15;
                 var t_stop = 500e-15;
 

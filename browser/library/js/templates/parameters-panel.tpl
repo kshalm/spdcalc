@@ -15,6 +15,18 @@
             <h4>Crystal Properties</h4>
         </div>
 
+         <div class="dropdown">
+            <select id="Crystal-Dropdown">
+                {{~it.crystalNames :value:index}}
+                <option value="{{=value}}">{{=value}}</option>
+                    <!-- {{? index ==0}} <option value="{{=value}}" selected="selected">{{=value}}</option> {{?}}
+                    {{? index !==1}}
+                    <option value="{{=value}}">{{=value}}</option>
+                    {{?}} -->
+                {{~}}
+            </select>
+        </div>
+
         <div class="dropdown">
             <select id="PM-Type-Dropdown">
                 {{~it.Types :value:index}}
@@ -28,7 +40,7 @@
 
         <div class="Form">
             <label>
-                Automatically calculate theta
+                Calculate theta
             </label>
             <div class="flatinputbox">
                 <input type="checkbox" class="inputbox" name="autocalctheta" {{? it.autocalctheta }} checked="checked" {{?}} />
@@ -120,4 +132,47 @@
             </div>
         </div>
     </div>
+
+    <div class="sp4">
+        <div class="Form">
+            <h4>Periodic Poling</h4>
+        </div>
+
+         <div class="Form">
+            <label>
+                Calculate poling period
+            </label>
+            <div class="flatinputbox">
+                <input type="checkbox" class="inputbox" name="autocalcpp" {{? it.autocalcpp }} checked="checked" {{?}} />
+            </div>
+        </div>
+
+        <div class="Form">   
+            <label>
+                Poling Period
+            </label>
+            <div class="flatinputbox">
+                <input type="text" class="inputbox" name="poling_period" value="{{= it.poling_period || ''}}" />
+            </div>
+        </div>
+
+        <div class="Form">   
+            <label>
+                Theta_s (deg)
+            </label>
+            <div class="flatinputbox">
+                <input type="text" class="inputbox" name="theta_s" value="{{= it.theta_s || ''}}" />
+            </div>
+        </div>
+        
+        <div class="Form">   
+            <label>
+                Phi_s (deg)
+            </label>
+            <div class="flatinputbox">
+                <input type="text" class="inputbox" name="phi_s" value="{{= it.phi_s || ''}}" />
+            </div>
+        </div>
+    </div>
+
 </div>

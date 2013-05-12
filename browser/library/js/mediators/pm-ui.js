@@ -149,9 +149,15 @@ define(
                     // update the corresponding property in the parameters object
                     self.parameters.set( key, val );
                 });
+
                 // PM Type dropdown box
                 self.el.find('#PM-Type-Dropdown').change(function(){
                     self.parameters.set("Type", self.el.find('#PM-Type-Dropdown').val() );  
+                });
+
+                // Crystal selection dropdown box
+                self.el.find('#Crystal-Dropdown').change(function(){
+                    self.parameters.set("xtal", self.el.find('#Crystal-Dropdown').val() );  
                 });
                 
 

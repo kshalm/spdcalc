@@ -51,11 +51,21 @@ define(
 
                         var val = self.get( key );
 
-                        self.props[ key ] = val;
+                        if (key === "xtal"){
+                            console.log("setting the crystal. Inside the props.js", val);
+                            self.props.set_crystal(val);
+                        }
+                        else {
+                            self.props[ key ] = val;
+                        }
 
                         if (self.props.autocalctheta){
                             PhaseMatch.auto_calc_Theta( self.props );
                         } 
+
+                        if (self.props.autocalcpp){
+                            PhaseMatch.calc_poling_period(self.props);
+                        }
                         console.log(val);
                     }
                 });

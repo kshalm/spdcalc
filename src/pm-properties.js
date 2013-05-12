@@ -4,42 +4,6 @@
 
 (function(){
 
-    // /**
-    //  * Rotation object
-    //  */
-    // var Rotation = function(){
-
-    //     this.Sx = 0;
-    //     this.Sy = 0;
-    //     this.Sz = 0;
-    // };
-
-    // Rotation.prototype = {
-
-    //     set: function( theta, phi, theta_s, phi_s ){
-
-    //         // First get the ransfomration to lambda_p coordinates
-    //         var S_x = Math.sin(theta_s)*Math.cos(phi_s);
-    //         var S_y = Math.sin(theta_s)*Math.sin(phi_s);
-    //         var S_z = Math.cos(theta_s);
-
-    //         // Transform from the lambda_p coordinates to crystal coordinates
-    //         var SR_x = Math.cos(theta)*Math.cos(phi)*S_x - Math.sin(phi)*S_y + Math.sin(theta)*Math.cos(phi)*S_z;
-    //         var SR_y = Math.cos(theta)*Math.sin(phi)*S_x + Math.cos(phi)*S_y + Math.sin(theta)*Math.sin(phi)*S_z;
-    //         var SR_z = -Math.sin(theta)*S_x  + Math.cos(theta)*S_z;
-            
-    //         // Normalambda_ize the unit vector
-    //         // FIX ME: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
-    //         // case I think the correct behaviour is for Norm = 1 ?
-    //         var Norm =  Math.sqrt(sq(S_x) + sq(S_y) + sq(S_z));
-    //         this.Sx = SR_x/(Norm);
-    //         this.Sy = SR_y/(Norm);
-    //         this.Sz = SR_z/(Norm);
-    //     }
-    // };
-
-    // PhaseMatch.Rotation = Rotation;
-
     var con = PhaseMatch.constants;
     var spdcDefaults = {
         lambda_p: 775 * con.nm,
@@ -80,7 +44,7 @@
             this.lambda_p = 775 * con.nm;
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
-            this.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
+            this.Types = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
             this.Type = this.Types[1];
             this.theta = 19.8371104525 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
@@ -89,15 +53,17 @@
             this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
-            this.poling_period = 1000000;
             this.L = 1000 * con.um;
             this.W = 500* con.um;
             this.p_bw = 3 * con.nm;
             this.phase = false;
             this.autocalctheta = true;
+            this.autocalcpp = false;
+            this.poling_period = 1000000;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.crystal = new PhaseMatch.KTP();
+            this.crystalNames = PhaseMatch.CrystalDBKeys;
+            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[0]];
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -107,8 +73,6 @@
             this.n_p = this.calc_Index_PMType(this.lambda_p, this.Type, this.S_p, "pump");
             this.n_s = this.calc_Index_PMType(this.lambda_s, this.Type, this.S_s, "signal");
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
-
-            console.log(this.n_p, this.n_s, this.n_i);
 
             this.msg = "";
 
@@ -182,16 +146,18 @@
             var n = 1;
 
             switch (Type){
-
-                case "e -> o + o":
+                case this.Types[0]:
+                    n = nfast;
+                break;
+                case this.Types[1]:
                     if (photon === "pump") { n = nslow;}
                     else { n = nfast;}
                 break;
-                case "e -> e + o":
+                case this.Types[2]:
                     if (photon === "idler") { n = nfast;}
                     else {n = nslow;}
                 break;
-                case "e -> o + e":
+                case this.Types[3]:
                     if (photon === "signal") { n = nfast;}
                     else {n = nslow;}
                 break;
@@ -200,6 +166,11 @@
             }
 
             return n ;
+        },
+
+        set_crystal : function (k){
+            this.crystal = PhaseMatch.CrystalDB[k];
+            var ind = this.crystal.indicies(this.lambda_p, this.temp);
         },
 
         calc_wbar : function (){
@@ -274,6 +245,14 @@
         var timeDiff = (endTime - startTime)/1000;
         console.log("Theta autocalc = ", timeDiff);
         props.theta = ans;
+    };
+
+    PhaseMatch.calc_poling_period = function calc_poling_period(props){
+        PhaseMatch.optimum_idler(props);
+        var delK = PhaseMatch.calc_delK(props);
+        props.poling_period = 2*Math.PI/delK[2];
+        console.log("poling period ", props.poling_period);
+        
     };
 
     PhaseMatch.brute_force_theta_i = function brute_force_theta_i(props){
