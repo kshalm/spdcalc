@@ -2047,7 +2047,7 @@ function sq( x ){
     var delKx = (2*Math.PI*((n_s*Ss[0]/P.lambda_s) + n_i*Si[0]/P.lambda_i));
     var delKy = (2*Math.PI*((n_s*Ss[1]/P.lambda_s) + n_i*Si[1]/P.lambda_i));
     var delKz = (2*Math.PI*(n_p/P.lambda_p - (n_s*Ss[2]/P.lambda_s) - n_i*Si[2]/P.lambda_i));
-    delKz = delKz -2*Math.PI/P.poling_period;
+    delKz = delKz - 2*Math.PI/P.poling_period;
 
     return [delKx, delKy, delKz];
 
@@ -2676,25 +2676,25 @@ PhaseMatch.calc_JSA_Diff = function calc_JSA_Diff(P, delT){
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.Types = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.Types[1];
-            this.theta = 19.8371104525 *Math.PI / 180;
+            this.Type = this.Types[2];
+            this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
             this.theta_s = 0 * Math.PI / 180;
             this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
-            this.L = 1000 * con.um;
+            this.L = 2000 * con.um;
             this.W = 500* con.um;
-            this.p_bw = 3 * con.nm;
+            this.p_bw = 6 * con.nm;
             this.phase = false;
-            this.autocalctheta = true;
-            this.autocalcpp = false;
+            this.autocalctheta = false;
+            this.autocalcpp = true;
             this.poling_period = 1000000;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.crystalNames = PhaseMatch.CrystalDBKeys;
-            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[0]];
+            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[1]];
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);

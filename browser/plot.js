@@ -172,12 +172,19 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         // createPlot(500, 500);
         var npts = 200;
         var con = PhaseMatch.constants;
-        var l_start = 700 * con.nm;
-        var l_stop = 900* con.nm; 
+        var l_start = 1500 * con.nm;
+        var l_stop = 1600* con.nm; 
         var P1 = new PhaseMatch.SPDCprop();
         PhaseMatch.optimum_idler(P1);
-        PhaseMatch.auto_calc_Theta(P1);
-        console.log(P1.lambda_s);
+        if (P1.autocalctheta){
+            PhaseMatch.auto_calc_Theta(P1);
+        }
+
+        if (P1.autocalcpp){
+            PhaseMatch.calc_poling_period(P1);
+        }
+        
+        // console.log(P1.lambda_s);
          $(function(){
             $('#viewport').append('<h2> JSA </h2>');
             plotJSA(P1,l_start,l_stop,l_start,l_stop, npts);
@@ -198,7 +205,6 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
             $('#viewport').append('<h2> XY idler </h2>');
             // plotJSA(P1,l_start,l_stop,l_start,l_stop, npts);
             var tmpType = P1.Type;
-            console.log("goingin");
             plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
             P1.Type = tmpType;
         });
@@ -209,15 +215,15 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
             plot_lambda_s_vs_theta_s(P1,l_start, l_stop, 0,5*Math.PI/180, npts)
         });
         
-        $(function(){
-            $('#viewport').append('<h2> Crystal phasematching (theta vs phi) </h2>');
-            plot_theta_phi(P1, 0, Math.PI/2, 0, Math.PI/2, npts);
-        });
+        // $(function(){
+        //     $('#viewport').append('<h2> Crystal phasematching (theta vs phi) </h2>');
+        //     plot_theta_phi(P1, 0, Math.PI/2, 0, Math.PI/2, npts);
+        // });
 
-        $(function(){
-            $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
-            plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
-        });
+        // $(function(){
+        //     $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
+        //     plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
+        // });
 
 
 
