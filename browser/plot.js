@@ -172,10 +172,12 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         // createPlot(500, 500);
         var npts = 200;
         var con = PhaseMatch.constants;
-        var l_start = 1500 * con.nm;
-        var l_stop = 1600* con.nm; 
+        // var l_start = 1500 * con.nm;
+        // var l_stop = 1600* con.nm; 
         var P1 = new PhaseMatch.SPDCprop();
         PhaseMatch.optimum_idler(P1);
+        
+
         if (P1.autocalctheta){
             PhaseMatch.auto_calc_Theta(P1);
         }
@@ -183,6 +185,12 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         if (P1.autocalcpp){
             PhaseMatch.calc_poling_period(P1);
         }
+        var threshold = 0.5;
+        var lsi = PhaseMatch.autorange_lambda(P1, threshold);
+        console.log(lsi);
+        var l_start = Math.min(lsi[0], lsi[1]);
+        var l_stop =  Math.max(lsi[0], lsi[1]);
+        console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
         
         // console.log(P1.lambda_s);
          $(function(){

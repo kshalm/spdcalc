@@ -62,6 +62,7 @@
             this.poling_period = 1000000;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
+            this.useguassianapprox = true;
             this.crystalNames = PhaseMatch.CrystalDBKeys;
             this.crystal = PhaseMatch.CrystalDB[this.crystalNames[1]];
             this.temp = 20;

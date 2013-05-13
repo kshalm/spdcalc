@@ -132,14 +132,6 @@ define(
                         y: HOM[i]
                     })
                 }
-                // get sin wave data
-            //     for ( var i = 0, l = 100; i < l; i += 0.1 ){
-                    
-            //         data.push({
-            //             x: i,
-            //             y: 20 * (Math.sin( i )+1)
-            //         });
-            //     }
 
                 self.data = data;
             },

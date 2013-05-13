@@ -18,11 +18,7 @@
          <div class="dropdown">
             <select id="Crystal-Dropdown">
                 {{~it.crystalNames :value:index}}
-                <option value="{{=value}}">{{=value}}</option>
-                    <!-- {{? index ==0}} <option value="{{=value}}" selected="selected">{{=value}}</option> {{?}}
-                    {{? index !==1}}
-                    <option value="{{=value}}">{{=value}}</option>
-                    {{?}} -->
+                <option value="{{=value}}" {{? value===it.crystal.name}} selected="selected" {{?}}>{{=value}}</option>
                 {{~}}
             </select>
         </div>
@@ -30,10 +26,7 @@
         <div class="dropdown">
             <select id="PM-Type-Dropdown">
                 {{~it.Types :value:index}}
-                    {{? index ==1}} <option value="{{=value}}" selected="selected">{{=value}}</option> {{?}}
-                    {{? index !==1}}
-                    <option value="{{=value}}">{{=value}}</option>
-                    {{?}}
+                     <option value="{{=value}}" {{? value===it.Type}} selected="selected" {{?}}>{{=value}}</option> 
                 {{~}}
             </select>
         </div>
