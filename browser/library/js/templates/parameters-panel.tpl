@@ -43,7 +43,7 @@
                 Calculate theta
             </label>
             <div class="flatinputbox">
-                <input type="checkbox" class="inputbox" name="autocalctheta" {{? it.autocalctheta }} checked="checked" {{?}} />
+                <input id="autocalctheta" type="checkbox" class="inputbox" name="autocalctheta" {{? it.autocalctheta }} checked="checked" {{?}} />
             </div>
         </div>
         <div class="Form">
@@ -164,7 +164,7 @@
                 <input type="text" class="inputbox" name="theta_s" value="{{= it.theta_s || ''}}" />
             </div>
         </div>
-        
+
         <div class="Form">   
             <label>
                 Phi_s (deg)

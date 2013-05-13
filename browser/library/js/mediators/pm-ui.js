@@ -106,9 +106,9 @@ define(
 
                 self.parameters.on('change', function(){
 
-                    if (!self.autocalc){
-                        return;
-                    }
+                    // if (!self.autocalc){
+                    //     return;
+                    // }
 
                     self.emit('calculate');
                 });
@@ -145,7 +145,7 @@ define(
                         ,key = $this.attr('name')
                         ,val = $this.val()
                         ;
-                    console.log("in PM-ui", val);
+                    // console.log("in PM-ui", key, val);
                     // update the corresponding property in the parameters object
                     self.parameters.set( key, val );
                 });
@@ -159,6 +159,12 @@ define(
                 self.el.find('#Crystal-Dropdown').change(function(){
                     self.parameters.set("xtal", self.el.find('#Crystal-Dropdown').val() );  
                 });
+
+                self.el.find('#autocalctheta').change(function(){
+                    console.log('autocaltheta clicked', self.el.find('#autocalctheta').is(':checked'));
+                    self.parameters.set("autocalctheta", self.el.find('#autocalctheta').is(':checked'));
+                });
+                
                 
 
                 var to;

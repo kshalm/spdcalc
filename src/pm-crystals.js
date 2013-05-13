@@ -71,7 +71,6 @@ PhaseMatch.CrystalDBKeys = [];
 
 for(var k in PhaseMatch.CrystalDB){
     PhaseMatch.CrystalDBKeys.push(k);
-    console.log(k);
 }
 
 // class KTP(Crystal):

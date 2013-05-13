@@ -48,25 +48,39 @@ define(
                 self.on({
 
                     change: function( key ){
+                        // console.log("the key is", key);
 
                         var val = self.get( key );
 
                         if (key === "xtal"){
-                            console.log("setting the crystal. Inside the props.js", val);
                             self.props.set_crystal(val);
                         }
+                        else if (key == "autocalctheta"){
+
+                            if (val === "on"){
+                                console.log('not falling for it!');   
+                            }
+                            else {
+                                self.props[ key ] = val;
+                            }
+                
+                        }
                         else {
+                            // console.log("setting: ", key,val);
                             self.props[ key ] = val;
                         }
 
                         if (self.props.autocalctheta){
+                            // console.log("parameters.js AUTOCALCULATE THETA", self.props.autocalctheta, key, val);
+                            // console.log("");
                             PhaseMatch.auto_calc_Theta( self.props );
+
                         } 
 
                         if (self.props.autocalcpp){
                             PhaseMatch.calc_poling_period(self.props);
                         }
-                        console.log(val);
+                        // console.log(val);
                     }
                 });
             },

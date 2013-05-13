@@ -243,7 +243,7 @@
         
 
         var timeDiff = (endTime - startTime)/1000;
-        console.log("Theta autocalc = ", timeDiff);
+        // console.log("Theta autocalc = ", timeDiff);
         props.theta = ans;
     };
 

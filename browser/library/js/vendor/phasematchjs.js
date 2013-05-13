@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-11
+ * phasematchjs v0.0.1a - 2013-05-12
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2874,7 +2874,7 @@ PhaseMatch.calc_JSA_Diff = function calc_JSA_Diff(P, delT){
         
 
         var timeDiff = (endTime - startTime)/1000;
-        console.log("Theta autocalc = ", timeDiff);
+        // console.log("Theta autocalc = ", timeDiff);
         props.theta = ans;
     };
 
@@ -2943,7 +2943,7 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
     var P = PhaseMatch.deepcopy(props);
     var endTime = new Date();
     var timeDiff = (endTime - startTime);
-    console.log("deep copy time = ", timeDiff);
+    // console.log("deep copy time = ", timeDiff);
 
 
     // var P = props;
@@ -3181,7 +3181,6 @@ PhaseMatch.CrystalDBKeys = [];
 
 for(var k in PhaseMatch.CrystalDB){
     PhaseMatch.CrystalDBKeys.push(k);
-    console.log(k);
 }
 
 // class KTP(Crystal):
