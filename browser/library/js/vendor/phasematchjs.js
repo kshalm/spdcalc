@@ -2893,12 +2893,32 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
         
         return P;
     };
+
+    PhaseMatch.updateallangles = function updateallangles(props){
+        console.log("updatingall");
+        props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
+        props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
+
+        props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
+        props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+
+        PhaseMatch.optimum_idler(props);
+        // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
+
+       
+        // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+
+    };
+
 })();
 
 
 PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     var startTime = new Date();
     var P = PhaseMatch.deepcopy(props);
+    console.log("calcjsa props, deepcopy theta", props.theta *180/Math.PI, P.theta *180/Math.PI);
+    PhaseMatch.updateallangles(props);
+    console.log("should be done ");
     var endTime = new Date();
     var timeDiff = (endTime - startTime);
     // console.log("deep copy time = ", timeDiff);

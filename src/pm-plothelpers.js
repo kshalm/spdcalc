@@ -5,6 +5,9 @@
 PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     var startTime = new Date();
     var P = PhaseMatch.deepcopy(props);
+    console.log("calcjsa props, deepcopy theta", props.theta *180/Math.PI, P.theta *180/Math.PI);
+    PhaseMatch.updateallangles(props);
+    console.log("should be done ");
     var endTime = new Date();
     var timeDiff = (endTime - startTime);
     // console.log("deep copy time = ", timeDiff);

@@ -327,5 +327,22 @@
         
         return P;
     };
+
+    PhaseMatch.updateallangles = function updateallangles(props){
+        console.log("updatingall");
+        props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
+        props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
+
+        props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
+        props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+
+        PhaseMatch.optimum_idler(props);
+        // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
+
+       
+        // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+
+    };
+
 })();
 
