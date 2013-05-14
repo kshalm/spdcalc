@@ -4,14 +4,16 @@ define(
         'stapes',
         'phasematch',
         'modules/heat-map',
-        'modules/line-plot'
+        'modules/line-plot',
+        'tpl!templates/time-delay-ctrl.tpl'
     ],
     function(
         $,
         Stapes,
         PhaseMatch,
         HeatMap,
-        LinePlot
+        LinePlot,
+        tplTimeDelayCtrl
     ) {
 
         'use strict';
@@ -47,7 +49,19 @@ define(
                     el: self.el.get(0)
                 });
 
-                self.elPlot = $(self.plot.el);
+                self.elPlot = $(self.plot.el)
+                
+                self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el );
+                
+                self.eldelT.slider({
+                    min: -500,
+                    max: 500,
+                    value: 0,
+                    orientation: "horizontal",
+                    range: "min"
+                });
+
+                self.set('delT', 200e-15);
 
                 // init plot
                 self.plot1d = new LinePlot({
@@ -126,6 +140,7 @@ define(
 
                 // @TODO: move this to a control bar
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
+                var self = this;
                 var dim = 200;
                 // var l_start = 1500 * con.nm;
                 // var l_stop = 1600 * con.nm; 
@@ -133,18 +148,17 @@ define(
                 var lsi = PhaseMatch.autorange_lambda(props, threshold);
                 var l_start = Math.min(lsi[0], lsi[1]);
                 var l_stop =  Math.max(lsi[0], lsi[1]);
-                // console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
                 var data1d = [];
-
-                console.log(props)
+                var delT = self.get('delT');
 
                 var self = this
-                    ,PM = PhaseMatch.calcJSA(
+                    ,PM = PhaseMatch.calc_HOM_JSA(
                         props, 
                         l_start, 
                         l_stop, 
                         l_start,
-                        l_stop, 
+                        l_stop,
+                        delT,
                         dim
                     )
                     ;

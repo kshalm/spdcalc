@@ -10,6 +10,7 @@
                     <select tabindex="1" class="span3" id="ui-modules">
                         <option value="jsa">JSA</option>
                         <option value="hom">Hong Ou Mandel</option>
+                        <option value="jsa-hom">JSA HOM</option>
                         <option value="pm-xy">PM XY</option>
                     </select>
                 </div>

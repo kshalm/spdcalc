@@ -50,14 +50,13 @@ define(
                 self.on({
 
                     'change': function( key ){
-                        // console.log("the key is", key);
-
+                        
                         var val = self.get( key );
                         self.props[ key ] = val;
+
+                        console.log('set ', key, 'to', val)
                     
                         if (self.props.autocalctheta){
-                            // console.log("parameters.js AUTOCALCULATE THETA", self.props.autocalctheta, key, val);
-                            // console.log("");
                             PhaseMatch.auto_calc_Theta( self.props );
                         } 
 
@@ -69,7 +68,6 @@ define(
                             // if we are going to trigger autocalculation, refresh
                             self.refresh();
                         }
-                        // console.log(val);
                     },
 
                     'change:xtal': function( val ){

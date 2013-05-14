@@ -18,7 +18,7 @@
         </div>
 
         <div class="control-group">
-            <select id="crystal-dropdown" name="Type" class="span3">
+            <select id="crystal-dropdown" name="xtal" class="span3">
                 {{~it.crystalNames :value:index}}
                 <option value="{{=value}}" {{? value===it.crystal.name}} selected="selected" {{?}}>{{=value}}</option>
                 {{~}}
@@ -26,7 +26,7 @@
         </div>
 
         <div class="control-group">
-            <select id="pm-type-dropdown" name="xtal" class="span3">
+            <select id="pm-type-dropdown" name="Type" class="span3">
                 {{~it.Types :value:index}}
                      <option value="{{=value}}" {{? value===it.Type}} selected="selected" {{?}}>{{=value}}</option> 
                 {{~}}
@@ -44,7 +44,7 @@
                 Theta (deg)
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="theta" value="{{= parseFloat( it.theta ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="theta" value="{{= parseFloat( it.theta ) }}" />
             </div>
             </label>
         </div>
@@ -53,7 +53,7 @@
                 Length (um)
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="L" value="{{= parseFloat( it.L ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="L" value="{{= parseFloat( it.L ) }}" />
             </div>
         </div>
         <div class="control-group">
@@ -61,7 +61,7 @@
                 Temperature
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="temp" value="{{= parseFloat( it.temp ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="temp" value="{{= parseFloat( it.temp ) }}" />
             </div>
         </div>
     </section>
@@ -75,7 +75,7 @@
                 Wavelength
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="lambda_p" value="{{= parseFloat( it.lambda_p ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="lambda_p" value="{{= parseFloat( it.lambda_p ) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -83,7 +83,7 @@
                 Bandwidth FWHM (nm)
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="p_bw" value="{{= parseFloat( it.p_bw ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="p_bw" value="{{= parseFloat( it.p_bw ) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -91,7 +91,7 @@
                 Waist (um)
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="W" value="{{= parseFloat( it.W ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="W" value="{{= parseFloat( it.W ) }}" />
             </div>
         </div>
     </section>
@@ -105,7 +105,7 @@
                 Wavelength
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="lambda_s" value="{{= parseFloat( it.lambda_s ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="lambda_s" value="{{= parseFloat( it.lambda_s ) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -113,7 +113,7 @@
                 Theta_s (deg)
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="theta_s" value="{{= parseFloat( it.theta_s ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="theta_s" value="{{= parseFloat( it.theta_s ) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -121,7 +121,7 @@
                 Phi_s (deg)
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="phi_s" value="{{= parseFloat( it.phi_s ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="phi_s" value="{{= parseFloat( it.phi_s ) }}" />
             </div>
         </div>
     </section>
@@ -134,7 +134,7 @@
          <div class="control-group">
             <label class="checkbox control-label">
                 Calculate poling period
-                <input type="checkbox" class="checkbox" name="autocalcpp" {{? it.autocalcpp }} checked="checked" {{?}} />
+                <input type="checkbox" data-parse="float" class="checkbox" name="autocalcpp" {{? it.autocalcpp }} checked="checked" {{?}} />
             </label>
         </div>
 
@@ -143,7 +143,7 @@
                 Poling Period
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="poling_period" value="{{= parseFloat( it.poling_period ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="poling_period" value="{{= parseFloat( it.poling_period ) }}" />
             </div>
         </div>
 
@@ -152,7 +152,7 @@
                 Theta_s (deg)
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="theta_s" value="{{= parseFloat( it.theta_s ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="theta_s" value="{{= parseFloat( it.theta_s ) }}" />
             </div>
         </div>
 
@@ -161,7 +161,7 @@
                 Phi_s (deg)
             </label>
             <div class="controls">
-                <input type="text" class="inputbox" name="phi_s" value="{{= parseFloat( it.phi_s ) }}" />
+                <input type="text" data-parse="float" class="inputbox" name="phi_s" value="{{= parseFloat( it.phi_s ) }}" />
             </div>
         </div>
     </section>

@@ -14,7 +14,8 @@ define(
         // physics modules
         'modules/parameters',
         'modules/jsa-ui',
-        'modules/hom-ui'
+        'modules/hom-ui',
+        'modules/jsa-hom-ui'
     ],
     function(
         $,
@@ -31,7 +32,8 @@ define(
         // physics modules
         Parameters,
         jsaUI,
-        homUI
+        homUI,
+        jsahomUI
     ) {
 
         'use strict';
@@ -154,7 +156,12 @@ define(
                     var $this = $(this)
                         ,key = $this.attr('name')
                         ,val = $this.val()
+                        ,parse = $this.data('parse')
                         ;
+
+                    if (parse === 'float'){
+                        val = parseFloat(val);
+                    }
                     // console.log("in PM-ui", key, val);
                     // update the corresponding property in the parameters object
                     self.parameters.set( key, val );
@@ -164,8 +171,12 @@ define(
                     var $this = $(this)
                         ,key = $this.attr('name')
                         ,val = $this.is(':checked')
+                        ,parse = $this.data('parse')
                         ;
 
+                    if (parse === 'float'){
+                        val = parseFloat(val);
+                    }
                     // update the corresponding boolean property in the parameters object
                     self.parameters.set( key, val );
                 });
@@ -215,6 +226,8 @@ define(
                 self.set('jsa', jsaUI());
                 // HOM
                 self.set('hom', homUI());
+                // JSA-HOM
+                self.set('jsa-hom', jsahomUI());
             },
 
             /**
@@ -269,11 +282,20 @@ define(
                     }
                 });
 
-                //  // display Phasematch type select box
+                // display Phasematch type select box
                 self.elParameters.find('select').dropkick({
                     change: function (value, label) {
 
-                        
+                        var $this = $(this)
+                            ,key = $this.attr('name')
+                            ,parse = $this.data('parse')
+                            ;
+
+                        if (parse === 'float'){
+                            value = parseFloat(value);
+                        }
+                        // update the corresponding property in the parameters object
+                        self.parameters.set( key, value );
                     }
                 });
 
