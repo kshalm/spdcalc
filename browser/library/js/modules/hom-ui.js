@@ -103,7 +103,7 @@ define(
                 return this.el;
             },
 
-            refresh: function( props ){
+            refresh: function(){
 
                 var self = this;
                 self.calc( self.parameters.getProps() );

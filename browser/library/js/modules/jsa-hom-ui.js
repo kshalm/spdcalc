@@ -58,10 +58,20 @@ define(
                     max: 500,
                     value: 0,
                     orientation: "horizontal",
-                    range: "min"
+                    range: "min",
+                    change: function(){
+
+                        // set local prop and convert
+                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * 1e-15 );
+                    },
+                    slide: function(){
+
+                        // set local prop and convert
+                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * 1e-15 );
+                    }
                 });
 
-                self.set('delT', 200e-15);
+                self.set('delT', 0);
 
                 // init plot
                 self.plot1d = new LinePlot({
@@ -75,6 +85,19 @@ define(
                 });
 
                 self.elPlot1d = $(self.plot1d.el);
+
+
+                // internal events
+                var to;
+                self.on('change:delT', function( delT ){
+                    
+                    clearTimeout( to );
+                    to = setTimeout(function(){
+
+                        // only refresh plots after a time delay
+                        self.refresh();
+                    }, 100);
+                });
             },
 
             initPhysics: function(){
@@ -129,7 +152,7 @@ define(
                 return this.el;
             },
 
-            refresh: function( props ){
+            refresh: function(){
 
                 var self = this;
                 self.calc( self.parameters.getProps() );
