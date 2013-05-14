@@ -2537,19 +2537,29 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
         return Math.abs(PM - threshold);
     };
 
-    var guess = P.lambda_s;// - 1e-9;
+    var guess = P.lambda_s - 1e-9;
     var ans = PhaseMatch.nelderMead(lambda_limit, guess, 50);
     var ans2 = 1/(1/props.lambda_p - 1/ans);
 
     var l1 = Math.min(ans, ans2);
     var l2 = Math.max(ans, ans2);
-    console.log(ans, l1, l2, P.p_bw/1e-9);
+    console.log(P.lambda_p/1e-9, l1/1e-9, l2/1e-9, P.p_bw/1e-9);
 
     var dif = (l2-l1);
-    if (dif>50e-9 * P.lambda_p/775e-9 * P.p_bw/10e-9){
-        dif = 50e-9 * P.lambda_p/775e-9 * P.p_bw/10e-9;
+
+    //Now try to find sensible limits. We want to make sure the range of values isn't too big,
+    //but also ensure that if the pump bandwidth is small, that the resulting JSA is visible.
+    //This is important for calculating things like the Hong-Ou-Mandel.
+    var difmax = 20e-9 * P.lambda_p/775e-9 * P.p_bw/1e-9 ;
+    
+    if (difmax>35e-9){
+        difmax = 35e-9;
     }
-    console.log("diff = ", dif/1e-9);
+
+    if (dif>difmax){
+        dif = difmax;
+    }
+    console.log("diff = ", dif/1e-9, difmax/1e-9);
     var la = 1/(1/l1 + 1/l2)*2 - 3 * dif;
     var lb = 1/(1/l1 + 1/l2)*2 + 3 * dif;
     // l1 = l1 -2*dif;

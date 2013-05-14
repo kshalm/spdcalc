@@ -125,6 +125,7 @@ define(
             calc: function( props ){
 
                 // @TODO: move this to a control bar
+                props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
                 var dim = 200;
                 // var l_start = 1500 * con.nm;
                 // var l_stop = 1600 * con.nm; 
