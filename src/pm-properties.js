@@ -270,6 +270,8 @@
 
     PhaseMatch.calc_poling_period = function calc_poling_period(props){
         PhaseMatch.optimum_idler(props);
+        //very large number. Eliminates previous values of poling period from calculation.
+        props.poling_period = 1e12; 
         var delK = PhaseMatch.calc_delK(props);
         props.poling_period = 2*Math.PI/delK[2];
         console.log("poling period ", props.poling_period);
