@@ -163,21 +163,10 @@ input,
 textarea,
 .uneditable-input{
   width: 75px;
-/*  line-height: 10px;
-*/}
-
-.flatinputbox{
-    float:right;
 }
 
 label{
     width: 120px;
-    float:left;
-    margin-right: 20px;
-}
-
-.Form{
-    clear:both;
 }
 
 .calcbutton{
@@ -186,7 +175,6 @@ label{
 
 .calccheckbox{
     float:left;
-    /*padding-right:;*/
     width:90px;
 }
 
@@ -196,19 +184,39 @@ label{
   visibility: visible;
 }
 
-/*.inputbox {
-    float:right;
-    width:50px;
-}*/
+// custom overrides for checkboxes
 
-/*label, input[type="text"] {
-   vertical-align: middle;
-   margin-right: 1em;
+.checkbox.control-label {
+    cursor: pointer;
+    text-align: right;
+    padding-left: 0;
+
+    .icon {
+        top: 5px;
+        right: -60px;
+        left: auto;
+    }
+
+    .icon-to-fade {
+        top: 5px;
+        left: auto;
+        right: -60px;
+    }
 }
 
-input[type="text"]{
-    margin-left:2em;
-}*/
+// .inputbox {
+//     float:right;
+//     width:50px;
+// }
+
+// label, input[type="text"] {
+//    vertical-align: middle;
+//    margin-right: 1em;
+// }
+
+// input[type="text"]{
+//     margin-left:2em;
+// }
 
 
 

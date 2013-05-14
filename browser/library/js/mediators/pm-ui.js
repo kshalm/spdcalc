@@ -264,12 +264,12 @@ define(
                 });
 
                 //  // display Phasematch type select box
-                // self.el.find('#ui-modules-PMType').dropkick({
-                //     change: function (value, label) {
+                self.elParameters.find('select').dropkick({
+                    change: function (value, label) {
 
-                //         // self.load( value );
-                //     }
-                // });
+                        
+                    }
+                });
 
                 // Init tags input
                 $("#tagsinput").tagsInput();
