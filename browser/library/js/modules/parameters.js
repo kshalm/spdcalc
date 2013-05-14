@@ -30,12 +30,14 @@ define(
                 var self = this;
 
                 self.props = new PhaseMatch.SPDCprop();
-                PhaseMatch.optimum_idler( self.props );
-
+                
                 if (self.props.autocalctheta){
                     PhaseMatch.auto_calc_Theta( self.props );
-                }   
-                
+                } 
+
+                if (self.props.autocalcpp){
+                    PhaseMatch.calc_poling_period( self.props );
+                }
 
                 self.set( self.props );
                 self.initEvents();
@@ -47,42 +49,49 @@ define(
 
                 self.on({
 
-                    change: function( key ){
+                    'change': function( key ){
                         // console.log("the key is", key);
 
                         var val = self.get( key );
-
-                        if (key === "xtal"){
-                            self.props.set_crystal(val);
-                        }
-                        else if (key == "autocalctheta"){
-
-                            if (val === "on"){
-                                console.log('not falling for it!');   
-                            }
-                            else {
-                                self.props[ key ] = val;
-                            }
-                
-                        }
-                        else {
-                            // console.log("setting: ", key,val);
-                            self.props[ key ] = val;
-                        }
-
+                        self.props[ key ] = val;
+                    
                         if (self.props.autocalctheta){
                             // console.log("parameters.js AUTOCALCULATE THETA", self.props.autocalctheta, key, val);
                             // console.log("");
                             PhaseMatch.auto_calc_Theta( self.props );
-
                         } 
 
                         if (self.props.autocalcpp){
-                            PhaseMatch.calc_poling_period(self.props);
+                            PhaseMatch.calc_poling_period( self.props );
+                        }
+
+                        if (self.props.autocalcpp || self.props.autocalctheta){
+                            // if we are going to trigger autocalculation, refresh
+                            self.refresh();
                         }
                         // console.log(val);
+                    },
+
+                    'change:xtal': function( val ){
+                        self.props.set_crystal( val );
                     }
                 });
+            },
+
+            // resync all values in the original self.props object
+            // into the wrapper
+            refresh: function(){
+
+                var self = this;
+
+                for ( var key in self.props ){
+
+                    // true is for "quiet". Don't trigger change events
+                    self.set( key, self.props[ key ], true );
+                }
+
+                // emit a final refresh event
+                self.emit('refresh');
             },
 
             getProps: function(){

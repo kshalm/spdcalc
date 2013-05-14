@@ -104,13 +104,23 @@ define(
                     }
                 });
 
-                self.parameters.on('change', function(){
+                self.parameters.on('change', function( key ){
 
-                    // if (!self.autocalc){
-                    //     return;
-                    // }
+                    if (!self.autocalc){
+                        return;
+                    }
 
                     self.emit('calculate');
+                });
+
+                self.parameters.on('refresh', function(){
+
+                    this.each(function( val, key ){
+                        // console.log(val, key)
+                        // refresh parameter values in the html
+                        self.elParameters.find('[name="'+key+'"]').val( val );
+                    });
+
                 });
 
                 // collapse button
@@ -139,7 +149,7 @@ define(
                 });
 
                 // parameters fields
-                self.elParameters.on('change', 'input', function(){
+                self.elParameters.on('change', 'input[type="text"], select', function(){
 
                     var $this = $(this)
                         ,key = $this.attr('name')
@@ -150,21 +160,15 @@ define(
                     self.parameters.set( key, val );
                 });
 
-                // PM Type dropdown box
-                self.el.find('#PM-Type-Dropdown').change(function(){
-                    self.parameters.set("Type", self.el.find('#PM-Type-Dropdown').val() );  
-                });
+                self.elParameters.on('change', 'input[type="checkbox"]', function(){
+                    var $this = $(this)
+                        ,key = $this.attr('name')
+                        ,val = $this.is(':checked')
+                        ;
 
-                // Crystal selection dropdown box
-                self.el.find('#Crystal-Dropdown').change(function(){
-                    self.parameters.set("xtal", self.el.find('#Crystal-Dropdown').val() );  
+                    // update the corresponding boolean property in the parameters object
+                    self.parameters.set( key, val );
                 });
-
-                self.el.find('#autocalctheta').change(function(){
-                    console.log('autocaltheta clicked', self.el.find('#autocalctheta').is(':checked'));
-                    self.parameters.set("autocalctheta", self.el.find('#autocalctheta').is(':checked'));
-                });
-                
                 
 
                 var to;
@@ -193,6 +197,8 @@ define(
 
                 // init parameters panel
                 self.elParameters.append( $(tplParametersPanel.render( self.parameters.getAll() )) );
+
+                self.autocalc = self.elParameters.find('#autocalc').is(':checked');
             },
 
             initParameters: function(){
@@ -272,37 +278,32 @@ define(
                 });
 
                 // Init tags input
-                $("#tagsinput").tagsInput();
+                // $("#tagsinput").tagsInput();
 
                 // Init jQuery UI slider
-                $("#slider").slider({
-                    min: 1,
-                    max: 5,
-                    value: 2,
-                    orientation: "horizontal",
-                    range: "min"
-                });
+                // $("#slider").slider({
+                //     min: 1,
+                //     max: 5,
+                //     value: 2,
+                //     orientation: "horizontal",
+                //     range: "min"
+                // });
 
                 // JS input/textarea placeholder
                 // $("input, textarea").placeholder();
 
                 // Make pagination demo work
-                $(".pagination a").click(function() {
-                    if (!$(this).parent().hasClass("previous") && !$(this).parent().hasClass("next")) {
-                        $(this).parent().siblings("li").removeClass("active");
-                        $(this).parent().addClass("active");
-                    }
-                });
+                // $(".pagination a").click(function() {
+                //     if (!$(this).parent().hasClass("previous") && !$(this).parent().hasClass("next")) {
+                //         $(this).parent().siblings("li").removeClass("active");
+                //         $(this).parent().addClass("active");
+                //     }
+                // });
 
-                $(".btn-group a").click(function() {
-                    $(this).siblings().removeClass("active");
-                    $(this).addClass("active");
-                });
-
-                // Disable link click not scroll top
-                $("a[href='#']").click(function() {
-                    return false;
-                });
+                // $(".btn-group a").click(function() {
+                //     $(this).siblings().removeClass("active");
+                //     $(this).addClass("active");
+                // });
 
                 self.emit('ready');
             }

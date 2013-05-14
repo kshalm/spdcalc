@@ -44,6 +44,8 @@ define(
                 $this.parent().toggleClass('disabled', $this.is(':disabled'));
             });
 
+            scope.find('input[type="checkbox"]:checked').parent().addClass('checked');
+
             $(".toggle", scope).each(function(index, toggle) {
                 toggleHandler(toggle);
             });
