@@ -10,7 +10,7 @@ PhaseMatch.BBO = function BBO () {
     //Selmeir coefficients for nx, ny, nz
     this.temp = 20;
     this.name = "BBO Ref 1";
-    this.info = ""
+    this.info = "";
 };
 
 PhaseMatch.BBO.prototype  = {
@@ -46,9 +46,9 @@ PhaseMatch.KTP.prototype  = {
         var dny= 1.3e-5;
         var dnz= 1.6e-5;
 
-        nx = nx + (temp -20.)*dnx;
-        ny = ny + (temp -20.)*dny;
-        nz = nz + (temp -20.)*dnz;
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
 
         // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
         // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));

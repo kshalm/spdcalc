@@ -126,8 +126,13 @@ define(
 
                 // @TODO: move this to a control bar
                 var dim = 200;
-                var l_start = 1500 * con.nm;
-                var l_stop = 1600 * con.nm; 
+                // var l_start = 1500 * con.nm;
+                // var l_stop = 1600 * con.nm; 
+                var threshold = 0.5;
+                var lsi = PhaseMatch.autorange_lambda(props, threshold);
+                var l_start = Math.min(lsi[0], lsi[1]);
+                var l_stop =  Math.max(lsi[0], lsi[1]);
+                console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
                 var data1d = [];
 
                 var self = this

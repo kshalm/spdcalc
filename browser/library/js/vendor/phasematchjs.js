@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-13
+ * phasematchjs v0.0.1a - 2013-05-14
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2175,15 +2175,16 @@ PhaseMatch.phasematch = function phasematch (P){
 
     // Phasematching along z dir
     var PMz = Math.sin(arg)/arg; //* Math.exp(1j*arg)
-
+    var PMz_real = 0;
+    var PMz_imag = 0;
     if (P.useguassianapprox){
         // console.log('approx');
-        PMz_real = Math.exp(-.193*sq(arg));
+        PMz_real = Math.exp(-0.193*sq(arg));
         PMz_imag = 0;
     }
     else{
-        var PMz_real =  PMz * Math.cos(arg);
-        var PMz_imag = PMz * Math.sin(arg);
+        PMz_real =  PMz * Math.cos(arg);
+        PMz_imag = PMz * Math.sin(arg);
     }
 
     // Phasematching along transverse directions
@@ -2527,103 +2528,35 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
     var lambda_limit = function(lambda_s){
         P.lambda_s = lambda_s;
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-        P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
+        P.n_s = P.calc_Index_PMType(lambda_s, P.Type, P.S_s, "signal");
+        P.lambda_i = 1/(1/P.lambda_p - 1/lambda_s);
         PhaseMatch.optimum_idler(P);
 
         var PM = PhaseMatch.phasematch_Int_Phase(P);
+        // console.log(P.lambda_p/1e-9, P.lambda_s/1e-9, P.lambda_i/1e-9, PM)
         return Math.abs(PM - threshold);
     };
 
-    var guess = P.lambda_s - 10e-9;
-    var ans = PhaseMatch.nelderMead(lambda_limit, guess, 100);
+    var guess = P.lambda_s;// - 1e-9;
+    var ans = PhaseMatch.nelderMead(lambda_limit, guess, 50);
     var ans2 = 1/(1/props.lambda_p - 1/ans);
 
     var l1 = Math.min(ans, ans2);
     var l2 = Math.max(ans, ans2);
-    console.log(ans, l1, l2);
+    console.log(ans, l1, l2, P.p_bw/1e-9);
+
     var dif = (l2-l1);
-    l1 = l1 -2*dif;
-    l2 = l2 + 2*dif;
-    return [l1,l2];
-    // return [P.lambda_s, P.lambda_i];
-    // return [ans, 1/(1/props.lambda_p - 1/ans)];
+    if (dif>50e-9 * P.lambda_p/775e-9 * P.p_bw/10e-9){
+        dif = 50e-9 * P.lambda_p/775e-9 * P.p_bw/10e-9;
+    }
+    console.log("diff = ", dif/1e-9);
+    var la = 1/(1/l1 + 1/l2)*2 - 3 * dif;
+    var lb = 1/(1/l1 + 1/l2)*2 + 3 * dif;
+    // l1 = l1 -2*dif;
+    // l2 = l2 + 2*dif;
+    return [la,lb];
 };
 
-
- // PhaseMatch.auto_calc_Theta = function auto_calc_Theta(props){
- //        var min_delK = function(x){
- //            if (x>Math.PI/2 || x<0){return 1e12;}
- //            props.theta = x;
- //            props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
- //            props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
- //            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-
- //            props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
- //            props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
- //            props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
-
- //            var delK =  PhaseMatch.calc_delK(props);
- //            // console.log("in the function", delK)
- //            return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
- //        };
-
- //        var guess = Math.PI/8;
- //        var startTime = new Date();
-
- //        var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
- //        // var ans = numeric.uncmin(min_delK, [guess]).solution[0];
- //        var endTime = new Date();
-        
-
- //        var timeDiff = (endTime - startTime)/1000;
- //        // console.log("Theta autocalc = ", timeDiff);
- //        props.theta = ans;
- //    };
- //    
- //    
- //    def get_lambda_limits(P, threshold, initialize):
-    
-//     # print "getting lambda limits"
-
-//     pump_bw = 2*np.pi*con.c/(P.lambda_p**2) *P.pump_bw 
-//     par = [P.lambda_p,P.theta, P.L, threshold, pump_bw, P.phi, P.theta_s, P.theta_i,P.phi_s,P.phi_i, P.W, P.crystal, P.Type]
-//     ls = optimize.fmin(phasematch_limits,1.9*P.lambda_s,par,xtol=1e-8,full_output=False, disp=False)
-//     li =  1/(1/(P.lambda_p)-1/(ls))
-//     #choose the wavelengths with good first guess
-//     dl = np.absolute(ls[0] - li[0])
-//     # print dl/nm
-//     wl = [li[0],ls[0]]
-
-//     if dl>200*nm :
-//         dl = 200*nm
-
-//     if dl < 1*nm :
-//         dl = 1*nm
-
-//     lambda_start = P.lambda_s - dl/2
-//     lambda_end =  P.lambda_i + dl/2
-
-//     return lambda_start, lambda_end
-
-
-// def phasematch_limits(ls,*params):
-
-//     ls = ls[0]
-//     pump = params[0]
-//     theta = params[1]
-//     L = params[2]
-//     threshold = params[3]
-//     p_bw = params[4]
-//     W= params[10]
-//     crystal = params[11]
-//     Type = params[12]
-    
-//     li = 1/(1/(pump)-1/(ls))
-//     PM = phasematch_Int_Phase(Type, crystal, pump, p_bw, W, ls, li, L, theta, params[5], params[6], params[7], params[8], params[9], False)
-//      # phasematch(pump, p_bw, W, ls,li,L,theta, phi, theta_s, theta_i, phi_s, phi_i)
-//      # [lambda_p,theta,L,threshold, pump_bw, 0.0, 0.0, 0.0,0.,0., W]
-//     return np.absolute(PM - threshold)
 
 (function(){
 
@@ -2668,7 +2601,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.Types = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.Types[2];
+            this.Type = this.Types[1];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
@@ -2678,14 +2611,14 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             this.phi_i = this.phi_s + Math.PI;
             this.L = 2000 * con.um;
             this.W = 500* con.um;
-            this.p_bw = 6 * con.nm;
+            this.p_bw = 1 * con.nm;
             this.phase = false;
             this.autocalctheta = true;
             this.autocalcpp = false;
             this.poling_period = 1000000;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.useguassianapprox = false;
+            this.useguassianapprox = true;
             this.crystalNames = PhaseMatch.CrystalDBKeys;
             this.crystal = PhaseMatch.CrystalDB[this.crystalNames[0]];
             this.temp = 20;
@@ -2770,24 +2703,44 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             var n = 1;
 
             switch (Type){
-                case this.Types[0]:
+                case "Type 0:   o -> o + o":
                     n = nfast;
                 break;
-                case this.Types[1]:
+                case "Type 1:   e -> o + o":
                     if (photon === "pump") { n = nslow;}
                     else { n = nfast;}
                 break;
-                case this.Types[2]:
+                case "Type 2:   e -> e + o":
                     if (photon === "idler") { n = nfast;}
                     else {n = nslow;}
                 break;
-                case this.Types[3]:
+                case "Type 2:   e -> o + e":
                     if (photon === "signal") { n = nfast;}
                     else {n = nslow;}
                 break;
                 default:
                     throw "Error: bad PMType specified";
             }
+
+            // switch (Type){
+            //     case this.Types[0]:
+            //         n = nfast;
+            //     break;
+            //     case this.Types[1]:
+            //         if (photon === "pump") { n = nslow;}
+            //         else { n = nfast;}
+            //     break;
+            //     case this.Types[2]:
+            //         if (photon === "idler") { n = nfast;}
+            //         else {n = nslow;}
+            //     break;
+            //     case this.Types[3]:
+            //         if (photon === "signal") { n = nfast;}
+            //         else {n = nslow;}
+            //     break;
+            //     default:
+            //         throw "Error: bad PMType specified";
+            // }
 
             return n ;
         },
@@ -2959,16 +2912,9 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
         
-        // P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-        // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        // P.calc_wbar();
-        // P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
-
-        //calcualte the correct idler angle analytically.
-        // PhaseMatch.optimum_idler(P);
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
     }
@@ -3113,7 +3059,7 @@ PhaseMatch.BBO = function BBO () {
     //Selmeir coefficients for nx, ny, nz
     this.temp = 20;
     this.name = "BBO Ref 1";
-    this.info = ""
+    this.info = "";
 };
 
 PhaseMatch.BBO.prototype  = {
@@ -3149,9 +3095,9 @@ PhaseMatch.KTP.prototype  = {
         var dny= 1.3e-5;
         var dnz= 1.6e-5;
 
-        nx = nx + (temp -20.)*dnx;
-        ny = ny + (temp -20.)*dny;
-        nz = nz + (temp -20.)*dnz;
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
 
         // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
         // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));

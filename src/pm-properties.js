@@ -45,7 +45,7 @@
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.Types = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.Types[2];
+            this.Type = this.Types[1];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
@@ -55,14 +55,14 @@
             this.phi_i = this.phi_s + Math.PI;
             this.L = 2000 * con.um;
             this.W = 500* con.um;
-            this.p_bw = 6 * con.nm;
+            this.p_bw = 1 * con.nm;
             this.phase = false;
             this.autocalctheta = true;
             this.autocalcpp = false;
             this.poling_period = 1000000;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.useguassianapprox = false;
+            this.useguassianapprox = true;
             this.crystalNames = PhaseMatch.CrystalDBKeys;
             this.crystal = PhaseMatch.CrystalDB[this.crystalNames[0]];
             this.temp = 20;
@@ -147,24 +147,44 @@
             var n = 1;
 
             switch (Type){
-                case this.Types[0]:
+                case "Type 0:   o -> o + o":
                     n = nfast;
                 break;
-                case this.Types[1]:
+                case "Type 1:   e -> o + o":
                     if (photon === "pump") { n = nslow;}
                     else { n = nfast;}
                 break;
-                case this.Types[2]:
+                case "Type 2:   e -> e + o":
                     if (photon === "idler") { n = nfast;}
                     else {n = nslow;}
                 break;
-                case this.Types[3]:
+                case "Type 2:   e -> o + e":
                     if (photon === "signal") { n = nfast;}
                     else {n = nslow;}
                 break;
                 default:
                     throw "Error: bad PMType specified";
             }
+
+            // switch (Type){
+            //     case this.Types[0]:
+            //         n = nfast;
+            //     break;
+            //     case this.Types[1]:
+            //         if (photon === "pump") { n = nslow;}
+            //         else { n = nfast;}
+            //     break;
+            //     case this.Types[2]:
+            //         if (photon === "idler") { n = nfast;}
+            //         else {n = nslow;}
+            //     break;
+            //     case this.Types[3]:
+            //         if (photon === "signal") { n = nfast;}
+            //         else {n = nslow;}
+            //     break;
+            //     default:
+            //         throw "Error: bad PMType specified";
+            // }
 
             return n ;
         },
