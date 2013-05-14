@@ -2463,7 +2463,7 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 
     var delT = new Float64Array(dim);
     var HOM_values = new Float64Array(dim);
-    var npts = 75;  //number of points to pass to the calc_HOM_JSA
+    var npts = 50;  //number of points to pass to the calc_HOM_JSA
 
     var i;
     delT = numeric.linspace(t_start, t_stop, dim);
@@ -2680,14 +2680,14 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             this.W = 500* con.um;
             this.p_bw = 6 * con.nm;
             this.phase = false;
-            this.autocalctheta = false;
-            this.autocalcpp = true;
+            this.autocalctheta = true;
+            this.autocalcpp = false;
             this.poling_period = 1000000;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.useguassianapprox = true;
+            this.useguassianapprox = false;
             this.crystalNames = PhaseMatch.CrystalDBKeys;
-            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[1]];
+            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[0]];
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);

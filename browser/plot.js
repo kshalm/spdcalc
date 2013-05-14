@@ -186,8 +186,12 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
             PhaseMatch.calc_poling_period(P1);
         }
         var threshold = 0.5;
+
+        var startTime = new Date();
         var lsi = PhaseMatch.autorange_lambda(P1, threshold);
-        console.log(lsi);
+        var endTime = new Date();
+        var timeDiff = (endTime - startTime);
+        console.log("autorange time = ", timeDiff);
         var l_start = Math.min(lsi[0], lsi[1]);
         var l_stop =  Math.max(lsi[0], lsi[1]);
         console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
@@ -228,10 +232,10 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         //     plot_theta_phi(P1, 0, Math.PI/2, 0, Math.PI/2, npts);
         // });
 
-        // $(function(){
-        //     $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
-        //     plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
-        // });
+        $(function(){
+            $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
+            plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
+        });
 
 
 

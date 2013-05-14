@@ -466,7 +466,7 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 
     var delT = new Float64Array(dim);
     var HOM_values = new Float64Array(dim);
-    var npts = 75;  //number of points to pass to the calc_HOM_JSA
+    var npts = 50;  //number of points to pass to the calc_HOM_JSA
 
     var i;
     delT = numeric.linspace(t_start, t_stop, dim);
