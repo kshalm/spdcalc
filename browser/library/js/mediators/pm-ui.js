@@ -38,6 +38,35 @@ define(
 
         'use strict';
 
+        var units = {
+            um: 1e-6,
+            nm: 1e-9,
+            deg: Math.PI / 180,
+        };
+
+        function convertFrom( unit, val ){
+
+            if ( !(unit in units) ){
+                throw 'Unit "' + unit + '" not defined in units.';
+            }
+
+            return val * units[ unit ];
+        }
+
+        function convertTo( unit, val, precision ){
+
+            precision = precision === undefined ? 2 : precision;
+
+            if ( !(unit in units) ){
+                throw 'Unit "' + unit + '" not defined in units.';
+            }
+
+            return (val / units[ unit ]).toFixed( precision );
+        }
+
+        tplParametersPanel.convertFrom = convertFrom;
+        tplParametersPanel.convertTo = convertTo;
+
         /**
          * Page-level Mediator
          * @module PMUI
@@ -120,7 +149,15 @@ define(
                     this.each(function( val, key ){
                         // console.log(val, key)
                         // refresh parameter values in the html
-                        self.elParameters.find('[name="'+key+'"]').val( val );
+                        var el = self.elParameters.find('[name="'+key+'"]')
+                            ,unit = el.data('unit')
+                            ;
+
+                        if (unit){
+                            val  = convertTo( unit, val );
+                        }
+
+                        el.val( val );
                     });
 
                 });
@@ -157,10 +194,15 @@ define(
                         ,key = $this.attr('name')
                         ,val = $this.val()
                         ,parse = $this.data('parse')
+                        ,unit = $this.data('unit')
                         ;
 
                     if (parse === 'float'){
                         val = parseFloat(val);
+                    }
+
+                    if (unit){
+                        val  = convertFrom( unit, val );
                     }
                     // console.log("in PM-ui", key, val);
                     // update the corresponding property in the parameters object
@@ -174,9 +216,6 @@ define(
                         ,parse = $this.data('parse')
                         ;
 
-                    if (parse === 'float'){
-                        val = parseFloat(val);
-                    }
                     // update the corresponding boolean property in the parameters object
                     self.parameters.set( key, val );
                 });

@@ -44,7 +44,7 @@
                 Theta (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="theta" value="{{= parseFloat( it.theta ) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta" value="{{= this.convertTo('deg', parseFloat( it.theta )) }}" />
             </div>
             </label>
         </div>
@@ -53,7 +53,7 @@
                 Length (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="L" value="{{= parseFloat( it.L ) }}" />
+                <input type="text" data-parse="float" data-unit="um" class="inputbox" name="L" value="{{= this.convertTo('um', parseFloat( it.L )) }}" />
             </div>
         </div>
         <div class="control-group">
@@ -72,10 +72,10 @@
         </div>
         <div class="control-group">   
             <label class="control-label">
-                Wavelength
+                Wavelength (nm)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="lambda_p" value="{{= parseFloat( it.lambda_p ) }}" />
+                <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="lambda_p" value="{{= this.convertTo('nm', parseFloat( it.lambda_p )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -83,7 +83,7 @@
                 Bandwidth FWHM (nm)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="p_bw" value="{{= parseFloat( it.p_bw ) }}" />
+                <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="p_bw" value="{{= this.convertTo('nm', parseFloat( it.p_bw )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -91,7 +91,7 @@
                 Waist (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="W" value="{{= parseFloat( it.W ) }}" />
+                <input type="text" data-parse="float" data-unit="um" class="inputbox" name="W" value="{{= this.convertTo('um', parseFloat( it.W )) }}" />
             </div>
         </div>
     </section>
@@ -102,10 +102,10 @@
         </div>
         <div class="control-group">   
             <label class="control-label">
-                Wavelength
+                Wavelength (nm)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="lambda_s" value="{{= parseFloat( it.lambda_s ) }}" />
+                <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="lambda_s" value="{{= this.convertTo('nm', parseFloat( it.lambda_s )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -113,7 +113,7 @@
                 Theta_s (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="theta_s" value="{{= parseFloat( it.theta_s ) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta_s" value="{{= this.convertTo('deg', parseFloat( it.theta_s )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -121,7 +121,7 @@
                 Phi_s (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="phi_s" value="{{= parseFloat( it.phi_s ) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi_s" value="{{= this.convertTo('deg', parseFloat( it.phi_s )) }}" />
             </div>
         </div>
     </section>
@@ -152,7 +152,7 @@
                 Theta_s (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="theta_s" value="{{= parseFloat( it.theta_s ) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta_s" value="{{= this.convertTo('deg', parseFloat( it.theta_s )) }}" />
             </div>
         </div>
 
@@ -161,7 +161,7 @@
                 Phi_s (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="phi_s" value="{{= parseFloat( it.phi_s ) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi_s" value="{{= this.convertTo('deg', parseFloat( it.phi_s )) }}" />
             </div>
         </div>
     </section>
