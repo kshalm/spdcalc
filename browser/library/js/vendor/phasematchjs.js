@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-14
+ * phasematchjs v0.0.1a - 2013-05-15
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2895,12 +2895,13 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     };
 
     PhaseMatch.updateallangles = function updateallangles(props){
-        console.log("updatingall");
+        // console.log("old pump index", props.n_p);
         props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
         props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
 
         props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
         props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+        // console.log("new pump index", props.n_p);
 
         PhaseMatch.optimum_idler(props);
         // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
@@ -2914,18 +2915,9 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
 
 PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_stop, dim){
-    var startTime = new Date();
+
     var P = PhaseMatch.deepcopy(props);
-    console.log("calcjsa props, deepcopy theta", props.theta *180/Math.PI, P.theta *180/Math.PI);
-    PhaseMatch.updateallangles(props);
-    console.log("should be done ");
-    var endTime = new Date();
-    var timeDiff = (endTime - startTime);
-    // console.log("deep copy time = ", timeDiff);
-
-
-    // var P = props;
-    // P = new PhaseMatch.SPDCprop();
+    PhaseMatch.updateallangles(P);
 
     var lambda_s = new Float64Array(dim);
     var lambda_i = new Float64Array(dim);
@@ -2936,6 +2928,8 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
 
     var N = dim * dim;
     var PM = new Float64Array( N );
+
+    var maxpm = 0;
     
     for (i=0; i<N; i++){
         var index_s = i % dim;
@@ -2949,8 +2943,12 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
         PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+
+        if (PM[i]>maxpm){maxpm = PM[i];}
     }
     
+    console.log("max pm value = ", maxpm);
+    console.log("");
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     
     return PM;
