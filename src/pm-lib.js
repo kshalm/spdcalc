@@ -567,8 +567,8 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     var la = 1/(1/l1 + 1/l2)*2 - 3 * dif;
     var lb = 1/(1/l1 + 1/l2)*2 + 3 * dif;
 
-    la = 1500e-9;
-    lb = 1600e-9;
+    // la = 1500e-9;
+    // lb = 1600e-9;
 
     console.log(la/1e-9, lb/1e-9);
     // l1 = l1 -2*dif;
