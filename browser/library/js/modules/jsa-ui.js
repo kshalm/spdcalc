@@ -4,14 +4,16 @@ define(
         'stapes',
         'phasematch',
         'modules/heat-map',
-        'modules/line-plot'
+        'modules/line-plot',
+        'tpl!templates/jsa-layout.tpl'
     ],
     function(
         $,
         Stapes,
         PhaseMatch,
         HeatMap,
-        LinePlot
+        LinePlot,
+        tplJSALayout
     ) {
 
         'use strict';
@@ -40,18 +42,18 @@ define(
 
                 self.initPhysics();
 
-                self.el = $('<div>');
+                self.el = $( tplJSALayout.render() );
 
                 // init plot
                 self.plot = new HeatMap({
-                    el: self.el.get(0)
+                    el: self.el.find('.heat-map-wrapper').get( 0 )
                 });
 
                 self.elPlot = $(self.plot.el);
 
                 // init plot
                 self.plot1d = new LinePlot({
-                    el: self.el.get(0),
+                    el: self.el.find('.line-plot-wrapper').get(0),
                     labels: {
                         x: 'x-axis',
                         y: 'y-axis'

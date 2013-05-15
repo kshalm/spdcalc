@@ -114,8 +114,6 @@ define(
 
                     'resize': function(){
 
-                        self.elMain.css('height', $(window).height());
-
                         if (self._curr){
                             self._curr.resize();
                         }
