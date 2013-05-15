@@ -35,7 +35,7 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
         if (PM[i]>maxpm){maxpm = PM[i];}
     }
     
-    console.log("max pm value = ", maxpm);
+    // console.log("max pm value = ", maxpm);
     console.log("");
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     

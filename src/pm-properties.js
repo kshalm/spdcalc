@@ -45,7 +45,7 @@
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.Types = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.Types[1];
+            this.Type = this.Types[2];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
@@ -55,16 +55,16 @@
             this.phi_i = this.phi_s + Math.PI;
             this.L = 2000 * con.um;
             this.W = 500* con.um;
-            this.p_bw = 1 * con.nm;
+            this.p_bw = 6 * con.nm;
             this.phase = false;
-            this.autocalctheta = true;
-            this.autocalcpp = false;
+            this.autocalctheta = false;
+            this.autocalcpp = true;
             this.poling_period = 1000000;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.useguassianapprox = true;
+            this.useguassianapprox = false;
             this.crystalNames = PhaseMatch.CrystalDBKeys;
-            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[0]];
+            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[1]];
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -242,13 +242,14 @@
         var min_delK = function(x){
             if (x>Math.PI/2 || x<0){return 1e12;}
             props.theta = x;
-            props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
-            props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
-            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
+            PhaseMatch.updateallangles(props);
+            // props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
+            // props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
+            // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
 
-            props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-            props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
-            props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+            // props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
+            // props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
             var delK =  PhaseMatch.calc_delK(props);
             // console.log("in the function", delK)
@@ -270,6 +271,8 @@
 
     PhaseMatch.calc_poling_period = function calc_poling_period(props){
         PhaseMatch.optimum_idler(props);
+        PhaseMatch.updateallangles(props);
+        console.log("theta_s = ", props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
         //very large number. Eliminates previous values of poling period from calculation.
         props.poling_period = 1e12; 
         var delK = PhaseMatch.calc_delK(props);

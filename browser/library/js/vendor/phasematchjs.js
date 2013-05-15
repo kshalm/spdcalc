@@ -2092,7 +2092,7 @@ PhaseMatch.optimum_idler = function optimum_idler(P){
     var delKpp = P.lambda_s/P.poling_period;
 
     var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
-    arg -= 2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
+    arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
     arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
     arg = Math.sqrt(arg);
 
@@ -2543,7 +2543,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
     var l1 = Math.min(ans, ans2);
     var l2 = Math.max(ans, ans2);
-    console.log(P.lambda_p/1e-9, l1/1e-9, l2/1e-9, P.p_bw/1e-9);
+    // console.log(P.lambda_p/1e-9, l1/1e-9, l2/1e-9, P.p_bw/1e-9);
 
     var dif = (l2-l1);
 
@@ -2559,9 +2559,15 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     if (dif>difmax){
         dif = difmax;
     }
-    console.log("diff = ", dif/1e-9, difmax/1e-9);
+    // console.log("diff = ", dif/1e-9, difmax/1e-9);
+    
     var la = 1/(1/l1 + 1/l2)*2 - 3 * dif;
     var lb = 1/(1/l1 + 1/l2)*2 + 3 * dif;
+
+    la = 1500e-9;
+    lb = 1600e-9;
+
+    console.log(la/1e-9, lb/1e-9);
     // l1 = l1 -2*dif;
     // l2 = l2 + 2*dif;
     return [la,lb];
@@ -2611,7 +2617,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.Types = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.Types[1];
+            this.Type = this.Types[2];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
@@ -2621,16 +2627,16 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             this.phi_i = this.phi_s + Math.PI;
             this.L = 2000 * con.um;
             this.W = 500* con.um;
-            this.p_bw = 1 * con.nm;
+            this.p_bw = 6 * con.nm;
             this.phase = false;
-            this.autocalctheta = true;
-            this.autocalcpp = false;
+            this.autocalctheta = false;
+            this.autocalcpp = true;
             this.poling_period = 1000000;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.useguassianapprox = true;
+            this.useguassianapprox = false;
             this.crystalNames = PhaseMatch.CrystalDBKeys;
-            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[0]];
+            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[1]];
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -2808,13 +2814,14 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
         var min_delK = function(x){
             if (x>Math.PI/2 || x<0){return 1e12;}
             props.theta = x;
-            props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
-            props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
-            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
+            PhaseMatch.updateallangles(props);
+            // props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
+            // props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
+            // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
 
-            props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-            props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
-            props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+            // props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
+            // props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
             var delK =  PhaseMatch.calc_delK(props);
             // console.log("in the function", delK)
@@ -2836,6 +2843,8 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
     PhaseMatch.calc_poling_period = function calc_poling_period(props){
         PhaseMatch.optimum_idler(props);
+        PhaseMatch.updateallangles(props);
+        console.log("theta_s = ", props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
         //very large number. Eliminates previous values of poling period from calculation.
         props.poling_period = 1e12; 
         var delK = PhaseMatch.calc_delK(props);
@@ -2947,7 +2956,7 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
         if (PM[i]>maxpm){maxpm = PM[i];}
     }
     
-    console.log("max pm value = ", maxpm);
+    // console.log("max pm value = ", maxpm);
     console.log("");
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     

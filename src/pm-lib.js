@@ -95,7 +95,7 @@ PhaseMatch.optimum_idler = function optimum_idler(P){
     var delKpp = P.lambda_s/P.poling_period;
 
     var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
-    arg -= 2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
+    arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
     arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
     arg = Math.sqrt(arg);
 
@@ -546,7 +546,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
     var l1 = Math.min(ans, ans2);
     var l2 = Math.max(ans, ans2);
-    console.log(P.lambda_p/1e-9, l1/1e-9, l2/1e-9, P.p_bw/1e-9);
+    // console.log(P.lambda_p/1e-9, l1/1e-9, l2/1e-9, P.p_bw/1e-9);
 
     var dif = (l2-l1);
 
@@ -562,9 +562,15 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     if (dif>difmax){
         dif = difmax;
     }
-    console.log("diff = ", dif/1e-9, difmax/1e-9);
+    // console.log("diff = ", dif/1e-9, difmax/1e-9);
+    
     var la = 1/(1/l1 + 1/l2)*2 - 3 * dif;
     var lb = 1/(1/l1 + 1/l2)*2 + 3 * dif;
+
+    la = 1500e-9;
+    lb = 1600e-9;
+
+    console.log(la/1e-9, lb/1e-9);
     // l1 = l1 -2*dif;
     // l2 = l2 + 2*dif;
     return [la,lb];

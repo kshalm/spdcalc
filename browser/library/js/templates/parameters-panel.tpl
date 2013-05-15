@@ -140,10 +140,10 @@
 
         <div class="control-group">   
             <label class="control-label">
-                Poling Period
+                Poling Period (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="poling_period" value="{{= parseFloat( it.poling_period ) }}" />
+                <input type="text" data-parse="float" data-unit="um" class="inputbox" name="poling_period" value="{{= this.convertTo('um', parseFloat( it.poling_period )) }}" />
             </div>
         </div>
 
