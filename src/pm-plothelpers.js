@@ -5,7 +5,7 @@
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
     var P = PhaseMatch.deepcopy(props);
-    PhaseMatch.updateallangles(P);
+    PhaseMatch.update_all_angles(P);
 
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);

@@ -238,7 +238,7 @@
         var min_delK = function(x){
             if (x>Math.PI/2 || x<0){return 1e12;}
             props.theta = x;
-            PhaseMatch.updateallangles(props);
+            PhaseMatch.update_all_angles(props);
             // props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
             // props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
@@ -267,7 +267,7 @@
     PhaseMatch.calc_poling_period = function calc_poling_period(props){
 
         props.poling_period = 1e12;  // Set this to a large number 
-        PhaseMatch.updateallangles(props);
+        PhaseMatch.update_all_angles(props);
         var P = PhaseMatch.deepcopy(props);
 
         var find_pp = function(x){
@@ -342,7 +342,7 @@
         return P;
     };
 
-    PhaseMatch.updateallangles = function updateallangles(props){
+    PhaseMatch.update_all_angles = function update_all_angles(props){
         // console.log("old pump index", props.n_p);
         props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
         props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
