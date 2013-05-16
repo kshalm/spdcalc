@@ -2,18 +2,14 @@
  * Constants accessible to PhaseMatch internally
  */
 
-PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_stop, dim){
+PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
     var P = PhaseMatch.deepcopy(props);
     PhaseMatch.updateallangles(P);
 
-
-    var lambda_s = new Float64Array(dim);
-    var lambda_i = new Float64Array(dim);
-
     var i;
-    lambda_s = numeric.linspace(ls_start, ls_stop, dim);
-    lambda_i = numeric.linspace(li_stop, li_start, dim); 
+    var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+    var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -44,16 +40,13 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
 
 };
 
-PhaseMatch.calcXY = function calcXY(props, x_start, x_stop, y_start, y_stop, dim){
+PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
 
     var P = PhaseMatch.deepcopy(props);
 
-    var X = new Float64Array(dim);
-    var Y = new Float64Array(dim);
-
     var i;
-    X = numeric.linspace(x_start, x_stop, dim);
-    Y = numeric.linspace(y_start, y_stop, dim); 
+    var X = PhaseMatch.linspace(x_start, x_stop, dim);
+    var Y = PhaseMatch.linspace(y_start, y_stop, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -98,12 +91,9 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 
     var P = PhaseMatch.deepcopy(props);
 
-    var lambda_s = new Float64Array(dim);
-    var theta_s = new Float64Array(dim);
-
     var i;
-    lambda_s = numeric.linspace(l_start, l_stop, dim);
-    theta_s = numeric.linspace(t_stop, t_start, dim); 
+    var lambda_s = PhaseMatch.linspace(l_start, l_stop, dim);
+    var theta_s = PhaseMatch.linspace(t_stop, t_start, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -136,12 +126,10 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
     var P = PhaseMatch.deepcopy(props);
-    var theta = new Float64Array(dim);
-    var phi = new Float64Array(dim);
 
     var i;
-    theta = numeric.linspace(t_start, t_stop, dim);
-    phi = numeric.linspace(p_start, p_stop, dim); 
+    var theta = PhaseMatch.linspace(t_start, t_stop, dim);
+    var phi = PhaseMatch.linspace(p_start, p_stop, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );

@@ -124,7 +124,7 @@ define(
                 var t_start = -100e-15;
                 var t_stop = 100e-15;
 
-                var delT = numeric.linspace(t_start, t_stop, dim);
+                var delT = PhaseMatch.linspace(t_start, t_stop, dim);
 
                 var self = this
                     ,data = []

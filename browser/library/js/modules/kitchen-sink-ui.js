@@ -165,7 +165,7 @@ define(
                 var dataThetaPhi = [];
 
                 var self = this
-                    ,PMJSA = PhaseMatch.calcJSA(
+                    ,PMJSA = PhaseMatch.calc_JSA(
                         props, 
                         l_start, 
                         l_stop, 
@@ -178,7 +178,7 @@ define(
 
                 var x_start = -10*Math.PI/180;
                 var x_stop = 10*Math.PI/180;
-                var PMXY = PhaseMatch.calcXY(props, x_start, x_stop, x_start,x_stop, dim);
+                var PMXY = PhaseMatch.calc_XY(props, x_start, x_stop, x_start,x_stop, dim);
                 self.dataPMXY = PMXY;
 
                 // Lambda signal vs theta signal
@@ -195,7 +195,7 @@ define(
                 // Hong-Ou-Mandel dip
                 var t_start = -800e-15;
                 var t_stop = 800e-15;
-                var delT = numeric.linspace(t_start, t_stop, dim);
+                var delT = PhaseMatch.linspace(t_start, t_stop, dim);
                 var HOM = PhaseMatch.calc_HOM_scan(props, t_start, t_stop, l_start, l_stop, l_start, l_stop, dim);
                 for ( var i = 0, l = HOM.length; i < l; i ++){
                     data1d.push({

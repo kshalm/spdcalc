@@ -322,12 +322,10 @@ PhaseMatch.calc_HOM = function calc_HOM(P, delT){
 PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
     var con = PhaseMatch.constants;
     var P = PhaseMatch.deepcopy(props);
-    var lambda_s = new Float64Array(dim);
-    var lambda_i = new Float64Array(dim);
 
     var i;
-    lambda_s = numeric.linspace(ls_start, ls_stop, dim);
-    lambda_i = numeric.linspace(li_stop, li_start, dim); 
+    var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+    var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
 
     var N = dim * dim;
     var THETA1_real = new Float64Array( N );
@@ -399,8 +397,8 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
 //     var lambda_i = new Float64Array(dim);
 
 //     var i;
-//     lambda_s = numeric.linspace(ls_start, ls_stop, dim);
-//     lambda_i = numeric.linspace(li_stop, li_start, dim); 
+//     lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+//     lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
 
 //     var N = dim * dim;
 //     var THETA1_real = new Float64Array( N );
@@ -465,18 +463,17 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
  */
 PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, ls_stop, li_start, li_stop, dim){
 
-    var delT = new Float64Array(dim);
-    var HOM_values = new Float64Array(dim);
     var npts = 50;  //number of points to pass to the calc_HOM_JSA
 
     var i;
-    delT = numeric.linspace(t_start, t_stop, dim);
-    HOM_values = numeric.linspace(t_start, t_stop, dim); 
+    var delT = PhaseMatch.linspace(t_start, t_stop, dim);
+
+    var HOM_values = PhaseMatch.linspace(t_start, t_stop, dim); 
     var PM_JSA = new Float64Array(npts*npts);
 
     // Calculate normalization
     var norm = new Float64Array(npts*npts);
-    norm = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, npts);
+    norm = PhaseMatch.calc_JSA(P,ls_start, ls_stop, li_start,li_stop, npts);
     var N = PhaseMatch.Sum(norm);
 
     for (i=0; i<dim; i++){
@@ -522,6 +519,16 @@ PhaseMatch.AntiTranspose = function Transpose(A, dim){
 
     }
     return Trans;
+};
+
+PhaseMatch.linspace = function linspace(xstart,xstop,npts){
+    var A = new Float64Array(npts);
+    var diff = (xstop-xstart)/(npts-1);
+    var curVal = 0;
+    for (var i=0; i<npts; i++){
+        A[i] = xstart + i*diff;
+    }
+    return A;
 };
 
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){

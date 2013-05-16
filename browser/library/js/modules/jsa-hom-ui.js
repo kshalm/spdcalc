@@ -196,7 +196,7 @@ define(
                 // Hong-Ou-Mandel dip
                 var t_start = -800e-15;
                 var t_stop = 800e-15;
-                var delT = numeric.linspace(t_start, t_stop, dim);
+                var delT = PhaseMatch.linspace(t_start, t_stop, dim);
                 var HOM = PhaseMatch.calc_HOM_scan(props, t_start, t_stop, l_start, l_stop, l_start, l_stop, dim);
                 for ( var i = 0, l = HOM.length; i < l; i ++){
                     data1d.push({

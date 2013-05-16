@@ -135,7 +135,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         
         // console.log('HOM dip values: ', HOM);
 
-        var delT = numeric.linspace(t_start, t_stop, dim);
+        var delT = PhaseMatch.linspace(t_start, t_stop, dim);
         
         var width = 500;
         var height = 500;
@@ -157,7 +157,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
                 y: HOM[i]
             })
         }
-        // var data = {x:numeric.linspace(t_start, t_stop, dim), y:HOM };
+        // var data = {x:PhaseMatch.linspace(t_start, t_stop, dim), y:HOM };
     //     var startTime = new Date();
         lp.plotData( data );
     //     var endTime = new Date();

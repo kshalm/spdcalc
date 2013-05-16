@@ -2319,12 +2319,10 @@ PhaseMatch.calc_HOM = function calc_HOM(P, delT){
 PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
     var con = PhaseMatch.constants;
     var P = PhaseMatch.deepcopy(props);
-    var lambda_s = new Float64Array(dim);
-    var lambda_i = new Float64Array(dim);
 
     var i;
-    lambda_s = numeric.linspace(ls_start, ls_stop, dim);
-    lambda_i = numeric.linspace(li_stop, li_start, dim); 
+    var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+    var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
 
     var N = dim * dim;
     var THETA1_real = new Float64Array( N );
@@ -2396,8 +2394,8 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
 //     var lambda_i = new Float64Array(dim);
 
 //     var i;
-//     lambda_s = numeric.linspace(ls_start, ls_stop, dim);
-//     lambda_i = numeric.linspace(li_stop, li_start, dim); 
+//     lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+//     lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
 
 //     var N = dim * dim;
 //     var THETA1_real = new Float64Array( N );
@@ -2462,18 +2460,17 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
  */
 PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, ls_stop, li_start, li_stop, dim){
 
-    var delT = new Float64Array(dim);
-    var HOM_values = new Float64Array(dim);
     var npts = 50;  //number of points to pass to the calc_HOM_JSA
 
     var i;
-    delT = numeric.linspace(t_start, t_stop, dim);
-    HOM_values = numeric.linspace(t_start, t_stop, dim); 
+    var delT = PhaseMatch.linspace(t_start, t_stop, dim);
+
+    var HOM_values = PhaseMatch.linspace(t_start, t_stop, dim); 
     var PM_JSA = new Float64Array(npts*npts);
 
     // Calculate normalization
     var norm = new Float64Array(npts*npts);
-    norm = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, npts);
+    norm = PhaseMatch.calc_JSA(P,ls_start, ls_stop, li_start,li_stop, npts);
     var N = PhaseMatch.Sum(norm);
 
     for (i=0; i<dim; i++){
@@ -2519,6 +2516,16 @@ PhaseMatch.AntiTranspose = function Transpose(A, dim){
 
     }
     return Trans;
+};
+
+PhaseMatch.linspace = function linspace(xstart,xstop,npts){
+    var A = new Float64Array(npts);
+    var diff = (xstop-xstart)/(npts-1);
+    var curVal = 0;
+    for (var i=0; i<npts; i++){
+        A[i] = xstart + i*diff;
+    }
+    return A;
 };
 
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
@@ -2828,7 +2835,6 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
         var startTime = new Date();
 
         var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
-        // var ans = numeric.uncmin(min_delK, [guess]).solution[0];
         var endTime = new Date();
         
 
@@ -2935,18 +2941,14 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 })();
 
 
-PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_stop, dim){
+PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
     var P = PhaseMatch.deepcopy(props);
     PhaseMatch.updateallangles(P);
 
-
-    var lambda_s = new Float64Array(dim);
-    var lambda_i = new Float64Array(dim);
-
     var i;
-    lambda_s = numeric.linspace(ls_start, ls_stop, dim);
-    lambda_i = numeric.linspace(li_stop, li_start, dim); 
+    var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+    var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -2977,16 +2979,13 @@ PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_sto
 
 };
 
-PhaseMatch.calcXY = function calcXY(props, x_start, x_stop, y_start, y_stop, dim){
+PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
 
     var P = PhaseMatch.deepcopy(props);
 
-    var X = new Float64Array(dim);
-    var Y = new Float64Array(dim);
-
     var i;
-    X = numeric.linspace(x_start, x_stop, dim);
-    Y = numeric.linspace(y_start, y_stop, dim); 
+    var X = PhaseMatch.linspace(x_start, x_stop, dim);
+    var Y = PhaseMatch.linspace(y_start, y_stop, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -3031,12 +3030,9 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 
     var P = PhaseMatch.deepcopy(props);
 
-    var lambda_s = new Float64Array(dim);
-    var theta_s = new Float64Array(dim);
-
     var i;
-    lambda_s = numeric.linspace(l_start, l_stop, dim);
-    theta_s = numeric.linspace(t_stop, t_start, dim); 
+    var lambda_s = PhaseMatch.linspace(l_start, l_stop, dim);
+    var theta_s = PhaseMatch.linspace(t_stop, t_start, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -3069,12 +3065,10 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
     var P = PhaseMatch.deepcopy(props);
-    var theta = new Float64Array(dim);
-    var phi = new Float64Array(dim);
 
     var i;
-    theta = numeric.linspace(t_start, t_stop, dim);
-    phi = numeric.linspace(p_start, p_stop, dim); 
+    var theta = PhaseMatch.linspace(t_start, t_stop, dim);
+    var phi = PhaseMatch.linspace(p_start, p_stop, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );

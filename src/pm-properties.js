@@ -256,7 +256,6 @@
         var startTime = new Date();
 
         var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
-        // var ans = numeric.uncmin(min_delK, [guess]).solution[0];
         var endTime = new Date();
         
 

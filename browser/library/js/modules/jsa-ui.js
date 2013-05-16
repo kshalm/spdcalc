@@ -139,7 +139,7 @@ define(
                 var data1d = [];
 
                 var self = this
-                    ,PM = PhaseMatch.calcJSA(
+                    ,PM = PhaseMatch.calc_JSA(
                         props, 
                         l_start, 
                         l_stop, 
