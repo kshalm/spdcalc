@@ -5,7 +5,7 @@ define(
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
-        'tpl!templates/time-delay-ctrl.tpl'
+        'tpl!templates/kitchen-sink-layout.tpl'
     ],
     function(
         $,
@@ -13,7 +13,7 @@ define(
         PhaseMatch,
         HeatMap,
         LinePlot,
-        tplTimeDelayCtrl
+        tplKSLayout
     ) {
 
         'use strict';
@@ -28,7 +28,7 @@ define(
          * @module JSAUI
          * @implements {Stapes}
          */
-        var jsaUI = Stapes.subclass({
+        var kitchen_sink_UI = Stapes.subclass({
 
             /**
              * Mediator Constructor
@@ -42,40 +42,37 @@ define(
 
                 self.initPhysics();
 
-                self.el = $('<div>');
+                self.el = $( tplKSLayout.render() );
 
-                // init plot
-                self.plot = new HeatMap({
-                    el: self.el.get(0)
+                // JSA plot
+                self.plotJSA = new HeatMap({
+                    el: self.el.find('.jsa-wrapper').get( 0 )
                 });
 
-                self.elPlot = $(self.plot.el)
-                
-                self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el );
-                
-                self.eldelT.slider({
-                    min: -800,
-                    max: 800,
-                    value: 0,
-                    orientation: "horizontal",
-                    range: "min",
-                    change: function(){
+                self.elPlotJSA = $(self.plotJSA.el);
 
-                        // set local prop and convert
-                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * 1e-15 );
-                    },
-                    slide: function(){
-
-                        // set local prop and convert
-                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * 1e-15 );
-                    }
+                // PMXY plot
+                self.plotPMXY = new HeatMap({
+                    el: self.el.find('.PMXY-wrapper').get( 0 )
                 });
+                self.elplotPMXY = $(self.plotPMXY.el);
 
-                self.set('delT', 0);
+                // Lambda_s vs theta_s plot
+                self.plotLambdasThetas = new HeatMap({
+                    el: self.el.find('.lambda_s-theta_s-wrapper').get( 0 )
+                });
+                self.elplotLambdasThetas = $(self.plotLambdasThetas.el);
 
-                // init plot
+                // Theta/Phi in the crystal
+                self.plotThetaPhi = new HeatMap({
+                    el: self.el.find('.pm-theta-phi-wrapper').get( 0 )
+                });
+                self.elplotThetaPhi = $(self.plotThetaPhi.el);
+
+
+                // HOM plot
                 self.plot1d = new LinePlot({
-                    el: self.el.get(0),
+                    el: self.el.find('.HOM-wrapper').get(0),
                     labels: {
                         x: 'x-axis',
                         y: 'y-axis'
@@ -83,19 +80,6 @@ define(
                 });
 
                 self.elPlot1d = $(self.plot1d.el);
-
-
-                // internal events
-                var to;
-                self.on('change:delT', function( delT ){
-                    
-                    clearTimeout( to );
-                    to = setTimeout(function(){
-
-                        // only refresh plots after a time delay
-                        self.refreshJSA();
-                    }, 50);
-                });
             },
 
             initPhysics: function(){
@@ -135,14 +119,19 @@ define(
             resize: function(){
 
                 var self = this
-                    ,par = self.elPlot.parent()
+                    ,par = self.elPlotJSA.parent()
                     ,width = par.width()
                     ,height = $(window).height()
                     ,dim = Math.min( width, height )
                     ;
                 if (dim>600){ dim = 600;}
-                self.plot.resize( dim, dim );
-                self.plot1d.resize( dim, dim/2 );
+                self.plotJSA.resize( dim, dim );
+                self.plot1d.resize( dim, dim );
+                self.plotPMXY.resize( dim, dim );
+                self.plotLambdasThetas.resize( dim, dim );
+                self.plotThetaPhi.resize( dim, dim );
+                
+
                 self.draw();
             },
 
@@ -157,18 +146,10 @@ define(
                 self.draw();
             },
 
-            refreshJSA: function(){
-
-                var self = this;
-                self.calc_HOM_JSA( self.parameters.getProps() );
-                self.draw();
-            },
-
             calc: function( props ){
 
                 // @TODO: move this to a control bar
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
-                var self = this;
                 var dim = 200;
                 // var l_start = 1500 * con.nm;
                 // var l_stop = 1600 * con.nm; 
@@ -176,23 +157,41 @@ define(
                 var lsi = PhaseMatch.autorange_lambda(props, threshold);
                 var l_start = Math.min(lsi[0], lsi[1]);
                 var l_stop =  Math.max(lsi[0], lsi[1]);
+                // console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
                 var data1d = [];
-                var delT = self.get('delT');
+                var dataPMXY = [];
+                var dataJSA = [];
+                var dataLambdasThetas = [];
+                var dataThetaPhi = [];
 
                 var self = this
-                    ,PM = PhaseMatch.calc_HOM_JSA(
+                    ,PMJSA = PhaseMatch.calcJSA(
                         props, 
                         l_start, 
                         l_stop, 
                         l_start,
-                        l_stop,
-                        delT,
+                        l_stop, 
                         dim
                     )
                     ;
+                self.dataJSA = PMJSA;
 
-                self.data = PM;
+                var x_start = -10*Math.PI/180;
+                var x_stop = 10*Math.PI/180;
+                var PMXY = PhaseMatch.calcXY(props, x_start, x_stop, x_start,x_stop, dim);
+                self.dataPMXY = PMXY;
 
+                // Lambda signal vs theta signal
+                var t_start = 0*Math.PI/180;
+                var t_stop = 5*Math.PI/180;
+                var PMLambdasThetas = PhaseMatch.calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start,t_stop, dim);
+                self.dataLambdasThetas = PMLambdasThetas;
+
+                // Theta vs Phi in crystal
+                var PMThetaPhi = PhaseMatch.calc_theta_phi(props, 0, 90*Math.PI/180, 0, 180*Math.PI/180, dim);
+                self.dataThetaPhi = PMThetaPhi;
+                
+                
                 // Hong-Ou-Mandel dip
                 var t_start = -800e-15;
                 var t_stop = 800e-15;
@@ -205,67 +204,66 @@ define(
                     })
                 }
 
-                self.data1d = data1d;
+                self.data1d = data1d;                
 
-            },
+                // // get sin wave data
+                // for ( var i = 0, l = 100; i < l; i += 0.1 ){
+                    
+                //     data1d.push({
+                //         x: i,
+                //         y: 20 * (Math.sin( i )+1)
+                //     });
+                // }
 
-            calc_HOM_JSA: function( props ){
-
-                // @TODO: move this to a control bar
-                props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
-                var self = this;
-                var dim = 200;
-                // var l_start = 1500 * con.nm;
-                // var l_stop = 1600 * con.nm; 
-                var threshold = 0.5;
-                var lsi = PhaseMatch.autorange_lambda(props, threshold);
-                var l_start = Math.min(lsi[0], lsi[1]);
-                var l_stop =  Math.max(lsi[0], lsi[1]);
-                // var data1d = [];
-                var delT = self.get('delT');
-
-                var self = this
-                    ,PM = PhaseMatch.calc_HOM_JSA(
-                        props, 
-                        l_start, 
-                        l_stop, 
-                        l_start,
-                        l_stop,
-                        delT,
-                        dim
-                    )
-                    ;
-
-                self.data = PM;
+                // self.data1d = data1d;
 
             },
 
             draw: function(){
 
                 var self = this
-                    ,data = self.data
+                    ,data = self.dataJSA
                     ;
 
                 if (!data){
                     return this;
                 }
+                self.plotJSA.plotData( data );
 
-                self.plot.plotData( data );
+                //// PMXY plot
+                if (!self.dataPMXY){
+                    return this;
+                }
+                self.plotPMXY.plotData( self.dataPMXY );
 
-                //////// other plot
+                //// lambda signal vs theta signal plot
+                if (!self.dataLambdasThetas){
+                    return this;
+                }
+                self.plotLambdasThetas.plotData( self.dataLambdasThetas );
+
+                //// Theta vs Phi in the crystal
+                if (!self.dataThetaPhi){
+                    return this;
+                }
+                self.plotThetaPhi.plotData( self.dataThetaPhi );
+
+
+                //////// HOM plot
                 var data1d = self.data1d;
 
                 if (!data1d){
                     return this;
                 }
-
                 self.plot1d.plotData( data1d );
+
+
             }
         });
 
         return function( config ){
 
-            return new jsaUI( config );
+            return new kitchen_sink_UI( config );
         };
     }
 );
