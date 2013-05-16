@@ -3,9 +3,10 @@
  */
 
 PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_stop, dim){
-
+    // PhaseMatch.updateallangles(props);
     var P = PhaseMatch.deepcopy(props);
     PhaseMatch.updateallangles(P);
+
 
     var lambda_s = new Float64Array(dim);
     var lambda_i = new Float64Array(dim);

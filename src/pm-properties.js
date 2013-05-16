@@ -194,10 +194,6 @@
             var ind = this.crystal.indicies(this.lambda_p, this.temp);
         },
 
-        calc_wbar : function (){
-            // this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
-            // this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
-        },
 
 
         set: function( name, val ){

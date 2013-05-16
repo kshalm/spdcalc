@@ -138,8 +138,6 @@ define(
                 // console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
                 var data1d = [];
 
-                console.log(props)
-
                 var self = this
                     ,PM = PhaseMatch.calcJSA(
                         props, 

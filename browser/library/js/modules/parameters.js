@@ -69,9 +69,25 @@ define(
                             self.refresh();
                         }
                     },
-
+                    //@TODO Krister:
+                    //The way the change events happen, if the crystal is selected everything is calculated twice.
+                    //There must be a more elegant way to deal with this.
                     'change:xtal': function( val ){
+                        // console.log("setting crystal now");
                         self.props.set_crystal( val );
+
+                        if (self.props.autocalctheta){
+                            PhaseMatch.auto_calc_Theta( self.props );
+                        } 
+
+                        if (self.props.autocalcpp){
+                            PhaseMatch.calc_poling_period( self.props );
+                        }
+
+                        if (self.props.autocalcpp || self.props.autocalctheta){
+                            // if we are going to trigger autocalculation, refresh
+                            self.refresh();
+                        }
                     }
                 });
             },

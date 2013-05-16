@@ -2766,10 +2766,6 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             var ind = this.crystal.indicies(this.lambda_p, this.temp);
         },
 
-        calc_wbar : function (){
-            // this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
-            // this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
-        },
 
 
         set: function( name, val ){
@@ -2940,9 +2936,10 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
 
 PhaseMatch.calcJSA = function calcJSA(props, ls_start, ls_stop, li_start, li_stop, dim){
-
+    // PhaseMatch.updateallangles(props);
     var P = PhaseMatch.deepcopy(props);
     PhaseMatch.updateallangles(P);
+
 
     var lambda_s = new Float64Array(dim);
     var lambda_i = new Float64Array(dim);
@@ -3135,16 +3132,30 @@ PhaseMatch.KTP = function KTP () {
     //Selmeir coefficients for nx, ny, nz
     this.temp = 20;
     this.name = "KTP";
-    this.info = "H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)";
+    // this.info = "H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)";
+    this.info = "http://www.redoptronics.com/KTP-crystal.html";
 };
 
 PhaseMatch.KTP.prototype  = {
     indicies:function(lambda, temp){
         lambda = lambda * Math.pow(10,6); //Convert for Sellmeir Coefficients
 
+        // http://www.redoptronics.com/KTP-crystal.html
         var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda)); 
         var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
         var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
+
+        // H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)
+        // var nx = Math.sqrt( 2.1146 + 0.89188/(1 - (0.20861/sq(lambda))) - (0.01320* sq(lambda)) );
+        // var ny = Math.sqrt( 2.1518 + 0.87862/(1 - (0.21801/sq(lambda))) - (0.01327* sq(lambda)) );
+        // var nz = Math.sqrt( 2.3136 + 1.00012/(1 - (0.23831/sq(lambda))) - (0.01679* sq(lambda)) );
+
+        // http://www.castech-us.com/casktp.htm
+        // var nx= Math.sqrt(3.0065+0.03901/(sq(lambda)-0.04251)-0.01327*sq(lambda));
+        // var ny= Math.sqrt(3.0333+0.04154/(sq(lambda)-0.04547)-0.01408*sq(lambda));
+        // var nz= Math.sqrt(3.0065+0.05694/(sq(lambda)-0.05658)-0.01682*sq(lambda));
+
+
 
         var dnx= 1.1e-5;
         var dny= 1.3e-5;
