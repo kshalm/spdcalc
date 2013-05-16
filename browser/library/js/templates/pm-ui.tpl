@@ -11,6 +11,7 @@
                         <option value="jsa">JSA</option>
                         <option value="hom">Hong Ou Mandel</option>
                         <option value="jsa-hom">JSA HOM</option>
+                        <option value="kitchen_sink">Kitchen Sink</option>
                         <option value="pm-xy">PM XY</option>
                     </select>
                 </div>

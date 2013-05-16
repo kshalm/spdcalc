@@ -277,7 +277,7 @@
             PhaseMatch.optimum_idler(P);
             var delK = PhaseMatch.calc_delK(P);
             return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
-        }
+        };
 
         var delK_guess = PhaseMatch.calc_delK(P);
         var guess = 2*Math.PI/delK_guess[2];

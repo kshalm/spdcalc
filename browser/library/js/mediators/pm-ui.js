@@ -15,7 +15,8 @@ define(
         'modules/parameters',
         'modules/jsa-ui',
         'modules/hom-ui',
-        'modules/jsa-hom-ui'
+        'modules/jsa-hom-ui',
+        'modules/kitchen-sink-ui'
     ],
     function(
         $,
@@ -33,7 +34,8 @@ define(
         Parameters,
         jsaUI,
         homUI,
-        jsahomUI
+        jsahomUI,
+        ksUI
     ) {
 
         'use strict';
@@ -265,6 +267,8 @@ define(
                 self.set('hom', homUI());
                 // JSA-HOM
                 self.set('jsa-hom', jsahomUI());
+                // Kitchen Sink
+                self.set('kitchen_sink', ksUI());
             },
 
             /**
