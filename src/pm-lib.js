@@ -321,7 +321,7 @@ PhaseMatch.calc_HOM = function calc_HOM(P, delT){
  */
 PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
     var con = PhaseMatch.constants;
-    var P = PhaseMatch.deepcopy(props);
+    var P = PhaseMatch.deep_copy(props);
 
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
@@ -392,7 +392,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
 
 //  PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
 //     var con = PhaseMatch.constants;
-//     var P = PhaseMatch.deepcopy(props);
+//     var P = PhaseMatch.deep_copy(props);
 //     var lambda_s = new Float64Array(dim);
 //     var lambda_i = new Float64Array(dim);
 
@@ -532,7 +532,7 @@ PhaseMatch.linspace = function linspace(xstart,xstop,npts){
 };
 
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
-    var P = PhaseMatch.deepcopy(props);
+    var P = PhaseMatch.deep_copy(props);
     //eliminates sinc side lobes which cause problems.
     P.useguassianapprox = true;
 

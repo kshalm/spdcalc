@@ -268,7 +268,7 @@
 
         props.poling_period = 1e12;  // Set this to a large number 
         PhaseMatch.update_all_angles(props);
-        var P = PhaseMatch.deepcopy(props);
+        var P = PhaseMatch.deep_copy(props);
 
         var find_pp = function(x){
             P.poling_period = x;
@@ -312,7 +312,7 @@
         var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
     };
 
-    PhaseMatch.deepcopy = function deepcopy(props){
+    PhaseMatch.deep_copy = function deep_copy(props){
         var P = new PhaseMatch.SPDCprop();
         P.crystal = props.crystal;
         P.lambda_p = PhaseMatch.util.clone(props.lambda_p,true);
