@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-15
+ * phasematchjs v0.0.1a - 2013-05-16
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2842,14 +2842,30 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     };
 
     PhaseMatch.calc_poling_period = function calc_poling_period(props){
-        PhaseMatch.optimum_idler(props);
+
+        props.poling_period = 1e12;  // Set this to a large number 
         PhaseMatch.updateallangles(props);
-        console.log("theta_s = ", props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
-        //very large number. Eliminates previous values of poling period from calculation.
-        props.poling_period = 1e12; 
-        var delK = PhaseMatch.calc_delK(props);
-        props.poling_period = 2*Math.PI/delK[2];
-        console.log("poling period ", props.poling_period);
+        var P = PhaseMatch.deepcopy(props);
+
+        var find_pp = function(x){
+            P.poling_period = x;
+            // Calculate the angle for the idler photon
+            PhaseMatch.optimum_idler(P);
+            var delK = PhaseMatch.calc_delK(P);
+            return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
+        }
+
+        var delK_guess = PhaseMatch.calc_delK(P);
+        var guess = 2*Math.PI/delK_guess[2];
+
+        //finds the minimum theta
+        var startTime = new Date();
+        PhaseMatch.nelderMead(find_pp, guess, 100);
+        var endTime = new Date();
+        // console.log("calculation time for periodic poling calc", endTime - startTime);
+
+        props.poling_period = P.poling_period;
+        // console.log("poling period ", props.poling_period);
         
     };
 
