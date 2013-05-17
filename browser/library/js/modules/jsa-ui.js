@@ -55,7 +55,11 @@ define(
                 self.plot = new HeatMap({
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     margins: margins,
-                    domain: [ 0, 100 ],
+                    labels: {
+                        x: 'Wavelength of Signal (nm)',
+                        y: 'Wavelength of Idler (nm)'
+                    },
+                    domain: [ 0, 200 ],
                     range: [ 0, 100 ]
                 });
 
@@ -165,6 +169,8 @@ define(
                     ;
 
                 self.data = PM;
+                self.plot.setRange([l_start/1e-9, l_stop/1e-9]);
+                self.plot.setDomain([l_start/1e-9, l_stop/1e-9]);
 
                 // get sin wave data
                 for ( var i = 0, l = 100; i < l; i += 0.1 ){

@@ -136,7 +136,7 @@ define(
             setRange: function( rangeArray ){
 
                 // yes, it should be domain here. not range
-                this.scales.x.domain( rangeArray );
+                this.scales.y.domain( rangeArray );
                 this.refreshAxes();
             },
 
