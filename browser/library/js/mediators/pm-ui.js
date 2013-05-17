@@ -141,9 +141,10 @@ define(
                         if (!self.autocalc){
                             return;
                         }
-                        if (!key==='xtal'){
-                            self.emit('calculate');
-                        }
+                        // if (!key==='xtal'){
+                        //     self.emit('calculate');
+                        // }
+                        self.emit('calculate');
                     },
                     'change:xtal': function( val ){
 
