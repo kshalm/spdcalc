@@ -13,7 +13,10 @@ define(
 
             width: 600,
             height: 400,
-            labels: {},
+            labels: {
+                x: 'X axis label',
+                y: 'Y axis label'
+            },
             // default autocalc
             domain: null,
             range: null,

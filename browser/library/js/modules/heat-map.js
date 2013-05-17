@@ -33,7 +33,7 @@ define(
             var width = options.width || 300;
             var height = options.height || 300;
 
-            this.el = $('<div>').addClass('plot').appendTo( options.el );
+            this.el = $('<div>').addClass('plot heat-map').appendTo( options.el );
 
             this.canvas = document.createElement('canvas');
             this.el.append( this.canvas );

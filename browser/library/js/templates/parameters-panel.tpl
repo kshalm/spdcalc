@@ -18,7 +18,7 @@
         </div>
 
         <div class="control-group">
-            <select id="crystal-dropdown" name="xtal" class="span3">
+            <select id="crystal-dropdown" name="xtal" class="full">
                 {{~it.crystal_Names :value:index}}
                 <option value="{{=value}}" {{? value===it.crystal.name}} selected="selected" {{?}}>{{=value}}</option>
                 {{~}}
@@ -26,7 +26,7 @@
         </div>
 
         <div class="control-group">
-            <select id="pm-type-dropdown" name="Type" class="span3">
+            <select id="pm-type-dropdown" name="Type" class="full">
                 {{~it.PM_type_names :value:index}}
                      <option value="{{=value}}" {{? value === it.Type }} selected="selected" {{?}}>{{=value}}</option> 
                 {{~}}

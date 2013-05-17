@@ -45,10 +45,6 @@
             </div>
         </div>
 
-        <div id="main"></div>
-
-    </div>
-    <div class="lower">
         <div id="parameters-wrap">
             <div class="row-fluid">
                 <h2 class="title">Options</h2>
@@ -59,6 +55,15 @@
             </div>
             <div id="parameters"></div>
         </div>
+
+        <div class="right">
+
+            <div id="main"></div>
+        </div>
+
+    </div>
+    <div class="lower">
+        
         <div id="logs"></div>
     </div>
 </div>
