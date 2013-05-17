@@ -60,6 +60,7 @@
             this.autocalctheta = false;
             this.autocalcpp = true;
             this.poling_period = 1000000;
+            this.poling_sign = 1;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.use_guassian_approx = false;
@@ -224,7 +225,7 @@
             var P = PhaseMatch.deep_copy(props);
 
             var find_pp = function(x){
-                if (x<0){ return 1e12;}  // arbitrary large number
+                // if (x<0){ return 1e12;}  // arbitrary large number
                 P.poling_period = x;
                 // Calculate the angle for the idler photon
                 P.optimum_idler();
@@ -232,8 +233,16 @@
                 return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
             };
 
-            var delK_guess = Math.abs(PhaseMatch.calc_delK(P)[2]);
+            var delK_guess = (PhaseMatch.calc_delK(P)[2]);
             var guess = 2*Math.PI/delK_guess;
+
+            if (guess<0){
+                P.poling_sign = -1;
+                guess = guess*-1;
+            }
+            else{
+                P.poling_sign = 1;
+            }
 
             //finds the minimum theta
             var startTime = new Date();
@@ -242,12 +251,13 @@
             // console.log("calculation time for periodic poling calc", endTime - startTime);
 
             props.poling_period = P.poling_period;
+            props.poling_sign = P.poling_sign;
         },
 
         optimum_idler : function (){
             var P = this;
 
-            var delKpp = P.lambda_s/P.poling_period;
+            var delKpp = P.lambda_s/(P.poling_period*P.poling_sign);
 
             var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
             arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
@@ -328,6 +338,7 @@
         P.phi_s = PhaseMatch.util.clone(props.phi_s,true);
         P.phi_i = PhaseMatch.util.clone(props.phi_i,true);
         P.poling_period = PhaseMatch.util.clone(props.poling_period,true);
+        P.poling_sign = PhaseMatch.util.clone(props.poling_sign,true);
         P.L = PhaseMatch.util.clone(props.L,true);
         P.W = PhaseMatch.util.clone(props.W,true);
         P.p_bw = PhaseMatch.util.clone(props.p_bw,true);
