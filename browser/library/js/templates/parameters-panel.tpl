@@ -28,7 +28,7 @@
         <div class="control-group">
             <select id="pm-type-dropdown" name="Type" class="span3">
                 {{~it.PM_type_names :value:index}}
-                     <option value="{{=value}}" {{? value===it.Type}} selected="selected" {{?}}>{{=value}}</option> 
+                     <option value="{{=value}}" {{? value === it.Type }} selected="selected" {{?}}>{{=value}}</option> 
                 {{~}}
             </select>
         </div>
