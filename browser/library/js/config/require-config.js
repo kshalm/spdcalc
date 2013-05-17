@@ -6,9 +6,6 @@ require.config({
         'd3': {
             exports: 'd3'
         },
-        'numeric': {
-            exports: 'numeric'
-        },
         'jquery-ui': {
             deps: ['jquery']
         },
@@ -34,7 +31,6 @@ require.config({
         'phasematch': 'vendor/phasematchjs',
 
         // third party
-        'numeric': 'vendor/numeric-1.2.6',
         'd3': 'vendor/d3.v3',
 
         'bootstrap-tooltip': 'vendor/bootstrap-tooltip',
