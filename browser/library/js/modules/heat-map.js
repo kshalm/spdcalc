@@ -30,7 +30,9 @@ define(
 
         var scale = d3.scale.linear()
             .domain([0, 1])
-            .range(["hsl(210, 100%, 100%)", "hsl(210, 96%, 29%)"])
+            // .range(["hsl(210, 29%, 29%)", "hsl(210, 100%, 100%)"])
+            .range(["hsl(210, 100%, 100%)", "hsl(210, 29%, 29%)"])
+            // .range(["white", "steelblue"])
             .interpolate(d3.interpolateLab)
             ;
 
