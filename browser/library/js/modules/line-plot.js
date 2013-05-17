@@ -11,6 +11,7 @@ define(
 
         var defaults = {
 
+            title: "Awesome Graph",
             width: 600,
             height: 400,
             labels: {
@@ -33,7 +34,19 @@ define(
             this.domain = options.domain;
             this.range = options.range;
 
-            this.el = $('<div>').addClass('plot line-plot').appendTo( options.el );
+            this.el = $('<div>')
+                .css('position', 'relative')
+                .addClass('plot line-plot')
+                .appendTo( options.el )
+                ;
+
+            this.elTitle = $('<label>').appendTo(this.el).css({
+                'position' : 'absolute',
+                'top' : '0',
+                'left' : '0'
+            });
+
+            this.setTitle( options.title );
 
             // init scales
             this.scales = {
@@ -83,6 +96,11 @@ define(
 
         LinePlot.prototype = {
 
+            setTitle: function( title ){
+
+                this.elTitle.text( title );
+            },
+
             setMargins: function( cfg ){
 
                 var w = this.width + this.margin.left + this.margin.right
@@ -91,6 +109,11 @@ define(
                     ;
 
                 this.svgPlot.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                this.elTitle.css({
+                    'top' : margin.top,
+                    'margin-top' : '-2em',
+                    'left': margin.left
+                });
 
                 this.resize( w, h );
             },
@@ -102,9 +125,15 @@ define(
                     ,margin = this.margin
                     ;
 
+                this.width = width;
+                this.height = height;
+
+                width += margin.left + margin.right;
+                height += margin.top + margin.bottom;
+
                 this.el
-                    .css('width', w+'px')
-                    .css('height', h+'px')
+                    .css('width', width+'px')
+                    .css('height', height+'px')
                     ;
 
                 this.svg
@@ -112,11 +141,7 @@ define(
                     .attr("height", height)
                     ;
 
-                width -= margin.left + margin.right;
-                height -= margin.top + margin.bottom;
-
-                this.width = width;
-                this.height = height;
+                
             },
 
             refreshAxes: function(){
@@ -146,20 +171,20 @@ define(
                   .call(xAxis)
                 .append("text")
                   .attr("y", 0)
-                  .attr("dy", "3em")
+                  .attr("dy", this.margin.bottom - 16)
                   .attr("x", width/2)
-                  .style("text-anchor", "center")
+                  .style("text-anchor", "middle")
                   .text( labels.x );
 
                 svg.append("g")
                   .attr("class", "y axis")
                   .call(yAxis)
                 .append("text")
-                  .attr("transform", "rotate(90)")
-                  .attr("x", width/2)
+                  .attr("x", -width/2)
                   .attr("y", 0)
-                  .attr("dy", "3.6em")
-                  .style("text-anchor", "end")
+                  .attr("transform", "rotate(-90)")
+                  .attr("dy", -this.margin.left + 16)
+                  .style("text-anchor", "middle")
                   .text( labels.y );
             },
 
