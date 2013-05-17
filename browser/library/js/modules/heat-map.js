@@ -29,19 +29,16 @@ define(
 
         var scale = d3.scale.linear()
             .domain([0, 1])
-            .range([0, 255])
-            .nice()
+            .range(["hsl(210, 100%, 100%)", "hsl(210, 96%, 29%)"])
+            .interpolate(d3.interpolateLab)
             ;
 
         function defaultColorMap( val ){
 
-            var r = 255 - scale( val )
-                ,g = 255 - scale( val )/1
-                ,b = 255
-                ;
-
-            return d3.rgb(r, g, b);
+            return d3.rgb(scale( val ));
         }
+
+        window.defcol = defaultColorMap;
 
         function HeatMap( options ){
 
