@@ -2039,24 +2039,24 @@ function sq( x ){
  * Analytically calcualte optimum idler photon wavelength
  * All angles in radians.
  */
-PhaseMatch.optimum_idler = function optimum_idler(P){
+// PhaseMatch.optimum_idler = function optimum_idler(P){
 
-    var delKpp = P.lambda_s/P.poling_period;
+//     var delKpp = P.lambda_s/P.poling_period;
 
-    var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
-    arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
-    arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
-    arg = Math.sqrt(arg);
+//     var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
+//     arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
+//     arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
+//     arg = Math.sqrt(arg);
 
-    var arg2 = P.n_s*Math.sin(P.theta_s)/arg;
+//     var arg2 = P.n_s*Math.sin(P.theta_s)/arg;
 
-    var theta_i = Math.asin(arg2);
-    // return theta_i;
-    P.theta_i = theta_i;
-    //Update the index of refraction for the idler
-    P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
-};
+//     var theta_i = Math.asin(arg2);
+//     // return theta_i;
+//     P.theta_i = theta_i;
+//     //Update the index of refraction for the idler
+//     P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+//     P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+// };
 
 /*
  * optimum_signal()
@@ -2296,7 +2296,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-        PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
+        P.optimum_idler(P); //Need to find the optimum idler.
         
         var PMtmp = PhaseMatch.phasematch(P);
         THETA1_real[i] = PMtmp[0];
@@ -2306,7 +2306,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         P.lambda_s = lambda_i[index_i];
         P.lambda_i = lambda_s[index_s];
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-        PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
+        P.optimum_idler(P); //Need to find the optimum idler.
         
         PMtmp = PhaseMatch.phasematch(P);
         THETA2_real[i] = PMtmp[0];
@@ -2426,7 +2426,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
         P.lambda_s = lambda_s;
         P.n_s = P.calc_Index_PMType(lambda_s, P.Type, P.S_s, "signal");
         P.lambda_i = 1/(1/P.lambda_p - 1/lambda_s);
-        PhaseMatch.optimum_idler(P);
+        P.optimum_idler(P);
 
         var PM = PhaseMatch.phasematch_Int_Phase(P);
         // console.log(P.lambda_p/1e-9, P.lambda_s/1e-9, P.lambda_i/1e-9, PM)
@@ -2642,6 +2642,119 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             var ind = this.crystal.indicies(this.lambda_p, this.temp);
         },
 
+        update_all_angles : function (){
+            var props = this;
+            // console.log("old pump index", props.n_p);
+
+            props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
+            props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
+
+            props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
+            props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            // console.log("new pump index", props.n_p);
+
+            props.optimum_idler();
+            // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
+
+           
+            // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+
+        },
+
+        auto_calc_Theta : function (){
+            var props = this;
+            var min_delK = function(x){
+                if (x>Math.PI/2 || x<0){return 1e12;}
+                props.theta = x;
+                props.update_all_angles(props);
+                var delK =  PhaseMatch.calc_delK(props);
+
+                return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
+            };
+
+            var guess = Math.PI/8;
+            var startTime = new Date();
+
+            var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
+            var endTime = new Date();
+            
+
+            var timeDiff = (endTime - startTime)/1000;
+            // console.log("Theta autocalc = ", timeDiff);
+            props.theta = ans;
+        },
+
+
+        calc_poling_period : function (){
+            var props = this;
+            props.poling_period = 1e12;  // Set this to a large number 
+            props.update_all_angles(props);
+            var P = PhaseMatch.deep_copy(props);
+
+            var find_pp = function(x){
+                if (x<0){ return 1e12;}  // arbitrary large number
+                P.poling_period = x;
+                // Calculate the angle for the idler photon
+                P.optimum_idler();
+                var delK = PhaseMatch.calc_delK(P);
+                return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
+            };
+
+            var delK_guess = Math.abs(PhaseMatch.calc_delK(P)[2]);
+            var guess = 2*Math.PI/delK_guess;
+
+            //finds the minimum theta
+            var startTime = new Date();
+            PhaseMatch.nelderMead(find_pp, guess, 100);
+            var endTime = new Date();
+            // console.log("calculation time for periodic poling calc", endTime - startTime);
+
+            props.poling_period = P.poling_period;
+        },
+
+        optimum_idler : function (){
+            var P = this;
+
+            var delKpp = P.lambda_s/P.poling_period;
+
+            var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
+            arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
+            arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
+            arg = Math.sqrt(arg);
+
+            var arg2 = P.n_s*Math.sin(P.theta_s)/arg;
+
+            var theta_i = Math.asin(arg2);
+            // return theta_i;
+            P.theta_i = theta_i;
+            //Update the index of refraction for the idler
+            P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+        },
+
+
+
+        brute_force_theta_i : function (){
+            var props = this;
+
+            var min_PM = function(x){
+                if (x>Math.PI/2 || x<0){return 1e12;}
+                props.theta_i = x;
+
+                props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
+                props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+
+                var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
+                return 1-PMtmp;
+            };
+
+            //Initial guess
+            props.optimum_idler();
+            var guess = props.theta_i;
+            // var startTime = new Date();
+
+            var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
+        },
 
 
         set: function( name, val ){
@@ -2668,98 +2781,6 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
     PhaseMatch.SPDCprop = SPDCprop;
 
-    //
-    // @TODO: Jasper suggests moving these into the props object
-    // itself ( thereby making this a more object oriented approach )
-    // 
-    // Ex: props.auto_calc_Theta();
-    // 
-    // inside functions you just need to change:
-    // function auto_calc_Theta( props )
-    // to
-    // function auto_calc_Theta(){
-    //     var props = this;
-    //     ...
-    // }
-    // 
-    PhaseMatch.auto_calc_Theta = function auto_calc_Theta(props){
-        var min_delK = function(x){
-            if (x>Math.PI/2 || x<0){return 1e12;}
-            props.theta = x;
-            PhaseMatch.update_all_angles(props);
-            // props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
-            // props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
-            // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-
-            // props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-            // props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
-            // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
-
-            var delK =  PhaseMatch.calc_delK(props);
-            // console.log("in the function", delK)
-            return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
-        };
-
-        var guess = Math.PI/8;
-        var startTime = new Date();
-
-        var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
-        var endTime = new Date();
-        
-
-        var timeDiff = (endTime - startTime)/1000;
-        // console.log("Theta autocalc = ", timeDiff);
-        props.theta = ans;
-    };
-
-    PhaseMatch.calc_poling_period = function calc_poling_period(props){
-
-        props.poling_period = 1e12;  // Set this to a large number 
-        PhaseMatch.update_all_angles(props);
-        var P = PhaseMatch.deep_copy(props);
-
-        var find_pp = function(x){
-            if (x<0){ return 1e12;}  // arbitrary large number
-            P.poling_period = x;
-            // Calculate the angle for the idler photon
-            PhaseMatch.optimum_idler(P);
-            var delK = PhaseMatch.calc_delK(P);
-            return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
-        };
-
-        var delK_guess = Math.abs(PhaseMatch.calc_delK(P)[2]);
-        var guess = 2*Math.PI/delK_guess;
-
-        //finds the minimum theta
-        var startTime = new Date();
-        PhaseMatch.nelderMead(find_pp, guess, 100);
-        var endTime = new Date();
-        // console.log("calculation time for periodic poling calc", endTime - startTime);
-
-        props.poling_period = P.poling_period;
-        // console.log("poling period ", props.poling_period);
-        
-    };
-
-    PhaseMatch.brute_force_theta_i = function brute_force_theta_i(props){
-        var min_PM = function(x){
-            if (x>Math.PI/2 || x<0){return 1e12;}
-            props.theta_i = x;
-
-            props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-            props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
-
-            var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
-            return 1-PMtmp;
-        };
-
-        //Initial guess
-        PhaseMatch.optimum_idler(props);
-        var guess = props.theta_i;
-        // var startTime = new Date();
-
-        var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
-    };
 
     PhaseMatch.deep_copy = function deep_copy(props){
         var P = new PhaseMatch.SPDCprop();
@@ -2791,23 +2812,6 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
         return P;
     };
 
-    PhaseMatch.update_all_angles = function update_all_angles(props){
-        // console.log("old pump index", props.n_p);
-        props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
-        props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
-
-        props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-        props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
-        // console.log("new pump index", props.n_p);
-
-        PhaseMatch.optimum_idler(props);
-        // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-
-       
-        // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
-
-    };
-
 })();
 
 
@@ -2815,7 +2819,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     // PhaseMatch.updateallangles(props);
     console.log("Calculating JSA");
     var P = PhaseMatch.deep_copy(props);
-    PhaseMatch.update_all_angles(P);
+    props.update_all_angles(P);
 
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
@@ -2835,7 +2839,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
+        P.optimum_idler(P); //Need to find the optimum idler for each angle.
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
 
@@ -2853,7 +2857,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
-    PhaseMatch.update_all_angles(P);
+    props.update_all_angles(P);
 
     var i;
     var X = PhaseMatch.linspace(x_start, x_stop, dim);
@@ -2880,11 +2884,11 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        // PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        // PhaseMatch.brute_force_theta_i(P); //use a search. could be time consuming.
+        // P.optimum_idler(P); //Need to find the optimum idler for each angle.
+        // P.brute_force_theta_i(P); //use a search. could be time consuming.
 
         //calculate the correct idler angle analytically.
-        PhaseMatch.optimum_idler(P);
+        P.optimum_idler(P);
 
         // P.calc_wbar();
         
@@ -2901,7 +2905,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start, t_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
-    PhaseMatch.update_all_angles(P);
+    props.update_all_angles(P);
     var i;
     var lambda_s = PhaseMatch.linspace(l_start, l_stop, dim);
     var theta_s = PhaseMatch.linspace(t_stop, t_start, dim); 
@@ -2921,7 +2925,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
+        P.optimum_idler(P); //Need to find the optimum idler for each angle.
         // P.calc_wbar();
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
@@ -2937,7 +2941,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
-    PhaseMatch.update_all_angles(P);
+    props.update_all_angles(P);
 
     var i;
     var theta = PhaseMatch.linspace(t_start, t_stop, dim);
@@ -2960,7 +2964,7 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         //calcualte the correct idler angle analytically.
-        PhaseMatch.optimum_idler(P);
+        P.optimum_idler(P);
         // P.calc_wbar();
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);

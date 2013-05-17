@@ -32,11 +32,11 @@ define(
                 self.props = new PhaseMatch.SPDCprop();
                 
                 if (self.props.autocalctheta){
-                    PhaseMatch.auto_calc_Theta( self.props );
+                    self.props.auto_calc_Theta( self.props );
                 } 
 
                 if (self.props.autocalcpp){
-                    PhaseMatch.calc_poling_period( self.props );
+                    self.props.calc_poling_period( self.props );
                 }
 
                 self.set( self.props );
@@ -57,11 +57,11 @@ define(
                         console.log('set ', key, 'to', val)
                     
                         if (self.props.autocalctheta){
-                            PhaseMatch.auto_calc_Theta( self.props );
+                            self.props.auto_calc_Theta( self.props );
                         } 
 
                         if (self.props.autocalcpp){
-                            PhaseMatch.calc_poling_period( self.props );
+                            self.props.calc_poling_period( self.props );
                         }
 
                         if (self.props.autocalcpp || self.props.autocalctheta){
@@ -77,11 +77,11 @@ define(
                         self.props.set_crystal( val );
 
                         if (self.props.autocalctheta){
-                            PhaseMatch.auto_calc_Theta( self.props );
+                            self.props.auto_calc_Theta( self.props );
                         } 
 
                         if (self.props.autocalcpp){
-                            PhaseMatch.calc_poling_period( self.props );
+                            self.props.calc_poling_period( self.props );
                         }
                         self.refresh();
                     }

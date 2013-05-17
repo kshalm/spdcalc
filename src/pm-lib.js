@@ -43,24 +43,24 @@
  * Analytically calcualte optimum idler photon wavelength
  * All angles in radians.
  */
-PhaseMatch.optimum_idler = function optimum_idler(P){
+// PhaseMatch.optimum_idler = function optimum_idler(P){
 
-    var delKpp = P.lambda_s/P.poling_period;
+//     var delKpp = P.lambda_s/P.poling_period;
 
-    var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
-    arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
-    arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
-    arg = Math.sqrt(arg);
+//     var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
+//     arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
+//     arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
+//     arg = Math.sqrt(arg);
 
-    var arg2 = P.n_s*Math.sin(P.theta_s)/arg;
+//     var arg2 = P.n_s*Math.sin(P.theta_s)/arg;
 
-    var theta_i = Math.asin(arg2);
-    // return theta_i;
-    P.theta_i = theta_i;
-    //Update the index of refraction for the idler
-    P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
-};
+//     var theta_i = Math.asin(arg2);
+//     // return theta_i;
+//     P.theta_i = theta_i;
+//     //Update the index of refraction for the idler
+//     P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+//     P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+// };
 
 /*
  * optimum_signal()
@@ -300,7 +300,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-        PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
+        P.optimum_idler(P); //Need to find the optimum idler.
         
         var PMtmp = PhaseMatch.phasematch(P);
         THETA1_real[i] = PMtmp[0];
@@ -310,7 +310,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         P.lambda_s = lambda_i[index_i];
         P.lambda_i = lambda_s[index_s];
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-        PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
+        P.optimum_idler(P); //Need to find the optimum idler.
         
         PMtmp = PhaseMatch.phasematch(P);
         THETA2_real[i] = PMtmp[0];
@@ -430,7 +430,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
         P.lambda_s = lambda_s;
         P.n_s = P.calc_Index_PMType(lambda_s, P.Type, P.S_s, "signal");
         P.lambda_i = 1/(1/P.lambda_p - 1/lambda_s);
-        PhaseMatch.optimum_idler(P);
+        P.optimum_idler(P);
 
         var PM = PhaseMatch.phasematch_Int_Phase(P);
         // console.log(P.lambda_p/1e-9, P.lambda_s/1e-9, P.lambda_i/1e-9, PM)
