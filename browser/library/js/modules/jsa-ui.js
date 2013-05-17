@@ -45,7 +45,7 @@ define(
                 self.el = $( tplJSALayout.render() );
 
                 var margins = {
-                    top: 20,
+                    top: 60,
                     right: 20,
                     left: 60,
                     bottom: 60
@@ -55,6 +55,8 @@ define(
                 self.plot = new HeatMap({
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     margins: margins,
+                    width: 520,
+                    height: 480,
                     labels: {
                         x: 'Wavelength of Signal (nm)',
                         y: 'Wavelength of Idler (nm)'
@@ -72,6 +74,8 @@ define(
                         x: 'x-axis',
                         y: 'y-axis'
                     },
+                    width: 520,
+                    height: 480,
                     margins: margins,
                     domain: [ 0, 100 ],
                     range: [ 0, 100 ]
@@ -120,7 +124,7 @@ define(
                     ,par = self.elPlot.parent()
                     ,width = par.width()
                     ,height = $(window).height()
-                    ,dim = Math.min( width, height )
+                    ,dim = Math.min( width, height ) - 20 // - margin
                     ;
 
                 if (dim > 600){ 

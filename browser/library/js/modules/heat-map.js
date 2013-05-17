@@ -38,8 +38,6 @@ define(
             return d3.rgb(scale( val ));
         }
 
-        window.defcol = defaultColorMap;
-
         function HeatMap( options ){
 
             options = $.extend({}, defaults, options);
@@ -66,6 +64,8 @@ define(
             this.el.append( $(this.canvas).css('zIndex', 1).css('position', 'relative') );
             this.hiddenCanvas = document.createElement('canvas');
 
+            this.setColorMap( options.colorMap );
+
             // init scales
             this.scales = {
                 x: d3.scale.linear().domain( options.domain ),
@@ -78,7 +78,6 @@ define(
             
             this.hiddenCtx = this.hiddenCanvas.getContext('2d');
             this.ctx = this.canvas.getContext('2d');
-            this.setColorMap( options.colorMap );
         }
 
         HeatMap.prototype = {
@@ -86,8 +85,8 @@ define(
             setMargins: function( cfg ){
 
                 var margin = this.margin = $.extend({}, this.margin, cfg)
-                    ,w = this.width + this.margin.left + this.margin.right
-                    ,h = this.height + this.margin.top + this.margin.bottom
+                    ,w = this.width
+                    ,h = this.height
                     ;
 
                 this.el.css({
@@ -105,9 +104,6 @@ define(
                     'width': w + 'px',
                     'height': h + 'px'
                 });
-
-                w -= this.margin.left + this.margin.right;
-                h -= this.margin.top + this.margin.bottom;
 
                 this.width = w;
                 this.height = h;
@@ -139,7 +135,8 @@ define(
 
             refreshAxes: function(){
 
-                var svg = this.svgAxis
+                var self = this
+                    ,svg = this.svgAxis
                     ,x = this.scales.x
                     ,y = this.scales.y
                     ,labels = this.labels
@@ -179,6 +176,26 @@ define(
                   .attr("dy", "3.6em")
                   .style("text-anchor", "end")
                   .text( labels.y );
+
+                var colorBarWidth = 100;
+                var colorBarHeight = 32;
+                var colorBarVals = d3.range( 0, 1, 0.01 );
+                var xColorBar = d3.scale.ordinal()
+                    .domain( colorBarVals )
+                    .rangeRoundBands([0, colorBarWidth])
+                    ;
+
+                svg.append("g").attr("class", "z axis").attr('transform', 'translate('+[width-colorBarWidth, -colorBarHeight].join(',')+')')
+                    .selectAll('rect')
+                    .data(colorBarVals)
+                    .enter()
+                    .append("rect")
+                    .attr("x", xColorBar)
+                    .attr("width", xColorBar.rangeBand())
+                    .attr("height", colorBarHeight)
+                    .style("fill", function( v ){
+                        return self.colorMap( v ).toString();
+                    });
             },
 
             getCanvas: function(){
@@ -219,8 +236,8 @@ define(
             plotData: function( data ){
 
                 var l = data.length
-                    ,cols = this.canvas.width
-                    ,rows = this.canvas.height
+                    ,cols = this.width
+                    ,rows = this.height
                     ,scale = Math.sqrt( l / (cols * rows) )
                     ;
 
