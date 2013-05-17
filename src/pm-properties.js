@@ -251,6 +251,7 @@
         var P = PhaseMatch.deep_copy(props);
 
         var find_pp = function(x){
+            if (x<0){ return 1e12;}  // arbitrary large number
             P.poling_period = x;
             // Calculate the angle for the idler photon
             PhaseMatch.optimum_idler(P);
@@ -258,8 +259,8 @@
             return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
         };
 
-        var delK_guess = PhaseMatch.calc_delK(P);
-        var guess = 2*Math.PI/delK_guess[2];
+        var delK_guess = Math.abs(PhaseMatch.calc_delK(P)[2]);
+        var guess = 2*Math.PI/delK_guess;
 
         //finds the minimum theta
         var startTime = new Date();

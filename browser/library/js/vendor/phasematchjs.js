@@ -2012,51 +2012,27 @@ function sq( x ){
     var n_p = P.n_p;
     var n_s = P.n_s;
     var n_i = P.n_i;
-    // console.log("going into calc_delK");
-    // console.log("Index of refraction inside calc_delk", P.lambda_s, n_s, n_i, n_p);
+
     // Directions of the signal and idler photons in the pump coordinates
     var Ss = [Math.sin(P.theta_s)*Math.cos(P.phi_s), Math.sin(P.theta_s)*Math.sin(P.phi_s), Math.cos(P.theta_s)];
     var Si = [Math.sin(P.theta_i)*Math.cos(P.phi_i), Math.sin(P.theta_i)*Math.sin(P.phi_i), Math.cos(P.theta_i)];
-    // console.log("SS, SI", Ss, Si);
-    // console.log("");
+
 
     var delKx = (2*Math.PI*((n_s*Ss[0]/P.lambda_s) + n_i*Si[0]/P.lambda_i));
     var delKy = (2*Math.PI*((n_s*Ss[1]/P.lambda_s) + n_i*Si[1]/P.lambda_i));
     var delKz = (2*Math.PI*(n_p/P.lambda_p - (n_s*Ss[2]/P.lambda_s) - n_i*Si[2]/P.lambda_i));
-    delKz = delKz - 2*Math.PI/P.poling_period;
+
+    if (delKz>0){
+        delKz = delKz - 2*Math.PI/P.poling_period;
+    }
+    else{
+        delKz = delKz + 2*Math.PI/P.poling_period;
+    }
 
     return [delKx, delKy, delKz];
 
 };
 
-/*
- * calc_delK()
- * Gets the index of refraction depending on phasematching type
- * All angles in radians.
- * P is SPDC Properties object
- */
-
- PhaseMatch.calc_delK_w = function calc_delK_w (P, w_p){
-    var con = PhaseMatch.constants;
-
-    var n_s = P.n_s;
-    var n_i = P.n_i;
-    // console.log("going into calc_delK");
-    // console.log("Index of refraction inside calc_delk", P.lambda_s, n_s, n_i, n_p);
-    // Directions of the signal and idler photons in the pump coordinates
-    var Ss = [Math.sin(P.theta_s)*Math.cos(P.phi_s), Math.sin(P.theta_s)*Math.sin(P.phi_s), Math.cos(P.theta_s)];
-    var Si = [Math.sin(P.theta_i)*Math.cos(P.phi_i), Math.sin(P.theta_i)*Math.sin(P.phi_i), Math.cos(P.theta_i)];
-    // console.log("SS, SI", Ss, Si);
-    // console.log("");
-
-    var delKx = (2*Math.PI*((n_s*Ss[0]/P.lambda_s) + n_i*Si[0]/P.lambda_i));
-    var delKy = (2*Math.PI*((n_s*Ss[1]/P.lambda_s) + n_i*Si[1]/P.lambda_i));
-    var delKz = w_p/con.c - (2*Math.PI*((n_s*Ss[2]/P.lambda_s) + n_i*Si[2]/P.lambda_i));
-    delKz = delKz -2*Math.PI/P.poling_period;
-
-    return [delKx, delKy, delKz];
-
-};
 
 /*
  * optimum_idler()
@@ -2743,6 +2719,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
         var P = PhaseMatch.deep_copy(props);
 
         var find_pp = function(x){
+            if (x<0){ return 1e12;}  // arbitrary large number
             P.poling_period = x;
             // Calculate the angle for the idler photon
             PhaseMatch.optimum_idler(P);
@@ -2750,8 +2727,8 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
         };
 
-        var delK_guess = PhaseMatch.calc_delK(P);
-        var guess = 2*Math.PI/delK_guess[2];
+        var delK_guess = Math.abs(PhaseMatch.calc_delK(P)[2]);
+        var guess = 2*Math.PI/delK_guess;
 
         //finds the minimum theta
         var startTime = new Date();
