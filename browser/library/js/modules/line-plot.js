@@ -9,35 +9,40 @@ define(
     ){
         'use strict';
 
+        var defaults = {
+
+            width: 600,
+            height: 400,
+            labels: {},
+            // default autocalc
+            domain: null,
+            range: null,
+
+            margins: { top: 20, right: 20, bottom: 60, left: 50 }
+
+        };
+
         function LinePlot( options ){
 
-            options = options || {};
+            options = $.extend({}, defaults, options);
 
-            // todo use extend
-            var width = options.width || 600;
-            var height = options.height || 400;
-            
-            var margin = this.margin = options.margins ||  {top: 20, right: 20, bottom: 60, left: 50};
-            this.labels = options.labels || {};
+            this.labels = options.labels;
             this.domain = options.domain;
             this.range = options.range;
 
             this.el = $('<div>').addClass('plot line-plot').appendTo( options.el );
 
             // init scales
-            this.scales = {};
-
-            var x = this.scales.x = d3.scale.linear();
-            var y = this.scales.y = d3.scale.linear();
+            this.scales = {
+                x: d3.scale.linear(),
+                y: d3.scale.linear()
+            };
                 
             // init svg
-            var svg = this.svg = d3.select( this.el.get(0) ).append("svg");
+            this.svg = d3.select( this.el.get(0) ).append("svg");
 
-            this.svgPlot = svg.append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                ;
-
-            this.resize( width, height );
+            this.setMargins( options.margins );
+            this.resize( options.width, options.height );
 
             // function showPoint( ans ){
             //     var circle = svg.selectAll('circle').data([ ans ]);
@@ -72,6 +77,15 @@ define(
         }
 
         LinePlot.prototype = {
+
+            setMargins: function( cfg ){
+
+                var margin = this.margin = $.extend({}, this.margin, cfg);
+
+                this.svgPlot = this.svg.append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    ;
+            },
 
             resize: function( w, h ){
 
