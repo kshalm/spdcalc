@@ -11,6 +11,7 @@ define(
 
         var defaults = {
 
+            title: "Awesome Graph",
             width: 600,
             height: 600,
             labels: {
@@ -51,6 +52,14 @@ define(
                 .css('position', 'relative')
                 ;
 
+            this.elTitle = $('<label>').appendTo(this.el).css({
+                'position' : 'absolute',
+                'top' : '0',
+                'left': '0'
+            });
+
+            this.setTitle( options.title );
+
             this.svg = d3.select( this.el.get(0) ).append("svg");
             $(this.svg.node()).css({
                 'position': 'absolute',
@@ -84,6 +93,11 @@ define(
 
         HeatMap.prototype = {
 
+            setTitle: function( title ){
+
+                this.elTitle.text( title );
+            },
+
             setMargins: function( cfg ){
 
                 var margin = this.margin = $.extend({}, this.margin, cfg)
@@ -93,6 +107,12 @@ define(
 
                 this.el.css({
                     'padding': [margin.top, margin.right, margin.bottom, margin.left].join('px ') + 'px'
+                });
+
+                this.elTitle.css({
+                    'top' : margin.top,
+                    'margin-top' : '-2em',
+                    'left': margin.left
                 });
 
                 this.svgAxis.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -163,20 +183,20 @@ define(
                   .call(xAxis)
                 .append("text")
                   .attr("y", 0)
-                  .attr("dy", "3em")
+                  .attr("dy", this.margin.bottom - 16)
                   .attr("x", width/2)
-                  .style("text-anchor", "center")
+                  .style("text-anchor", "middle")
                   .text( labels.x );
 
                 svg.append("g")
                   .attr("class", "y axis")
                   .call(yAxis)
                 .append("text")
-                  .attr("transform", "rotate(90)")
-                  .attr("x", width/2)
+                  .attr("x", -width/2)
                   .attr("y", 0)
-                  .attr("dy", "3.6em")
-                  .style("text-anchor", "end")
+                  .attr("transform", "rotate(-90)")
+                  .attr("dy", -this.margin.left + 16)
+                  .style("text-anchor", "middle")
                   .text( labels.y );
 
                 var colorBarWidth = 100;

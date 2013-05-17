@@ -46,8 +46,8 @@ define(
 
                 var margins = {
                     top: 60,
-                    right: 20,
-                    left: 60,
+                    right: 40,
+                    left: 80,
                     bottom: 60
                 };
 
@@ -55,7 +55,7 @@ define(
                 self.plot = new HeatMap({
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     margins: margins,
-                    width: 520,
+                    width: 480,
                     height: 480,
                     labels: {
                         x: 'Wavelength of Signal (nm)',
@@ -74,7 +74,7 @@ define(
                         x: 'x-axis',
                         y: 'y-axis'
                     },
-                    width: 520,
+                    width: 480,
                     height: 480,
                     margins: margins,
                     domain: [ 0, 100 ],
@@ -124,7 +124,7 @@ define(
                     ,par = self.elPlot.parent()
                     ,width = par.width()
                     ,height = $(window).height()
-                    ,dim = Math.min( width, height ) - 20 // - margin
+                    ,dim = Math.min( width, height ) - 100 // - margin
                     ;
 
                 if (dim > 600){ 
