@@ -2348,17 +2348,19 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
 
     // THETA2_real = PhaseMatch.AntiTranspose(THETA1_real,dim);
     // THETA2_imag = PhaseMatch.AntiTranspose(THETA1_imag,dim);
-
+    var maxval = 0;
     for (i=0; i<N; i++){
         // arg2 = THETA2*Tosc. Split calculation to handle complex numbers
         var arg2_real = Tosc_real[i]*THETA2_real[i] - Tosc_imag[i]*THETA2_imag[i];
         var arg2_imag = Tosc_real[i]*THETA2_imag[i] + Tosc_imag[i]*THETA2_real[i];
 
-        var PM_real = (THETA1_real[i] - arg2_real)/Math.sqrt(2);
-        var PM_imag = (THETA1_imag[i] - arg2_imag)/Math.sqrt(2);
+        var PM_real = (THETA1_real[i] - arg2_real)/2;///Math.sqrt(2);
+        var PM_imag = (THETA1_imag[i] - arg2_imag)/2; //Math.sqrt(2);
 
         PM[i] = sq(PM_real) + sq(PM_imag);
+        if (PM[i] > maxval) {maxval = PM[i];}
     }
+    // console.log("Max PM value = ", maxval);
 
     return PM;
 };
@@ -2386,7 +2388,7 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 
     for (i=0; i<dim; i++){
         PM_JSA = PhaseMatch.calc_HOM_JSA(P, ls_start, ls_stop, li_start, li_stop, delT[i], npts);
-        var total = PhaseMatch.Sum(PM_JSA)/N/2;
+        var total = PhaseMatch.Sum(PM_JSA)/N;
         HOM_values[i] = total;
     }
 
