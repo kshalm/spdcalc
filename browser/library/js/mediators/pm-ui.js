@@ -306,7 +306,8 @@ define(
                 self._curr = mod;
 
                 // inject containers
-                self.elMain.empty().append( mod.getMainPanel() );
+                self.elMain.children().detach();
+                self.elMain.append( mod.getMainPanel() );
                 mod.connect( self );
 
                 self.emit('resize');
