@@ -130,19 +130,15 @@ $sidePanelCollapsed: 70px;
 }
 
 .heat-map {
-    border: 1px solid lighten($gray, 10);
+    @include box-sizing(border-box);
 }
 
-.plot.line-plot {
+.plot {
     .axis path,
     .axis line {
       fill: none;
       stroke: #000;
       shape-rendering: crispEdges;
-    }
-
-    .x.axis path {
-      display: none;
     }
 
     .line {

@@ -21,7 +21,7 @@ define(
             domain: null,
             range: null,
 
-            margins: { top: 20, right: 20, bottom: 60, left: 50 }
+            margins: { top: 20, right: 20, bottom: 60, left: 60 }
 
         };
 
@@ -43,9 +43,11 @@ define(
                 
             // init svg
             this.svg = d3.select( this.el.get(0) ).append("svg");
+            this.svgPlot = this.svg.append("g");
 
-            this.setMargins( options.margins );
+            this.margin = defaults.margins;
             this.resize( options.width, options.height );
+            this.setMargins( options.margins );
 
             // function showPoint( ans ){
             //     var circle = svg.selectAll('circle').data([ ans ]);
@@ -83,11 +85,14 @@ define(
 
             setMargins: function( cfg ){
 
-                var margin = this.margin = $.extend({}, this.margin, cfg);
-
-                this.svgPlot = this.svg.append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                var w = this.width + this.margin.left + this.margin.right
+                    ,h = this.height + this.margin.top + this.margin.bottom
+                    ,margin = this.margin = $.extend({}, this.margin, cfg)
                     ;
+
+                this.svgPlot.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                this.resize( w, h );
             },
 
             resize: function( w, h ){
@@ -102,16 +107,16 @@ define(
                     .css('height', h+'px')
                     ;
 
+                this.svg
+                    .attr("width", width)
+                    .attr("height", height)
+                    ;
+
                 width -= margin.left + margin.right;
                 height -= margin.top + margin.bottom;
 
                 this.width = width;
                 this.height = height;
-
-                this.svg
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    ;
             },
 
             refreshAxes: function(){
@@ -126,7 +131,6 @@ define(
 
                 // init axes
                 var xAxis = d3.svg.axis()
-                    .tickSubdivide(10)
                     .scale(x)
                     .orient("bottom");
 
@@ -138,7 +142,7 @@ define(
 
                 svg.append("g")
                   .attr("class", "x axis")
-                  .attr("transform", "translate(0," + height + ")")
+                  .attr("transform", "translate(0, " + height + ")")
                   .call(xAxis)
                 .append("text")
                   .attr("y", 0)
@@ -151,9 +155,10 @@ define(
                   .attr("class", "y axis")
                   .call(yAxis)
                 .append("text")
-                  .attr("transform", "rotate(-90)")
-                  .attr("y", 6)
-                  .attr("dy", "-3em")
+                  .attr("transform", "rotate(90)")
+                  .attr("x", width/2)
+                  .attr("y", 0)
+                  .attr("dy", "3.6em")
                   .style("text-anchor", "end")
                   .text( labels.y );
             },

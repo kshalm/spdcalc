@@ -44,9 +44,19 @@ define(
 
                 self.el = $( tplJSALayout.render() );
 
+                var margins = {
+                    top: 20,
+                    right: 20,
+                    left: 60,
+                    bottom: 60
+                };
+
                 // init plot
                 self.plot = new HeatMap({
-                    el: self.el.find('.heat-map-wrapper').get( 0 )
+                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    margins: margins,
+                    domain: [ 0, 100 ],
+                    range: [ 0, 100 ]
                 });
 
                 self.elPlot = $(self.plot.el);
@@ -58,6 +68,7 @@ define(
                         x: 'x-axis',
                         y: 'y-axis'
                     },
+                    margins: margins,
                     domain: [ 0, 100 ],
                     range: [ 0, 100 ]
                 });
@@ -107,7 +118,11 @@ define(
                     ,height = $(window).height()
                     ,dim = Math.min( width, height )
                     ;
-                if (dim>600){ dim = 600;}
+
+                if (dim > 600){ 
+                    dim = 600;
+                }
+
                 self.plot.resize( dim, dim );
                 self.plot1d.resize( dim, dim );
                 self.draw();
