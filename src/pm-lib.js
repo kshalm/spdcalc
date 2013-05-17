@@ -3,29 +3,6 @@
  * This is the file that will evolve into the lambda_ibrary of functions to compute phasematching.
  */
 
-/**
- * BBO indicies. This is a test object that returns the index of refraction
- * for BBO. Eventually this will be called from the crystal database, but 
- * it is useful to have here for now.
- * @class BBO
- * @param {Array} temp [description]
- */
-// PhaseMatch.BBO = function BBO (temp) {
-//     //Selmeir coefficients for nx, ny, nz
-//     this.temp = temp;
-//     // this.lambda = lambda
-// };
-
-// PhaseMatch.BBO.prototype  = {
-//     indicies:function(lambda){
-//         lambda = lambda * Math.pow(10,6); //Convert for Sellmeir Coefficients
-//         var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-//         var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
-
-//         return [no, no, ne];
-//     }
-// };
-
 
 /*
  * calc_delK()
@@ -389,71 +366,6 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
 
     return PM;
 };
-
-//  PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
-//     var con = PhaseMatch.constants;
-//     var P = PhaseMatch.deep_copy(props);
-//     var lambda_s = new Float64Array(dim);
-//     var lambda_i = new Float64Array(dim);
-
-//     var i;
-//     lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
-//     lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
-
-//     var N = dim * dim;
-//     var THETA1_real = new Float64Array( N );
-//     var THETA1_imag = new Float64Array( N );
-//     var THETA2_real  = new Float64Array( N ); // The transposed version of THETA1
-//     var THETA2_imag  = new Float64Array( N ); 
-//     var Tosc_real = new Float64Array( N ); // Real/Imag components of phase shift
-//     var Tosc_imag = new Float64Array( N );
-//     var ARG = 0;
-
-//     var PM = new Float64Array( N );
-
-    
-//     for (i=0; i<N; i++){
-//         var index_s = i % dim;
-//         var index_i = Math.floor(i / dim);
-
-//         P.lambda_s = lambda_s[index_s];
-//         P.lambda_i = lambda_i[index_i];
-//         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-
-//         PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
-//         P.calc_wbar();
-        
-//         var PMtmp = PhaseMatch.phasematch(P);
-//         THETA1_real[i] = PMtmp[0];
-//         THETA1_imag[i] = PMtmp[1];
-
-//         // THETA2_real[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[0]; //Transpose
-//         // THETA2_imag[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[1];
-
-//         ARG = 2*Math.PI*con.c *(1/P.lambda_s - 1/P.lambda_i)*delT;
-//         Tosc_real[i] = Math.cos(ARG);
-//         Tosc_imag[i] = Math.sin(ARG);
-//         // Tosc_real[i] = 1;
-//         // Tosc_imag[i] = 0;
-//     }
-
-//     THETA2_real = PhaseMatch.AntiTranspose(THETA1_real,dim);
-//     THETA2_imag = PhaseMatch.AntiTranspose(THETA1_imag,dim);
-
-//     for (i=0; i<N; i++){
-//         // arg2 = THETA2*Tosc. Split calculation to handle complex numbers
-//         var arg2_real = Tosc_real[i]*THETA2_real[i] - Tosc_imag[i]*THETA2_imag[i];
-//         var arg2_imag = Tosc_real[i]*THETA2_imag[i] + Tosc_imag[i]*THETA2_real[i];
-
-//         var PM_real = (THETA1_real[i] - arg2_real)/Math.sqrt(2);
-//         var PM_imag = (THETA1_imag[i] - arg2_imag)/Math.sqrt(2);
-
-//         PM[i] = sq(PM_real) + sq(PM_imag);
-//     }
-
-//     return PM;
-// };
-
 
 /*
  * calc_HOM_scan()

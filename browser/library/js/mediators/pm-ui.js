@@ -135,13 +135,21 @@ define(
                     }
                 });
 
-                self.parameters.on('change', function( key ){
+                self.parameters.on({
+                    'change': function( key ){
 
-                    if (!self.autocalc){
-                        return;
+                        if (!self.autocalc){
+                            return;
+                        }
+                        self.emit('calculate');
+                    },
+                    'change:xtal': function( val ){
+
+                        if (!self.autocalc){
+                            return;
+                        }
+                        self.emit('calculate');
                     }
-
-                    self.emit('calculate');
                 });
 
                 self.parameters.on('refresh', function(){

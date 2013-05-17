@@ -19,7 +19,7 @@
 
         <div class="control-group">
             <select id="crystal-dropdown" name="xtal" class="span3">
-                {{~it.crystalNames :value:index}}
+                {{~it.crystal_Names :value:index}}
                 <option value="{{=value}}" {{? value===it.crystal.name}} selected="selected" {{?}}>{{=value}}</option>
                 {{~}}
             </select>

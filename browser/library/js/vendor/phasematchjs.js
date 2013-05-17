@@ -2000,30 +2000,6 @@ function sq( x ){
       return true;
     };
 })();
-/**
- * BBO indicies. This is a test object that returns the index of refraction
- * for BBO. Eventually this will be called from the crystal database, but 
- * it is useful to have here for now.
- * @class BBO
- * @param {Array} temp [description]
- */
-// PhaseMatch.BBO = function BBO (temp) {
-//     //Selmeir coefficients for nx, ny, nz
-//     this.temp = temp;
-//     // this.lambda = lambda
-// };
-
-// PhaseMatch.BBO.prototype  = {
-//     indicies:function(lambda){
-//         lambda = lambda * Math.pow(10,6); //Convert for Sellmeir Coefficients
-//         var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-//         var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
-
-//         return [no, no, ne];
-//     }
-// };
-
-
 /*
  * calc_delK()
  * Gets the index of refraction depending on phasematching type
@@ -2387,71 +2363,6 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
     return PM;
 };
 
-//  PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
-//     var con = PhaseMatch.constants;
-//     var P = PhaseMatch.deep_copy(props);
-//     var lambda_s = new Float64Array(dim);
-//     var lambda_i = new Float64Array(dim);
-
-//     var i;
-//     lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
-//     lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
-
-//     var N = dim * dim;
-//     var THETA1_real = new Float64Array( N );
-//     var THETA1_imag = new Float64Array( N );
-//     var THETA2_real  = new Float64Array( N ); // The transposed version of THETA1
-//     var THETA2_imag  = new Float64Array( N ); 
-//     var Tosc_real = new Float64Array( N ); // Real/Imag components of phase shift
-//     var Tosc_imag = new Float64Array( N );
-//     var ARG = 0;
-
-//     var PM = new Float64Array( N );
-
-    
-//     for (i=0; i<N; i++){
-//         var index_s = i % dim;
-//         var index_i = Math.floor(i / dim);
-
-//         P.lambda_s = lambda_s[index_s];
-//         P.lambda_i = lambda_i[index_i];
-//         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-
-//         PhaseMatch.optimum_idler(P); //Need to find the optimum idler.
-//         P.calc_wbar();
-        
-//         var PMtmp = PhaseMatch.phasematch(P);
-//         THETA1_real[i] = PMtmp[0];
-//         THETA1_imag[i] = PMtmp[1];
-
-//         // THETA2_real[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[0]; //Transpose
-//         // THETA2_imag[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[1];
-
-//         ARG = 2*Math.PI*con.c *(1/P.lambda_s - 1/P.lambda_i)*delT;
-//         Tosc_real[i] = Math.cos(ARG);
-//         Tosc_imag[i] = Math.sin(ARG);
-//         // Tosc_real[i] = 1;
-//         // Tosc_imag[i] = 0;
-//     }
-
-//     THETA2_real = PhaseMatch.AntiTranspose(THETA1_real,dim);
-//     THETA2_imag = PhaseMatch.AntiTranspose(THETA1_imag,dim);
-
-//     for (i=0; i<N; i++){
-//         // arg2 = THETA2*Tosc. Split calculation to handle complex numbers
-//         var arg2_real = Tosc_real[i]*THETA2_real[i] - Tosc_imag[i]*THETA2_imag[i];
-//         var arg2_imag = Tosc_real[i]*THETA2_imag[i] + Tosc_imag[i]*THETA2_real[i];
-
-//         var PM_real = (THETA1_real[i] - arg2_real)/Math.sqrt(2);
-//         var PM_imag = (THETA1_imag[i] - arg2_imag)/Math.sqrt(2);
-
-//         PM[i] = sq(PM_real) + sq(PM_imag);
-//     }
-
-//     return PM;
-// };
-
-
 /*
  * calc_HOM_scan()
  * Calculates the HOM probability of coincidences over range of times.
@@ -2642,8 +2553,8 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.useguassianapprox = false;
-            this.crystalNames = PhaseMatch.CrystalDBKeys;
-            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[1]];
+            this.crystal_Names = PhaseMatch.CrystalDBKeys;
+            this.crystal = PhaseMatch.CrystalDB[this.crystal_Names[1]];
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -2943,6 +2854,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
+    console.log("Calculating JSA");
     var P = PhaseMatch.deep_copy(props);
     PhaseMatch.update_all_angles(P);
 
@@ -2982,6 +2894,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
+    PhaseMatch.update_all_angles(P);
 
     var i;
     var X = PhaseMatch.linspace(x_start, x_stop, dim);
@@ -3029,7 +2942,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start, t_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
-
+    PhaseMatch.update_all_angles(P);
     var i;
     var lambda_s = PhaseMatch.linspace(l_start, l_stop, dim);
     var theta_s = PhaseMatch.linspace(t_stop, t_start, dim); 
@@ -3065,6 +2978,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
+    PhaseMatch.update_all_angles(P);
 
     var i;
     var theta = PhaseMatch.linspace(t_start, t_stop, dim);

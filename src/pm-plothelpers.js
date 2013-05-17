@@ -4,6 +4,7 @@
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
+    console.log("Calculating JSA");
     var P = PhaseMatch.deep_copy(props);
     PhaseMatch.update_all_angles(P);
 
@@ -43,6 +44,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
+    PhaseMatch.update_all_angles(P);
 
     var i;
     var X = PhaseMatch.linspace(x_start, x_stop, dim);
@@ -90,7 +92,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start, t_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
-
+    PhaseMatch.update_all_angles(P);
     var i;
     var lambda_s = PhaseMatch.linspace(l_start, l_stop, dim);
     var theta_s = PhaseMatch.linspace(t_stop, t_start, dim); 
@@ -126,6 +128,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
+    PhaseMatch.update_all_angles(P);
 
     var i;
     var theta = PhaseMatch.linspace(t_start, t_stop, dim);

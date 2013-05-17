@@ -63,8 +63,8 @@
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.useguassianapprox = false;
-            this.crystalNames = PhaseMatch.CrystalDBKeys;
-            this.crystal = PhaseMatch.CrystalDB[this.crystalNames[1]];
+            this.crystal_Names = PhaseMatch.CrystalDBKeys;
+            this.crystal = PhaseMatch.CrystalDB[this.crystal_Names[1]];
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
