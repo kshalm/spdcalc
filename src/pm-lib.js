@@ -157,7 +157,7 @@ PhaseMatch.phasematch = function phasematch (P){
     var PMz = Math.sin(arg)/arg; //* Math.exp(1j*arg)
     var PMz_real = 0;
     var PMz_imag = 0;
-    if (P.useguassianapprox){
+    if (P.use_guassian_approx){
         // console.log('approx');
         PMz_real = Math.exp(-0.193*sq(arg));
         PMz_imag = 0;
@@ -446,7 +446,7 @@ PhaseMatch.linspace = function linspace(xstart,xstop,npts){
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     var P = PhaseMatch.deep_copy(props);
     //eliminates sinc side lobes which cause problems.
-    P.useguassianapprox = true;
+    P.use_guassian_approx = true;
 
     var lambda_limit = function(lambda_s){
         P.lambda_s = lambda_s;

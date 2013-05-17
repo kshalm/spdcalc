@@ -2153,7 +2153,7 @@ PhaseMatch.phasematch = function phasematch (P){
     var PMz = Math.sin(arg)/arg; //* Math.exp(1j*arg)
     var PMz_real = 0;
     var PMz_imag = 0;
-    if (P.useguassianapprox){
+    if (P.use_guassian_approx){
         // console.log('approx');
         PMz_real = Math.exp(-0.193*sq(arg));
         PMz_imag = 0;
@@ -2442,7 +2442,7 @@ PhaseMatch.linspace = function linspace(xstart,xstop,npts){
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     var P = PhaseMatch.deep_copy(props);
     //eliminates sinc side lobes which cause problems.
-    P.useguassianapprox = true;
+    P.use_guassian_approx = true;
 
     var lambda_limit = function(lambda_s){
         P.lambda_s = lambda_s;
@@ -2534,8 +2534,8 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             this.lambda_p = 775 * con.nm;
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
-            this.Types = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.Types[2];
+            this.PM_type_names = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
+            this.Type = this.PM_type_names[2];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
@@ -2552,7 +2552,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             this.poling_period = 1000000;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
-            this.useguassianapprox = false;
+            this.use_guassian_approx = false;
             this.crystal_Names = PhaseMatch.CrystalDBKeys;
             this.crystal = PhaseMatch.CrystalDB[this.crystal_Names[1]];
             this.temp = 20;
@@ -2655,26 +2655,6 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
                 default:
                     throw "Error: bad PMType specified";
             }
-
-            // switch (Type){
-            //     case this.Types[0]:
-            //         n = nfast;
-            //     break;
-            //     case this.Types[1]:
-            //         if (photon === "pump") { n = nslow;}
-            //         else { n = nfast;}
-            //     break;
-            //     case this.Types[2]:
-            //         if (photon === "idler") { n = nfast;}
-            //         else {n = nslow;}
-            //     break;
-            //     case this.Types[3]:
-            //         if (photon === "signal") { n = nfast;}
-            //         else {n = nslow;}
-            //     break;
-            //     default:
-            //         throw "Error: bad PMType specified";
-            // }
 
             return n ;
         },
