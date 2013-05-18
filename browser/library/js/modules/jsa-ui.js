@@ -61,8 +61,8 @@ define(
                         x: 'Wavelength of Signal (nm)',
                         y: 'Wavelength of Idler (nm)'
                     },
-                    domain: [ 0, 200 ],
-                    range: [ 0, 100 ],
+                    xrange: [ 0, 200 ],
+                    yrange: [ 0, 100 ],
                     format: '.0f'
                 });
 
@@ -78,7 +78,7 @@ define(
                     width: 480,
                     height: 480,
                     margins: margins,
-                    domain: [ 0, 100 ],
+                    xyrange: [ 0, 100 ],
                     range: [ 0, 100 ],
                     format: '.0f'
                 });
@@ -175,8 +175,9 @@ define(
                     ;
 
                 self.data = PM;
-                self.plot.setRange([l_start/1e-9, l_stop/1e-9]);
-                self.plot.setDomain([l_start/1e-9, l_stop/1e-9]);
+                // multiplication is faster than division
+                self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
+                self.plot.setYRange([l_start * 1e9, l_stop * 1e9]);
 
                 // get sin wave data
                 for ( var i = 0, l = 100; i < l; i += 0.1 ){

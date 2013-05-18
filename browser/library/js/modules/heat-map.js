@@ -24,10 +24,12 @@ define(
                 left: 80,
                 bottom: 60
             },
-            domain: [0, 1],
-            range: [0, 1],
+            xrange: [0, 1],
+            yrange: [0, 1],
             // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
             format: null,
+
+            // use a d3 scale to control the color mapping
             colorScale: d3.scale.linear()
                 .domain([0, 1])
                 .range(["hsl(210, 100%, 100%)", "hsl(210, 29%, 29%)"])
@@ -76,8 +78,8 @@ define(
 
             // init scales
             this.scales = {
-                x: d3.scale.linear().domain( options.domain ),
-                y: d3.scale.linear().domain( options.range ),
+                x: d3.scale.linear().domain( options.xrange ),
+                y: d3.scale.linear().domain( options.yrange ),
                 z: options.colorScale
             };
 
@@ -140,16 +142,16 @@ define(
             },
 
             // these only make cosmetic changes...
-            setDomain: function( domainArray ){
+            setXRange: function( xrangeArr ){
 
-                this.scales.x.domain( domainArray );
+                this.scales.x.domain( xrangeArr );
                 this.refreshAxes();
             },
 
-            setRange: function( rangeArray ){
+            setYRange: function( yrangeArr ){
 
                 // yes, it should be domain here. not range
-                this.scales.y.domain( rangeArray );
+                this.scales.y.domain( yrangeArr );
                 this.refreshAxes();
             },
 

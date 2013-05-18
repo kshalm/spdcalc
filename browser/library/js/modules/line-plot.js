@@ -19,8 +19,8 @@ define(
                 y: 'Y axis label'
             },
             // default autocalc
-            domain: null,
-            range: null,
+            xrange: null,
+            yrange: null,
 
             margins: {
                 top: 60,
@@ -39,8 +39,8 @@ define(
             options = $.extend({}, defaults, options);
 
             this.labels = options.labels;
-            this.domain = options.domain;
-            this.range = options.range;
+            this.xrange = options.xrange;
+            this.yrange = options.yrange;
             this.format = options.format;
 
             this.el = $('<div>')
@@ -209,11 +209,11 @@ define(
                     ,line
                     ;
 
-                x.domain( this.domain || d3.extent(data, function(d) { return d.x; }))
+                x.domain( this.xrange || d3.extent(data, function(d) { return d.x; }))
                  .range([0, width])
                  ;
 
-                y.domain( this.range || d3.extent(data, function(d) { return d.y; }))
+                y.domain( this.yrange || d3.extent(data, function(d) { return d.y; }))
                  .range([height, 0])
                  ;
 
