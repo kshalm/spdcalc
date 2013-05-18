@@ -12,17 +12,17 @@ define(
         var defaults = {
 
             title: "Awesome Graph",
-            width: 600,
-            height: 600,
+            width: 480,
+            height: 480,
             labels: {
                 x: 'X axis label',
                 y: 'Y axis label'
             },
             margins: {
-                top: 20,
-                right: 20,
-                bottom: 50,
-                left: 50
+                top: 60,
+                right: 40,
+                left: 80,
+                bottom: 60
             },
             domain: [0, 1],
             range: [0, 1],

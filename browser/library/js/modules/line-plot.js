@@ -12,8 +12,8 @@ define(
         var defaults = {
 
             title: "Awesome Graph",
-            width: 600,
-            height: 400,
+            width: 480,
+            height: 480,
             labels: {
                 x: 'X axis label',
                 y: 'Y axis label'
@@ -22,7 +22,12 @@ define(
             domain: null,
             range: null,
 
-            margins: { top: 20, right: 20, bottom: 60, left: 60 },
+            margins: {
+                top: 60,
+                right: 40,
+                left: 80,
+                bottom: 60
+            },
 
             // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
             format: null
