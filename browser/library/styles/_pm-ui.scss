@@ -133,6 +133,12 @@ $sidePanelCollapsed: 70px;
 }
 
 .plot {
+
+    .title {
+        font-size: 2em;
+        width: auto;
+    }
+
     .axis path,
     .axis line {
       fill: none;

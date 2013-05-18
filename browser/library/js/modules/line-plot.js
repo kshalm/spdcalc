@@ -44,7 +44,7 @@ define(
                 .appendTo( options.el )
                 ;
 
-            this.elTitle = $('<label>').appendTo(this.el).css({
+            this.elTitle = $('<label>').addClass('title').appendTo(this.el).css({
                 'position' : 'absolute',
                 'top' : '0',
                 'left' : '0'
@@ -115,7 +115,7 @@ define(
                 this.svgPlot.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
                 this.elTitle.css({
                     'top' : margin.top,
-                    'margin-top' : '-2em',
+                    'margin-top' : '-1.6em',
                     'left': margin.left
                 });
 

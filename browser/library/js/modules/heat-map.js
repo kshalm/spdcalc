@@ -27,18 +27,14 @@ define(
             domain: [0, 1],
             range: [0, 1],
             // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
-            format: null
+            format: null,
+            colorScale: d3.scale.linear()
+                .domain([0, 1])
+                .range(["hsl(210, 100%, 100%)", "hsl(210, 29%, 29%)"])
+                .interpolate(d3.interpolateLab)
         };
 
-        var scale = d3.scale.linear()
-            .domain([0, 1])
-            // .range(["hsl(210, 29%, 29%)", "hsl(210, 100%, 100%)"])
-            .range(["hsl(210, 100%, 100%)", "hsl(210, 29%, 29%)"])
-            // .range(["white", "steelblue"])
-            .interpolate(d3.interpolateLab)
-            ;
-
-        function defaultColorMap( val ){
+        function defaultColorScale( val ){
 
             return d3.rgb(scale( val ));
         }
@@ -55,7 +51,7 @@ define(
                 .css('position', 'relative')
                 ;
 
-            this.elTitle = $('<label>').appendTo(this.el).css({
+            this.elTitle = $('<label>').addClass('title').appendTo(this.el).css({
                 'position' : 'absolute',
                 'top' : '0',
                 'left': '0'
@@ -78,12 +74,11 @@ define(
             this.el.append( $(this.canvas).css('zIndex', 1).css('position', 'relative') );
             this.hiddenCanvas = document.createElement('canvas');
 
-            this.setColorMap( options.colorMap );
-
             // init scales
             this.scales = {
                 x: d3.scale.linear().domain( options.domain ),
-                y: d3.scale.linear().domain( options.range )
+                y: d3.scale.linear().domain( options.range ),
+                z: options.colorScale
             };
 
             this.margin = defaults.margins;
@@ -114,7 +109,7 @@ define(
 
                 this.elTitle.css({
                     'top' : margin.top,
-                    'margin-top' : '-2em',
+                    'margin-top' : '-1.6em',
                     'left': margin.left
                 });
 
@@ -164,6 +159,7 @@ define(
                     ,svg = this.svgAxis
                     ,x = this.scales.x
                     ,y = this.scales.y
+                    ,z = this.scales.z
                     ,labels = this.labels
                     ,width = this.width
                     ,height = this.height
@@ -206,23 +202,36 @@ define(
 
                 var colorBarWidth = 100;
                 var colorBarHeight = 32;
-                var colorBarVals = d3.range( 0, 1, 0.01 );
+                var dom = z.domain();
+                var colorBarVals = d3.range( dom[0], dom[1], 0.01 );
                 var xColorBar = d3.scale.ordinal()
                     .domain( colorBarVals )
                     .rangeRoundBands([0, colorBarWidth])
                     ;
 
-                svg.append("g").attr("class", "z axis").attr('transform', 'translate('+[width-colorBarWidth, -colorBarHeight].join(',')+')')
-                    .selectAll('rect')
+                var colorbar = svg.append("g").attr("class", "z axis")
+                    .attr('transform', 'translate('+[width-colorBarWidth, -colorBarHeight].join(',')+')')
+                    ;
+
+                colorbar.selectAll('rect')
                     .data(colorBarVals)
-                    .enter()
+                   .enter()
                     .append("rect")
                     .attr("x", xColorBar)
                     .attr("width", xColorBar.rangeBand())
                     .attr("height", colorBarHeight)
                     .style("fill", function( v ){
-                        return self.colorMap( v ).toString();
+                        return z( v );
                     });
+
+                var zAxis = d3.svg.axis()
+                    .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
+                    .tickValues( dom )
+                    .tickSubdivide(1)
+                    .tickFormat( d3.format( this.format ) )
+                    .orient("top");
+
+                colorbar.call(zAxis);
             },
 
             getCanvas: function(){
@@ -230,15 +239,16 @@ define(
                 return this.canvas;
             },
 
-            setColorMap: function( fn ){
+            setColorScale: function( fn ){
 
-                this.colorMap = fn || defaultColorMap;
+                this.scales.z = fn || defaults.colorScale;
+                this.refreshAxes();
             },
 
             makeImageData: function( width, height, data ){
 
                 var img = this.hiddenCtx.getImageData(0, 0, width, height)
-                    ,colorMap = this.colorMap
+                    ,colorScale = this.scales.z
                     ,val
                     ,idx
                     ,color
@@ -249,7 +259,7 @@ define(
                 for ( var i = 0, l = data.length; i < l; ++i ){
                             
                     val = data[ i ];
-                    color = colorMap( val );
+                    color = d3.rgb(colorScale( val ));
                     idx = 4 * i;
                     img.data[ idx ] = color.r; //red
                     img.data[ idx + 1 ] = color.g; //green
