@@ -6,7 +6,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     // PhaseMatch.updateallangles(props);
     console.log("Calculating JSA");
     var P = PhaseMatch.deep_copy(props);
-    PhaseMatch.update_all_angles(P);
+    props.update_all_angles(P);
 
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
@@ -26,7 +26,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
+        P.optimum_idler(P); //Need to find the optimum idler for each angle.
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
 
@@ -44,7 +44,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
-    PhaseMatch.update_all_angles(P);
+    props.update_all_angles(P);
 
     var i;
     var X = PhaseMatch.linspace(x_start, x_stop, dim);
@@ -71,11 +71,11 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        // PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
-        // PhaseMatch.brute_force_theta_i(P); //use a search. could be time consuming.
+        // P.optimum_idler(P); //Need to find the optimum idler for each angle.
+        // P.brute_force_theta_i(P); //use a search. could be time consuming.
 
         //calculate the correct idler angle analytically.
-        PhaseMatch.optimum_idler(P);
+        P.optimum_idler(P);
 
         // P.calc_wbar();
         
@@ -92,7 +92,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start, t_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
-    PhaseMatch.update_all_angles(P);
+    props.update_all_angles(P);
     var i;
     var lambda_s = PhaseMatch.linspace(l_start, l_stop, dim);
     var theta_s = PhaseMatch.linspace(t_stop, t_start, dim); 
@@ -112,7 +112,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        PhaseMatch.optimum_idler(P); //Need to find the optimum idler for each angle.
+        P.optimum_idler(P); //Need to find the optimum idler for each angle.
         // P.calc_wbar();
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
@@ -128,7 +128,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
     var P = PhaseMatch.deep_copy(props);
-    PhaseMatch.update_all_angles(P);
+    props.update_all_angles(P);
 
     var i;
     var theta = PhaseMatch.linspace(t_start, t_stop, dim);
@@ -151,7 +151,7 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
         //calcualte the correct idler angle analytically.
-        PhaseMatch.optimum_idler(P);
+        P.optimum_idler(P);
         // P.calc_wbar();
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
