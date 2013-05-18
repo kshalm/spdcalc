@@ -62,7 +62,8 @@ define(
                         y: 'Wavelength of Idler (nm)'
                     },
                     domain: [ 0, 200 ],
-                    range: [ 0, 100 ]
+                    range: [ 0, 100 ],
+                    format: '.0f'
                 });
 
                 self.elPlot = $(self.plot.el);
@@ -78,7 +79,8 @@ define(
                     height: 480,
                     margins: margins,
                     domain: [ 0, 100 ],
-                    range: [ 0, 100 ]
+                    range: [ 0, 100 ],
+                    format: '.0f'
                 });
 
                 self.elPlot1d = $(self.plot1d.el);

@@ -25,7 +25,9 @@ define(
                 left: 50
             },
             domain: [0, 1],
-            range: [0, 1]
+            range: [0, 1],
+            // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
+            format: null
         };
 
         var scale = d3.scale.linear()
@@ -45,6 +47,7 @@ define(
 
             options = $.extend({}, defaults, options);
             this.labels = options.labels;
+            this.format = options.format;
 
             this.el = $('<div>')
                 .addClass('plot heat-map')
@@ -169,10 +172,12 @@ define(
                 // init axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
+                    .tickFormat( d3.format( this.format ) )
                     .orient("bottom");
 
                 var yAxis = d3.svg.axis()
                     .scale(y)
+                    .tickFormat( d3.format( this.format ) )
                     .orient("left");
 
                 svg.selectAll('.axis').remove();

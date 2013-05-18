@@ -22,7 +22,10 @@ define(
             domain: null,
             range: null,
 
-            margins: { top: 20, right: 20, bottom: 60, left: 60 }
+            margins: { top: 20, right: 20, bottom: 60, left: 60 },
+
+            // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
+            format: null
 
         };
 
@@ -33,6 +36,7 @@ define(
             this.labels = options.labels;
             this.domain = options.domain;
             this.range = options.range;
+            this.format = options.format;
 
             this.el = $('<div>')
                 .css('position', 'relative')
@@ -157,10 +161,12 @@ define(
                 // init axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
+                    .tickFormat( d3.format( this.format ) )
                     .orient("bottom");
 
                 var yAxis = d3.svg.axis()
                     .scale(y)
+                    .tickFormat( d3.format( this.format ) )
                     .orient("left");
 
                 svg.selectAll('.axis').remove();
