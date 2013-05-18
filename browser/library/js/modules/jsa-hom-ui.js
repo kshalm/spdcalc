@@ -18,6 +18,8 @@ define(
 
         'use strict';
 
+        var delTConversion = 1e-15;
+
 
         var con = PhaseMatch.constants;
         var defaults = {
@@ -62,12 +64,12 @@ define(
                     change: function(){
 
                         // set local prop and convert
-                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * 1e-15 );
+                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * delTConversion );
                     },
                     slide: function(){
 
                         // set local prop and convert
-                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * 1e-15 );
+                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * delTConversion );
                     }
                 });
 
@@ -88,6 +90,8 @@ define(
                 // internal events
                 var to;
                 self.on('change:delT', function( delT ){
+
+                    self.refreshLine( delT );
                     
                     clearTimeout( to );
                     to = setTimeout(function(){
@@ -140,7 +144,10 @@ define(
                     ,height = $(window).height()
                     ,dim = Math.min( width, height )
                     ;
-                if (dim>600){ dim = 600;}
+                
+                // maximum value of 600
+                dim = Math.min(600, dim);
+
                 self.plot.resize( dim, dim );
                 self.plot1d.resize( dim, dim/2 );
                 self.draw();
@@ -155,6 +162,7 @@ define(
                 var self = this;
                 self.calc( self.parameters.getProps() );
                 self.draw();
+                self.refreshLine( self.get('delT') );
             },
 
             refreshJSA: function(){
@@ -162,6 +170,36 @@ define(
                 var self = this;
                 self.calc_HOM_JSA( self.parameters.getProps() );
                 self.draw();
+            },
+
+            // refresh the vertical line on the line-plot
+            refreshLine: function( delT ){
+
+                var self = this
+                    ,line = self.plot1d.svgPlot
+                        .selectAll('.vline')
+                        .data([ delT ])
+                    ,y = self.plot1d.scales.y
+                    ,dom = y.domain()
+                    ;
+
+                // create
+                line.enter()
+                    .append('rect')
+                    .attr("class", 'vline')
+                    .attr("width", 2)
+                    // this measurement is awkward...
+                    .attr("height", (y(dom[0]) - y(dom[1])) / 2)
+                    .style("fill", 'red')
+                    ;
+
+                line.attr('x', function(d) {
+                        
+                        return self.plot1d.scales.x( d / delTConversion );
+                    })
+                    ;
+
+                line.exit().remove();
             },
 
             calc: function( props ){
