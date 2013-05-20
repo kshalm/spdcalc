@@ -78,15 +78,6 @@
 
             this.msg = "";
 
-            // this.wbar_pump = 2*Math.PI*con.c/this.lambda_p * this.n_p;
-            // this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
-            // this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
-
-            // wbar = 2*pi*con.c *n_p0/pump
-//     wbar_s =  2*pi*con.c *n_s0/(2*pump)
-//     wbar_i = 2*pi*con.c *n_i0/(2*pump)
-
-
         },
             // this.autocalcTheta = false;
             // this.calc_theta= function(){
@@ -172,7 +163,7 @@
 
         set_crystal : function (k){
             this.crystal = PhaseMatch.CrystalDB[k];
-            var ind = this.crystal.indicies(this.lambda_p, this.temp);
+            // var ind = this.crystal.indicies(this.lambda_p, this.temp);
         },
 
         update_all_angles : function (){
@@ -192,6 +183,22 @@
            
             // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
+        },
+
+        get_group_velocity : function(lambda, Type, S, photon){
+            // var props = this;
+            var con = PhaseMatch.constants;
+            var bw = 1e-11; 
+            // var P = PhaseMatch.deep_copy(props);
+            
+            var n1 = this.calc_Index_PMType(lambda - bw, Type, S, photon);
+            var n2 = this.calc_Index_PMType(lambda + bw, Type, S, photon);
+            
+            var dn = (n2 - n1)/(2*bw);
+
+            var gv = con.c/(n1 - lambda*dn);
+
+            return gv;
         },
 
         auto_calc_Theta : function (){
@@ -327,6 +334,7 @@
     PhaseMatch.deep_copy = function deep_copy(props){
         var P = new PhaseMatch.SPDCprop();
         P.crystal = props.crystal;
+        P.temp = PhaseMatch.util.clone(props.temp,true);
         P.lambda_p = PhaseMatch.util.clone(props.lambda_p,true);
         P.lambda_s = PhaseMatch.util.clone(props.lambda_s,true);
         P.lambda_i = PhaseMatch.util.clone(props.lambda_i,true);

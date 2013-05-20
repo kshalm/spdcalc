@@ -64,12 +64,12 @@ define(
                     change: function(){
 
                         // set local prop and convert
-                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * delTConversion );
+                        self.set( 'delT', (parseFloat(self.eldelT.slider( 'value' )) * delTConversion ));
                     },
                     slide: function(){
 
                         // set local prop and convert
-                        self.set( 'delT', parseFloat(self.eldelT.slider( 'value' )) * delTConversion );
+                        self.set( 'delT', (parseFloat(self.eldelT.slider( 'value' )) * delTConversion ));
                     }
                 });
 
@@ -80,8 +80,9 @@ define(
                     el: self.el.get(0),
                     labels: {
                         x: 'x-axis',
-                        y: 'y-axis'
-                    }
+                        y: 'y-axis',
+                    },
+                    yrange: [0,.65]
                 });
 
                 self.elPlot1d = $(self.plot1d.el);
@@ -183,18 +184,20 @@ define(
                     ,dom = y.domain()
                     ;
 
+                // console.log("dom", dom)
+
                 // create
                 line.enter()
                     .append('rect')
                     .attr("class", 'vline')
                     .attr("width", 2)
                     // this measurement is awkward...
-                    .attr("height", (y(dom[0]) - y(dom[1])) / 2)
+                    .attr("height", Math.abs(y(dom[0]) - y(dom[1])) / 3)
                     .style("fill", 'red')
                     ;
 
                 line.attr('x', function(d) {
-                        
+                        console.log("x", d);
                         return self.plot1d.scales.x( d / delTConversion );
                     })
                     ;
@@ -212,14 +215,25 @@ define(
                 // var l_stop = 1600 * con.nm; 
                 var threshold = 0.5;
                 var lsi = PhaseMatch.autorange_lambda(props, threshold);
-                var l_start = Math.min(lsi[0], lsi[1]);
-                var l_stop =  Math.max(lsi[0], lsi[1]);
+                var l_start = Math.min(lsi[0], lsi[1], lsi[2], lsi[3]);
+                var l_stop =  Math.max(lsi[0], lsi[1], lsi[2], lsi[3]);
+
+                var tsi = PhaseMatch.autorange_delT(props, l_start, l_stop);
+                var t_start = tsi[1];
+                var t_stop = tsi[2];
+
+                self.set_slider_values(tsi[0], tsi[1],tsi[2]);
+
                 var data1d = [];
                 var delT = self.get('delT');
 
                 var self = this
                     ,PM = PhaseMatch.calc_HOM_JSA(
                         props, 
+                        // lsi[0], 
+                        // lsi[1], 
+                        // lsi[2],
+                        // lsi[3],
                         l_start, 
                         l_stop, 
                         l_start,
@@ -230,10 +244,14 @@ define(
                     ;
 
                 self.data = PM;
+                self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
+                self.plot.setYRange([l_start * 1e9, l_stop * 1e9]);
+                // self.plot.setXRange([lsi[0] * 1e9, lsi[1] * 1e9]);
+                // self.plot.setYRange([lsi[2] * 1e9, lsi[3] * 1e9]);
 
                 // Hong-Ou-Mandel dip
-                var t_start = -800e-15;
-                var t_stop = 800e-15;
+                // var t_start = 0e-15;
+                // var t_stop = 10000e-15;
                 var delT = PhaseMatch.linspace(t_start, t_stop, dim);
                 var HOM = PhaseMatch.calc_HOM_scan(props, t_start, t_stop, l_start, l_stop, l_start, l_stop, dim);
                 for ( var i = 0, l = HOM.length; i < l; i ++){
@@ -244,7 +262,20 @@ define(
                 }
 
                 self.data1d = data1d;
+            },
 
+            set_slider_values: function(zero_delay, t_start, t_stop){
+                var self = this;
+                // console.log("set slider values", self.eldelT.slider);
+                // @TODO Krister: Noticed a weird bug where using self.set to change "delT" causes the red line to
+                // disappear for any value other than 0.
+                self.eldelT.slider({
+                    min: Math.round(t_start/1e-15),
+                    max: Math.round(t_stop/1e-15)
+                    // value: Math.round(0/1e-15)
+                    // value: Math.round(zero_delay/1e-15)
+                });
+                // self.set('delT', zero_delay);
             },
 
             calc_HOM_JSA: function( props ){
@@ -257,14 +288,20 @@ define(
                 // var l_stop = 1600 * con.nm; 
                 var threshold = 0.5;
                 var lsi = PhaseMatch.autorange_lambda(props, threshold);
-                var l_start = Math.min(lsi[0], lsi[1]);
-                var l_stop =  Math.max(lsi[0], lsi[1]);
+                // var l_start = Math.min(lsi[0], lsi[1]);
+                // var l_stop =  Math.max(lsi[0], lsi[1]);
+                var l_start = Math.min(lsi[0], lsi[1], lsi[2], lsi[3]);
+                var l_stop =  Math.max(lsi[0], lsi[1], lsi[2], lsi[3]);
                 // var data1d = [];
                 var delT = self.get('delT');
 
                 var self = this
                     ,PM = PhaseMatch.calc_HOM_JSA(
-                        props, 
+                        props,
+                        // lsi[0], 
+                        // lsi[1], 
+                        // lsi[2],
+                        // lsi[3], 
                         l_start, 
                         l_stop, 
                         l_start,
@@ -275,6 +312,10 @@ define(
                     ;
 
                 self.data = PM;
+                self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
+                self.plot.setYRange([l_start * 1e9, l_stop * 1e9]);
+                // self.plot.setXRange([lsi[0] * 1e9, lsi[1] * 1e9]);
+                // self.plot.setYRange([lsi[2] * 1e9, lsi[3] * 1e9]);
 
             },
 

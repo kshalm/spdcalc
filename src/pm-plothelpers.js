@@ -4,7 +4,7 @@
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
-    console.log("Calculating JSA");
+    console.log("Calculating JSA", props.temp);
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
 

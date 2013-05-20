@@ -79,7 +79,7 @@ define(
                     height: 480,
                     margins: margins,
                     xyrange: [ 0, 100 ],
-                    range: [ 0, 100 ],
+                    yrange: [ 0, 100 ],
                     format: '.0f'
                 });
 
@@ -168,8 +168,8 @@ define(
                         props, 
                         l_start, 
                         l_stop, 
-                        l_start,
-                        l_stop, 
+                        lsi[2],
+                        lsi[3], 
                         dim
                     )
                     ;
@@ -177,7 +177,7 @@ define(
                 self.data = PM;
                 // multiplication is faster than division
                 self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
-                self.plot.setYRange([l_start * 1e9, l_stop * 1e9]);
+                self.plot.setYRange([lsi[2] * 1e9, lsi[3] * 1e9]);
 
                 // get sin wave data
                 for ( var i = 0, l = 100; i < l; i += 0.1 ){

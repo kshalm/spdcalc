@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-18
+ * phasematchjs v0.0.1a - 2013-05-20
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2036,30 +2036,6 @@ function sq( x ){
 
 
 /*
- * optimum_idler()
- * Analytically calcualte optimum idler photon wavelength
- * All angles in radians.
- */
-// PhaseMatch.optimum_idler = function optimum_idler(P){
-
-//     var delKpp = P.lambda_s/P.poling_period;
-
-//     var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
-//     arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
-//     arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
-//     arg = Math.sqrt(arg);
-
-//     var arg2 = P.n_s*Math.sin(P.theta_s)/arg;
-
-//     var theta_i = Math.asin(arg2);
-//     // return theta_i;
-//     P.theta_i = theta_i;
-//     //Update the index of refraction for the idler
-//     P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-//     P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
-// };
-
-/*
  * optimum_signal()
  * Analytically calcualte optimum signal photon wavelength
  * All angles in radians.
@@ -2202,68 +2178,6 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
 
 /*
  * calc_HOM_JSA()
- * Calculates the HOM interference for a particular point
- * P is SPDC Properties object
- * delT is the time delay between signal and idler
- */
-PhaseMatch.calc_HOM = function calc_HOM(P, delT){
-    var con = PhaseMatch.constants;
-
-    var THETA1 = PhaseMatch.phasematch(P);
-
-    // first make copies of the parameters
-    var lambda_s = P.lambda_s;
-    var lambda_i = P.lambda_i;
-    var theta_s = P.theta_s;
-    var theta_i = P.theta_i;
-    var S_s = P.S_s;
-    var S_i = P.S_i;
-    var n_s = P.n_s;
-    var n_i = P.n_i;
-
-    // Now swap the signal and idler 
-    P.lambda_s = lambda_i;
-    P.lambda_i = lambda_s;
-    P.theta_i = theta_s;
-
-    P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler"); 
-
-    //calculate the new optimum signal angle
-    PhaseMatch.optimum_signal(P);
-
-    // Calculate the phasematching function with signal/idler swapped
-    var THETA2 = PhaseMatch.phasematch(P);
-
-    // Now reset all of the values of P
-    P.lambda_s = lambda_s;
-    P.lambda_i = lambda_i;
-    P.theta_s = theta_s;
-    P.theta_i = theta_i;
-    P.S_s = S_s;
-    P.S_i = S_i;
-    P.n_s = n_s;
-    P.n_i = n_i;
-
-
-    //Oscillations due to the time difference
-    var arg = 2*Math.PI*con.c *(1/P.lambda_s - 1/P.lambda_i)*delT;
-    var Tosc_real = Math.cos(arg);
-    var Tosc_imag = Math.sin(arg);
-
-    // arg2 = THETA2*Tosc. Split calculation to handle complex numbers
-    var arg2_real = Tosc_real*THETA2[0] - Tosc_imag*THETA2[1];
-    var arg2_imag = Tosc_real*THETA2[1] + Tosc_imag*THETA2[0];
-
-    var PM_real = (THETA1[0] - arg2_real)/Math.sqrt(2);
-    var PM_imag = (THETA1[1] - arg2_imag)/Math.sqrt(2);
-
-    var PMint = sq(PM_real)+sq(PM_imag);
-    return PMint;
-};
-
-/*
- * calc_HOM_JSA()
  * Calculates the Joint Spectra Amplitude of the HOM at a particluar time delay
  * P is SPDC Properties object
  * ls_start ... li_stop are the signal/idler wavelength ranges to calculate over
@@ -2373,6 +2287,9 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
     
 };
 
+/*
+A series of helper functions
+ */
 PhaseMatch.Sum = function Sum(A){
     var total=0;
     var l = A.length;
@@ -2418,6 +2335,17 @@ PhaseMatch.linspace = function linspace(xstart,xstop,npts){
     return A;
 };
 
+/**
+ * The following section is where we calculate intelligent guesses for the ranges of the plots.
+ */
+
+
+/**
+ * [autorange_lambda Calculates intelligent axes limits for lambda signal and idler]
+ * @param  {[type]} props     [description]
+ * @param  {[type]} threshold [description]
+ * @return {[type]}           [description]
+ */
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     var P = PhaseMatch.deep_copy(props);
     //eliminates sinc side lobes which cause problems.
@@ -2440,14 +2368,17 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
     var l1 = Math.min(ans, ans2);
     var l2 = Math.max(ans, ans2);
-    // console.log(P.lambda_p/1e-9, l1/1e-9, l2/1e-9, P.p_bw/1e-9);
+    // console.log(l1/1e-9, l2/1e-9);
 
-    var dif = (l2-l1);
+    var dif = Math.abs(ans-props.lambda_s);
+    console.log(ans/1e-9, ans2/1e-9, P.lambda_s/1e-9, dif/1e-9);
 
     //Now try to find sensible limits. We want to make sure the range of values isn't too big,
     //but also ensure that if the pump bandwidth is small, that the resulting JSA is visible.
     //This is important for calculating things like the Hong-Ou-Mandel.
-    var difmax = 20e-9 * P.lambda_p/775e-9 * P.p_bw/1e-9 ;
+    var difmax = 2e-9 * P.lambda_p/775e-9 * P.p_bw/1e-9 ;
+
+    console.log("diff = ", dif/1e-9, difmax/1e-9);
     
     if (difmax>35e-9){
         difmax = 35e-9;
@@ -2456,19 +2387,51 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     if (dif>difmax){
         dif = difmax;
     }
-    // console.log("diff = ", dif/1e-9, difmax/1e-9);
     
-    var la = 1/(1/l1 + 1/l2)*2 - 3 * dif;
-    var lb = 1/(1/l1 + 1/l2)*2 + 3 * dif;
+    
+    var ls_a = props.lambda_s - 10 * dif;
+    var ls_b = props.lambda_s + 10 * dif;
+
+    // var li_a = props.lambda_i - 3 * dif;
+    // var li_b = props.lambda_i + 3 * dif;
+
+    // var ls_a = 1/(1/l1 + 1/l2)*2 - 3 * dif;
+    // var ls_b = 1/(1/l1 + 1/l2)*2 + 3 * dif;
+
+    var li_a = 1/(1/P.lambda_p - 1/ls_b);
+    var li_b = 1/(1/P.lambda_p - 1/ls_a);
+
+    
 
     // la = 1500e-9;
     // lb = 1600e-9;
 
-    console.log(la/1e-9, lb/1e-9);
+    // console.log(ls_a/1e-9, ls_b/1e-9);
     // l1 = l1 -2*dif;
     // l2 = l2 + 2*dif;
-    return [la,lb];
+    return [ls_a,ls_b, li_a, li_b];
 };
+
+PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_stop){
+    // var P = PhaseMatch.deep_copy(props);
+    var con = PhaseMatch.constants;
+
+    var gv_s = props.get_group_velocity(props.lambda_s, props.Type, props.S_s, "signal");
+    var gv_i = props.get_group_velocity(props.lambda_i, props.Type, props.S_i, "idler");
+
+    var zero_delay = props.L * (1/gv_i - 1/gv_s)/2;
+    console.log("minimum of HOM dip = ", zero_delay/1e-15);
+
+    var bw = Math.abs(lambda_stop - lambda_start);
+    var coh_time = 1/ (2*Math.PI*con.c / sq(lambda_start + bw/2) * bw); 
+
+    var t_start = zero_delay - 40*coh_time;
+    var t_stop = zero_delay + 40*coh_time;
+
+    return [zero_delay, t_start, t_stop];
+
+};
+
 
 
 (function(){
@@ -2546,15 +2509,6 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
 
             this.msg = "";
-
-            // this.wbar_pump = 2*Math.PI*con.c/this.lambda_p * this.n_p;
-            // this.wbar_s = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "signal");
-            // this.wbar_i = 2*Math.PI*con.c/(2*this.lambda_p) * this.calc_Index_PMType(2*this.lambda_p, this.Type, this.S_s, "idler");
-
-            // wbar = 2*pi*con.c *n_p0/pump
-//     wbar_s =  2*pi*con.c *n_s0/(2*pump)
-//     wbar_i = 2*pi*con.c *n_i0/(2*pump)
-
 
         },
             // this.autocalcTheta = false;
@@ -2641,7 +2595,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
         set_crystal : function (k){
             this.crystal = PhaseMatch.CrystalDB[k];
-            var ind = this.crystal.indicies(this.lambda_p, this.temp);
+            // var ind = this.crystal.indicies(this.lambda_p, this.temp);
         },
 
         update_all_angles : function (){
@@ -2661,6 +2615,22 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
            
             // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
 
+        },
+
+        get_group_velocity : function(lambda, Type, S, photon){
+            // var props = this;
+            var con = PhaseMatch.constants;
+            var bw = 1e-11; 
+            // var P = PhaseMatch.deep_copy(props);
+            
+            var n1 = this.calc_Index_PMType(lambda - bw, Type, S, photon);
+            var n2 = this.calc_Index_PMType(lambda + bw, Type, S, photon);
+            
+            var dn = (n2 - n1)/(2*bw);
+
+            var gv = con.c/(n1 - lambda*dn);
+
+            return gv;
         },
 
         auto_calc_Theta : function (){
@@ -2796,6 +2766,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     PhaseMatch.deep_copy = function deep_copy(props){
         var P = new PhaseMatch.SPDCprop();
         P.crystal = props.crystal;
+        P.temp = PhaseMatch.util.clone(props.temp,true);
         P.lambda_p = PhaseMatch.util.clone(props.lambda_p,true);
         P.lambda_s = PhaseMatch.util.clone(props.lambda_s,true);
         P.lambda_i = PhaseMatch.util.clone(props.lambda_i,true);
@@ -2829,7 +2800,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
-    console.log("Calculating JSA");
+    console.log("Calculating JSA", props.temp);
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
 
