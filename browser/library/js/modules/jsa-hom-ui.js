@@ -145,11 +145,11 @@ define(
                     ,dim = Math.min( width, height )
                     ;
                 
-                // maximum value of 600
-                dim = Math.min(600, dim);
+                // maximum value of 400
+                dim = Math.min(400, dim);
 
                 self.plot.resize( dim, dim );
-                self.plot1d.resize( dim, dim/2 );
+                self.plot1d.resize( dim, dim/3 );
                 self.draw();
             },
 

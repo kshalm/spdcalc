@@ -3,6 +3,7 @@
   @extend .progress
   margin-bottom: 20px
   position: relative
+  width: 400px
 
 .ui-slider-handle
   background-color: scale-color($firm, $lightness: -15%)
@@ -16,8 +17,10 @@
   z-index: 2
   +transition(background .25s)
 
+
   &[style*='100']
     margin-left: -15px
+
 
   &:hover,
   &:focus

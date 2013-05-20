@@ -203,7 +203,7 @@ define(
                   .text( labels.y );
 
                 var colorBarWidth = 100;
-                var colorBarHeight = 32;
+                var colorBarHeight = 16;
                 var dom = z.domain();
                 var colorBarVals = d3.range( dom[0], dom[1], 0.01 );
                 var xColorBar = d3.scale.ordinal()
@@ -212,7 +212,7 @@ define(
                     ;
 
                 var colorbar = svg.append("g").attr("class", "z axis")
-                    .attr('transform', 'translate('+[width-colorBarWidth, -colorBarHeight].join(',')+')')
+                    .attr('transform', 'translate('+[width-colorBarWidth, -2*colorBarHeight].join(',')+')')
                     ;
 
                 colorbar.selectAll('rect')

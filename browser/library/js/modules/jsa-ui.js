@@ -129,8 +129,8 @@ define(
                     ,dim = Math.min( width, height ) - 100 // - margin
                     ;
 
-                if (dim > 600){ 
-                    dim = 600;
+                if (dim > 400){ 
+                    dim = 400;
                 }
 
                 self.plot.resize( dim, dim );
