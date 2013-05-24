@@ -8,11 +8,10 @@
 
                 <div class="ui-module-wrap pull-left">
                     <select tabindex="1" class="span3" id="ui-modules">
-                        <option value="jsa">JSA</option>
-                        <option value="hom">Hong Ou Mandel</option>
-                        <option value="jsa-hom">JSA HOM</option>
+                        <option value="jsa">Joint Spectral Amplitude</option>
+                        <option value="xy">Emission Angle</option>
+                        <option value="jsa-hom">Hong-Ou-Mandel</option>
                         <option value="kitchen_sink">Kitchen Sink</option>
-                        <option value="pm-xy">PM XY</option>
                     </select>
                 </div>
                 

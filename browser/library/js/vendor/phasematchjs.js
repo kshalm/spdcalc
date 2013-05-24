@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-20
+ * phasematchjs v0.0.1a - 2013-05-23
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2489,6 +2489,7 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
             this.W = 500* con.um;
             this.p_bw = 6 * con.nm;
             this.phase = false;
+            this.brute_force = true;
             this.autocalctheta = false;
             this.autocalcpp = true;
             this.poling_period = 1000000;
@@ -2842,6 +2843,10 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
 
+    if (P.brute_force){
+        dim = 50;
+    }
+
     var i;
     var X = PhaseMatch.linspace(x_start, x_stop, dim);
     var Y = PhaseMatch.linspace(y_start, y_stop, dim); 
@@ -2867,16 +2872,15 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        // P.optimum_idler(P); //Need to find the optimum idler for each angle.
-        // P.brute_force_theta_i(P); //use a search. could be time consuming.
-
-        //calculate the correct idler angle analytically.
-        P.optimum_idler(P);
-
-        // P.calc_wbar();
+        if (P.brute_force) {
+           P.brute_force_theta_i(P); //use a search. could be time consuming. 
+        }
+        else {
+            //calculate the correct idler angle analytically.
+            P.optimum_idler(P);
+        }
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
-        // PM[i] = PhaseMatch.calc_delK(P);
 
     }
     var endTime = new Date();
@@ -2889,6 +2893,11 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
+
+    if (P.brute_force){
+        dim = 50;
+    }
+
     var i;
     var lambda_s = PhaseMatch.linspace(l_start, l_stop, dim);
     var theta_s = PhaseMatch.linspace(t_stop, t_start, dim); 
@@ -2908,7 +2917,15 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        P.optimum_idler(P); //Need to find the optimum idler for each angle.
+         if (P.brute_force) {
+           P.brute_force_theta_i(P); //use a search. could be time consuming. 
+        }
+        else {
+            //calculate the correct idler angle analytically.
+            P.optimum_idler(P);
+        }
+        
+        // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         // P.calc_wbar();
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
@@ -2953,6 +2970,96 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
 
     }
+    return PM;
+
+};
+
+PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_start, x_stop, y_start, y_stop, dim){
+
+    var P = PhaseMatch.deep_copy(props);
+    props.update_all_angles(P);
+
+    if (P.brute_force){
+        dim = 50;
+    }
+
+    var i;
+    var X = PhaseMatch.linspace(x_start, x_stop, dim);
+    var Y = PhaseMatch.linspace(y_start, y_stop, dim); 
+
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+    
+    var startTime = new Date();
+    for (i=0; i<N; i++){
+        var index_x = i % dim;
+        var index_y = Math.floor(i / dim);
+
+        P.theta_s = X[index_x];
+        P.phi_s =Y[index_y];
+
+
+        // console.log(P.theta_s /Math.PI * 180, P.phi_s /Math.PI * 180);
+        P.phi_i = (P.phi_s + Math.PI);
+        
+        P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+        // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+
+        if (P.brute_force) {
+           P.brute_force_theta_i(P); //use a search. could be time consuming. 
+        }
+        else {
+            //calculate the correct idler angle analytically.
+            P.optimum_idler(P);
+        }
+        
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+
+    }
+    var endTime = new Date();
+    var timeDiff = (endTime - startTime);
+    return PM;
+
+};
+
+
+PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idler_theta(props, x_start, x_stop, y_start, y_stop, dim){
+
+    var P = PhaseMatch.deep_copy(props);
+    props.update_all_angles(P);
+
+    var i;
+    var X = PhaseMatch.linspace(x_start, x_stop, dim);
+    var Y = PhaseMatch.linspace(y_stop, y_start, dim); 
+
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+    
+    var startTime = new Date();
+    for (i=0; i<N; i++){
+        var index_x = i % dim;
+        var index_y = Math.floor(i / dim);
+
+        P.theta_s = X[index_x];
+        P.theta_i =Y[index_y];
+
+
+        // console.log(P.theta_s /Math.PI * 180, P.phi_s /Math.PI * 180);
+        // P.phi_i = (P.phi_s + Math.PI);
+        
+        P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+        P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+
+        
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        // PM[i] = PhaseMatch.calc_delK(P);
+
+    }
+    var endTime = new Date();
+    var timeDiff = (endTime - startTime);
     return PM;
 
 };

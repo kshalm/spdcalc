@@ -12,8 +12,8 @@ define(
         var defaults = {
 
             title: "Awesome Graph",
-            width: 480,
-            height: 480,
+            width: 400,
+            height: 400,
             labels: {
                 x: 'X axis label',
                 y: 'Y axis label'
@@ -27,7 +27,7 @@ define(
             xrange: [0, 1],
             yrange: [0, 1],
             // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
-            format: null,
+            format: '.0f',
 
             // use a d3 scale to control the color mapping
             colorScale: d3.scale.linear()
@@ -122,10 +122,17 @@ define(
 
             resize: function( w, h ){
 
+                if (w>400 || h>400){
+                    w = 400;
+                    h = 400;
+                }
+
                 this.el.css({
                     'width': w + 'px',
                     'height': h + 'px'
                 });
+
+
 
                 this.width = w;
                 this.height = h;

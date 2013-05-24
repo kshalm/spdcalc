@@ -65,25 +65,9 @@ define(
                     yrange: [ 0, 100 ],
                     format: '.0f'
                 });
-
+                self.plot.setTitle('Joint spectral amplitude');
                 self.elPlot = $(self.plot.el);
 
-                // init plot
-                self.plot1d = new LinePlot({
-                    el: self.el.find('.line-plot-wrapper').get(0),
-                    labels: {
-                        x: 'x-axis',
-                        y: 'y-axis'
-                    },
-                    width: 480,
-                    height: 480,
-                    margins: margins,
-                    xyrange: [ 0, 100 ],
-                    yrange: [ 0, 100 ],
-                    format: '.0f'
-                });
-
-                self.elPlot1d = $(self.plot1d.el);
             },
 
             initPhysics: function(){
@@ -129,12 +113,11 @@ define(
                     ,dim = Math.min( width, height ) - 100 // - margin
                     ;
 
-                if (dim > 400){ 
-                    dim = 400;
-                }
+                // if (dim > 400){ 
+                //     dim = 400;
+                // }
 
-                self.plot.resize( dim, dim );
-                self.plot1d.resize( dim, dim );
+                // self.plot.resize( dim, dim );
                 self.draw();
             },
 
@@ -179,16 +162,7 @@ define(
                 self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
                 self.plot.setYRange([lsi[2] * 1e9, lsi[3] * 1e9]);
 
-                // get sin wave data
-                for ( var i = 0, l = 100; i < l; i += 0.1 ){
-                    
-                    data1d.push({
-                        x: i,
-                        y: 20 * (Math.sin( i )+1)
-                    });
-                }
-
-                self.data1d = data1d;
+                
 
             },
 
@@ -204,14 +178,7 @@ define(
 
                 self.plot.plotData( data );
 
-                //////// other plot
-                var data1d = self.data1d;
-
-                if (!data1d){
-                    return this;
-                }
-
-                self.plot1d.plotData( data1d );
+               
             }
         });
 

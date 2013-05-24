@@ -1,4 +1,4 @@
-<div class="">
+<div class="span3">
     <section class="form-horizontal">
         <div class="control-group">
             <div class="calcbutton">

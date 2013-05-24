@@ -48,11 +48,16 @@ define(
 
                 // init plot
                 self.plot = new HeatMap({
-                    el: self.el.get(0)
+                    el: self.el.get(0),
+                    labels: {
+                        x: 'Signal Wavelength(nm)',
+                        y: 'Idler Wavelength(nm)'
+                    }
                 });
 
                 self.elPlot = $(self.plot.el)
-                
+                self.plot.setTitle('Joint spectral amplitude');
+
                 self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el );
                 
                 self.eldelT.slider({
@@ -79,11 +84,12 @@ define(
                 self.plot1d = new LinePlot({
                     el: self.el.get(0),
                     labels: {
-                        x: 'x-axis',
-                        y: 'y-axis',
+                        x: 'Time delay (fs)',
+                        y: 'Coincidence probability'
                     },
                     yrange: [0,.65]
                 });
+                self.plot1d.setTitle('Hong-Ou-Mandel Dip');
 
                 self.elPlot1d = $(self.plot1d.el);
 
