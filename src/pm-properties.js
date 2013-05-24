@@ -58,6 +58,7 @@
             this.p_bw = 6 * con.nm;
             this.phase = false;
             this.brute_force = true;
+            this.brute_dim = 50;
             this.autocalctheta = false;
             this.autocalcpp = true;
             this.poling_period = 1000000;

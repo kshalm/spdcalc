@@ -47,16 +47,17 @@ define(
                 self.el = $('<div>');
 
                 // init plot
-                self.plot = new HeatMap({
+                self.plot1d = new LinePlot({
                     el: self.el.get(0),
                     labels: {
-                        x: 'Signal Wavelength(nm)',
-                        y: 'Idler Wavelength(nm)'
-                    }
+                        x: 'Time delay (fs)',
+                        y: 'Coincidence probability'
+                    },
+                    yrange: [0,.65]
                 });
+                self.plot1d.setTitle('Hong-Ou-Mandel Dip');
 
-                self.elPlot = $(self.plot.el)
-                self.plot.setTitle('Joint spectral amplitude');
+                self.elPlot1d = $(self.plot1d.el);
 
                 self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el );
                 
@@ -81,17 +82,16 @@ define(
                 self.set('delT', 0);
 
                 // init plot
-                self.plot1d = new LinePlot({
+                 self.plot = new HeatMap({
                     el: self.el.get(0),
                     labels: {
-                        x: 'Time delay (fs)',
-                        y: 'Coincidence probability'
-                    },
-                    yrange: [0,.65]
+                        x: 'Signal Wavelength(nm)',
+                        y: 'Idler Wavelength(nm)'
+                    }
                 });
-                self.plot1d.setTitle('Hong-Ou-Mandel Dip');
 
-                self.elPlot1d = $(self.plot1d.el);
+                self.elPlot = $(self.plot.el)
+                self.plot.setTitle('Joint spectral amplitude');
 
 
                 // internal events

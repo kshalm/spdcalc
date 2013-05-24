@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-23
+ * phasematchjs v0.0.1a - 2013-05-24
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2490,6 +2490,7 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
             this.p_bw = 6 * con.nm;
             this.phase = false;
             this.brute_force = true;
+            this.brute_dim = 50;
             this.autocalctheta = false;
             this.autocalcpp = true;
             this.poling_period = 1000000;
@@ -2844,7 +2845,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     props.update_all_angles(P);
 
     if (P.brute_force){
-        dim = 50;
+        dim = P.brute_dim;
     }
 
     var i;
@@ -2895,7 +2896,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
     props.update_all_angles(P);
 
     if (P.brute_force){
-        dim = 50;
+        dim = P.brute_dim;
     }
 
     var i;
@@ -2924,7 +2925,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
             //calculate the correct idler angle analytically.
             P.optimum_idler(P);
         }
-        
+
         // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         // P.calc_wbar();
 
@@ -2980,7 +2981,7 @@ PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_
     props.update_all_angles(P);
 
     if (P.brute_force){
-        dim = 50;
+        dim = P.brute_dim;
     }
 
     var i;
