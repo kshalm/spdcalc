@@ -46,7 +46,6 @@
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta" value="{{= this.convertTo('deg', parseFloat( it.theta )) }}" />
             </div>
-            </label>
         </div>
         <div class="control-group">
             <label class="control-label">

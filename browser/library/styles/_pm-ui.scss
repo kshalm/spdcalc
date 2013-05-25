@@ -19,7 +19,7 @@ $sidePanelCollapsed: 70px;
         > .upper,
         > .lower {
             position: relative;
-            /*float:left;*/
+            overflow: hidden;
         }
 
         > .upper > .right {

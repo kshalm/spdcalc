@@ -5,7 +5,9 @@ define(
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
-        'tpl!templates/jsa-layout.tpl'
+        'modules/converter',
+        'tpl!templates/jsa-layout.tpl',
+        'tpl!templates/jsa-plot-opts.tpl'
     ],
     function(
         $,
@@ -13,10 +15,15 @@ define(
         PhaseMatch,
         HeatMap,
         LinePlot,
-        tplJSALayout
+        converter,
+        tplJSALayout,
+        tplJSAPlotOpts
     ) {
 
         'use strict';
+
+
+        tplJSAPlotOpts.converter = converter;
 
 
         var con = PhaseMatch.constants;
@@ -68,6 +75,67 @@ define(
                 self.plot.setTitle('Joint spectral amplitude');
                 self.elPlot = $(self.plot.el);
 
+                // init plot options
+                self.initPlotOpts();
+
+            },
+
+            initPlotOpts: function(){
+
+                var self = this;
+
+                // @TODO: this object should be replaced
+                // by whatever is storing the plot options.
+                // (or just use this object...)
+                self.plotOpts = {};
+
+                self.elPlotOpts = $( tplJSAPlotOpts.render( self.plotOpts ) );
+
+                // @TODO this won't work right now...
+                // need plotOpts to be a stapes module
+                // 
+                // self.plotOpts.on('refresh', function(){
+
+                //     this.each(function( val, key ){
+                //         // console.log(val, key)
+                //         // refresh parameter values in the html
+                //         var el = self.elPlotOpts.find('[name="'+key+'"]')
+                //             ,unit = el.data('unit')
+                //             ;
+
+                //         if (unit){
+                //             val  = converter.to( unit, val );
+                //         }
+
+                //         el.val( val );
+                //     });
+
+                // });
+
+                self.elPlotOpts.on('change', 'input[type="text"], select', function(){
+
+                    var $this = $(this)
+                        ,key = $this.attr('name')
+                        ,val = $this.val()
+                        ,parse = $this.data('parse')
+                        ,unit = $this.data('unit')
+                        ;
+
+                    if (parse === 'float'){
+                        val = parseFloat(val);
+                    }
+
+                    if (unit){
+                        val  = converter.from( unit, val );
+                    }
+                    
+                    // update the corresponding property in the plotOpts object
+                    self.plotOpts[ key ] = val;
+
+                    // recalc and draw
+                    self.calc( self.parameters );
+                    self.draw();
+                });
             },
 
             initPhysics: function(){
@@ -125,11 +193,22 @@ define(
                 return this.el;
             },
 
+            getOptsPanel: function(){
+                return this.elPlotOpts;
+            },
+
             refresh: function(){
 
                 var self = this;
                 self.calc( self.parameters.getProps() );
                 self.draw();
+            },
+
+            autocalcPlotOpts: function(){
+
+                var self = this;
+
+                self.plotOpts.x
             },
 
             calc: function( props ){
@@ -143,6 +222,11 @@ define(
                 var lsi = PhaseMatch.autorange_lambda(props, threshold);
                 var l_start = Math.min(lsi[0], lsi[1]);
                 var l_stop =  Math.max(lsi[0], lsi[1]);
+
+                // @TODO add in getting ranges from plotOpts
+                // l_start = plotOpts.l_start
+                // l_stop = plotOpts.l_stop
+
                 // console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
                 var data1d = [];
 
@@ -158,12 +242,9 @@ define(
                     ;
 
                 self.data = PM;
-                // multiplication is faster than division
-                self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
-                self.plot.setYRange([lsi[2] * 1e9, lsi[3] * 1e9]);
-
                 
-
+                self.plot.setXRange([ converter.to('nm', l_start), converter.to('nm', l_stop) ]);
+                self.plot.setYRange([ converter.to('nm', lsi[2]), converter.to('nm', lsi[3]) ]);
             },
 
             draw: function(){

@@ -10,6 +10,7 @@ define(
         'jquery.dropkick',
         'jquery.tagsinput',
         'custom-checkbox',
+        'modules/converter',
 
         // physics modules
         'modules/parameters',
@@ -30,6 +31,7 @@ define(
         _dk,
         _jqtags,
         customCheckbox,
+        converter,
 
         // physics modules
         Parameters,
@@ -42,34 +44,10 @@ define(
 
         'use strict';
 
-        var units = {
-            um: 1e-6,
-            nm: 1e-9,
-            deg: Math.PI / 180,
-        };
+        // Note: conversions moved to converter module
 
-        function convertFrom( unit, val ){
-
-            if ( !(unit in units) ){
-                throw 'Unit "' + unit + '" not defined in units.';
-            }
-
-            return val * units[ unit ];
-        }
-
-        function convertTo( unit, val, precision ){
-
-            precision = precision === undefined ? 2 : precision;
-
-            if ( !(unit in units) ){
-                throw 'Unit "' + unit + '" not defined in units.';
-            }
-
-            return (val / units[ unit ]).toFixed( precision );
-        }
-
-        tplParametersPanel.convertFrom = convertFrom;
-        tplParametersPanel.convertTo = convertTo;
+        tplParametersPanel.convertFrom = converter.from;
+        tplParametersPanel.convertTo = converter.to;
 
         /**
          * Page-level Mediator
@@ -167,7 +145,7 @@ define(
                             ;
 
                         if (unit){
-                            val  = convertTo( unit, val );
+                            val  = converter.to( unit, val );
                         }
 
                         el.val( val );
@@ -215,7 +193,7 @@ define(
                     }
 
                     if (unit){
-                        val  = convertFrom( unit, val );
+                        val  = converter.from( unit, val );
                     }
                     // console.log("in PM-ui", key, val);
                     // update the corresponding property in the parameters object
@@ -256,6 +234,7 @@ define(
 
                 self.elMain = self.el.find('#main');
                 self.elParameters = self.el.find('#parameters');
+                self.elPlotOpts = self.el.find('#plot-opts');
                 self.elLogs = self.el.find('#logs');
 
                 // init parameters panel
@@ -312,6 +291,14 @@ define(
                 // inject containers
                 self.elMain.children().detach();
                 self.elMain.append( mod.getMainPanel() );
+
+                // plot options inputs
+                self.elPlotOpts.children().detach();
+
+                if (mod.getOptsPanel){
+                    self.elPlotOpts.append( mod.getOptsPanel() );
+                }
+
                 mod.connect( self );
 
                 self.emit('resize');

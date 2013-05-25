@@ -53,6 +53,8 @@
                 </div>
             </div>
             <div id="parameters"></div>
+
+            <div id="plot-opts"></div>
         </div>
 
         <div class="right">
