@@ -217,18 +217,16 @@ define(
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
                 var self = this;
                 var dim = 200;
-                // var l_start = 1500 * con.nm;
-                // var l_stop = 1600 * con.nm; 
                 var threshold = 0.5;
-                var lsi = PhaseMatch.autorange_lambda(props, threshold);
-                var l_start = Math.min(lsi[0], lsi[1], lsi[2], lsi[3]);
-                var l_stop =  Math.max(lsi[0], lsi[1], lsi[2], lsi[3]);
+                var lim = PhaseMatch.autorange_lambda(props, threshold);
+                var l_start = Math.min(lim.lambda_s.min, lim.lambda_i.min);
+                var l_stop =  Math.max(lim.lambda_s.max, lim.lambda_i.max);
 
                 var tsi = PhaseMatch.autorange_delT(props, l_start, l_stop);
                 var t_start = tsi[1];
                 var t_stop = tsi[2];
 
-                self.set_slider_values(tsi[0], tsi[1],tsi[2]);
+                self.set_slider_values(tsi[0], tsi[1], tsi[2]);
 
                 var data1d = [];
                 var delT = self.get('delT');
@@ -236,10 +234,6 @@ define(
                 var self = this
                     ,PM = PhaseMatch.calc_HOM_JSA(
                         props, 
-                        // lsi[0], 
-                        // lsi[1], 
-                        // lsi[2],
-                        // lsi[3],
                         l_start, 
                         l_stop, 
                         l_start,
@@ -252,8 +246,6 @@ define(
                 self.data = PM;
                 self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
                 self.plot.setYRange([l_start * 1e9, l_stop * 1e9]);
-                // self.plot.setXRange([lsi[0] * 1e9, lsi[1] * 1e9]);
-                // self.plot.setYRange([lsi[2] * 1e9, lsi[3] * 1e9]);
 
                 // Hong-Ou-Mandel dip
                 // var t_start = 0e-15;
@@ -290,24 +282,15 @@ define(
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
                 var self = this;
                 var dim = 200;
-                // var l_start = 1500 * con.nm;
-                // var l_stop = 1600 * con.nm; 
                 var threshold = 0.5;
-                var lsi = PhaseMatch.autorange_lambda(props, threshold);
-                // var l_start = Math.min(lsi[0], lsi[1]);
-                // var l_stop =  Math.max(lsi[0], lsi[1]);
-                var l_start = Math.min(lsi[0], lsi[1], lsi[2], lsi[3]);
-                var l_stop =  Math.max(lsi[0], lsi[1], lsi[2], lsi[3]);
-                // var data1d = [];
+                var lim = PhaseMatch.autorange_lambda(props, threshold);
+                var l_start = Math.min(lim.lambda_s.min, lim.lambda_i.min);
+                var l_stop =  Math.max(lim.lambda_s.max, lim.lambda_i.max);
                 var delT = self.get('delT');
 
                 var self = this
                     ,PM = PhaseMatch.calc_HOM_JSA(
                         props,
-                        // lsi[0], 
-                        // lsi[1], 
-                        // lsi[2],
-                        // lsi[3], 
                         l_start, 
                         l_stop, 
                         l_start,
@@ -320,8 +303,6 @@ define(
                 self.data = PM;
                 self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
                 self.plot.setYRange([l_start * 1e9, l_stop * 1e9]);
-                // self.plot.setXRange([lsi[0] * 1e9, lsi[1] * 1e9]);
-                // self.plot.setYRange([lsi[2] * 1e9, lsi[3] * 1e9]);
 
             },
 

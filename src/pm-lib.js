@@ -365,7 +365,17 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     // console.log(ls_a/1e-9, ls_b/1e-9);
     // l1 = l1 -2*dif;
     // l2 = l2 + 2*dif;
-    return [ls_a,ls_b, li_a, li_b];
+    
+    return {
+        lambda_s: {
+            min: Math.min(ls_a, ls_b),
+            max: Math.max(ls_a, ls_b)
+        }, 
+        lambda_i: {
+            min: Math.min(li_a, li_b),
+            max: Math.max(li_a, li_b)
+        }
+    };
 };
 
 PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_stop){
