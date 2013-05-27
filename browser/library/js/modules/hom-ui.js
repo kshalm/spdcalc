@@ -114,13 +114,9 @@ define(
 
                 // @TODO: move this to a control bar
                 var dim = 100;
-                // var l_start = 1500 * con.nm;
-                // var l_stop = 1600 * con.nm;
                 var threshold = 0.5;
-                var lsi = PhaseMatch.autorange_lambda(props, threshold);
-                var l_start = Math.min(lsi[0], lsi[1]);
-                var l_stop =  Math.max(lsi[0], lsi[1]);
-
+                var lim = PhaseMatch.autorange_lambda(props, threshold);
+                
                 var t_start = -100e-15;
                 var t_stop = 100e-15;
 
@@ -130,7 +126,7 @@ define(
                     ,data = []
                     ;
 
-                var HOM = PhaseMatch.calc_HOM_scan(props, t_start, t_stop, l_start, l_stop, l_start, l_stop, dim);
+                var HOM = PhaseMatch.calc_HOM_scan(props, t_start, t_stop, lim.lambda_s.min, lim.lambda_s.max, lim.lambda_s.min, lim.lambda_s.max, dim);
                 for ( var i = 0, l = HOM.length; i < l; i ++){
                     data.push({
                         x: delT[i]/1e-15,

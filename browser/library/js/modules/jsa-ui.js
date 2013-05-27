@@ -216,35 +216,26 @@ define(
                 // @TODO: move this to a control bar
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
                 var dim = 200;
-                // var l_start = 1500 * con.nm;
-                // var l_stop = 1600 * con.nm; 
                 var threshold = 0.5;
-                var lsi = PhaseMatch.autorange_lambda(props, threshold);
-                var l_start = Math.min(lsi[0], lsi[1]);
-                var l_stop =  Math.max(lsi[0], lsi[1]);
+                var lim = PhaseMatch.autorange_lambda(props, threshold);
 
-                // @TODO add in getting ranges from plotOpts
-                // l_start = plotOpts.l_start
-                // l_stop = plotOpts.l_stop
-
-                // console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
                 var data1d = [];
 
                 var self = this
                     ,PM = PhaseMatch.calc_JSA(
                         props, 
-                        l_start, 
-                        l_stop, 
-                        lsi[2],
-                        lsi[3], 
+                        lim.lambda_s.min, 
+                        lim.lambda_s.max, 
+                        lim.lambda_i.min,
+                        lim.lambda_i.max, 
                         dim
                     )
                     ;
 
                 self.data = PM;
                 
-                self.plot.setXRange([ converter.to('nm', l_start), converter.to('nm', l_stop) ]);
-                self.plot.setYRange([ converter.to('nm', lsi[2]), converter.to('nm', lsi[3]) ]);
+                self.plot.setXRange([ converter.to('nm', lim.lambda_s.min), converter.to('nm', lim.lambda_s.max) ]);
+                self.plot.setYRange([ converter.to('nm', lim.lambda_i.min), converter.to('nm', lim.lambda_i.max) ]);
             },
 
             draw: function(){
