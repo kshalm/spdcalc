@@ -188,12 +188,12 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         var threshold = 0.5;
 
         var startTime = new Date();
-        var lsi = PhaseMatch.autorange_lambda(P1, threshold);
+        var lim = PhaseMatch.autorange_lambda(P1, threshold);
         var endTime = new Date();
         var timeDiff = (endTime - startTime);
         console.log("autorange time = ", timeDiff);
-        var l_start = Math.min(lsi[0], lsi[1]);
-        var l_stop =  Math.max(lsi[0], lsi[1]);
+        var l_start = lim.lambda_s.min;
+        var l_stop =  lim.lambda_s.max;
         console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
         
         // console.log(P1.lambda_s);
