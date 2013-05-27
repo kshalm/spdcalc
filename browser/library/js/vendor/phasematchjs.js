@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-24
+ * phasematchjs v0.0.1a - 2013-05-27
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -1581,6 +1581,55 @@ function sq( x ){
     return x * x;
 }
 
+/*
+A series of helper functions
+ */
+PhaseMatch.Sum = function Sum(A){
+    var total=0;
+    var l = A.length;
+    for(var i=0; i<l; i++) { 
+        total += A[i]; 
+    }
+    return total;
+};
+
+PhaseMatch.Transpose = function Transpose(A, dim){
+    var Trans = new Float64Array(dim*dim);
+    var l = A.length;
+    for(var i=0; i<l; i++) { 
+        var index_c = i % dim;
+        var index_r = Math.floor(i / dim);
+        //swap rows with columns
+        Trans[index_c * dim + index_r] = A[i];
+
+    }
+    return Trans;
+};
+
+PhaseMatch.AntiTranspose = function Transpose(A, dim){
+    var Trans = new Float64Array(dim*dim);
+    var l = A.length;
+    for(var i=0; i<l; i++) { 
+        var index_c = i % dim;
+        var index_r = Math.floor(i / dim);
+        //swap rows with columns
+        Trans[(dim -1 - index_c) * dim + (dim - 1 -index_r)] = A[i];
+
+    }
+    return Trans;
+};
+
+PhaseMatch.linspace = function linspace(xstart,xstop,npts){
+    var A = new Float64Array(npts);
+    var diff = (xstop-xstart)/(npts-1);
+    var curVal = 0;
+    for (var i=0; i<npts; i++){
+        A[i] = xstart + i*diff;
+    }
+    return A;
+};
+
+
 (function(){
 
     //Implementation of Nelder-Mead Simplex Linear Optimizer
@@ -2285,54 +2334,6 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 
     return HOM_values;
     
-};
-
-/*
-A series of helper functions
- */
-PhaseMatch.Sum = function Sum(A){
-    var total=0;
-    var l = A.length;
-    for(var i=0; i<l; i++) { 
-        total += A[i]; 
-    }
-    return total;
-};
-
-PhaseMatch.Transpose = function Transpose(A, dim){
-    var Trans = new Float64Array(dim*dim);
-    var l = A.length;
-    for(var i=0; i<l; i++) { 
-        var index_c = i % dim;
-        var index_r = Math.floor(i / dim);
-        //swap rows with columns
-        Trans[index_c * dim + index_r] = A[i];
-
-    }
-    return Trans;
-};
-
-PhaseMatch.AntiTranspose = function Transpose(A, dim){
-    var Trans = new Float64Array(dim*dim);
-    var l = A.length;
-    for(var i=0; i<l; i++) { 
-        var index_c = i % dim;
-        var index_r = Math.floor(i / dim);
-        //swap rows with columns
-        Trans[(dim -1 - index_c) * dim + (dim - 1 -index_r)] = A[i];
-
-    }
-    return Trans;
-};
-
-PhaseMatch.linspace = function linspace(xstart,xstop,npts){
-    var A = new Float64Array(npts);
-    var diff = (xstop-xstart)/(npts-1);
-    var curVal = 0;
-    for (var i=0; i<npts; i++){
-        A[i] = xstart + i*diff;
-    }
-    return A;
 };
 
 /**
