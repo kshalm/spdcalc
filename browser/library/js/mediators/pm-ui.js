@@ -296,7 +296,6 @@ define(
 
                 if (mod.getOptsPanel){
                     self.elPlotOpts.append( mod.getOptsPanel() );
-                    customCheckbox( self.elPlotOpts );
                 }
 
                 mod.connect( self );

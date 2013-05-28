@@ -6,6 +6,7 @@ define(
         'modules/heat-map',
         'modules/line-plot',
         'modules/converter',
+        'modules/panel',
         'tpl!templates/jsa-layout.tpl',
         'tpl!templates/jsa-plot-opts.tpl'
     ],
@@ -16,15 +17,12 @@ define(
         HeatMap,
         LinePlot,
         converter,
+        Panel,
         tplJSALayout,
         tplJSAPlotOpts
     ) {
 
         'use strict';
-
-
-        tplJSAPlotOpts.converter = converter;
-
 
         var con = PhaseMatch.constants;
         var defaults = {
@@ -82,67 +80,31 @@ define(
 
             initPlotOpts: function(){
 
-                var self = this;
+                var self = this
+                    ,to
+                    ;
 
-                // @TODO: this object should be replaced
-                // by whatever is storing the plot options.
-                // (or just use this object...)
-                self.plotOpts = new (Stapes.subclass());
-
-                self.plotOpts.set('autocalc_plotopts', true);
-
-                self.elPlotOpts = $( tplJSAPlotOpts.render( self.plotOpts.getAll() ) );
-
-                self.plotOpts.on('change', function( key ){
-
-                    // refresh parameter values in the html
-                    var el = self.elPlotOpts.find('[name="'+key+'"]')
-                        ,val = this.get( key )
-                        ,unit = el.data('unit')
-                        ;
-
-                    if (unit){
-                        val  = converter.to( unit, val );
+                self.plotOpts = Panel({
+                    template: tplJSAPlotOpts,
+                    data: {
+                        'autocalc_plotopts': true
                     }
-
-                    el.val( val );
                 });
 
-                self.elPlotOpts.on('change', 'input[type="text"], select', function(){
+                self.plotOpts.on('change', function(){
 
-                    var $this = $(this)
-                        ,key = $this.attr('name')
-                        ,val = $this.val()
-                        ,parse = $this.data('parse')
-                        ,unit = $this.data('unit')
-                        ;
+                    clearTimeout( to );
 
-                    if (parse === 'float'){
-                        val = parseFloat(val);
+                    if (self.calculating){
+                        return;
                     }
 
-                    if (unit){
-                        val  = converter.from( unit, val );
-                    }
-                    
-                    // update the corresponding property in the plotOpts object
-                    self.plotOpts.set(key, val);
+                    to = setTimeout(function(){
 
-                    // recalc and draw
-                    self.refresh();
-                });
+                        // recalc and draw
+                        self.refresh();
 
-                self.elPlotOpts.on('change', 'input[type="checkbox"]', function(){
-                    var $this = $(this)
-                        ,key = $this.attr('name')
-                        ,val = $this.is(':checked')
-                        ;
-
-                    // update the corresponding boolean property in the parameters object
-                    self.plotOpts.set( key, val );
-
-                    // recalc and draw
-                    self.refresh();
+                    }, 100);
                 });
             },
 
@@ -202,7 +164,7 @@ define(
             },
 
             getOptsPanel: function(){
-                return this.elPlotOpts;
+                return this.plotOpts.getElement();
             },
 
             refresh: function(){
@@ -236,6 +198,8 @@ define(
 
                 var self = this;
 
+                self.calculating = true;
+
                 if ( self.plotOpts.get('autocalc_plotopts') ){
 
                     self.autocalcPlotOpts();
@@ -256,6 +220,8 @@ define(
                 
                 self.plot.setXRange([ converter.to('nm', self.plotOpts.get('ls_start')), converter.to('nm', self.plotOpts.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nm', self.plotOpts.get('li_start')), converter.to('nm', self.plotOpts.get('li_stop')) ]);
+
+                self.calculating = false;
             },
 
             draw: function(){
