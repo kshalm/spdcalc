@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-27
+ * phasematchjs v0.0.1a - 2013-05-28
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2515,7 +2515,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
             this.W = 500* con.um;
             this.p_bw = 6 * con.nm;
             this.phase = false;
-            this.brute_force = true;
+            this.brute_force = false;
             this.brute_dim = 50;
             this.autocalctheta = false;
             this.autocalcpp = true;
@@ -2662,6 +2662,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
         },
 
         auto_calc_Theta : function (){
+            this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             var props = this;
             var min_delK = function(x){
                 if (x>Math.PI/2 || x<0){return 1e12;}
@@ -2687,6 +2688,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
 
         calc_poling_period : function (){
             var props = this;
+            this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             props.poling_period = 1e12;  // Set this to a large number 
             props.update_all_angles(props);
             var P = PhaseMatch.deep_copy(props);
@@ -3274,15 +3276,22 @@ PhaseMatch.LiNbO3_1 = function LiNbO3_1 () {
 PhaseMatch.LiNbO3_1.prototype  = {
     indicies:function(lambda, temp){
         lambda = lambda * Math.pow(10,6); //Convert for Sellmeir Coefficients
-        //Alan Migdal's program
-        var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
-        var ny = nx;
-        var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
+        //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
+        // var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
+        // var ny = nx;
+        // var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
+
+        // http://www.redoptronics.com/linbo3-crystals.html
+        // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));
+        // var ny = nx
+        // var nz = Math.sqrt(4.5820+0.099169/(sq(lambda)- 0.04443) - 0.021950 * sq(lambda));
 
         //http://www.newlightphotonics.com/LN-crystal.html
         var dnx = -0.874e-6;
         var dny = dnx;
         var dnz = 39.073e-6;
+
+
 
         nx = nx + (temp -20.0)*dnx;
         ny = ny + (temp -20.0)*dny;
@@ -3310,71 +3319,6 @@ PhaseMatch.CrystalDBKeys = [];
 for(var k in PhaseMatch.CrystalDB){
     PhaseMatch.CrystalDBKeys.push(k);
 }
-
-// class KTP(Crystal):
-//     Name = "KTP"
-//     CrystalType = "Biaxial"
-//     CrystalClass = "Unknown"
-//     MinLambda = 0.35*nm
-//     MaxLambda = 4.5*nm
-//     # Temp = 70.
-//     def Index(self,Lambda,theta):
-//         # H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27,
-// #       3314 (1988)
-
-//         Lambda=Lambda*10**6
-
-//         # nx = ( 2.1146 + 0.89188/(1 - (0.20861/Lambda)**2) - (0.01320*Lambda**2) )**.5
-//         # ny = ( 2.1518 + 0.87862/(1 - (0.21801/Lambda)**2) - (0.01327*Lambda**2) )**.5
-//         # nz = ( 2.3136 + 1.00012/(1 - (0.23831/Lambda)**2) - (0.01679*Lambda**2) )**.5
-//         #http://www.redoptronics.com/KTP-crystal.html
-//         nx=(2.10468 + 0.89342*Lambda**2/(Lambda**2-0.04438)-0.01036*Lambda**2)**.5 
-//         ny=(2.14559 + 0.87629*Lambda**2/(Lambda**2-0.0485)-0.01173*Lambda**2)**.5
-//         nz=(1.9446 + 1.3617*Lambda**2/(Lambda**2-0.047)-0.01491*Lambda**2)**.5
-
-//         dnx=1.1 *10**(-5)
-//         dny=1.3 *10**(-5)
-//         dnz=1.6 *10**(-5)
-
-//         nx = nx + (self.Temp -20.)*dnx
-//         ny = ny + (self.Temp -20.)*dny
-//         nz = nz + (self.Temp -20.)*dnz
-
-//         # http://www.castech-us.com/casktp.htm
-//         # nx=(3.0065+0.03901/(Lambda**2-0.04251)-0.01327*Lambda**2)**.5
-//         # ny=(3.0333+0.04154/(Lambda**2-0.04547)-0.01408*Lambda**2)**.5
-//         # nz=(3.0065+0.05694/(Lambda**2-0.05658)-0.01682*Lambda**2)**.5
-//         return nx, ny, nz
-
-
-// class LiNbO3(Crystal):
-//     Name = "LiNbO3"
-//     CrystalType = "NegativeUniaxial"
-//     CrystalClass = "class_3m"
-//     MinLambda = 0.4*nm
-//     MaxLambda = 3.4*nm
-//     # Temp = 70.
-
-//     def Index(self,Lambda,theta):
-//         # H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27,
-// #       3314 (1988)
-
-//         Lambda=Lambda*10**6
-
-//         nx = ( 4.9048 - 0.11768/(0.04750 - Lambda**2) - 0.027169*Lambda**2 )**.5
-//         ny = nx
-//         nz = ( 4.5820 - 0.099169/(0.044432 - Lambda**2) -  0.021950*Lambda**2 )**.5
-
-//         # nx = np.sqrt( 1 + 2.6734*Lambda**2/(Lambda**2-0.01764) + 1.2290*Lambda**2/(Lambda**2-0.05914) + 12.614*Lambda**2/(Lambda**2-474.60) )
-//         # ny = nx
-//         # nz = np.sqrt( 1 + 2.9804*Lambda**2/(Lambda**2-0.02047) + 0.5981*Lambda**2/(Lambda**2-0.0666) + 8.9543*Lambda**2/(Lambda**2-416.08) )
-
-        
-//         # nx = nx + (self.Temp -20.)*dnx
-//         # ny = ny + (self.Temp -20.)*dny
-//         # nz = nz + (self.Temp -20.)*dnz
-
-//         return nx, ny, nz
 
 
 

@@ -57,7 +57,7 @@
             this.W = 500* con.um;
             this.p_bw = 6 * con.nm;
             this.phase = false;
-            this.brute_force = true;
+            this.brute_force = false;
             this.brute_dim = 50;
             this.autocalctheta = false;
             this.autocalcpp = true;
@@ -204,6 +204,7 @@
         },
 
         auto_calc_Theta : function (){
+            this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             var props = this;
             var min_delK = function(x){
                 if (x>Math.PI/2 || x<0){return 1e12;}
@@ -229,6 +230,7 @@
 
         calc_poling_period : function (){
             var props = this;
+            this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             props.poling_period = 1e12;  // Set this to a large number 
             props.update_all_angles(props);
             var P = PhaseMatch.deep_copy(props);

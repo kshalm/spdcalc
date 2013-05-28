@@ -49,6 +49,14 @@
         </div>
         <div class="control-group">
             <label class="control-label">
+                Phi (deg)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi" value="{{= this.convertTo('deg', parseFloat( it.phi )) }}" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">
                 Length (um)
             </label>
             <div class="controls">
