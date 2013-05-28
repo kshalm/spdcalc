@@ -60,7 +60,7 @@
                 Length (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="um" class="inputbox" name="L" value="{{= this.convertTo('um', parseFloat( it.L )) }}" />
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="L" value="{{= this.convertTo('micro', parseFloat( it.L )) }}" />
             </div>
         </div>
         <div class="control-group">
@@ -82,7 +82,7 @@
                 Wavelength (nm)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="lambda_p" value="{{= this.convertTo('nm', parseFloat( it.lambda_p )) }}" />
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lambda_p" value="{{= this.convertTo('nano', parseFloat( it.lambda_p )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -90,7 +90,7 @@
                 Bandwidth FWHM (nm)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="p_bw" value="{{= this.convertTo('nm', parseFloat( it.p_bw )) }}" />
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="p_bw" value="{{= this.convertTo('nano', parseFloat( it.p_bw )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -98,7 +98,7 @@
                 Waist (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="um" class="inputbox" name="W" value="{{= this.convertTo('um', parseFloat( it.W )) }}" />
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W" value="{{= this.convertTo('micro', parseFloat( it.W )) }}" />
             </div>
         </div>
     </section>
@@ -112,7 +112,7 @@
                 Wavelength (nm)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="lambda_s" value="{{= this.convertTo('nm', parseFloat( it.lambda_s )) }}" />
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lambda_s" value="{{= this.convertTo('nano', parseFloat( it.lambda_s )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -150,7 +150,7 @@
                 Poling Period (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="um" class="inputbox" name="poling_period" value="{{= this.convertTo('um', parseFloat( it.poling_period )) }}" />
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period" value="{{= this.convertTo('micro', parseFloat( it.poling_period )) }}" />
             </div>
         </div>
 

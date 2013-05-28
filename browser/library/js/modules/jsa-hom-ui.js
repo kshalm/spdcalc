@@ -5,7 +5,10 @@ define(
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
-        'tpl!templates/time-delay-ctrl.tpl'
+        'modules/converter',
+        'modules/panel',
+        'tpl!templates/time-delay-ctrl.tpl',
+        'tpl!templates/jsa-hom-plot-opts.tpl'
     ],
     function(
         $,
@@ -13,7 +16,10 @@ define(
         PhaseMatch,
         HeatMap,
         LinePlot,
-        tplTimeDelayCtrl
+        converter,
+        Panel,
+        tplTimeDelayCtrl,
+        tplJSAHOMPlotOpts
     ) {
 
         'use strict';
@@ -82,7 +88,7 @@ define(
                 self.set('delT', 0);
 
                 // init plot
-                 self.plot = new HeatMap({
+                self.plot = new HeatMap({
                     el: self.el.get(0),
                     labels: {
                         x: 'Signal Wavelength(nm)',
@@ -106,6 +112,38 @@ define(
                         // only refresh plots after a time delay
                         self.refreshJSA();
                     }, 50);
+                });
+
+                self.initPlotOpts();
+            },
+
+            initPlotOpts: function(){
+
+                var self = this
+                    ,to
+                    ;
+
+                self.plotOpts = Panel({
+                    template: tplJSAHOMPlotOpts,
+                    data: {
+                        'autocalc_plotopts': true
+                    }
+                });
+
+                self.plotOpts.on('change', function(){
+
+                    clearTimeout( to );
+
+                    if (self.calculating){
+                        return;
+                    }
+
+                    to = setTimeout(function(){
+
+                        // recalc and draw
+                        self.refresh();
+
+                    }, 100);
                 });
             },
 
@@ -164,6 +202,10 @@ define(
                 return this.el;
             },
 
+            getOptsPanel: function(){
+                return this.plotOpts.getElement();
+            },
+
             refresh: function(){
 
                 var self = this;
@@ -211,47 +253,69 @@ define(
                 line.exit().remove();
             },
 
-            calc: function( props ){
-
-                // @TODO: move this to a control bar
-                props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
-                var self = this;
-                var dim = 200;
-                var threshold = 0.5;
-                var lim = PhaseMatch.autorange_lambda(props, threshold);
-                var l_start = Math.min(lim.lambda_s.min, lim.lambda_i.min);
-                var l_stop =  Math.max(lim.lambda_s.max, lim.lambda_i.max);
-
-                var tsi = PhaseMatch.autorange_delT(props, l_start, l_stop);
-                var t_start = tsi[1];
-                var t_stop = tsi[2];
-
-                self.set_slider_values(tsi[0], tsi[1], tsi[2]);
-
-                var data1d = [];
-                var delT = self.get('delT');
+            autocalcPlotOpts: function(){
 
                 var self = this
-                    ,PM = PhaseMatch.calc_HOM_JSA(
-                        props, 
-                        l_start, 
-                        l_stop, 
-                        l_start,
-                        l_stop,
-                        delT,
-                        dim
-                    )
+                    ,threshold = 0.5
+                    ,props = self.parameters.getProps()
+                    ,lim
+                    ,tsi
                     ;
 
-                self.data = PM;
-                self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
-                self.plot.setYRange([l_start * 1e9, l_stop * 1e9]);
+                // this does nothing... need to use .set()
+                props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
+                lim = PhaseMatch.autorange_lambda(props, threshold);
+                tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max);
+                
+                self.set_slider_values(tsi[0], tsi[1], tsi[2]);
+
+                self.plotOpts.set({
+                    'ls_start': lim.lambda_s.min,
+                    'ls_stop': lim.lambda_s.max,
+                    'li_start': lim.lambda_i.min,
+                    'li_stop': lim.lambda_i.max,
+
+                    'delT_start': tsi[1],
+                    'delT_stop': tsi[2]
+                });
+            },
+
+            calc: function( props ){
+
+                var self = this;
+
+                self.calculating = true;
+
+                if ( self.plotOpts.get('autocalc_plotopts') ){
+
+                    self.autocalcPlotOpts();
+                }
+
+                self.calc_HOM_JSA( props );
 
                 // Hong-Ou-Mandel dip
                 // var t_start = 0e-15;
                 // var t_stop = 10000e-15;
-                var delT = PhaseMatch.linspace(t_start, t_stop, dim);
-                var HOM = PhaseMatch.calc_HOM_scan(props, t_start, t_stop, l_start, l_stop, l_start, l_stop, dim);
+                var data1d = []
+                    ,dim = 200
+                    ,po = self.plotOpts
+                    ,delT = PhaseMatch.linspace(
+                        po.get('delT_start'), 
+                        po.get('delT_stop'), 
+                        dim
+                    )
+                    ,HOM = PhaseMatch.calc_HOM_scan(
+                        props, 
+                        po.get('delT_start'), 
+                        po.get('delT_stop'), 
+                        po.get('ls_start'), 
+                        po.get('ls_stop'),
+                        po.get('li_start'),
+                        po.get('li_stop'), 
+                        dim
+                    )
+                    ;
+
                 for ( var i = 0, l = HOM.length; i < l; i ++){
                     data1d.push({
                         x: delT[i]/1e-15,
@@ -260,6 +324,8 @@ define(
                 }
 
                 self.data1d = data1d;
+
+                self.calculating = false;
             },
 
             set_slider_values: function(zero_delay, t_start, t_stop){
@@ -270,40 +336,30 @@ define(
                 self.eldelT.slider({
                     min: Math.round(t_start/1e-15),
                     max: Math.round(t_stop/1e-15)
-                    // value: Math.round(0/1e-15)
-                    // value: Math.round(zero_delay/1e-15)
                 });
-                // self.set('delT', zero_delay);
             },
 
             calc_HOM_JSA: function( props ){
 
-                // @TODO: move this to a control bar
-                props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
-                var self = this;
-                var dim = 200;
-                var threshold = 0.5;
-                var lim = PhaseMatch.autorange_lambda(props, threshold);
-                var l_start = Math.min(lim.lambda_s.min, lim.lambda_i.min);
-                var l_stop =  Math.max(lim.lambda_s.max, lim.lambda_i.max);
-                var delT = self.get('delT');
-
                 var self = this
+                    ,dim = 200
+                    ,delT = self.get('delT')
+                    ,po = self.plotOpts
                     ,PM = PhaseMatch.calc_HOM_JSA(
                         props,
-                        l_start, 
-                        l_stop, 
-                        l_start,
-                        l_stop,
-                        delT,
+                        po.get('ls_start'), 
+                        po.get('ls_stop'),
+                        po.get('li_start'),
+                        po.get('li_stop'), 
+                        self.get('delT'),
                         dim
                     )
                     ;
 
                 self.data = PM;
-                self.plot.setXRange([l_start * 1e9, l_stop * 1e9]);
-                self.plot.setYRange([l_start * 1e9, l_stop * 1e9]);
 
+                self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
+                self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
             },
 
             draw: function(){
@@ -318,7 +374,7 @@ define(
 
                 self.plot.plotData( data );
 
-                //////// other plot
+                // other plot
                 var data1d = self.data1d;
 
                 if (!data1d){

@@ -218,8 +218,8 @@ define(
 
                 self.data = PM;
                 
-                self.plot.setXRange([ converter.to('nm', self.plotOpts.get('ls_start')), converter.to('nm', self.plotOpts.get('ls_stop')) ]);
-                self.plot.setYRange([ converter.to('nm', self.plotOpts.get('li_start')), converter.to('nm', self.plotOpts.get('li_stop')) ]);
+                self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
+                self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
                 self.calculating = false;
             },

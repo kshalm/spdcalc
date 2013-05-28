@@ -1,6 +1,6 @@
 <section class="form-horizontal">
 
-    <!-- JSA Plot Options -->
+    <!-- JSA-HOM Plot Options -->
     <h3>Plot Options</h3>
 
     <div class="control-group">
@@ -45,6 +45,25 @@
         </label>
         <div class="controls">
             <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="li_stop" value="{{= this.converter.to('nano', parseFloat( it.li_stop )) }}" />
+        </div>
+    </div>
+
+    <label>Time Delay Range</label>
+    <div class="control-group">
+        <label class="control-label">
+            Start (fs)
+        </label>
+        <div class="controls">
+            <input type="text" data-parse="float" data-unit="femto" class="inputbox" name="delT_start" value="{{= this.converter.to('femto', parseFloat( it.delT_start )) }}" />
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">
+            Stop (fs)
+        </label>
+        <div class="controls">
+            <input type="text" data-parse="float" data-unit="femto" class="inputbox" name="delT_stop" value="{{= this.converter.to('femto', parseFloat( it.delT_stop )) }}" />
         </div>
     </div>
 </section>
