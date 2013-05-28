@@ -204,7 +204,6 @@ define(
                     var $this = $(this)
                         ,key = $this.attr('name')
                         ,val = $this.is(':checked')
-                        ,parse = $this.data('parse')
                         ;
 
                     // update the corresponding boolean property in the parameters object
@@ -297,6 +296,7 @@ define(
 
                 if (mod.getOptsPanel){
                     self.elPlotOpts.append( mod.getOptsPanel() );
+                    customCheckbox( self.elPlotOpts );
                 }
 
                 mod.connect( self );
