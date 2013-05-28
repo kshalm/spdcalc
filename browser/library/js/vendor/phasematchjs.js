@@ -2443,6 +2443,21 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
 
 };
 
+PhaseMatch.autorange_theta = function autorange_theta(props){
+    var P = PhaseMatch.deep_copy(props);
+    P.update_all_angles();
+    var offset = 2* Math.PI/180;
+    var dif = (P.theta_s - P.theta_s*.4);
+    var theta_start =dif*(1-(1e-6/P.W));
+    var theta_start = Math.max(0, theta_start);
+    var theta_end = P.theta_s + P.theta_s*.4;
+    var theta_end = Math.max(2*Math.PI/180, theta_end);
+
+    // console.log("optimal theta", theta_start*180/Math.PI, theta_end*theta_start*180/Math.PI);
+
+    return [theta_start, theta_end];
+};
+
 
 
 (function(){

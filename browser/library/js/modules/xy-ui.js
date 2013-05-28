@@ -172,10 +172,16 @@ define(
                 var dataThetaPhi = [];
                 var dataThetaTheta = [];
 
+                var theta_lim = PhaseMatch.autorange_theta(props);
+                var t_start = theta_lim[0];
+                var t_stop = theta_lim[1];
+
                 var self = this;
 
-                var x_start = -10*Math.PI/180;
-                var x_stop = 10*Math.PI/180;
+                // var x_start = -10*Math.PI/180;
+                // var x_stop = 10*Math.PI/180;
+                var x_start = -1*t_stop;
+                var x_stop = t_stop;
                 var PMXY = PhaseMatch.calc_XY(props, x_start, x_stop, x_start,x_stop, dim);
                 self.dataPMXY = PMXY;
                 var conv = 180/Math.PI;
@@ -183,8 +189,8 @@ define(
                 self.plotPMXY.setYRange([x_start * conv, x_stop * conv]);
 
                 // Lambda signal vs theta signal
-                var t_start = 0*Math.PI/180;
-                var t_stop = 5*Math.PI/180;
+                // var t_start = 0*Math.PI/180;
+                // var t_stop = 5*Math.PI/180;
                 var PMLambdasThetas = PhaseMatch.calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start,t_stop, dim);
                 self.dataLambdasThetas = PMLambdasThetas;
                 self.plotLambdasThetas.setXRange([l_start / 1e-9, l_stop / 1e-9]);
