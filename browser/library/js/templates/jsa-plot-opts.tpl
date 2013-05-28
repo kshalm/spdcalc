@@ -4,20 +4,47 @@
     <h3>Plot Options</h3>
 
     <div class="control-group">
+        <label class="checkbox control-label" for="autocalc_plotopts"> 
+            Auto calculate plot options
+            <input type="checkbox" name="autocalc_plotopts" id="autocalc_plotopts" {{? it.autocalc_plotopts }}checked="checked"{{?}}> 
+        </label>
+    </div>
+
+    <label>Signal Wavelength</label>
+    <div class="control-group">
         <label class="control-label">
-            Lambda Start (nm)
+            Start (nm)
         </label>
         <div class="controls">
-            <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="l_start" value="{{= this.converter.to('nm', parseFloat( it.l_start )) }}" />
+            <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="ls_start" value="{{= this.converter.to('nm', parseFloat( it.ls_start )) }}" />
         </div>
     </div>
 
     <div class="control-group">
         <label class="control-label">
-            Lambda Stop (nm)
+            Stop (nm)
         </label>
         <div class="controls">
-            <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="l_stop" value="{{= this.converter.to('nm', parseFloat( it.l_stop )) }}" />
+            <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="ls_stop" value="{{= this.converter.to('nm', parseFloat( it.ls_stop )) }}" />
+        </div>
+    </div>
+
+    <label>Idler Wavelength</label>
+    <div class="control-group">
+        <label class="control-label">
+            Start (nm)
+        </label>
+        <div class="controls">
+            <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="li_start" value="{{= this.converter.to('nm', parseFloat( it.li_start )) }}" />
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">
+            Stop (nm)
+        </label>
+        <div class="controls">
+            <input type="text" data-parse="float" data-unit="nm" class="inputbox" name="li_stop" value="{{= this.converter.to('nm', parseFloat( it.li_stop )) }}" />
         </div>
     </div>
 </section>

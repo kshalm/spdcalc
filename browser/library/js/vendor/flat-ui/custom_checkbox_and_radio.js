@@ -35,18 +35,22 @@ define(
             $("html").addClass("has-js");
 
             // First let's prepend icons (needed for effects)
-            $(".checkbox, .radio", scope).prepend("<span class='icon'></span><span class='icon-to-fade'></span>");
+            var els = $(".checkbox:not([data-init]), .radio:not([data-init])", scope);
 
-            scope.on('click', '.checkbox input[type="checkbox"], .radio input[type="radio"]', function(){
+            els.attr('data-init', 'true');
+            els.prepend("<span class='icon'></span><span class='icon-to-fade'></span>");
+
+            els.find('input[type="checkbox"], input[type="radio"]').on('click', function(){
                 
                 var $this = $(this);
                 $this.parent().toggleClass('checked', $this.is(':checked'));
                 $this.parent().toggleClass('disabled', $this.is(':disabled'));
             });
 
-            scope.find('input[type="checkbox"]:checked').parent().addClass('checked');
+            els.find('input[type="checkbox"]:checked').parent().addClass('checked');
 
-            $(".toggle", scope).each(function(index, toggle) {
+            $(".toggle:not([data-init])", scope).each(function(index, toggle) {
+                toggle.attr('data-init', 'true');
                 toggleHandler(toggle);
             });
         }

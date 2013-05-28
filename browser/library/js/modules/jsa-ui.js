@@ -87,30 +87,26 @@ define(
                 // @TODO: this object should be replaced
                 // by whatever is storing the plot options.
                 // (or just use this object...)
-                self.plotOpts = {};
+                self.plotOpts = new (Stapes.subclass());
 
-                self.elPlotOpts = $( tplJSAPlotOpts.render( self.plotOpts ) );
+                self.plotOpts.set('autocalc_plotopts', true);
 
-                // @TODO this won't work right now...
-                // need plotOpts to be a stapes module
-                // 
-                // self.plotOpts.on('refresh', function(){
+                self.elPlotOpts = $( tplJSAPlotOpts.render( self.plotOpts.getAll() ) );
 
-                //     this.each(function( val, key ){
-                //         // console.log(val, key)
-                //         // refresh parameter values in the html
-                //         var el = self.elPlotOpts.find('[name="'+key+'"]')
-                //             ,unit = el.data('unit')
-                //             ;
+                self.plotOpts.on('change', function( key ){
 
-                //         if (unit){
-                //             val  = converter.to( unit, val );
-                //         }
+                    // refresh parameter values in the html
+                    var el = self.elPlotOpts.find('[name="'+key+'"]')
+                        ,val = this.get( key )
+                        ,unit = el.data('unit')
+                        ;
 
-                //         el.val( val );
-                //     });
+                    if (unit){
+                        val  = converter.to( unit, val );
+                    }
 
-                // });
+                    el.val( val );
+                });
 
                 self.elPlotOpts.on('change', 'input[type="text"], select', function(){
 
@@ -130,11 +126,23 @@ define(
                     }
                     
                     // update the corresponding property in the plotOpts object
-                    self.plotOpts[ key ] = val;
+                    self.plotOpts.set(key, val);
 
                     // recalc and draw
-                    self.calc( self.parameters );
-                    self.draw();
+                    self.refresh();
+                });
+
+                self.elPlotOpts.on('change', 'input[type="checkbox"]', function(){
+                    var $this = $(this)
+                        ,key = $this.attr('name')
+                        ,val = $this.is(':checked')
+                        ;
+
+                    // update the corresponding boolean property in the parameters object
+                    self.plotOpts.set( key, val );
+
+                    // recalc and draw
+                    self.refresh();
                 });
             },
 
@@ -206,36 +214,48 @@ define(
 
             autocalcPlotOpts: function(){
 
-                var self = this;
+                var self = this
+                    ,threshold = 0.5
+                    ,props = self.parameters.getProps()
+                    ,lim
+                    ;
 
-                self.plotOpts.x
+                // this does nothing... need to use .set()
+                props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
+                lim = PhaseMatch.autorange_lambda(props, threshold);
+
+                self.plotOpts.set({
+                    'ls_start': lim.lambda_s.min,
+                    'ls_stop': lim.lambda_s.max,
+                    'li_start': lim.lambda_i.min,
+                    'li_stop': lim.lambda_i.max
+                });
             },
 
             calc: function( props ){
 
-                // @TODO: move this to a control bar
-                props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
-                var dim = 200;
-                var threshold = 0.5;
-                var lim = PhaseMatch.autorange_lambda(props, threshold);
+                var self = this;
 
-                var data1d = [];
+                if ( self.plotOpts.get('autocalc_plotopts') ){
 
-                var self = this
+                    self.autocalcPlotOpts();
+                }
+
+                var dim = 200
                     ,PM = PhaseMatch.calc_JSA(
                         props, 
-                        lim.lambda_s.min, 
-                        lim.lambda_s.max, 
-                        lim.lambda_i.min,
-                        lim.lambda_i.max, 
+                        self.plotOpts.get('ls_start'), 
+                        self.plotOpts.get('ls_stop'),
+                        self.plotOpts.get('li_start'),
+                        self.plotOpts.get('li_stop'), 
                         dim
                     )
                     ;
 
                 self.data = PM;
                 
-                self.plot.setXRange([ converter.to('nm', lim.lambda_s.min), converter.to('nm', lim.lambda_s.max) ]);
-                self.plot.setYRange([ converter.to('nm', lim.lambda_i.min), converter.to('nm', lim.lambda_i.max) ]);
+                self.plot.setXRange([ converter.to('nm', self.plotOpts.get('ls_start')), converter.to('nm', self.plotOpts.get('ls_stop')) ]);
+                self.plot.setYRange([ converter.to('nm', self.plotOpts.get('li_start')), converter.to('nm', self.plotOpts.get('li_stop')) ]);
             },
 
             draw: function(){
