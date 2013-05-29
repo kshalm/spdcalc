@@ -14,14 +14,22 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
     function plotJSA(P,ls_start, ls_stop, li_start,li_stop, dim){
         var con = PhaseMatch.constants;
 
-    
-        var startTime = new Date();
-        var PM = PhaseMatch.calcJSA(P,ls_start, ls_stop, li_start,li_stop, dim);
+        // dim = 2000;
+        
+        var PM = PhaseMatch.calc_JSA(P,ls_start, ls_stop, li_start,li_stop, dim);
         // var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, -400-15, dim);
         // var PM = PhaseMatch.calc_JSA_Asymmetry(P,ls_start, ls_stop, li_start,li_stop, 4000e-15, dim);
-        var endTime = new Date();
+       
+
+
+        var startTime = new Date();
+        //Test the create2Ddata routine to produce a 2D array
+        var data2D = PhaseMatch.create2Darray(PM, dim, dim);
+         var endTime = new Date();
         var timeDiff = (endTime - startTime);
-        console.log("Calc time = ", timeDiff)
+        console.log("Calc time = ", timeDiff);
+
+        console.log(dim, "data middle", data2D[100][100]);
         
         // PM = PhaseMatch.AntiTranspose(PM, dim);
         
@@ -47,7 +55,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         var con = PhaseMatch.constants;
         
         var startTime = new Date();
-        var PM = PhaseMatch.calcXY(P,x_start, x_stop, y_start,y_stop, dim);
+        var PM = PhaseMatch.calc_XY(P,x_start, x_stop, y_start,y_stop, dim);
         var endTime = new Date();
         var timeDiff = (endTime - startTime);
         console.log("Calc time = ", timeDiff)
@@ -175,15 +183,15 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         // var l_start = 1500 * con.nm;
         // var l_stop = 1600* con.nm; 
         var P1 = new PhaseMatch.SPDCprop();
-        PhaseMatch.optimum_idler(P1);
+        P1.optimum_idler();
         
 
         if (P1.autocalctheta){
-            PhaseMatch.auto_calc_Theta(P1);
+            P1.auto_calc_Theta();
         }
 
         if (P1.autocalcpp){
-            PhaseMatch.calc_poling_period(P1);
+            P1.calc_poling_period();
         }
         var threshold = 0.5;
 
@@ -202,40 +210,40 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
             plotJSA(P1,l_start,l_stop,l_start,l_stop, npts);
         });
 
-        var x_start = -10*Math.PI/180;
-        var x_stop = 10*Math.PI/180;
-        var y_start = -10*Math.PI/180;
-        var y_stop = 10*Math.PI/180;
-        // $(function(){
-        //     $('#viewport').append('<h2> XY signal </h2>');
-        //     var P2 = new PhaseMatch.SPDCprop();
-        //     plotXY(P2,x_start,x_stop,y_start,y_stop,npts);
-        // });
+        // var x_start = -10*Math.PI/180;
+        // var x_stop = 10*Math.PI/180;
+        // var y_start = -10*Math.PI/180;
+        // var y_stop = 10*Math.PI/180;
+        // // $(function(){
+        // //     $('#viewport').append('<h2> XY signal </h2>');
+        // //     var P2 = new PhaseMatch.SPDCprop();
+        // //     plotXY(P2,x_start,x_stop,y_start,y_stop,npts);
+        // // });
 
         
-        $(function(){
-            $('#viewport').append('<h2> XY idler </h2>');
-            // plotJSA(P1,l_start,l_stop,l_start,l_stop, npts);
-            var tmpType = P1.Type;
-            plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
-            P1.Type = tmpType;
-        });
-
-
-        $(function(){
-            $('#viewport').append('<h2> Lambda_s vs Theta_s </h2>');
-            plot_lambda_s_vs_theta_s(P1,l_start, l_stop, 0,5*Math.PI/180, npts)
-        });
-        
         // $(function(){
-        //     $('#viewport').append('<h2> Crystal phasematching (theta vs phi) </h2>');
-        //     plot_theta_phi(P1, 0, Math.PI/2, 0, Math.PI/2, npts);
+        //     $('#viewport').append('<h2> XY idler </h2>');
+        //     // plotJSA(P1,l_start,l_stop,l_start,l_stop, npts);
+        //     var tmpType = P1.Type;
+        //     plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
+        //     P1.Type = tmpType;
         // });
 
-        $(function(){
-            $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
-            plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
-        });
+
+        // $(function(){
+        //     $('#viewport').append('<h2> Lambda_s vs Theta_s </h2>');
+        //     plot_lambda_s_vs_theta_s(P1,l_start, l_stop, 0,5*Math.PI/180, npts)
+        // });
+        
+        // // $(function(){
+        // //     $('#viewport').append('<h2> Crystal phasematching (theta vs phi) </h2>');
+        // //     plot_theta_phi(P1, 0, Math.PI/2, 0, Math.PI/2, npts);
+        // // });
+
+        // $(function(){
+        //     $('#viewport').append('<h2> HONG-OU-MANDEL </h2>');
+        //     plot_HOM(P1, -400e-15, 400e-15, l_start,l_stop,l_start,l_stop, 100);
+        // });
 
 
 

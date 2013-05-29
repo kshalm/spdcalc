@@ -8,6 +8,10 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
 
+    if (P.brute_force){
+        dim = P.brute_dim;
+    }
+
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
     var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
@@ -26,7 +30,14 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
-        P.optimum_idler(P); //Need to find the optimum idler for each angle.
+        // P.optimum_idler(P); //Need to find the optimum idler for each angle.
+        if (P.brute_force) {
+           P.brute_force_theta_i(P); //use a search. could be time consuming. 
+        }
+        else {
+            //calculate the correct idler angle analytically.
+            P.optimum_idler(P);
+        }
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
 
