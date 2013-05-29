@@ -11,6 +11,7 @@ define(
         'jquery.tagsinput',
         'custom-checkbox',
         'modules/converter',
+        'modules/panel',
 
         // physics modules
         'modules/parameters',
@@ -32,6 +33,7 @@ define(
         _jqtags,
         customCheckbox,
         converter,
+        Panel,
 
         // physics modules
         Parameters,
@@ -65,6 +67,7 @@ define(
                 var self = this;
 
                 self.initParameters();
+                self.initPlotOpts();
                 self.initUI();
                 self.initEvents();
                 self.initModules();
@@ -237,6 +240,17 @@ define(
                 
                 var self = this;
                 self.parameters = Parameters();
+            },
+
+            initPlotOpts: function(){
+
+                var self = this;
+
+                self.plotOpts = Panel({
+                    data: {
+                        'autocalc_plotopts': true
+                    }
+                });
             },
 
             initModules: function(){

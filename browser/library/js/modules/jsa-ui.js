@@ -5,8 +5,8 @@ define(
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
+        'modules/skeleton-ui',
         'modules/converter',
-        'modules/panel',
         'tpl!templates/jsa-layout.tpl',
         'tpl!templates/jsa-plot-opts.tpl'
     ],
@@ -16,8 +16,8 @@ define(
         PhaseMatch,
         HeatMap,
         LinePlot,
+        SkeletonUI,
         converter,
-        Panel,
         tplJSALayout,
         tplJSAPlotOpts
     ) {
@@ -25,29 +25,24 @@ define(
         'use strict';
 
         var con = PhaseMatch.constants;
-        var defaults = {
-            
-        };
-
+        
         /**
          * @module JSAUI
          * @implements {Stapes}
          */
-        var jsaUI = Stapes.subclass({
+        var jsaUI = SkeletonUI.subclass({
+
+            constructor: SkeletonUI.prototype.constructor,
+            tplPlots: tplJSALayout,
+            tplPlotOpts: tplJSAPlotOpts,
 
             /**
-             * Mediator Constructor
+             * Initialize Plots
              * @return {void}
              */
-            constructor : function( config ){
+            initPlots : function( config ){
 
                 var self = this;
-
-                self.options = $.extend({}, defaults, config);
-
-                self.initPhysics();
-
-                self.el = $( tplJSALayout.render() );
 
                 var margins = {
                     top: 60,
@@ -71,107 +66,6 @@ define(
                     format: '.0f'
                 });
                 self.plot.setTitle('Joint spectral amplitude');
-                self.elPlot = $(self.plot.el);
-
-                // init plot options
-                self.initPlotOpts();
-
-            },
-
-            initPlotOpts: function(){
-
-                var self = this
-                    ,to
-                    ;
-
-                self.plotOpts = Panel({
-                    template: tplJSAPlotOpts,
-                    data: {
-                        'autocalc_plotopts': true
-                    }
-                });
-
-                self.plotOpts.on('change', function(){
-
-                    clearTimeout( to );
-
-                    if (self.calculating){
-                        return;
-                    }
-
-                    to = setTimeout(function(){
-
-                        // recalc and draw
-                        self.refresh();
-
-                    }, 100);
-                });
-            },
-
-            initPhysics: function(){
-
-                // initialize physics if needed...
-            },
-
-            /**
-             * Connect to main app
-             * @return {void}
-             */
-            connect : function( app ){
-
-                var self = this
-                    ;
-
-                self.parameters = app.parameters;
-
-                // connect to the app events
-                app.on({
-
-                    calculate: self.refresh
-
-                }, self);
-
-                // auto draw
-                self.refresh();
-                
-            },
-
-            disconnect: function( app ){
-
-                // disconnect from app events
-                app.off( 'calculate', self.refresh );
-            },
-
-            resize: function(){
-
-                var self = this
-                    ,par = self.elPlot.parent()
-                    ,width = par.width()
-                    ,height = $(window).height()
-                    ,dim = Math.min( width, height ) - 100 // - margin
-                    ;
-
-                // if (dim > 400){ 
-                //     dim = 400;
-                // }
-
-                // self.plot.resize( dim, dim );
-                self.draw();
-            },
-
-            getMainPanel: function(){
-                return this.el;
-            },
-
-            getOptsPanel: function(){
-                return this.plotOpts.getElement();
-            },
-
-            refresh: function(){
-
-                var self = this;
-                self.calc( self.parameters.getProps() );
-                self.draw();
             },
 
             autocalcPlotOpts: function(){
@@ -198,13 +92,6 @@ define(
 
                 var self = this;
 
-                self.calculating = true;
-
-                if ( self.plotOpts.get('autocalc_plotopts') ){
-
-                    self.autocalcPlotOpts();
-                }
-
                 var dim = 200
                     ,PM = PhaseMatch.calc_JSA(
                         props, 
@@ -220,8 +107,6 @@ define(
                 
                 self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
-
-                self.calculating = false;
             },
 
             draw: function(){
@@ -235,8 +120,6 @@ define(
                 }
 
                 self.plot.plotData( data );
-
-               
             }
         });
 
