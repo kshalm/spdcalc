@@ -104,6 +104,8 @@ define(
 
             detachView: function( domEl ){
 
+                var self = this;
+
                 domEl.off('.panel');
 
                 self.els = self.els.not( domEl );

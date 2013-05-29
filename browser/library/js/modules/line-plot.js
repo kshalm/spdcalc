@@ -129,28 +129,28 @@ define(
 
             resize: function( w, h ){
 
-                var width = w
-                    ,height = h
-                    ,margin = this.margin
+                var margin = this.margin
                     ;
 
-                this.width = width;
-                this.height = height;
+                if ( !h ){
+                    h = (this.height/this.width) * w;
+                }
 
-                width += margin.left + margin.right;
-                height += margin.top + margin.bottom;
+                this.width = w;
+                this.height = h;
+
+                w += margin.left + margin.right;
+                h += margin.top + margin.bottom;
 
                 this.el
-                    .css('width', width+'px')
-                    .css('height', height+'px')
+                    .css('width', w+'px')
+                    .css('height', h+'px')
                     ;
 
                 this.svg
-                    .attr("width", width)
-                    .attr("height", height)
+                    .attr("width", w)
+                    .attr("height", h)
                     ;
-
-                
             },
 
             refreshAxes: function(){

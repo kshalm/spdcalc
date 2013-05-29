@@ -69,6 +69,7 @@ define(
                 self.el = $( self.tplPlots.render() );
 
                 self.elPlotOpts = $('<div>');
+                self.plots = [];
                 self.initPlots();
             },
 
@@ -87,6 +88,15 @@ define(
 
                 self.plotOpts.attachView( self.elPlotOpts );
                 self.plotOpts.on('change', checkRecalc, self);
+            },
+
+            addPlot: function( plot ){
+
+                var self = this
+                    ,plots = self.plots
+                    ;
+
+                plots.push( plot );
             },
 
             /**
@@ -117,6 +127,8 @@ define(
 
             disconnect: function( app ){
 
+                var self = this;
+
                 // disconnect from app events
                 app.off( 'calculate', self.refresh );
 
@@ -133,11 +145,15 @@ define(
                     ,dim = Math.min( width, height ) - 100 // - margin
                     ;
 
-                // if (dim > 400){ 
-                //     dim = 400;
-                // }
+                if (dim > 400){ 
+                    dim = 400;
+                }
 
-                // self.plot.resize( dim, dim );
+                for ( var i = 0, l = self.plots.length; i < l; ++i ){
+                    
+                    self.plots[ i ].resize( dim );
+                }
+                
                 self.draw();
             },
 
@@ -163,6 +179,8 @@ define(
                 self.calculating = false;
 
                 self.draw();
+
+                self.emit('refresh');
             },
 
             autocalcPlotOpts: function(){

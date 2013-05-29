@@ -122,17 +122,14 @@ define(
 
             resize: function( w, h ){
 
-                if (w>400 || h>400){
-                    w = 400;
-                    h = 400;
+                if ( !h ){
+                    h = (this.height/this.width) * w;
                 }
 
                 this.el.css({
                     'width': w + 'px',
                     'height': h + 'px'
                 });
-
-
 
                 this.width = w;
                 this.height = h;

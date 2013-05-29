@@ -40,7 +40,7 @@ define(
              * Initialize Plots
              * @return {void}
              */
-            initPlots : function( config ){
+            initPlots : function(){
 
                 var self = this;
 
@@ -53,6 +53,7 @@ define(
 
                 // init plot
                 self.plot = new HeatMap({
+                    title: 'Joint spectral amplitude',
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     margins: margins,
                     width: 480,
@@ -65,7 +66,8 @@ define(
                     yrange: [ 0, 100 ],
                     format: '.0f'
                 });
-                self.plot.setTitle('Joint spectral amplitude');
+
+                self.addPlot( self.plot );
             },
 
             autocalcPlotOpts: function(){
