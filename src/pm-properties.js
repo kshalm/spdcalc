@@ -66,8 +66,8 @@
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.use_guassian_approx = false;
-            this.crystal_Names = PhaseMatch.CrystalDBKeys;
-            this.crystal = PhaseMatch.CrystalDB[this.crystal_Names[0]];
+            this.crystaldb = PhaseMatch.Crystals;
+            this.crystal = PhaseMatch.Crystals('BBO-1');
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -163,8 +163,9 @@
             return n ;
         },
 
-        set_crystal : function (k){
-            this.crystal = PhaseMatch.CrystalDB[k];
+        set_crystal : function ( key ){
+            
+            this.crystal = PhaseMatch.Crystals( key );
             // var ind = this.crystal.indicies(this.lambda_p, this.temp);
         },
 

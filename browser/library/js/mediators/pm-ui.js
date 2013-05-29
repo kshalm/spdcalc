@@ -11,11 +11,11 @@ define(
         'jquery.tagsinput',
         'custom-checkbox',
         'modules/converter',
+        'modules/panel',
 
         // physics modules
         'modules/parameters',
         'modules/jsa-ui',
-        'modules/hom-ui',
         'modules/jsa-hom-ui',
         'modules/kitchen-sink-ui',
         'modules/xy-ui'
@@ -32,11 +32,11 @@ define(
         _jqtags,
         customCheckbox,
         converter,
+        Panel,
 
         // physics modules
         Parameters,
         jsaUI,
-        homUI,
         jsahomUI,
         ksUI,
         xyUI
@@ -65,6 +65,7 @@ define(
                 var self = this;
 
                 self.initParameters();
+                self.initPlotOpts();
                 self.initUI();
                 self.initEvents();
                 self.initModules();
@@ -116,21 +117,12 @@ define(
                 });
 
                 self.parameters.on({
-                    'change': function( key ){
+                    'refresh': function( key ){
 
                         if (!self.autocalc){
                             return;
                         }
-                        // if (!key==='xtal'){
-                        //     self.emit('calculate');
-                        // }
-                        self.emit('calculate');
-                    },
-                    'change:xtal': function( val ){
-
-                        if (!self.autocalc){
-                            return;
-                        }
+                        
                         self.emit('calculate');
                     }
                 });
@@ -248,14 +240,23 @@ define(
                 self.parameters = Parameters();
             },
 
+            initPlotOpts: function(){
+
+                var self = this;
+
+                self.plotOpts = Panel({
+                    data: {
+                        'autocalc_plotopts': true
+                    }
+                });
+            },
+
             initModules: function(){
                 
                 var self = this;
 
                 // JSA
                 self.set('jsa', jsaUI());
-                // HOM
-                self.set('hom', homUI());
                 // JSA-HOM
                 self.set('jsa-hom', jsahomUI());
                 // Kitchen Sink

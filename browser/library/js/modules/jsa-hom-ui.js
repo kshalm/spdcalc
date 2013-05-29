@@ -5,8 +5,9 @@ define(
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
+        'modules/skeleton-ui',
         'modules/converter',
-        'modules/panel',
+        'tpl!templates/jsa-layout.tpl',
         'tpl!templates/time-delay-ctrl.tpl',
         'tpl!templates/jsa-hom-plot-opts.tpl'
     ],
@@ -16,8 +17,9 @@ define(
         PhaseMatch,
         HeatMap,
         LinePlot,
+        SkeletonUI,
         converter,
-        Panel,
+        tplJSALayout,
         tplTimeDelayCtrl,
         tplJSAHOMPlotOpts
     ) {
@@ -26,46 +28,40 @@ define(
 
         var delTConversion = 1e-15;
 
-
         var con = PhaseMatch.constants;
-        var defaults = {
-            
-        };
-
+        
         /**
          * @module JSAUI
          * @implements {Stapes}
          */
-        var jsaUI = Stapes.subclass({
+        var jsahomUI = SkeletonUI.subclass({
+
+            constructor: SkeletonUI.prototype.constructor,
+            tplPlots: tplJSALayout,
+            tplPlotOpts: tplJSAHOMPlotOpts,
 
             /**
-             * Mediator Constructor
+             * Initialize Plots
              * @return {void}
              */
-            constructor : function( config ){
+            initPlots : function(){
 
                 var self = this;
 
-                self.options = $.extend({}, defaults, config);
-
-                self.initPhysics();
-
-                self.el = $('<div>');
-
                 // init plot
                 self.plot1d = new LinePlot({
-                    el: self.el.get(0),
+                    title: 'Hong-Ou-Mandel Dip',
+                    el: self.el.find('.heat-map-wrapper').get( 0 ),
                     labels: {
                         x: 'Time delay (fs)',
                         y: 'Coincidence probability'
                     },
                     yrange: [0,.65]
                 });
-                self.plot1d.setTitle('Hong-Ou-Mandel Dip');
 
                 self.elPlot1d = $(self.plot1d.el);
 
-                self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el );
+                self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el.find('.heat-map-wrapper') );
                 
                 self.eldelT.slider({
                     min: -800,
@@ -89,16 +85,13 @@ define(
 
                 // init plot
                 self.plot = new HeatMap({
-                    el: self.el.get(0),
+                    title: 'Joint spectral amplitude',
+                    el: self.el.find('.heat-map-wrapper').get( 0 ),
                     labels: {
                         x: 'Signal Wavelength(nm)',
                         y: 'Idler Wavelength(nm)'
                     }
                 });
-
-                self.elPlot = $(self.plot.el)
-                self.plot.setTitle('Joint spectral amplitude');
-
 
                 // internal events
                 var to;
@@ -114,104 +107,12 @@ define(
                     }, 50);
                 });
 
-                self.initPlotOpts();
-            },
-
-            initPlotOpts: function(){
-
-                var self = this
-                    ,to
-                    ;
-
-                self.plotOpts = Panel({
-                    template: tplJSAHOMPlotOpts,
-                    data: {
-                        'autocalc_plotopts': true
-                    }
+                self.on('refresh', function(){
+                    self.refreshLine( self.get('delT') );
                 });
 
-                self.plotOpts.on('change', function(){
-
-                    clearTimeout( to );
-
-                    if (self.calculating){
-                        return;
-                    }
-
-                    to = setTimeout(function(){
-
-                        // recalc and draw
-                        self.refresh();
-
-                    }, 100);
-                });
-            },
-
-            initPhysics: function(){
-
-                // initialize physics if needed...
-            },
-
-            /**
-             * Connect to main app
-             * @return {void}
-             */
-            connect : function( app ){
-
-                var self = this
-                    ;
-
-                self.parameters = app.parameters;
-
-                // connect to the app events
-                app.on({
-
-                    calculate: self.refresh
-
-                }, self);
-
-                // auto draw
-                self.refresh();
-                
-            },
-
-            disconnect: function( app ){
-
-                // disconnect from app events
-                app.off( 'calculate', self.refresh );
-            },
-
-            resize: function(){
-
-                var self = this
-                    ,par = self.elPlot.parent()
-                    ,width = par.width()
-                    ,height = $(window).height()
-                    ,dim = Math.min( width, height )
-                    ;
-                
-                // maximum value of 400
-                dim = Math.min(400, dim);
-
-                self.plot.resize( dim, dim );
-                self.plot1d.resize( dim, dim/3 );
-                self.draw();
-            },
-
-            getMainPanel: function(){
-                return this.el;
-            },
-
-            getOptsPanel: function(){
-                return this.plotOpts.getElement();
-            },
-
-            refresh: function(){
-
-                var self = this;
-                self.calc( self.parameters.getProps() );
-                self.draw();
-                self.refreshLine( self.get('delT') );
+                self.addPlot( self.plot );
+                self.addPlot( self.plot1d );
             },
 
             refreshJSA: function(){
@@ -284,13 +185,6 @@ define(
 
                 var self = this;
 
-                self.calculating = true;
-
-                if ( self.plotOpts.get('autocalc_plotopts') ){
-
-                    self.autocalcPlotOpts();
-                }
-
                 self.calc_HOM_JSA( props );
 
                 // Hong-Ou-Mandel dip
@@ -324,8 +218,6 @@ define(
                 }
 
                 self.data1d = data1d;
-
-                self.calculating = false;
             },
 
             set_slider_values: function(zero_delay, t_start, t_stop){
@@ -387,7 +279,7 @@ define(
 
         return function( config ){
 
-            return new jsaUI( config );
+            return new jsahomUI( config );
         };
     }
 );
