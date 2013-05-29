@@ -44,7 +44,7 @@ define(
              * Initialize Plots
              * @return {void}
              */
-            initPlots : function( config ){
+            initPlots : function(){
 
                 var self = this;
 

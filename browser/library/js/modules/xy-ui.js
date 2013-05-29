@@ -5,7 +5,10 @@ define(
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
-        'tpl!templates/xy-layout.tpl'
+        'modules/converter',
+        'modules/skeleton-ui',
+        'tpl!templates/xy-layout.tpl',
+        'tpl!templates/xy-plot-opts.tpl'
     ],
     function(
         $,
@@ -13,233 +16,209 @@ define(
         PhaseMatch,
         HeatMap,
         LinePlot,
-        tplXYLayout
+        converter,
+        SkeletonUI,
+        tplXYLayout,
+        tplXYPlotOpts
     ) {
 
         'use strict';
 
 
         var con = PhaseMatch.constants;
-        var defaults = {
-            
-        };
-
+        
         /**
          * @module JSAUI
          * @implements {Stapes}
          */
-        var xy_UI = Stapes.subclass({
+        var xy_UI = SkeletonUI.subclass({
+
+            constructor: SkeletonUI.prototype.constructor,
+            tplPlots: tplXYLayout,
+            tplPlotOpts: tplXYPlotOpts,
 
             /**
-             * Mediator Constructor
+             * Initialize Plots
              * @return {void}
              */
-            constructor : function( config ){
+            initPlots : function(){
 
                 var self = this;
 
-                self.options = $.extend({}, defaults, config);
-
-                self.initPhysics();
-
-                self.el = $( tplXYLayout.render() );
-
                 // PMXY plot
                 self.plotPMXY = new HeatMap({
+                    title: 'External Emission angle',
                     el: self.el.find('.PMXY-wrapper').get( 0 ),
                     labels: {
                         x: 'X Emission Angle (deg)',
                         y: 'Y Emission Angle (deg)'
                     }
                 });
-                self.plotPMXY.setTitle('External Emission angle');
+
                 self.elplotPMXY = $(self.plotPMXY.el);
 
                 // Lambda_s vs theta_s plot
                 self.plotLambdasThetas = new HeatMap({
+                    title: 'Wavelength vs emission angle',
                     el: self.el.find('.lambda_s-theta_s-wrapper').get( 0 ),
                     labels: {
                         x: 'Signal Wavelength (nm)',
                         y: 'Theta Signal (deg)'
                     }
                 });
-                self.plotLambdasThetas.setTitle('Wavelength vs emission angle');
+
                 self.elplotLambdasThetas = $(self.plotLambdasThetas.el);
 
                 // Theta/Phi in the crystal
                 self.plotThetaPhi = new HeatMap({
+                    title: 'Signal Theta vs Phi',
                     el: self.el.find('.pm-theta-phi-wrapper').get( 0 ),
                     labels: {
                         x: 'Theta Signal (deg)',
                         y: 'Phi Signal (deg)'
                     }
                 });
-                self.plotThetaPhi.setTitle('Signal Theta vs Phi ');
+                
                 self.elplotThetaPhi = $(self.plotThetaPhi.el);
 
                 // Theta/Phi in the crystal
                 self.plotThetaTheta = new HeatMap({
+                    title: 'Signal vs Idler',
                     el: self.el.find('.pm-theta-theta-wrapper').get( 0 ),
                     labels: {
                         x: 'Theta Signal (deg)',
                         y: 'Theta Idler (deg)'
                     }
                 });
-                self.plotThetaTheta.setTitle('Signal vs Idler ');
+                
                 self.elplotThetaTheta = $(self.plotThetaTheta.el);
 
+                self.addPlot( self.plotPMXY );
+                self.addPlot( self.plotLambdasThetas );
+                self.addPlot( self.plotThetaPhi );
+                self.addPlot( self.plotThetaTheta );
             },
 
-            initPhysics: function(){
-
-                // initialize physics if needed...
-            },
-
-            /**
-             * Connect to main app
-             * @return {void}
-             */
-            connect : function( app ){
+            autocalcPlotOpts: function(){
 
                 var self = this
+                    ,threshold = 0.5
+                    ,props = self.parameters.getProps()
+                    ,lim
+                    ,lim_theta
                     ;
 
-                self.parameters = app.parameters;
-
-                // connect to the app events
-                app.on({
-
-                    calculate: self.refresh
-
-                }, self);
-
-                // auto draw
-                self.refresh();
+                // this does nothing... need to use .set()
+                props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
+                lim = PhaseMatch.autorange_lambda(props, threshold);
+                lim_theta = PhaseMatch.autorange_theta(props);
                 
-            },
+                self.plotOpts.set({
+                    'ls_start': lim.lambda_s.min,
+                    'ls_stop': lim.lambda_s.max,
+                    'li_start': lim.lambda_i.min,
+                    'li_stop': lim.lambda_i.max,
 
-            disconnect: function( app ){
-
-                // disconnect from app events
-                app.off( 'calculate', self.refresh );
-            },
-
-            resize: function(){
-
-                var self = this
-                    ,par = self.elplotPMXY.parent()
-                    ,width = par.width()
-                    ,height = $(window).height()
-                    ,dim = Math.min( width, height )
-                    ;
-                if (dim>600){ dim = 600;}
-                self.plotPMXY.resize( dim, dim );
-                self.plotLambdasThetas.resize( dim, dim );
-                self.plotThetaPhi.resize( dim, dim );
-                self.plotThetaTheta.resize( dim, dim );
-                
-
-                self.draw();
-            },
-
-            getMainPanel: function(){
-                return this.el;
-            },
-
-            refresh: function(){
-
-                var self = this;
-                self.calc( self.parameters.getProps() );
-                self.draw();
+                    'theta_start': lim_theta[0],
+                    'theta_stop': lim_theta[1]
+                });
             },
 
             calc: function( props ){
 
-                // @TODO: move this to a control bar
-                props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
-                var dim = 200;
-                // var l_start = 1500 * con.nm;
-                // var l_stop = 1600 * con.nm; 
-                var threshold = 0.5;
-                var lim = PhaseMatch.autorange_lambda(props, threshold);
-                var l_start = lim.lambda_s.min;
-                var l_stop =  lim.lambda_s.max;
-                // console.log("max, min ",threshold,  l_start/1e-9, l_stop/1e-9);
-                var data1d = [];
-                var dataPMXY = [];
-                var dataJSA = [];
-                var dataLambdasThetas = [];
-                var dataThetaPhi = [];
-                var dataThetaTheta = [];
+                var self = this
+                    ,dim = 200
+                    ,po = this.plotOpts
+                    ,data1d = []
+                    ,dataPMXY = []
+                    ,dataJSA = []
+                    ,dataLambdasThetas = []
+                    ,dataThetaPhi = []
+                    ,dataThetaTheta = []
+                    ,l_start = converter.to('nano', po.get('ls_start'))
+                    ,l_stop =  converter.to('nano', po.get('ls_stop'))
+                    ,t_start = converter.to('deg', po.get('theta_start'))
+                    ,t_stop = converter.to('deg', po.get('theta_stop'))
+                    ,x_start = -1 * t_stop
+                    ,x_stop = t_stop
+                    ;
 
-                var theta_lim = PhaseMatch.autorange_theta(props);
-                var t_start = theta_lim[0];
-                var t_stop = theta_lim[1];
-
-                var self = this;
-
-                // var x_start = -10*Math.PI/180;
-                // var x_stop = 10*Math.PI/180;
-                var x_start = -1*t_stop;
-                var x_stop = t_stop;
-                var PMXY = PhaseMatch.calc_XY(props, x_start, x_stop, x_start,x_stop, dim);
+                var PMXY = PhaseMatch.calc_XY(
+                    props, 
+                    -1 * po.get('theta_stop'), 
+                    po.get('theta_stop'), 
+                    -1 * po.get('theta_stop'), 
+                    po.get('theta_stop'), 
+                    dim
+                );
                 self.dataPMXY = PMXY;
-                var conv = 180/Math.PI;
-                self.plotPMXY.setXRange([x_start * conv, x_stop * conv]);
-                self.plotPMXY.setYRange([x_start * conv, x_stop * conv]);
+
+                self.plotPMXY.setXRange([ x_start, x_stop ]);
+                self.plotPMXY.setYRange([ x_start, x_stop ]);
 
                 // Lambda signal vs theta signal
-                // var t_start = 0*Math.PI/180;
-                // var t_stop = 5*Math.PI/180;
-                var PMLambdasThetas = PhaseMatch.calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start,t_stop, dim);
+                var PMLambdasThetas = PhaseMatch.calc_lambda_s_vs_theta_s(
+                    props,
+                    po.get('ls_start'),
+                    po.get('ls_stop'),
+                    po.get('theta_start'),
+                    po.get('theta_stop'),
+                    dim
+                );
                 self.dataLambdasThetas = PMLambdasThetas;
-                self.plotLambdasThetas.setXRange([l_start / 1e-9, l_stop / 1e-9]);
-                self.plotLambdasThetas.setYRange([t_start * conv, t_stop * conv]);
+                self.plotLambdasThetas.setXRange([ l_start, l_stop ]);
+                self.plotLambdasThetas.setYRange([ t_start, t_stop ]);
 
                 // Theta vs Phi in crystal
-                var PMThetaPhi = PhaseMatch.calc_signal_theta_phi (props,t_start, t_stop,  0 , 90*Math.PI/180, dim);
+                var PMThetaPhi = PhaseMatch.calc_signal_theta_phi(
+                    props,
+                    po.get('theta_start'),
+                    po.get('theta_stop'),
+                    0,
+                    0.5 * Math.PI,
+                    dim
+                );
                 self.dataThetaPhi = PMThetaPhi;
-                self.plotThetaPhi.setXRange([t_start * conv, t_stop * conv]);
+                self.plotThetaPhi.setXRange([ t_start, t_stop ]);
                 self.plotThetaPhi.setYRange([0 ,90]);
 
                 // Signal Theta vs Idler Theta in crystal
-                var PMThetaTheta = PhaseMatch.calc_signal_theta_vs_idler_theta(props, t_start, t_stop,  t_start, t_stop, dim);
+                var PMThetaTheta = PhaseMatch.calc_signal_theta_vs_idler_theta(
+                    props,
+                    po.get('theta_start'),
+                    po.get('theta_stop'),
+                    po.get('theta_start'),
+                    po.get('theta_stop'),
+                    dim
+                );
                 self.dataThetaTheta = PMThetaTheta;
-                self.plotThetaTheta.setXRange([t_start * conv, t_stop * conv]);
-                self.plotThetaTheta.setYRange([t_start * conv, t_stop * conv]);
-                
-    
+                self.plotThetaTheta.setXRange([ t_start, t_stop ]);
+                self.plotThetaTheta.setYRange([ t_start, t_stop ]);
             },
 
             draw: function(){
 
                 var self = this;
                     
-                //// PMXY plot
-                if (!self.dataPMXY){
+                // PMXY plot
+                if (!self.dataPMXY || 
+                    !self.dataLambdasThetas || 
+                    !self.dataThetaPhi ||
+                    !self.dataThetaTheta
+                ){
                     return this;
                 }
+
                 self.plotPMXY.plotData( self.dataPMXY );
 
-                //// lambda signal vs theta signal plot
-                if (!self.dataLambdasThetas){
-                    return this;
-                }
+                // lambda signal vs theta signal plot
                 self.plotLambdasThetas.plotData( self.dataLambdasThetas );
 
-                //// Theta vs Phi in the crystal
-                if (!self.dataThetaPhi){
-                    return this;
-                }
+                // Theta vs Phi in the crystal
                 self.plotThetaPhi.plotData( self.dataThetaPhi );
 
-                //// Theta vs Phi in the crystal
-                if (!self.dataThetaTheta){
-                    return this;
-                }
+                // Theta vs Phi in the crystal
                 self.plotThetaTheta.plotData( self.dataThetaTheta );
-
-
 
             }
         });
