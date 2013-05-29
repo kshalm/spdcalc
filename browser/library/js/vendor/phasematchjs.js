@@ -2595,45 +2595,52 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
         calc_Index_PMType : function (lambda, Type, S, photon){
             var ind = this.crystal.indicies(lambda, this.temp);
 
-            var nx = ind[0];
-            var ny = ind[1];
-            var nz = ind[2];
+            var nx_squared_inv = 1/sq( ind[0] );
+            var ny_squared_inv = 1/sq( ind[1] );
+            var nz_squared_inv = 1/sq( ind[2] );
 
-            var Sx = S[0];
-            var Sy = S[1];
-            var Sz = S[2];
+            var Sx_squared = sq( S[0] );
+            var Sy_squared = sq( S[1] );
+            var Sz_squared = sq( S[2] );
 
-            var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
-            var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
+            var B = Sx_squared * (ny_squared_inv + nz_squared_inv) + Sy_squared * (nx_squared_inv + nz_squared_inv) + Sz_squared * (nx_squared_inv + ny_squared_inv);
+            var C = Sx_squared * (ny_squared_inv * nz_squared_inv) + Sy_squared * (nx_squared_inv * nz_squared_inv) + Sz_squared * (nx_squared_inv * ny_squared_inv);
             var D = sq(B) - 4 * C;
 
-            var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
-            var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
-            //nfast = o, nslow = e
-
-            var n = 1;
+            var doSlow = true;
 
             switch (Type){
                 case "Type 0:   o -> o + o":
-                    n = nfast;
+                    doSlow = false;
                 break;
                 case "Type 1:   e -> o + o":
-                    if (photon === "pump") { n = nslow;}
-                    else { n = nfast;}
+                    if (photon !== "pump") { 
+                        doSlow = false;
+                    }
                 break;
                 case "Type 2:   e -> e + o":
-                    if (photon === "idler") { n = nfast;}
-                    else {n = nslow;}
+                    if (photon !== "idler") { 
+                        doSlow = false;
+                    }
                 break;
                 case "Type 2:   e -> o + e":
-                    if (photon === "signal") { n = nfast;}
-                    else {n = nslow;}
+                    if (photon !== "signal") { 
+                        doSlow = false;
+                    }
                 break;
                 default:
                     throw "Error: bad PMType specified";
             }
 
-            return n ;
+            // determine the expensive calculation we need before doing it
+            if ( doSlow ){
+
+                return Math.sqrt(2/ (B + Math.sqrt(D)));
+
+            } else {
+
+                return Math.sqrt(2/ (B - Math.sqrt(D)));
+            }
         },
 
         set_crystal : function ( key ){
