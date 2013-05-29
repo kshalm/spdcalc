@@ -5,6 +5,7 @@ define(
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
+        'modules/skeleton-ui',
         'tpl!templates/kitchen-sink-layout.tpl'
     ],
     function(
@@ -13,36 +14,32 @@ define(
         PhaseMatch,
         HeatMap,
         LinePlot,
+        SkeletonUI,
         tplKSLayout
     ) {
 
         'use strict';
 
-
         var con = PhaseMatch.constants;
-        var defaults = {
-            
-        };
-
+        
         /**
          * @module JSAUI
          * @implements {Stapes}
          */
-        var kitchen_sink_UI = Stapes.subclass({
+        var kitchen_sink_UI = SkeletonUI.subclass({
+
+            constructor: SkeletonUI.prototype.constructor,
+            tplPlots: tplKSLayout,
+            // dummy
+            tplPlotOpts: {render: function(){}},
 
             /**
-             * Mediator Constructor
+             * Initialize Plots
              * @return {void}
              */
-            constructor : function( config ){
+            initPlots : function(){
 
                 var self = this;
-
-                self.options = $.extend({}, defaults, config);
-
-                self.initPhysics();
-
-                self.el = $( tplKSLayout.render() );
 
                 // JSA plot
                 self.plotJSA = new HeatMap({
@@ -69,7 +66,6 @@ define(
                 });
                 self.elplotThetaPhi = $(self.plotThetaPhi.el);
 
-
                 // HOM plot
                 self.plot1d = new LinePlot({
                     el: self.el.find('.HOM-wrapper').get(0),
@@ -80,75 +76,18 @@ define(
                 });
 
                 self.elPlot1d = $(self.plot1d.el);
+
+                self.addPlot( self.plotJSA );
+                self.addPlot( self.plotPMXY );
+                self.addPlot( self.plotLambdasThetas );
+                self.addPlot( self.plotThetaPhi );
+                self.addPlot( self.plot1d );
             },
 
-            initPhysics: function(){
-
-                // initialize physics if needed...
-            },
-
-            /**
-             * Connect to main app
-             * @return {void}
-             */
-            connect : function( app ){
-
-                var self = this
-                    ;
-
-                self.parameters = app.parameters;
-
-                // connect to the app events
-                app.on({
-
-                    calculate: self.refresh
-
-                }, self);
-
-                // auto draw
-                self.refresh();
-                
-            },
-
-            disconnect: function( app ){
-
-                // disconnect from app events
-                app.off( 'calculate', self.refresh );
-            },
-
-            resize: function(){
-
-                var self = this
-                    ,par = self.elPlotJSA.parent()
-                    ,width = par.width()
-                    ,height = $(window).height()
-                    ,dim = Math.min( width, height )
-                    ;
-                if (dim>600){ dim = 600;}
-                self.plotJSA.resize( dim, dim );
-                self.plot1d.resize( dim, dim );
-                self.plotPMXY.resize( dim, dim );
-                self.plotLambdasThetas.resize( dim, dim );
-                self.plotThetaPhi.resize( dim, dim );
-                
-
-                self.draw();
-            },
-
-            getMainPanel: function(){
-                return this.el;
-            },
-
-            refresh: function(){
-
-                var self = this;
-                self.calc( self.parameters.getProps() );
-                self.draw();
-            },
+            autocalcPlotOpts: function(){},
 
             calc: function( props ){
 
-                // @TODO: move this to a control bar
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
                 var dim = 200;
                 var threshold = 0.5;
@@ -202,59 +141,33 @@ define(
                     })
                 }
 
-                self.data1d = data1d;                
-
-                // // get sin wave data
-                // for ( var i = 0, l = 100; i < l; i += 0.1 ){
-                    
-                //     data1d.push({
-                //         x: i,
-                //         y: 20 * (Math.sin( i )+1)
-                //     });
-                // }
-
-                // self.data1d = data1d;
+                self.data1d = data1d;
 
             },
 
             draw: function(){
 
                 var self = this
-                    ,data = self.dataJSA
                     ;
 
-                if (!data){
+                if (!self.dataJSA ||
+                    !self.dataPMXY || 
+                    !self.dataLambdasThetas || 
+                    !self.dataThetaPhi ||
+                    !self.data1d
+                ){
                     return this;
                 }
-                self.plotJSA.plotData( data );
 
-                //// PMXY plot
-                if (!self.dataPMXY){
-                    return this;
-                }
+                self.plotJSA.plotData( self.dataJSA );
+
                 self.plotPMXY.plotData( self.dataPMXY );
 
-                //// lambda signal vs theta signal plot
-                if (!self.dataLambdasThetas){
-                    return this;
-                }
                 self.plotLambdasThetas.plotData( self.dataLambdasThetas );
 
-                //// Theta vs Phi in the crystal
-                if (!self.dataThetaPhi){
-                    return this;
-                }
                 self.plotThetaPhi.plotData( self.dataThetaPhi );
 
-
-                //////// HOM plot
-                var data1d = self.data1d;
-
-                if (!data1d){
-                    return this;
-                }
-                self.plot1d.plotData( data1d );
-
+                self.plot1d.plotData( self.data1d );
 
             }
         });
