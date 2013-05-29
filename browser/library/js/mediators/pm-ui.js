@@ -16,7 +16,6 @@ define(
         // physics modules
         'modules/parameters',
         'modules/jsa-ui',
-        'modules/hom-ui',
         'modules/jsa-hom-ui',
         'modules/kitchen-sink-ui',
         'modules/xy-ui'
@@ -38,7 +37,6 @@ define(
         // physics modules
         Parameters,
         jsaUI,
-        homUI,
         jsahomUI,
         ksUI,
         xyUI
@@ -259,8 +257,6 @@ define(
 
                 // JSA
                 self.set('jsa', jsaUI());
-                // HOM
-                self.set('hom', homUI());
                 // JSA-HOM
                 self.set('jsa-hom', jsahomUI());
                 // Kitchen Sink
