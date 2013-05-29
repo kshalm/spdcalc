@@ -116,21 +116,12 @@ define(
                 });
 
                 self.parameters.on({
-                    'change': function( key ){
+                    'refresh': function( key ){
 
                         if (!self.autocalc){
                             return;
                         }
-                        // if (!key==='xtal'){
-                        //     self.emit('calculate');
-                        // }
-                        self.emit('calculate');
-                    },
-                    'change:xtal': function( val ){
-
-                        if (!self.autocalc){
-                            return;
-                        }
+                        
                         self.emit('calculate');
                     }
                 });

@@ -10,6 +10,31 @@ define(
 
         'use strict';
 
+        var debounce = function( fn, delay, ctx ){
+
+            var to
+                ,ret
+                ;
+
+            delay = delay || 100;
+            ctx = ctx || this;
+
+            return function(){
+
+                clearTimeout( to );
+
+                var args = Array.prototype.slice.call( arguments );
+
+                to = setTimeout(function(){
+                    
+                    ret = fn.apply(ctx, args);
+
+                }, 100);
+
+                return ret;
+            };
+        };
+
         var con = PhaseMatch.constants;
         var defaults = {
             
@@ -29,6 +54,14 @@ define(
 
                 var self = this;
 
+
+                // this ensures that .refresh() calls
+                // get throttled so they don't do double refreshes
+                
+                self.refresh = debounce( self.refresh, 100, self );
+                self.checkautocalc = debounce( self.checkautocalc, 50, self );
+
+                // setup props
                 self.props = new PhaseMatch.SPDCprop();
                 
                 if (self.props.autocalctheta){
@@ -50,42 +83,40 @@ define(
                 self.on({
 
                     'change': function( key ){
+
+                        // do nothing for crystal... 
+                        // taken care of by other event
+                        if ( key === 'xtal' ){
+                            return;
+                        }
                         
                         var val = self.get( key );
                         self.props[ key ] = val;
 
-                        console.log('set ', key, 'to', val)
-                    
-                        if (self.props.autocalctheta){
-                            self.props.auto_calc_Theta( self.props );
-                        } 
-
-                        if (self.props.autocalcpp){
-                            self.props.calc_poling_period( self.props );
-                        }
-
-                        if (self.props.autocalcpp || self.props.autocalctheta){
-                            // if we are going to trigger autocalculation, refresh
-                            self.refresh();
-                        }
+                        self.checkautocalc();
                         self.refresh();
                     },
-                    //@TODO Krister:
-                    //The way the change events happen, if the crystal is selected everything is calculated twice.
-                    //There must be a more elegant way to deal with this.
+                    
                     'change:xtal': function( val ){
+                        
                         self.props.set_crystal( val );
-
-                        if (self.props.autocalctheta){
-                            self.props.auto_calc_Theta( self.props );
-                        } 
-
-                        if (self.props.autocalcpp){
-                            self.props.calc_poling_period( self.props );
-                        }
+                        self.checkautocalc();
                         self.refresh();
                     }
                 });
+            },
+
+            checkautocalc: function(){
+
+                var self = this;
+
+                if (self.props.autocalctheta){
+                    self.props.auto_calc_Theta( self.props );
+                } 
+
+                if (self.props.autocalcpp){
+                    self.props.calc_poling_period( self.props );
+                }
             },
 
             // resync all values in the original self.props object
