@@ -3236,7 +3236,7 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
                 throw 'Crystal type "' + key + ' already defined.';
             }
 
-            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create);
+            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create, { id: key });
         }
 
         return PhaseMatch.util.clone( crystals[ key ], true );

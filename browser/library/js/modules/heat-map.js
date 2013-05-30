@@ -36,6 +36,25 @@ define(
                 .interpolate(d3.interpolateLab)
         };
 
+        function create2DArray(data, dimx, dimy){
+            var data2D = [];
+            var index = 0;
+
+            for (var i = 0; i<dimy; i++){
+                
+                var row = new Float64Array(dimx);
+                
+                for  (var j = 0; j<dimx; j++){
+                    row[j] = data[index];
+                    index += 1;
+                }
+
+                data2D[i] = row;
+            }
+
+            return data2D;
+        };
+
         function defaultColorScale( val ){
 
             return d3.rgb(scale( val ));
@@ -276,6 +295,56 @@ define(
                 return img;
             },
 
+            exportData: function(){
+
+                if (!this.data){
+                    return [];
+                }
+
+                var data = this.data
+                    ,l = data.length
+                    ,cols = this.width
+                    ,rows = this.height
+                    ,scale = Math.sqrt( l / (cols * rows) )
+                    ,i
+                    ,xvals = []
+                    ,yvals = []
+                    ,x = this.scales.x
+                    ,y = this.scales.y
+                    ;
+
+                cols *= scale;
+                rows *= scale;
+
+                cols = Math.floor(cols);
+                rows = Math.floor(rows);
+
+                for ( var i = 0; i < cols; ++i ){
+                    
+                    xvals.push( x.invert( i / scale ) );
+                }
+
+                for ( var i = 0; i < rows; ++i ){
+
+                    yvals.push( y.invert( i / scale ) );
+                }
+
+                return {
+                    title: this.elTitle.text(),
+                    x: {
+                        label: this.labels.x,
+                        values: xvals,
+                        length: cols
+                    },
+                    y: {
+                        label: this.labels.y,
+                        values: yvals,
+                        length: rows
+                    },
+                    data: create2DArray( data, cols, rows )
+                };
+            },
+
             plotData: function( data ){
 
                 var l = data.length
@@ -283,6 +352,8 @@ define(
                     ,rows = this.height
                     ,scale = Math.sqrt( l / (cols * rows) )
                     ;
+
+                this.data = data;
 
                 cols *= scale;
                 rows *= scale;

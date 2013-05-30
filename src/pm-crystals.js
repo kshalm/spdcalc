@@ -31,7 +31,7 @@
                 throw 'Crystal type "' + key + ' already defined.';
             }
 
-            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create);
+            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create, { id: key });
         }
 
         return PhaseMatch.util.clone( crystals[ key ], true );
