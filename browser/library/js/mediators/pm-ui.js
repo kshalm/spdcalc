@@ -18,7 +18,8 @@ define(
         'modules/jsa-ui',
         'modules/jsa-hom-ui',
         'modules/kitchen-sink-ui',
-        'modules/xy-ui'
+        'modules/xy-ui',
+        'modules/schmidt-2d-ui'
     ],
     function(
         $,
@@ -39,7 +40,8 @@ define(
         jsaUI,
         jsahomUI,
         ksUI,
-        xyUI
+        xyUI,
+        schmidtUI
     ) {
 
         'use strict';
@@ -263,6 +265,9 @@ define(
                 self.set('kitchen_sink', ksUI());
                 // XY
                 self.set('xy', xyUI());
+                // Schmidt Spectral Purity  
+                // self.set('schmidt-2d', schmidtUI);
+                self.set('schmidt-2d', schmidtUI());
             },
 
             /**

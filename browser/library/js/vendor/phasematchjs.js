@@ -2376,11 +2376,13 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 /*
  * calc_Schmidt
  * Calculates the Schmidt number for a 2D matrix
+ * NOTE: The SVD routine has problems with odd dimensions
  */
 PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
     // var PM2D = PhaseMatch.create2Darray(PM, dim,dim);
 
     var svd = PhaseMatch.svdcmp(PM);
+    // @TODO: add in logic to test if the SVD converged. It will return false if it did not.
     var D = svd.W;
     // console.log("D", D);
     var Norm = PhaseMatch.Sum(D); // Normalization
@@ -2392,15 +2394,6 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
     } 
     return 1/Kinv;
 };
-// #===============================================================================
-// # # Calculate the Schmidt Number using Singular Value Decomposition
-// #===============================================================================
-// def cal_Schmidt_number(PM):
-//     D = np.linalg.svd(PM, full_matrices=True)[1]
-//     D = np.diag(D)
-//     D = D/np.sum(D) # Normalize
-//     K = 1/np.sum(D**2)
-//     return K
 
 /**
  * The following section is where we calculate intelligent guesses for the ranges of the plots.
@@ -3180,6 +3173,92 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
     }
     var endTime = new Date();
     var timeDiff = (endTime - startTime);
+    return PM;
+
+};
+
+/* calc_schmidt_plot
+* Params is a JSON string of the form { x: "L/W/BW", y:"L/W/BW"}
+*/
+PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop, y_start, y_stop, ls_start, ls_stop, li_start, li_stop, dim, params){
+
+    var P = PhaseMatch.deep_copy(props);
+    props.update_all_angles(P);
+
+
+    if (P.brute_force && dim>P.brute_dim){
+        dim = P.brute_dim;
+    }
+
+    var xrange = PhaseMatch.linspace(x_start, x_stop, dim);
+    var yrange = PhaseMatch.linspace(y_stop, y_start, dim); 
+    var i;
+
+    var S = new Float64Array( dim );
+
+    var dimjsa = 50; //make sure this is even
+
+    var maxpm = 0;
+
+    
+    
+    for (i=0; i<N; i++){
+        var index_s = i % dim;
+        var index_i = Math.floor(i / dim);
+
+        // Figure out what to plot in the x dimension
+        switch (params.x){
+            case "L":
+                P.L = xrange[index_s];
+            break;
+            case "W":
+                P.W = xrange[index_s];
+            break;
+            case "BW":
+                P.p_bw = xrange[index_s];
+            break;
+            default:
+                throw "Error: x input type";
+        }
+
+        // Figure out what to plot in the y dimension
+        switch (params.y){
+            case "L":
+                P.L = yrange[index_s];
+            break;
+            case "W":
+                P.W = yrange[index_s];
+            break;
+            case "BW":
+                P.p_bw = yrange[index_s];
+            break;
+            default:
+                throw "Error: y input type";
+        }
+        
+        //now calculate the JSA for these values
+        var jsa = calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dimjsa);
+        // v = 
+        S[i] = PhaseMatch.calc_Schmidt(jsa);
+
+        // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+
+        // // P.optimum_idler(P); //Need to find the optimum idler for each angle.
+        // if (P.brute_force) {
+        //    P.brute_force_theta_i(P); //use a search. could be time consuming. 
+        // }
+        // else {
+        //     //calculate the correct idler angle analytically.
+        //     P.optimum_idler(P);
+        // }
+        
+        // PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+    }
+    
+    // console.log("max pm value = ", maxpm);
+    console.log("");
+    // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
+    
     return PM;
 
 };

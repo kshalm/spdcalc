@@ -11,6 +11,7 @@
                         <option value="jsa">Joint Spectral Amplitude</option>
                         <option value="xy">Emission Angle</option>
                         <option value="jsa-hom">Hong-Ou-Mandel</option>
+                        <option value="schmidt-2d">Spectral Purity</option>
                         <option value="kitchen_sink">Kitchen Sink</option>
                     </select>
                 </div>

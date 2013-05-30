@@ -14,7 +14,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
     function plotJSA(P,ls_start, ls_stop, li_start,li_stop, dim){
         var con = PhaseMatch.constants;
 
-        // dim = 2000;
+        dim = 50;
         
         var PM = PhaseMatch.calc_JSA(P,ls_start, ls_stop, li_start,li_stop, dim);
         // var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, -400-15, dim);
@@ -30,7 +30,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
        //     [  2, -6,  6,  5,  1],
        //     [  4,  5,  0, -2,  2]];
 
-       var  A = [[1,2,3],[4,5,6],[7,8,9]];
+       // var  A = [[1,2,3],[4,5,6],[7,8,9]];
 
        var startTime = new Date();
         //Test the create2Ddata routine to produce a 2D array
@@ -52,7 +52,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         
 
 
-        console.log(dim, "data middle", data2D[100][100]);
+        // console.log(dim, "data middle", data2D[100][100]);
         
         // PM = PhaseMatch.AntiTranspose(PM, dim);
         
