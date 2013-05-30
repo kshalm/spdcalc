@@ -291,6 +291,34 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
     
 };
 
+/*
+ * calc_Schmidt
+ * Calculates the Schmidt number for a 2D matrix
+ */
+PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
+    // var PM2D = PhaseMatch.create2Darray(PM, dim,dim);
+
+    var svd = PhaseMatch.svdcmp(PM);
+    var D = svd.W;
+    var Norm = PhaseMatch.Sum(D); // Normalization
+    console.log("normalization", Norm);
+    var l = D.length;
+    var K = 0;
+    for (var i = 0; i<l; i++){
+        K += 1/sq(D[i]/Norm); //calculate the Schmidt number
+    } 
+    return K;
+};
+// #===============================================================================
+// # # Calculate the Schmidt Number using Singular Value Decomposition
+// #===============================================================================
+// def cal_Schmidt_number(PM):
+//     D = np.linalg.svd(PM, full_matrices=True)[1]
+//     D = np.diag(D)
+//     D = D/np.sum(D) # Normalize
+//     K = 1/np.sum(D**2)
+//     return K
+
 /**
  * The following section is where we calculate intelligent guesses for the ranges of the plots.
  */

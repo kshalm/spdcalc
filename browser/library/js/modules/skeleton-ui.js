@@ -138,23 +138,23 @@ define(
 
             resize: function(){
 
-                var self = this
-                    ,par = self.el.parent()
-                    ,width = par.width()
-                    ,height = $(window).height()
-                    ,dim = Math.min( width, height ) - 100 // - margin
-                    ;
+                // var self = this
+                //     ,par = self.el.parent()
+                //     ,width = par.width()
+                //     ,height = $(window).height()
+                //     ,dim = Math.min( width, height ) - 100 // - margin
+                //     ;
 
-                if (dim > 400){ 
-                    dim = 400;
-                }
+                // if (dim > 400){ 
+                //     dim = 400;
+                // }
 
-                for ( var i = 0, l = self.plots.length; i < l; ++i ){
+                // for ( var i = 0, l = self.plots.length; i < l; ++i ){
                     
-                    self.plots[ i ].resize( dim );
-                }
+                //     self.plots[ i ].resize( dim );
+                // }
                 
-                self.draw();
+                // self.draw();
             },
 
             getMainPanel: function(){

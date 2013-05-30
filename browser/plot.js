@@ -20,16 +20,39 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         // var PM = PhaseMatch.calc_HOM_JSA(P,ls_start, ls_stop, li_start,li_stop, -400-15, dim);
         // var PM = PhaseMatch.calc_JSA_Asymmetry(P,ls_start, ls_stop, li_start,li_stop, 4000e-15, dim);
        
+       // var A =
+       //    [[ 22, 10,  2,  3,  7],
+       //     [ 14,  7, 10,  0,  8],
+       //     [ -1, 13, -1,-11,  3],
+       //     [ -3, -2, 13, -2,  4],
+       //     [  9,  8,  1, -2,  4],
+       //     [  9,  1, -7,  5, -1],
+       //     [  2, -6,  6,  5,  1],
+       //     [  4,  5,  0, -2,  2]];
+
+       // var  A = [[1,2,3],[4,5,6],[7,8,9]];
+
+       // var startTime = new Date();
+       //  //Test the create2Ddata routine to produce a 2D array
+       //  var data2D = PhaseMatch.create2Darray(PM, dim, dim);
+
+       //  var endTime = new Date();
+       //  var timeDiff = (endTime - startTime);
+       //  console.log("Calc time = ", timeDiff);
 
 
-        var startTime = new Date();
-        //Test the create2Ddata routine to produce a 2D array
-        var data2D = PhaseMatch.create2Darray(PM, dim, dim);
-         var endTime = new Date();
-        var timeDiff = (endTime - startTime);
-        console.log("Calc time = ", timeDiff);
+       //  var startTime = new Date();
+       //  var svdresults = PhaseMatch.svdcmp(data2D);
+       //  // console.log(svdresults.U, svdresults.W, svdresults.V);
+       //  var endTime = new Date();
+       //  var timeDiff = (endTime - startTime);
+       //  console.log("SVD time = ", timeDiff);
 
-        console.log(dim, "data middle", data2D[100][100]);
+       //  var K = PhaseMatch.calc_Schmidt(data2D);
+       //  console.log("schmidt = ", K);
+
+
+       //  console.log(dim, "data middle", data2D[100][100]);
         
         // PM = PhaseMatch.AntiTranspose(PM, dim);
         

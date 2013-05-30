@@ -56,8 +56,12 @@ define(
                         x: 'Time delay (fs)',
                         y: 'Coincidence probability'
                     },
+                    width: 400,
+                    height: 200,
                     yrange: [0,.65]
                 });
+
+                self.plot1d.resize(400,150);
 
                 self.elPlot1d = $(self.plot1d.el);
 
@@ -183,7 +187,12 @@ define(
 
             calc: function( props ){
 
-                var self = this;
+                var self = this,
+                    threshold = 0.5
+                    ,props = self.parameters.getProps();
+                    
+                var lim = PhaseMatch.autorange_lambda(props, threshold);
+                var tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max);
 
                 self.calc_HOM_JSA( props );
 
@@ -218,6 +227,8 @@ define(
                 }
 
                 self.data1d = data1d;
+
+                self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
             },
 
             set_slider_values: function(zero_delay, t_start, t_stop){
