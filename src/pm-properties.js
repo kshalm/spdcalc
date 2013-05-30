@@ -45,7 +45,7 @@
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.PM_type_names = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.PM_type_names[2];
+            this.Type = this.PM_type_names[1];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;

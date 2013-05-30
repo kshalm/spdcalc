@@ -2004,7 +2004,7 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
               h = 1.0 / h;
               c = g * h;
               s = -f * h;
-              for (j = 1; j <= m; ++ j){
+              for (j = 0; j < m; ++ j){
                 y = a[j][nm];
                 z = a[j][i];
                 a[j][nm] = y * c + z * s;
@@ -2385,11 +2385,11 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
     var Norm = PhaseMatch.Sum(D); // Normalization
     console.log("normalization", Norm);
     var l = D.length;
-    var K = 0;
+    var Kinv = 0;
     for (var i = 0; i<l; i++){
-        K += 1/sq(D[i]/Norm); //calculate the Schmidt number
+        Kinv += sq(D[i]/Norm); //calculate the inverse of the Schmidt number
     } 
-    return K;
+    return 1/Kinv;
 };
 // #===============================================================================
 // # # Calculate the Schmidt Number using Singular Value Decomposition
@@ -2568,7 +2568,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
             this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.PM_type_names = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.PM_type_names[2];
+            this.Type = this.PM_type_names[1];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;

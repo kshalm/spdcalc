@@ -303,11 +303,11 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
     var Norm = PhaseMatch.Sum(D); // Normalization
     console.log("normalization", Norm);
     var l = D.length;
-    var K = 0;
+    var Kinv = 0;
     for (var i = 0; i<l; i++){
-        K += 1/sq(D[i]/Norm); //calculate the Schmidt number
+        Kinv += sq(D[i]/Norm); //calculate the inverse of the Schmidt number
     } 
-    return K;
+    return 1/Kinv;
 };
 // #===============================================================================
 // # # Calculate the Schmidt Number using Singular Value Decomposition
