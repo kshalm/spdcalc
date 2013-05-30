@@ -2576,33 +2576,33 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
 
         init:function(){
             var con = PhaseMatch.constants;
-            this.lambda_p = 775 * con.nm;
-            this.lambda_s = 1550 * con.nm;
+            this.lambda_p = 405 * con.nm;
+            this.lambda_s = 810 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.PM_type_names = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
             this.Type = this.PM_type_names[1];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
-            this.phi = 0;
-            this.theta_s = 0 * Math.PI / 180;
+            this.phi = 90 * Math.PI/ 180;
+            this.theta_s = 11 * Math.PI / 180;
             this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
-            this.L = 2000 * con.um;
+            this.L = 300 * con.um;
             this.W = 500* con.um;
             this.p_bw = 6 * con.nm;
             this.phase = false;
             this.brute_force = false;
             this.brute_dim = 50;
-            this.autocalctheta = false;
-            this.autocalcpp = true;
+            this.autocalctheta = true;
+            this.autocalcpp = false;
             this.poling_period = 1000000;
             this.poling_sign = 1;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.use_guassian_approx = false;
             this.crystaldb = PhaseMatch.Crystals;
-            this.crystal = PhaseMatch.Crystals('KTP-1');
+            this.crystal = PhaseMatch.Crystals('BBO-1');
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -2921,7 +2921,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
-    console.log("Calculating JSA", props.temp);
+    // console.log("Calculating JSA", props.temp);
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
 
@@ -2962,7 +2962,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     }
     
     // console.log("max pm value = ", maxpm);
-    console.log("");
+    // console.log("");
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     
     return PM;

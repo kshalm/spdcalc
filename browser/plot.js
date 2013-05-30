@@ -34,7 +34,7 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
 
        var startTime = new Date();
         //Test the create2Ddata routine to produce a 2D array
-        var data2D = PhaseMatch.create2Darray(PM, dim, dim);
+        var data2D = PhaseMatch.create_2d_array(PM, dim, dim);
 
         var endTime = new Date();
         var timeDiff = (endTime - startTime);

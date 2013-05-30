@@ -178,6 +178,11 @@ define(
                 this.refreshAxes();
             },
 
+            setZRange: function (zrangeArr){
+                this.scales.z.domain(zrangeArr);
+                this.refreshAxes();
+            },
+
             refreshAxes: function(){
 
                 var self = this

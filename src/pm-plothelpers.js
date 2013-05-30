@@ -4,7 +4,7 @@
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
-    console.log("Calculating JSA", props.temp);
+    // console.log("Calculating JSA", props.temp);
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
 
@@ -45,7 +45,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     }
     
     // console.log("max pm value = ", maxpm);
-    console.log("");
+    // console.log("");
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     
     return PM;
