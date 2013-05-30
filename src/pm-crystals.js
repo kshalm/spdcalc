@@ -17,7 +17,7 @@
     PhaseMatch.Crystals = function( key, create ){
 
         // invalid args
-        if ( !key ) return null;
+        if ( !key ) {return null;}
 
         if ( !create && !( key in crystals ) ){
 
@@ -207,9 +207,9 @@ PhaseMatch.Crystals('LiNbO3-1', {
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
         //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
-        // var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
-        // var ny = nx;
-        // var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
+        var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
+        var ny = nx;
+        var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
 
         // http://www.redoptronics.com/linbo3-crystals.html
         // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));

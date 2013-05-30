@@ -56,13 +56,27 @@ PhaseMatch.linspace = function linspace(xstart,xstop,npts){
 
 PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
   var data2D = [];
-  var row = new Float64Array(dimx);
   var index = 0;
 
   for (var i = 0; i<dimy; i++){
+    var row = new Float64Array(dimx);
     for  (var j = 0; j<dimx; j++){
       row[j] = data[index];
       index += 1;
+    }
+    data2D[i] = row;
+  }
+  return data2D;
+};
+
+PhaseMatch.zeros = function zeros(dimx, dimy){
+  var data2D = [];
+  var index = 0;
+
+  for (var i = 0; i<dimy; i++){
+    var row = new Float64Array(dimx);
+    for  (var j = 0; j<dimx; j++){
+      row[j] = 0;
     }
     data2D[i] = row;
   }
@@ -255,9 +269,17 @@ PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
       return b >= 0.0? Math.abs(a): -Math.abs(a);
     };
 
-    PhaseMatch.svdcmp = function(a, m, n, w, v){
+    // PhaseMatch.svdcmp = function(a, m, n, w, v){
+      PhaseMatch.svdcmp = function(a){
       var flag, i, its, j, jj, k, l, nm,
           anorm = 0.0, c, f, g = 0.0, h, s, scale = 0.0, x, y, z, rv1 = [];
+
+          var m = a.length;  //number of rows
+          var n = a[0].length; // number of cols
+
+          var v = PhaseMatch.zeros(m,n);
+          // var v = PhaseMatch.util.clone(a,true);
+          var w = [];
           
       //Householder reduction to bidiagonal form
       for (i = 0; i < n; ++ i){
@@ -407,7 +429,7 @@ PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
               h = 1.0 / h;
               c = g * h;
               s = -f * h;
-              for (j = 1; j <= m; ++ j){
+              for (j = 0; j < m; ++ j){
                 y = a[j][nm];
                 z = a[j][i];
                 a[j][nm] = y * c + z * s;
@@ -486,6 +508,6 @@ PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
         }
       }
 
-      return true;
+      return {U: a, W: w, V:v};
     };
 })();

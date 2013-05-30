@@ -41,15 +41,15 @@
 
         init:function(){
             var con = PhaseMatch.constants;
-            this.lambda_p = 405 * con.nm;
-            this.lambda_s = 810 * con.nm;
+            this.lambda_p = 775 * con.nm;
+            this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.PM_type_names = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
             this.Type = this.PM_type_names[1];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
             this.phi = 0;
-            this.theta_s = 11 * Math.PI / 180;
+            this.theta_s = 0 * Math.PI / 180;
             this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
@@ -57,17 +57,17 @@
             this.W = 500* con.um;
             this.p_bw = 6 * con.nm;
             this.phase = false;
-            this.brute_force = true;
+            this.brute_force = false;
             this.brute_dim = 50;
-            this.autocalctheta = true;
-            this.autocalcpp = false;
+            this.autocalctheta = false;
+            this.autocalcpp = true;
             this.poling_period = 1000000;
             this.poling_sign = 1;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.use_guassian_approx = false;
             this.crystaldb = PhaseMatch.Crystals;
-            this.crystal = PhaseMatch.Crystals('BBO-1');
+            this.crystal = PhaseMatch.Crystals('KTP-1');
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -122,6 +122,20 @@
         calc_Index_PMType : function (lambda, Type, S, photon){
             var ind = this.crystal.indicies(lambda, this.temp);
 
+            // var nx = ind[0];
+            // var ny = ind[1];
+            // var nz = ind[2];
+
+            // var Sx = S[0];
+            // var Sy = S[1];
+            // var Sz = S[2];
+
+            // var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
+            // var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
+            // var D = sq(B) - 4 * C;
+
+           
+
             var nx_squared_inv = 1/sq( ind[0] );
             var ny_squared_inv = 1/sq( ind[1] );
             var nz_squared_inv = 1/sq( ind[2] );
@@ -134,40 +148,32 @@
             var C = Sx_squared * (ny_squared_inv * nz_squared_inv) + Sy_squared * (nx_squared_inv * nz_squared_inv) + Sz_squared * (nx_squared_inv * ny_squared_inv);
             var D = sq(B) - 4 * C;
 
-            var doSlow = true;
+            var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
+            var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
+
+            var n = 1;
 
             switch (Type){
                 case "Type 0:   o -> o + o":
-                    doSlow = false;
+                    n = nfast;
                 break;
                 case "Type 1:   e -> o + o":
-                    if (photon !== "pump") { 
-                        doSlow = false;
-                    }
+                    if (photon === "pump") { n = nslow;}
+                    else { n = nfast;}
                 break;
                 case "Type 2:   e -> e + o":
-                    if (photon !== "idler") { 
-                        doSlow = false;
-                    }
+                    if (photon === "idler") { n = nfast;}
+                    else {n = nslow;}
                 break;
                 case "Type 2:   e -> o + e":
-                    if (photon !== "signal") { 
-                        doSlow = false;
-                    }
+                    if (photon === "signal") { n = nfast;}
+                    else {n = nslow;}
                 break;
                 default:
                     throw "Error: bad PMType specified";
             }
 
-            // determine the expensive calculation we need before doing it
-            if ( doSlow ){
-
-                return Math.sqrt(2/ (B + Math.sqrt(D)));
-
-            } else {
-
-                return Math.sqrt(2/ (B - Math.sqrt(D)));
-            }
+            return n ;
         },
 
         set_crystal : function ( key ){
