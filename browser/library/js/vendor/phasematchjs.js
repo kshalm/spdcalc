@@ -1644,6 +1644,24 @@ PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
   return data2D;
 };
 
+PhaseMatch.create_2d_array_view = function create_2d_array_view(data, dimx, dimy){
+  var data2D = [];
+
+  if (data.buffer && data.buffer.byteLength){
+
+    for ( var i = 0; i < dimy; i++ ){
+      
+      data2D[ i ] = new Float64Array(data.buffer, i * 16, dimx);
+    }
+
+  } else {
+
+    return null;
+  }
+
+  return data2D;
+};
+
 PhaseMatch.zeros = function zeros(dimx, dimy){
   var data2D = [];
   var index = 0;
