@@ -40,6 +40,33 @@ $sidePanelCollapsed: 70px;
     }
 }
 
+.dropdown {
+
+    .dropdown-menu {
+        background: $base;
+        border: 0;
+        color: $inverse;
+        min-width: 180px;
+
+        a {
+            color: $inverse;
+            text-decoration: none;
+
+            &:hover,
+            &:focus {
+                background: $base;
+                color: $firm;
+            }
+        }
+    }
+
+    
+}
+
+.btn i {
+    vertical-align: middle;
+}
+
 .navbar {
     .site-title {
         float: left;
@@ -150,6 +177,17 @@ $sidePanelCollapsed: 70px;
       fill: none;
       stroke: steelblue;
       stroke-width: 1.5px;
+    }
+
+    .menu-ctrl {
+        position: absolute;
+        left: 28px;
+        top: 22px;
+        z-index: 3;
+        
+        .btn {
+            padding: 4px 8px;
+        }
     }
 }
 

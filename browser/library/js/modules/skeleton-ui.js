@@ -4,14 +4,18 @@ define(
         'stapes',
         'modules/converter',
         'modules/panel',
-        'custom-checkbox'
+        'modules/ddmenu',
+        'custom-checkbox',
+        'tpl!templates/plot-menu.tpl'
     ],
     function(
         $,
         Stapes,
         converter,
         Panel,
-        customCheckbox
+        ddmenu,
+        customCheckbox,
+        tplPlotMenu
     ) {
 
         'use strict';
@@ -97,6 +101,17 @@ define(
                     ;
 
                 plots.push( plot );
+
+                self.addPlotMenu( plot );
+            },
+
+            addPlotMenu: function( plot ){
+
+                plot.el.prepend( tplPlotMenu.render({
+
+                }));
+
+                ddmenu(plot.el.find('.dropdown'));
             },
 
             /**
