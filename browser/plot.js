@@ -38,18 +38,18 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
 
         var endTime = new Date();
         var timeDiff = (endTime - startTime);
-        console.log("Calc time = ", timeDiff);
+        console.log("New 2D time = ", timeDiff);
 
 
         var startTime = new Date();
-        var svdresults = PhaseMatch.svdcmp(data2D);
-        console.log(svdresults.U, svdresults.W, svdresults.V);
+        var K = PhaseMatch.calc_Schmidt(data2D);
         var endTime = new Date();
         var timeDiff = (endTime - startTime);
-        console.log("SVD time = ", timeDiff);
 
-        var K = PhaseMatch.calc_Schmidt(data2D);
         console.log("schmidt = ", K);
+        console.log("Schmidt time = ", timeDiff);
+
+        
 
 
         console.log(dim, "data middle", data2D[100][100]);

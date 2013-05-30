@@ -2382,8 +2382,9 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
 
     var svd = PhaseMatch.svdcmp(PM);
     var D = svd.W;
+    // console.log("D", D);
     var Norm = PhaseMatch.Sum(D); // Normalization
-    console.log("normalization", Norm);
+    // console.log("normalization", Norm);
     var l = D.length;
     var Kinv = 0;
     for (var i = 0; i<l; i++){
