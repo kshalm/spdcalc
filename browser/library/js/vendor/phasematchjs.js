@@ -1629,7 +1629,7 @@ PhaseMatch.linspace = function linspace(xstart,xstop,npts){
     return A;
 };
 
-PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
+PhaseMatch.create_2d_array = function create_2d_array(data, dimx, dimy){
   var data2D = [];
   var index = 0;
 
@@ -3211,8 +3211,8 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
     var xrange = PhaseMatch.linspace(x_start, x_stop, dim);
     var yrange = PhaseMatch.linspace(y_stop, y_start, dim); 
     var i;
-
-    var S = new Float64Array( dim );
+    var N = dim*dim;
+    var S = new Float64Array( N );
 
     var dimjsa = 50; //make sure this is even
 
@@ -3242,22 +3242,22 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
         // Figure out what to plot in the y dimension
         switch (params.y){
             case "L":
-                P.L = yrange[index_s];
+                P.L = yrange[index_i];
             break;
             case "W":
-                P.W = yrange[index_s];
+                P.W = yrange[index_i];
             break;
             case "BW":
-                P.p_bw = yrange[index_s];
+                P.p_bw = yrange[index_i];
             break;
             default:
                 throw "Error: y input type";
         }
         
         //now calculate the JSA for these values
-        var jsa = calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dimjsa);
-        // v = 
-        S[i] = PhaseMatch.calc_Schmidt(jsa);
+        var jsa = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, dimjsa);
+        var jsa2d = PhaseMatch.create_2d_array(jsa, dimjsa, dimjsa);
+        S[i] = PhaseMatch.calc_Schmidt(jsa2d);
 
         // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 
@@ -3277,7 +3277,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
     console.log("");
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     
-    return PM;
+    return S;
 
 };
 

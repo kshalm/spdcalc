@@ -54,7 +54,7 @@ PhaseMatch.linspace = function linspace(xstart,xstop,npts){
     return A;
 };
 
-PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
+PhaseMatch.create_2d_array = function create_2d_array(data, dimx, dimy){
   var data2D = [];
   var index = 0;
 
