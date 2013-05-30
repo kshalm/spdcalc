@@ -3315,7 +3315,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
                 throw 'Crystal type "' + key + ' already defined.';
             }
 
-            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create);
+            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create, { id: key });
         }
 
         return PhaseMatch.util.clone( crystals[ key ], true );

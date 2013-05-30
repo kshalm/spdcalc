@@ -107,11 +107,20 @@ define(
 
             addPlotMenu: function( plot ){
 
+                var self = this;
+
                 plot.el.prepend( tplPlotMenu.render({
 
                 }));
 
-                ddmenu(plot.el.find('.dropdown'));
+                var dd = plot.el.find('.dropdown');
+
+                ddmenu( dd );
+
+                dd.on('click', '.export-csv-ctrl', function(e){
+
+                    self.emit('export-csv', plot.exportData());
+                });
             },
 
             /**

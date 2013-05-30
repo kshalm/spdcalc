@@ -20,7 +20,7 @@
         <div class="control-group">
             <select id="crystal-dropdown" name="xtal" class="full">
                 {{~it.crystaldb.keys() :value:index}}
-                <option value="{{= value }}" {{? value === it.crystal.name}} selected="selected" {{?}}>{{= it.crystaldb(value).name }}</option>
+                <option value="{{= value }}" {{? value === it.crystal.id}} selected="selected" {{?}}>{{= it.crystaldb(value).name }}</option>
                 {{~}}
             </select>
         </div>

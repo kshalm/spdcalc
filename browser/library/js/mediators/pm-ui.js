@@ -5,6 +5,8 @@ define(
         'phasematch',
         'tpl!templates/pm-ui.tpl',
         'tpl!templates/parameters-panel.tpl',
+        'text!templates/converters/heat-map-as-csv.tpl',
+        'dot',
         'jquery-ui',
         'bootstrap-tooltip',
         'jquery.dropkick',
@@ -27,6 +29,8 @@ define(
         PhaseMatch,
         tplPMUI,
         tplParametersPanel,
+        textHeatMapAsCSV,
+        doT,
         _jqui,
         _bstt,
         _dk,
@@ -115,6 +119,31 @@ define(
                         }
 
                         self.elLogs.append('<p>' + msg + '</p>');
+                    },
+
+                    'create': function( key ){
+
+                        var mod = self.get( key );
+
+                        if (mod.on){
+
+                            mod.on({
+
+                                'export-csv': function( data ){
+
+                                    var tpl = doT.template(textHeatMapAsCSV, $.extend({}, doT.templateSettings, { strip: false }));
+                                    var csv = tpl({
+                                        meta: self.parameters.getAll(),
+                                        plot: data
+                                    });
+
+                                    // console.log(csv);
+                                    // return;
+
+                                    document.location = 'data:Application/octet-stream,' + window.encodeURIComponent(csv);
+                                }
+                            });
+                        }
                     }
                 });
 
