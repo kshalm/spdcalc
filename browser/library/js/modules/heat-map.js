@@ -233,7 +233,7 @@ define(
                 var colorBarWidth = 100;
                 var colorBarHeight = 16;
                 var dom = z.domain();
-                var colorBarVals = d3.range( dom[0], dom[1], 0.01 );
+                var colorBarVals = d3.range( dom[0], dom[1], Math.abs(dom[1]-dom[0])/colorBarWidth );
                 var xColorBar = d3.scale.ordinal()
                     .domain( colorBarVals )
                     .rangeRoundBands([0, colorBarWidth])
