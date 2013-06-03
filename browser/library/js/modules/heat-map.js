@@ -99,7 +99,7 @@ define(
             this.scales = {
                 x: d3.scale.linear().domain( options.xrange ),
                 y: d3.scale.linear().domain( options.yrange ),
-                z: options.colorScale
+                z: options.colorScale.copy()
             };
 
             this.margin = defaults.margins;
@@ -271,7 +271,7 @@ define(
 
             setColorScale: function( fn ){
 
-                this.scales.z = fn || defaults.colorScale;
+                this.scales.z = fn || defaults.colorScale.copy();
                 this.refreshAxes();
             },
 
