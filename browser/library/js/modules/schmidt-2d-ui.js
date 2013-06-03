@@ -94,14 +94,14 @@ define(
 
                 var self = this;
 
-                var dim = 30
+                var dim = 10;
                 var params = {
                     x: "L",
                     y: "BW"
                 };
 
-                var x_start = 500e-6;
-                var x_stop = 5000e-6;
+                var x_start = 100e-6;
+                var x_stop = 1000e-6;
                 var y_start = 2e-9;
                 var y_stop = 20e-9;
 
@@ -111,7 +111,7 @@ define(
                 self.data = PM;
 
                 // self.plot.scales.z = d3.scale.linear().domain([0, 50]);
-                self.plot.setZRange([1,5]);
+                self.plot.setZRange([0,5]);
                 self.plot.setXRange( [ converter.to('micro',x_start), converter.to('micro',x_stop)]);
                 self.plot.setYRange( [ converter.to('nano',y_start), converter.to('nano',y_stop)]);
                 

@@ -20,4 +20,5 @@ Apodization FWHM: {{=it.meta.apodization_FWHM}}
 
 {{=it.plot.x.label}}{{~it.plot.x.values :val:idx}}, {{= val }}{{~}}
 {{=it.plot.y.label}}{{~it.plot.y.values :val:idx}}, {{= val }}{{~}}
-{{~it.plot.data :cols:row}}{{= row }}{{~cols :val:col}}, {{= val }}{{~}}{{~}}
+{{~it.plot.data :cols:row}}{{= row }}{{~cols :val:col}}, {{= val }}{{~}}
+{{~}}
