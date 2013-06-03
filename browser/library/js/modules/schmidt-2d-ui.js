@@ -94,7 +94,7 @@ define(
 
                 var self = this;
 
-                var dim = 10
+                var dim = 10;
                 var params = {
                     x: "L",
                     y: "BW"
