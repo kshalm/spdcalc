@@ -336,6 +336,7 @@ define(
 
                 return {
                     title: this.elTitle.text(),
+                    type: 'heat-map',
                     x: {
                         label: this.labels.x,
                         values: xvals,

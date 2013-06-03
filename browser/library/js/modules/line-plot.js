@@ -199,6 +199,28 @@ define(
                   .text( labels.y );
             },
 
+            exportData: function(){
+
+                if (!this.data){
+                    return [];
+                }
+
+                // clone
+                var data = $.map(this.data, $.proxy($.extend, $, true));
+
+                return {
+                    title: this.elTitle.text(),
+                    type: 'line',
+                    x: {
+                        label: this.labels.x
+                    },
+                    y: {
+                        label: this.labels.y
+                    },
+                    data: data
+                };
+            },
+
             plotData: function( data ){
 
                 var svg = this.svgPlot
@@ -216,6 +238,8 @@ define(
                 y.domain( this.yrange || d3.extent(data, function(d) { return d.y; }))
                  .range([height, 0])
                  ;
+
+                this.data = data;
 
                 line = d3.svg.line( data )
                     .x(function(d) { return x(d.x); })

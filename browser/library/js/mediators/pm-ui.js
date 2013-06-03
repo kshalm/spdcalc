@@ -6,6 +6,7 @@ define(
         'tpl!templates/pm-ui.tpl',
         'tpl!templates/parameters-panel.tpl',
         'text!templates/converters/heat-map-as-csv.tpl',
+        'text!templates/converters/line-plot-as-csv.tpl',
         'dot',
         'jquery-ui',
         'bootstrap-tooltip',
@@ -30,6 +31,7 @@ define(
         tplPMUI,
         tplParametersPanel,
         textHeatMapAsCSV,
+        textLinePlotAsCSV,
         doT,
         _jqui,
         _bstt,
@@ -49,6 +51,9 @@ define(
     ) {
 
         'use strict';
+
+        var tplHeatMapAsCSV = doT.template(textHeatMapAsCSV, $.extend({}, doT.templateSettings, { strip: false }));
+        var tplLinePlotAsCSV = doT.template(textLinePlotAsCSV, $.extend({}, doT.templateSettings, { strip: false }));
 
         // Note: conversions moved to converter module
 
@@ -131,7 +136,17 @@ define(
 
                                 'export-csv': function( data ){
 
-                                    var tpl = doT.template(textHeatMapAsCSV, $.extend({}, doT.templateSettings, { strip: false }));
+                                    var tpl;
+
+                                    if (data.type === 'heat-map'){
+                                        
+                                        tpl = tplHeatMapAsCSV;
+
+                                    } else {
+
+                                        tpl = tplLinePlotAsCSV;
+                                    }
+
                                     var csv = tpl({
                                         meta: self.parameters.getAll(),
                                         plot: data
