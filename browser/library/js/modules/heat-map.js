@@ -33,6 +33,9 @@ define(
                 z: '.1f'
             },
 
+            // use antialiasing when scaling the data 
+            antialias: true,
+
             // use a d3 scale to control the color mapping
             colorScale: d3.scale.linear()
                 .domain([0, 1])
@@ -68,6 +71,7 @@ define(
 
             options = $.extend({}, defaults, options);
             this.labels = options.labels;
+            this.antialias = options.antialias;
 
             this.el = $('<div>')
                 .addClass('plot heat-map')
@@ -392,12 +396,39 @@ define(
                 };
             },
 
+            scaleImageData: function( srcImg, width, height, scale ){
+
+                var src_p = 0;
+                var dst_p = 0;
+                var imgdata = this.ctx.createImageData(scale * width, scale * height);
+                var d = imgdata.data;
+                var src = srcImg.data;
+
+                for (var y = 0; y < height; ++y) {
+                    for (var i = 0; i < scale; ++i) {
+                        for (var x = 0; x < width; ++x) {
+                            var src_p = 4 * (y * width + x);
+                            for (var j = 0; j < scale; ++j) {
+                                var tmp = src_p;
+                                d[dst_p++] = src[tmp++];
+                                d[dst_p++] = src[tmp++];
+                                d[dst_p++] = src[tmp++];
+                                d[dst_p++] = src[tmp++];
+                            }
+                        }
+                    }
+                }
+
+                return imgdata;
+            },
+
             plotData: function( data ){
 
                 var l = data.length
                     ,cols = this.width
                     ,rows = this.height
                     ,scale = Math.sqrt( l / (cols * rows) )
+                    ,img
                     ;
 
                 this.data = data;
@@ -409,18 +440,28 @@ define(
                 rows = Math.floor(rows);
 
                 // write the image data to the hidden canvas
-                this.hiddenCtx.putImageData(this.makeImageData( cols, rows, data ), 0, 0);
+                img = this.makeImageData( cols, rows, data );
 
-                // draw to the visible canvas
-                this.ctx.save();
-                
-                if ( scale < 1 ){
-                    // scale it if necessary
-                    this.ctx.scale( 1/scale, 1/scale );
+                if (this.antialias){
+                    
+                    this.hiddenCtx.putImageData(img, 0, 0);
+
+                    // draw to the visible canvas
+                    this.ctx.save();
+                    
+                    if ( scale < 1 ){
+                        // scale it if necessary
+                        this.ctx.scale( 1/scale, 1/scale );
+                    }
+
+                    this.ctx.drawImage(this.hiddenCanvas, 0, 0);
+                    this.ctx.restore();
+
+                } else {
+
+                    var invScale = Math.floor( 1 / scale );
+                    this.ctx.putImageData(this.scaleImageData(img, cols, rows, invScale), 0, 0);
                 }
-
-                this.ctx.drawImage(this.hiddenCanvas, 0, 0);
-                this.ctx.restore();
             }
         };
 

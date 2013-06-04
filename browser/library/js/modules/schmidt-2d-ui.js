@@ -64,6 +64,7 @@ define(
                     },
                     xrange: [ 0, 200 ],
                     yrange: [ 0, 100 ],
+                    antialias: false,
                     format: '.0f'
                 });
 
@@ -94,7 +95,7 @@ define(
 
                 var self = this;
 
-                var dim = 10;
+                var dim = 4;
                 var params = {
                     x: "L",
                     y: "BW"
