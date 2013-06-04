@@ -26,8 +26,12 @@ define(
             },
             xrange: [0, 1],
             yrange: [0, 1],
-            // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
-            format: '.0f',
+            // See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
+            format: {
+                x: '.0f',
+                y: '.0f',
+                z: '.2f'
+            },
 
             // use a d3 scale to control the color mapping
             colorScale: d3.scale.linear()
@@ -64,7 +68,6 @@ define(
 
             options = $.extend({}, defaults, options);
             this.labels = options.labels;
-            this.format = options.format;
 
             this.el = $('<div>')
                 .addClass('plot heat-map')
@@ -103,6 +106,7 @@ define(
             };
 
             this.margin = defaults.margins;
+            this.setFormat(options.format);
             this.resize( options.width, options.height );
             this.setMargins( options.margins );
             
@@ -111,6 +115,24 @@ define(
         }
 
         HeatMap.prototype = {
+
+            setFormat: function( fmt ){
+
+                this.format = {};
+
+                if (typeof fmt === 'object'){
+
+                    this.format = $.extend( this.format, fmt );
+                    
+                } else {
+
+                    this.format.x = fmt;
+                    this.format.y = fmt;
+                    this.format.z = fmt;
+                }
+
+                this.refreshAxes();
+            },
 
             setTitle: function( title ){
 
@@ -179,7 +201,7 @@ define(
             },
 
             setZRange: function (zrangeArr){
-                this.scales.z.domain(zrangeArr);
+                this.scales.z.domain( zrangeArr );
                 this.refreshAxes();
             },
 
@@ -198,14 +220,14 @@ define(
                 // init axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
-                    .tickFormat( d3.format( this.format ) )
+                    .tickFormat( d3.format( this.format.x ) )
                     .orient("bottom")
                     .ticks( (width / 50)|0 )
                     ;
 
                 var yAxis = d3.svg.axis()
                     .scale(y)
-                    .tickFormat( d3.format( this.format ) )
+                    .tickFormat( d3.format( this.format.y ) )
                     .orient("left")
                     .ticks( (height / 40)|0 )
                     ;
@@ -261,11 +283,19 @@ define(
                     })
                     ;
 
+                // border around
+                colorbar.append('rect')
+                    .attr('width', colorBarWidth)
+                    .attr('height', colorBarHeight)
+                    .style('fill', 'none')
+                    .style('stroke', '#000')
+                    .style('shape-rendering', 'crispEdges')
+                    ;
+
                 var zAxis = d3.svg.axis()
                     .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
-                    .tickValues( dom )
-                    .tickSubdivide(1)
-                    .tickFormat( d3.format( this.format ) )
+                    .ticks( 3 )
+                    .tickFormat( d3.format( this.format.z ) )
                     .orient("top")
                     ;
 
