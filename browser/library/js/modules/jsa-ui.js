@@ -64,7 +64,10 @@ define(
                     },
                     xrange: [ 0, 200 ],
                     yrange: [ 0, 100 ],
-                    format: '.0f'
+                    format: {
+                        x: '.0f',
+                        y: '.0f'
+                    }
                 });
 
                 self.addPlot( self.plot );

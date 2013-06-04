@@ -26,8 +26,15 @@ define(
             },
             xrange: [0, 1],
             yrange: [0, 1],
-            // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
-            format: '.0f',
+            // See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
+            format: {
+                x: '.0f',
+                y: '.0f',
+                z: '.1f'
+            },
+
+            // use antialiasing when scaling the data 
+            antialias: true,
 
             // use a d3 scale to control the color mapping
             colorScale: d3.scale.linear()
@@ -64,7 +71,7 @@ define(
 
             options = $.extend({}, defaults, options);
             this.labels = options.labels;
-            this.format = options.format;
+            this.antialias = options.antialias;
 
             this.el = $('<div>')
                 .addClass('plot heat-map')
@@ -103,6 +110,7 @@ define(
             };
 
             this.margin = defaults.margins;
+            this.setFormat(options.format);
             this.resize( options.width, options.height );
             this.setMargins( options.margins );
             
@@ -111,6 +119,24 @@ define(
         }
 
         HeatMap.prototype = {
+
+            setFormat: function( fmt ){
+
+                this.format = {};
+
+                if (typeof fmt === 'object'){
+
+                    this.format = $.extend( this.format, fmt );
+                    
+                } else {
+
+                    this.format.x = fmt;
+                    this.format.y = fmt;
+                    this.format.z = fmt;
+                }
+
+                this.refreshAxes();
+            },
 
             setTitle: function( title ){
 
@@ -179,7 +205,7 @@ define(
             },
 
             setZRange: function (zrangeArr){
-                this.scales.z.domain(zrangeArr);
+                this.scales.z.domain( zrangeArr );
                 this.refreshAxes();
             },
 
@@ -198,13 +224,17 @@ define(
                 // init axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
-                    .tickFormat( d3.format( this.format ) )
-                    .orient("bottom");
+                    .tickFormat( d3.format( this.format.x ) )
+                    .orient("bottom")
+                    .ticks( (width / 50)|0 )
+                    ;
 
                 var yAxis = d3.svg.axis()
                     .scale(y)
-                    .tickFormat( d3.format( this.format ) )
-                    .orient("left");
+                    .tickFormat( d3.format( this.format.y ) )
+                    .orient("left")
+                    .ticks( (height / 40)|0 )
+                    ;
 
                 svg.selectAll('.axis').remove();
 
@@ -217,18 +247,20 @@ define(
                   .attr("dy", this.margin.bottom - 16)
                   .attr("x", width/2)
                   .style("text-anchor", "middle")
-                  .text( labels.x );
+                  .text( labels.x )
+                  ;
 
                 svg.append("g")
                   .attr("class", "y axis")
                   .call(yAxis)
                 .append("text")
-                  .attr("x", -width/2)
+                  .attr("x", -height/2)
                   .attr("y", 0)
                   .attr("transform", "rotate(-90)")
                   .attr("dy", -this.margin.left + 16)
                   .style("text-anchor", "middle")
-                  .text( labels.y );
+                  .text( labels.y )
+                  ;
 
                 var colorBarWidth = 100;
                 var colorBarHeight = 16;
@@ -252,14 +284,27 @@ define(
                     .attr("height", colorBarHeight)
                     .style("fill", function( v ){
                         return z( v );
-                    });
+                    })
+                    ;
+
+                // border around
+                colorbar.append('rect')
+                    .attr('width', colorBarWidth)
+                    .attr('height', colorBarHeight)
+                    .style('fill', 'none')
+                    .style('stroke', '#000')
+                    .style('shape-rendering', 'crispEdges')
+                    ;
+
+                var vals = [].concat(dom);
+                vals.splice(1, 0, (dom[1]-dom[0]) / 2);
 
                 var zAxis = d3.svg.axis()
                     .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
-                    .tickValues( dom )
-                    .tickSubdivide(1)
-                    .tickFormat( d3.format( this.format ) )
-                    .orient("top");
+                    .tickValues( vals )
+                    .tickFormat( d3.format( this.format.z ) )
+                    .orient("top")
+                    ;
 
                 colorbar.call(zAxis);
             },
@@ -351,12 +396,39 @@ define(
                 };
             },
 
+            scaleImageData: function( srcImg, width, height, scale ){
+
+                var src_p = 0;
+                var dst_p = 0;
+                var imgdata = this.ctx.createImageData(scale * width, scale * height);
+                var d = imgdata.data;
+                var src = srcImg.data;
+
+                for (var y = 0; y < height; ++y) {
+                    for (var i = 0; i < scale; ++i) {
+                        for (var x = 0; x < width; ++x) {
+                            var src_p = 4 * (y * width + x);
+                            for (var j = 0; j < scale; ++j) {
+                                var tmp = src_p;
+                                d[dst_p++] = src[tmp++];
+                                d[dst_p++] = src[tmp++];
+                                d[dst_p++] = src[tmp++];
+                                d[dst_p++] = src[tmp++];
+                            }
+                        }
+                    }
+                }
+
+                return imgdata;
+            },
+
             plotData: function( data ){
 
                 var l = data.length
                     ,cols = this.width
                     ,rows = this.height
                     ,scale = Math.sqrt( l / (cols * rows) )
+                    ,img
                     ;
 
                 this.data = data;
@@ -368,18 +440,28 @@ define(
                 rows = Math.floor(rows);
 
                 // write the image data to the hidden canvas
-                this.hiddenCtx.putImageData(this.makeImageData( cols, rows, data ), 0, 0);
+                img = this.makeImageData( cols, rows, data );
 
-                // draw to the visible canvas
-                this.ctx.save();
-                
-                if ( scale < 1 ){
-                    // scale it if necessary
-                    this.ctx.scale( 1/scale, 1/scale );
+                if (this.antialias){
+                    
+                    this.hiddenCtx.putImageData(img, 0, 0);
+
+                    // draw to the visible canvas
+                    this.ctx.save();
+                    
+                    if ( scale < 1 ){
+                        // scale it if necessary
+                        this.ctx.scale( 1/scale, 1/scale );
+                    }
+
+                    this.ctx.drawImage(this.hiddenCanvas, 0, 0);
+                    this.ctx.restore();
+
+                } else {
+
+                    var invScale = Math.floor( 1 / scale );
+                    this.ctx.putImageData(this.scaleImageData(img, cols, rows, invScale), 0, 0);
                 }
-
-                this.ctx.drawImage(this.hiddenCanvas, 0, 0);
-                this.ctx.restore();
             }
         };
 
