@@ -56,6 +56,7 @@ define(
                         x: 'Time delay (fs)',
                         y: 'Coincidence probability'
                     },
+                    format: {x: '.0f'},
                     width: 400,
                     height: 200,
                     yrange: [0,.65]
@@ -94,6 +95,10 @@ define(
                     labels: {
                         x: 'Signal Wavelength(nm)',
                         y: 'Idler Wavelength(nm)'
+                    },
+                    format: {
+                        x: '.0f',
+                        y: '.0f'
                     }
                 });
 

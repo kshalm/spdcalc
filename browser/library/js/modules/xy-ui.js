@@ -64,7 +64,8 @@ define(
                     labels: {
                         x: 'Signal Wavelength (nm)',
                         y: 'Theta Signal (deg)'
-                    }
+                    },
+                    format: {z: '.0f'}
                 });
 
                 self.elplotLambdasThetas = $(self.plotLambdasThetas.el);

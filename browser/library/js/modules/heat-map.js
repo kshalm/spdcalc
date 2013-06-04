@@ -28,8 +28,8 @@ define(
             yrange: [0, 1],
             // See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
             format: {
-                x: '.0f',
-                y: '.0f',
+                x: '.02f',
+                y: '.02f',
                 z: '.1f'
             },
 
