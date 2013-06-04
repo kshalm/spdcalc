@@ -292,9 +292,12 @@ define(
                     .style('shape-rendering', 'crispEdges')
                     ;
 
+                var vals = [].concat(dom);
+                vals.splice(1, 0, (dom[1]-dom[0]) / 2);
+
                 var zAxis = d3.svg.axis()
                     .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
-                    .ticks( 3 )
+                    .tickValues( vals )
                     .tickFormat( d3.format( this.format.z ) )
                     .orient("top")
                     ;
