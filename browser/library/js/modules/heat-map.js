@@ -30,7 +30,7 @@ define(
             format: {
                 x: '.0f',
                 y: '.0f',
-                z: '.2f'
+                z: '.1f'
             },
 
             // use a d3 scale to control the color mapping
