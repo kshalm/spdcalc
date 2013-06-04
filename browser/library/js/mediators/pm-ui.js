@@ -392,33 +392,13 @@ define(
                     }
                 });
 
-                // Init tags input
-                // $("#tagsinput").tagsInput();
+                $(window).on('click', function(e){
 
-                // Init jQuery UI slider
-                // $("#slider").slider({
-                //     min: 1,
-                //     max: 5,
-                //     value: 2,
-                //     orientation: "horizontal",
-                //     range: "min"
-                // });
+                    var tgt = $(e.target);
 
-                // JS input/textarea placeholder
-                // $("input, textarea").placeholder();
-
-                // Make pagination demo work
-                // $(".pagination a").click(function() {
-                //     if (!$(this).parent().hasClass("previous") && !$(this).parent().hasClass("next")) {
-                //         $(this).parent().siblings("li").removeClass("active");
-                //         $(this).parent().addClass("active");
-                //     }
-                // });
-
-                // $(".btn-group a").click(function() {
-                //     $(this).siblings().removeClass("active");
-                //     $(this).addClass("active");
-                // });
+                    // close all dropdowns on body click
+                    $('.dk_open').removeClass('dk_open');
+                });
 
                 self.emit('ready');
             }
