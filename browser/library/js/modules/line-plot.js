@@ -191,7 +191,7 @@ define(
                   .attr("class", "y axis")
                   .call(yAxis)
                 .append("text")
-                  .attr("x", -width/2)
+                  .attr("x", -height/2)
                   .attr("y", 0)
                   .attr("transform", "rotate(-90)")
                   .attr("dy", -this.margin.left + 16)
