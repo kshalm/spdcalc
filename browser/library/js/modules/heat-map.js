@@ -199,12 +199,16 @@ define(
                 var xAxis = d3.svg.axis()
                     .scale(x)
                     .tickFormat( d3.format( this.format ) )
-                    .orient("bottom");
+                    .orient("bottom")
+                    .ticks( (width / 50)|0 )
+                    ;
 
                 var yAxis = d3.svg.axis()
                     .scale(y)
                     .tickFormat( d3.format( this.format ) )
-                    .orient("left");
+                    .orient("left")
+                    .ticks( (height / 40)|0 )
+                    ;
 
                 svg.selectAll('.axis').remove();
 
@@ -217,18 +221,20 @@ define(
                   .attr("dy", this.margin.bottom - 16)
                   .attr("x", width/2)
                   .style("text-anchor", "middle")
-                  .text( labels.x );
+                  .text( labels.x )
+                  ;
 
                 svg.append("g")
                   .attr("class", "y axis")
                   .call(yAxis)
                 .append("text")
-                  .attr("x", -width/2)
+                  .attr("x", -height/2)
                   .attr("y", 0)
                   .attr("transform", "rotate(-90)")
                   .attr("dy", -this.margin.left + 16)
                   .style("text-anchor", "middle")
-                  .text( labels.y );
+                  .text( labels.y )
+                  ;
 
                 var colorBarWidth = 100;
                 var colorBarHeight = 16;
@@ -252,14 +258,16 @@ define(
                     .attr("height", colorBarHeight)
                     .style("fill", function( v ){
                         return z( v );
-                    });
+                    })
+                    ;
 
                 var zAxis = d3.svg.axis()
                     .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
                     .tickValues( dom )
                     .tickSubdivide(1)
                     .tickFormat( d3.format( this.format ) )
-                    .orient("top");
+                    .orient("top")
+                    ;
 
                 colorbar.call(zAxis);
             },
