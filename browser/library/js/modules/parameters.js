@@ -1,11 +1,13 @@
 define(
     [   
         'stapes',
-        'phasematch'
+        'phasematch',
+        'vendor/hash'
     ],
     function(
         Stapes,
-        PhaseMatch
+        PhaseMatch,
+        Hash
     ){
 
         'use strict';
@@ -63,17 +65,15 @@ define(
 
                 // setup props
                 self.props = new PhaseMatch.SPDCprop();
-                
-                if (self.props.autocalctheta){
-                    self.props.auto_calc_Theta( self.props );
-                } 
-
-                if (self.props.autocalcpp){
-                    self.props.calc_poling_period( self.props );
-                }
 
                 self.set( self.props );
                 self.initEvents();
+
+                // get values from hash
+                self.getHashVals();
+
+                self.checkautocalc();
+                self.set( self.props );
             },
 
             initEvents: function(){
@@ -102,6 +102,20 @@ define(
                         self.props.set_crystal( val );
                         self.checkautocalc();
                         self.refresh();
+                    }
+                });
+            },
+
+            getHashVals: function(){
+
+                var self = this;
+
+                self.each(function( val, key ){
+
+                    var urlVal = Hash.get( key );
+
+                    if (urlVal){
+                        self.set(key, urlVal);
                     }
                 });
             },
