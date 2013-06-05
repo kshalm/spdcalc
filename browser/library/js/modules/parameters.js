@@ -1,10 +1,12 @@
 define(
-    [   
+    [
+        'jquery',
         'stapes',
         'phasematch',
         'vendor/hash'
     ],
     function(
+        $,
         Stapes,
         PhaseMatch,
         Hash
@@ -47,6 +49,7 @@ define(
             'boolean': '!',
             'string': '~'
         };
+        var typesVals = ['+', '!', '~'];
 
         /**
          * @module Parameters
@@ -116,13 +119,15 @@ define(
 
                 var self = this;
 
+                self.set('xtal', self.props.crystal.id);
+
                 self.each(function( val, key ){
 
                     var urlVal = Hash.get( key )
                         ,tp = urlVal && urlVal.substr(0, 1)
                         ;
 
-                    if (urlVal){
+                    if (urlVal && $.inArray( tp, typesVals ) > -1 ){
 
                         urlVal = urlVal.substr(1);
 
@@ -147,6 +152,12 @@ define(
                     ;
 
                 self.each(function( val, key ){
+
+                    if ( key === 'crystal' ){
+
+                        val = val.id;
+                        key = 'xtal';
+                    }
 
                     var tp = typeof val
                         ,pfx = types[ tp ]
