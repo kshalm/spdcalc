@@ -150,7 +150,7 @@ define(
                     .attr("class", 'vline')
                     .attr("width", 2)
                     // this measurement is awkward...
-                    .attr("height", Math.abs(y(dom[0]) - y(dom[1])) / 3)
+                    .attr("height", Math.abs(y(dom[0]) - y(dom[1])) )
                     .style("fill", 'red')
                     ;
 
