@@ -6,6 +6,7 @@ define(
         'tpl!templates/pm-ui.tpl',
         'tpl!templates/parameters-panel.tpl',
         'text!templates/converters/heat-map-as-csv.tpl',
+        'text!templates/converters/line-plot-as-csv.tpl',
         'dot',
         'jquery-ui',
         'bootstrap-tooltip',
@@ -30,6 +31,7 @@ define(
         tplPMUI,
         tplParametersPanel,
         textHeatMapAsCSV,
+        textLinePlotAsCSV,
         doT,
         _jqui,
         _bstt,
@@ -49,6 +51,9 @@ define(
     ) {
 
         'use strict';
+
+        var tplHeatMapAsCSV = doT.template(textHeatMapAsCSV, $.extend({}, doT.templateSettings, { strip: false }));
+        var tplLinePlotAsCSV = doT.template(textLinePlotAsCSV, $.extend({}, doT.templateSettings, { strip: false }));
 
         // Note: conversions moved to converter module
 
@@ -131,7 +136,17 @@ define(
 
                                 'export-csv': function( data ){
 
-                                    var tpl = doT.template(textHeatMapAsCSV, $.extend({}, doT.templateSettings, { strip: false }));
+                                    var tpl;
+
+                                    if (data.type === 'heat-map'){
+                                        
+                                        tpl = tplHeatMapAsCSV;
+
+                                    } else {
+
+                                        tpl = tplLinePlotAsCSV;
+                                    }
+
                                     var csv = tpl({
                                         meta: self.parameters.getAll(),
                                         plot: data
@@ -377,33 +392,13 @@ define(
                     }
                 });
 
-                // Init tags input
-                // $("#tagsinput").tagsInput();
+                $(window).on('click', function(e){
 
-                // Init jQuery UI slider
-                // $("#slider").slider({
-                //     min: 1,
-                //     max: 5,
-                //     value: 2,
-                //     orientation: "horizontal",
-                //     range: "min"
-                // });
+                    var tgt = $(e.target);
 
-                // JS input/textarea placeholder
-                // $("input, textarea").placeholder();
-
-                // Make pagination demo work
-                // $(".pagination a").click(function() {
-                //     if (!$(this).parent().hasClass("previous") && !$(this).parent().hasClass("next")) {
-                //         $(this).parent().siblings("li").removeClass("active");
-                //         $(this).parent().addClass("active");
-                //     }
-                // });
-
-                // $(".btn-group a").click(function() {
-                //     $(this).siblings().removeClass("active");
-                //     $(this).addClass("active");
-                // });
+                    // close all dropdowns on body click
+                    $('.dk_open').removeClass('dk_open');
+                });
 
                 self.emit('ready');
             }

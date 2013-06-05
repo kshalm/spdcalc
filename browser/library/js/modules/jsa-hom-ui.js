@@ -56,6 +56,7 @@ define(
                         x: 'Time delay (fs)',
                         y: 'Coincidence probability'
                     },
+                    format: {x: '.0f'},
                     width: 400,
                     height: 200,
                     yrange: [0,.65]
@@ -94,6 +95,10 @@ define(
                     labels: {
                         x: 'Signal Wavelength(nm)',
                         y: 'Idler Wavelength(nm)'
+                    },
+                    format: {
+                        x: '.0f',
+                        y: '.0f'
                     }
                 });
 
@@ -145,7 +150,7 @@ define(
                     .attr("class", 'vline')
                     .attr("width", 2)
                     // this measurement is awkward...
-                    .attr("height", Math.abs(y(dom[0]) - y(dom[1])) / 3)
+                    .attr("height", Math.abs(y(dom[0]) - y(dom[1])) )
                     .style("fill", 'red')
                     ;
 

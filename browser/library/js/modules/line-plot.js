@@ -167,12 +167,16 @@ define(
                 var xAxis = d3.svg.axis()
                     .scale(x)
                     .tickFormat( d3.format( this.format ) )
-                    .orient("bottom");
+                    .orient("bottom")
+                    .ticks( (width / 50)|0 )
+                    ;
 
                 var yAxis = d3.svg.axis()
                     .scale(y)
                     .tickFormat( d3.format( this.format ) )
-                    .orient("left");
+                    .orient("left")
+                    .ticks( (height / 40)|0 )
+                    ;
 
                 svg.selectAll('.axis').remove();
 
@@ -185,18 +189,42 @@ define(
                   .attr("dy", this.margin.bottom - 16)
                   .attr("x", width/2)
                   .style("text-anchor", "middle")
-                  .text( labels.x );
+                  .text( labels.x )
+                  ;
 
                 svg.append("g")
                   .attr("class", "y axis")
                   .call(yAxis)
                 .append("text")
-                  .attr("x", -width/2)
+                  .attr("x", -height/2)
                   .attr("y", 0)
                   .attr("transform", "rotate(-90)")
                   .attr("dy", -this.margin.left + 16)
                   .style("text-anchor", "middle")
-                  .text( labels.y );
+                  .text( labels.y )
+                  ;
+            },
+
+            exportData: function(){
+
+                if (!this.data){
+                    return [];
+                }
+
+                // clone
+                var data = $.map(this.data, $.proxy($.extend, $, true));
+
+                return {
+                    title: this.elTitle.text(),
+                    type: 'line',
+                    x: {
+                        label: this.labels.x
+                    },
+                    y: {
+                        label: this.labels.y
+                    },
+                    data: data
+                };
             },
 
             plotData: function( data ){
@@ -216,6 +244,8 @@ define(
                 y.domain( this.yrange || d3.extent(data, function(d) { return d.y; }))
                  .range([height, 0])
                  ;
+
+                this.data = data;
 
                 line = d3.svg.line( data )
                     .x(function(d) { return x(d.x); })

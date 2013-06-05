@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-05-29
+ * phasematchjs v0.0.1a - 2013-06-05
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -1629,15 +1629,47 @@ PhaseMatch.linspace = function linspace(xstart,xstop,npts){
     return A;
 };
 
-PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
+PhaseMatch.create_2d_array = function create_2d_array(data, dimx, dimy){
   var data2D = [];
-  var row = new Float64Array(dimx);
   var index = 0;
 
   for (var i = 0; i<dimy; i++){
+    var row = new Float64Array(dimx);
     for  (var j = 0; j<dimx; j++){
       row[j] = data[index];
       index += 1;
+    }
+    data2D[i] = row;
+  }
+  return data2D;
+};
+
+PhaseMatch.create_2d_array_view = function create_2d_array_view(data, dimx, dimy){
+  var data2D = [];
+
+  if (data.buffer && data.buffer.byteLength){
+
+    for ( var i = 0; i < dimy; i++ ){
+      
+      data2D[ i ] = new Float64Array(data.buffer, i * 16, dimx);
+    }
+
+  } else {
+
+    return null;
+  }
+
+  return data2D;
+};
+
+PhaseMatch.zeros = function zeros(dimx, dimy){
+  var data2D = [];
+  var index = 0;
+
+  for (var i = 0; i<dimy; i++){
+    var row = new Float64Array(dimx);
+    for  (var j = 0; j<dimx; j++){
+      row[j] = 0;
     }
     data2D[i] = row;
   }
@@ -1830,9 +1862,17 @@ PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
       return b >= 0.0? Math.abs(a): -Math.abs(a);
     };
 
-    PhaseMatch.svdcmp = function(a, m, n, w, v){
+    // PhaseMatch.svdcmp = function(a, m, n, w, v){
+      PhaseMatch.svdcmp = function(a){
       var flag, i, its, j, jj, k, l, nm,
           anorm = 0.0, c, f, g = 0.0, h, s, scale = 0.0, x, y, z, rv1 = [];
+
+          var m = a.length;  //number of rows
+          var n = a[0].length; // number of cols
+
+          var v = PhaseMatch.zeros(m,n);
+          // var v = PhaseMatch.util.clone(a,true);
+          var w = [];
           
       //Householder reduction to bidiagonal form
       for (i = 0; i < n; ++ i){
@@ -1982,7 +2022,7 @@ PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
               h = 1.0 / h;
               c = g * h;
               s = -f * h;
-              for (j = 1; j <= m; ++ j){
+              for (j = 0; j < m; ++ j){
                 y = a[j][nm];
                 z = a[j][i];
                 a[j][nm] = y * c + z * s;
@@ -2061,7 +2101,7 @@ PhaseMatch.create2Darray = function create2Darray(data, dimx, dimy){
         }
       }
 
-      return true;
+      return {U: a, W: w, V:v};
     };
 })();
 /*
@@ -2351,6 +2391,28 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
     
 };
 
+/*
+ * calc_Schmidt
+ * Calculates the Schmidt number for a 2D matrix
+ * NOTE: The SVD routine has problems with odd dimensions
+ */
+PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
+    // var PM2D = PhaseMatch.create2Darray(PM, dim,dim);
+
+    var svd = PhaseMatch.svdcmp(PM);
+    // @TODO: add in logic to test if the SVD converged. It will return false if it did not.
+    var D = svd.W;
+    // console.log("D", D);
+    var Norm = PhaseMatch.Sum(D); // Normalization
+    // console.log("normalization", Norm);
+    var l = D.length;
+    var Kinv = 0;
+    for (var i = 0; i<l; i++){
+        Kinv += sq(D[i]/Norm); //calculate the inverse of the Schmidt number
+    } 
+    return 1/Kinv;
+};
+
 /**
  * The following section is where we calculate intelligent guesses for the ranges of the plots.
  */
@@ -2514,38 +2576,33 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
 
         init:function(){
             var con = PhaseMatch.constants;
-            this.lambda_p = 405 * con.nm;
-            this.lambda_s = 810 * con.nm;
+            this.lambda_p = 775 * con.nm;
+            this.lambda_s = 1550 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.PM_type_names = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.PM_type_names[1];
+            this.Type = this.PM_type_names[2];
             this.theta = 90 *Math.PI / 180;
             // this.theta = 19.2371104525 *Math.PI / 180;
-            this.phi = 0;
-            this.theta_s = 11 * Math.PI / 180;
+            this.phi = 0 * Math.PI/ 180;
+            this.theta_s = 0 * Math.PI / 180;
             this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
-            this.L = 2000 * con.um;
+            this.L = 12000 * con.um;
             this.W = 500* con.um;
-            this.p_bw = 6 * con.nm;
+            this.p_bw = 1 * con.nm;
             this.phase = false;
             this.brute_force = true;
             this.brute_dim = 50;
-            this.autocalctheta = true;
-            this.autocalcpp = false;
+            this.autocalctheta = false;
+            this.autocalcpp = true;
             this.poling_period = 1000000;
             this.poling_sign = 1;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.use_guassian_approx = false;
-<<<<<<< HEAD
-            this.crystal_Names = PhaseMatch.CrystalDBKeys;
-            this.crystal = PhaseMatch.CrystalDB[this.crystal_Names[0]];
-=======
             this.crystaldb = PhaseMatch.Crystals;
-            this.crystal = PhaseMatch.Crystals('BBO-1');
->>>>>>> 61db2a99a246b3e801b2e5d0309f7d14f13b5984
+            this.crystal = PhaseMatch.Crystals('KTP-1');
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -2600,21 +2657,34 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
         calc_Index_PMType : function (lambda, Type, S, photon){
             var ind = this.crystal.indicies(lambda, this.temp);
 
-            var nx = ind[0];
-            var ny = ind[1];
-            var nz = ind[2];
+            // var nx = ind[0];
+            // var ny = ind[1];
+            // var nz = ind[2];
 
-            var Sx = S[0];
-            var Sy = S[1];
-            var Sz = S[2];
+            // var Sx = S[0];
+            // var Sy = S[1];
+            // var Sz = S[2];
 
-            var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
-            var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
+            // var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
+            // var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
+            // var D = sq(B) - 4 * C;
+
+           
+
+            var nx_squared_inv = 1/sq( ind[0] );
+            var ny_squared_inv = 1/sq( ind[1] );
+            var nz_squared_inv = 1/sq( ind[2] );
+
+            var Sx_squared = sq( S[0] );
+            var Sy_squared = sq( S[1] );
+            var Sz_squared = sq( S[2] );
+
+            var B = Sx_squared * (ny_squared_inv + nz_squared_inv) + Sy_squared * (nx_squared_inv + nz_squared_inv) + Sz_squared * (nx_squared_inv + ny_squared_inv);
+            var C = Sx_squared * (ny_squared_inv * nz_squared_inv) + Sy_squared * (nx_squared_inv * nz_squared_inv) + Sz_squared * (nx_squared_inv * ny_squared_inv);
             var D = sq(B) - 4 * C;
 
             var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
             var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
-            //nfast = o, nslow = e
 
             var n = 1;
 
@@ -2851,7 +2921,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
-    console.log("Calculating JSA", props.temp);
+    // console.log("Calculating JSA", props.temp);
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
 
@@ -2892,7 +2962,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     }
     
     // console.log("max pm value = ", maxpm);
-    console.log("");
+    // console.log("");
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     
     return PM;
@@ -3125,6 +3195,92 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
 
 };
 
+/* calc_schmidt_plot
+* Params is a JSON string of the form { x: "L/W/BW", y:"L/W/BW"}
+*/
+PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop, y_start, y_stop, ls_start, ls_stop, li_start, li_stop, dim, params){
+
+    var P = PhaseMatch.deep_copy(props);
+    props.update_all_angles(P);
+
+
+    if (P.brute_force && dim>P.brute_dim){
+        dim = P.brute_dim;
+    }
+
+    var xrange = PhaseMatch.linspace(x_start, x_stop, dim);
+    var yrange = PhaseMatch.linspace(y_stop, y_start, dim); 
+    var i;
+    var N = dim*dim;
+    var S = new Float64Array( N );
+
+    var dimjsa = 50; //make sure this is even
+
+    var maxpm = 0;
+
+    
+    
+    for (i=0; i<N; i++){
+        var index_s = i % dim;
+        var index_i = Math.floor(i / dim);
+
+        // Figure out what to plot in the x dimension
+        switch (params.x){
+            case "L":
+                P.L = xrange[index_s];
+            break;
+            case "W":
+                P.W = xrange[index_s];
+            break;
+            case "BW":
+                P.p_bw = xrange[index_s];
+            break;
+            default:
+                throw "Error: x input type";
+        }
+
+        // Figure out what to plot in the y dimension
+        switch (params.y){
+            case "L":
+                P.L = yrange[index_i];
+            break;
+            case "W":
+                P.W = yrange[index_i];
+            break;
+            case "BW":
+                P.p_bw = yrange[index_i];
+            break;
+            default:
+                throw "Error: y input type";
+        }
+        
+        //now calculate the JSA for these values
+        var jsa = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, dimjsa);
+        var jsa2d = PhaseMatch.create_2d_array(jsa, dimjsa, dimjsa);
+        S[i] = PhaseMatch.calc_Schmidt(jsa2d);
+
+        // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+
+        // // P.optimum_idler(P); //Need to find the optimum idler for each angle.
+        // if (P.brute_force) {
+        //    P.brute_force_theta_i(P); //use a search. could be time consuming. 
+        // }
+        // else {
+        //     //calculate the correct idler angle analytically.
+        //     P.optimum_idler(P);
+        // }
+        
+        // PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+    }
+    
+    // console.log("max pm value = ", maxpm);
+    console.log("");
+    // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
+    
+    return S;
+
+};
+
 
 (function(){
 
@@ -3145,7 +3301,7 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
     PhaseMatch.Crystals = function( key, create ){
 
         // invalid args
-        if ( !key ) return null;
+        if ( !key ) {return null;}
 
         if ( !create && !( key in crystals ) ){
 
@@ -3159,7 +3315,7 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
                 throw 'Crystal type "' + key + ' already defined.';
             }
 
-            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create);
+            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create, { id: key });
         }
 
         return PhaseMatch.util.clone( crystals[ key ], true );
@@ -3286,6 +3442,43 @@ PhaseMatch.Crystals('KTP-2', {
     }
 });
 
+/**
+ * KTP indicies.
+ */
+PhaseMatch.Crystals('KTP-3', {
+    name: 'KTP ref 3',
+    // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
+    info: 'Includes Franco Wong"s modificatin.  http://dx.doi.org/10.1063/1.1668320, http://www.redoptronics.com/KTP-crystal.html',
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+
+        // http://www.redoptronics.com/KTP-crystal.html
+        var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
+
+        if (lambda< 1.2){
+            var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
+        }
+        else {
+            var ny= Math.sqrt(2.0993 + 0.922683*sq(lambda)/(sq(lambda)-0.0467695)-0.0138408*sq(lambda));
+        }
+        
+        var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
+
+        var dnx= 1.1e-5;
+        var dny= 1.3e-5;
+        var dnz= 1.6e-5;
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+
+        // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
+        // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
+
+        return [nx, ny, nz];
+    }
+});
+
 
 
 /**
@@ -3335,9 +3528,9 @@ PhaseMatch.Crystals('LiNbO3-1', {
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
         //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
-        // var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
-        // var ny = nx;
-        // var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
+        var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
+        var ny = nx;
+        var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
 
         // http://www.redoptronics.com/linbo3-crystals.html
         // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));

@@ -64,7 +64,11 @@ define(
                     },
                     xrange: [ 0, 200 ],
                     yrange: [ 0, 100 ],
-                    format: '.0f'
+                    antialias: false,
+                    format: {
+                        x: '.01f',
+                        y: '.02f'
+                    }
                 });
 
                 self.addPlot( self.plot );
@@ -94,16 +98,16 @@ define(
 
                 var self = this;
 
-                var dim = 10
+                var dim = 10;
                 var params = {
                     x: "L",
                     y: "BW"
                 };
 
-                var x_start = 100e-6;
-                var x_stop = 1000e-6;
-                var y_start = 2e-9;
-                var y_stop = 20e-9;
+                var x_start = 11000e-6;
+                var x_stop = 30000e-6;
+                var y_start = .9e-9;
+                var y_stop = 10e-9;
 
                 var PM = PhaseMatch.calc_schmidt_plot(props, x_start, x_stop, y_start, y_stop, self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'),
                     self.plotOpts.get('li_start'), self.plotOpts.get('li_stop'), dim, params);
@@ -111,7 +115,7 @@ define(
                 self.data = PM;
 
                 // self.plot.scales.z = d3.scale.linear().domain([0, 50]);
-                self.plot.setZRange([0,5]);
+                self.plot.setZRange([1,5]);
                 self.plot.setXRange( [ converter.to('micro',x_start), converter.to('micro',x_stop)]);
                 self.plot.setYRange( [ converter.to('nano',y_start), converter.to('nano',y_stop)]);
                 
