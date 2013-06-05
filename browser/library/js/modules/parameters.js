@@ -42,6 +42,12 @@ define(
             
         };
 
+        var types = {
+            'number': '+',
+            'boolean': '!',
+            'string': '~'
+        };
+
         /**
          * @module Parameters
          * @implements {Stapes}
@@ -57,12 +63,6 @@ define(
                 var self = this;
 
 
-                // this ensures that .refresh() calls
-                // get throttled so they don't do double refreshes
-                
-                self.refresh = debounce( self.refresh, 100, self );
-                self.checkautocalc = debounce( self.checkautocalc, 50, self );
-
                 // setup props
                 self.props = new PhaseMatch.SPDCprop();
 
@@ -74,6 +74,12 @@ define(
 
                 self.checkautocalc();
                 self.set( self.props );
+
+                // this ensures that .refresh() calls
+                // get throttled so they don't do double refreshes
+                
+                self.refresh = debounce( self.refresh, 100, self );
+                self.checkautocalc = debounce( self.checkautocalc, 50, self );
             },
 
             initEvents: function(){
@@ -112,9 +118,23 @@ define(
 
                 self.each(function( val, key ){
 
-                    var urlVal = Hash.get( key );
+                    var urlVal = Hash.get( key )
+                        ,tp = urlVal && urlVal.substr(0, 1)
+                        ;
 
                     if (urlVal){
+
+                        urlVal = urlVal.substr(1);
+
+                        switch (tp){
+                            case '+':
+                                urlVal = parseFloat( urlVal );
+                            break;
+                            case '!':
+                                urlVal = (urlVal === 'true');
+                            break;
+                        }
+
                         self.set(key, urlVal);
                     }
                 });
@@ -128,10 +148,15 @@ define(
 
                 self.each(function( val, key ){
 
-                    var tp = typeof val;
+                    var tp = typeof val
+                        ,pfx = types[ tp ]
+                        ;
 
-                    if ( val !== undefined && val !== '' && tp !== 'function' && tp !== 'object' ){
-                        ser += '&' + encodeURIComponent( key ) + '=' + encodeURIComponent( val );
+                    if (    pfx &&
+                            val !== null && 
+                            val !== ''
+                    ){
+                        ser += '&' + encodeURIComponent( key ) + '=' + encodeURIComponent( pfx + val );
                     }
                 });
 
