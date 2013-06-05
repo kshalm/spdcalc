@@ -63,6 +63,7 @@ define(
                 });
 
                 self.plot1d.resize(400,150);
+                // self.plot1d.setTitle("boo");
 
                 self.elPlot1d = $(self.plot1d.el);
 
@@ -232,6 +233,13 @@ define(
                 }
 
                 self.data1d = data1d;
+
+                // Calculate visibility
+                // title: 'Hong-Ou-Mandel Dip'
+                var vis = (0.5 -  PhaseMatch.min(HOM))/0.5;
+                console.log("visibility", vis);
+                self.plot1d.setTitle("Hong-Ou-Mandel Dip, Visbibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
+
 
                 self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
             },
