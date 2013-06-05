@@ -1593,6 +1593,17 @@ PhaseMatch.Sum = function Sum(A){
     return total;
 };
 
+PhaseMatch.min = function min(A){
+    var minval=A[0];
+    var l = A.length;
+    for(var i=0; i<l; i++) { 
+        if (A[i]<minval){
+          minval = A[i];
+        } 
+    }
+    return minval;
+};
+
 PhaseMatch.Transpose = function Transpose(A, dim){
     var Trans = new Float64Array(dim*dim);
     var l = A.length;
@@ -2592,10 +2603,10 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
             this.W = 500* con.um;
             this.p_bw = 1 * con.nm;
             this.phase = false;
-            this.brute_force = true;
+            this.brute_force = false;
             this.brute_dim = 50;
-            this.autocalctheta = false;
-            this.autocalcpp = true;
+            this.autocalctheta = true;
+            this.autocalcpp = false;
             this.poling_period = 1000000;
             this.poling_sign = 1;
             this.apodization = 1;

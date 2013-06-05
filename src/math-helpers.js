@@ -18,6 +18,17 @@ PhaseMatch.Sum = function Sum(A){
     return total;
 };
 
+PhaseMatch.min = function min(A){
+    var minval=A[0];
+    var l = A.length;
+    for(var i=0; i<l; i++) { 
+        if (A[i]<minval){
+          minval = A[i];
+        } 
+    }
+    return minval;
+};
+
 PhaseMatch.Transpose = function Transpose(A, dim){
     var Trans = new Float64Array(dim*dim);
     var l = A.length;

@@ -57,10 +57,10 @@
             this.W = 500* con.um;
             this.p_bw = 1 * con.nm;
             this.phase = false;
-            this.brute_force = true;
+            this.brute_force = false;
             this.brute_dim = 50;
-            this.autocalctheta = false;
-            this.autocalcpp = true;
+            this.autocalctheta = true;
+            this.autocalcpp = false;
             this.poling_period = 1000000;
             this.poling_sign = 1;
             this.apodization = 1;
