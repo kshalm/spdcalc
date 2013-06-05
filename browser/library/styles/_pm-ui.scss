@@ -251,6 +251,18 @@ label{
     }
 }
 
+// share url
+.share-wrap {
+    position: relative;
+}
+#share-url {
+    display: none;
+    width: 170px;
+    position: absolute;
+    top: -11px;
+    right: 0;
+}
+
 #time-delay {
     margin: 1em 0;
     margin-left: 80px;

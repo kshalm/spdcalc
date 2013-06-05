@@ -392,12 +392,30 @@ define(
                     }
                 });
 
+                self.el.on('click', '.ctrl-share', function(e){
+                    e.preventDefault();
+
+                    var url = window.location.origin + window.location.pathname + '#' + self.parameters.serialize();
+
+                    $('#share-url')
+                        .val( url )
+                        .show()
+                        .focus()
+                        .select()
+                        ;
+
+                });
+
                 $(window).on('click', function(e){
 
                     var tgt = $(e.target);
 
                     // close all dropdowns on body click
                     $('.dk_open').removeClass('dk_open');
+
+                    if ( ! $(e.target).is('#share-url, .ctrl-share') ){
+                        $('#share-url').hide();
+                    }
                 });
 
                 self.emit('ready');

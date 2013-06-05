@@ -1,5 +1,13 @@
 <div class="">
     <section class="form-horizontal">
+        <div class="control-group share-wrap">
+            <div class="pull-left">
+                <button class="btn ctrl-share">Share</button>
+            </div>
+            <div class="controls">
+                <input type="text" value="" id="share-url"> 
+            </div>
+        </div>
         <div class="control-group">
             <div class="calcbutton">
                 <button class="btn btn-success ctrl-calc">Calculate</button>

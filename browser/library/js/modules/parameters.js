@@ -120,6 +120,24 @@ define(
                 });
             },
 
+            serialize: function(){
+
+                var self = this
+                    ,ser = ''
+                    ;
+
+                self.each(function( val, key ){
+
+                    var tp = typeof val;
+
+                    if ( val !== undefined && val !== '' && tp !== 'function' && tp !== 'object' ){
+                        ser += '&' + encodeURIComponent( key ) + '=' + encodeURIComponent( val );
+                    }
+                });
+
+                return ser.substr(1);
+            },
+
             checkautocalc: function(){
 
                 var self = this;
