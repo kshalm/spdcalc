@@ -3364,7 +3364,7 @@ PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_
 
 
 PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_stop, y_start, y_stop, BW, dim){
-    dim = 50;
+    // dim = 50;
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
 
@@ -3388,8 +3388,8 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
     // p_bw = p_bw /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
     // var P.W_sx = .1 * Math.PI/180;
     // var P.W_sy = P.W_sx;
-    var dim_theta = 60;
-    var scale =10;
+    var dim_theta = dim/1;
+    var scale = 10;
 
     // var theta_i = PhaseMatch.linspace(0, P.theta_i + scale*P.W_sx/2, dim_theta);
 
