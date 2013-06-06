@@ -433,54 +433,38 @@ PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_
 };
 
 
-PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_stop, y_start, y_stop, dim){
+PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_stop, y_start, y_stop, BW, dim){
     dim = 50;
     var P = PhaseMatch.deep_copy(props);
     props.update_all_angles(P);
 
-
-    //temporarily setup the idler angle
-
-    // P.theta_i = P.theta_s;
     P.optimum_idler(P);
     P.phi_i = P.phi_s + Math.PI;
-    var X_0 = Math.sin(P.theta_i)* Math.cos(P.phi_i);
-    
-    // var phi_i_0 = P.phi_i;
-    var Y_0 = Math.sin(P.theta_i)* Math.sin(P.phi_i);
-
-    var theta_i_0 = Math.asin(Math.sqrt(sq(X_0) + sq(Y_0)));
-    var phi_i_0 = Math.atan2(Y_0,X_0)+ Math.PI;
-    console.log("theta 0 , phi 0 = ", theta_i_0*180/Math.PI, phi_i_0*180/Math.PI);
-
-    // console.log('setting idler phi to: ', P.phi_i*180/Math.PI);
-        
-    // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-    // P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
-
+    var X_0 = Math.sin(P.theta_s)* Math.cos(P.phi_s);
+    var Y_0 = Math.sin(P.theta_s)* Math.sin(P.phi_s);
 
     var i;
     var X = PhaseMatch.linspace(x_start, x_stop, dim);
     var Y = PhaseMatch.linspace(y_start, y_stop, dim);
 
-    var BW = .000001e-9;
+    // var BW = 1e-9;
     var dim_lambda = 2; 
     console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
     var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);
     var lambda_i = PhaseMatch.linspace(P.lambda_i - BW/2, P.lambda_i + BW/2, dim_lambda);
-    console.log(lambda_s);
+    // console.log();
 
     // Set idler collection waist in theta and phi direction
     // p_bw = p_bw /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-    var Wx = .1 * Math.PI/180;
-    var Wy = Wx;
+    // var P.W_sx = .1 * Math.PI/180;
+    // var P.W_sy = P.W_sx;
     var dim_theta = 60;
     var scale =10;
 
-    // var theta_i = PhaseMatch.linspace(0, P.theta_i + scale*Wx/2, dim_theta);
+    // var theta_i = PhaseMatch.linspace(0, P.theta_i + scale*P.W_sx/2, dim_theta);
 
-    var theta_i = PhaseMatch.linspace(P.theta_i - scale*Wx/2, P.theta_i + scale*Wx/2, dim_theta);
-    var phi_i = PhaseMatch.linspace(P.phi_i - scale*Wy/2, P.phi_i + scale*Wy/2, dim_theta);
+    var theta_s = PhaseMatch.linspace(P.theta_s - scale*P.W_sx/2, P.theta_s + scale*P.W_sx/2, dim_theta);
+    var phi_s = PhaseMatch.linspace(P.phi_s - scale*P.W_sy/2, P.phi_s + scale*P.W_sy/2, dim_theta);
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -489,9 +473,9 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
         var index_x = i % dim;
         var index_y = Math.floor(i / dim);
 
-        P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
-        P.phi_s = Math.atan2(Y[index_y],X[index_x]);
-        P.phi_i = P.phi_s + Math.PI;
+        P.theta_i = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
+        P.phi_i = Math.atan2(Y[index_y],X[index_x]);
+        P.phi_s = P.phi_i + Math.PI;
 
         var maxval = 0;
 
@@ -499,13 +483,14 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
             // for (var k=0; k<dim_theta; k++){ // loop over all theta_i
             //     P.phi_i = phi_i[k];
                 
-                P.theta_i = theta_i[l];                
+                P.theta_s = theta_s[l];                
                 P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
                 P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
 
-                var x = Math.sin(P.theta_i)*Math.cos(P.phi_i);
-                var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
-                var alpha_i = Math.exp(-1*sq((X_0 - x )/(2*Wx)) - sq((Y_0 - y)/(2*Wy)));
+                var x = Math.sin(P.theta_s)*Math.cos(P.phi_s);
+                var y = Math.sin(P.theta_s)*Math.sin(P.phi_s);
+                var alpha_i = Math.exp(-1*sq((X_0 - x )/(2*P.W_sx)) - sq((Y_0 - y)/(2*P.W_sy)));
+                // var alpha_i = 1;
 
                 for (var j=0; j<dim_lambda; j++){
                     P.lambda_s = lambda_s[j];
@@ -517,7 +502,7 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
 
                     var PM_tmp = PhaseMatch.phasematch_Int_Phase(P);
                     // Multiply by the Gaussian mode of the idler photon
-                    // var alpha_i = Math.exp(-1*sq((theta_i_0 - P.theta_i )/(2*Wx)) - sq((phi_i_0 - P.phi_i )/(2*Wy)));
+                    // var alpha_i = Math.exp(-1*sq((theta_i_0 - P.theta_i )/(2*P.W_sx)) - sq((phi_i_0 - P.phi_i )/(2*P.W_sy)));
 
                     PM_tmp = PM_tmp*alpha_i;
                     // maxval += PM_tmp/dim_lambda/8;

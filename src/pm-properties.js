@@ -56,6 +56,8 @@
             this.L = 2000 * con.um;
             this.W = 500* con.um;
             this.p_bw = 5.35 * con.nm;
+            this.W_sx = .1*Math.PI/180;
+            this.W_sy = this.W_sx;
             this.phase = false;
             this.brute_force = false;
             this.brute_dim = 50;

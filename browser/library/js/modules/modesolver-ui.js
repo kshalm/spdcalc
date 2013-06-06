@@ -53,7 +53,7 @@ define(
 
                 // init plot
                 self.plot2dSignal = new HeatMap({
-                    title: 'Signal spatial mode',
+                    title: 'Idler spatial mode',
                     el: self.el.find('.signalmode').get( 0 ),
                     margins: margins,
                     width: 480,
@@ -98,11 +98,19 @@ define(
                 var self = this;
 
                 var dim = 100;
+                var scale = 10;
+                var BW = 1e-10;
+                //make sure the angles are correct so we can calculate the right ranges
+                props.phi_i = props.phi_s + Math.PI;
+                props.update_all_angles();
 
-                var x_start = 1*Math.PI/180;
-                var x_stop = 3*Math.PI/180;
-                var y_start = -1*Math.PI/180;
-                var y_stop = 1*Math.PI/180;
+                var X_0 = Math.sin(props.theta_i)* Math.cos(props.phi_i);
+                var Y_0 = Math.sin(props.theta_i)* Math.sin(props.phi_i);
+
+                var x_start = X_0 - scale*props.W_sx/2;
+                var x_stop = X_0 + scale*props.W_sx/2;
+                var y_start = Y_0 - scale*props.W_sy/2;
+                var y_stop = Y_0 + scale*props.W_sy/2;
                     
 
                 var PM_s = PhaseMatch.calc_XY_mode_solver(
@@ -111,6 +119,7 @@ define(
                     x_stop,
                     y_start,
                     y_stop,
+                    BW,
                     dim
                 );
 
