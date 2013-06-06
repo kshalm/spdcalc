@@ -22,7 +22,8 @@ define(
         'modules/jsa-hom-ui',
         'modules/kitchen-sink-ui',
         'modules/xy-ui',
-        'modules/schmidt-2d-ui'
+        'modules/schmidt-2d-ui',
+        'modules/modesolver-ui'
     ],
     function(
         $,
@@ -47,7 +48,8 @@ define(
         jsahomUI,
         ksUI,
         xyUI,
-        schmidtUI
+        schmidtUI,
+        msUI
     ) {
 
         'use strict';
@@ -312,6 +314,8 @@ define(
                 // Schmidt Spectral Purity  
                 // self.set('schmidt-2d', schmidtUI);
                 self.set('schmidt-2d', schmidtUI());
+                // Mode solver view
+                self.set('modesolver', msUI());
             },
 
             /**

@@ -238,7 +238,7 @@ define(
                 // title: 'Hong-Ou-Mandel Dip'
                 var vis = (0.5 -  PhaseMatch.min(HOM))/0.5;
                 console.log("visibility", vis);
-                self.plot1d.setTitle("Hong-Ou-Mandel Dip, Visbibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
+                self.plot1d.setTitle("Hong-Ou-Mandel visbibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
 
 
                 self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));

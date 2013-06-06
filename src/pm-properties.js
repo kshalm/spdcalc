@@ -41,8 +41,8 @@
 
         init:function(){
             var con = PhaseMatch.constants;
-            this.lambda_p = 775 * con.nm;
-            this.lambda_s = 1550 * con.nm;
+            this.lambda_p = 785 * con.nm;
+            this.lambda_s = 1570 * con.nm;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             this.PM_type_names = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
             this.Type = this.PM_type_names[2];
@@ -53,21 +53,21 @@
             this.theta_i = this.theta_s;
             this.phi_s = 0;
             this.phi_i = this.phi_s + Math.PI;
-            this.L = 12000 * con.um;
+            this.L = 2000 * con.um;
             this.W = 500* con.um;
-            this.p_bw = 1 * con.nm;
+            this.p_bw = 5.35 * con.nm;
             this.phase = false;
             this.brute_force = false;
             this.brute_dim = 50;
-            this.autocalctheta = true;
-            this.autocalcpp = false;
+            this.autocalctheta = false;
+            this.autocalcpp = true;
             this.poling_period = 1000000;
             this.poling_sign = 1;
             this.apodization = 1;
             this.apodization_FWHM = 1000 * con.um;
             this.use_guassian_approx = false;
             this.crystaldb = PhaseMatch.Crystals;
-            this.crystal = PhaseMatch.Crystals('KTP-1');
+            this.crystal = PhaseMatch.Crystals('KTP-3');
             this.temp = 20;
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);

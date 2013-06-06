@@ -152,6 +152,17 @@ define(
                     po.get('theta_stop'), 
                     dim
                 );
+
+                //  var PMXY = PhaseMatch.calc_XY_mode_solver(
+                //     props, 
+                //     -1 * po.get('theta_stop'), 
+                //     po.get('theta_stop'), 
+                //     -1 * po.get('theta_stop'), 
+                //     po.get('theta_stop'), 
+                //     dim
+                // );
+
+
                 self.dataPMXY = PMXY;
 
                 self.plotPMXY.setXRange([ x_start, x_stop ]);
