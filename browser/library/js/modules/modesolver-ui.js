@@ -98,8 +98,12 @@ define(
                 var self = this;
 
                 var dim = 50;
-                var scale = 8;
-                var BW = 60e-9;
+                var scale = 10;
+                var BW = 20e-9;
+
+                // props.W_sx = .1*Math.PI/180;
+                // props.W_sy = props.W_sx;
+                console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
                 //make sure the angles are correct so we can calculate the right ranges
                 props.phi_i = props.phi_s + Math.PI;
                 props.update_all_angles();
@@ -122,6 +126,7 @@ define(
                     BW,
                     dim
                 );
+                console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
 
                 // var PM_s = PhaseMatch.calc_XY_mode_solver(
                 //     props, 

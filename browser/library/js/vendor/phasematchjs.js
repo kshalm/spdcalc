@@ -2583,7 +2583,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
             this.L = 2000 * con.um;
             this.W = 500* con.um;
             this.p_bw = 5.35 * con.nm;
-            this.W_sx = .3*Math.PI/180;
+            this.W_sx = 10*Math.PI/180;
             this.W_sy = this.W_sx;
             this.phase = false;
             this.brute_force = false;
@@ -2900,6 +2900,8 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
         P.poling_sign = PhaseMatch.util.clone(props.poling_sign,true);
         P.L = PhaseMatch.util.clone(props.L,true);
         P.W = PhaseMatch.util.clone(props.W,true);
+        P.W_sx = PhaseMatch.util.clone(props.W_sx,true);
+        P.W_sy = PhaseMatch.util.clone(props.W_sy,true);
         P.p_bw = PhaseMatch.util.clone(props.p_bw,true);
         P.phase = PhaseMatch.util.clone(props.phase,true);
         P.apodization = PhaseMatch.util.clone(props.apodization,true);
@@ -3395,7 +3397,7 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
     var Y = PhaseMatch.linspace(y_start, y_stop, dim);
 
     // var BW = 1e-9;
-    var dim_lambda = 20; 
+    var dim_lambda = 10; 
     var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);
     var lambda_i = PhaseMatch.linspace(P.lambda_i - BW/2, P.lambda_i + BW/2, dim_lambda);
    
@@ -3409,6 +3411,8 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
 
     var N = dim * dim;
     var PM = new Float64Array( N );
+
+    console.log("indside plothelper ", P.W_sx * 180/Math.PI);
     
     for (i=0; i<N; i++){
         var index_x = i % dim;
@@ -3491,6 +3495,8 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
 
     }
     // console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
+    console.log("end indside plothelper ", P.W_sx * 180/Math.PI);
+
     return PM;
 };
 

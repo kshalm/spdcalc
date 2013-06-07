@@ -56,7 +56,7 @@
             this.L = 2000 * con.um;
             this.W = 500* con.um;
             this.p_bw = 5.35 * con.nm;
-            this.W_sx = .3*Math.PI/180;
+            this.W_sx = 10*Math.PI/180;
             this.W_sy = this.W_sx;
             this.phase = false;
             this.brute_force = false;
@@ -373,6 +373,8 @@
         P.poling_sign = PhaseMatch.util.clone(props.poling_sign,true);
         P.L = PhaseMatch.util.clone(props.L,true);
         P.W = PhaseMatch.util.clone(props.W,true);
+        P.W_sx = PhaseMatch.util.clone(props.W_sx,true);
+        P.W_sy = PhaseMatch.util.clone(props.W_sy,true);
         P.p_bw = PhaseMatch.util.clone(props.p_bw,true);
         P.phase = PhaseMatch.util.clone(props.phase,true);
         P.apodization = PhaseMatch.util.clone(props.apodization,true);

@@ -186,31 +186,31 @@ define(
                 self.plotThetaPhi.setYRange([0 ,90]);
 
                 // Signal Theta vs Idler Theta in crystal
-                // var PMThetaTheta = PhaseMatch.calc_signal_theta_vs_idler_theta(
-                //     props,
-                //     po.get('theta_start'),
-                //     po.get('theta_stop'),
-                //     po.get('theta_start'),
-                //     po.get('theta_stop'),
-                //     dim
-                // );
-                
-                t_start = 0;
-                t_stop = Math.PI/180;
-
-                var PMThetaTheta = PhaseMatch.calc_signal_phi_vs_idler_phi(
+                var PMThetaTheta = PhaseMatch.calc_signal_theta_vs_idler_theta(
                     props,
-                    t_start,
-                    t_stop,
-                    t_start+Math.PI,
-                    Math.PI + t_stop,
+                    po.get('theta_start'),
+                    po.get('theta_stop'),
+                    po.get('theta_start'),
+                    po.get('theta_stop'),
                     dim
                 );
                 
+                // t_start = 0;
+                // t_stop = Math.PI/180;
+
+                // var PMThetaTheta = PhaseMatch.calc_signal_phi_vs_idler_phi(
+                //     props,
+                //     t_start,
+                //     t_stop,
+                //     t_start+Math.PI,
+                //     Math.PI + t_stop,
+                //     dim
+                // );
+                
                 self.dataThetaTheta = PMThetaTheta;
                 self.plotThetaTheta.setXRange([ t_start, t_stop ]);
-                // self.plotThetaTheta.setYRange([ t_start, t_stop ]);
-                self.plotThetaTheta.setYRange([ t_start+Math.PI, t_stop+Math.PI ]);
+                self.plotThetaTheta.setYRange([ t_start, t_stop ]);
+                // self.plotThetaTheta.setYRange([ t_start+Math.PI, t_stop+Math.PI ]);
             },
 
             draw: function(){
