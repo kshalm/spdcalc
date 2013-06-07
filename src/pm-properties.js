@@ -56,10 +56,10 @@
             this.L = 2000 * con.um;
             this.W = 500* con.um;
             this.p_bw = 5.35 * con.nm;
-            this.W_sx = .1*Math.PI/180;
+            this.W_sx = .3*Math.PI/180;
             this.W_sy = this.W_sx;
             this.phase = false;
-            this.brute_force = false;
+            this.brute_force = true;
             this.brute_dim = 50;
             this.autocalctheta = false;
             this.autocalcpp = true;
@@ -123,20 +123,6 @@
 
         calc_Index_PMType : function (lambda, Type, S, photon){
             var ind = this.crystal.indicies(lambda, this.temp);
-
-            // var nx = ind[0];
-            // var ny = ind[1];
-            // var nz = ind[2];
-
-            // var Sx = S[0];
-            // var Sy = S[1];
-            // var Sz = S[2];
-
-            // var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
-            // var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
-            // var D = sq(B) - 4 * C;
-
-           
 
             var nx_squared_inv = 1/sq( ind[0] );
             var ny_squared_inv = 1/sq( ind[1] );

@@ -448,23 +448,17 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
     var Y = PhaseMatch.linspace(y_start, y_stop, dim);
 
     // var BW = 1e-9;
-    var dim_lambda = 2; 
-    console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
+    var dim_lambda = 5; 
     var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);
     var lambda_i = PhaseMatch.linspace(P.lambda_i - BW/2, P.lambda_i + BW/2, dim_lambda);
-    // console.log();
-
-    // Set idler collection waist in theta and phi direction
-    // p_bw = p_bw /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-    // var P.W_sx = .1 * Math.PI/180;
-    // var P.W_sy = P.W_sx;
-    var dim_theta = dim/1;
+   
+    var dim_theta = dim*10;
     var scale = 10;
-
-    // var theta_i = PhaseMatch.linspace(0, P.theta_i + scale*P.W_sx/2, dim_theta);
 
     var theta_s = PhaseMatch.linspace(P.theta_s - scale*P.W_sx/2, P.theta_s + scale*P.W_sx/2, dim_theta);
     var phi_s = PhaseMatch.linspace(P.phi_s - scale*P.W_sy/2, P.phi_s + scale*P.W_sy/2, dim_theta);
+
+    var dtheta_s = (theta_s[1] - theta_s[0])/dim_theta;
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -494,18 +488,20 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
 
                 for (var j=0; j<dim_lambda; j++){
                     P.lambda_s = lambda_s[j];
-                    // P.lambda_i = 1520e-9;
+                    // P.lambda_s = 1500e-9;
                     P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
 
                     P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
                     P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
 
-                    var PM_tmp = PhaseMatch.phasematch_Int_Phase(P);
-                    // Multiply by the Gaussian mode of the idler photon
-                    // var alpha_i = Math.exp(-1*sq((theta_i_0 - P.theta_i )/(2*P.W_sx)) - sq((phi_i_0 - P.phi_i )/(2*P.W_sy)));
+                    // var PM_tmp = PhaseMatch.phasematch_Int_Phase(P);
+                    var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 
-                    PM_tmp = PM_tmp*alpha_i;
+                    // maxval[0] += PM_tmp[0]*alpha_i*dtheta_s;
+                    // maxval[1] += PM_tmp[1]*alpha_i*dtheta_s; 
+                    // PM_tmp = PM_tmp*alpha_i;
                     // maxval += PM_tmp/dim_lambda/8;
+                    var PM_tmp = sq(PM_tmp_complex[0]*alpha_i) + sq(PM_tmp_complex[1]*alpha_i);
                     if (PM_tmp>maxval){
                         maxval = PM_tmp;
                     }
@@ -514,9 +510,10 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
             // }
         }
         PM[i] = maxval;
+        // PM[i] = sq(maxval[0]/dim_lambda) + sq(maxval[1]/dim_lambda);
 
     }
-    console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
+    // console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
     return PM;
 
 };

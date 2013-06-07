@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-06-06
+ * phasematchjs v0.0.1a - 2013-06-07
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2173,14 +2173,11 @@ PhaseMatch.optimum_signal = function optimum_signal(P){
     P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 };
 
-
-
 /*
- * phasematch()
- * Gets the index of refraction depending on phasematching type
- * P is SPDC Properties object
+ * calc_PM_tz
+ * Returns Phasematching function for the transverse and longitudinal directions
  */
-PhaseMatch.phasematch = function phasematch (P){
+PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
@@ -2188,15 +2185,11 @@ PhaseMatch.phasematch = function phasematch (P){
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
 
-    // var w_p = 2*Math.PI *con.c * (P.n_s/P.lambda_s + P.n_i/P.lambda_i);
-
     var delK = PhaseMatch.calc_delK(P);
-    // var delK = PhaseMatch.calc_delK_w(P, w_p);
     
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
 
-    // P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
     var arg = P.L/2*(delK[2]);
 
     //More advanced calculation of phasematching in the z direction. Don't need it now.
@@ -2232,33 +2225,45 @@ PhaseMatch.phasematch = function phasematch (P){
     }
 
     // Phasematching along transverse directions
-    // np.exp(-.5*(delKx**2 + delKy**2)*W**2)
     var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
 
-    // Calculate the Pump spectrum
-    // convert pump bandwidth from FWHM to standard deviation
-    // p_bw = p_bw / 2.35482;
-    // var w_s = 2*Math.PI*con.c *P.n_s/P.lambda_s;
-    // var w_i = 2*Math.PI*con.c *P.n_i/P.lambda_i;
+    return [PMz_real, PMz_imag, PMt];
+}
 
-    var p_bw = 2*Math.PI*con.c/sq(lambda_p) *P.p_bw; //* n_p; //convert from wavelength to w 
+/*
+ * pump_spectrum
+ * Returns the pump mode
+ */
+PhaseMatch.pump_spectrum = function pump_spectrum (P){
+    var con = PhaseMatch.constants;
+    // @TODO: Need to move the pump bandwidth to someplace that is cached.
+    var p_bw = 2*Math.PI*con.c/sq(P.lambda_p) *P.p_bw; //* n_p; //convert from wavelength to w 
     p_bw = p_bw /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-    // var alpha = Math.exp(-sq(((w_s - P.wbar_s)+(w_i - P.wbar_i))/(2*p_bw)));
-    // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( P.n_s/P.lambda_s + P.n_i/P.lambda_i +1/P.poling_period - P.n_p/P.lambda_p) )/(p_bw)));
     var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(2*p_bw)));
+    return alpha
+}
 
-    // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i +1/P.poling_period - 1/P.lambda_p) )/(p_bw)));
 
-    // var alpha = 1;
-    // PMt = 1;
-    // PMz_real = 1;
-    // PMz_imag = 0;
+/*
+ * phasematch()
+ * Gets the index of refraction depending on phasematching type
+ * P is SPDC Properties object
+ */
+PhaseMatch.phasematch = function phasematch (P){
 
-    
+    var pm = PhaseMatch.calc_PM_tz(P);
+    // Longitundinal components of PM. 
+    var PMz_real = pm[0];
+    var PMz_imag = pm[1];
+    // Transverse component of PM
+    var PMt = pm[2];
+    // Pump spectrum
+    var alpha = PhaseMatch.pump_spectrum(P);
+
     //return the real and imaginary parts of Phase matching function
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];
-    // return [(delK[2]), 0];
 };
+
 
 /*
  * phasematch()
@@ -2268,7 +2273,6 @@ PhaseMatch.phasematch = function phasematch (P){
 PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
     
     // PM is a complex array. First element is real part, second element is imaginary.
-    // var PM = PhaseMatch.phasematch(P, P.crystal, P.Type, P.lambda_p, P.p_bw, P.W, P.lambda_s, P.lambda_i, P.L, P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM);
     var PM = PhaseMatch.phasematch(P);
 
     // var PMInt = sq(PM[0]) + sq(PM[1])
@@ -2602,10 +2606,10 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
             this.L = 2000 * con.um;
             this.W = 500* con.um;
             this.p_bw = 5.35 * con.nm;
-            this.W_sx = .1*Math.PI/180;
+            this.W_sx = .3*Math.PI/180;
             this.W_sy = this.W_sx;
             this.phase = false;
-            this.brute_force = false;
+            this.brute_force = true;
             this.brute_dim = 50;
             this.autocalctheta = false;
             this.autocalcpp = true;
@@ -2669,20 +2673,6 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
 
         calc_Index_PMType : function (lambda, Type, S, photon){
             var ind = this.crystal.indicies(lambda, this.temp);
-
-            // var nx = ind[0];
-            // var ny = ind[1];
-            // var nz = ind[2];
-
-            // var Sx = S[0];
-            // var Sy = S[1];
-            // var Sz = S[2];
-
-            // var B = sq(Sx) * (1/sq(ny) + 1/sq(nz)) + sq(Sy) *(1/sq(nx) + 1/sq(nz)) + sq(Sz) *(1/sq(nx) + 1/sq(ny));
-            // var C = sq(Sx) / (sq(ny) * sq(nz)) + sq(Sy) /(sq(nx) * sq(nz)) + sq(Sz) / (sq(nx) * sq(ny));
-            // var D = sq(B) - 4 * C;
-
-           
 
             var nx_squared_inv = 1/sq( ind[0] );
             var ny_squared_inv = 1/sq( ind[1] );
@@ -3378,23 +3368,17 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
     var Y = PhaseMatch.linspace(y_start, y_stop, dim);
 
     // var BW = 1e-9;
-    var dim_lambda = 2; 
-    console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
+    var dim_lambda = 5; 
     var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);
     var lambda_i = PhaseMatch.linspace(P.lambda_i - BW/2, P.lambda_i + BW/2, dim_lambda);
-    // console.log();
-
-    // Set idler collection waist in theta and phi direction
-    // p_bw = p_bw /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-    // var P.W_sx = .1 * Math.PI/180;
-    // var P.W_sy = P.W_sx;
-    var dim_theta = dim/1;
+   
+    var dim_theta = dim*10;
     var scale = 10;
-
-    // var theta_i = PhaseMatch.linspace(0, P.theta_i + scale*P.W_sx/2, dim_theta);
 
     var theta_s = PhaseMatch.linspace(P.theta_s - scale*P.W_sx/2, P.theta_s + scale*P.W_sx/2, dim_theta);
     var phi_s = PhaseMatch.linspace(P.phi_s - scale*P.W_sy/2, P.phi_s + scale*P.W_sy/2, dim_theta);
+
+    var dtheta_s = (theta_s[1] - theta_s[0])/dim_theta;
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -3424,18 +3408,20 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
 
                 for (var j=0; j<dim_lambda; j++){
                     P.lambda_s = lambda_s[j];
-                    // P.lambda_i = 1520e-9;
+                    // P.lambda_s = 1500e-9;
                     P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
 
                     P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
                     P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
 
-                    var PM_tmp = PhaseMatch.phasematch_Int_Phase(P);
-                    // Multiply by the Gaussian mode of the idler photon
-                    // var alpha_i = Math.exp(-1*sq((theta_i_0 - P.theta_i )/(2*P.W_sx)) - sq((phi_i_0 - P.phi_i )/(2*P.W_sy)));
+                    // var PM_tmp = PhaseMatch.phasematch_Int_Phase(P);
+                    var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 
-                    PM_tmp = PM_tmp*alpha_i;
+                    // maxval[0] += PM_tmp[0]*alpha_i*dtheta_s;
+                    // maxval[1] += PM_tmp[1]*alpha_i*dtheta_s; 
+                    // PM_tmp = PM_tmp*alpha_i;
                     // maxval += PM_tmp/dim_lambda/8;
+                    var PM_tmp = sq(PM_tmp_complex[0]*alpha_i) + sq(PM_tmp_complex[1]*alpha_i);
                     if (PM_tmp>maxval){
                         maxval = PM_tmp;
                     }
@@ -3444,9 +3430,10 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
             // }
         }
         PM[i] = maxval;
+        // PM[i] = sq(maxval[0]/dim_lambda) + sq(maxval[1]/dim_lambda);
 
     }
-    console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
+    // console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
     return PM;
 
 };

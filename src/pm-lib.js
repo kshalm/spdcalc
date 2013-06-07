@@ -62,14 +62,11 @@ PhaseMatch.optimum_signal = function optimum_signal(P){
     P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
 };
 
-
-
 /*
- * phasematch()
- * Gets the index of refraction depending on phasematching type
- * P is SPDC Properties object
+ * calc_PM_tz
+ * Returns Phasematching function for the transverse and longitudinal directions
  */
-PhaseMatch.phasematch = function phasematch (P){
+PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
@@ -77,15 +74,11 @@ PhaseMatch.phasematch = function phasematch (P){
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
 
-    // var w_p = 2*Math.PI *con.c * (P.n_s/P.lambda_s + P.n_i/P.lambda_i);
-
     var delK = PhaseMatch.calc_delK(P);
-    // var delK = PhaseMatch.calc_delK_w(P, w_p);
     
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
 
-    // P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
     var arg = P.L/2*(delK[2]);
 
     //More advanced calculation of phasematching in the z direction. Don't need it now.
@@ -121,33 +114,45 @@ PhaseMatch.phasematch = function phasematch (P){
     }
 
     // Phasematching along transverse directions
-    // np.exp(-.5*(delKx**2 + delKy**2)*W**2)
     var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
 
-    // Calculate the Pump spectrum
-    // convert pump bandwidth from FWHM to standard deviation
-    // p_bw = p_bw / 2.35482;
-    // var w_s = 2*Math.PI*con.c *P.n_s/P.lambda_s;
-    // var w_i = 2*Math.PI*con.c *P.n_i/P.lambda_i;
+    return [PMz_real, PMz_imag, PMt];
+}
 
-    var p_bw = 2*Math.PI*con.c/sq(lambda_p) *P.p_bw; //* n_p; //convert from wavelength to w 
+/*
+ * pump_spectrum
+ * Returns the pump mode
+ */
+PhaseMatch.pump_spectrum = function pump_spectrum (P){
+    var con = PhaseMatch.constants;
+    // @TODO: Need to move the pump bandwidth to someplace that is cached.
+    var p_bw = 2*Math.PI*con.c/sq(P.lambda_p) *P.p_bw; //* n_p; //convert from wavelength to w 
     p_bw = p_bw /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-    // var alpha = Math.exp(-sq(((w_s - P.wbar_s)+(w_i - P.wbar_i))/(2*p_bw)));
-    // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( P.n_s/P.lambda_s + P.n_i/P.lambda_i +1/P.poling_period - P.n_p/P.lambda_p) )/(p_bw)));
     var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(2*p_bw)));
+    return alpha
+}
 
-    // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i +1/P.poling_period - 1/P.lambda_p) )/(p_bw)));
 
-    // var alpha = 1;
-    // PMt = 1;
-    // PMz_real = 1;
-    // PMz_imag = 0;
+/*
+ * phasematch()
+ * Gets the index of refraction depending on phasematching type
+ * P is SPDC Properties object
+ */
+PhaseMatch.phasematch = function phasematch (P){
 
-    
+    var pm = PhaseMatch.calc_PM_tz(P);
+    // Longitundinal components of PM. 
+    var PMz_real = pm[0];
+    var PMz_imag = pm[1];
+    // Transverse component of PM
+    var PMt = pm[2];
+    // Pump spectrum
+    var alpha = PhaseMatch.pump_spectrum(P);
+
     //return the real and imaginary parts of Phase matching function
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];
-    // return [(delK[2]), 0];
 };
+
 
 /*
  * phasematch()
@@ -157,7 +162,6 @@ PhaseMatch.phasematch = function phasematch (P){
 PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
     
     // PM is a complex array. First element is real part, second element is imaginary.
-    // var PM = PhaseMatch.phasematch(P, P.crystal, P.Type, P.lambda_p, P.p_bw, P.W, P.lambda_s, P.lambda_i, P.L, P.theta, P.phi, P.theta_s, P.theta_i, P.phi_s, P.phi_i, P.poling_period, P.phase, P.apodization ,P.apodization_FWHM);
     var PM = PhaseMatch.phasematch(P);
 
     // var PMInt = sq(PM[0]) + sq(PM[1])
