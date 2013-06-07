@@ -480,7 +480,7 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
     var Y = PhaseMatch.linspace(y_start, y_stop, dim);
 
     // var BW = 1e-9;
-    var dim_lambda = 10; 
+    var dim_lambda = 20; 
     var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);
     var lambda_i = PhaseMatch.linspace(P.lambda_i - BW/2, P.lambda_i + BW/2, dim_lambda);
    
@@ -502,7 +502,7 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
         P.theta_i = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
         P.phi_i = Math.atan2(Y[index_y],X[index_x]);
         // phi_s[0] = P.phi_i + Math.PI;
-        phi_s = P.phi_i + Math.PI;
+        P.phi_s = P.phi_i + Math.PI;
 
         var maxval = 0;
 
@@ -544,7 +544,7 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
         // if (P.brute_force){
         if (true){
             var guess = P.theta_i;
-            var ans = PhaseMatch.nelderMead(min_theta_s, guess, 20);
+            var ans = PhaseMatch.nelderMead(min_theta_s, guess, 15);
         }
         else{
             for (var j=0; j<dim_lambda; j++){

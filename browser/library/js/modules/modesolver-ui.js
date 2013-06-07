@@ -98,8 +98,8 @@ define(
                 var self = this;
 
                 var dim = 50;
-                var scale = 10;
-                var BW = 40e-9;
+                var scale = 8;
+                var BW = 60e-9;
                 //make sure the angles are correct so we can calculate the right ranges
                 props.phi_i = props.phi_s + Math.PI;
                 props.update_all_angles();
