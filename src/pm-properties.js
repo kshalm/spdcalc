@@ -56,7 +56,7 @@
             this.L = 2000 * con.um;
             this.W = 500* con.um;
             this.p_bw = 5.35 * con.nm;
-            this.W_sx = .3*Math.PI/180;
+            this.W_sx = .01*Math.PI/180;
             this.W_sy = this.W_sx;
             this.phase = false;
             this.brute_force = true;
@@ -287,7 +287,25 @@
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
         },
 
+        optimum_signal : function (){
+            var P = this;
 
+            var delKpp = P.lambda_i/(P.poling_period*P.poling_sign);
+
+            var arg = sq(P.n_i) + sq(P.n_p*P.lambda_i/P.lambda_p);    
+            arg += -2*P.n_i*P.n_p*(P.lambda_i/P.lambda_p)*Math.cos(P.theta_i) - 2*P.n_p*P.lambda_i/P.lambda_p*delKpp;
+            arg += 2*P.n_i*Math.cos(P.theta_i)*delKpp + sq(delKpp);
+            arg = Math.sqrt(arg);
+
+            var arg2 = P.n_i*Math.sin(P.theta_i)/arg;
+
+            var theta_s = Math.asin(arg2);
+            // return theta_i;
+            P.theta_s = theta_s;
+            //Update the index of refraction for the idler
+            P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+            P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        },
 
         brute_force_theta_i : function (){
             var props = this;
