@@ -2583,10 +2583,10 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
             this.L = 2000 * con.um;
             this.W = 500* con.um;
             this.p_bw = 5.35 * con.nm;
-            this.W_sx = .01*Math.PI/180;
+            this.W_sx = .1*Math.PI/180;
             this.W_sy = this.W_sx;
             this.phase = false;
-            this.brute_force = true;
+            this.brute_force = false;
             this.brute_dim = 50;
             this.autocalctheta = false;
             this.autocalcpp = true;
@@ -3200,6 +3200,38 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
 
 };
 
+PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(props, x_start, x_stop, y_start, y_stop, dim){
+
+    var P = PhaseMatch.deep_copy(props);
+    props.update_all_angles(P);
+
+    var i;
+    var X = PhaseMatch.linspace(x_start, x_stop, dim);
+    var Y = PhaseMatch.linspace(y_stop, y_start, dim); 
+
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+    
+    for (i=0; i<N; i++){
+        var index_x = i % dim;
+        var index_y = Math.floor(i / dim);
+
+        P.phi_s = X[index_x];
+        P.phi_i =Y[index_y];
+
+        P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+        P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+
+    }
+
+    return PM;
+
+};
+
 /* calc_schmidt_plot
 * Params is a JSON string of the form { x: "L/W/BW", y:"L/W/BW"}
 */
@@ -3367,7 +3399,7 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
     var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);
     var lambda_i = PhaseMatch.linspace(P.lambda_i - BW/2, P.lambda_i + BW/2, dim_lambda);
    
-    var dim_theta = dim*10;
+    var dim_theta =2;
     var scale = 10;
 
     var theta_s = PhaseMatch.linspace(P.theta_s - scale*P.W_sx/2, P.theta_s + scale*P.W_sx/2, dim_theta);
@@ -3384,7 +3416,8 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
 
         P.theta_i = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
         P.phi_i = Math.atan2(Y[index_y],X[index_x]);
-        P.phi_s = P.phi_i + Math.PI;
+        // phi_s[0] = P.phi_i + Math.PI;
+        phi_s = P.phi_i + Math.PI;
 
         var maxval = 0;
 
@@ -3395,28 +3428,31 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
         };
 
         var iterate_theta = function(){
-            P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-            P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+            // for (var r=0; r<dim_theta; r++){
+            //     P.phi_s = phi_s[r];
+                P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+                P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
 
-            var x = Math.sin(P.theta_s)*Math.cos(P.phi_s);
-            var y = Math.sin(P.theta_s)*Math.sin(P.phi_s);
-            var alpha_i = Math.exp(-1*sq((X_0 - x )/(2*P.W_sx)) - sq((Y_0 - y)/(2*P.W_sy)));
+                var x = Math.sin(P.theta_s)*Math.cos(P.phi_s);
+                var y = Math.sin(P.theta_s)*Math.sin(P.phi_s);
+                var alpha_i = Math.exp(-1*sq((X_0 - x )/(2*P.W_sx)) - sq((Y_0 - y)/(2*P.W_sy)));
 
-            for (var j=0; j<dim_lambda; j++){
-                P.lambda_s = lambda_s[j];
-                // P.lambda_s = 1500e-9;
-                P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
+                for (var j=0; j<dim_lambda; j++){
+                    P.lambda_s = lambda_s[j];
+                    // P.lambda_s = 1500e-9;
+                    P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
 
-                P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-                P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+                    P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+                    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
 
-                var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
+                    var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 
-                var PM_tmp = sq(PM_tmp_complex[0]*alpha_i) + sq(PM_tmp_complex[1]*alpha_i);
-                if (PM_tmp>maxval){
-                    maxval = PM_tmp;
+                    var PM_tmp = sq(PM_tmp_complex[0]*alpha_i) + sq(PM_tmp_complex[1]*alpha_i);
+                    if (PM_tmp>maxval){
+                        maxval = PM_tmp;
+                    }
                 }
-            }
+            // }
         };
 
         
