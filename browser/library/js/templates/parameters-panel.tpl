@@ -156,6 +156,12 @@
                 <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sy" value="{{= this.convertTo('deg', parseFloat( it.W_sy )) }}" />
             </div>
         </div>
+        <div class="control-group">
+            <label class="checkbox control-label">
+                Brute force calculation
+                <input id="brute_force" type="checkbox" class="inputbox" name="brute_force" {{? it.brute_force }} checked="checked" {{?}} />
+            </label>
+        </div>
     </section>
 
     <!-- Periodic Poling Properties -->

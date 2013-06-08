@@ -2943,6 +2943,8 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
         P.n_p = PhaseMatch.util.clone(props.n_p,true);
         P.n_s = PhaseMatch.util.clone(props.n_s,true);
         P.n_i = PhaseMatch.util.clone(props.n_i,true);
+        P.brute_force = PhaseMatch.util.clone(props.brute_force,true);
+        P.brute_dim = PhaseMatch.util.clone(props.brute_dim,true);
         
         return P;
     };
@@ -3553,8 +3555,8 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     var dim_lambda = 3; 
 
     if (P.brute_force){
-        // dim = P.brute_dim;
-        dim_lambda = Math.round(dim_lambda/5)+1;
+        dim = P.brute_dim;
+        // dim_lambda = Math.round(dim_lambda/5)+1;
     }
 
     var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);

@@ -605,8 +605,8 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     var dim_lambda = 3; 
 
     if (P.brute_force){
-        // dim = P.brute_dim;
-        dim_lambda = Math.round(dim_lambda/5)+1;
+        dim = P.brute_dim;
+        // dim_lambda = Math.round(dim_lambda/5)+1;
     }
 
     var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);

@@ -405,6 +405,8 @@
         P.n_p = PhaseMatch.util.clone(props.n_p,true);
         P.n_s = PhaseMatch.util.clone(props.n_s,true);
         P.n_i = PhaseMatch.util.clone(props.n_i,true);
+        P.brute_force = PhaseMatch.util.clone(props.brute_force,true);
+        P.brute_dim = PhaseMatch.util.clone(props.brute_dim,true);
         
         return P;
     };

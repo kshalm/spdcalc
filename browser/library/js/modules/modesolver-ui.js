@@ -101,8 +101,9 @@ define(
 
                 if (props.brute_force){
                     dim = props.brute_dim;
-                    console.log("blay");
+                    
                 }
+                // console.log("BF = ", props.brute_force);
                 // console.log("DIM", dim, props.brute_dim);
 
                 var scale = 5;
