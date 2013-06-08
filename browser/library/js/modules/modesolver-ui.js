@@ -8,7 +8,7 @@ define(
         'modules/skeleton-ui',
         'modules/converter',
         'tpl!templates/modesolver-layout.tpl',
-        'tpl!templates/jsa-plot-opts.tpl'
+        'tpl!templates/modesolver-plot-opts.tpl'
     ],
     function(
         $,
@@ -97,8 +97,15 @@ define(
 
                 var self = this;
 
-                var dim = 50;
-                var scale = 10;
+                var dim = 200;
+
+                if (props.brute_force){
+                    dim = props.brute_dim;
+                    console.log("blay");
+                }
+                // console.log("DIM", dim, props.brute_dim);
+
+                var scale = 5;
                 var BW = 20e-9;
 
                 // props.W_sx = .1*Math.PI/180;
@@ -111,13 +118,15 @@ define(
                 var X_0 = Math.sin(props.theta_i)* Math.cos(props.phi_i);
                 var Y_0 = Math.sin(props.theta_i)* Math.sin(props.phi_i);
 
-                var x_start = X_0 - scale*props.W_sx/2;
-                var x_stop = X_0 + scale*props.W_sx/2;
-                var y_start = Y_0 - scale*props.W_sy/2;
-                var y_stop = Y_0 + scale*props.W_sy/2;
+                var W = Math.max(props.W_sx, props.W_sy);
+
+                var x_start = X_0 - scale*W/2;
+                var x_stop = X_0 + scale*W/2;
+                var y_start = Y_0 - scale*W/2;
+                var y_stop = Y_0 + scale*W/2;
                     
 
-                var PM_s = PhaseMatch.calc_XY_mode_solver(
+                var PM_s = PhaseMatch.calc_XY_mode_solver2(
                     props, 
                     x_start,
                     x_stop,

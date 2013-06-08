@@ -56,10 +56,10 @@
             this.L = 2000 * con.um;
             this.W = 500* con.um;
             this.p_bw = 5.35 * con.nm;
-            this.W_sx = 10*Math.PI/180;
+            this.W_sx = 1.2*Math.PI/180;
             this.W_sy = this.W_sx;
             this.phase = false;
-            this.brute_force = false;
+            this.brute_force = true;
             this.brute_dim = 50;
             this.autocalctheta = false;
             this.autocalcpp = true;
@@ -329,6 +329,26 @@
             var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
         },
 
+        brute_force_theta_s : function (){
+            var props = this;
+
+            var min_PM = function(x){
+                if (x>Math.PI/2 || x<0){return 1e12;}
+                props.theta_s = x;
+
+                props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
+                props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+
+                var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
+                return 1-PMtmp;
+            };
+
+            //Initial guess
+            props.optimum_signal();
+            var guess = props.theta_s;
+
+            var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
+        },
 
         set: function( name, val ){
 

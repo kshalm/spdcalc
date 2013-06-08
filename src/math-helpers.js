@@ -29,6 +29,17 @@ PhaseMatch.min = function min(A){
     return minval;
 };
 
+PhaseMatch.max = function max(A){
+    var maxval=A[0];
+    var l = A.length;
+    for(var i=0; i<l; i++) { 
+        if (A[i]>maxval){
+          maxval = A[i];
+        } 
+    }
+    return maxval;
+};
+
 PhaseMatch.Transpose = function Transpose(A, dim){
     var Trans = new Float64Array(dim*dim);
     var l = A.length;

@@ -111,6 +111,7 @@
         </div>
     </section>
 
+    <!-- Signal Properties -->
     <section class="form-horizontal">
         <div class="control-group">
             <h4>Signal Properties</h4>
@@ -139,8 +140,25 @@
                 <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi_s" value="{{= this.convertTo('deg', parseFloat( it.phi_s )) }}" />
             </div>
         </div>
+        <div class="control-group">   
+            <label class="control-label">
+                Waist x dir (deg)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sx" value="{{= this.convertTo('deg', parseFloat( it.W_sx )) }}" />
+            </div>
+        </div>
+        <div class="control-group">   
+            <label class="control-label">
+                Waist y dir (deg)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sy" value="{{= this.convertTo('deg', parseFloat( it.W_sy )) }}" />
+            </div>
+        </div>
     </section>
 
+    <!-- Periodic Poling Properties -->
     <section class="form-horizontal">
         <div class="control-group">
             <h4>Periodic Poling</h4>
@@ -159,24 +177,6 @@
             </label>
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period" value="{{= this.convertTo('micro', parseFloat( it.poling_period )) }}" />
-            </div>
-        </div>
-
-        <div class="control-group">   
-            <label class="control-label">
-                Theta_s (deg)
-            </label>
-            <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta_s" value="{{= this.convertTo('deg', parseFloat( it.theta_s )) }}" />
-            </div>
-        </div>
-
-        <div class="control-group">   
-            <label class="control-label">
-                Phi_s (deg)
-            </label>
-            <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi_s" value="{{= this.convertTo('deg', parseFloat( it.phi_s )) }}" />
             </div>
         </div>
     </section>
