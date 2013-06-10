@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-06-08
+ * phasematchjs v0.0.1a - 2013-06-10
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -1593,27 +1593,10 @@ PhaseMatch.Sum = function Sum(A){
     return total;
 };
 
-PhaseMatch.min = function min(A){
-    var minval=A[0];
-    var l = A.length;
-    for(var i=0; i<l; i++) { 
-        if (A[i]<minval){
-          minval = A[i];
-        } 
-    }
-    return minval;
-};
-
-PhaseMatch.max = function max(A){
-    var maxval=A[0];
-    var l = A.length;
-    for(var i=0; i<l; i++) { 
-        if (A[i]>maxval){
-          maxval = A[i];
-        } 
-    }
-    return maxval;
-};
+/* Note:
+    Use: Math.max.apply(null, [1,5,2,7,8])
+    instead of creating your own
+ */
 
 PhaseMatch.Transpose = function Transpose(A, dim){
     var Trans = new Float64Array(dim*dim);

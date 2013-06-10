@@ -18,27 +18,10 @@ PhaseMatch.Sum = function Sum(A){
     return total;
 };
 
-PhaseMatch.min = function min(A){
-    var minval=A[0];
-    var l = A.length;
-    for(var i=0; i<l; i++) { 
-        if (A[i]<minval){
-          minval = A[i];
-        } 
-    }
-    return minval;
-};
-
-PhaseMatch.max = function max(A){
-    var maxval=A[0];
-    var l = A.length;
-    for(var i=0; i<l; i++) { 
-        if (A[i]>maxval){
-          maxval = A[i];
-        } 
-    }
-    return maxval;
-};
+/* Note:
+    Use: Math.max.apply(null, [1,5,2,7,8])
+    instead of creating your own
+ */
 
 PhaseMatch.Transpose = function Transpose(A, dim){
     var Trans = new Float64Array(dim*dim);
