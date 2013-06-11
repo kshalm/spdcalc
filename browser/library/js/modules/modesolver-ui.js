@@ -97,7 +97,7 @@ define(
 
                 var self = this;
 
-                var dim = 200;
+                var dim = 100;
 
                 if (props.brute_force){
                     dim = props.brute_dim;
@@ -107,7 +107,7 @@ define(
                 // console.log("DIM", dim, props.brute_dim);
 
                 var scale = 5;
-                var BW = 20e-9;
+                var BW = 20e-12;
 
                 // props.W_sx = .1*Math.PI/180;
                 // props.W_sy = props.W_sx;

@@ -602,7 +602,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     var X = PhaseMatch.linspace(x_start, x_stop, dim);
     var Y = PhaseMatch.linspace(y_start, y_stop, dim);
 
-    var dim_lambda = 3; 
+    var dim_lambda = 20; 
 
     if (P.brute_force){
         dim = P.brute_dim;
@@ -615,8 +615,6 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
     var N = dim * dim;
     var PM = new Float64Array( N );
-
-    console.log("indside plothelper ", P.W_sx * 180/Math.PI);
     
     for (var i=0; i<N; i++){
         var index_x = i % dim;
@@ -653,18 +651,16 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
             var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 
             var PM_tmp = sq(PM_tmp_complex[0]*alpha_i) + sq(PM_tmp_complex[1]*alpha_i);
-            maxval += PM_tmp/dim_lambda;
-            // if (PM_tmp>maxval){
-            //     maxval = PM_tmp;
-            // }
+            // maxval += PM_tmp/dim_lambda;
+            if (PM_tmp>maxval){
+                maxval = PM_tmp;
+            }
         }
             
         PM[i] = maxval;
 
     }
-    console.log("MAXXXXX", PhaseMatch.max(PM));
-    // console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
-    console.log("end indside plothelper ", P.W_sx * 180/Math.PI);
+    console.log("MAX", PhaseMatch.max(PM));
 
     return PM;
 };
