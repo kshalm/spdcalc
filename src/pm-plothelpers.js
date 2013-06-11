@@ -662,7 +662,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         PM[i] = maxval;
 
     }
-    console.log("MAXXXXX", PhaseMatch.max(PM));
+    console.log("MAXXXXX", Math.max.apply(null, PM));
     // console.log("bloop", P.lambda_s*1e9, P.lambda_i*1e9);
     console.log("end indside plothelper ", P.W_sx * 180/Math.PI);
 

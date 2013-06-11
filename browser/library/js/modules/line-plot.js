@@ -62,6 +62,8 @@ define(
                 x: d3.scale.linear(),
                 y: d3.scale.linear()
             };
+
+            this.clear();
                 
             // init svg
             this.svg = d3.select( this.el.get(0) ).append("svg");
@@ -70,37 +72,6 @@ define(
             this.margin = defaults.margins;
             this.resize( options.width, options.height );
             this.setMargins( options.margins );
-
-            // function showPoint( ans ){
-            //     var circle = svg.selectAll('circle').data([ ans ]);
-                
-            //     circle.enter()
-            //         .append('circle')
-            //         .attr('r', 10)
-            //         .attr('cx', function(d) {
-            //           return x(d * 180/Math.PI);
-            //         })
-            //         .attr('cy', function(d) {
-            //           return y(min_delK( d ));
-            //         })
-            //         .attr('fill', function(d, i) {return 'red';})
-            //         ;
-
-            //     circle
-            //         .transition()
-            //         .duration(1000)
-            //         .attr('cx', function(d) {
-            //           return x(d * 180/Math.PI);
-            //         })
-            //         .attr('cy', function(d) {
-            //           return y(min_delK( d ));
-            //         })
-            //         ;
-
-            //     circle.exit()
-            //         .remove()
-            //         ;
-            // }
         }
 
         LinePlot.prototype = {
@@ -227,6 +198,61 @@ define(
                 };
             },
 
+            calcRanges: function(){
+
+                if (this.xrange && this.yrange){
+                    return;
+                }
+
+                var all = [];
+
+                for ( var i = 0, l = this.series.length; i < l; ++i ){
+                    
+                    all.push.apply(all, this.series[ i ].data);
+                }
+
+                this.xrange = d3.extent(all, function(d) { return d.x; });
+                this.yrange = d3.extent(all, function(d) { return d.y; });
+            },
+
+            // call as one of:
+            // addSeries( data );
+            // addSeries( data, 'title' );
+            // addSeries( data, { title: 'title', color: 'color' });
+            // addSeries({ title: 'title', color: 'color', data: data });
+            addSeries: function( data, cfg ){
+
+                if ( !data ){
+                    return;
+                }
+
+                if ( typeof cfg !== 'object' ){
+
+                    if ( typeof data === 'object' && data.data ){
+
+                        cfg = data;
+                        data = cfg.data;
+
+                    } else {
+
+                        cfg = {
+                            title: cfg || 'Series ' + this.series.length,
+                            color: this.colors( this.series.length )
+                        };    
+                    }
+                }
+
+                cfg.data = data;
+
+                this.series.push( cfg );
+            },
+
+            clear: function(){
+
+                this.colors = d3.scale.category10();
+                this.series = [];
+            },
+
             plotData: function( data ){
 
                 var svg = this.svgPlot
@@ -235,30 +261,42 @@ define(
                     ,width = this.width
                     ,height = this.height
                     ,line
+                    ,series
                     ;
 
-                x.domain( this.xrange || d3.extent(data, function(d) { return d.x; }))
+                if ( data ){
+                    this.clear();
+                    this.addSeries( data );
+                }
+
+                this.calcRanges();
+
+                x.domain( this.xrange )
                  .range([0, width])
                  ;
 
-                y.domain( this.yrange || d3.extent(data, function(d) { return d.y; }))
+                y.domain( this.yrange )
                  .range([height, 0])
                  ;
 
-                this.data = data;
-
-                line = d3.svg.line( data )
-                    .x(function(d) { return x(d.x); })
-                    .y(function(d) { return y(d.y); })
-                    ;
-
                 svg.selectAll('.line').remove();
-                
-                svg.append('path')
-                    .datum( data )
-                    .attr("class", "line")
-                    .attr("d", line)
-                    ;
+
+                for ( var i = 0, l = this.series.length; i < l; ++i ){
+                    
+                    series = this.series[ i ];
+
+                    line = d3.svg.line( series.data )
+                        .x(function(d) { return x(d.x); })
+                        .y(function(d) { return y(d.y); })
+                        ;
+                    
+                    svg.append('path')
+                        .datum( series.data )
+                        .attr("class", "line")
+                        .attr("d", line)
+                        .attr("stroke", series.color)
+                        ;
+                }
 
                 this.refreshAxes();
             }
