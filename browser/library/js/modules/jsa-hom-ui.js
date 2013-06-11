@@ -236,7 +236,7 @@ define(
 
                 // Calculate visibility
                 // title: 'Hong-Ou-Mandel Dip'
-                var vis = (0.5 -  PhaseMatch.min(HOM))/0.5;
+                var vis = (0.5 -  Math.min.apply(null, HOM))/0.5;
                 console.log("visibility", vis);
                 self.plot1d.setTitle("Hong-Ou-Mandel visbibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
 

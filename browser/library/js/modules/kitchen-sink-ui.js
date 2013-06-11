@@ -167,7 +167,11 @@ define(
 
                 self.plotThetaPhi.plotData( self.dataThetaPhi );
 
-                self.plot1d.plotData( self.data1d );
+
+                self.plot1d.clear();
+                self.plot1d.addSeries( self.data1d );
+                self.plot1d.addSeries( $.map(new Array(100), function( val, i ){ return { x: i*5-400, y: Math.sin(i/10) }; }) );
+                self.plot1d.plotData();
 
             }
         });

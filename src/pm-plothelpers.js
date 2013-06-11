@@ -660,7 +660,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         PM[i] = maxval;
 
     }
-    console.log("MAX", PhaseMatch.max(PM));
+    console.log("MAXXXXX", Math.max.apply(null, PM));
 
     return PM;
 };
