@@ -8,8 +8,7 @@ define(
         'modules/skeleton-ui',
         'modules/converter',
         'tpl!templates/jsa-layout.tpl',
-        'tpl!templates/time-delay-ctrl.tpl',
-        'tpl!templates/jsa-hom-plot-opts.tpl'
+        'tpl!templates/time-delay-ctrl.tpl'
     ],
     function(
         $,
@@ -20,8 +19,7 @@ define(
         SkeletonUI,
         converter,
         tplJSALayout,
-        tplTimeDelayCtrl,
-        tplJSAHOMPlotOpts
+        tplTimeDelayCtrl
     ) {
 
         'use strict';
@@ -38,7 +36,10 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplJSALayout,
-            tplPlotOpts: tplJSAHOMPlotOpts,
+            hiddenPlotOpts: [
+                'time-delay',
+                'theta'
+            ],
 
             /**
              * Initialize Plots

@@ -5,6 +5,7 @@ define(
         'phasematch',
         'tpl!templates/pm-ui.tpl',
         'tpl!templates/parameters-panel.tpl',
+        'tpl!templates/plot-opts.tpl',
         'text!templates/converters/heat-map-as-csv.tpl',
         'text!templates/converters/line-plot-as-csv.tpl',
         'dot',
@@ -31,6 +32,7 @@ define(
         PhaseMatch,
         tplPMUI,
         tplParametersPanel,
+        tplPlotOpts,
         textHeatMapAsCSV,
         textLinePlotAsCSV,
         doT,
@@ -62,6 +64,8 @@ define(
         tplParametersPanel.convertFrom = converter.from;
         tplParametersPanel.convertTo = converter.to;
 
+        tplPlotOpts.converter = converter;
+
         /**
          * Page-level Mediator
          * @module PMUI
@@ -78,8 +82,8 @@ define(
                 var self = this;
 
                 self.initParameters();
-                self.initPlotOpts();
                 self.initUI();
+                self.initPlotOpts();
                 self.initEvents();
                 self.initModules();
 
@@ -297,6 +301,10 @@ define(
                         'autocalc_plotopts': true
                     }
                 });
+
+                self.elPlotOpts.html( tplPlotOpts.render( self.plotOpts.getAll() ) );
+                customCheckbox( self.elPlotOpts );
+                self.plotOpts.attachView( self.elPlotOpts );
             },
 
             initModules: function(){
@@ -344,13 +352,6 @@ define(
                 // inject containers
                 self.elMain.children().detach();
                 self.elMain.append( mod.getMainPanel() );
-
-                // plot options inputs
-                self.elPlotOpts.children().detach();
-
-                if (mod.getOptsPanel){
-                    self.elPlotOpts.append( mod.getOptsPanel() );
-                }
 
                 mod.connect( self );
 

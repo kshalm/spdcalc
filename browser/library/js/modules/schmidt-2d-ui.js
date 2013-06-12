@@ -7,8 +7,7 @@ define(
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
-        'tpl!templates/schmidt-2d-layout.tpl',
-        'tpl!templates/schmidt-2d-plot-opts.tpl'
+        'tpl!templates/schmidt-2d-layout.tpl'
     ],
     function(
         $,
@@ -18,8 +17,7 @@ define(
         LinePlot,
         SkeletonUI,
         converter,
-        tplSchmidtLayout,
-        tplSchmidtPlotOpts
+        tplSchmidtLayout
     ) {
 
         'use strict';
@@ -34,7 +32,9 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplSchmidtLayout,
-            tplPlotOpts: tplSchmidtPlotOpts,
+            hiddenPlotOpts: [
+                'time-delay'
+            ],
 
             /**
              * Initialize Plots

@@ -7,8 +7,7 @@ define(
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
-        'tpl!templates/modesolver-layout.tpl',
-        'tpl!templates/modesolver-plot-opts.tpl'
+        'tpl!templates/modesolver-layout.tpl'
     ],
     function(
         $,
@@ -18,8 +17,7 @@ define(
         LinePlot,
         SkeletonUI,
         converter,
-        tplMSLayout,
-        tplMSPlotOpts
+        tplMSLayout
     ) {
 
         'use strict';
@@ -34,7 +32,9 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplMSLayout,
-            tplPlotOpts: tplMSPlotOpts,
+            hiddenPlotOpts: [
+                'time-delay'
+            ],
 
             /**
              * Initialize Plots
