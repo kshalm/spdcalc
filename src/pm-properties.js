@@ -4,73 +4,63 @@
 
 (function(){
 
+    var PMTypes = [
+        "Type 0:   o -> o + o", 
+        "Type 1:   e -> o + o", 
+        "Type 2:   e -> e + o", 
+        "Type 2:   e -> o + e"
+    ];
+
     var con = PhaseMatch.constants;
     var spdcDefaults = {
-        lambda_p: 775 * con.nm,
-        lambda_s: 1500 * con.nm,
-        lambda_i: 1600 * con.nm,
-        Type: [
-            "o -> o + o", 
-            "e -> o + o", 
-            "e -> e + o", 
-            "e -> o + e"
-        ],
-        theta: 19.8371104525 * Math.PI / 180,
+        lambda_p: 785 * con.nm,
+        lambda_s: 1570 * con.nm,
+        lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
+        Type: PMTypes[2],
+        theta: 90 *Math.PI / 180,
         phi: 0,
         theta_s: 0, // * Math.PI / 180,
         theta_i: 0,
         phi_s: 0,
         phi_i: 0,
         poling_period: 1000000,
+        poling_sign: 1,
         L: 2000 * con.um,
         W: 500 * con.um,
-        p_bw: 1 * con.nm,
+        W_sx: 1.2 * Math.PI / 180,
+        W_sy: 1.2 * Math.PI / 180,
+        p_bw: 5.35 * con.nm,
+        temp: 20,
         phase: false,
+        brute_force: true,
+        brute_dim: 50,
+        autocalctheta: false,
+        autocalcpp: true,
+        use_guassian_approx: false,
         apodization: 1,
-        apodization_FWHM: 1000 * con.um
+        apodization_FWHM: 1000 * con.um,
+        crystal: PhaseMatch.Crystals('KTP-3')
     };
+
+    var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
 
     /**
      * SPDCprop
      */
     var SPDCprop = function( cfg ){
-        this.init( cfg || spdcDefaults );
+        this.init( cfg );
     };
 
     SPDCprop.prototype = {
 
-        init:function(){
-            var con = PhaseMatch.constants;
-            this.lambda_p = 785 * con.nm;
-            this.lambda_s = 1570 * con.nm;
-            this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
-            this.PM_type_names = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.PM_type_names[2];
-            this.theta = 90 *Math.PI / 180;
-            // this.theta = 19.2371104525 *Math.PI / 180;
-            this.phi = 0 * Math.PI/ 180;
-            this.theta_s = 0 * Math.PI / 180;
-            this.theta_i = this.theta_s;
-            this.phi_s = 0;
-            this.phi_i = this.phi_s + Math.PI;
-            this.L = 2000 * con.um;
-            this.W = 500* con.um;
-            this.p_bw = 5.35 * con.nm;
-            this.W_sx = 1.2*Math.PI/180;
-            this.W_sy = this.W_sx;
-            this.phase = false;
-            this.brute_force = true;
-            this.brute_dim = 50;
-            this.autocalctheta = false;
-            this.autocalcpp = true;
-            this.poling_period = 1000000;
-            this.poling_sign = 1;
-            this.apodization = 1;
-            this.apodization_FWHM = 1000 * con.um;
-            this.use_guassian_approx = false;
+        init: function( cfg ){
+                
+            this.PM_type_names = PMTypes;
             this.crystaldb = PhaseMatch.Crystals;
-            this.crystal = PhaseMatch.Crystals('KTP-3');
-            this.temp = 20;
+
+            // set properties or fall back to defaults
+            this.set( PhaseMatch.util.extend({}, spdcDefaults, cfg) );
+
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
             this.S_s = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_s, this.phi_s);
@@ -79,16 +69,8 @@
             this.n_p = this.calc_Index_PMType(this.lambda_p, this.Type, this.S_p, "pump");
             this.n_s = this.calc_Index_PMType(this.lambda_s, this.Type, this.S_s, "signal");
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
-
-            this.msg = "";
-
         },
-            // this.autocalcTheta = false;
-            // this.calc_theta= function(){
-            //     //unconstrained minimization
-            //     if this.autocalcTheta{}
-            //     return this.theta = answer
-            // }
+            
         calc_Coordinate_Transform : function (theta, phi, theta_s, phi_s){
             //Should save some calculation time by defining these variables.
             var SIN_THETA = Math.sin(theta);
@@ -183,10 +165,7 @@
 
             props.optimum_idler();
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-
-           
             // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
-
         },
 
         get_group_velocity : function(lambda, Type, S, photon){
@@ -350,22 +329,26 @@
             var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
         },
 
+        /**
+         * Set config value or many values that are allowed (ie: defined in spdcDefaults )
+         * @param {String|Object} name The key name to set, or a config object with key: value pairs
+         * @param {Mixed} val  The value to set
+         */
         set: function( name, val ){
 
-            // set the value
-            this[ name ] = val;
+            if ( typeof name === 'object' ){
 
-            switch ( name ){
-
-                case 'theta':
-                case 'phi':
-                case 'theta_s':
-                case 'phi_s':
-
-                    // update rotation object
-                    this.S.set( this.theta, this.phi, this.theta_s, this.phi_s );
-                break;
+                val = PhaseMatch.util.pick( name, spdcDefaultKeys );
+                PhaseMatch.util.extend( this, val );
+                return this;
             }
+
+            // set the value
+            if ( name in spdcDefaults ){
+                this[ name ] = val;
+            }
+
+            // @TODO: add logic for refreshing autocalc values?            
 
             // for chaining calls
             return this;

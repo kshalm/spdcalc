@@ -23,9 +23,9 @@ module.exports = function(grunt) {
             'src/constants.js',
             'src/math-helpers.js',
             'src/pm-lib.js',
+            'src/pm-crystals.js',
             'src/pm-properties.js',
             'src/pm-plothelpers.js',
-            'src/pm-crystals.js',
             // add more...
             // can use wildcards. eg: src/thing-*.js
             'build/outro.js'
@@ -72,7 +72,7 @@ module.exports = function(grunt) {
             // category: ['collections', 'functions']
             exports: ['none'],
             iife: '(function(){%output%;lodash.extend(PhaseMatch.util, lodash);}());',
-            include: ['extend', 'bind', 'clone', 'keys']
+            include: ['extend', 'bind', 'clone', 'keys', 'pick']
             // minus: ['result', 'shuffle']
             // plus: ['random', 'template'],
             // template: './*.jst'

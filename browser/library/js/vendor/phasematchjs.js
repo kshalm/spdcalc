@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-06-11
+ * phasematchjs v0.0.1a - 2013-06-12
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -1344,6 +1344,55 @@ var PhaseMatch = { util: {} };
     return typeof value == 'string' || toString.call(value) == stringClass;
   }
 
+  /**
+   * Creates a shallow clone of `object` composed of the specified properties.
+   * Property names may be specified as individual arguments or as arrays of property
+   * names. If `callback` is passed, it will be executed for each property in the
+   * `object`, picking the properties `callback` returns truthy for. The `callback`
+   * is bound to `thisArg` and invoked with three arguments; (value, key, object).
+   *
+   * @static
+   * @memberOf _
+   * @category Objects
+   * @param {Object} object The source object.
+   * @param {Array|Function|String} callback|[prop1, prop2, ...] The function called
+   *  per iteration or properties to pick, either as individual arguments or arrays.
+   * @param {Mixed} [thisArg] The `this` binding of `callback`.
+   * @returns {Object} Returns an object composed of the picked properties.
+   * @example
+   *
+   * _.pick({ 'name': 'moe', '_userid': 'moe1' }, 'name');
+   * // => { 'name': 'moe' }
+   *
+   * _.pick({ 'name': 'moe', '_userid': 'moe1' }, function(value, key) {
+   *   return key.charAt(0) != '_';
+   * });
+   * // => { 'name': 'moe' }
+   */
+  function pick(object, callback, thisArg) {
+    var result = {};
+    if (typeof callback != 'function') {
+      var index = -1,
+          props = concat.apply(arrayRef, nativeSlice.call(arguments, 1)),
+          length = isObject(object) ? props.length : 0;
+
+      while (++index < length) {
+        var key = props[index];
+        if (key in object) {
+          result[key] = object[key];
+        }
+      }
+    } else {
+      callback = lodash.createCallback(callback, thisArg);
+      forIn(object, function(value, key, object) {
+        if (callback(value, key, object)) {
+          result[key] = value;
+        }
+      });
+    }
+    return result;
+  }
+
   /*--------------------------------------------------------------------------*/
 
   /**
@@ -1537,6 +1586,7 @@ var PhaseMatch = { util: {} };
   lodash.forIn = forIn;
   lodash.forOwn = forOwn;
   lodash.keys = keys;
+  lodash.pick = pick;
 
   lodash.each = forEach;
   lodash.extend = assign;
@@ -2525,73 +2575,335 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
 
 (function(){
 
+    var crystals = {};
+
+    // defaults defined for every crystal
+    var defaults = {
+
+        name: 'Unnamed Crystal',
+        temp: 20,
+        info: '',
+
+        indicies: function(){ return [1, 1, 1]; }
+    };
+
+    // get and set crystal db entries
+
+    PhaseMatch.Crystals = function( key, create ){
+
+        // invalid args
+        if ( !key ) {return null;}
+
+        if ( !create && !( key in crystals ) ){
+
+            throw 'Crystal type "' + key + ' not yet defined.';
+        }
+
+        if ( create ){
+
+            if ( key in crystals ){
+
+                throw 'Crystal type "' + key + ' already defined.';
+            }
+
+            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create, { id: key });
+        }
+
+        return PhaseMatch.util.clone( crystals[ key ], true );
+    };
+
+    // get all crystal keynames
+    PhaseMatch.Crystals.keys = function(){
+
+        return PhaseMatch.util.keys( crystals );
+    };
+
+})();
+
+
+/**
+ * These are the properties that are used to calculate phasematching
+ */
+
+
+/**
+ * BBO indicies. 
+ */
+PhaseMatch.Crystals('BBO-1', {
+    name: 'BBO ref 1',
+    // info: '',
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        // http://www.newlightphotonics.com/bbo-properties.html & Alan Migdall
+        var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
+        var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
+
+        //from Newlight Photonics
+        var dno= -9.3e-6;
+        var dne = -16.6e-6;
+
+        no = no + (temp -20.0)*dno;
+        ne = ne + (temp -20.0)*dne;
+
+        return [no, no, ne];
+    }
+});
+
+/**
+ * KTP indicies.
+ */
+PhaseMatch.Crystals('KTP-1', {
+    name: 'KTP ref 1',
+    // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
+    info: 'http://www.redoptronics.com/KTP-crystal.html',
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+
+        // http://www.redoptronics.com/KTP-crystal.html
+        var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda)); 
+        var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
+        var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
+
+
+        // H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)
+        // var nx = Math.sqrt( 2.1146 + 0.89188/(1 - (0.20861/sq(lambda))) - (0.01320* sq(lambda)) );
+        // var ny = Math.sqrt( 2.1518 + 0.87862/(1 - (0.21801/sq(lambda))) - (0.01327* sq(lambda)) );
+        // var nz = Math.sqrt( 2.3136 + 1.00012/(1 - (0.23831/sq(lambda))) - (0.01679* sq(lambda)) );
+
+        // http://www.castech-us.com/casktp.htm & Newlight Photonics
+        // var nx= Math.sqrt(3.0065+0.03901/(sq(lambda)-0.04251)-0.01327*sq(lambda));
+        // var ny= Math.sqrt(3.0333+0.04154/(sq(lambda)-0.04547)-0.01408*sq(lambda));
+        // var nz= Math.sqrt(3.0065+0.05694/(sq(lambda)-0.05658)-0.01682*sq(lambda));
+
+
+        var dnx= 1.1e-5;
+        var dny= 1.3e-5;
+        var dnz= 1.6e-5;
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+
+        // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
+        // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
+
+        return [nx, ny, nz];
+    }
+});
+
+/**
+ * KTP Ref 2 indicies.
+ */
+PhaseMatch.Crystals('KTP-2', {
+    name: 'KTP ref 2',
+    // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
+    info: 'http://www.castech-us.com/casktp.htm & Newlight Photonics',
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+
+        // http://www.redoptronics.com/KTP-crystal.html
+        // var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda)); 
+        // var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
+        // var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
+
+
+        // H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)
+        // var nx = Math.sqrt( 2.1146 + 0.89188/(1 - (0.20861/sq(lambda))) - (0.01320* sq(lambda)) );
+        // var ny = Math.sqrt( 2.1518 + 0.87862/(1 - (0.21801/sq(lambda))) - (0.01327* sq(lambda)) );
+        // var nz = Math.sqrt( 2.3136 + 1.00012/(1 - (0.23831/sq(lambda))) - (0.01679* sq(lambda)) );
+
+        // http://www.castech-us.com/casktp.htm & Newlight Photonics
+        var nx= Math.sqrt(3.0065+0.03901/(sq(lambda)-0.04251)-0.01327*sq(lambda));
+        var ny= Math.sqrt(3.0333+0.04154/(sq(lambda)-0.04547)-0.01408*sq(lambda));
+        var nz= Math.sqrt(3.0065+0.05694/(sq(lambda)-0.05658)-0.01682*sq(lambda));
+
+
+        var dnx= 1.1e-5;
+        var dny= 1.3e-5;
+        var dnz= 1.6e-5;
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+
+        // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
+        // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
+
+        return [nx, ny, nz];
+    }
+});
+
+/**
+ * KTP indicies.
+ */
+PhaseMatch.Crystals('KTP-3', {
+    name: 'KTP ref 3',
+    // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
+    info: 'Includes Franco Wong"s modificatin.  http://dx.doi.org/10.1063/1.1668320, http://www.redoptronics.com/KTP-crystal.html',
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+
+        // http://www.redoptronics.com/KTP-crystal.html
+        var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
+
+        if (lambda< 1.2){
+            var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
+        }
+        else {
+            var ny= Math.sqrt(2.0993 + 0.922683*sq(lambda)/(sq(lambda)-0.0467695)-0.0138408*sq(lambda));
+        }
+        
+        var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
+
+        var dnx= 1.1e-5;
+        var dny= 1.3e-5;
+        var dnz= 1.6e-5;
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+
+        // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
+        // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
+
+        return [nx, ny, nz];
+    }
+});
+
+
+
+/**
+ * BiBO indicies.
+ */
+PhaseMatch.Crystals('BiBO-1', {
+    name: 'BiBO ref 1',
+    info: 'http://www.newlightphotonics.com/bibo-properties.html',
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        //Alan Migdal's program
+        // var nx = Math.sqrt(3.0740 + 0.0323/(sq(lambda)-0.0316) - 0.01337*sq(lambda) );
+        // var ny = Math.sqrt(3.1685 + 0.0373/(sq(lambda)-0.0346) - 0.01750*sq(lambda) );
+        // var nz = Math.sqrt(3.6545 + 0.0511/(sq(lambda)-0.0371) - 0.0226*sq(lambda)  );
+
+        //http://www.crystech.com/products/crystals/nlocrystals/BIBO.htm
+        // var nx = Math.sqrt(3.0740+0.0323/(sq(lambda)-0.0316)-0.01337*sq(lambda));
+        // var ny = Math.sqrt(3.1685+0.0373/(sq(lambda)-0.0346)-0.01750*sq(lambda));
+        // var nz = Math.sqrt(3.6545+0.0511/(sq(lambda)-0.0371)-0.0226*sq(lambda));
+
+        // http://www.newlightphotonics.com/bibo-properties.html
+        var nx = (3.0740 + 0.0323/(sq(lambda)-0.0316)-0.01337*sq(lambda));
+        var ny = (3.1685 + 0.0373/(sq(lambda)-0.0346)-0.01750*sq(lambda));
+        var nz = (3.6545 + 0.0511/(sq(lambda)-0.0371)-0.0226*sq(lambda));
+
+        // var dnx = 4.8e-5;
+        // var dny = 4.4e-6;
+        // var dnz = -2.69e-5;
+        // nx = nx + (temp -20.0)*dnx;
+        // ny = ny + (temp -20.0)*dny;
+        // nz = nz + (temp -20.0)*dnz;
+        return [nx, ny, nz];
+    }
+});
+
+
+/**
+ * LiNbO3 indicies.
+ */
+PhaseMatch.Crystals('LiNbO3-1', {
+    name: 'LiNbO3 ref 1',
+    info: 'http://www.newlightphotonics.com/bibo-properties.html',
+    type: 'Negative Uniaxial',
+    cls: 'class_3m',
+    lambda_min: 0.4*1e-9,
+    lambda_max: 3.4*1e-9,
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
+        var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
+        var ny = nx;
+        var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
+
+        // http://www.redoptronics.com/linbo3-crystals.html
+        // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));
+        // var ny = nx
+        // var nz = Math.sqrt(4.5820+0.099169/(sq(lambda)- 0.04443) - 0.021950 * sq(lambda));
+
+        //http://www.newlightphotonics.com/LN-crystal.html
+        var dnx = -0.874e-6;
+        var dny = dnx;
+        var dnz = 39.073e-6;
+
+
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+
+        return [nx, ny, nz];
+    }
+});
+
+
+
+(function(){
+
+    var PMTypes = [
+        "Type 0:   o -> o + o", 
+        "Type 1:   e -> o + o", 
+        "Type 2:   e -> e + o", 
+        "Type 2:   e -> o + e"
+    ];
+
     var con = PhaseMatch.constants;
     var spdcDefaults = {
-        lambda_p: 775 * con.nm,
-        lambda_s: 1500 * con.nm,
-        lambda_i: 1600 * con.nm,
-        Type: [
-            "o -> o + o", 
-            "e -> o + o", 
-            "e -> e + o", 
-            "e -> o + e"
-        ],
-        theta: 19.8371104525 * Math.PI / 180,
+        lambda_p: 785 * con.nm,
+        lambda_s: 1570 * con.nm,
+        lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
+        Type: PMTypes[2],
+        theta: 90 *Math.PI / 180,
         phi: 0,
         theta_s: 0, // * Math.PI / 180,
         theta_i: 0,
         phi_s: 0,
         phi_i: 0,
         poling_period: 1000000,
+        poling_sign: 1,
         L: 2000 * con.um,
         W: 500 * con.um,
-        p_bw: 1 * con.nm,
+        W_sx: 1.2 * Math.PI / 180,
+        W_sy: 1.2 * Math.PI / 180,
+        p_bw: 5.35 * con.nm,
+        temp: 20,
         phase: false,
+        brute_force: true,
+        brute_dim: 50,
+        autocalctheta: false,
+        autocalcpp: true,
+        use_guassian_approx: false,
         apodization: 1,
-        apodization_FWHM: 1000 * con.um
+        apodization_FWHM: 1000 * con.um,
+        crystal: PhaseMatch.Crystals('KTP-3')
     };
+
+    var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
 
     /**
      * SPDCprop
      */
     var SPDCprop = function( cfg ){
-        this.init( cfg || spdcDefaults );
+        this.init( cfg );
     };
 
     SPDCprop.prototype = {
 
-        init:function(){
-            var con = PhaseMatch.constants;
-            this.lambda_p = 785 * con.nm;
-            this.lambda_s = 1570 * con.nm;
-            this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
-            this.PM_type_names = ["Type 0:   o -> o + o", "Type 1:   e -> o + o", "Type 2:   e -> e + o", "Type 2:   e -> o + e"];
-            this.Type = this.PM_type_names[2];
-            this.theta = 90 *Math.PI / 180;
-            // this.theta = 19.2371104525 *Math.PI / 180;
-            this.phi = 0 * Math.PI/ 180;
-            this.theta_s = 0 * Math.PI / 180;
-            this.theta_i = this.theta_s;
-            this.phi_s = 0;
-            this.phi_i = this.phi_s + Math.PI;
-            this.L = 2000 * con.um;
-            this.W = 500* con.um;
-            this.p_bw = 5.35 * con.nm;
-            this.W_sx = 1.2*Math.PI/180;
-            this.W_sy = this.W_sx;
-            this.phase = false;
-            this.brute_force = true;
-            this.brute_dim = 50;
-            this.autocalctheta = false;
-            this.autocalcpp = true;
-            this.poling_period = 1000000;
-            this.poling_sign = 1;
-            this.apodization = 1;
-            this.apodization_FWHM = 1000 * con.um;
-            this.use_guassian_approx = false;
+        init: function( cfg ){
+                
+            this.PM_type_names = PMTypes;
             this.crystaldb = PhaseMatch.Crystals;
-            this.crystal = PhaseMatch.Crystals('KTP-3');
-            this.temp = 20;
+
+            // set properties or fall back to defaults
+            this.set( PhaseMatch.util.extend({}, spdcDefaults, cfg) );
+
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
             this.S_s = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_s, this.phi_s);
@@ -2600,16 +2912,8 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
             this.n_p = this.calc_Index_PMType(this.lambda_p, this.Type, this.S_p, "pump");
             this.n_s = this.calc_Index_PMType(this.lambda_s, this.Type, this.S_s, "signal");
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
-
-            this.msg = "";
-
         },
-            // this.autocalcTheta = false;
-            // this.calc_theta= function(){
-            //     //unconstrained minimization
-            //     if this.autocalcTheta{}
-            //     return this.theta = answer
-            // }
+            
         calc_Coordinate_Transform : function (theta, phi, theta_s, phi_s){
             //Should save some calculation time by defining these variables.
             var SIN_THETA = Math.sin(theta);
@@ -2704,10 +3008,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
 
             props.optimum_idler();
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-
-           
             // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
-
         },
 
         get_group_velocity : function(lambda, Type, S, photon){
@@ -2871,22 +3172,26 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
             var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
         },
 
+        /**
+         * Set config value or many values that are allowed (ie: defined in spdcDefaults )
+         * @param {String|Object} name The key name to set, or a config object with key: value pairs
+         * @param {Mixed} val  The value to set
+         */
         set: function( name, val ){
 
-            // set the value
-            this[ name ] = val;
+            if ( typeof name === 'object' ){
 
-            switch ( name ){
-
-                case 'theta':
-                case 'phi':
-                case 'theta_s':
-                case 'phi_s':
-
-                    // update rotation object
-                    this.S.set( this.theta, this.phi, this.theta_s, this.phi_s );
-                break;
+                val = PhaseMatch.util.pick( name, spdcDefaultKeys );
+                PhaseMatch.util.extend( this, val );
+                return this;
             }
+
+            // set the value
+            if ( name in spdcDefaults ){
+                this[ name ] = val;
+            }
+
+            // @TODO: add logic for refreshing autocalc values?            
 
             // for chaining calls
             return this;
@@ -3601,278 +3906,6 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
     return PM;
 };
-(function(){
-
-    var crystals = {};
-
-    // defaults defined for every crystal
-    var defaults = {
-
-        name: 'Unnamed Crystal',
-        temp: 20,
-        info: '',
-
-        indicies: function(){ return [1, 1, 1]; }
-    };
-
-    // get and set crystal db entries
-
-    PhaseMatch.Crystals = function( key, create ){
-
-        // invalid args
-        if ( !key ) {return null;}
-
-        if ( !create && !( key in crystals ) ){
-
-            throw 'Crystal type "' + key + ' not yet defined.';
-        }
-
-        if ( create ){
-
-            if ( key in crystals ){
-
-                throw 'Crystal type "' + key + ' already defined.';
-            }
-
-            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create, { id: key });
-        }
-
-        return PhaseMatch.util.clone( crystals[ key ], true );
-    };
-
-    // get all crystal keynames
-    PhaseMatch.Crystals.keys = function(){
-
-        return PhaseMatch.util.keys( crystals );
-    };
-
-})();
-
-
-/**
- * These are the properties that are used to calculate phasematching
- */
-
-
-/**
- * BBO indicies. 
- */
-PhaseMatch.Crystals('BBO-1', {
-    name: 'BBO ref 1',
-    // info: '',
-    indicies: function(lambda, temp){
-        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        // http://www.newlightphotonics.com/bbo-properties.html & Alan Migdall
-        var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-        var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
-
-        //from Newlight Photonics
-        var dno= -9.3e-6;
-        var dne = -16.6e-6;
-
-        no = no + (temp -20.0)*dno;
-        ne = ne + (temp -20.0)*dne;
-
-        return [no, no, ne];
-    }
-});
-
-/**
- * KTP indicies.
- */
-PhaseMatch.Crystals('KTP-1', {
-    name: 'KTP ref 1',
-    // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
-    info: 'http://www.redoptronics.com/KTP-crystal.html',
-    indicies: function(lambda, temp){
-        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-
-        // http://www.redoptronics.com/KTP-crystal.html
-        var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda)); 
-        var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
-        var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
-
-
-        // H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)
-        // var nx = Math.sqrt( 2.1146 + 0.89188/(1 - (0.20861/sq(lambda))) - (0.01320* sq(lambda)) );
-        // var ny = Math.sqrt( 2.1518 + 0.87862/(1 - (0.21801/sq(lambda))) - (0.01327* sq(lambda)) );
-        // var nz = Math.sqrt( 2.3136 + 1.00012/(1 - (0.23831/sq(lambda))) - (0.01679* sq(lambda)) );
-
-        // http://www.castech-us.com/casktp.htm & Newlight Photonics
-        // var nx= Math.sqrt(3.0065+0.03901/(sq(lambda)-0.04251)-0.01327*sq(lambda));
-        // var ny= Math.sqrt(3.0333+0.04154/(sq(lambda)-0.04547)-0.01408*sq(lambda));
-        // var nz= Math.sqrt(3.0065+0.05694/(sq(lambda)-0.05658)-0.01682*sq(lambda));
-
-
-        var dnx= 1.1e-5;
-        var dny= 1.3e-5;
-        var dnz= 1.6e-5;
-
-        nx = nx + (temp -20.0)*dnx;
-        ny = ny + (temp -20.0)*dny;
-        nz = nz + (temp -20.0)*dnz;
-
-        // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-        // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
-
-        return [nx, ny, nz];
-    }
-});
-
-/**
- * KTP Ref 2 indicies.
- */
-PhaseMatch.Crystals('KTP-2', {
-    name: 'KTP ref 2',
-    // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
-    info: 'http://www.castech-us.com/casktp.htm & Newlight Photonics',
-    indicies: function(lambda, temp){
-        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-
-        // http://www.redoptronics.com/KTP-crystal.html
-        // var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda)); 
-        // var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
-        // var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
-
-
-        // H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)
-        // var nx = Math.sqrt( 2.1146 + 0.89188/(1 - (0.20861/sq(lambda))) - (0.01320* sq(lambda)) );
-        // var ny = Math.sqrt( 2.1518 + 0.87862/(1 - (0.21801/sq(lambda))) - (0.01327* sq(lambda)) );
-        // var nz = Math.sqrt( 2.3136 + 1.00012/(1 - (0.23831/sq(lambda))) - (0.01679* sq(lambda)) );
-
-        // http://www.castech-us.com/casktp.htm & Newlight Photonics
-        var nx= Math.sqrt(3.0065+0.03901/(sq(lambda)-0.04251)-0.01327*sq(lambda));
-        var ny= Math.sqrt(3.0333+0.04154/(sq(lambda)-0.04547)-0.01408*sq(lambda));
-        var nz= Math.sqrt(3.0065+0.05694/(sq(lambda)-0.05658)-0.01682*sq(lambda));
-
-
-        var dnx= 1.1e-5;
-        var dny= 1.3e-5;
-        var dnz= 1.6e-5;
-
-        nx = nx + (temp -20.0)*dnx;
-        ny = ny + (temp -20.0)*dny;
-        nz = nz + (temp -20.0)*dnz;
-
-        // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-        // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
-
-        return [nx, ny, nz];
-    }
-});
-
-/**
- * KTP indicies.
- */
-PhaseMatch.Crystals('KTP-3', {
-    name: 'KTP ref 3',
-    // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
-    info: 'Includes Franco Wong"s modificatin.  http://dx.doi.org/10.1063/1.1668320, http://www.redoptronics.com/KTP-crystal.html',
-    indicies: function(lambda, temp){
-        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-
-        // http://www.redoptronics.com/KTP-crystal.html
-        var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
-
-        if (lambda< 1.2){
-            var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
-        }
-        else {
-            var ny= Math.sqrt(2.0993 + 0.922683*sq(lambda)/(sq(lambda)-0.0467695)-0.0138408*sq(lambda));
-        }
-        
-        var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
-
-        var dnx= 1.1e-5;
-        var dny= 1.3e-5;
-        var dnz= 1.6e-5;
-
-        nx = nx + (temp -20.0)*dnx;
-        ny = ny + (temp -20.0)*dny;
-        nz = nz + (temp -20.0)*dnz;
-
-        // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-        // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
-
-        return [nx, ny, nz];
-    }
-});
-
-
-
-/**
- * BiBO indicies.
- */
-PhaseMatch.Crystals('BiBO-1', {
-    name: 'BiBO ref 1',
-    info: 'http://www.newlightphotonics.com/bibo-properties.html',
-    indicies: function(lambda, temp){
-        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        //Alan Migdal's program
-        // var nx = Math.sqrt(3.0740 + 0.0323/(sq(lambda)-0.0316) - 0.01337*sq(lambda) );
-        // var ny = Math.sqrt(3.1685 + 0.0373/(sq(lambda)-0.0346) - 0.01750*sq(lambda) );
-        // var nz = Math.sqrt(3.6545 + 0.0511/(sq(lambda)-0.0371) - 0.0226*sq(lambda)  );
-
-        //http://www.crystech.com/products/crystals/nlocrystals/BIBO.htm
-        // var nx = Math.sqrt(3.0740+0.0323/(sq(lambda)-0.0316)-0.01337*sq(lambda));
-        // var ny = Math.sqrt(3.1685+0.0373/(sq(lambda)-0.0346)-0.01750*sq(lambda));
-        // var nz = Math.sqrt(3.6545+0.0511/(sq(lambda)-0.0371)-0.0226*sq(lambda));
-
-        // http://www.newlightphotonics.com/bibo-properties.html
-        var nx = (3.0740 + 0.0323/(sq(lambda)-0.0316)-0.01337*sq(lambda));
-        var ny = (3.1685 + 0.0373/(sq(lambda)-0.0346)-0.01750*sq(lambda));
-        var nz = (3.6545 + 0.0511/(sq(lambda)-0.0371)-0.0226*sq(lambda));
-
-        // var dnx = 4.8e-5;
-        // var dny = 4.4e-6;
-        // var dnz = -2.69e-5;
-        // nx = nx + (temp -20.0)*dnx;
-        // ny = ny + (temp -20.0)*dny;
-        // nz = nz + (temp -20.0)*dnz;
-        return [nx, ny, nz];
-    }
-});
-
-
-/**
- * LiNbO3 indicies.
- */
-PhaseMatch.Crystals('LiNbO3-1', {
-    name: 'LiNbO3 ref 1',
-    info: 'http://www.newlightphotonics.com/bibo-properties.html',
-    type: 'Negative Uniaxial',
-    cls: 'class_3m',
-    lambda_min: 0.4*1e-9,
-    lambda_max: 3.4*1e-9,
-    indicies: function(lambda, temp){
-        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
-        var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
-        var ny = nx;
-        var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
-
-        // http://www.redoptronics.com/linbo3-crystals.html
-        // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));
-        // var ny = nx
-        // var nz = Math.sqrt(4.5820+0.099169/(sq(lambda)- 0.04443) - 0.021950 * sq(lambda));
-
-        //http://www.newlightphotonics.com/LN-crystal.html
-        var dnx = -0.874e-6;
-        var dny = dnx;
-        var dnz = 39.073e-6;
-
-
-
-        nx = nx + (temp -20.0)*dnx;
-        ny = ny + (temp -20.0)*dny;
-        nz = nz + (temp -20.0)*dnz;
-
-        return [nx, ny, nz];
-    }
-});
-
-
-
 
 return PhaseMatch;
 }));
