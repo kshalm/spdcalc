@@ -1620,6 +1620,7 @@ var PhaseMatch = { util: {} };
 var nm = Math.pow(10, -9);
 var um = Math.pow(10, -6);
 var lightspeed =  2.99792458 * Math.pow(10, 8);
+var twoPI = 2 * Math.PI;
 
 PhaseMatch.constants = {
     // user accessible constants
@@ -2171,17 +2172,20 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
     var n_p = P.n_p;
     var n_s = P.n_s;
     var n_i = P.n_i;
+    var sinThetaS = Math.sin(P.theta_s);
+    var sinThetaI = Math.sin(P.theta_i);
+    var invLambdaS = 1 / P.lambda_s;
+    var invLambdaI = 1 / P.lambda_i;
 
     // Directions of the signal and idler photons in the pump coordinates
-    var Ss = [Math.sin(P.theta_s)*Math.cos(P.phi_s), Math.sin(P.theta_s)*Math.sin(P.phi_s), Math.cos(P.theta_s)];
-    var Si = [Math.sin(P.theta_i)*Math.cos(P.phi_i), Math.sin(P.theta_i)*Math.sin(P.phi_i), Math.cos(P.theta_i)];
+    var Ss = [ sinThetaS * Math.cos(P.phi_s),  sinThetaS * Math.sin(P.phi_s), Math.cos(P.theta_s)];
+    var Si = [ sinThetaI * Math.cos(P.phi_i),  sinThetaI * Math.sin(P.phi_i), Math.cos(P.theta_i)];
 
+    var delKx = (twoPI * ((n_s * Ss[0] * invLambdaS) + n_i * Si[0] * invLambdaI));
+    var delKy = (twoPI * ((n_s * Ss[1] * invLambdaS) + n_i * Si[1] * invLambdaI));
+    var delKz = (twoPI * (n_p / P.lambda_p - (n_s * Ss[2] * invLambdaS) - n_i * Si[2] * invLambdaI));
 
-    var delKx = (2*Math.PI*((n_s*Ss[0]/P.lambda_s) + n_i*Si[0]/P.lambda_i));
-    var delKy = (2*Math.PI*((n_s*Ss[1]/P.lambda_s) + n_i*Si[1]/P.lambda_i));
-    var delKz = (2*Math.PI*(n_p/P.lambda_p - (n_s*Ss[2]/P.lambda_s) - n_i*Si[2]/P.lambda_i));
-
-    delKz = delKz - 2*Math.PI/(P.poling_period*P.poling_sign);
+    delKz -= twoPI / (P.poling_period * P.poling_sign);
     // if (delKz>0){
     //     delKz = delKz - 2*Math.PI/P.poling_period;
     // }
