@@ -2329,7 +2329,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
  */
 PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
     var con = PhaseMatch.constants;
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
 
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
@@ -2465,7 +2465,7 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
  * @return {[type]}           [description]
  */
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     //eliminates sinc side lobes which cause problems.
     P.use_guassian_approx = true;
 
@@ -2541,7 +2541,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 };
 
 PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_stop){
-    // var P = PhaseMatch.deep_copy(props);
+    // var P = props.clone();
     var con = PhaseMatch.constants;
 
     var gv_s = props.get_group_velocity(props.lambda_s, props.Type, props.S_s, "signal");
@@ -2561,7 +2561,7 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
 };
 
 PhaseMatch.autorange_theta = function autorange_theta(props){
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     P.update_all_angles();
     var offset = 2* Math.PI/180;
     var dif = (P.theta_s - P.theta_s*.4);
@@ -2891,6 +2891,19 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
 
+    // deep copy callback to extend deeper into object
+    var cloneCallback = function( a, b ){
+
+        var type = typeof b;
+
+        if ( type === 'object' || type === 'array' ){
+
+            return PhaseMatch.util.clone( b, true );
+        }
+
+        return b !== undefined ? b : a;
+    };
+
     /**
      * SPDCprop
      */
@@ -3019,7 +3032,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
             // var props = this;
             var con = PhaseMatch.constants;
             var bw = 1e-11; 
-            // var P = PhaseMatch.deep_copy(props);
+            // var P = props.clone();
             
             var n1 = this.calc_Index_PMType(lambda - bw, Type, S, photon);
             var n2 = this.calc_Index_PMType(lambda + bw, Type, S, photon);
@@ -3061,7 +3074,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             props.poling_period = 1e12;  // Set this to a large number 
             props.update_all_angles(props);
-            var P = PhaseMatch.deep_copy(props);
+            var P = props.clone();
 
             var find_pp = function(x){
                 // if (x<0){ return 1e12;}  // arbitrary large number
@@ -3199,47 +3212,23 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
             // for chaining calls
             return this;
+        },
+
+        /**
+         * Create a clone of self
+         * @return {SPDCprop} The cloned properties object
+         */
+        clone: function(){
+
+            var clone = Object.create( SPDCprop.prototype );
+
+            PhaseMatch.util.extend( clone, this, cloneCallback );
+
+            return clone;
         }
     };
 
     PhaseMatch.SPDCprop = SPDCprop;
-
-
-    PhaseMatch.deep_copy = function deep_copy(props){
-        var P = new PhaseMatch.SPDCprop();
-        P.crystal = props.crystal;
-        P.temp = PhaseMatch.util.clone(props.temp,true);
-        P.lambda_p = PhaseMatch.util.clone(props.lambda_p,true);
-        P.lambda_s = PhaseMatch.util.clone(props.lambda_s,true);
-        P.lambda_i = PhaseMatch.util.clone(props.lambda_i,true);
-        P.Type = PhaseMatch.util.clone(props.Type,true);
-        P.theta = PhaseMatch.util.clone(props.theta,true);
-        P.phi = PhaseMatch.util.clone(props.phi,true);
-        P.theta_s = PhaseMatch.util.clone(props.theta_s,true);
-        P.theta_i = PhaseMatch.util.clone(props.theta_i,true);
-        P.phi_s = PhaseMatch.util.clone(props.phi_s,true);
-        P.phi_i = PhaseMatch.util.clone(props.phi_i,true);
-        P.poling_period = PhaseMatch.util.clone(props.poling_period,true);
-        P.poling_sign = PhaseMatch.util.clone(props.poling_sign,true);
-        P.L = PhaseMatch.util.clone(props.L,true);
-        P.W = PhaseMatch.util.clone(props.W,true);
-        P.W_sx = PhaseMatch.util.clone(props.W_sx,true);
-        P.W_sy = PhaseMatch.util.clone(props.W_sy,true);
-        P.p_bw = PhaseMatch.util.clone(props.p_bw,true);
-        P.phase = PhaseMatch.util.clone(props.phase,true);
-        P.apodization = PhaseMatch.util.clone(props.apodization,true);
-        P.apodization_FWHM = PhaseMatch.util.clone(props.apodization_FWHM,true);
-        P.S_p = PhaseMatch.util.clone(props.S_p,true);
-        P.S_s = PhaseMatch.util.clone(props.S_s,true);
-        P.S_i = PhaseMatch.util.clone(props.S_i,true);
-        P.n_p = PhaseMatch.util.clone(props.n_p,true);
-        P.n_s = PhaseMatch.util.clone(props.n_s,true);
-        P.n_i = PhaseMatch.util.clone(props.n_i,true);
-        P.brute_force = PhaseMatch.util.clone(props.brute_force,true);
-        P.brute_dim = PhaseMatch.util.clone(props.brute_dim,true);
-        
-        return P;
-    };
 
 })();
 
@@ -3247,7 +3236,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
     // console.log("Calculating JSA", props.temp);
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     if (P.brute_force){
@@ -3296,7 +3285,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.phi_i = (P.phi_s + Math.PI);
@@ -3349,7 +3338,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 
 PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start, t_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.phi_i = (P.phi_s + Math.PI);
@@ -3400,7 +3389,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 
 PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.phi_i = (P.phi_s + Math.PI);
@@ -3439,7 +3428,7 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
 
 PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     if (P.brute_force){
@@ -3489,7 +3478,7 @@ PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_
 
 PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idler_theta(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     var i;
@@ -3529,7 +3518,7 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
 
 PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     var i;
@@ -3564,7 +3553,7 @@ PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(
 */
 PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop, y_start, y_stop, ls_start, ls_stop, li_start, li_stop, dim, params){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
 
@@ -3647,7 +3636,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
 
 PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
 
@@ -3709,7 +3698,7 @@ PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_
 
 PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_stop, y_start, y_stop, BW, dim){
     // dim = 50;
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.optimum_idler(P);
@@ -3833,7 +3822,7 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
 
 PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, x_stop, y_start, y_stop, BW, dim){
     // dim = 50;
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.optimum_idler(P);

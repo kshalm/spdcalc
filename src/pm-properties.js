@@ -44,6 +44,19 @@
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
 
+    // deep copy callback to extend deeper into object
+    var cloneCallback = function( a, b ){
+
+        var type = typeof b;
+
+        if ( type === 'object' || type === 'array' ){
+
+            return PhaseMatch.util.clone( b, true );
+        }
+
+        return b !== undefined ? b : a;
+    };
+
     /**
      * SPDCprop
      */
@@ -172,7 +185,7 @@
             // var props = this;
             var con = PhaseMatch.constants;
             var bw = 1e-11; 
-            // var P = PhaseMatch.deep_copy(props);
+            // var P = props.clone();
             
             var n1 = this.calc_Index_PMType(lambda - bw, Type, S, photon);
             var n2 = this.calc_Index_PMType(lambda + bw, Type, S, photon);
@@ -214,7 +227,7 @@
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             props.poling_period = 1e12;  // Set this to a large number 
             props.update_all_angles(props);
-            var P = PhaseMatch.deep_copy(props);
+            var P = props.clone();
 
             var find_pp = function(x){
                 // if (x<0){ return 1e12;}  // arbitrary large number
@@ -352,47 +365,23 @@
 
             // for chaining calls
             return this;
+        },
+
+        /**
+         * Create a clone of self
+         * @return {SPDCprop} The cloned properties object
+         */
+        clone: function(){
+
+            var clone = Object.create( SPDCprop.prototype );
+
+            PhaseMatch.util.extend( clone, this, cloneCallback );
+
+            return clone;
         }
     };
 
     PhaseMatch.SPDCprop = SPDCprop;
-
-
-    PhaseMatch.deep_copy = function deep_copy(props){
-        var P = new PhaseMatch.SPDCprop();
-        P.crystal = props.crystal;
-        P.temp = PhaseMatch.util.clone(props.temp,true);
-        P.lambda_p = PhaseMatch.util.clone(props.lambda_p,true);
-        P.lambda_s = PhaseMatch.util.clone(props.lambda_s,true);
-        P.lambda_i = PhaseMatch.util.clone(props.lambda_i,true);
-        P.Type = PhaseMatch.util.clone(props.Type,true);
-        P.theta = PhaseMatch.util.clone(props.theta,true);
-        P.phi = PhaseMatch.util.clone(props.phi,true);
-        P.theta_s = PhaseMatch.util.clone(props.theta_s,true);
-        P.theta_i = PhaseMatch.util.clone(props.theta_i,true);
-        P.phi_s = PhaseMatch.util.clone(props.phi_s,true);
-        P.phi_i = PhaseMatch.util.clone(props.phi_i,true);
-        P.poling_period = PhaseMatch.util.clone(props.poling_period,true);
-        P.poling_sign = PhaseMatch.util.clone(props.poling_sign,true);
-        P.L = PhaseMatch.util.clone(props.L,true);
-        P.W = PhaseMatch.util.clone(props.W,true);
-        P.W_sx = PhaseMatch.util.clone(props.W_sx,true);
-        P.W_sy = PhaseMatch.util.clone(props.W_sy,true);
-        P.p_bw = PhaseMatch.util.clone(props.p_bw,true);
-        P.phase = PhaseMatch.util.clone(props.phase,true);
-        P.apodization = PhaseMatch.util.clone(props.apodization,true);
-        P.apodization_FWHM = PhaseMatch.util.clone(props.apodization_FWHM,true);
-        P.S_p = PhaseMatch.util.clone(props.S_p,true);
-        P.S_s = PhaseMatch.util.clone(props.S_s,true);
-        P.S_i = PhaseMatch.util.clone(props.S_i,true);
-        P.n_p = PhaseMatch.util.clone(props.n_p,true);
-        P.n_s = PhaseMatch.util.clone(props.n_s,true);
-        P.n_i = PhaseMatch.util.clone(props.n_i,true);
-        P.brute_force = PhaseMatch.util.clone(props.brute_force,true);
-        P.brute_dim = PhaseMatch.util.clone(props.brute_dim,true);
-        
-        return P;
-    };
 
 })();
 

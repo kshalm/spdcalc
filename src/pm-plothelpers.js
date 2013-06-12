@@ -5,7 +5,7 @@
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
     // console.log("Calculating JSA", props.temp);
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     if (P.brute_force){
@@ -54,7 +54,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.phi_i = (P.phi_s + Math.PI);
@@ -107,7 +107,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 
 PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start, t_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.phi_i = (P.phi_s + Math.PI);
@@ -158,7 +158,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 
 PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.phi_i = (P.phi_s + Math.PI);
@@ -197,7 +197,7 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
 
 PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     if (P.brute_force){
@@ -247,7 +247,7 @@ PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_
 
 PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idler_theta(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     var i;
@@ -287,7 +287,7 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
 
 PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     var i;
@@ -322,7 +322,7 @@ PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(
 */
 PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop, y_start, y_stop, ls_start, ls_stop, li_start, li_stop, dim, params){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
 
@@ -405,7 +405,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
 
 PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_stop, y_start, y_stop, dim){
 
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
 
@@ -467,7 +467,7 @@ PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_
 
 PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_stop, y_start, y_stop, BW, dim){
     // dim = 50;
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.optimum_idler(P);
@@ -591,7 +591,7 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
 
 PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, x_stop, y_start, y_stop, BW, dim){
     // dim = 50;
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     props.update_all_angles(P);
 
     P.optimum_idler(P);

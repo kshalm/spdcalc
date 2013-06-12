@@ -173,7 +173,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
  */
 PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
     var con = PhaseMatch.constants;
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
 
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
@@ -309,7 +309,7 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
  * @return {[type]}           [description]
  */
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     //eliminates sinc side lobes which cause problems.
     P.use_guassian_approx = true;
 
@@ -385,7 +385,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 };
 
 PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_stop){
-    // var P = PhaseMatch.deep_copy(props);
+    // var P = props.clone();
     var con = PhaseMatch.constants;
 
     var gv_s = props.get_group_velocity(props.lambda_s, props.Type, props.S_s, "signal");
@@ -405,7 +405,7 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
 };
 
 PhaseMatch.autorange_theta = function autorange_theta(props){
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     P.update_all_angles();
     var offset = 2* Math.PI/180;
     var dif = (P.theta_s - P.theta_s*.4);
