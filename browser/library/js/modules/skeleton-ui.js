@@ -63,12 +63,7 @@ define(
                     throw 'Specify the property tplPlots: template in the submodule class definition';
                 }
 
-                if (!self.tplPlotOpts){
-                    throw 'Specify the property tplPlotOpts: template in the submodule class definition';
-                }
-
                 self.tplPlots.converter = converter;
-                self.tplPlotOpts.converter = converter;
 
                 self.el = $( self.tplPlots.render() );
 
@@ -80,18 +75,6 @@ define(
             initPlots: function(){
 
                 throw 'You must override the initPlots() method.';
-            },
-
-            initPlotOpts: function(){
-
-                var self = this
-                    ;
-
-                self.elPlotOpts.html( self.tplPlotOpts.render( self.plotOpts.getAll() ) );
-                customCheckbox( self.elPlotOpts );
-
-                self.plotOpts.attachView( self.elPlotOpts );
-                self.plotOpts.on('change', checkRecalc, self);
             },
 
             addPlot: function( plot ){
@@ -142,7 +125,13 @@ define(
 
                 }, self);
 
-                self.initPlotOpts();
+                app.plotOpts.on('change', checkRecalc, self);
+
+                app.plotOpts.els.find( '[id^="plot-opt-"]' ).show();
+                // hide plot opts if needed
+                if (self.hiddenPlotOpts){
+                    app.plotOpts.els.find( '#plot-opt-' + self.hiddenPlotOpts.join(',#plot-opt-') ).hide();
+                }
 
                 // auto draw
                 self.refresh();
@@ -156,8 +145,8 @@ define(
                 // disconnect from app events
                 app.off( 'calculate', self.refresh );
 
-                self.plotOpts.detachView( self.elPlotOpts );
-                self.plotOpts.off('change', checkRecalc);
+                // self.plotOpts.detachView( self.elPlotOpts );
+                app.plotOpts.off('change', checkRecalc);
             },
 
             resize: function(){
@@ -183,10 +172,6 @@ define(
 
             getMainPanel: function(){
                 return this.el;
-            },
-
-            getOptsPanel: function(){
-                return this.elPlotOpts;
             },
 
             refresh: function(){

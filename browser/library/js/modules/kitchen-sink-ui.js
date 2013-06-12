@@ -30,8 +30,7 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplKSLayout,
-            // dummy
-            tplPlotOpts: {render: function(){}},
+            hiddenPlotOpts: false,
 
             /**
              * Initialize Plots

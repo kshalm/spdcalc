@@ -7,8 +7,7 @@ define(
         'modules/line-plot',
         'modules/converter',
         'modules/skeleton-ui',
-        'tpl!templates/xy-layout.tpl',
-        'tpl!templates/xy-plot-opts.tpl'
+        'tpl!templates/xy-layout.tpl'
     ],
     function(
         $,
@@ -18,8 +17,7 @@ define(
         LinePlot,
         converter,
         SkeletonUI,
-        tplXYLayout,
-        tplXYPlotOpts
+        tplXYLayout
     ) {
 
         'use strict';
@@ -35,7 +33,9 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplXYLayout,
-            tplPlotOpts: tplXYPlotOpts,
+            hiddenPlotOpts: [
+                'time-delay'
+            ],
 
             /**
              * Initialize Plots

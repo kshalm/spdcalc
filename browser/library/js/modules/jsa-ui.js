@@ -7,8 +7,7 @@ define(
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
-        'tpl!templates/jsa-layout.tpl',
-        'tpl!templates/jsa-plot-opts.tpl'
+        'tpl!templates/jsa-layout.tpl'
     ],
     function(
         $,
@@ -18,8 +17,7 @@ define(
         LinePlot,
         SkeletonUI,
         converter,
-        tplJSALayout,
-        tplJSAPlotOpts
+        tplJSALayout
     ) {
 
         'use strict';
@@ -34,7 +32,10 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplJSALayout,
-            tplPlotOpts: tplJSAPlotOpts,
+            hiddenPlotOpts: [
+                'time-delay',
+                'theta'
+            ],
 
             /**
              * Initialize Plots
