@@ -98,6 +98,18 @@ define(
                 this.resize( w, h );
             },
 
+            setXRange: function( xrange ){
+
+                this.xrange = xrange;
+                this.refreshAxes();
+            },
+
+            setYRange: function( yrange ){
+
+                this.yrange = yrange;
+                this.refreshAxes();
+            },
+
             resize: function( w, h ){
 
                 var margin = this.margin
