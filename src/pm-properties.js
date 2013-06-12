@@ -4,7 +4,9 @@
 
 (function(){
 
-    var PMTypes = [
+    // These are the names associated with the types
+    // The "type" property is stored as an integer
+    PhaseMatch.PMTypes = [
         "Type 0:   o -> o + o", 
         "Type 1:   e -> o + o", 
         "Type 2:   e -> e + o", 
@@ -16,7 +18,7 @@
         lambda_p: 785 * con.nm,
         lambda_s: 1570 * con.nm,
         lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
-        Type: PMTypes[2],
+        type: 2,
         theta: 90 *Math.PI / 180,
         phi: 0,
         theta_s: 0, // * Math.PI / 180,
@@ -68,9 +70,6 @@
 
         init: function( cfg ){
                 
-            this.PM_type_names = PMTypes;
-            this.crystaldb = PhaseMatch.Crystals;
-
             // set properties or fall back to defaults
             this.set( PhaseMatch.util.extend({}, spdcDefaults, cfg) );
 
@@ -79,9 +78,9 @@
             this.S_s = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_s, this.phi_s);
             this.S_i = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_i, this.phi_i);
 
-            this.n_p = this.calc_Index_PMType(this.lambda_p, this.Type, this.S_p, "pump");
-            this.n_s = this.calc_Index_PMType(this.lambda_s, this.Type, this.S_s, "signal");
-            this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
+            this.n_p = this.calc_Index_PMType(this.lambda_p, this.type, this.S_p, "pump");
+            this.n_s = this.calc_Index_PMType(this.lambda_s, this.type, this.S_s, "signal");
+            this.n_i = this.calc_Index_PMType(this.lambda_i, this.type, this.S_i, "idler");
         },
             
         calc_Coordinate_Transform : function (theta, phi, theta_s, phi_s){
@@ -137,18 +136,18 @@
             var n = 1;
 
             switch (Type){
-                case "Type 0:   o -> o + o":
+                case 0:
                     n = nfast;
                 break;
-                case "Type 1:   e -> o + o":
+                case 1:
                     if (photon === "pump") { n = nslow;}
                     else { n = nfast;}
                 break;
-                case "Type 2:   e -> e + o":
+                case 2:
                     if (photon === "idler") { n = nfast;}
                     else {n = nslow;}
                 break;
-                case "Type 2:   e -> o + e":
+                case 3:
                     if (photon === "signal") { n = nfast;}
                     else {n = nslow;}
                 break;
@@ -172,13 +171,13 @@
             props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
             props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
 
-            props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-            props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            props.n_p = props.calc_Index_PMType(props.lambda_p, props.type, props.S_p, "pump");
+            props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
             // console.log("new pump index", props.n_p);
 
             props.optimum_idler();
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-            // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+            // props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
         },
 
         get_group_velocity : function(lambda, Type, S, photon){
@@ -276,7 +275,7 @@
             P.theta_i = theta_i;
             //Update the index of refraction for the idler
             P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-            P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
         },
 
         optimum_signal : function (){
@@ -296,7 +295,7 @@
             P.theta_s = theta_s;
             //Update the index of refraction for the idler
             P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-            P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+            P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         },
 
         brute_force_theta_i : function (){
@@ -307,7 +306,7 @@
                 props.theta_i = x;
 
                 props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-                props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+                props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
 
                 var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
                 return 1-PMtmp;
@@ -329,7 +328,7 @@
                 props.theta_s = x;
 
                 props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
-                props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+                props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
 
                 var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
                 return 1-PMtmp;
@@ -358,6 +357,11 @@
 
             // set the value
             if ( name in spdcDefaults ){
+
+                if ( name === 'type' ){
+                    val = ~~val;
+                }
+
                 this[ name ] = val;
             }
 
@@ -365,6 +369,21 @@
 
             // for chaining calls
             return this;
+        },
+
+        /**
+         * Gets all, or single property
+         * @param {String} key (optional) key name of single property to return
+         * @return {Mixed} Property value (if specified) or object containing all setable properties
+         */
+        get: function( key ){
+
+            if ( key ){
+
+                return (key in spdcDefaults) ? PhaseMatch.util.clone(this[ key ], true) : undefined; 
+            }
+
+            return PhaseMatch.util.clone( PhaseMatch.util.pick( this, spdcDefaultKeys ), true );
         },
 
         /**

@@ -52,7 +52,7 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     var n_p = P.n_p;
 
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
-    P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
+    P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
     var delK = PhaseMatch.calc_delK(P);
     
@@ -198,7 +198,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         //First calculate PM(ws,wi)
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.optimum_idler(P); //Need to find the optimum idler.
         
         var PMtmp = PhaseMatch.phasematch(P);
@@ -208,7 +208,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         //Next calculate PM(wi,ws)
         P.lambda_s = lambda_i[index_i];
         P.lambda_i = lambda_s[index_s];
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.optimum_idler(P); //Need to find the optimum idler.
         
         PMtmp = PhaseMatch.phasematch(P);
@@ -315,7 +315,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
     var lambda_limit = function(lambda_s){
         P.lambda_s = lambda_s;
-        P.n_s = P.calc_Index_PMType(lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(lambda_s, P.type, P.S_s, "signal");
         P.lambda_i = 1/(1/P.lambda_p - 1/lambda_s);
         P.optimum_idler(P);
 
@@ -388,8 +388,8 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
     // var P = props.clone();
     var con = PhaseMatch.constants;
 
-    var gv_s = props.get_group_velocity(props.lambda_s, props.Type, props.S_s, "signal");
-    var gv_i = props.get_group_velocity(props.lambda_i, props.Type, props.S_i, "idler");
+    var gv_s = props.get_group_velocity(props.lambda_s, props.type, props.S_s, "signal");
+    var gv_i = props.get_group_velocity(props.lambda_i, props.type, props.S_i, "idler");
 
     var zero_delay = props.L * (1/gv_i - 1/gv_s)/2;
     console.log("minimum of HOM dip = ", zero_delay/1e-15);

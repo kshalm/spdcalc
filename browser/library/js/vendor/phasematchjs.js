@@ -2208,7 +2208,7 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     var n_p = P.n_p;
 
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
-    P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
+    P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
     var delK = PhaseMatch.calc_delK(P);
     
@@ -2354,7 +2354,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         //First calculate PM(ws,wi)
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.optimum_idler(P); //Need to find the optimum idler.
         
         var PMtmp = PhaseMatch.phasematch(P);
@@ -2364,7 +2364,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         //Next calculate PM(wi,ws)
         P.lambda_s = lambda_i[index_i];
         P.lambda_i = lambda_s[index_s];
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.optimum_idler(P); //Need to find the optimum idler.
         
         PMtmp = PhaseMatch.phasematch(P);
@@ -2471,7 +2471,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
     var lambda_limit = function(lambda_s){
         P.lambda_s = lambda_s;
-        P.n_s = P.calc_Index_PMType(lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(lambda_s, P.type, P.S_s, "signal");
         P.lambda_i = 1/(1/P.lambda_p - 1/lambda_s);
         P.optimum_idler(P);
 
@@ -2544,8 +2544,8 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
     // var P = props.clone();
     var con = PhaseMatch.constants;
 
-    var gv_s = props.get_group_velocity(props.lambda_s, props.Type, props.S_s, "signal");
-    var gv_i = props.get_group_velocity(props.lambda_i, props.Type, props.S_i, "idler");
+    var gv_s = props.get_group_velocity(props.lambda_s, props.type, props.S_s, "signal");
+    var gv_i = props.get_group_velocity(props.lambda_i, props.type, props.S_i, "idler");
 
     var zero_delay = props.L * (1/gv_i - 1/gv_s)/2;
     console.log("minimum of HOM dip = ", zero_delay/1e-15);
@@ -2851,7 +2851,9 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
 (function(){
 
-    var PMTypes = [
+    // These are the names associated with the types
+    // The "type" property is stored as an integer
+    PhaseMatch.PMTypes = [
         "Type 0:   o -> o + o", 
         "Type 1:   e -> o + o", 
         "Type 2:   e -> e + o", 
@@ -2863,7 +2865,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
         lambda_p: 785 * con.nm,
         lambda_s: 1570 * con.nm,
         lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
-        Type: PMTypes[2],
+        type: 2,
         theta: 90 *Math.PI / 180,
         phi: 0,
         theta_s: 0, // * Math.PI / 180,
@@ -2915,9 +2917,6 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
         init: function( cfg ){
                 
-            this.PM_type_names = PMTypes;
-            this.crystaldb = PhaseMatch.Crystals;
-
             // set properties or fall back to defaults
             this.set( PhaseMatch.util.extend({}, spdcDefaults, cfg) );
 
@@ -2926,9 +2925,9 @@ PhaseMatch.Crystals('LiNbO3-1', {
             this.S_s = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_s, this.phi_s);
             this.S_i = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_i, this.phi_i);
 
-            this.n_p = this.calc_Index_PMType(this.lambda_p, this.Type, this.S_p, "pump");
-            this.n_s = this.calc_Index_PMType(this.lambda_s, this.Type, this.S_s, "signal");
-            this.n_i = this.calc_Index_PMType(this.lambda_i, this.Type, this.S_i, "idler");
+            this.n_p = this.calc_Index_PMType(this.lambda_p, this.type, this.S_p, "pump");
+            this.n_s = this.calc_Index_PMType(this.lambda_s, this.type, this.S_s, "signal");
+            this.n_i = this.calc_Index_PMType(this.lambda_i, this.type, this.S_i, "idler");
         },
             
         calc_Coordinate_Transform : function (theta, phi, theta_s, phi_s){
@@ -2984,18 +2983,18 @@ PhaseMatch.Crystals('LiNbO3-1', {
             var n = 1;
 
             switch (Type){
-                case "Type 0:   o -> o + o":
+                case 0:
                     n = nfast;
                 break;
-                case "Type 1:   e -> o + o":
+                case 1:
                     if (photon === "pump") { n = nslow;}
                     else { n = nfast;}
                 break;
-                case "Type 2:   e -> e + o":
+                case 2:
                     if (photon === "idler") { n = nfast;}
                     else {n = nslow;}
                 break;
-                case "Type 2:   e -> o + e":
+                case 3:
                     if (photon === "signal") { n = nfast;}
                     else {n = nslow;}
                 break;
@@ -3019,13 +3018,13 @@ PhaseMatch.Crystals('LiNbO3-1', {
             props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
             props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
 
-            props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-            props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+            props.n_p = props.calc_Index_PMType(props.lambda_p, props.type, props.S_p, "pump");
+            props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
             // console.log("new pump index", props.n_p);
 
             props.optimum_idler();
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-            // props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+            // props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
         },
 
         get_group_velocity : function(lambda, Type, S, photon){
@@ -3123,7 +3122,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
             P.theta_i = theta_i;
             //Update the index of refraction for the idler
             P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-            P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
         },
 
         optimum_signal : function (){
@@ -3143,7 +3142,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
             P.theta_s = theta_s;
             //Update the index of refraction for the idler
             P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-            P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+            P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         },
 
         brute_force_theta_i : function (){
@@ -3154,7 +3153,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
                 props.theta_i = x;
 
                 props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
-                props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+                props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
 
                 var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
                 return 1-PMtmp;
@@ -3176,7 +3175,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
                 props.theta_s = x;
 
                 props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
-                props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
+                props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
 
                 var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
                 return 1-PMtmp;
@@ -3205,6 +3204,11 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
             // set the value
             if ( name in spdcDefaults ){
+
+                if ( name === 'type' ){
+                    val = ~~val;
+                }
+
                 this[ name ] = val;
             }
 
@@ -3212,6 +3216,21 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
             // for chaining calls
             return this;
+        },
+
+        /**
+         * Gets all, or single property
+         * @param {String} key (optional) key name of single property to return
+         * @return {Mixed} Property value (if specified) or object containing all setable properties
+         */
+        get: function( key ){
+
+            if ( key ){
+
+                return (key in spdcDefaults) ? PhaseMatch.util.clone(this[ key ], true) : undefined; 
+            }
+
+            return PhaseMatch.util.clone( PhaseMatch.util.pick( this, spdcDefaultKeys ), true );
         },
 
         /**
@@ -3259,7 +3278,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
         
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         if (P.brute_force) {
@@ -3317,7 +3336,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         if (P.brute_force) {
            P.brute_force_theta_i(P); //use a search. could be time consuming. 
@@ -3364,7 +3383,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
         P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
         
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
          if (P.brute_force) {
            P.brute_force_theta_i(P); //use a search. could be time consuming. 
@@ -3410,10 +3429,10 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
 
         
         P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
-        P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
+        P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         //calcualte the correct idler angle analytically.
         P.optimum_idler(P);
@@ -3456,7 +3475,7 @@ PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_
         
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         if (P.brute_force) {
            P.brute_force_theta_i(P); //use a search. could be time consuming. 
@@ -3502,8 +3521,8 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
         
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-        P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
@@ -3537,8 +3556,8 @@ PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(
 
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-        P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
 
@@ -3612,7 +3631,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
         var jsa2d = PhaseMatch.create_2d_array(jsa, dimjsa, dimjsa);
         S[i] = PhaseMatch.calc_Schmidt(jsa2d);
 
-        // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        // P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         // // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         // if (P.brute_force) {
@@ -3649,7 +3668,7 @@ PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_
     // console.log('setting idler phi to: ', P.phi_i*180/Math.PI);
         
     P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+    P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
 
     var i;
@@ -3681,8 +3700,8 @@ PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_
             P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
 
             P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-            P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-            P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+            P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
             var PM_tmp = PhaseMatch.phasematch_Int_Phase(P);
             if (PM_tmp>maxval){
@@ -3761,8 +3780,8 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
                     // P.lambda_s = 1500e-9;
                     P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
 
-                    P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-                    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+                    P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+                    P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
                     var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 
@@ -3791,14 +3810,14 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
                 P.optimum_signal;
                 P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
                 // P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-                P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+                P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
                 var x = Math.sin(P.theta_s)*Math.cos(P.phi_s);
                 var y = Math.sin(P.theta_s)*Math.sin(P.phi_s);
                 var alpha_i = Math.exp(-1*sq((X_0 - x )/(2*P.W_sx)) - sq((Y_0 - y)/(2*P.W_sy)));
 
 
-                P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+                P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
                 var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 
@@ -3863,7 +3882,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
          for (var j=0; j<dim_lambda; j++){
             P.lambda_s = lambda_s[j];
             P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s); 
-            P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
             if (P.brute_force) {
                P.brute_force_theta_s(); //use a search. time consuming. 
@@ -3879,7 +3898,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
             var alpha_i = Math.exp(-1*sq((X_0 - x )/(2*P.W_sx)) - sq((Y_0 - y)/(2*P.W_sy)));
 
 
-            // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+            // P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
             var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 

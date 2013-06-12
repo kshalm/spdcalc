@@ -61,9 +61,8 @@ define(
 
         // Note: conversions moved to converter module
 
-        tplParametersPanel.convertFrom = converter.from;
-        tplParametersPanel.convertTo = converter.to;
-
+        tplParametersPanel.PhaseMatch = PhaseMatch;
+        tplParametersPanel.converter = converter;
         tplPlotOpts.converter = converter;
 
         /**
@@ -142,18 +141,20 @@ define(
 
                                 'export-csv': function( data ){
 
-                                    var tpl;
+                                    var tpl = {
+                                        PhaseMatch: PhaseMatch
+                                    };
 
                                     if (data.type === 'heat-map'){
                                         
-                                        tpl = tplHeatMapAsCSV;
+                                        tpl.render = tplHeatMapAsCSV;
 
                                     } else {
 
-                                        tpl = tplLinePlotAsCSV;
+                                        tpl.render = tplLinePlotAsCSV;
                                     }
 
-                                    var csv = tpl({
+                                    var csv = tpl.render({
                                         meta: self.parameters.getAll(),
                                         plot: data
                                     });
@@ -234,6 +235,8 @@ define(
 
                     if (parse === 'float'){
                         val = parseFloat(val);
+                    } else if (parse === 'int'){
+                        val = ~~val;
                     }
 
                     if (unit){

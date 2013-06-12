@@ -28,7 +28,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
         
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         if (P.brute_force) {
@@ -86,7 +86,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         if (P.brute_force) {
            P.brute_force_theta_i(P); //use a search. could be time consuming. 
@@ -133,7 +133,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
         P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
         
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
          if (P.brute_force) {
            P.brute_force_theta_i(P); //use a search. could be time consuming. 
@@ -179,10 +179,10 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
 
         
         P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
-        P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
+        P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         //calcualte the correct idler angle analytically.
         P.optimum_idler(P);
@@ -225,7 +225,7 @@ PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_
         
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         if (P.brute_force) {
            P.brute_force_theta_i(P); //use a search. could be time consuming. 
@@ -271,8 +271,8 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
         
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-        P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
@@ -306,8 +306,8 @@ PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(
 
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-        P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
 
@@ -381,7 +381,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
         var jsa2d = PhaseMatch.create_2d_array(jsa, dimjsa, dimjsa);
         S[i] = PhaseMatch.calc_Schmidt(jsa2d);
 
-        // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        // P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         // // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         // if (P.brute_force) {
@@ -418,7 +418,7 @@ PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_
     // console.log('setting idler phi to: ', P.phi_i*180/Math.PI);
         
     P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+    P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
 
     var i;
@@ -450,8 +450,8 @@ PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_
             P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
 
             P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-            P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-            P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+            P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
             var PM_tmp = PhaseMatch.phasematch_Int_Phase(P);
             if (PM_tmp>maxval){
@@ -530,8 +530,8 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
                     // P.lambda_s = 1500e-9;
                     P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
 
-                    P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
-                    P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+                    P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+                    P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
                     var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 
@@ -560,14 +560,14 @@ PhaseMatch.calc_XY_mode_solver = function calc_XY_mode_solver(props, x_start, x_
                 P.optimum_signal;
                 P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
                 // P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-                P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+                P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
                 var x = Math.sin(P.theta_s)*Math.cos(P.phi_s);
                 var y = Math.sin(P.theta_s)*Math.sin(P.phi_s);
                 var alpha_i = Math.exp(-1*sq((X_0 - x )/(2*P.W_sx)) - sq((Y_0 - y)/(2*P.W_sy)));
 
 
-                P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+                P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
                 var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 
@@ -632,7 +632,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
          for (var j=0; j<dim_lambda; j++){
             P.lambda_s = lambda_s[j];
             P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s); 
-            P.n_i = P.calc_Index_PMType(P.lambda_i, P.Type, P.S_i, "idler");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
             if (P.brute_force) {
                P.brute_force_theta_s(); //use a search. time consuming. 
@@ -648,7 +648,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
             var alpha_i = Math.exp(-1*sq((X_0 - x )/(2*P.W_sx)) - sq((Y_0 - y)/(2*P.W_sy)));
 
 
-            // P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+            // P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
             var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
 

@@ -247,9 +247,9 @@ require([ 'jquery', 'modules/heat-map', 'phasematch', 'modules/line-plot' ], fun
         // $(function(){
         //     $('#viewport').append('<h2> XY idler </h2>');
         //     // plotJSA(P1,l_start,l_stop,l_start,l_stop, npts);
-        //     var tmpType = P1.Type;
+        //     var tmpType = P1.type;
         //     plotXY(P1,x_start,x_stop,y_start,y_stop,npts);
-        //     P1.Type = tmpType;
+        //     P1.type = tmpType;
         // });
 
 
