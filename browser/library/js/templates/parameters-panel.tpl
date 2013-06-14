@@ -27,16 +27,16 @@
 
         <div class="control-group">
             <select id="crystal-dropdown" name="xtal" class="full">
-                {{~it.crystaldb.keys() :value:index}}
-                <option value="{{= value }}" {{? value === it.crystal.id}} selected="selected" {{?}}>{{= it.crystaldb(value).name }}</option>
+                {{~this.PhaseMatch.Crystals.keys() :value:index}}
+                <option value="{{= value }}" {{? value === it.crystal.id }} selected="selected" {{?}}>{{= this.PhaseMatch.Crystals(value).name }}</option>
                 {{~}}
             </select>
         </div>
 
         <div class="control-group">
-            <select id="pm-type-dropdown" name="Type" class="full">
-                {{~it.PM_type_names :value:index}}
-                     <option value="{{=value}}" {{? value === it.Type }} selected="selected" {{?}}>{{=value}}</option> 
+            <select id="pm-type-dropdown" name="type" class="full">
+                {{~this.PhaseMatch.PMTypes :value:index}}
+                     <option value="{{=index}}" {{? index === it.type }} selected="selected" {{?}}>{{=value}}</option> 
                 {{~}}
             </select>
         </div>
@@ -52,7 +52,7 @@
                 Theta (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta" value="{{= this.convertTo('deg', parseFloat( it.theta )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta" value="{{= this.converter.to('deg', parseFloat( it.theta )) }}" />
             </div>
         </div>
         <div class="control-group">
@@ -60,7 +60,7 @@
                 Phi (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi" value="{{= this.convertTo('deg', parseFloat( it.phi )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi" value="{{= this.converter.to('deg', parseFloat( it.phi )) }}" />
             </div>
         </div>
         <div class="control-group">
@@ -68,7 +68,7 @@
                 Length (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="L" value="{{= this.convertTo('micro', parseFloat( it.L )) }}" />
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="L" value="{{= this.converter.to('micro', parseFloat( it.L )) }}" />
             </div>
         </div>
         <div class="control-group">
@@ -90,7 +90,7 @@
                 Wavelength (nm)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lambda_p" value="{{= this.convertTo('nano', parseFloat( it.lambda_p )) }}" />
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lambda_p" value="{{= this.converter.to('nano', parseFloat( it.lambda_p )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -98,7 +98,7 @@
                 Bandwidth FWHM (nm)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="p_bw" value="{{= this.convertTo('nano', parseFloat( it.p_bw )) }}" />
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="p_bw" value="{{= this.converter.to('nano', parseFloat( it.p_bw )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -106,7 +106,7 @@
                 Waist (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W" value="{{= this.convertTo('micro', parseFloat( it.W )) }}" />
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W" value="{{= this.converter.to('micro', parseFloat( it.W )) }}" />
             </div>
         </div>
     </section>
@@ -121,7 +121,7 @@
                 Wavelength (nm)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lambda_s" value="{{= this.convertTo('nano', parseFloat( it.lambda_s )) }}" />
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lambda_s" value="{{= this.converter.to('nano', parseFloat( it.lambda_s )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -129,7 +129,7 @@
                 Theta_s (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta_s" value="{{= this.convertTo('deg', parseFloat( it.theta_s )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta_s" value="{{= this.converter.to('deg', parseFloat( it.theta_s )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -137,7 +137,7 @@
                 Phi_s (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi_s" value="{{= this.convertTo('deg', parseFloat( it.phi_s )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi_s" value="{{= this.converter.to('deg', parseFloat( it.phi_s )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -145,7 +145,7 @@
                 Waist x dir (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sx" value="{{= this.convertTo('deg', parseFloat( it.W_sx )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sx" value="{{= this.converter.to('deg', parseFloat( it.W_sx )) }}" />
             </div>
         </div>
         <div class="control-group">   
@@ -153,7 +153,7 @@
                 Waist y dir (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sy" value="{{= this.convertTo('deg', parseFloat( it.W_sy )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sy" value="{{= this.converter.to('deg', parseFloat( it.W_sy )) }}" />
             </div>
         </div>
         <div class="control-group">
@@ -182,7 +182,7 @@
                 Poling Period (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period" value="{{= this.convertTo('micro', parseFloat( it.poling_period )) }}" />
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period" value="{{= this.converter.to('micro', parseFloat( it.poling_period )) }}" />
             </div>
         </div>
     </section>

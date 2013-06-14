@@ -69,14 +69,14 @@ define(
                 // setup props
                 self.props = new PhaseMatch.SPDCprop();
 
-                self.set( self.props );
+                self.set( self.props.get() );
                 self.initEvents();
 
                 // get values from hash
                 self.getHashVals();
 
                 self.checkautocalc();
-                self.set( self.props );
+                self.set( self.props.get() );
 
                 // this ensures that .refresh() calls
                 // get throttled so they don't do double refreshes
@@ -100,7 +100,7 @@ define(
                         }
                         
                         var val = self.get( key );
-                        self.props[ key ] = val;
+                        self.props.set( key, val );
 
                         self.checkautocalc();
                         self.refresh();
@@ -119,7 +119,7 @@ define(
 
                 var self = this;
 
-                self.set('xtal', self.props.crystal.id);
+                self.set('xtal', self.props.get('crystal').id);
 
                 self.each(function( val, key ){
 
@@ -191,12 +191,14 @@ define(
             // into the wrapper
             refresh: function(){
 
-                var self = this;
+                var self = this
+                    ,vals = self.props.get()
+                    ;
 
-                for ( var key in self.props ){
+                for ( var key in vals ){
 
                     // true is for "quiet". Don't trigger change events
-                    self.set( key, self.props[ key ], true );
+                    self.set( key, vals[ key ], true );
                 }
 
                 // emit a final refresh event

@@ -16,17 +16,20 @@
     var n_p = P.n_p;
     var n_s = P.n_s;
     var n_i = P.n_i;
+    var sinThetaS = Math.sin(P.theta_s);
+    var sinThetaI = Math.sin(P.theta_i);
+    var invLambdaS = 1 / P.lambda_s;
+    var invLambdaI = 1 / P.lambda_i;
 
     // Directions of the signal and idler photons in the pump coordinates
-    var Ss = [Math.sin(P.theta_s)*Math.cos(P.phi_s), Math.sin(P.theta_s)*Math.sin(P.phi_s), Math.cos(P.theta_s)];
-    var Si = [Math.sin(P.theta_i)*Math.cos(P.phi_i), Math.sin(P.theta_i)*Math.sin(P.phi_i), Math.cos(P.theta_i)];
+    var Ss = [ sinThetaS * Math.cos(P.phi_s),  sinThetaS * Math.sin(P.phi_s), Math.cos(P.theta_s)];
+    var Si = [ sinThetaI * Math.cos(P.phi_i),  sinThetaI * Math.sin(P.phi_i), Math.cos(P.theta_i)];
 
+    var delKx = (twoPI * ((n_s * Ss[0] * invLambdaS) + n_i * Si[0] * invLambdaI));
+    var delKy = (twoPI * ((n_s * Ss[1] * invLambdaS) + n_i * Si[1] * invLambdaI));
+    var delKz = (twoPI * (n_p / P.lambda_p - (n_s * Ss[2] * invLambdaS) - n_i * Si[2] * invLambdaI));
 
-    var delKx = (2*Math.PI*((n_s*Ss[0]/P.lambda_s) + n_i*Si[0]/P.lambda_i));
-    var delKy = (2*Math.PI*((n_s*Ss[1]/P.lambda_s) + n_i*Si[1]/P.lambda_i));
-    var delKz = (2*Math.PI*(n_p/P.lambda_p - (n_s*Ss[2]/P.lambda_s) - n_i*Si[2]/P.lambda_i));
-
-    delKz = delKz - 2*Math.PI/(P.poling_period*P.poling_sign);
+    delKz -= twoPI / (P.poling_period * P.poling_sign);
     // if (delKz>0){
     //     delKz = delKz - 2*Math.PI/P.poling_period;
     // }
@@ -49,7 +52,7 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     var n_p = P.n_p;
 
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
-    P.n_p = P.calc_Index_PMType(P.lambda_p, P.Type, P.S_p, "pump");
+    P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
     var delK = PhaseMatch.calc_delK(P);
     
@@ -170,7 +173,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
  */
 PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
     var con = PhaseMatch.constants;
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
 
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
@@ -195,7 +198,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         //First calculate PM(ws,wi)
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.optimum_idler(P); //Need to find the optimum idler.
         
         var PMtmp = PhaseMatch.phasematch(P);
@@ -205,7 +208,7 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         //Next calculate PM(wi,ws)
         P.lambda_s = lambda_i[index_i];
         P.lambda_i = lambda_s[index_s];
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.optimum_idler(P); //Need to find the optimum idler.
         
         PMtmp = PhaseMatch.phasematch(P);
@@ -306,13 +309,13 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
  * @return {[type]}           [description]
  */
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     //eliminates sinc side lobes which cause problems.
     P.use_guassian_approx = true;
 
     var lambda_limit = function(lambda_s){
         P.lambda_s = lambda_s;
-        P.n_s = P.calc_Index_PMType(lambda_s, P.Type, P.S_s, "signal");
+        P.n_s = P.calc_Index_PMType(lambda_s, P.type, P.S_s, "signal");
         P.lambda_i = 1/(1/P.lambda_p - 1/lambda_s);
         P.optimum_idler(P);
 
@@ -382,11 +385,11 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 };
 
 PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_stop){
-    // var P = PhaseMatch.deep_copy(props);
+    // var P = props.clone();
     var con = PhaseMatch.constants;
 
-    var gv_s = props.get_group_velocity(props.lambda_s, props.Type, props.S_s, "signal");
-    var gv_i = props.get_group_velocity(props.lambda_i, props.Type, props.S_i, "idler");
+    var gv_s = props.get_group_velocity(props.lambda_s, props.type, props.S_s, "signal");
+    var gv_i = props.get_group_velocity(props.lambda_i, props.type, props.S_i, "idler");
 
     var zero_delay = props.L * (1/gv_i - 1/gv_s)/2;
     console.log("minimum of HOM dip = ", zero_delay/1e-15);
@@ -402,7 +405,7 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
 };
 
 PhaseMatch.autorange_theta = function autorange_theta(props){
-    var P = PhaseMatch.deep_copy(props);
+    var P = props.clone();
     P.update_all_angles();
     var offset = 2* Math.PI/180;
     var dif = (P.theta_s - P.theta_s*.4);

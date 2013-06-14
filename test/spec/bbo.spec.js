@@ -3,35 +3,38 @@
 //
 describe("SPDCprop", function() {
 
-    var props = new PhaseMatch.SPDCprop();
     var con = PhaseMatch.constants;
-    props.lambda_p = 775 * con.nm;
-    props.lambda_s = 1550 * con.nm;
-    props.lambda_i = 1550 * con.nm;
-    props.Types = ["o -> o + o", "e -> o + o", "e -> e + o", "e -> o + e"];
-    props.Type = props.Types[1];
-    props.theta = 19.8371104525 *Math.PI / 180;
-    props.phi = 0;
-    props.theta_s = 0;
-    props.theta_i = 0;
-    props.phi_s = 0;
-    props.phi_i = 0;
-    props.poling_period = 1000000;
-    props.L = 20000 * con.um;
-    props.W = 500 * con.um;
-    props.p_bw = 1;
-    props.phase = false;
-    props.apodization = 1;
-    props.apodization_FWHM = 1000 * con.um;
-    props.crystal = new PhaseMatch.BBO();
+    var props = new PhaseMatch.SPDCprop({
+
+        lambda_p: 775 * con.nm,
+        lambda_s: 1550 * con.nm,
+        lambda_i: 1550 * con.nm,
+        type: 1,
+        theta: 19.8371104525 *Math.PI / 180,
+        phi: 0,
+        theta_s: 0,
+        theta_i: 0,
+        phi_s: 0,
+        phi_i: 0,
+        poling_period: 1000000,
+        L: 20000 * con.um,
+        W: 500 * con.um,
+        p_bw: 1,
+        phase: false,
+        apodization: 1,
+        apodization_FWHM: 1000 * con.um,
+        crystal: PhaseMatch.Crystals('BBO-1')
+    });
+    
+    
     //Other functions that do not need to be included in the default init
     props.S_p = props.calc_Coordinate_Transform(props.theta, props.phi, 0, 0);
     props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
     props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
 
-    props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-    props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
-    props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+    props.n_p = props.calc_Index_PMType(props.lambda_p, props.type, props.S_p, "pump");
+    props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
+    props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
 
     it("Check expected pump index calculation", function() {
 

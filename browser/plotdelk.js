@@ -8,8 +8,9 @@ require([ 'jquery', 'd3', 'phasematch' ], function( $, d3, PhaseMatch ){
         var con = PhaseMatch.constants;
         var l_start = 1500 * con.nm;
         var l_stop = 1600 * con.nm; 
-        var props = new PhaseMatch.SPDCprop();
-        props.Type = props.Types[2];
+        var props = new PhaseMatch.SPDCprop({
+            type: 2
+        });
 
         var sq = function sq (x) {
             return x * x;
@@ -22,9 +23,9 @@ require([ 'jquery', 'd3', 'phasematch' ], function( $, d3, PhaseMatch ){
             props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
             props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
 
-            props.n_p = props.calc_Index_PMType(props.lambda_p, props.Type, props.S_p, "pump");
-            props.n_s = props.calc_Index_PMType(props.lambda_s, props.Type, props.S_s, "signal");
-            props.n_i = props.calc_Index_PMType(props.lambda_i, props.Type, props.S_i, "idler");
+            props.n_p = props.calc_Index_PMType(props.lambda_p, props.type, props.S_p, "pump");
+            props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
+            props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
 
             // console.log(props.theta*180/Math.PI);
             // props.msg = "going in";
