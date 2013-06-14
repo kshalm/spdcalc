@@ -37,7 +37,6 @@ define(
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplJSALayout,
             hiddenPlotOpts: [
-                'time-delay',
                 'theta'
             ],
 

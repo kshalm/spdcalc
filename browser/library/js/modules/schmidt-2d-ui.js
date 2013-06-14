@@ -98,16 +98,16 @@ define(
 
                 var self = this;
 
-                var dim = 10;
+                var dim = 20;
                 var params = {
                     x: "L",
                     y: "BW"
                 };
 
-                var x_start = 11000e-6;
-                var x_stop = 30000e-6;
-                var y_start = .9e-9;
-                var y_stop = 10e-9;
+                var x_start = 5000e-6;
+                var x_stop = 10000e-6;
+                var y_start = .1e-9;
+                var y_stop = 20e-9;
 
                 var PM = PhaseMatch.calc_schmidt_plot(props, x_start, x_stop, y_start, y_stop, self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'),
                     self.plotOpts.get('li_start'), self.plotOpts.get('li_stop'), dim, params);
