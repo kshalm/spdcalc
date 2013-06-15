@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-06-13
+ * phasematchjs v0.0.1a - 2013-06-15
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2868,27 +2868,27 @@ PhaseMatch.Crystals('LiNbO3-1', {
         type: 2,
         theta: 90 *Math.PI / 180,
         phi: 0,
-        theta_s: 0, // * Math.PI / 180,
+        theta_s: 0,
         theta_i: 0,
         phi_s: 0,
-        phi_i: 0,
-        poling_period: 1000000,
-        poling_sign: 1,
+        phi_i: Math.PI,
         L: 2000 * con.um,
         W: 500 * con.um,
-        W_sx: 1.2 * Math.PI / 180,
-        W_sy: 1.2 * Math.PI / 180,
         p_bw: 5.35 * con.nm,
-        temp: 20,
+        W_sx: 1.2 * Math.PI/180,
+        W_sy: 1.2 * Math.PI/180,
         phase: false,
         brute_force: true,
         brute_dim: 50,
         autocalctheta: false,
         autocalcpp: true,
-        use_guassian_approx: false,
+        poling_period: 1000000,
+        poling_sign: 1,
         apodization: 1,
         apodization_FWHM: 1000 * con.um,
-        crystal: PhaseMatch.Crystals('KTP-3')
+        use_guassian_approx: false,
+        crystal: PhaseMatch.Crystals('KTP-3'),
+        temp: 20
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
