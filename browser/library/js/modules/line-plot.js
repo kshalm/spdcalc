@@ -223,8 +223,8 @@ define(
                     all.push.apply(all, this.series[ i ].data);
                 }
 
-                this.xrange = d3.extent(all, function(d) { return d.x; });
-                this.yrange = d3.extent(all, function(d) { return d.y; });
+                this.xrangeauto = d3.extent(all, function(d) { return d.x; });
+                this.yrangeauto = d3.extent(all, function(d) { return d.y; });
             },
 
             // call as one of:
@@ -283,11 +283,11 @@ define(
 
                 this.calcRanges();
 
-                x.domain( this.xrange )
+                x.domain( this.xrange || this.xrangeauto )
                  .range([0, width])
                  ;
 
-                y.domain( this.yrange )
+                y.domain( this.yrange || this.yrangeauto )
                  .range([height, 0])
                  ;
 
