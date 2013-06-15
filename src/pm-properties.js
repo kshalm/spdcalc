@@ -158,12 +158,6 @@
             return n ;
         },
 
-        set_crystal : function ( key ){
-            
-            this.crystal = PhaseMatch.Crystals( key );
-            // var ind = this.crystal.indicies(this.lambda_p, this.temp);
-        },
-
         update_all_angles : function (){
             var props = this;
             // console.log("old pump index", props.n_p);
@@ -350,19 +344,25 @@
 
             if ( typeof name === 'object' ){
 
-                val = PhaseMatch.util.pick( name, spdcDefaultKeys );
-                PhaseMatch.util.extend( this, val );
+                PhaseMatch.util.each( name, function(val, name){this.set(name, val);}, this );
                 return this;
-            }
 
-            // set the value
-            if ( name in spdcDefaults ){
+            } else {
 
-                if ( name === 'type' ){
-                    val = ~~val;
+                // set the value
+                if ( name in spdcDefaults ){
+
+                    if ( name === 'type' ){
+                        
+                        val = ~~val;
+
+                    } else if ( name === 'crystal' && typeof val !== 'object' ){
+
+                        val = PhaseMatch.Crystals( val );
+                    }
+
+                    this[ name ] = val;
                 }
-
-                this[ name ] = val;
             }
 
             // @TODO: add logic for refreshing autocalc values?            
@@ -383,7 +383,9 @@
                 return (key in spdcDefaults) ? PhaseMatch.util.clone(this[ key ], true) : undefined; 
             }
 
-            return PhaseMatch.util.clone( PhaseMatch.util.pick( this, spdcDefaultKeys ), true );
+            var vals = PhaseMatch.util.clone( PhaseMatch.util.pick( this, spdcDefaultKeys ), true );
+            vals.crystal = vals.crystal.id;
+            return vals;
         },
 
         /**

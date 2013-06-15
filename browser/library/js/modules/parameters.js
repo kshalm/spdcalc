@@ -65,15 +65,10 @@ define(
 
                 var self = this;
 
-
                 // setup props
-                self.props = new PhaseMatch.SPDCprop();
+                self.props = new PhaseMatch.SPDCprop( self.getHashVals() );
 
-                self.set( self.props.get() );
                 self.initEvents();
-
-                // get values from hash
-                self.getHashVals();
 
                 self.checkautocalc();
                 self.set( self.props.get() );
@@ -93,22 +88,9 @@ define(
 
                     'change': function( key ){
 
-                        // do nothing for crystal... 
-                        // taken care of by other event
-                        if ( key === 'xtal' ){
-                            return;
-                        }
-                        
                         var val = self.get( key );
                         self.props.set( key, val );
 
-                        self.checkautocalc();
-                        self.refresh();
-                    },
-                    
-                    'change:xtal': function( val ){
-                        
-                        self.props.set_crystal( val );
                         self.checkautocalc();
                         self.refresh();
                     }
@@ -117,51 +99,55 @@ define(
 
             getHashVals: function(){
 
-                var self = this;
+                var self = this
+                    ,vals = Hash.get()
+                    ,key
+                    ,val
+                    ,tp
+                    ,obj = {}
+                    ;
 
-                self.set('xtal', self.props.get('crystal').id);
+                for (key in vals){
 
-                self.each(function( val, key ){
+                    val = vals[ key ];
+                    tp = val && val.substr(0, 1);
 
-                    var urlVal = Hash.get( key )
-                        ,tp = urlVal && urlVal.substr(0, 1)
-                        ;
+                    if (val && $.inArray( tp, typesVals ) > -1 ){
 
-                    if (urlVal && $.inArray( tp, typesVals ) > -1 ){
-
-                        urlVal = urlVal.substr(1);
+                        val = val.substr(1);
 
                         switch (tp){
                             case '+':
-                                urlVal = parseFloat( urlVal );
+                                val = parseFloat( val );
                             break;
                             case '!':
-                                urlVal = (urlVal === 'true');
+                                val = (val === 'true');
                             break;
                         }
 
-                        self.set(key, urlVal);
+                        obj[ key ] = val;
                     }
-                });
+                }
+
+                return obj;
             },
 
             serialize: function(){
 
                 var self = this
                     ,ser = ''
+                    ,key
+                    ,val
+                    ,props = self.props.get()
+                    ,tp
+                    ,pfx
                     ;
 
-                self.each(function( val, key ){
+                for (key in props){
 
-                    if ( key === 'crystal' ){
-
-                        val = val.id;
-                        key = 'xtal';
-                    }
-
-                    var tp = typeof val
-                        ,pfx = types[ tp ]
-                        ;
+                    val = props[ key ];
+                    tp = typeof val;
+                    pfx = types[ tp ];
 
                     if (    pfx &&
                             val !== null && 
@@ -169,7 +155,7 @@ define(
                     ){
                         ser += '&' + encodeURIComponent( key ) + '=' + encodeURIComponent( pfx + val );
                     }
-                });
+                };
 
                 return ser.substr(1);
             },
