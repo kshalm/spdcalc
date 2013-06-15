@@ -30,7 +30,7 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplKSLayout,
-            hiddenPlotOpts: false,
+            showPlotOpts: false,
 
             /**
              * Initialize Plots

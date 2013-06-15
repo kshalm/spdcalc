@@ -32,8 +32,10 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplSchmidtLayout,
-            hiddenPlotOpts: [
-                'time-delay'
+            showPlotOpts: [
+                'signal-wavelength',
+                'idler-wavelength',
+                'theta'
             ],
 
             /**

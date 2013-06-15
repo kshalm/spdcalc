@@ -36,8 +36,11 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplJSALayout,
-            hiddenPlotOpts: [
-                'theta'
+            showPlotOpts: [
+                'signal-wavelength',
+                'idler-wavelength',
+                'theta',
+                'time-delay'
             ],
 
             /**

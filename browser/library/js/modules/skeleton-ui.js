@@ -127,10 +127,10 @@ define(
 
                 app.plotOpts.on('change', checkRecalc, self);
 
-                app.plotOpts.els.find( '[id^="plot-opt-"]' ).show();
-                // hide plot opts if needed
-                if (self.hiddenPlotOpts){
-                    app.plotOpts.els.find( '#plot-opt-' + self.hiddenPlotOpts.join(',#plot-opt-') ).hide();
+                app.plotOpts.els.find( '[id^="plot-opt-"]' ).hide();
+                // show plot opts if needed
+                if (self.showPlotOpts){
+                    app.plotOpts.els.find( '#plot-opt-' + self.showPlotOpts.join(',#plot-opt-') ).show();
                 }
 
                 // auto draw
