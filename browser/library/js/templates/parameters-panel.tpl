@@ -26,9 +26,9 @@
         </div>
 
         <div class="control-group">
-            <select id="crystal-dropdown" name="xtal" class="full">
+            <select id="crystal-dropdown" name="crystal" class="full">
                 {{~this.PhaseMatch.Crystals.keys() :value:index}}
-                <option value="{{= value }}" {{? value === it.crystal.id }} selected="selected" {{?}}>{{= this.PhaseMatch.Crystals(value).name }}</option>
+                <option value="{{= value }}" {{? value === it.crystal }} selected="selected" {{?}}>{{= this.PhaseMatch.Crystals(value).name }}</option>
                 {{~}}
             </select>
         </div>

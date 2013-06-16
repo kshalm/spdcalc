@@ -1,5 +1,5 @@
 {{=it.plot.title}}
-Crystal: {{=it.meta.crystal.name}}
+Crystal: {{=it.meta.crystal}}
 Pump Wavelength: {{=it.meta.lambda_p}}
 Signal Wavelength: {{=it.meta.lambda_s}}
 Idler Wavelength: {{=it.meta.lambda_i}}
