@@ -125,7 +125,7 @@ define(
                     self.plotOpts.get('li_stop'), 
                     po.get('grid_size'), 
                     params);
-                console.log(PM);
+                // console.log(PM);
                 self.data = PM;
 
                 // self.plot.scales.z = d3.scale.linear().domain([0, 50]);

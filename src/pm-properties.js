@@ -25,7 +25,7 @@
         theta_i: 0,
         phi_s: 0,
         phi_i: Math.PI,
-        L: 2000 * con.um,
+        L: 6000 * con.um,
         W: 500 * con.um,
         p_bw: 5.35 * con.nm,
         W_sx: .2 * Math.PI/180,
@@ -38,8 +38,8 @@
         poling_period: 1000000,
         poling_sign: 1,
         calc_apodization: true,
-        apodization: 1,
-        apodization_FWHM: 500 * con.um,
+        apodization: 7,
+        apodization_FWHM: 1600 * con.um,
         use_guassian_approx: false,
         crystal: PhaseMatch.Crystals('KTP-3'),
         temp: 20
@@ -342,10 +342,15 @@
             var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
         },
 
-        apodization_function : function (m){
-            var l_range = PhaseMatch.linspace(0,this.L,this.apodization+1);
-            var delL = Math.abs(l_range[1] - l_range[0]);
-            var A = Math.exp(-sq((l_range[m] - this.L/2))/2/sq(this.apodization_FWHM));
+        get_apodization : function (l){
+            // var l_range = PhaseMatch.linspace(0,this.L,this.apodization+1);
+            // var delL = Math.abs(l_range[1] - l_range[0]);
+            // var A = Math.exp(-sq((l_range[m] - this.L/2))/2/sq(this.apodization_FWHM));
+            // var bw = this.apodization_FWHM /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
+            var bw = this.apodization_FWHM  / 2.3548;
+            // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(2*p_bw)));
+            var A = Math.exp(-sq((l - this.L/2)/(bw))/2);
+            // A = A / ( bw *Math.sqrt(2*Math.PI)); //normalization
             return A;
         },
 

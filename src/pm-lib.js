@@ -66,32 +66,30 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     var PMz_imag = 0;
 
     //More advanced calculation of phasematching in the z direction. Don't need it now.
-    if (P.calc_apodization){
-        if (P.apodization<1){
-            P.apodization = 1;
-        }
-
+    if (P.calc_apodization ){
         var l_range = PhaseMatch.linspace(0,P.L,P.apodization+1);
-        // var A = Math.exp(-sq((l_range - P.L/2))/2/sq(P.apodization_FWHM));
-        // A = 1;
         var delL = Math.abs(l_range[1] - l_range[0]);
+        var gauss_norm = 0;
 
-        var PMz = 1/delK[2]/delL;
-
-        // PMz = 0
         for (var m = 0; m<P.apodization; m++){    
-            // PMz = PMz + A[m]*1j*(Math.exp(1j*delKz*l_range[m]) - Math.exp(1j*delKz*l_range[m+1]))/delKz/(delL)
-            var A = Math.exp(-sq((l_range[m] - P.L/2))/2/sq(P.apodization_FWHM));
-            PMz_real += PMz*A*(Math.sin(delK[2]*l_range[m+1]) - Math.sin(delK[2]*l_range[m]));///P.apodization;
-            PMz_imag += PMz*A*(Math.cos(delK[2]*l_range[m]) - Math.cos(delK[2]*l_range[m+1]));///P.apodization;
+            PMz_real += P.get_apodization(l_range[m])*(Math.sin(delK[2]*l_range[m+1]) - Math.sin(delK[2]*l_range[m]));///P.apodization;
+            PMz_imag += P.get_apodization(l_range[m])*(Math.cos(delK[2]*l_range[m]) - Math.cos(-delK[2]*l_range[m+1]));///P.apodization;
+            var g = P.get_apodization(l_range[m]);
+            gauss_norm += P.get_apodization(l_range[m]);
         }
+        
+        PMz_real = PMz_real/(delK[2]*delL * gauss_norm);
+        PMz_imag = PMz_imag/(delK[2]*delL * gauss_norm);
 
-        var PMz_int = Math.sqrt(sq(PMz_real) + sq(PMz_imag));
+        // var PMz_int = Math.sqrt(sq(PMz_real) + sq(PMz_imag));
 
-        var PMz_ref = Math.sin(arg)/arg;
-        var norm = PMz_ref / PMz_int;
-        PMz_real = PMz_real*norm;
-        PMz_imag = PMz_imag*norm;
+        // var PMz_ref = Math.sin(arg)/arg;
+        // var PMz_real_ref =  PMz_ref * Math.cos(arg);
+        // var PMz_imag_ref =  PMz_ref * Math.sin(arg);
+        // var norm = PMz_ref / PMz_int;
+        // PMz_real = PMz_real*norm;
+        // PMz_imag = PMz_imag*norm;
+        var t;
     }
     else {
         var PMz = Math.sin(arg)/arg;

@@ -44,7 +44,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         if (PM[i]>maxpm){maxpm = PM[i];}
     }
     
-    console.log("max pm value = ", maxpm);
+    // console.log("max pm value = ", maxpm);
     // console.log("");
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     
@@ -339,6 +339,9 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
     var dimjsa = 50; //make sure this is even
 
     var maxpm = 0;
+    var maxschmidt = 10;
+    var x_ideal = 0;
+    var y_ideal = 0;
 
     
     
@@ -381,6 +384,12 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
         var jsa2d = PhaseMatch.create_2d_array(jsa, dimjsa, dimjsa);
         S[i] = PhaseMatch.calc_Schmidt(jsa2d);
 
+        if (S[i]<maxschmidt){
+            maxschmidt = S[i];
+            x_ideal = xrange[index_s];
+            y_ideal = yrange[index_i];
+        }
+
         // P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
         // // P.optimum_idler(P); //Need to find the optimum idler for each angle.
@@ -396,7 +405,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
     }
     
     // console.log("max pm value = ", maxpm);
-    console.log("");
+    console.log("Lowest Schmidt = ", maxschmidt, " , X = ", x_ideal, ", Y = ", y_ideal);
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     
     return S;
