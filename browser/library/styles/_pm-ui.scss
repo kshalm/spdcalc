@@ -4,8 +4,17 @@
 
 $sidePanelCollapsed: 70px;
 
+#viewport{
+    min-width: 960px;
+    max-width:960px;
+    width: 960px;
+}
+
 & {
-    width: 100%;
+    /*width: 100%;*/
+    width:960px;
+    min-width:960px;
+    margin: 0 auto;
     // background: $lightgray;
     background: #fff;
     padding: 10px;
@@ -91,7 +100,7 @@ $sidePanelCollapsed: 70px;
 }
 
 .options-wrap{
-    width: 300px;
+    /*width: 220px;*/
     /*float: left;
     overflow: hidden;*/
 }
@@ -99,11 +108,13 @@ $sidePanelCollapsed: 70px;
 .parameters-wrap {
     /*width: 100%;*/
     /*width: 300px;*/
+    /*width: 220px;*/
     float: left;
     overflow: hidden;
-    padding: 20px;
+    padding: 10px;
     /*border-bottom: 1px solid $gray;*/
     /*background: #fff;*/
+    /*background-color: #1ABC9C;*/
     background-color: #ECF0F1;
     border: 1px solid #ECF0F1;
     /*// background: rgba(#fff, 0.3);*/
@@ -114,10 +125,11 @@ $sidePanelCollapsed: 70px;
         /*width:150px;*/
         float:left;
         margin: 0;
+        font-weight: bold;
         /*margin-bottom: 2em;*/
         vertical-align: top;
         clear:both;
-        font-size: 1.5em;
+        font-size: 1em;
     }
 
     &.collapsed {
@@ -130,6 +142,7 @@ $sidePanelCollapsed: 70px;
         }
         .title{
             color:#ECF0F1;
+            font-weight: normal;
         }
         
         /*#parameters {
@@ -226,11 +239,11 @@ $sidePanelCollapsed: 70px;
 input,
 textarea,
 .uneditable-input{
-  width: 75px;
+  width: 70px;
 }
 
 label{
-    width: 120px;
+    width: 100px;
 }
 
 .calcbutton {
@@ -293,7 +306,7 @@ label{
 
 // .inputbox {
 //     float:right;
-//     width:50px;
+//     width:75px;
 // }
 
 // label, input[type="text"] {
@@ -308,6 +321,18 @@ label{
 .page-title{
     font-size: 4em;
     margin: 1em 0 1em 0;
+}
+
+.form-horizontal {
+  
+  .controls {
+    *padding-left: 0px;
+    margin-left: 120px;
+    *margin-left: 0;
+    &:first-child {
+      *padding-left: 120px;
+    }
+    }
 }
 
 

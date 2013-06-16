@@ -59,8 +59,8 @@ define(
                     title: 'Joint spectral amplitude',
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     margins: margins,
-                    width: 480,
-                    height: 480,
+                    width: 400,
+                    height: 400,
                     labels: {
                         x: 'Wavelength of Signal (nm)',
                         y: 'Wavelength of Idler (nm)'

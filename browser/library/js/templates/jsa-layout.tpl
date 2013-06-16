@@ -1,8 +1,6 @@
-<div class="span8">
-    <div class="heat-map-wrapper">
+<div class="span9">
+    <div class="heat-map-wrapper span7">
         <!-- heat map goes here -->
     </div>
-    <div class="line-plot-wrapper">
-
-    </div>
+    
 </div>

@@ -48,7 +48,7 @@
 
         <div class="page-title">  </div>
 
-        <div class="options-wrap">
+        <div class="options-wrap span3">
 
             <div id="parameters"></div>
 
