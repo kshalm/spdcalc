@@ -37,7 +37,7 @@
         autocalcpp: true,
         poling_period: 1000000,
         poling_sign: 1,
-        calc_apodization: true,
+        calc_apodization: false,
         apodization: 7,
         apodization_FWHM: 1600 * con.um,
         use_guassian_approx: false,

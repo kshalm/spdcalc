@@ -118,10 +118,15 @@ define(
                 console.log("time", timeDiff);
 
                 //calculate the Schmidt number
-                var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
+                if (props.brute_force){
+                    var jsa2d = PhaseMatch.create_2d_array(PM, props.brute_dim, props.brute_dim);
+                }
+                else{
+                    var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
+                }
                 var S= PhaseMatch.calc_Schmidt(jsa2d);
                 self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
-
+                console.log(jsa2d[25]);
                 self.data = PM;
                 
                 // self.plot.setZRange([0, 0.2]);
