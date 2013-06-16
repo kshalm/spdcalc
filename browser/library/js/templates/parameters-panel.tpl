@@ -179,12 +179,39 @@
 
         <div class="control-group">   
             <label class="control-label">
-                Poling Period (um)
+                Poling period (um)
             </label>
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period" value="{{= this.converter.to('micro', parseFloat( it.poling_period )) }}" />
             </div>
         </div>
+
+        <div class="control-group">
+            <label class="checkbox control-label">
+                Enable apodization
+                <input type="checkbox" data-parse="float" class="checkbox" name="calc_apodization" {{? it.calc_apodization }} checked="checked" {{?}} />
+            </label>
+        </div>
+
+        <div class="control-group">   
+            <label class="control-label">
+                Apodization FWHM (um)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="apodization_FWHM" value="{{= this.converter.to('micro', parseFloat( it.apodization_FWHM )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">   
+            <label class="control-label">
+                Apodization steps
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="" class="inputbox" name="apodization" value="{{=  parseFloat( it.apodization ) }}" />
+            </div>
+        </div>
+        
+
     </section>
 
 </div>

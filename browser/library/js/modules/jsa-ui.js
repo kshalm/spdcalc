@@ -117,9 +117,14 @@ define(
                 var timeDiff = (endTime - startTime);
                 console.log("time", timeDiff);
 
+                //calculate the Schmidt number
+                var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
+                var S= PhaseMatch.calc_Schmidt(jsa2d);
+                self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
+
                 self.data = PM;
                 
-                self.plot.setZRange([0, 0.2]);
+                // self.plot.setZRange([0, 0.2]);
                 self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
             },
