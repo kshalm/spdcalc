@@ -57,7 +57,7 @@
                     <h2 class="title">Plot Options</h2>
                     
                     <div class="btn-wrap ">
-                        <button class="btn collapse-ctrl" id="collapse-plotopts">-</button>
+                        <button class="btn collapse-ctrl" id="collapse-plotopts">+</button>
                     </div>
                 </div>
                 <div id="plot-opts"></div>
