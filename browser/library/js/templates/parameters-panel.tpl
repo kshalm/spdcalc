@@ -1,30 +1,5 @@
 <div class="">
 
-     <div class="parameters-wrap">
-        <div class="row-fluid">
-        <section class="form-horizontal">
-                <div class="control-group share-wrap">
-                    <div class="pull-left">
-                        <button class="btn ctrl-share">Share</button>
-                    </div>
-                    <div class="controls">
-                        <input type="text" value="" id="share-url"> 
-                    </div>
-                </div>
-                <div class="control-group">
-                    <div class="calcbutton">
-                        <button class="btn btn-success ctrl-calc">Calculate</button>
-                    </div>
-                    <div class="calccheckbox">
-                        <label class="checkbox" for="autocalc"> Auto calculate
-                            <input type="checkbox" value="" id="autocalc" checked="checked"> 
-                        </label>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </div>
-
     <div class="parameters-wrap">
         <div class="row-fluid">
             <h2 class="title">Crystal Options</h2>

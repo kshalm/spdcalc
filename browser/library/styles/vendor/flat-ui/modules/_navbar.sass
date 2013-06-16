@@ -3,7 +3,7 @@
   font-size: 18px
 
   .brand
-    color: $firm
+    color: $base
     font-size: inherit
     font-weight: 700
     padding-bottom: 16px
@@ -115,13 +115,18 @@
 
 // Inverse skin --------------------------
 .navbar-inverse
+  // .navbar-inner
+  //   background: $base
+  //   +drop-ie-gradient
+
   .navbar-inner
-    background: $base
+    background: $lightgray
     +drop-ie-gradient
 
   .nav
     > li > a
-      color: $inverse
+      //color: $inverse
+      color: $base
 
     .active > a
       &, &:hover, &:focus

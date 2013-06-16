@@ -336,6 +336,7 @@ define(
                 self.elParameters.append( $(tplParametersPanel.render( self.parameters.getAll() )) );
 
                 self.autocalc = self.elParameters.find('#autocalc').is(':checked');
+                self.autocalc = true;
             },
 
             initParameters: function(){
