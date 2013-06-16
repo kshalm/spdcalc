@@ -199,9 +199,58 @@ define(
                 });
 
                 // collapse button
-                self.el.on('click', '.collapse-ctrl', function(e){
+                self.el.on('click', '#collapse-crystal', function(e){
                     e.preventDefault();
-                    var target = self.elParameters.parent()
+                    // var target = self.elParameters.parent()
+                    var target = self.el.find('#collapse-crystal').parent().parent().parent()
+                        ,text = target.is('.collapsed') ? '-' : '+'
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                // collapse button pump properties
+                self.el.on('click', '#collapse-pump', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = self.el.find('#collapse-pump').parent().parent().parent()
+                        ,text = target.is('.collapsed') ? '-' : '+'
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                // collapse button signal properties
+                self.el.on('click', '#collapse-signal', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = self.el.find('#collapse-signal').parent().parent().parent()
+                        ,text = target.is('.collapsed') ? '-' : '+'
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                // collapse button poling properties
+                self.el.on('click', '#collapse-poling', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = self.el.find('#collapse-poling').parent().parent().parent()
+                        ,text = target.is('.collapsed') ? '-' : '+'
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                // collapse button plot options
+                self.el.on('click', '#collapse-plotopts', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = self.el.find('#collapse-plotopts').parent().parent().parent()
                         ,text = target.is('.collapsed') ? '-' : '+'
                         ;
 

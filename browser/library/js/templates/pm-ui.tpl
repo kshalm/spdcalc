@@ -46,17 +46,53 @@
             </div>
         </div>
 
-        <div id="parameters-wrap">
-            <div class="row-fluid">
-                <h2 class="title">Options</h2>
-                
-                <div class="btn-wrap ">
-                    <button class="btn collapse-ctrl">-</button>
-                </div>
-            </div>
+        <div class="options-wrap">
+
             <div id="parameters"></div>
 
-            <div id="plot-opts"></div>
+            <!-- Plot options -->
+
+            <div class="parameters-wrap collapsed">
+                <div class="row-fluid">
+                    <h2 class="title">Plot Options</h2>
+                    
+                    <div class="btn-wrap ">
+                        <button class="btn collapse-ctrl" id="collapse-plotopts">-</button>
+                    </div>
+                </div>
+                <div id="plot-opts"></div>
+            </div>
+
+             <!-- <div class="parameters-wrap">
+                <div class="row-fluid">
+                    <div>
+                        <section class="form-horizontal">
+                                <div class="control-group share-wrap">
+                                    <div class="pull-left">
+                                        <button class="btn ctrl-share">Share</button>
+                                    </div>
+                                    <div class="controls">
+                                        <input type="text" value="" id="share-url"> 
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="calcbutton">
+                                        <button class="btn btn-success ctrl-calc">Calculate</button>
+                                    </div>
+                                    <div class="calccheckbox">
+                                        <label class="checkbox" for="autocalc"> Auto calculate
+                                            <input type="checkbox" value="" id="autocalc" checked="checked"> 
+                                        </label>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                </div>
+            </div> -->
+
+
+
+
         </div>
 
         <div class="right">

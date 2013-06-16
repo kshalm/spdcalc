@@ -1,7 +1,7 @@
 <section class="form-horizontal">
 
     <!-- Plot Options -->
-    <h3>Plot Options</h3>
+    <!-- <h3>Plot Options</h3> -->
 
     <div class="control-group">
         <label class="checkbox control-label" for="autocalc_plotopts"> 

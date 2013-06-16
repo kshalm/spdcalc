@@ -1,89 +1,115 @@
 <div class="">
-    <section class="form-horizontal">
-        <div class="control-group share-wrap">
-            <div class="pull-left">
-                <button class="btn ctrl-share">Share</button>
-            </div>
-            <div class="controls">
-                <input type="text" value="" id="share-url"> 
+
+     <div class="parameters-wrap">
+        <div class="row-fluid">
+        <section class="form-horizontal">
+                <div class="control-group share-wrap">
+                    <div class="pull-left">
+                        <button class="btn ctrl-share">Share</button>
+                    </div>
+                    <div class="controls">
+                        <input type="text" value="" id="share-url"> 
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="calcbutton">
+                        <button class="btn btn-success ctrl-calc">Calculate</button>
+                    </div>
+                    <div class="calccheckbox">
+                        <label class="checkbox" for="autocalc"> Auto calculate
+                            <input type="checkbox" value="" id="autocalc" checked="checked"> 
+                        </label>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="parameters-wrap">
+        <div class="row-fluid">
+            <h2 class="title">Crystal Options</h2>
+            
+            <div class="btn-wrap ">
+                <button class="btn collapse-ctrl" id="collapse-crystal">-</button>
             </div>
         </div>
-        <div class="control-group">
-            <div class="calcbutton">
-                <button class="btn btn-success ctrl-calc">Calculate</button>
+
+        <section class="form-horizontal">
+            <div class="control-group">
+                <!-- <h4>Crystal Properties</h4> -->
             </div>
-            <div class="calccheckbox">
-                <label class="checkbox" for="autocalc"> Auto calculate
-                    <input type="checkbox" value="" id="autocalc" checked="checked"> 
+
+            <div class="control-group">
+                <select id="crystal-dropdown" name="crystal" class="full">
+                    {{~this.PhaseMatch.Crystals.keys() :value:index}}
+                    <option value="{{= value }}" {{? value === it.crystal }} selected="selected" {{?}}>{{= this.PhaseMatch.Crystals(value).name }}</option>
+                    {{~}}
+                </select>
+            </div>
+
+            <div class="control-group">
+                <select id="pm-type-dropdown" name="type" class="full">
+                    {{~this.PhaseMatch.PMTypes :value:index}}
+                         <option value="{{=index}}" {{? index === it.type }} selected="selected" {{?}}>{{=value}}</option> 
+                    {{~}}
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label class="checkbox control-label">
+                    Calculate theta
+                    <input id="autocalctheta" type="checkbox" class="inputbox" name="autocalctheta" {{? it.autocalctheta }} checked="checked" {{?}} />
                 </label>
             </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Theta (deg)
+                </label>
+                <div class="controls">
+                    <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta" value="{{= this.converter.to('deg', parseFloat( it.theta )) }}" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Phi (deg)
+                </label>
+                <div class="controls">
+                    <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi" value="{{= this.converter.to('deg', parseFloat( it.phi )) }}" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Length (um)
+                </label>
+                <div class="controls">
+                    <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="L" value="{{= this.converter.to('micro', parseFloat( it.L )) }}" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Temperature
+                </label>
+                <div class="controls">
+                    <input type="text" data-parse="float" class="inputbox" name="temp" value="{{= parseFloat( it.temp ) }}" />
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Pump properties -->
+
+<div class="parameters-wrap collapsed">
+    <div class="row-fluid">
+        <h2 class="title">Pump Options</h2>
+        
+        <div class="btn-wrap ">
+            <button class="btn collapse-ctrl" id="collapse-pump">-</button>
         </div>
-    </section>
+    </div>
 
     <section class="form-horizontal">
         <div class="control-group">
-            <h4>Crystal Properties</h4>
-        </div>
-
-        <div class="control-group">
-            <select id="crystal-dropdown" name="crystal" class="full">
-                {{~this.PhaseMatch.Crystals.keys() :value:index}}
-                <option value="{{= value }}" {{? value === it.crystal }} selected="selected" {{?}}>{{= this.PhaseMatch.Crystals(value).name }}</option>
-                {{~}}
-            </select>
-        </div>
-
-        <div class="control-group">
-            <select id="pm-type-dropdown" name="type" class="full">
-                {{~this.PhaseMatch.PMTypes :value:index}}
-                     <option value="{{=index}}" {{? index === it.type }} selected="selected" {{?}}>{{=value}}</option> 
-                {{~}}
-            </select>
-        </div>
-
-        <div class="control-group">
-            <label class="checkbox control-label">
-                Calculate theta
-                <input id="autocalctheta" type="checkbox" class="inputbox" name="autocalctheta" {{? it.autocalctheta }} checked="checked" {{?}} />
-            </label>
-        </div>
-        <div class="control-group">
-            <label class="control-label">
-                Theta (deg)
-            </label>
-            <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta" value="{{= this.converter.to('deg', parseFloat( it.theta )) }}" />
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label">
-                Phi (deg)
-            </label>
-            <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi" value="{{= this.converter.to('deg', parseFloat( it.phi )) }}" />
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label">
-                Length (um)
-            </label>
-            <div class="controls">
-                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="L" value="{{= this.converter.to('micro', parseFloat( it.L )) }}" />
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label">
-                Temperature
-            </label>
-            <div class="controls">
-                <input type="text" data-parse="float" class="inputbox" name="temp" value="{{= parseFloat( it.temp ) }}" />
-            </div>
-        </div>
-    </section>
-
-    <section class="form-horizontal">
-        <div class="control-group">
-            <h4>Pump Properties</h4>
+            <!-- <h4>Pump Properties</h4> -->
         </div>
         <div class="control-group">   
             <label class="control-label">
@@ -110,11 +136,20 @@
             </div>
         </div>
     </section>
+</div>
 
+<div class="parameters-wrap collapsed">
+    <div class="row-fluid">
+        <h2 class="title">Signal Options</h2>
+        
+        <div class="btn-wrap ">
+            <button class="btn collapse-ctrl" id="collapse-signal">-</button>
+        </div>
+    </div>
     <!-- Signal Properties -->
     <section class="form-horizontal">
         <div class="control-group">
-            <h4>Signal Properties</h4>
+            <!-- <h4>Signal Properties</h4> -->
         </div>
         <div class="control-group">   
             <label class="control-label">
@@ -163,11 +198,22 @@
             </label>
         </div>
     </section>
+</div>
+
 
     <!-- Periodic Poling Properties -->
+
+<div class="parameters-wrap collapsed">
+    <div class="row-fluid">
+        <h2 class="title">Periodic Poling</h2>
+        
+        <div class="btn-wrap ">
+            <button class="btn collapse-ctrl" id="collapse-poling">-</button>
+        </div>
+    </div>
     <section class="form-horizontal">
         <div class="control-group">
-            <h4>Periodic Poling</h4>
+            <!-- <h4>Periodic Poling</h4> -->
         </div>
 
          <div class="control-group">
@@ -213,5 +259,6 @@
         
 
     </section>
+</div>
 
 </div>

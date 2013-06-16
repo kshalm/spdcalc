@@ -90,9 +90,15 @@ $sidePanelCollapsed: 70px;
     text-align: center;
 }
 
-#parameters-wrap {
-    /*width: 100%;*/
+.options-wrap{
     width: 300px;
+    /*float: left;
+    overflow: hidden;*/
+}
+
+.parameters-wrap {
+    /*width: 100%;*/
+    /*width: 300px;*/
     float: left;
     overflow: hidden;
     padding: 20px;
@@ -119,9 +125,9 @@ $sidePanelCollapsed: 70px;
             content: '';
         }
         
-        #parameters {
+        /*#parameters {
             @include opacity( 0 );
-        }
+        }*/
     }
 
     .ctrl-calc,
@@ -143,9 +149,12 @@ $sidePanelCollapsed: 70px;
         text-align: right;
     }
 
-    #parameters {
-        margin-top: 1em;
+    .form-horizontal{
+         margin-top: 1em;
     }
+    /*#parameters {
+        margin-top: 1em;
+    }*/
 
     .form-horizontal .control-group {
         margin-bottom: 5px;
