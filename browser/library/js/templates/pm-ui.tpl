@@ -65,17 +65,14 @@
                 <div id="plot-opts"></div>
             </div>
 
-         <div class="parameters-wrap">
+         <div class="span3">
             <div class="row-fluid">
-                <h2 class="title">Other</h2>
+                <h2 class="title"></h2>
                     
-                    <div class="btn-wrap ">
-                        <button class="btn collapse-ctrl" id="collapse-other">+</button>
-                    </div>
                 </div>
                     <section class="form-horizontal">
                             <div class="control-group ">
-                                <div class="pull-left">
+                                <div class="">
                                     <button class="btn ctrl-share">Share</button>
                                 </div>
                                 <div class="controls">

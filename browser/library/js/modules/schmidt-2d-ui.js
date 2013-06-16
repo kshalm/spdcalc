@@ -58,8 +58,6 @@ define(
                     title: 'Schmidt number',
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     margins: margins,
-                    width: 480,
-                    height: 480,
                     labels: {
                         x: 'Crystal Length (um)',
                         y: 'Pump Bandwidth (nm)'

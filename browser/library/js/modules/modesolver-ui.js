@@ -59,8 +59,6 @@ define(
                     title: 'Idler spatial mode',
                     el: self.el.find('.signalmode').get( 0 ),
                     margins: margins,
-                    width: 480,
-                    height: 480,
                     labels: {
                         x: 'X emission angle (deg)',
                         y: 'Y emission angle (deg)'

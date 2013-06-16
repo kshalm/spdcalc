@@ -4,11 +4,6 @@
 
 $sidePanelCollapsed: 70px;
 
-#viewport{
-    min-width: 960px;
-    max-width:960px;
-    width: 960px;
-}
 
 & {
     /*width: 100%;*/
@@ -18,11 +13,13 @@ $sidePanelCollapsed: 70px;
     // background: $lightgray;
     background: #fff;
     padding: 10px;
+    padding-top:0;
     @include box-sizing(border-box);
 
     > .inner {
         position: relative;
         overflow: hidden;
+        width:100%;
         /*border: 1px solid $gray;
         @include border-radius( 10px );*/
 
@@ -34,13 +31,13 @@ $sidePanelCollapsed: 70px;
 
         > .upper > .right {
 
-            margin-left: 320px;
+            /*margin-left: 320px;*/
             overflow: hidden;
 
             #main {
                 width: 100%;
-                max-width: 610px;
-                margin: auto;
+                /*min-width: 960px;*/
+                /*margin: auto;*/
             }
         }
 
@@ -84,10 +81,15 @@ $sidePanelCollapsed: 70px;
         padding: 5px;
         color: $base;
         font-weight: normal;
+        font-size: 1.285em;
     }
 
     .ui-module-wrap {
         margin: 6px 0 -5px;
+    }
+
+    .nav, .ui-module-wrap{
+        float:right;
     }
 }
 
@@ -319,7 +321,7 @@ label{
 // }
 
 .page-title{
-    font-size: 4em;
+    font-size: 3.4285em;
     margin: 1em 0 1em 0;
 }
 
