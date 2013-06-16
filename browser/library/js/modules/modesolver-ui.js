@@ -33,6 +33,7 @@ define(
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplMSLayout,
             showPlotOpts: [
+                'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
                 'theta'
@@ -88,6 +89,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
+                    'grid_size': 100,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -98,6 +100,7 @@ define(
             calc: function( props ){
 
                 var self = this;
+                var po = this.plotOpts;
 
                 var dim = 100;
 
@@ -136,7 +139,7 @@ define(
                     y_start,
                     y_stop,
                     BW,
-                    dim
+                    po.get('grid_size')
                 );
                 console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
 
@@ -146,7 +149,7 @@ define(
                 //     po.get('theta_stop'), 
                 //     -1 * po.get('theta_stop'), 
                 //     po.get('theta_stop'), 
-                //     dim
+                //     po.get('grid_size')
                 // );
 
                 self.data = PM_s;

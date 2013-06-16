@@ -34,6 +34,7 @@ define(
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplXYLayout,
             showPlotOpts: [
+                'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
                 'theta'
@@ -117,6 +118,7 @@ define(
                 lim_theta = PhaseMatch.autorange_theta(props);
                 
                 self.plotOpts.set({
+                    'grid_size': 100,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -152,7 +154,7 @@ define(
                     po.get('theta_stop'), 
                     -1 * po.get('theta_stop'), 
                     po.get('theta_stop'), 
-                    dim
+                    po.get('grid_size')
                 );
 
 
@@ -168,7 +170,7 @@ define(
                     po.get('ls_stop'),
                     po.get('theta_start'),
                     po.get('theta_stop'),
-                    dim
+                    po.get('grid_size')
                 );
                 self.dataLambdasThetas = PMLambdasThetas;
                 self.plotLambdasThetas.setXRange([ l_start, l_stop ]);
@@ -181,7 +183,7 @@ define(
                     po.get('theta_stop'),
                     0,
                     0.5 * Math.PI,
-                    dim
+                    po.get('grid_size')
                 );
                 self.dataThetaPhi = PMThetaPhi;
                 self.plotThetaPhi.setXRange([ t_start, t_stop ]);
@@ -194,7 +196,7 @@ define(
                     po.get('theta_stop'),
                     po.get('theta_start'),
                     po.get('theta_stop'),
-                    dim
+                    po.get('grid_size')
                 );
                 
                 // t_start = 0;

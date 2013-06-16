@@ -33,6 +33,7 @@ define(
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplJSALayout,
             showPlotOpts: [
+                'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
                 'theta'
@@ -88,6 +89,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
+                    'grid_size': 100,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -99,16 +101,21 @@ define(
 
                 var self = this;
 
-                var dim = 200
+                var startTime = new Date();
+                var dim = 100
                     ,PM = PhaseMatch.calc_JSA(
                         props, 
                         self.plotOpts.get('ls_start'), 
                         self.plotOpts.get('ls_stop'),
                         self.plotOpts.get('li_start'),
                         self.plotOpts.get('li_stop'), 
-                        dim
+                        self.plotOpts.get('grid_size')
                     )
                     ;
+
+                var endTime = new Date();
+                var timeDiff = (endTime - startTime);
+                console.log("time", timeDiff);
 
                 self.data = PM;
                 

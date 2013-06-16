@@ -37,6 +37,7 @@ define(
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplJSALayout,
             showPlotOpts: [
+                'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
                 'theta',
@@ -184,6 +185,7 @@ define(
                 self.set_slider_values(tsi[0], tsi[1], tsi[2]);
 
                 self.plotOpts.set({
+                    'grid_size': 100,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -261,7 +263,6 @@ define(
             calc_HOM_JSA: function( props ){
 
                 var self = this
-                    ,dim = 200
                     ,delT = self.get('delT')
                     ,po = self.plotOpts
                     ,PM = PhaseMatch.calc_HOM_JSA(
@@ -271,7 +272,7 @@ define(
                         po.get('li_start'),
                         po.get('li_stop'), 
                         self.get('delT'),
-                        dim
+                        po.get('grid_size')
                     )
                     ;
 

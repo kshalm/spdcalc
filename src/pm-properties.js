@@ -28,17 +28,18 @@
         L: 2000 * con.um,
         W: 500 * con.um,
         p_bw: 5.35 * con.nm,
-        W_sx: 1.2 * Math.PI/180,
-        W_sy: 1.2 * Math.PI/180,
+        W_sx: .2 * Math.PI/180,
+        W_sy: .2 * Math.PI/180,
         phase: false,
-        brute_force: true,
+        brute_force: false,
         brute_dim: 50,
         autocalctheta: false,
         autocalcpp: true,
         poling_period: 1000000,
         poling_sign: 1,
+        calc_apodization: true,
         apodization: 1,
-        apodization_FWHM: 1000 * con.um,
+        apodization_FWHM: 500 * con.um,
         use_guassian_approx: false,
         crystal: PhaseMatch.Crystals('KTP-3'),
         temp: 20
@@ -339,6 +340,13 @@
             var guess = props.theta_s;
 
             var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
+        },
+
+        apodization_function : function (m){
+            var l_range = PhaseMatch.linspace(0,this.L,this.apodization+1);
+            var delL = Math.abs(l_range[1] - l_range[0]);
+            var A = Math.exp(-sq((l_range[m] - this.L/2))/2/sq(this.apodization_FWHM));
+            return A;
         },
 
         /**
