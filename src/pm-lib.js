@@ -71,11 +71,11 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
         var delL = Math.abs(l_range[1] - l_range[0]);
         var gauss_norm = 0;
 
-        for (var m = 0; m<P.apodization; m++){    
-            PMz_real += P.get_apodization(l_range[m])*(Math.sin(delK[2]*l_range[m+1]) - Math.sin(delK[2]*l_range[m]));///P.apodization;
-            PMz_imag += P.get_apodization(l_range[m])*(Math.cos(delK[2]*l_range[m]) - Math.cos(-delK[2]*l_range[m+1]));///P.apodization;
-            var g = P.get_apodization(l_range[m]);
-            gauss_norm += P.get_apodization(l_range[m]);
+        for (var m = 0; m<P.apodization; m++){   
+            var A =  P.get_apodization(l_range[m]);
+            PMz_real += A*(Math.sin(delK[2]*l_range[m+1]) - Math.sin(delK[2]*l_range[m]));///P.apodization;
+            PMz_imag += A*(Math.cos(delK[2]*l_range[m]) - Math.cos(-delK[2]*l_range[m+1]));///P.apodization;
+            gauss_norm += A;
         }
         
         PMz_real = PMz_real/(delK[2]*delL * gauss_norm);
