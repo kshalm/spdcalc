@@ -38,6 +38,7 @@ define(
                 'idler-wavelength'
             ],
 
+
             /**
              * Initialize Plots
              * @return {void}
@@ -72,6 +73,7 @@ define(
                 });
 
                 self.addPlot( self.plot );
+
             },
 
             autocalcPlotOpts: function(){

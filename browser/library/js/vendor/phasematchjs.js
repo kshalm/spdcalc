@@ -2594,6 +2594,64 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     return [theta_start, theta_end];
 };
 
+PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
+    var P = props.clone();
+
+    if (photon === 'signal'){
+        var snell_external = (Math.sin(props.theta_s));
+
+        var min_snells_law = function(theta_internal){
+            if (theta_internal>Math.PI/2 || theta_internal<0){return 1e12;}
+            P.theta_s = theta_internal;
+
+            P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+            P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+
+            return Math.abs(snell_external - P.n_s*Math.sin(P.theta_s));
+        };
+
+        //Initial guess
+        var guess = props.theta_s;
+    }
+    if (photon === 'idler'){
+        var snell_external = (Math.sin(props.theta_i));
+
+        var min_snells_law = function(theta_internal){
+            if (theta_internal>Math.PI/2 || theta_internal<0){return 1e12;}
+            P.theta_i = theta_internal;
+
+            P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "signal");
+
+            return Math.abs(snell_external - P.n_i*Math.sin(P.theta_i));
+        };
+
+        //Initial guess
+        var guess = props.theta_i;
+    }
+    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 50);
+    console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
+    return ans;
+};
+
+PhaseMatch.find_external_angle = function find_external_angle (props, photon){
+    var theta_external = 0;
+
+    if (photon === 'signal'){
+        var arg = (props.n_s * Math.sin(props.theta_s));
+        theta_external = Math.asin(arg);
+    }
+    if (photon === 'idler'){
+        var arg = (props.n_i * Math.sin(props.theta_i));
+        theta_external = Math.asin(arg);
+    }
+
+    console.log("External angle is: ", theta_external*180/Math.PI, props.theta_s*180/Math.PI );
+    return theta_external;
+
+    
+};
+
 
 
 (function(){

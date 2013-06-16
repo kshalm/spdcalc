@@ -99,6 +99,9 @@ define(
 
                 var self = this;
 
+                var internalangle = PhaseMatch.find_internal_angle(props, 'signal');
+                var externalangle = PhaseMatch.find_external_angle(props, 'signal');
+
                 var startTime = new Date();
                 var dim = 100
                     ,PM = PhaseMatch.calc_JSA(
