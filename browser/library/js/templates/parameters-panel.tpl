@@ -139,7 +139,7 @@
                 Theta_s (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta_s" value="{{= this.converter.to('deg', parseFloat( it.theta_s )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta_s_e" value="{{= this.converter.to('deg', parseFloat( it.theta_s_e )) }}" />
             </div>
         </div>
         <div class="control-group">   

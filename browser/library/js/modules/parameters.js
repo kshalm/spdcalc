@@ -91,6 +91,21 @@ define(
                         var val = self.get( key );
                         self.props.set( key, val );
 
+                        if (key === 'theta_s_e'){
+                            var theta_s = PhaseMatch.find_internal_angle(self.props, "signal");
+                            // console.log("theta_s int", val);
+                            self.props.set("theta_s", theta_s);
+                        }
+                        if (key === 'theta_i_e'){
+                            var theta_i = PhaseMatch.find_internal_angle(self.props, "idler");
+                            // console.log("theta_s int", val);
+                            self.props.set("theta_i", theta_i);
+                        }
+                        // if (name === "theta_i_e"){
+                        //     var theta_i = PhaseMatch.find_external_angle(this, "idler");
+                        //     this.set("theta_i", theta_i);
+                        // }
+
                         self.checkautocalc();
                         self.refresh();
                     }

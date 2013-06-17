@@ -2585,9 +2585,18 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     var offset = 2* Math.PI/180;
     var dif = (P.theta_s - P.theta_s*.4);
     var theta_start =dif*(1-(1e-6/P.W));
-    var theta_start = Math.max(0, theta_start);
+    theta_start = Math.max(0, theta_start);
     var theta_end = P.theta_s + P.theta_s*.4;
     theta_end = Math.max(2*Math.PI/180, theta_end);
+    console.log("Before", theta_start*180/Math.PI, theta_end*180/Math.PI);
+    P.theta_s = theta_start;
+    P.update_all_angles();
+    theta_start = PhaseMatch.find_external_angle(P,"signal");
+
+    P.theta_s = theta_end;
+    P.update_all_angles();
+    theta_end = PhaseMatch.find_external_angle(P,"signal");
+    console.log("after", theta_start*180/Math.PI, theta_end*180/Math.PI);
 
     // console.log("optimal theta", theta_start*180/Math.PI, theta_end*theta_start*180/Math.PI);
 
@@ -2598,7 +2607,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
     var P = props.clone();
 
     if (photon === 'signal'){
-        var snell_external = (Math.sin(props.theta_s));
+        var snell_external = (Math.sin(props.theta_s_e));
 
         var min_snells_law = function(theta_internal){
             if (theta_internal>Math.PI/2 || theta_internal<0){return 1e12;}
@@ -2614,7 +2623,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         var guess = props.theta_s;
     }
     if (photon === 'idler'){
-        var snell_external = (Math.sin(props.theta_i));
+        var snell_external = (Math.sin(props.theta_i_e));
 
         var min_snells_law = function(theta_internal){
             if (theta_internal>Math.PI/2 || theta_internal<0){return 1e12;}
@@ -2629,8 +2638,8 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         //Initial guess
         var guess = props.theta_i;
     }
-    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 50);
-    console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
+    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 20);
+    // console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
     return ans;
 };
 
@@ -2646,7 +2655,7 @@ PhaseMatch.find_external_angle = function find_external_angle (props, photon){
         theta_external = Math.asin(arg);
     }
 
-    console.log("External angle is: ", theta_external*180/Math.PI, props.theta_s*180/Math.PI );
+    // console.log("External angle is: ", theta_external*180/Math.PI, props.theta_s*180/Math.PI );
     return theta_external;
 
     
@@ -2947,8 +2956,10 @@ PhaseMatch.Crystals('LiNbO3-1', {
         phi: 0,
         theta_s: 0,
         theta_i: 0,
+        theta_s_e: 3 *Math.PI / 180,
+        theta_i_e: 0,
         phi_s: 0,
-        phi_i: Math.PI,
+        phi_i: Math.PI ,
         L: 6000 * con.um,
         W: 500 * con.um,
         p_bw: 5.35 * con.nm,
@@ -2997,6 +3008,10 @@ PhaseMatch.Crystals('LiNbO3-1', {
                 
             // set properties or fall back to defaults
             this.set( PhaseMatch.util.extend({}, spdcDefaults, cfg) );
+
+            // Find internal angles for signal and idler
+            this.theta_s = PhaseMatch.find_internal_angle(this, "signal");
+            this.theta_i = PhaseMatch.find_internal_angle(this, "idler");
 
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -3299,6 +3314,8 @@ PhaseMatch.Crystals('LiNbO3-1', {
                     }
 
                     this[ name ] = val;
+
+
                 }
             }
 
@@ -3347,6 +3364,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
     // PhaseMatch.updateallangles(props);
     // console.log("Calculating JSA", props.temp);
+
     var P = props.clone();
     props.update_all_angles(P);
 
@@ -3409,6 +3427,9 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     var X = PhaseMatch.linspace(x_start, x_stop, dim);
     var Y = PhaseMatch.linspace(y_start, y_stop, dim); 
 
+    var X_ext = X;
+    var Y_ext = Y;
+
     var N = dim * dim;
     var PM = new Float64Array( N );
     
@@ -3458,12 +3479,20 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
         dim = P.brute_dim;
     }
 
+    var lambda_s_e = PhaseMatch.linspace(t_start, t_stop, dim);
+    var theta_s = lambda_s_e;
+
+    for (var k = 0; k<dim; k++){
+        P.lambda_s_e = lambda_s_e[k];
+        theta_s[k] = PhaseMatch.find_internal_angle(P,"signal");
+    }
     var i;
     var lambda_s = PhaseMatch.linspace(l_start, l_stop, dim);
-    var theta_s = PhaseMatch.linspace(t_stop, t_start, dim); 
+    // var theta_s_e = []; 
 
     var N = dim * dim;
     var PM = new Float64Array( N );
+    var radtodeg = 180/Math.PI;
     
     var startTime = new Date();
     for (i=0; i<N; i++){
@@ -3485,6 +3514,11 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
             P.optimum_idler(P);
         }
 
+        // if (i%dim === 0){
+        //     theta_s_e[dim - index_i -1] = PhaseMatch.find_external_angle(P,"signal")*radtodeg;
+        // }
+        // theta_s_e[index_i] = PhaseMatch.find_external_angle(P,"signal")*radtodeg;
+
         // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         // P.calc_wbar();
 
@@ -3494,7 +3528,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
     }
     var endTime = new Date();
     var timeDiff = (endTime - startTime);
-    return PM;
+    return {data:PM};
 
 };
 
@@ -3593,8 +3627,21 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
     props.update_all_angles(P);
 
     var i;
-    var X = PhaseMatch.linspace(x_start, x_stop, dim);
-    var Y = PhaseMatch.linspace(y_stop, y_start, dim); 
+
+    var theta_s_e = PhaseMatch.linspace(x_start, x_stop, dim);
+    var theta_i_e = PhaseMatch.linspace(y_stop, y_start, dim);
+    var X = theta_s_e;
+    var Y = theta_i_e;
+
+    for (var k = 0; k<dim; k++){
+        P.theta_s_e = theta_s_e[k];
+        X[k] = PhaseMatch.find_internal_angle(P,"signal");
+        P.theta_s_e = theta_i_e[k];
+        Y[k] = PhaseMatch.find_internal_angle(P,"idler");
+    }
+
+    // var X = PhaseMatch.linspace(x_start, x_stop, dim);
+    // var Y = PhaseMatch.linspace(y_stop, y_start, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );

@@ -23,8 +23,10 @@
         phi: 0,
         theta_s: 0,
         theta_i: 0,
+        theta_s_e: 3 *Math.PI / 180,
+        theta_i_e: 0,
         phi_s: 0,
-        phi_i: Math.PI,
+        phi_i: Math.PI ,
         L: 6000 * con.um,
         W: 500 * con.um,
         p_bw: 5.35 * con.nm,
@@ -73,6 +75,10 @@
                 
             // set properties or fall back to defaults
             this.set( PhaseMatch.util.extend({}, spdcDefaults, cfg) );
+
+            // Find internal angles for signal and idler
+            this.theta_s = PhaseMatch.find_internal_angle(this, "signal");
+            this.theta_i = PhaseMatch.find_internal_angle(this, "idler");
 
             //Other functions that do not need to be included in the default init
             this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -375,6 +381,8 @@
                     }
 
                     this[ name ] = val;
+
+
                 }
             }
 

@@ -172,9 +172,11 @@ define(
                     po.get('theta_stop'),
                     po.get('grid_size')
                 );
-                self.dataLambdasThetas = PMLambdasThetas;
+                self.dataLambdasThetas = PMLambdasThetas.data;
                 self.plotLambdasThetas.setXRange([ l_start, l_stop ]);
                 self.plotLambdasThetas.setYRange([ t_start, t_stop ]);
+                // console.log(PMLambdasThetas);
+                // self.plotLambdasThetas.setYRange(PMLambdasThetas.theta_s);
 
                 // Theta vs Phi in crystal
                 var PMThetaPhi = PhaseMatch.calc_signal_theta_phi(

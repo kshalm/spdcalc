@@ -429,9 +429,18 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     var offset = 2* Math.PI/180;
     var dif = (P.theta_s - P.theta_s*.4);
     var theta_start =dif*(1-(1e-6/P.W));
-    var theta_start = Math.max(0, theta_start);
+    theta_start = Math.max(0, theta_start);
     var theta_end = P.theta_s + P.theta_s*.4;
     theta_end = Math.max(2*Math.PI/180, theta_end);
+    console.log("Before", theta_start*180/Math.PI, theta_end*180/Math.PI);
+    P.theta_s = theta_start;
+    P.update_all_angles();
+    theta_start = PhaseMatch.find_external_angle(P,"signal");
+
+    P.theta_s = theta_end;
+    P.update_all_angles();
+    theta_end = PhaseMatch.find_external_angle(P,"signal");
+    console.log("after", theta_start*180/Math.PI, theta_end*180/Math.PI);
 
     // console.log("optimal theta", theta_start*180/Math.PI, theta_end*theta_start*180/Math.PI);
 
@@ -442,7 +451,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
     var P = props.clone();
 
     if (photon === 'signal'){
-        var snell_external = (Math.sin(props.theta_s));
+        var snell_external = (Math.sin(props.theta_s_e));
 
         var min_snells_law = function(theta_internal){
             if (theta_internal>Math.PI/2 || theta_internal<0){return 1e12;}
@@ -458,7 +467,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         var guess = props.theta_s;
     }
     if (photon === 'idler'){
-        var snell_external = (Math.sin(props.theta_i));
+        var snell_external = (Math.sin(props.theta_i_e));
 
         var min_snells_law = function(theta_internal){
             if (theta_internal>Math.PI/2 || theta_internal<0){return 1e12;}
@@ -473,8 +482,8 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         //Initial guess
         var guess = props.theta_i;
     }
-    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 50);
-    console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
+    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 20);
+    // console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
     return ans;
 };
 
@@ -490,7 +499,7 @@ PhaseMatch.find_external_angle = function find_external_angle (props, photon){
         theta_external = Math.asin(arg);
     }
 
-    console.log("External angle is: ", theta_external*180/Math.PI, props.theta_s*180/Math.PI );
+    // console.log("External angle is: ", theta_external*180/Math.PI, props.theta_s*180/Math.PI );
     return theta_external;
 
     
