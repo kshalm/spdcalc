@@ -474,7 +474,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
             P.theta_i = theta_internal;
 
             P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "signal");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
             return Math.abs(snell_external - P.n_i*Math.sin(P.theta_i));
         };
@@ -482,7 +482,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         //Initial guess
         var guess = props.theta_i;
     }
-    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 20);
+    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 30);
     // console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
     return ans;
 };

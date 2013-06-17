@@ -79,16 +79,21 @@
                                     <input type="text" value="" id="share-url"> 
                                 </div>
                             </div>
+
                             <div class="control-group">
-                                <div class="calcbutton">
-                                    <button class="btn btn-success ctrl-calc">Calculate</button>
-                                </div>
                                 <div class="calccheckbox">
                                     <label class="checkbox" for="autocalc"> Auto calculate
                                         <input type="checkbox" value="" id="autocalc" checked="checked"> 
                                     </label>
                                 </div>
                             </div>
+                            
+                            <div class="control-group">
+                                <div class="calcbutton">
+                                    <button class="btn btn-success ctrl-calc">Calculate</button>
+                                </div>
+                            </div>
+
                         </section>
             
             </div>

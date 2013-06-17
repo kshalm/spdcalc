@@ -4,14 +4,17 @@
 
 $sidePanelCollapsed: 70px;
 
+body {
+    background-color: $lightgray;
+}
 
 & {
     /*width: 100%;*/
     width:960px;
     min-width:960px;
     margin: 0 auto;
-    // background: $lightgray;
-    background: #fff;
+    /*background: $lightgray;*/
+    /*background: #fff;*/
     padding: 10px;
     padding-top:0;
     @include box-sizing(border-box);
@@ -45,6 +48,11 @@ $sidePanelCollapsed: 70px;
            /* border-top: 2px solid $gray;*/
         }
     }
+}
+
+.navbar-inverse .navbar-inner {
+    background-color: #ECF0F1;
+    border:none;
 }
 
 .dropdown {
@@ -93,6 +101,11 @@ $sidePanelCollapsed: 70px;
     }
 }
 
+.navbar-inverse .brand,
+.navbar-inverse .nav > li > a {
+  text-shadow: 0 0px 0 rgba(0, 0, 0, 0);
+}
+
 .loading-msg {
     color: $firm;
     font-size: 3em;
@@ -117,8 +130,13 @@ $sidePanelCollapsed: 70px;
     /*border-bottom: 1px solid $gray;*/
     /*background: #fff;*/
     /*background-color: #1ABC9C;*/
-    background-color: #ECF0F1;
-    border: 1px solid #ECF0F1;
+    /*background-color: #ECF0F1;*/
+    /*background-color: #fff;*/
+    background-color: transparent;
+    /*border: 1px solid #ECF0F1;*/
+    border-color: $gray;
+    border: none;
+    border-top: 1px solid $gray;
     /*// background: rgba(#fff, 0.3);*/
     @include box-sizing( border-box );
 
@@ -136,14 +154,16 @@ $sidePanelCollapsed: 70px;
 
     &.collapsed {
         height: $sidePanelCollapsed;
-        border-color: $gray;
-        background-color: #2E4053;
+        /*background-color: #2E4053;*/
+        background-color: #2C3E50;
+        background-color: #fff;
         color: #ECF0F1;
         .title:after {
             content: '';
         }
         .title{
             color:#ECF0F1;
+            color: #2C3E50 ;
             font-weight: normal;
         }
         

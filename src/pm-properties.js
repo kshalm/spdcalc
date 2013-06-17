@@ -23,7 +23,7 @@
         phi: 0,
         theta_s: 0,
         theta_i: 0,
-        theta_s_e: 3 *Math.PI / 180,
+        theta_s_e: 0 *Math.PI / 180,
         theta_i_e: 0,
         phi_s: 0,
         phi_i: Math.PI ,

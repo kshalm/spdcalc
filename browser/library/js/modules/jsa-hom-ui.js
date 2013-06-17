@@ -154,18 +154,38 @@ define(
                     .append('rect')
                     .attr("class", 'vline')
                     .attr("width", 2)
+                    // .attr("height", 20)
                     // this measurement is awkward...
                     .attr("height", Math.abs(y(dom[0]) - y(dom[1])) )
-                    .style("fill", 'red')
+                    .style("fill", '#16A085')
                     ;
 
                 line.attr('x', function(d) {
-                        console.log("x", d);
                         return self.plot1d.scales.x( d / delTConversion );
                     })
                     ;
 
                 line.exit().remove();
+
+                // var circle = self.plot1d.svgPlot.selectAll("circle").data([ delT ]);
+
+                // circle.enter()
+                //     .append('circle')
+                //     .attr("r", 4)
+                //     .style("fill", '#16A085');
+
+                // circle.attr('cx', function(d) {
+                //         return self.plot1d.scales.x( d / delTConversion );
+                //     })
+                //     ;
+
+                // // circle.attr('cy', function(d) {
+                // //         console.log("y pos", self.plot1d.scales.y( .1 ));
+                // //         return self.plot1d.scales.y( d/delTConversion );
+                // //     })
+                // //     ;
+
+                // circle.exit().remove();
             },
 
             autocalcPlotOpts: function(){
