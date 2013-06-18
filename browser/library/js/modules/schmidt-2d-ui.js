@@ -113,6 +113,8 @@ define(
                 var y_start = .1e-9;
                 var y_stop = 20e-9;
 
+
+                var Tstart = new Date();
                 var PM = PhaseMatch.calc_schmidt_plot(
                     props, 
                     x_start, 
@@ -125,8 +127,12 @@ define(
                     self.plotOpts.get('li_stop'), 
                     po.get('grid_size'), 
                     params);
+
+                var Tstop = new Date();
+                console.log("Schmidt time = ", Tstop - Tstart);
                 // console.log(PM);
                 self.data = PM;
+
 
                 // self.plot.scales.z = d3.scale.linear().domain([0, 50]);
                 self.plot.setZRange([1,5]);

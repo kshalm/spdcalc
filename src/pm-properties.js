@@ -13,6 +13,9 @@
         "Type 2:   e -> o + e"
     ];
 
+    PhaseMatch.apodization_L = [];
+    PhaseMatch.apodization_coeff = [];
+
     var con = PhaseMatch.constants;
     var spdcDefaults = {
         lambda_p: 785 * con.nm,
@@ -88,6 +91,11 @@
             this.n_p = this.calc_Index_PMType(this.lambda_p, this.type, this.S_p, "pump");
             this.n_s = this.calc_Index_PMType(this.lambda_s, this.type, this.S_s, "signal");
             this.n_i = this.calc_Index_PMType(this.lambda_i, this.type, this.S_i, "idler");
+
+            //set the apodization length and Gaussian profile
+            this.set_apodization_L();
+            this.set_apodization_coeff();
+
         },
             
         calc_Coordinate_Transform : function (theta, phi, theta_s, phi_s){
@@ -342,16 +350,39 @@
             var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
         },
 
-        get_apodization : function (l){
-            // var l_range = PhaseMatch.linspace(0,this.L,this.apodization+1);
-            // var delL = Math.abs(l_range[1] - l_range[0]);
-            // var A = Math.exp(-sq((l_range[m] - this.L/2))/2/sq(this.apodization_FWHM));
+        // get_apodization : PhaseMatch.util.memoize(function (l){
+        //     // var l_range = PhaseMatch.linspace(0,this.L,this.apodization+1);
+        //     // var delL = Math.abs(l_range[1] - l_range[0]);
+        //     // var A = Math.exp(-sq((l_range[m] - this.L/2))/2/sq(this.apodization_FWHM));
+        //     // var bw = this.apodization_FWHM /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
+        //     var bw = this.apodization_FWHM  / 2.3548;
+        //     // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(2*p_bw)));
+        //     var A = Math.exp(-sq((l - this.L/2)/(bw))/2);
+        //     // A = A / ( bw *Math.sqrt(2*Math.PI)); //normalization
+        //     return A;
+        // }),
+
+        set_apodization_L : function (){
+            this.apodization_L = PhaseMatch.linspace(0,this.L,this.apodization+1);
+        },
+
+        set_apodization_coeff : function (){
             // var bw = this.apodization_FWHM /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
             var bw = this.apodization_FWHM  / 2.3548;
-            // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(2*p_bw)));
-            var A = Math.exp(-sq((l - this.L/2)/(bw))/2);
-            // A = A / ( bw *Math.sqrt(2*Math.PI)); //normalization
-            return A;
+            var dim = this.apodization_L.length;
+            this.apodization_coeff = [];
+            var delL = Math.abs(this.apodization_L[0] - this.apodization_L[1]);
+            for (var i=0; i<dim; i++){
+                this.apodization_coeff[i] =  Math.exp(-sq((this.apodization_L[i] - this.L/2)/(bw))/2);
+            }
+
+            var total = PhaseMatch.Sum(this.apodization_coeff);
+
+            //normalize
+            for (i=0; i<dim; i++){
+                this.apodization_coeff[i] = this.apodization_coeff[i]/total; 
+            }
+    
         },
 
         /**
@@ -381,6 +412,13 @@
                     }
 
                     this[ name ] = val;
+
+                    
+                    if (name === 'apodization' || name === 'apodization_FWHM'){//} || name = 'calc_apodization')){
+                        this.set_apodization_L();
+                        this.set_apodization_coeff();
+                    }
+
 
 
                 }
