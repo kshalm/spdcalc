@@ -2737,7 +2737,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         //Initial guess
         var guess = props.theta_i;
     }
-    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 35e-90);
+    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 30);
     // console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
     return ans;
 };
@@ -3550,6 +3550,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
 };
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
+    console.log('inside calc_xy', x_start, x_stop, y_start, y_stop);
 
     var P = props.clone();
     props.update_all_angles(P);
@@ -3581,6 +3582,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             Y[dim - k -1] = X[k];
         }
 
+
         // P.theta_s_e = theta_x_e[k];
         // X[k] = PhaseMatch.find_internal_angle(P,"signal");
         // if (theta)
@@ -3589,6 +3591,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         // Y[k] = PhaseMatch.find_internal_angle(P,"signal");
     }
 
+    // console.log(theta_x_e);
 
     var N = dim * dim;
     var PM = new Float64Array( N );

@@ -551,7 +551,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         //Initial guess
         var guess = props.theta_i;
     }
-    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 35e-90);
+    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 30);
     // console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
     return ans;
 };

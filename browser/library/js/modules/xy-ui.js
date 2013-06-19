@@ -175,7 +175,7 @@ define(
                 self.dataLambdasThetas = PMLambdasThetas.data;
                 self.plotLambdasThetas.setXRange([ l_start, l_stop ]);
                 self.plotLambdasThetas.setYRange([ t_start, t_stop ]);
-                // console.log(PMLambdasThetas);
+                console.log('BLAH', po.get('theta_start'), po.get('theta_stop') * 180/Math.PI);
                 // self.plotLambdasThetas.setYRange(PMLambdasThetas.theta_s);
 
                 // Theta vs Phi in crystal
