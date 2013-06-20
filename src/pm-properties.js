@@ -106,6 +106,7 @@
             var COS_THETA_S = Math.cos(theta_s);
             var SIN_PHI = Math.sin(phi);
             var COS_PHI = Math.cos(phi);
+            
             var SIN_PHI_S = Math.sin(phi_s);
             var COS_PHI_S = Math.cos(phi_s);
 
@@ -147,6 +148,8 @@
 
             var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
             var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
+
+            // var phit= this.phi*180/Math.PI;
 
             var n = 1;
 

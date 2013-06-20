@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-06-18
+ * phasematchjs v0.0.1a - 2013-06-20
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -3138,6 +3138,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
             var COS_THETA_S = Math.cos(theta_s);
             var SIN_PHI = Math.sin(phi);
             var COS_PHI = Math.cos(phi);
+            
             var SIN_PHI_S = Math.sin(phi_s);
             var COS_PHI_S = Math.cos(phi_s);
 
@@ -3179,6 +3180,8 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
             var nslow = Math.sqrt(2/ (B + Math.sqrt(D)));
             var nfast = Math.sqrt(2/ (B - Math.sqrt(D)));
+
+            // var phit= this.phi*180/Math.PI;
 
             var n = 1;
 
@@ -3499,11 +3502,10 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
-    // PhaseMatch.updateallangles(props);
-    // console.log("Calculating JSA", props.temp);
 
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
+    
 
     if (P.brute_force){
         dim = P.brute_dim;
@@ -3550,10 +3552,11 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
 };
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
-    console.log('inside calc_xy', x_start, x_stop, y_start, y_stop);
+    console.log('inside calc_xy',props.phi*180/Math.PI);
 
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
+    // console.log('After clone',props.phi*180/Math.PI);
 
     P.phi_i = (P.phi_s + Math.PI);
 
@@ -3582,13 +3585,6 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             Y[dim - k -1] = X[k];
         }
 
-
-        // P.theta_s_e = theta_x_e[k];
-        // X[k] = PhaseMatch.find_internal_angle(P,"signal");
-        // if (theta)
-
-        // P.theta_s_e = theta_y_e[k];
-        // Y[k] = PhaseMatch.find_internal_angle(P,"signal");
     }
 
     // console.log(theta_x_e);
@@ -3614,6 +3610,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
+
         if (P.brute_force) {
            P.brute_force_theta_i(P); //use a search. could be time consuming. 
         }
@@ -3621,8 +3618,11 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             //calculate the correct idler angle analytically.
             P.optimum_idler(P);
         }
+
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+
+        // console.log('inside !',props.phi*180/Math.PI);
 
     }
     var endTime = new Date();
@@ -3633,8 +3633,8 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 
 PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l_start, l_stop, t_start, t_stop, dim){
 
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
 
     P.phi_i = (P.phi_s + Math.PI);
 
@@ -3697,9 +3697,8 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
 
 PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_start, p_stop, dim){
 
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
-
     P.phi_i = (P.phi_s + Math.PI);
 
     var i;
@@ -3736,8 +3735,8 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
 
 PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_start, x_stop, y_start, y_stop, dim){
 
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
 
     if (P.brute_force){
         dim = P.brute_dim;
@@ -3794,8 +3793,8 @@ PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_
 
 PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idler_theta(props, x_start, x_stop, y_start, y_stop, dim){
 
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
 
     var i;
 
@@ -3848,8 +3847,8 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
 
 PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(props, x_start, x_stop, y_start, y_stop, dim){
 
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
 
     var i;
     var X = PhaseMatch.linspace(x_start, x_stop, dim);
@@ -3883,8 +3882,8 @@ PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(
 */
 PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop, y_start, y_stop, ls_start, ls_stop, li_start, li_stop, dim, params){
 
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
 
 
     if (P.brute_force && dim>P.brute_dim){
@@ -3963,8 +3962,8 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
 
 PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_stop, y_start, y_stop, dim){
 
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
 
 
     //temporarily setup the idler angle
@@ -4027,9 +4026,9 @@ PhaseMatch.calc_XY_fixed_idler = function calc_XY_fixed_idler(props, x_start, x_
 
 
 PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, x_stop, y_start, y_stop, BW, dim){
-    // dim = 50;
+
+    props.update_all_angles();
     var P = props.clone();
-    props.update_all_angles(P);
 
     P.optimum_idler(P);
     P.phi_i = P.phi_s + Math.PI;
