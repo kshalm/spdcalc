@@ -54,6 +54,8 @@ define(
                     bottom: 60
                 };
 
+                this.heatmapmargins = margins;
+
                 // init plot
                 self.plot2dSignal = new HeatMap({
                     title: 'Idler spatial mode',
@@ -173,18 +175,19 @@ define(
                 var yy = self.plot2dSignal.scales.y;
                 var oneoveresquared = 1.699 *W;
 
+
                 circleFWHM.enter()
                     .append('circle')
-                    .attr("r", Math.abs(xx(X0-W/2) - xx(X0))*180/Math.PI)
-                    .attr("transform", "translate(80, 60)")
+                    .attr("r", Math.abs(xx(X0+W/2) - xx(X0))*180/Math.PI)
+                    .attr("transform", "translate(" + this.heatmapmargins.left +',' + this.heatmapmargins.top +")")
                     .style("fill", 'transparent')
                     .style('stroke', '#1ABC9C')
                     .style('stroke-width', 2)
-                    .style('stroke-opacity', 0.3);
+                    .style('stroke-opacity', 0.6);
 
 
                 circleFWHM.attr('cx', function(d) {
-                        console.log(xx(X0 * 180/Math.PI), yy(Y0 * 180/Math.PI), X0*180/Math.PI, self.plot2dSignal.scales.x( X0*180/Math.PI ));
+                        // console.log(xx(X0 * 180/Math.PI), yy(Y0 * 180/Math.PI), X0*180/Math.PI, self.plot2dSignal.scales.x( X0*180/Math.PI ));
                         return xx(X0 * 180/Math.PI);
                     });
 
@@ -192,9 +195,16 @@ define(
                         return self.plot2dSignal.scales.y( Y0*180/Math.PI );
                     });
 
+
+                // circleoneoveresquared = circleFWHM;
+
+                // circleoneoveresquared
+                //     .attr("r", Math.abs(xx(X0+oneoveresquared/2) - xx(X0))*180/Math.PI)
+                //     .style('stroke-opacity', 0.3);
+                    
                 circleoneoveresquared.enter()
                     .append('circle')
-                    .attr("r", Math.abs(xx(X0-oneoveresquared/2) - xx(X0))*180/Math.PI)
+                    .attr("r", Math.abs(xx(X0+oneoveresquared/2) - xx(X0))*180/Math.PI)
                     .attr("transform", "translate(80, 60)")
                     .style("fill", 'transparent')
                     .style('stroke', '#1ABC9C')
@@ -203,7 +213,6 @@ define(
 
 
                 circleoneoveresquared.attr('cx', function(d) {
-                        console.log(xx(X0 * 180/Math.PI), yy(Y0 * 180/Math.PI), X0*180/Math.PI, self.plot2dSignal.scales.x( X0*180/Math.PI ));
                         return xx(X0 * 180/Math.PI);
                     });
 
@@ -211,8 +220,48 @@ define(
                         return self.plot2dSignal.scales.y( Y0*180/Math.PI );
                     });
 
+                // Now draw labels on graph 
+                var FWHMLabel = self.plot2dSignal.svg.selectAll("text").data([0]);
+                var oneoveresquaredLabel = self.plot2dSignal.svg.selectAll("text").data([20]);
+
+                oneoveresquaredLabel.enter()
+                    // .append("text")
+                    // .attr("y", 0)
+                    // .attr("dy", 20)
+                    // .attr("x", 200/2)
+                    // .attr("dx", 50)
+                    // .style("text-anchor", "middle")
+                    // .text( 'helloworld' )
+                    // ;
+                    .append('text')
+                    .attr("x",  xx(X0 * 180/Math.PI))
+                    .attr("transform", "translate(80, 60)")
+                    .attr("y",  self.plot2dSignal.scales.y( Y0*180/Math.PI ))
+                    .attr("dx", 60)
+                    .attr("dy", 20)
+                    .attr("text-anchor", "middle")
+                    .text('Signal 1/e^2')
+                    .attr('fill',  '#1ABC9C');
+                    // 
                
                 // circle.exit().remove();
+                
+                // //Add lines
+                var line1 = self.plot2dSignal.svg.selectAll('line').data([ 0 ]);
+
+                // // create
+                line1.enter()
+                    .append('line')
+                    .attr("x1", 200)
+                    .attr("y1", 200)
+                    .attr("x2", 300)
+                    .attr("y2", 200)
+                    .style('stroke-width', 2)
+                    .style('stroke-opacity', 1.0);
+
+                // line.exit().remove();
+                
+
             },
 
             draw: function(){
