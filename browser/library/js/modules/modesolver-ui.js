@@ -100,16 +100,16 @@ define(
                 var self = this;
                 var po = this.plotOpts;
 
-                var dim = 100;
+                // var dim = 100;
 
-                if (props.brute_force){
-                    dim = props.brute_dim;
+                // if (props.brute_force){
+                //     dim = props.brute_dim;
                     
-                }
+                // }
                 // console.log("BF = ", props.brute_force);
                 // console.log("DIM", dim, props.brute_dim);
 
-                var scale = 5;
+                var scale = 10;
                 var BW = 20e-12;
 
                 // props.W_sx = .1*Math.PI/180;
@@ -117,10 +117,12 @@ define(
                 console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
                 //make sure the angles are correct so we can calculate the right ranges
                 props.phi_i = props.phi_s + Math.PI;
-                props.update_all_angles();
+                props.update_all_angles(); 
+                //find the external idler angle
+                props.theta_i_e = PhaseMatch.find_external_angle(props,'idler');
 
-                var X_0 = Math.sin(props.theta_i)* Math.cos(props.phi_i);
-                var Y_0 = Math.sin(props.theta_i)* Math.sin(props.phi_i);
+                var X_0 = Math.sin(props.theta_i_e)* Math.cos(props.phi_i);
+                var Y_0 = Math.sin(props.theta_i_e)* Math.sin(props.phi_i);
 
                 var W = Math.max(props.W_sx, props.W_sy);
 
@@ -139,7 +141,7 @@ define(
                     BW,
                     po.get('grid_size')
                 );
-                console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
+                // console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
 
                 // var PM_s = PhaseMatch.calc_XY_mode_solver(
                 //     props, 

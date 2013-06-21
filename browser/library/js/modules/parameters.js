@@ -93,7 +93,7 @@ define(
 
                         if (key === 'theta_s_e'){
                             var theta_s = PhaseMatch.find_internal_angle(self.props, "signal");
-                            // console.log("theta_s int", val);
+                            console.log("theta_s int", theta_s*180/Math.PI);
                             self.props.set("theta_s", theta_s);
                         }
                         if (key === 'theta_i_e'){
