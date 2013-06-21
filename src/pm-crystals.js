@@ -216,9 +216,9 @@ PhaseMatch.Crystals('BiBO-1', {
         // var nz = Math.sqrt(3.6545+0.0511/(sq(lambda)-0.0371)-0.0226*sq(lambda));
 
         // http://www.newlightphotonics.com/bibo-properties.html
-        var nx = (3.0740 + 0.0323/(sq(lambda)-0.0316)-0.01337*sq(lambda));
-        var ny = (3.1685 + 0.0373/(sq(lambda)-0.0346)-0.01750*sq(lambda));
-        var nz = (3.6545 + 0.0511/(sq(lambda)-0.0371)-0.0226*sq(lambda));
+        var nx = Math.sqrt(3.0740 + 0.0323/(sq(lambda)-0.0316)-0.01337*sq(lambda));
+        var ny = Math.sqrt(3.1685 + 0.0373/(sq(lambda)-0.0346)-0.01750*sq(lambda));
+        var nz = Math.sqrt(3.6545 + 0.0511/(sq(lambda)-0.0371)-0.0226*sq(lambda));
 
         // var dnx = 4.8e-5;
         // var dny = 4.4e-6;
