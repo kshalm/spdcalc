@@ -535,14 +535,19 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
     if (P.brute_force){
         dim = P.brute_dim;
-        // dim_lambda = Math.round(dim_lambda/5)+1;
+        dim_lambda = Math.round(dim_lambda/5)+1;
     }
 
     //convert the angular FWHM outside the xtal to sigma inside.
     // var W_sx = P.W_sx / P.n_s;
     // var W_sy = P.W_sy / P.n_s;
+    
     var W_sx = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
     var W_sy = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sy/2)/(P.n_s * Math.cos(P.theta_s)));
+    //convert from FWHM to sigma
+    W_sx = W_sx /(2 * Math.sqrt(2*Math.log(2)));
+    W_sy = W_sx;
+    // W_sy = W_sy /(2 * Math.sqrt(2*Math.log(2)));
 
     console.log("Angluar FWHM =", W_sx *180/Math.PI, W_sy * 180/Math.PI, P.theta_s_e*180/Math.PI);
 

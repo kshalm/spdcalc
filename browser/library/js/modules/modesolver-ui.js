@@ -109,7 +109,7 @@ define(
                 // console.log("BF = ", props.brute_force);
                 // console.log("DIM", dim, props.brute_dim);
 
-                var scale = 10;
+                var scale = 5;
                 var BW = 20e-12;
 
                 // props.W_sx = .1*Math.PI/180;
@@ -124,7 +124,8 @@ define(
                 var X_0 = Math.sin(props.theta_i_e)* Math.cos(props.phi_i);
                 var Y_0 = Math.sin(props.theta_i_e)* Math.sin(props.phi_i);
 
-                var W = Math.max(props.W_sx, props.W_sy);
+                // var W = Math.max(props.W_sx, props.W_sy);
+                var W = props.W_sx;
 
                 var x_start = X_0 - scale*W/2;
                 var x_stop = X_0 + scale*W/2;
@@ -156,6 +157,62 @@ define(
                 
                 self.plot2dSignal.setXRange([ converter.to('deg', x_start), converter.to('deg', x_stop) ]);
                 self.plot2dSignal.setYRange([ converter.to('deg', y_start), converter.to('deg', y_stop) ]);
+
+                self.refreshSignalFWHMCircle(W,  X_0, Y_0, props);
+
+            },
+
+            // draw circle outlining FWHM of the signal photon
+            refreshSignalFWHMCircle: function( W, X0, Y0, props ){
+
+                var self = this;
+                var circleFWHM = self.plot2dSignal.svg.selectAll("circle").data([0]);
+                var circleoneoveresquared = self.plot2dSignal.svg.selectAll("circle").data([0]);
+
+                var xx = self.plot2dSignal.scales.x;
+                var yy = self.plot2dSignal.scales.y;
+                var oneoveresquared = 1.699 *W;
+
+                circleFWHM.enter()
+                    .append('circle')
+                    .attr("r", Math.abs(xx(X0-W/2) - xx(X0))*180/Math.PI)
+                    .attr("transform", "translate(80, 60)")
+                    .style("fill", 'transparent')
+                    .style('stroke', '#1ABC9C')
+                    .style('stroke-width', 2)
+                    .style('stroke-opacity', 0.3);
+
+
+                circleFWHM.attr('cx', function(d) {
+                        console.log(xx(X0 * 180/Math.PI), yy(Y0 * 180/Math.PI), X0*180/Math.PI, self.plot2dSignal.scales.x( X0*180/Math.PI ));
+                        return xx(X0 * 180/Math.PI);
+                    });
+
+                circleFWHM.attr('cy', function(d) {
+                        return self.plot2dSignal.scales.y( Y0*180/Math.PI );
+                    });
+
+                circleoneoveresquared.enter()
+                    .append('circle')
+                    .attr("r", Math.abs(xx(X0-oneoveresquared/2) - xx(X0))*180/Math.PI)
+                    .attr("transform", "translate(80, 60)")
+                    .style("fill", 'transparent')
+                    .style('stroke', '#1ABC9C')
+                    .style('stroke-width', 2)
+                    .style('stroke-opacity', 0.3);
+
+
+                circleoneoveresquared.attr('cx', function(d) {
+                        console.log(xx(X0 * 180/Math.PI), yy(Y0 * 180/Math.PI), X0*180/Math.PI, self.plot2dSignal.scales.x( X0*180/Math.PI ));
+                        return xx(X0 * 180/Math.PI);
+                    });
+
+                circleoneoveresquared.attr('cy', function(d) {
+                        return self.plot2dSignal.scales.y( Y0*180/Math.PI );
+                    });
+
+               
+                // circle.exit().remove();
             },
 
             draw: function(){
