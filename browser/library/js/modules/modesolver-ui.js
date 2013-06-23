@@ -171,8 +171,8 @@ define(
                 var deg = 180 / Math.PI;
 
                 var data = [ 
-                    { X0: X0 * deg, Y0: Y0 * deg, r: W/2 * deg, title: 'Half width' },
-                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W/2 * deg, title: '1/e^2' },
+                    { X0: X0 * deg, Y0: Y0 * deg, r: W/2 * deg, opacity: .9, title: 'Signal FWHM'},
+                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W/2 * deg, opacity: 0.3, title: 'Signal 1/e^2' },
                 ];
                 var xx = self.plot2dSignal.scales.x;
                 var yy = self.plot2dSignal.scales.y;
@@ -192,14 +192,16 @@ define(
                     .style('fill', 'transparent')
                     .style('stroke', '#1ABC9C')
                     .style('stroke-width', 2)
-                    .style('stroke-opacity', 0.6)
+                    .style('stroke-opacity', function ( d ){
+                        return d.opacity;
+                    })
                     ;
 
                 // create lines
                 overlaysEnter.append('line')
                     .style('stroke', '#1ABC9C')
                     .style('stroke-width', 2)
-                    .style('stroke-opacity', 1.0)
+                    .style('stroke-opacity', 0.3)
                     ;
 
                 // create text
@@ -248,11 +250,12 @@ define(
                 // update the circle based on data
                 overlays.selectAll('circle')
                     .attr('r', function( d ){ 
+                        // console.log("circle Radius", Math.abs( xx(d.X0 + d.r) - xx(d.X0) ));
 
                         return Math.abs( xx(d.X0 + d.r) - xx(d.X0) ); 
                     })
                     .attr('cx', function( d ) {
-
+                        // console.log("circle x: ", xx( d.X0 ));
                         return xx( d.X0 );
                     })
                     .attr('cy', function( d ) {
