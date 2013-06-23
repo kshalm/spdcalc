@@ -170,14 +170,22 @@ define(
                 var self = this;
                 var deg = 180 / Math.PI;
 
-                var data = [ 
+                var data =[];
+
+                data = [ 
                     { X0: X0 * deg, Y0: Y0 * deg, r: W/2 * deg, opacity: .9, title: 'Signal FWHM'},
                     { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W/2 * deg, opacity: 0.3, title: 'Signal 1/e^2' },
                 ];
                 var xx = self.plot2dSignal.scales.x;
                 var yy = self.plot2dSignal.scales.y;
 
+                console.log("refreshing: ", xx(1*data[0].X0*deg), xx(1*X0*deg), Math.abs( xx(data[0].X0 + data[0].r) - xx(data[0].X0) ));
+
                 var extension = 0.15; // percentage of yrange to extend label line through
+
+                //Need to remove the elements first in order to redraw them
+                self.plot2dSignal.svg.selectAll('.overlay').remove();
+
                 var overlays = self.plot2dSignal.svg.selectAll('.overlay').data( data );
                 
                 var overlaysEnter = overlays.enter()
@@ -217,14 +225,14 @@ define(
                     .attr('y1', function( d, a, idx ){
                         // naive alternating of direction...
                         var sign = (idx % 2 ? -1 : 1);
-                        return xx( d.Y0 + sign * d.r );
+                        return yy( d.Y0 - sign * d.r );
                     })
                     .attr('x2', function( d ){
                         return xx( d.X0 );
                     })
                     .attr('y2', function( d, a, idx ){
                         var sign = (idx % 2 ? -1 : 1);
-                        return xx( d.Y0 + sign * d.r) - sign * (yy.range()[1] - yy.range()[0]) * extension;
+                        return yy( d.Y0 - sign * d.r) - sign * (yy.range()[1] - yy.range()[0]) * extension;
                     })
                     ;
 
@@ -235,7 +243,7 @@ define(
                     })
                     .attr('y', function( d, a, idx ){
                         var sign = (idx % 2 ? -1 : 1);
-                        return xx( d.Y0 + sign * d.r) - sign * (yy.range()[1] - yy.range()[0]) * extension;
+                        return yy( d.Y0 - sign * d.r) - sign * (yy.range()[1] - yy.range()[0]) * extension;
                     })
                     .attr('dx', 0)
                     .attr('dy', function( d, a, idx ){
@@ -250,12 +258,12 @@ define(
                 // update the circle based on data
                 overlays.selectAll('circle')
                     .attr('r', function( d ){ 
-                        // console.log("circle Radius", Math.abs( xx(d.X0 + d.r) - xx(d.X0) ));
+                        console.log("circle Radius", Math.abs( xx(d.X0 + d.r) - xx(d.X0) ));
 
                         return Math.abs( xx(d.X0 + d.r) - xx(d.X0) ); 
                     })
                     .attr('cx', function( d ) {
-                        // console.log("circle x: ", xx( d.X0 ));
+                        console.log("circle x: ", d.X0, ( X0 * deg ));
                         return xx( d.X0 );
                     })
                     .attr('cy', function( d ) {
