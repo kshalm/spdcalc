@@ -173,8 +173,8 @@ define(
                 var data =[];
 
                 data = [ 
-                    { X0: X0 * deg, Y0: Y0 * deg, r: W/2 * deg, opacity: .9, title: 'Signal FWHM'},
-                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W/2 * deg, opacity: 0.3, title: 'Signal 1/e^2' },
+                    { X0: X0 * deg, Y0: Y0 * deg, r: W/2 * deg, opacity: .9, title: 'Signal FWHM', labelX: (X0)*deg, labelY: (Y0+2*W)*deg},
+                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W/2 * deg, opacity: 0.3, title: 'Signal 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+2*W)*deg },
                 ];
                 var xx = self.plot2dSignal.scales.x;
                 var yy = self.plot2dSignal.scales.y;
@@ -225,25 +225,28 @@ define(
                     .attr('y1', function( d, a, idx ){
                         // naive alternating of direction...
                         var sign = (idx % 2 ? -1 : 1);
-                        return yy( d.Y0 - sign * d.r );
+                        return yy( d.Y0 + sign * d.r );
                     })
                     .attr('x2', function( d ){
-                        return xx( d.X0 );
+                        return xx( d.labelX );
                     })
                     .attr('y2', function( d, a, idx ){
                         var sign = (idx % 2 ? -1 : 1);
-                        return yy( d.Y0 - sign * d.r) - sign * (yy.range()[1] - yy.range()[0]) * extension;
+                        // return yy( d.Y0 - sign * d.r) - sign * (yy.range()[1] - yy.range()[0]) * extension;
+                        return yy(d.labelY)+ sign*25;
                     })
                     ;
 
                 // update text properties based on data
                 overlays.selectAll('text')
                     .attr('x', function( d ){
-                        return xx( d.X0 );
+                        return xx( d.labelX );
                     })
                     .attr('y', function( d, a, idx ){
                         var sign = (idx % 2 ? -1 : 1);
-                        return yy( d.Y0 - sign * d.r) - sign * (yy.range()[1] - yy.range()[0]) * extension;
+                        // return yy( d.Y0 - sign * d.r) - sign * (yy.range()[1] - yy.range()[0]) * extension;
+                        // console.log("text y label", yy(d.labelY));
+                        return yy(d.labelY);
                     })
                     .attr('dx', 0)
                     .attr('dy', function( d, a, idx ){
