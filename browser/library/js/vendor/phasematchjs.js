@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-06-22
+ * phasematchjs v0.0.1a - 2013-06-27
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2430,6 +2430,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         // var AP[x] = 1.
 
         // PM = PMang * AP;
+        PM= PMang*180/Math.PI;
     } else {
         // console.log  ("calculating Intensity")
         PM = sq(PM[0]) + sq(PM[1]);
