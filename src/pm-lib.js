@@ -263,6 +263,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
 PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
     var con = PhaseMatch.constants;
     var P = props.clone();
+    P.update_all_angles();
 
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
@@ -288,7 +289,9 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         P.lambda_s = lambda_s[index_s];
         P.lambda_i = lambda_i[index_i];
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-        P.optimum_idler(P); //Need to find the optimum idler.
+        // P.optimum_idler(P); //Need to find the optimum idler.
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
         
         var PMtmp = PhaseMatch.phasematch(P);
         THETA1_real[i] = PMtmp[0];
@@ -298,7 +301,8 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_sta
         P.lambda_s = lambda_i[index_i];
         P.lambda_i = lambda_s[index_s];
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-        P.optimum_idler(P); //Need to find the optimum idler.
+        // P.optimum_idler(P); //Need to find the optimum idler.
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
         
         PMtmp = PhaseMatch.phasematch(P);
         THETA2_real[i] = PMtmp[0];

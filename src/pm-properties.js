@@ -283,6 +283,16 @@
             var arg2 = P.n_s*Math.sin(P.theta_s)/arg;
 
             var theta_i = Math.asin(arg2);
+
+            // Test without the PP
+
+            // arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);
+            // arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s);
+            // arg = Math.sqrt(arg);
+            // arg2 = P.n_s*Math.sin(P.theta_s)/arg;
+            // theta_i = Math.asin(arg2);
+
+
             // return theta_i;
             P.theta_i = theta_i;
             //Update the index of refraction for the idler
