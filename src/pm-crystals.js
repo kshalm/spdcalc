@@ -161,8 +161,8 @@ PhaseMatch.Crystals('KTP-2', {
 /**
  * KTP indicies.
  */
-PhaseMatch.Crystals('KTP-3 Franco Wong', {
-    name: 'KTP ref 3',
+PhaseMatch.Crystals('KTP-3', {
+    name: 'KTP ref 3 (Franco Wong)',
     // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
     info: 'Includes Franco Wong"s modificatin.  http://dx.doi.org/10.1063/1.1668320, http://www.redoptronics.com/KTP-crystal.html',
     indicies: function(lambda, temp){
@@ -208,7 +208,7 @@ PhaseMatch.Crystals('KTP-ADvR', {
         var nx= Math.sqrt(3.29100 + 0.0414/(sq(lambda)-0.03978)+ 9.35522/(sq(lambda) -31.45571));
         var ny= Math.sqrt(3.45018  + 0.04341/(sq(lambda)-0.04597)+ 16.98825/(sq(lambda) -39.43799));
         var nz= Math.sqrt(4.59423  + 0.06206/(sq(lambda)-0.04763)+ 110.80672/(sq(lambda) -86.12171));
-        
+
         // TODO: These temperature coefficients need to be modified.
         var dnx= 1.1e-5;
         var dny= 1.3e-5;
