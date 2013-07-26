@@ -230,6 +230,8 @@ define(
                 // Hong-Ou-Mandel dip
                 // var t_start = 0e-15;
                 // var t_stop = 10000e-15;
+                
+                var starttime = new Date();
                 var data1d = []
                     ,dim = 200
                     ,po = self.plotOpts
@@ -249,6 +251,9 @@ define(
                         dim
                     )
                     ;
+
+                 var endtime = new Date();
+                 console.log("Time to run HOM scan code: ", endtime-starttime);
 
                 for ( var i = 0, l = HOM.length; i < l; i ++){
                     data1d.push({

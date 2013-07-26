@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-07-18
+ * phasematchjs v0.0.1a - 2013-07-25
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -1660,6 +1660,7 @@ PhaseMatch.constants = {
 };
 function sq( x ){
     return x * x;
+    // return Math.pow(x,2);
 }
 
 /*
@@ -2930,7 +2931,7 @@ PhaseMatch.Crystals('KTP-2', {
 /**
  * KTP indicies.
  */
-PhaseMatch.Crystals('KTP-3', {
+PhaseMatch.Crystals('KTP-3 Franco Wong', {
     name: 'KTP ref 3',
     // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
     info: 'Includes Franco Wong"s modificatin.  http://dx.doi.org/10.1063/1.1668320, http://www.redoptronics.com/KTP-crystal.html',
@@ -2963,6 +2964,37 @@ PhaseMatch.Crystals('KTP-3', {
         return [nx, ny, nz];
     }
 });
+
+/**
+ * KTP indicies. From ADvR. Kiyoshi Kato and Eiko Takaoka, Applied Optics, Vo. 41, No. 24 5040. 2002
+ */
+PhaseMatch.Crystals('KTP-ADvR', {
+    name: 'KTP ref ADvR',
+    // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
+    info: 'Kiyoshi Kato and Eiko Takaoka, Applied Optics, Vo. 41, No. 24 5040. 2002. Used by ADvR for Flux grown KTP.',
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+
+        var nx= Math.sqrt(3.29100 + 0.0414/(sq(lambda)-0.03978)+ 9.35522/(sq(lambda) -31.45571));
+        var ny= Math.sqrt(3.45018  + 0.04341/(sq(lambda)-0.04597)+ 16.98825/(sq(lambda) -39.43799));
+        var nz= Math.sqrt(4.59423  + 0.06206/(sq(lambda)-0.04763)+ 110.80672/(sq(lambda) -86.12171));
+        
+        // TODO: These temperature coefficients need to be modified.
+        var dnx= 1.1e-5;
+        var dny= 1.3e-5;
+        var dnz= 1.6e-5;
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+
+        // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
+        // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
+
+        return [nx, ny, nz];
+    }
+});
+
 
 
 
@@ -3169,7 +3201,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
         },
 
         calc_Index_PMType : function (lambda, Type, S, photon){
-            var ind = this.crystal.indicies(lambda, this.temp);
+            var ind = this.crystal.indicies(lambda, this.temp); //can I move this out to speed it up?
 
             var nx_squared_inv = 1/sq( ind[0] );
             var ny_squared_inv = 1/sq( ind[1] );

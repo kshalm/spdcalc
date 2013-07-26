@@ -4,6 +4,7 @@
 
 function sq( x ){
     return x * x;
+    // return Math.pow(x,2);
 }
 
 /*

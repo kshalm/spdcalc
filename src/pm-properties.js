@@ -132,7 +132,7 @@
         },
 
         calc_Index_PMType : function (lambda, Type, S, photon){
-            var ind = this.crystal.indicies(lambda, this.temp);
+            var ind = this.crystal.indicies(lambda, this.temp); //can I move this out to speed it up?
 
             var nx_squared_inv = 1/sq( ind[0] );
             var ny_squared_inv = 1/sq( ind[1] );

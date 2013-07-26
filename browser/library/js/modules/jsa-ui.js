@@ -129,7 +129,7 @@ define(
                 self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
                 // console.log(jsa2d[25]);
                 self.data = PM;
-                console.log(PM);
+                // console.log(PM);
                 
                 // self.plot.setZRange([0, 180]);
                 self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
