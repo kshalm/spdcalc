@@ -1,4 +1,4 @@
-<div class="">
+<div>
 
     <div class="parameters-wrap">
         <div class="row-fluid">
@@ -178,62 +178,73 @@
 
     <!-- Periodic Poling Properties -->
 
-<div class="parameters-wrap collapsed">
-    <div class="row-fluid">
-        <h2 class="title">Periodic Poling</h2>
-        
-        <div class="btn-wrap ">
-            <button class="btn collapse-ctrl" id="collapse-poling">+</button>
+    <div class="parameters-wrap collapsed">
+        <div class="row-fluid">
+            <h2 class="title">Periodic Poling</h2>
+            
+            <div class="btn-wrap ">
+                <button class="btn collapse-ctrl" id="collapse-poling">+</button>
+            </div>
         </div>
+        <section class="form-horizontal">
+            <div class="control-group">
+                <!-- <h4>Periodic Poling</h4> -->
+            </div>
+
+             <div class="control-group">
+                <label class="checkbox control-label">
+                    Calculate poling period
+                    <input type="checkbox" data-parse="float" class="checkbox" name="autocalcpp" {{? it.autocalcpp }} checked="checked" {{?}} />
+                </label>
+            </div>
+
+            <div class="control-group">   
+                <label class="control-label">
+                    Poling period (um)
+                </label>
+                <div class="controls">
+                    <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period" value="{{= this.converter.to('micro', parseFloat( it.poling_period )) }}" />
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="checkbox control-label">
+                    Enable apodization
+                    <input type="checkbox" data-parse="float" class="checkbox" name="calc_apodization" {{? it.calc_apodization }} checked="checked" {{?}} />
+                </label>
+            </div>
+
+            <div class="control-group">   
+                <label class="control-label">
+                    Apodization FWHM (um)
+                </label>
+                <div class="controls">
+                    <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="apodization_FWHM" value="{{= this.converter.to('micro', parseFloat( it.apodization_FWHM )) }}" />
+                </div>
+            </div>
+
+            <div class="control-group">   
+                <label class="control-label">
+                    Apodization steps
+                </label>
+                <div class="controls">
+                    <input type="text" data-parse="float" data-unit="" class="inputbox" name="apodization" value="{{=  parseFloat( it.apodization ) }}" />
+                </div>
+            </div>
+            
+
+        </section>
     </div>
-    <section class="form-horizontal">
-        <div class="control-group">
-            <!-- <h4>Periodic Poling</h4> -->
-        </div>
 
-         <div class="control-group">
-            <label class="checkbox control-label">
-                Calculate poling period
-                <input type="checkbox" data-parse="float" class="checkbox" name="autocalcpp" {{? it.autocalcpp }} checked="checked" {{?}} />
-            </label>
-        </div>
-
-        <div class="control-group">   
-            <label class="control-label">
-                Poling period (um)
-            </label>
-            <div class="controls">
-                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period" value="{{= this.converter.to('micro', parseFloat( it.poling_period )) }}" />
+    <div class="parameters-wrap collapsed">
+        <div class="row-fluid">
+            <h2 class="title">Plot Options</h2>
+            
+            <div class="btn-wrap ">
+                <button class="btn collapse-ctrl" id="collapse-plotopts">+</button>
             </div>
         </div>
-
-        <div class="control-group">
-            <label class="checkbox control-label">
-                Enable apodization
-                <input type="checkbox" data-parse="float" class="checkbox" name="calc_apodization" {{? it.calc_apodization }} checked="checked" {{?}} />
-            </label>
-        </div>
-
-        <div class="control-group">   
-            <label class="control-label">
-                Apodization FWHM (um)
-            </label>
-            <div class="controls">
-                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="apodization_FWHM" value="{{= this.converter.to('micro', parseFloat( it.apodization_FWHM )) }}" />
-            </div>
-        </div>
-
-        <div class="control-group">   
-            <label class="control-label">
-                Apodization steps
-            </label>
-            <div class="controls">
-                <input type="text" data-parse="float" data-unit="" class="inputbox" name="apodization" value="{{=  parseFloat( it.apodization ) }}" />
-            </div>
-        </div>
-        
-
-    </section>
-</div>
+        <div id="plot-opts"></div>
+    </div>
 
 </div>

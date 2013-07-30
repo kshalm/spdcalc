@@ -3,7 +3,9 @@
 //
 
 $sidePanelCollapsed: 70px;
-
+#viewport{
+    min-width:1000px;
+}
 body {
     background-color: $lightgray;
 }
@@ -26,6 +28,7 @@ body {
         /*border: 1px solid $gray;
         @include border-radius( 10px );*/
 
+
         > .upper,
         > .lower {
             position: relative;
@@ -34,9 +37,18 @@ body {
 
         > .upper,
         > .lower,
-        .navbar-inner .container {
+        .navbar-inner {
             width:960px;
             margin: 0 auto;
+        }
+
+        > .upper{
+            margin-top: 4em;
+        }
+
+        .container {
+            margin-left: 20px;
+            margin-right:20px;
         }
 
         > .upper > .right {
@@ -57,9 +69,15 @@ body {
     }
 }
 
-.navbar-inverse .navbar-inner {
+.navbar {
     background-color: #ECF0F1;
     border:none;
+    min-height:40px;
+}
+
+.navbar-inverse .navbar-inner {
+    moz-box-shadow: none;
+    box-shadow: none;
 }
 
 .dropdown {
@@ -92,8 +110,9 @@ body {
 .navbar {
     .site-title {
         float: left;
-        margin: 0 1em 0 0.2em;
+        margin: 0 1em 0 0.0em;
         padding: 5px;
+        padding-left:0px;
         color: $base;
         font-weight: normal;
         font-size: 1.285em;
@@ -131,9 +150,9 @@ body {
     /*width: 100%;*/
     /*width: 300px;*/
     /*width: 220px;*/
-    float: left;
+    /*float: left;*/
     overflow: hidden;
-    padding: 10px;
+    padding: 10px 0 10px 0;
     /*border-bottom: 1px solid $gray;*/
     /*background: #fff;*/
     /*background-color: #1ABC9C;*/
@@ -271,8 +290,19 @@ textarea,
   width: 70px;
 }
 
-label{
-    width: 100px;
+.parameters-wrap label{
+    width: 220px;
+    margin-top: 2em;
+    font-style: italic;
+}   
+.parameters-wrap .control-label{
+    width: 120px;
+    margin-top: 0;
+    font-style: normal;
+}
+
+.control-label{
+    width:120px;
 }
 
 .calcbutton {
@@ -299,14 +329,14 @@ label{
 
     .icon {
         top: 5px;
-        right: -60px;
+        right: -38px;
         left: auto;
     }
 
     .icon-to-fade {
         top: 5px;
         left: auto;
-        right: -60px;
+        right: -38px;
     }
 }
 
@@ -315,11 +345,11 @@ label{
     position: relative;
 }
 #share-url {
-    display: none;
+    display: block;
     width: 170px;
-    position: absolute;
-    top: -11px;
-    right: 0;
+    // position: absolute;
+    //top: -11px;
+    //right: 0;
 }
 
 #time-delay {
@@ -356,10 +386,10 @@ label{
   
   .controls {
     *padding-left: 0px;
-    margin-left: 120px;
+    margin-left: 136px;
     *margin-left: 0;
     &:first-child {
-      *padding-left: 120px;
+      *padding-left: 136px;
     }
     }
 }

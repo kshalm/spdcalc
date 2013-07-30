@@ -46,7 +46,7 @@
         </div>
     </div>
     
-    <div class="upper">
+    <div class="upper row">
 
         <div class="options-wrap span3">
 
@@ -54,7 +54,7 @@
 
             <!-- Plot options -->
 
-            <div class="parameters-wrap collapsed">
+            <!-- <div class="parameters-wrap collapsed">
                 <div class="row-fluid">
                     <h2 class="title">Plot Options</h2>
                     
@@ -63,8 +63,8 @@
                     </div>
                 </div>
                 <div id="plot-opts"></div>
-            </div>
-
+            </div> -->
+        <!-- <div id="plot-opts"></div> -->
          <div class="span3">
             <div class="row-fluid">
                 <h2 class="title"></h2>

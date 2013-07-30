@@ -329,11 +329,14 @@ define(
 
                 self.elMain = self.el.find('#main');
                 self.elParameters = self.el.find('#parameters');
-                self.elPlotOpts = self.el.find('#plot-opts');
+                
                 self.elLogs = self.el.find('#logs');
 
                 // init parameters panel
                 self.elParameters.append( $(tplParametersPanel.render( self.parameters.getAll() )) );
+
+                // self.elPlotOpts = self.el.find('#plot-opts');
+                self.elPlotOpts = self.elParameters.find('#plot-opts');
 
                 self.autocalc = self.elParameters.find('#autocalc').is(':checked');
                 self.autocalc = true;
