@@ -227,12 +227,14 @@ body {
         -moz-border-radius: 13px;
         border-radius: 13px;*/
         padding:0px;
-        font-size:40px;
+        font-size:35px;
         line-height: 60px;
         /*border: 1px solid #ECF0F1;*/
         background: transparent;
         color: #2C3E50;
         color: $gray;
+        font-family: 'monospace', 'Courier New', 'monoFontFamily';
+
     }
 
     .collapse-ctrl:hover{
