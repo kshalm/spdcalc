@@ -64,7 +64,7 @@
                     <div class="row-fluid">
                         <div class="control-group">
                             <div class="calcbutton">
-                                <button class="btn btn-success ctrl-calc">Calculate</button>
+                                <button class="btn ctrl-calc">Calculate</button>
                             </div>
                         </div>
                     </div>
