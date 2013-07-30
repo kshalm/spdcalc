@@ -5,7 +5,7 @@
             <h2 class="title">Crystal Options</h2>
             
             <div class="btn-wrap ">
-                <button class="btn collapse-ctrl" id="collapse-crystal">-</button>
+                <button class="btn collapse-ctrl" id="collapse-crystal">&#x2296;</button>
             </div>
         </div>
 
@@ -78,7 +78,7 @@
         <h2 class="title">Pump Options</h2>
         
         <div class="btn-wrap ">
-            <button class="btn collapse-ctrl" id="collapse-pump">+</button>
+            <button class="btn collapse-ctrl" id="collapse-pump">&#x2295;</button>
         </div>
     </div>
 
@@ -118,7 +118,7 @@
         <h2 class="title">Signal Options</h2>
         
         <div class="btn-wrap ">
-            <button class="btn collapse-ctrl" id="collapse-signal">+</button>
+            <button class="btn collapse-ctrl" id="collapse-signal">&#x2295;</button>
         </div>
     </div>
     <!-- Signal Properties -->
@@ -183,7 +183,7 @@
             <h2 class="title">Periodic Poling</h2>
             
             <div class="btn-wrap ">
-                <button class="btn collapse-ctrl" id="collapse-poling">+</button>
+                <button class="btn collapse-ctrl" id="collapse-poling">&#x2295;</button>
             </div>
         </div>
         <section class="form-horizontal">
@@ -236,12 +236,12 @@
         </section>
     </div>
 
-    <div class="parameters-wrap collapsed">
+    <div class="parameters-wrap collapsed last-parameters">
         <div class="row-fluid">
             <h2 class="title">Plot Options</h2>
             
             <div class="btn-wrap ">
-                <button class="btn collapse-ctrl" id="collapse-plotopts">+</button>
+                <button class="btn collapse-ctrl" id="collapse-plotopts">&#x2295;</button>
             </div>
         </div>
         <div id="plot-opts"></div>

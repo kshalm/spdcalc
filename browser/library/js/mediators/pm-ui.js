@@ -203,7 +203,7 @@ define(
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = self.el.find('#collapse-crystal').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? '-' : '+'
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
                         ;
 
                     $(this).text( text );
@@ -215,7 +215,7 @@ define(
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = self.el.find('#collapse-pump').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? '-' : '+'
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
                         ;
 
                     $(this).text( text );
@@ -227,7 +227,7 @@ define(
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = self.el.find('#collapse-signal').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? '-' : '+'
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
                         ;
 
                     $(this).text( text );
@@ -239,7 +239,7 @@ define(
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = self.el.find('#collapse-poling').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? '-' : '+'
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
                         ;
 
                     $(this).text( text );
@@ -251,7 +251,7 @@ define(
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = self.el.find('#collapse-plotopts').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? '-' : '+'
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
                         ;
 
                     $(this).text( text );
@@ -474,9 +474,10 @@ define(
                     // close all dropdowns on body click
                     $('.dk_open').removeClass('dk_open');
 
-                    if ( ! $(e.target).is('#share-url, .ctrl-share') ){
-                        $('#share-url').hide();
-                    }
+                    // if ( ! $(e.target).is('#share-url, .ctrl-share') ){
+                    //     $('#share-url').hide();
+                    //     // $('#share-url').show();
+                    // }
                 });
 
                 self.emit('ready');

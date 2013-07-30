@@ -2,16 +2,19 @@
 // Styles for the PhaseMatch UI
 //
 
-$sidePanelCollapsed: 70px;
-#viewport{
-    min-width:1000px;
-}
+$sidePanelCollapsed: 60px;
+/*#viewport{
+    width:980px;
+    min-width: 980px;
+}*/
+
 body {
     background-color: $lightgray;
 }
 
 & {
     width: 100%;
+    min-width:980px;
     // width:960px;
     // min-width:960px;
     // margin: 0 auto;
@@ -110,12 +113,24 @@ body {
 .navbar {
     .site-title {
         float: left;
-        margin: 0 1em 0 0.0em;
+        margin: 0em 1em 0 0.0em;
         padding: 5px;
         padding-left:0px;
         color: $base;
         font-weight: normal;
         font-size: 1.285em;
+    }
+
+    .site-logo{
+        background: url(/library/images/logo@2x.png);
+        background-repeat: no-repeat;
+        background-size: 142px 40px;
+        width: 142px;
+        height: 40px;
+        float: left;
+
+        margin: 0.5em 1em 0.5em 0.0em;
+        padding-top:0px;
     }
 
     .ui-module-wrap {
@@ -147,17 +162,9 @@ body {
 }
 
 .parameters-wrap {
-    /*width: 100%;*/
-    /*width: 300px;*/
-    /*width: 220px;*/
-    /*float: left;*/
+
     overflow: hidden;
-    padding: 10px 0 10px 0;
-    /*border-bottom: 1px solid $gray;*/
-    /*background: #fff;*/
-    /*background-color: #1ABC9C;*/
-    /*background-color: #ECF0F1;*/
-    /*background-color: #fff;*/
+    padding: 0px 0 0px 0;
     background-color: transparent;
     /*border: 1px solid #ECF0F1;*/
     border-color: $gray;
@@ -165,17 +172,21 @@ body {
     border-top: 1px solid $gray;
     /*// background: rgba(#fff, 0.3);*/
     @include box-sizing( border-box );
+    padding-bottom: 20px;
 
     .title {
         /*width:100%;*/
         /*width:150px;*/
         float:left;
         margin: 0;
+        margin-top:10px;
         font-weight: bold;
+        /*font-weight: normal;*/
         /*margin-bottom: 2em;*/
         vertical-align: top;
         clear:both;
         font-size: 1em;
+        width:140px;
     }
 
     &.collapsed {
@@ -184,6 +195,8 @@ body {
         background-color: #2C3E50;
         background-color: #fff;
         color: #ECF0F1;
+        padding-bottom: 0px;
+
         .title:after {
             content: '';
         }
@@ -191,6 +204,7 @@ body {
             color:#ECF0F1;
             color: #2C3E50 ;
             font-weight: normal;
+            /*width:140px;*/
         }
         
         /*#parameters {
@@ -207,11 +221,21 @@ body {
     }
     .collapse-ctrl{
         float: right;
-        width:40px;
-        -webkit-border-radius: 25px;
-        -moz-border-radius: 25px;
-        border-radius: 25px;
+        /*width:26px;*/
+    /*    -webkit-border-radius: 13px;
+        -moz-border-radius: 13px;
+        border-radius: 13px;*/
+        padding:0px;
+        font-size:40px;
+        line-height: 60px;
         /*border: 1px solid #ECF0F1;*/
+        background: transparent;
+        color: #2C3E50;
+        color: $gray;
+    }
+
+    .collapse-ctrl:hover{
+        color: #2C3E50;
     }
 
     .btn-wrap {
@@ -232,6 +256,14 @@ body {
     .full {
         width: 100%;
     }
+}
+
+
+
+.last-parameters{
+    border-bottom: 1px solid $gray;
+    padding-bottom: 20px;
+    margin-bottom:40px;
 }
 
 .heat-map {
@@ -305,14 +337,14 @@ textarea,
     width:120px;
 }
 
-.calcbutton {
+/*.calcbutton {
     float:left;
-}
+}*/
 
-.calccheckbox {
-    float:left;
-    width:90px;
-}
+/*.calccheckbox {
+    float:right;
+    width:123px;
+}*/
 
 .dropdown select {
   position: relative;
@@ -342,15 +374,38 @@ textarea,
 
 // share url
 .share-wrap {
-    position: relative;
+    /*position: relative;*/
 }
 #share-url {
-    display: block;
-    width: 170px;
+    /*display: inline;*/
+    width: 120px;
+    float:right;
     // position: absolute;
     //top: -11px;
     //right: 0;
 }
+
+.ctrl-share{
+    float:left;
+    margin-top:6px;
+}
+
+.btn{
+    padding:4px 8px;
+    /*background-color: $gray;*/
+}
+
+.ctrl-calc{
+    padding:10px 75px;
+}
+
+/*.btn.btn-success {
+    background-color: #1abc9c;
+}
+
+.btn.btn-success:hover {
+    background-color: #1abc9c;
+}*/
 
 #time-delay {
     margin: 1em 0;

@@ -262,8 +262,8 @@ define(
                   .text( labels.y )
                   ;
 
-                var colorBarWidth = 100;
-                var colorBarHeight = 16;
+                var colorBarWidth = 60;
+                var colorBarHeight = 12;
                 var dom = z.domain();
                 var colorBarVals = d3.range( dom[0], dom[1], Math.abs(dom[1]-dom[0])/colorBarWidth );
                 var xColorBar = d3.scale.ordinal()
