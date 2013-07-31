@@ -163,12 +163,6 @@ define(
                                     // return;
 
                                     document.location = 'data:Application/octet-stream,' + window.encodeURIComponent(csv);
-                                },
-                                'log-plot-ctrl': function(data) {
-                                    if (data.type === 'heat-map'){
-                                        console.log('dooing something');
-                                        data.logplot = true;
-                                    }
                                 }
                             });
                         }
@@ -264,6 +258,23 @@ define(
                     target.toggleClass('collapsed');
                 });
 
+                // // collapse button for JSA module plot
+                // self.el.on('click', '#collapse-jsa', function(e){
+                //     e.preventDefault();
+                //     // var target = self.elParameters.parent()
+                //     var target = self.el.find('#collapse-JSA').parent().parent().parent()
+                //         ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                //         ;
+
+                //     $(this).text( text );
+                //     target.toggleClass('collapsed');
+                // });
+
+
+
+
+
+                //////////////////////////////////////////////////////////////////////////////////
                 // autocalc checkbox
                 self.el.on('change', '#autocalc', function(){
 

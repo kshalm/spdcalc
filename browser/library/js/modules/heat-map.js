@@ -194,7 +194,7 @@ define(
 
                 this.elTitle.css({
                     'top' : margin.top,
-                    'margin-top' : '-1.6em',
+                    'margin-top' : '-2.4em',
                     'left': margin.left
                 });
 

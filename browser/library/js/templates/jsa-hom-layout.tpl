@@ -1,6 +1,6 @@
 <div class="plot-wrapper last-parameters span7 offset1">
     <div class="row-fluid">
-    	<h2 class="title">Joint Spectral Amplitude</h2>
+    	<h2 class="title">Hong-Ou-Mandel interference between signal and idler photons</h2>
             
             <div class="btn-wrap ">
                 <button class="btn collapse-ctrl" id="collapse-JSA">&#x2296;</button>

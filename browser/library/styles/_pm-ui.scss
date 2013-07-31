@@ -156,13 +156,13 @@ body {
 }
 
 .options-wrap{
-    margin-top:22px;
+    /*margin-top:22px;*/
     /*width: 220px;*/
     /*float: left;
     overflow: hidden;*/
 }
 
-.parameters-wrap {
+.parameters-wrap, .plot-wrapper {
 
     overflow: hidden;
     padding: 0px 0 0px 0;
@@ -233,7 +233,7 @@ body {
         background: transparent;
         color: #2C3E50;
         color: $gray;
-        font-family: 'monospace', 'Courier New', 'monoFontFamily';
+        font-family: 'Courier New', 'monoFontFamily';
 
     }
 
@@ -261,6 +261,9 @@ body {
     }
 }
 
+.plot-wrapper .title{
+    width:450px;
+}
 
 
 .last-parameters{
@@ -276,7 +279,9 @@ body {
 .plot {
 
     .title {
-        font-size: 1.5em;
+        /*font-size: 1.5em;*/
+        font-weight: normal;
+        font-style: normal;
         width: auto;
     }
 
@@ -337,7 +342,7 @@ textarea,
   width: 70px;
 }
 
-.parameters-wrap label{
+.parameters-wrap label, .plot-wrapper label{
     width: 220px;
     margin-top: 2em;
     font-style: italic;

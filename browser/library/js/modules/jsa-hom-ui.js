@@ -7,7 +7,7 @@ define(
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
-        'tpl!templates/jsa-layout.tpl',
+        'tpl!templates/jsa-hom-layout.tpl',
         'tpl!templates/time-delay-ctrl.tpl'
     ],
     function(
@@ -268,7 +268,7 @@ define(
                 // title: 'Hong-Ou-Mandel Dip'
                 var vis = (0.5 -  Math.min.apply(null, HOM))/0.5;
                 console.log("visibility", vis);
-                self.plot1d.setTitle("Hong-Ou-Mandel visbibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
+                self.plot1d.setTitle("Hong-Ou-Mandel visibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
 
 
                 self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
