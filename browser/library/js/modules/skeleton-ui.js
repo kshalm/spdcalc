@@ -107,7 +107,15 @@ define(
 
                 dd.on('click', '.log-plot-ctrl', function(e){
 
-                    self.emit('log-plot', plot.setLogPlot(true));
+                    // self.emit('log-plot', function(){
+                        console.log('inside emit', plot.getLogPlot());
+                        if (plot.getLogPlot() === true){
+                            plot.setLogPlot(false);
+                        }   
+                        else if(plot.getLogPlot() === false){
+                            plot.setLogPlot(true);
+                        }
+                    
                 });
             },
 

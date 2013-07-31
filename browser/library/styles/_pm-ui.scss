@@ -294,15 +294,27 @@ body {
 
     .menu-ctrl {
         position: absolute;
-        left: 28px;
-        top: 22px;
+        left: 0px;
+        top: 26px;
         z-index: 3;
+        font-family: "symbol";
+        
         
         .btn {
-            padding: 4px 8px;
+            padding: 0px 4px;
+            font-size: 12px;
         }
     }
 }
+
+/*.menu-ctrl .btn{
+    background:transparent;
+    color:$firm;
+}
+
+.menu-ctrl .btn:hover, .menu-ctrl .btn:focus{
+    color: #4e6d8d;
+}*/
 
 #logs {
     width:100%;
