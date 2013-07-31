@@ -163,6 +163,12 @@ define(
                                     // return;
 
                                     document.location = 'data:Application/octet-stream,' + window.encodeURIComponent(csv);
+                                },
+                                'log-plot-ctrl': function(data) {
+                                    if (data.type === 'heat-map'){
+                                        console.log('dooing something');
+                                        data.logplot = true;
+                                    }
                                 }
                             });
                         }

@@ -36,11 +36,28 @@ define(
             // use antialiasing when scaling the data 
             antialias: true,
 
+            //show log plot
+            logplot: false,
+
             // use a d3 scale to control the color mapping
-            colorScale: d3.scale.linear()
-                .domain([0, 1])
-                .range(["hsl(210, 100%, 100%)", "hsl(210, 29%, 29%)"])
-                .interpolate(d3.interpolateLab)
+            // colorScale: d3.scale.linear()
+            colorScale: function(zrangeArr){
+                // var colorsc;
+                if (defaults.logplot){
+                    var colorsc = d3.scale.log()
+                        .domain(zrangeArr)
+                        .range(["hsl(210, 100%, 100%)", "hsl(210, 29%, 29%)"])
+                        .interpolate(d3.interpolateLab);
+                }
+                else{
+                    var colorsc =  d3.scale.linear()
+                        .domain(zrangeArr)
+                        .range(["hsl(210, 100%, 100%)", "hsl(210, 29%, 29%)"])
+                        .interpolate(d3.interpolateLab);
+                }
+
+                return colorsc;
+            }
         };
 
         function create2DArray(data, dimx, dimy){
@@ -103,11 +120,24 @@ define(
             this.hiddenCanvas = document.createElement('canvas');
 
             // init scales
-            this.scales = {
-                x: d3.scale.linear().domain( options.xrange ),
-                y: d3.scale.linear().domain( options.yrange ),
-                z: options.colorScale.copy()
-            };
+            
+            if (options.logplot){
+                this.scales = {
+                    x: d3.scale.linear().domain( options.xrange ).nice(),
+                    y: d3.scale.linear().domain( options.yrange ).nice(),
+                    z: options.colorScale([0.001,1])
+                };
+            }
+            else{
+                this.scales = {
+                    x: d3.scale.linear().domain( options.xrange ).nice(),
+                    y: d3.scale.linear().domain( options.yrange ).nice(),
+                    z: options.colorScale([0,1])
+                };
+            }
+
+
+            
 
             this.margin = defaults.margins;
             this.setFormat(options.format);
@@ -184,8 +214,8 @@ define(
                 this.hiddenCanvas.width = w;
                 this.hiddenCanvas.height = h;
 
-                this.scales.x.range([0, w]);
-                this.scales.y.range([h, 0]);
+                this.scales.x.range([0, w]).nice();
+                this.scales.y.range([h, 0]).nice();
 
                 this.refreshAxes();
             },
@@ -193,19 +223,25 @@ define(
             // these only make cosmetic changes...
             setXRange: function( xrangeArr ){
 
-                this.scales.x.domain( xrangeArr );
+                this.scales.x.domain( xrangeArr ).nice();
                 this.refreshAxes();
             },
 
             setYRange: function( yrangeArr ){
 
                 // yes, it should be domain here. not range
-                this.scales.y.domain( yrangeArr );
+                this.scales.y.domain( yrangeArr ).nice();
                 this.refreshAxes();
             },
 
             setZRange: function (zrangeArr){
-                this.scales.z.domain( zrangeArr );
+                // this.scales.z.domain( zrangeArr );
+                this.scales.z = defaults.colorScale(zrangeArr);
+                this.refreshAxes();
+            },
+
+            setLogPlot: function(bool){
+                defaults.logplot = bool;
                 this.refreshAxes();
             },
 
@@ -213,9 +249,10 @@ define(
 
                 var self = this
                     ,svg = this.svgAxis
-                    ,x = this.scales.x
-                    ,y = this.scales.y
+                    ,x = this.scales.x.nice()
+                    ,y = this.scales.y.nice()
                     ,z = this.scales.z
+                    ,logplot = defaults.logplot
                     ,labels = this.labels
                     ,width = this.width
                     ,height = this.height
@@ -226,14 +263,14 @@ define(
                     .scale(x)
                     .tickFormat( d3.format( this.format.x ) )
                     .orient("bottom")
-                    .ticks( (width / 50)|0 )
+                    .ticks( (width / 80)|0 ).tickSubdivide(5).tickSize(6, 3, 0)
                     ;
 
                 var yAxis = d3.svg.axis()
                     .scale(y)
                     .tickFormat( d3.format( this.format.y ) )
                     .orient("left")
-                    .ticks( (height / 40)|0 )
+                    .ticks( (height / 80)|0 ).tickSubdivide(5).tickSize(6, 3, 0)
                     ;
 
                 svg.selectAll('.axis').remove();
@@ -262,7 +299,7 @@ define(
                   .text( labels.y )
                   ;
 
-                var colorBarWidth = 60;
+                var colorBarWidth = 100;
                 var colorBarHeight = 12;
                 var dom = z.domain();
                 var colorBarVals = d3.range( dom[0], dom[1], Math.abs(dom[1]-dom[0])/colorBarWidth );
@@ -297,14 +334,34 @@ define(
                     ;
 
                 var vals = [].concat(dom);
-                vals.splice(1, 0, (dom[1]-dom[0]) / 2);
 
-                var zAxis = d3.svg.axis()
-                    .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
+                if (logplot){ 
+                    vals.splice(1, 0, (dom[1]-dom[0]) / 10);
+                    var zAxis = d3.svg.axis()
+                    // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
+                    .scale( d3.scale.log().domain( dom ).nice().range([0, colorBarWidth]) )
                     .tickValues( vals )
-                    .tickFormat( d3.format( this.format.z ) )
+                    .tickFormat( d3.format( '.1f' ) )
                     .orient("top")
                     ;
+                }
+                else{
+                    vals.splice(1, 0, (dom[1]-dom[0]) / 2);
+                    var zAxis = d3.svg.axis()
+                    .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
+                    .tickValues( vals )
+                    .tickFormat( d3.format( '.1f' ) )
+                    .orient("top")
+                    ;
+                }
+
+                // var zAxis = d3.svg.axis()
+                //     // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
+                //     .scale( d3.scale.log().domain( dom ).nice().range([0, colorBarWidth]) )
+                //     .tickValues( vals )
+                //     .tickFormat( d3.format( '.1f' ) )
+                //     .orient("top")
+                //     ;
 
                 colorbar.call(zAxis);
             },

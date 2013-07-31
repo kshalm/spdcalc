@@ -104,6 +104,11 @@ define(
 
                     self.emit('export-csv', plot.exportData());
                 });
+
+                dd.on('click', '.log-plot-ctrl', function(e){
+
+                    self.emit('log-plot', plot.setLogPlot(true));
+                });
             },
 
             /**
