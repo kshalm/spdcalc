@@ -41,9 +41,9 @@ define(
 
             // use a d3 scale to control the color mapping
             // colorScale: d3.scale.linear()
-            colorScale: function(zrangeArr){
+            colorScale: function(logplot, zrangeArr){
                 // var colorsc;
-                if (defaults.logplot){
+                if (logplot){
                     //make sure we don't set any of the domain values to 0.
                     if (zrangeArr[0] === 0){
                         zrangeArr[0] = 0.01;
@@ -127,23 +127,26 @@ define(
             this.el.append( $(this.canvas).css('zIndex', 1).css('position', 'relative') );
             this.hiddenCanvas = document.createElement('canvas');
 
+            this.logplot = new Boolean();
+            this.logplot = options.logplot;
+
             // init scales
             
-            if (options.logplot){
+            if (this.logplot){
                 this.scales = {
                     x: d3.scale.linear().domain( options.xrange ).nice(),
                     y: d3.scale.linear().domain( options.yrange ).nice(),
-                    z: options.colorScale([0.001,1])
+                    z: options.colorScale(this.logplot, [0.001,1]).copy()
                 };
             }
             else{
                 this.scales = {
                     x: d3.scale.linear().domain( options.xrange ).nice(),
                     y: d3.scale.linear().domain( options.yrange ).nice(),
-                    z: options.colorScale([0,1])
+                    z: options.colorScale(this.logplot, [0,1]).copy()
                 };
             }
-            console.log("initalize",options.logplot);
+            console.log("initalize",this.logplot);
 
             
 
@@ -244,21 +247,21 @@ define(
 
             setZRange: function (zrangeArr){
                 // this.scales.z.domain( zrangeArr );
-                this.scales.z = defaults.colorScale(zrangeArr);
+                this.scales.z = defaults.colorScale(this.logplot,zrangeArr).copy();
                 this.refreshAxes();
             },
 
             setLogPlot: function(bool){
-                defaults.logplot = bool;
+                this.logplot = bool;
                 // console.log('current domain: ', this.scales.z.domain());
-                this.scales.z = defaults.colorScale(this.scales.z.domain());
+                this.scales.z = defaults.colorScale(this.logplot, this.scales.z.domain()).copy();
                 // this.refreshAxes();
                 this.plotData(this.data);
                 this.refreshAxes();
             },
 
             getLogPlot: function(){
-                return defaults.logplot;
+                return this.logplot;
             },
 
             refreshAxes: function(){
@@ -268,7 +271,7 @@ define(
                     ,x = this.scales.x.nice()
                     ,y = this.scales.y.nice()
                     // ,z = this.scales.z
-                    ,z = defaults.colorScale(this.scales.z.domain())
+                    ,z = defaults.colorScale(this.logplot, this.scales.z.domain()).copy()
                     ,labels = this.labels
                     ,width = this.width
                     ,height = this.height
@@ -351,7 +354,7 @@ define(
 
                 var vals = [].concat(dom);
                 // console.log(defaults.logplot);
-                if (defaults.logplot){ 
+                if (this.logplot){ 
                     vals.splice(1, 0, (dom[1]-dom[0]) / 10);
                     var zAxis = d3.svg.axis()
                     // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
@@ -398,7 +401,7 @@ define(
 
                 var img = this.hiddenCtx.getImageData(0, 0, width, height)
                     // ,colorScale = this.scales.z
-                    ,colorScale = defaults.colorScale(this.scales.z.domain())
+                    ,colorScale = defaults.colorScale(this.logplot, this.scales.z.domain()).copy()
                     ,val
                     ,idx
                     ,color
