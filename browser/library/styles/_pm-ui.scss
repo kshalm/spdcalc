@@ -2,6 +2,8 @@
 // Styles for the PhaseMatch UI
 //
 
+$lightgray : #ecf0f1;
+
 $sidePanelCollapsed: 60px;
 /*#viewport{
     width:980px;
@@ -9,7 +11,7 @@ $sidePanelCollapsed: 60px;
 }*/
 
 body {
-    background-color: $lightgray;
+    // background-color: $lightgray;
 }
 
 & {
@@ -73,7 +75,9 @@ body {
 }
 
 .navbar {
-    background-color: #ECF0F1;
+    // background-color: #ECF0F1;
+    background-color: $lightgray;
+    background-color: $base;
     border:none;
     min-height:40px;
 }
@@ -81,6 +85,7 @@ body {
 .navbar-inverse .navbar-inner {
     moz-box-shadow: none;
     box-shadow: none;
+    background-color: transparent;
 }
 
 .dropdown {
@@ -103,7 +108,7 @@ body {
         }
     }
 
-    
+
 }
 
 .btn i {
@@ -116,7 +121,8 @@ body {
         margin: 0em 1em 0 0.0em;
         padding: 5px;
         padding-left:0px;
-        color: $base;
+        // color: $base;
+        color: $white;
         font-weight: normal;
         font-size: 1.285em;
     }
@@ -145,6 +151,7 @@ body {
 .navbar-inverse .brand,
 .navbar-inverse .nav > li > a {
   text-shadow: 0 0px 0 rgba(0, 0, 0, 0);
+  color: #fff;
 }
 
 .loading-msg {
@@ -207,7 +214,7 @@ body {
             font-weight: normal;
             /*width:140px;*/
         }
-        
+
         /*#parameters {
             @include opacity( 0 );
         }*/
@@ -303,8 +310,8 @@ body {
         top: 26px;
         z-index: 3;
         font-family: "symbol";
-        
-        
+
+
         .btn {
             padding: 0px 4px;
             font-size: 12px;
@@ -331,7 +338,7 @@ body {
 
     p {
         font-family: $monoFontFamily;
-        
+
     }
 }
 
@@ -346,7 +353,7 @@ textarea,
     width: 220px;
     margin-top: 2em;
     font-style: italic;
-}   
+}
 .parameters-wrap .control-label{
     width: 120px;
     margin-top: 0;
@@ -431,7 +438,7 @@ textarea,
     margin: 1em 0;
     margin-left: 80px;
     overflow: visible;
-    
+
     // .ui-slider-handle {
     //     height: 26px;
     //     width: 26px;
@@ -458,7 +465,7 @@ textarea,
 }
 
 .form-horizontal {
-  
+
   .controls {
     *padding-left: 0px;
     margin-left: 136px;
