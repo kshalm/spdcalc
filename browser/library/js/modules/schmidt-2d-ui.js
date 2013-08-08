@@ -35,7 +35,9 @@ define(
             showPlotOpts: [
                 'grid_size',
                 'signal-wavelength',
-                'idler-wavelength'
+                'idler-wavelength',
+                'xtal_length_range',
+                'pump_bw_range'
             ],
 
 
@@ -93,7 +95,11 @@ define(
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
-                    'li_stop': lim.lambda_i.max
+                    'li_stop': lim.lambda_i.max,
+                    'xtal_l_start': props.L/3,
+                    'xtal_l_stop': props.L*3,
+                    'bw_start' : props.p_bw/3,
+                    'bw_stop': props.p_bw*3
                 });
             },
 
@@ -108,25 +114,37 @@ define(
                     y: "BW"
                 };
 
-                var x_start = 100e-6;
-                var x_stop = 10000e-6;
+                // var x_start = 100e-6;
+                // var x_stop = 10000e-6;
                 var y_start = .1e-9;
                 var y_stop = 20e-9;
 
 
                 var Tstart = new Date();
                 var PM = PhaseMatch.calc_schmidt_plot(
-                    props, 
-                    x_start, 
-                    x_stop, 
-                    y_start, 
-                    y_stop, 
+                     props, 
+                    self.plotOpts.get('xtal_l_start'),
+                    self.plotOpts.get('xtal_l_stop'),
+                    self.plotOpts.get('bw_start'),
+                    self.plotOpts.get('bw_stop'),
                     self.plotOpts.get('ls_start'), 
                     self.plotOpts.get('ls_stop'),
                     self.plotOpts.get('li_start'), 
                     self.plotOpts.get('li_stop'), 
                     po.get('grid_size'), 
                     params);
+
+                    // props, 
+                    // x_start, 
+                    // x_stop, 
+                    // y_start, 
+                    // y_stop, 
+                    // self.plotOpts.get('ls_start'), 
+                    // self.plotOpts.get('ls_stop'),
+                    // self.plotOpts.get('li_start'), 
+                    // self.plotOpts.get('li_stop'), 
+                    // po.get('grid_size'), 
+                    // params);
 
                 var Tstop = new Date();
                 console.log("Schmidt time = ", Tstop - Tstart);
@@ -136,8 +154,8 @@ define(
 
                 // self.plot.scales.z = d3.scale.linear().domain([0, 50]);
                 self.plot.setZRange([1,5]);
-                self.plot.setXRange( [ converter.to('micro',x_start), converter.to('micro',x_stop)]);
-                self.plot.setYRange( [ converter.to('nano',y_start), converter.to('nano',y_stop)]);
+                self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('xtal_l_start')), converter.to('micro',self.plotOpts.get('xtal_l_stop'))]);
+                self.plot.setYRange( [ converter.to('nano',self.plotOpts.get('bw_start')), converter.to('nano',self.plotOpts.get('bw_stop'))]);
                 
                 // self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 // self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);

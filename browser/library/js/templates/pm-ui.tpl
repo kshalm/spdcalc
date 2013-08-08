@@ -15,11 +15,11 @@
                     <option value="jsa-hom">Hong-Ou-Mandel</option>
                     <option value="modesolver">Mode Solver</option>
                     <option value="schmidt-2d">Spectral Purity</option>
-                    <option value="kitchen_sink">Kitchen Sink</option>
+                   <!--  <option value="kitchen_sink">Kitchen Sink</option> -->
                 </select>
             </div>
             
-            <ul class="nav">
+            <!-- <ul class="nav">
                 <li>
                   <a href="#">
                     Dropdown
@@ -33,17 +33,18 @@
                         <li><a href="#">Element One</a></li>
                         <li><a href="#">Element Two</a></li>
                         <li><a href="#">Element Three</a></li>
-                      </ul> <!-- /Sub menu -->
+                      </ul> 
                     </li>
                     <li><a href="#">Element Three</a></li>
-                  </ul> <!-- /Sub menu -->
+                  </ul> 
                 </li>
                 <li>
                   <a href="#">
                     About
                   </a>
                 </li>
-              </ul>
+              </ul> -->
+
           </div>
         </div>
     </div>

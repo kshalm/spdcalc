@@ -427,10 +427,14 @@
                     this[ name ] = val;
 
                     
-                    if (name === 'apodization' || name === 'apodization_FWHM'){//} || name = 'calc_apodization')){
+                    if (name === 'apodization' || name === 'apodization_FWHM' || name === 'L'){//} || name = 'calc_apodization')){
                         this.set_apodization_L();
                         this.set_apodization_coeff();
                     }
+
+                    // if (name === 'L'){
+                    //     this.set
+                    // }
 
 
 

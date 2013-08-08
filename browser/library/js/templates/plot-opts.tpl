@@ -104,4 +104,48 @@
             </div>
         </div>
     </div>
+
+    <!-- Now for the spectral purity calculator parameters.-->
+    <!-- Crystal Length -->
+    <div id="plot-opt-xtal_length_range">
+        <label>Crystal Length Range</label>
+        <div class="control-group">
+            <label class="control-label">
+                Start (um)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="xtal_l_start" value="{{= this.converter.to('micro', parseFloat( it.xtal_l_start )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Stop (um)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="xtal_l_stop" value="{{= this.converter.to('micro', parseFloat( it.xtal_l_stop )) }}" />
+            </div>
+        </div>
+    </div>
+    <!-- Pump Bandwidth range -->
+    <div id="plot-opt-pump_bw_range">
+        <label>Pump Bandwidth Range</label>
+        <div class="control-group">
+            <label class="control-label">
+                Start (nm)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="bw_start" value="{{= this.converter.to('nano', parseFloat( it.bw_start )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Stop (nm)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="bw_stop" value="{{= this.converter.to('nano', parseFloat( it.bw_stop )) }}" />
+            </div>
+        </div>
+    </div>
 </section>
