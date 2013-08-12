@@ -37,7 +37,7 @@
                 </label>
             </div>
             <div class="control-group">
-                <label class="control-label">
+                <label class="control-label theta">
                     Theta (deg)
                 </label>
                 <div class="controls">

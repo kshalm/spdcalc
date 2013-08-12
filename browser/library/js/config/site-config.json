@@ -1,3 +1,5 @@
 {
-    
+    "tooltips": {
+    	"theta": "<p>Here is some tooltip html</p>"
+    }
 }

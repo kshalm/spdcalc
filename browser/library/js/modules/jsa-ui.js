@@ -7,7 +7,8 @@ define(
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
-        'tpl!templates/jsa-layout.tpl'
+        'tpl!templates/jsa-layout.tpl',
+        'tpl!templates/jsa-docs.tpl'
     ],
     function(
         $,
@@ -17,7 +18,8 @@ define(
         LinePlot,
         SkeletonUI,
         converter,
-        tplJSALayout
+        tplJSALayout,
+        tplDocsJSA
     ) {
 
         'use strict';
@@ -32,6 +34,7 @@ define(
 
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplJSALayout,
+            tplDoc: tplDocsJSA,
             showPlotOpts: [
                 'grid_size',
                 'signal-wavelength',
