@@ -3,6 +3,7 @@ define(
         'jquery',
         'stapes',
         'phasematch',
+        'json!site-config',
         'tpl!templates/pm-ui.tpl',
         'tpl!templates/parameters-panel.tpl',
         'tpl!templates/plot-opts.tpl',
@@ -30,6 +31,7 @@ define(
         $,
         Stapes,
         PhaseMatch,
+        config,
         tplPMUI,
         tplParametersPanel,
         tplPlotOpts,
@@ -348,6 +350,7 @@ define(
                 self.elParameters = self.el.find('#parameters');
                 
                 self.elLogs = self.el.find('#logs');
+                self.elDocs = self.el.find('#docs');
 
                 // init parameters panel
                 self.elParameters.append( $(tplParametersPanel.render( self.parameters.getAll() )) );
@@ -428,6 +431,16 @@ define(
 
                 mod.connect( self );
 
+                self.elDocs.empty();
+
+                if (mod.tplDoc){
+                    self.elDocs.html( mod.tplDoc.render() );
+                }
+
+                if (window.MathJax){
+                    window.MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
+                }
+
                 self.emit('resize');
 
                 return this;
@@ -495,6 +508,13 @@ define(
                     //     $('#share-url').hide();
                     //     // $('#share-url').show();
                     // }
+                });
+
+                // self.elParameters.find('label[title]').tooltip();
+
+                self.elParameters.find('label.theta').tooltip({
+                    title: config.tooltips.theta,
+                    html: true
                 });
 
                 self.emit('ready');

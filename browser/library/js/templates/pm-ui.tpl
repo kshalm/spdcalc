@@ -132,5 +132,6 @@
     <div class="lower">
         
         <div id="logs"></div>
+        <div id="docs"></div>
     </div>
 </div>
