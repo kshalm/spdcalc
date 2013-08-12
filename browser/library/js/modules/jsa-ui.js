@@ -41,13 +41,12 @@ define(
 
             initEvents : function(){
                 var self = this;
-                self.el = $(tplPlots.render());
-
+                // self.el = $(tplPlots.render());
                 // collapse button for JSA module plot
                 self.el.on('click', '#collapse-jsa', function(e){
                     e.preventDefault();
                     // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-JSA').parent().parent().parent()
+                    var target = $(this).parent().parent().parent()
                         ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
                         ;
 
@@ -88,6 +87,7 @@ define(
                 });
 
                 self.addPlot( self.plot );
+                self.initEvents();
             },
 
             autocalcPlotOpts: function(){
