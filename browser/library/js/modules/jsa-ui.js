@@ -38,8 +38,7 @@ define(
             showPlotOpts: [
                 'grid_size',
                 'signal-wavelength',
-                'idler-wavelength',
-                'theta'
+                'idler-wavelength'
             ],
 
             initEvents : function(){

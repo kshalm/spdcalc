@@ -245,7 +245,7 @@ body {
     }
 
     .collapse-ctrl:hover{
-        color: #2C3E50;
+        color: #2C3E50pm
     }
 
     .btn-wrap {
@@ -269,7 +269,7 @@ body {
 }
 
 .plot-wrapper .title{
-    width:450px;
+    width:480px;
 }
 
 
@@ -474,6 +474,10 @@ textarea,
       *padding-left: 136px;
     }
     }
+}
+
+.tooltip{
+    // float:right;
 }
 
 // .circle{

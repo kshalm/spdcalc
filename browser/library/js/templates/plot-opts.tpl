@@ -4,7 +4,7 @@
     <!-- <h3>Plot Options</h3> -->
 
     <div class="control-group">
-        <label class="checkbox control-label" for="autocalc_plotopts"> 
+        <label class="checkbox control-label calc_plotopts" for="autocalc_plotopts"> 
             Auto calculate plot options
             <input type="checkbox" name="autocalc_plotopts" id="autocalc_plotopts" {{? it.autocalc_plotopts }}checked="checked"{{?}}> 
         </label>
@@ -12,7 +12,7 @@
 
     <div id="plot-opt-grid_size">
         <div class="control-group">
-            <label class="control-label">
+            <label class="control-label grid_size">
                 Grid size
             </label>
             <div class="controls">
@@ -22,7 +22,7 @@
     </div>
 
     <div id="plot-opt-signal-wavelength">
-        <label>Signal Wavelength</label>
+        <label class="plot_lambda_s">Signal Wavelength</label>
         <div class="control-group">
             <label class="control-label">
                 Start (nm)
@@ -43,7 +43,7 @@
     </div>
 
     <div id="plot-opt-idler-wavelength">
-        <label>Idler Wavelength</label>
+        <label class="plot_lambda_i">Idler Wavelength</label>
         <div class="control-group">
             <label class="control-label">
                 Start (nm)
@@ -64,7 +64,7 @@
     </div>
 
     <div id="plot-opt-theta">
-        <label>Theta Range</label>
+        <label class="plot_theta_s">Signal Theta Range</label>
         <div class="control-group">
             <label class="control-label">
                 Start (deg)
@@ -85,7 +85,7 @@
     </div>
 
     <div id="plot-opt-time-delay">
-        <label>Time Delay Range</label>
+        <label class="plot_time_delay">Time Delay Range</label>
         <div class="control-group">
             <label class="control-label">
                 Start (fs)
@@ -108,7 +108,7 @@
     <!-- Now for the spectral purity calculator parameters.-->
     <!-- Crystal Length -->
     <div id="plot-opt-xtal_length_range">
-        <label>Crystal Length Range</label>
+        <label class="plot_crystal_length">Crystal Length Range</label>
         <div class="control-group">
             <label class="control-label">
                 Start (um)
@@ -129,7 +129,7 @@
     </div>
     <!-- Pump Bandwidth range -->
     <div id="plot-opt-pump_bw_range">
-        <label>Pump Bandwidth Range</label>
+        <label class="plot_pump_bw">Pump Bandwidth Range</label>
         <div class="control-group">
             <label class="control-label">
                 Start (nm)

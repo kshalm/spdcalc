@@ -512,9 +512,154 @@ define(
 
                 // self.elParameters.find('label[title]').tooltip();
 
+                self.elParameters.find('label.calc_theta').tooltip({
+                    title: config.tooltips.calc_theta,
+                    html: true,
+                    placement: 'top'
+                });
+
                 self.elParameters.find('label.theta').tooltip({
                     title: config.tooltips.theta,
-                    html: true
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.phi').tooltip({
+                    title: config.tooltips.phi,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.length').tooltip({
+                    title: config.tooltips.length,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.temperature').tooltip({
+                    title: config.tooltips.temperature,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.lambda_p').tooltip({
+                    title: config.tooltips.lambda_p,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.pump_bw').tooltip({
+                    title: config.tooltips.pump_bw,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.waist_p').tooltip({
+                    title: config.tooltips.waist_p,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.lambda_s').tooltip({
+                    title: config.tooltips.lambda_s,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.theta_s').tooltip({
+                    title: config.tooltips.theta_s,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.phi_s').tooltip({
+                    title: config.tooltips.phi_s,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.brute_force').tooltip({
+                    title: config.tooltips.brute_force,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.calc_pp').tooltip({
+                    title: config.tooltips.calc_pp,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.poling_period').tooltip({
+                    title: config.tooltips.poling_period,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.calc_apodization').tooltip({
+                    title: config.tooltips.calc_apodization,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.apodization_fwhm').tooltip({
+                    title: config.tooltips.apodization_fwhm,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.apodization_steps').tooltip({
+                    title: config.tooltips.apodization_steps,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.calc_plotopts').tooltip({
+                    title: config.tooltips.calc_plotopts,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.grid_size').tooltip({
+                    title: config.tooltips.grid_size,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.plot_lambda_s').tooltip({
+                    title: config.tooltips.plot_lambda_s,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.plot_lambda_i').tooltip({
+                    title: config.tooltips.plot_lambda_i,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.plot_theta_s').tooltip({
+                    title: config.tooltips.plot_theta_s,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.plot_time_delay').tooltip({
+                    title: config.tooltips.plot_time_delay,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.plot_crystal_length').tooltip({
+                    title: config.tooltips.plot_crystal_length,
+                    html: true,
+                    placement: 'top'
+                });
+
+                self.elParameters.find('label.plot_pump_bw').tooltip({
+                    title: config.tooltips.plot_pump_bw,
+                    html: true,
+                    placement: 'top'
                 });
 
                 self.emit('ready');

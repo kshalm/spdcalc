@@ -44,6 +44,18 @@ define(
                 'time-delay'
             ],
 
+            initEvents : function(){
+                var self = this;
+                self.el.on('click', '#collapse-homjsa', function(e){
+                    e.preventDefault();
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+            },
             /**
              * Initialize Plots
              * @return {void}
@@ -127,6 +139,7 @@ define(
 
                 self.addPlot( self.plot );
                 self.addPlot( self.plot1d );
+                self.initEvents();
             },
 
             refreshJSA: function(){

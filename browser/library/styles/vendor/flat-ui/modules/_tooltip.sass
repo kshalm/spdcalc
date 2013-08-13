@@ -1,6 +1,9 @@
 // Tooltip on hover
 .tooltip
-  font-size: 13px
+  font-size: 12px
+    // left: -80px !important
+    // position: relative !important
+    // top: -80px !important
 
   &.in
     +opacity(1)
@@ -11,7 +14,7 @@
       border-top-color: $base
       border-width: 9px 9px 0
       bottom: 0
-      margin-left: -9px
+      // margin-left: 20px
 
   &.right
     .tooltip-arrow
@@ -39,7 +42,7 @@
   background-color: $base
   line-height: 18px
   padding: 12px 12px
-  text-align: center
-  width: 183px
+  text-align: left
+  // width: 200px
   +border-radius(6px)
 

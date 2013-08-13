@@ -31,7 +31,7 @@
             </div>
 
             <div class="control-group">
-                <label class="checkbox control-label">
+                <label class="checkbox control-label calc_theta">
                     Calculate theta
                     <input id="autocalctheta" type="checkbox" class="inputbox" name="autocalctheta" {{? it.autocalctheta }} checked="checked" {{?}} />
                 </label>
@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label">
+                <label class="control-label phi">
                     Phi (deg)
                 </label>
                 <div class="controls">
@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label">
+                <label class="control-label length">
                     Length (um)
                 </label>
                 <div class="controls">
@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label">
+                <label class="control-label temperature">
                     Temperature
                 </label>
                 <div class="controls">
@@ -87,7 +87,7 @@
             <!-- <h4>Pump Properties</h4> -->
         </div>
         <div class="control-group">   
-            <label class="control-label">
+            <label class="control-label lambda_p">
                 Wavelength (nm)
             </label>
             <div class="controls">
@@ -95,7 +95,7 @@
             </div>
         </div>
         <div class="control-group">   
-            <label class="control-label">
+            <label class="control-label pump_bw">
                 Bandwidth FWHM (nm)
             </label>
             <div class="controls">
@@ -103,7 +103,7 @@
             </div>
         </div>
         <div class="control-group">   
-            <label class="control-label">
+            <label class="control-label waist_p">
                 Waist (um)
             </label>
             <div class="controls">
@@ -127,7 +127,7 @@
             <!-- <h4>Signal Properties</h4> -->
         </div>
         <div class="control-group">   
-            <label class="control-label">
+            <label class="control-label lambda_s">
                 Wavelength (nm)
             </label>
             <div class="controls">
@@ -135,16 +135,16 @@
             </div>
         </div>
         <div class="control-group">   
-            <label class="control-label">
-                Theta_s (deg)
+            <label class="control-label theta_s">
+                Theta (deg)
             </label>
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta_s_e" value="{{= this.converter.to('deg', parseFloat( it.theta_s_e )) }}" />
             </div>
         </div>
         <div class="control-group">   
-            <label class="control-label">
-                Phi_s (deg)
+            <label class="control-label phi_s">
+                Phi (deg)
             </label>
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi_s" value="{{= this.converter.to('deg', parseFloat( it.phi_s )) }}" />
@@ -167,7 +167,7 @@
             </div>
         </div>
         <div class="control-group">
-            <label class="checkbox control-label">
+            <label class="checkbox control-label brute_force">
                 Brute force calculation
                 <input id="brute_force" type="checkbox" class="inputbox" name="brute_force" {{? it.brute_force }} checked="checked" {{?}} />
             </label>
@@ -192,14 +192,14 @@
             </div>
 
              <div class="control-group">
-                <label class="checkbox control-label">
+                <label class="checkbox control-label calc_pp">
                     Calculate poling period
                     <input type="checkbox" data-parse="float" class="checkbox" name="autocalcpp" {{? it.autocalcpp }} checked="checked" {{?}} />
                 </label>
             </div>
 
             <div class="control-group">   
-                <label class="control-label">
+                <label class="control-label poling_period">
                     Poling period (um)
                 </label>
                 <div class="controls">
@@ -208,14 +208,14 @@
             </div>
 
             <div class="control-group">
-                <label class="checkbox control-label">
+                <label class="checkbox control-label calc_apodization">
                     Enable apodization
                     <input type="checkbox" data-parse="float" class="checkbox" name="calc_apodization" {{? it.calc_apodization }} checked="checked" {{?}} />
                 </label>
             </div>
 
-            <div class="control-group">   
-                <label class="control-label">
+            <div class="control-group ">   
+                <label class="control-label apodization_fwhm">
                     Apodization FWHM (um)
                 </label>
                 <div class="controls">
@@ -224,7 +224,7 @@
             </div>
 
             <div class="control-group">   
-                <label class="control-label">
+                <label class="control-label apodization_steps">
                     Apodization steps
                 </label>
                 <div class="controls">

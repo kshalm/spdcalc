@@ -40,6 +40,55 @@ define(
                 'theta'
             ],
 
+            initEvents : function(){
+                var self = this;
+                // self.el = $(tplPlots.render());
+                // collapse button for JSA module plot
+                self.el.on('click', '#collapse-xy-emission', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-theta-phi', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-thetas-thetai', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-lambda-theta', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+            },
+
             /**
              * Initialize Plots
              * @return {void}
@@ -101,6 +150,7 @@ define(
                 self.addPlot( self.plotLambdasThetas );
                 self.addPlot( self.plotThetaPhi );
                 self.addPlot( self.plotThetaTheta );
+                self.initEvents();
             },
 
             autocalcPlotOpts: function(){
