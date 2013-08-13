@@ -40,6 +40,21 @@ define(
                 'pump_bw_range'
             ],
 
+            initEvents : function(){
+                var self = this;
+                // self.el = $(tplPlots.render());
+                // collapse button for JSA module plot
+                self.el.on('click', '#collapse-schmidt', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+            },
 
             /**
              * Initialize Plots
@@ -75,6 +90,7 @@ define(
                 });
 
                 self.addPlot( self.plot );
+                self.initEvents();
 
             },
 
