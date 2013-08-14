@@ -285,6 +285,15 @@ define(
                     self.autocalc = enabled;
                 });
 
+                 //////////////////////////////////////////////////////////////////////////////////
+                // Enable the periodic poling options
+                self.el.on('change', '#enable-calc-pp', function(){
+
+                    var enabled = $(this).is(':checked');
+                    $('#periodic-poling-options').find('input, textarea, button, select').prop('disabled', !enabled);
+                    self.calcpp = enabled;
+                });
+
                 // calculate button
                 self.el.on('click', '.ctrl-calc', function(){
 
@@ -359,7 +368,10 @@ define(
                 self.elPlotOpts = self.elParameters.find('#plot-opts');
 
                 self.autocalc = self.elParameters.find('#autocalc').is(':checked');
+
+                self.calcpp = self.elParameters.find('enable-calc-pp').is(':checked');
                 self.autocalc = true;
+                // self.calcpp = true;
             },
 
             initParameters: function(){

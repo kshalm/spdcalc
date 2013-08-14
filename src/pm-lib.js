@@ -30,7 +30,10 @@
     var delKy = (twoPI * ((n_s * Ss[1] * invLambdaS) + n_i * Si[1] * invLambdaI));
     var delKz = (twoPI * (n_p / P.lambda_p - (n_s * Ss[2] * invLambdaS) - n_i * Si[2] * invLambdaI));
 
-    delKz -= twoPI / (P.poling_period * P.poling_sign);
+    if (P.enable_pp){
+        delKz -= twoPI / (P.poling_period * P.poling_sign);
+    }
+    
     // if (delKz>0){
     //     delKz = delKz - 2*Math.PI/P.poling_period;
     // }
@@ -66,7 +69,7 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     var PMz_imag = 0;
 
     //More advanced calculation of phasematching in the z direction. Don't need it now.
-    if (P.calc_apodization ){
+    if (P.calc_apodization && P.enable_pp){
         var gauss_norm = 1;
         var delL = Math.abs(P.apodization_L[0] - P.apodization_L[1]);
 

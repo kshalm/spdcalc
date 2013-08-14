@@ -399,6 +399,13 @@ textarea,
     }
 }
 
+.checkbox.control-label:disabled .icon, input[type=checkbox][disabled] .icon, input[type=checkbox][disabled] .icon-to-fade{
+// .checkbox.checked.disabled .icon, .radio.checked .disabled{
+    background-position: -90px 0px;
+    // opacity: 0;
+    // display:none;
+}
+
 // share url
 .share-wrap {
     /*position: relative;*/

@@ -47,7 +47,8 @@
         apodization_FWHM: 1600 * con.um,
         use_guassian_approx: false,
         crystal: PhaseMatch.Crystals('KTP-3'),
-        temp: 20
+        temp: 20,
+        enable_pp: true
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );

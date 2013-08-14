@@ -191,47 +191,55 @@
                 <!-- <h4>Periodic Poling</h4> -->
             </div>
 
-             <div class="control-group">
-                <label class="checkbox control-label calc_pp">
-                    Calculate poling period
-                    <input type="checkbox" data-parse="float" class="checkbox" name="autocalcpp" {{? it.autocalcpp }} checked="checked" {{?}} />
-                </label>
-            </div>
-
-            <div class="control-group">   
-                <label class="control-label poling_period">
-                    Poling period (um)
-                </label>
-                <div class="controls">
-                    <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period" value="{{= this.converter.to('micro', parseFloat( it.poling_period )) }}" />
-                </div>
-            </div>
-
             <div class="control-group">
-                <label class="checkbox control-label calc_apodization">
-                    Enable apodization
-                    <input type="checkbox" data-parse="float" class="checkbox" name="calc_apodization" {{? it.calc_apodization }} checked="checked" {{?}} />
+                <label class="checkbox control-label">
+                    Enable periodic poling
+                    <input type="checkbox" data-parse="float" class="checkbox" id="enable-calc-pp" name="enable_pp" {{? it.enable_pp }} checked="checked" {{?}} />
                 </label>
             </div>
 
-            <div class="control-group ">   
-                <label class="control-label apodization_fwhm">
-                    Apodization FWHM (um)
-                </label>
-                <div class="controls">
-                    <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="apodization_FWHM" value="{{= this.converter.to('micro', parseFloat( it.apodization_FWHM )) }}" />
-                </div>
-            </div>
+            <div id="periodic-poling-options"><!-- Start the periodic poling group  -->
 
-            <div class="control-group">   
-                <label class="control-label apodization_steps">
-                    Apodization steps
-                </label>
-                <div class="controls">
-                    <input type="text" data-parse="float" data-unit="" class="inputbox" name="apodization" value="{{=  parseFloat( it.apodization ) }}" />
+                 <div class="control-group">
+                    <label class="checkbox control-label calc-pp">
+                        Calculate poling period
+                        <input type="checkbox" data-parse="float" id="autocalcppid" class="checkbox" name="autocalcpp" {{? it.autocalcpp }} checked="checked" {{?}} />
+                    </label>
                 </div>
-            </div>
-            
+
+                <div class="control-group">   
+                    <label class="control-label poling_period">
+                        Poling period (um)
+                    </label>
+                    <div class="controls">
+                        <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period" value="{{= this.converter.to('micro', parseFloat( it.poling_period )) }}" />
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="checkbox control-label calc_apodization">
+                        Enable apodization
+                        <input type="checkbox" data-parse="float" class="checkbox" name="calc_apodization" {{? it.calc_apodization }} checked="checked" {{?}} />
+                    </label>
+                </div>
+
+                <div class="control-group ">   
+                    <label class="control-label apodization_fwhm">
+                        Apodization FWHM (um)
+                    </label>
+                    <div class="controls">
+                        <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="apodization_FWHM" value="{{= this.converter.to('micro', parseFloat( it.apodization_FWHM )) }}" />
+                    </div>
+                </div>
+
+                <div class="control-group">   
+                    <label class="control-label apodization_steps">
+                        Apodization steps
+                    </label>
+                    <div class="controls">
+                        <input type="text" data-parse="float" data-unit="" class="inputbox" name="apodization" value="{{=  parseFloat( it.apodization ) }}" />
+                    </div>
+            </div><!-- end the periodic poling group  -->
 
         </section>
     </div>
