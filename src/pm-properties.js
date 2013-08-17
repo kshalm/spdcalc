@@ -30,7 +30,7 @@
         theta_i_e: 0,
         phi_s: 0,
         phi_i: Math.PI ,
-        L: 6000 * con.um,
+        L: 2000 * con.um,
         W: 500 * con.um,
         p_bw: 5.35 * con.nm,
         W_sx: .2 * Math.PI/180,

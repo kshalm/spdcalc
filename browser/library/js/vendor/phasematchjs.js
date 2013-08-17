@@ -2711,6 +2711,21 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     return [theta_start, theta_end];
 };
 
+
+PhaseMatch.autorange_poling_period = function autorange_poling_period(props){
+    var P = props.clone();
+    P.update_all_angles();
+    P.calc_poling_period();
+    var diff = 10e-6;
+    var poling_start = P.poling_period - diff;
+    var poling_end = P.poling_period +diff;
+
+    if (poling_start<0){poling_start = 0.1;}
+
+    return [poling_start, poling_end];
+};
+
+
 PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
     var P = props.clone();
 
@@ -3102,7 +3117,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
         theta_i_e: 0,
         phi_s: 0,
         phi_i: Math.PI ,
-        L: 6000 * con.um,
+        L: 2000 * con.um,
         W: 500 * con.um,
         p_bw: 5.35 * con.nm,
         W_sx: .2 * Math.PI/180,
@@ -3761,6 +3776,40 @@ PhaseMatch.calc_PM_Pump_Theta_Poling = function calc_PM_Pump_Theta_Poling(props,
     }
     return PM;
 };
+
+// /* Plot the indicies of refraction of the signal, idler, and pump
+// */
+// PhaseMatch.calc_indicies = function calc_indicies(props, dim){
+
+//     props.update_all_angles();
+//     var P = props.clone();    
+
+//     // if (P.brute_force){
+//     //     dim = P.brute_dim;
+//     // }
+
+//     var i;
+//     var poling = PhaseMatch.linspace(poling_start, poling_stop, dim);
+//     var theta = PhaseMatch.linspace(theta_stop, theta_start, dim); 
+
+//     var N = dim * dim;
+//     var PM = new Float64Array( N );
+
+ 
+//     for (i=0; i<N; i++){
+//         var index_poling = i % dim;
+//         var index_theta = Math.floor(i / dim);
+
+//         P.poling_period = poling[index_poling];
+//         P.theta = theta[index_theta];
+
+//         //crystal has changed angle, so update all angles and indices
+//         P.update_all_angles();
+        
+//         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+//     }
+//     return PM;
+// };
 
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){

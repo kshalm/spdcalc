@@ -209,6 +209,40 @@ PhaseMatch.calc_PM_Pump_Theta_Poling = function calc_PM_Pump_Theta_Poling(props,
     return PM;
 };
 
+// /* Plot the indicies of refraction of the signal, idler, and pump
+// */
+// PhaseMatch.calc_indicies = function calc_indicies(props, dim){
+
+//     props.update_all_angles();
+//     var P = props.clone();    
+
+//     // if (P.brute_force){
+//     //     dim = P.brute_dim;
+//     // }
+
+//     var i;
+//     var poling = PhaseMatch.linspace(poling_start, poling_stop, dim);
+//     var theta = PhaseMatch.linspace(theta_stop, theta_start, dim); 
+
+//     var N = dim * dim;
+//     var PM = new Float64Array( N );
+
+ 
+//     for (i=0; i<N; i++){
+//         var index_poling = i % dim;
+//         var index_theta = Math.floor(i / dim);
+
+//         P.poling_period = poling[index_poling];
+//         P.theta = theta[index_theta];
+
+//         //crystal has changed angle, so update all angles and indices
+//         P.update_all_angles();
+        
+//         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+//     }
+//     return PM;
+// };
+
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
     // console.log('inside calc_xy',props.phi*180/Math.PI);

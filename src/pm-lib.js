@@ -524,6 +524,21 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     return [theta_start, theta_end];
 };
 
+
+PhaseMatch.autorange_poling_period = function autorange_poling_period(props){
+    var P = props.clone();
+    P.update_all_angles();
+    P.calc_poling_period();
+    var diff = 10e-6;
+    var poling_start = P.poling_period - diff;
+    var poling_end = P.poling_period +diff;
+
+    if (poling_start<0){poling_start = 0.1;}
+
+    return [poling_start, poling_end];
+};
+
+
 PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
     var P = props.clone();
 

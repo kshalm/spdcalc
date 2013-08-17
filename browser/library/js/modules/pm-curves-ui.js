@@ -36,12 +36,12 @@ define(
             showPlotOpts: [
                 'grid_size',
                 // 'signal-wavelength',
-                'pm_signal_wavelength',
+                'pm-signal-wavelength',
                 // 'idler-wavelength',
                 'pump-wavelength',
                 'pump-theta',
                 'pump-phi',
-                'poling_period'
+                'poling-period'
             ],
 
             initEvents : function(){
@@ -170,6 +170,7 @@ define(
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
                 lim = PhaseMatch.autorange_lambda(props, threshold);
                 lim_theta = PhaseMatch.autorange_theta(props);
+                var poling_limits = PhaseMatch.autorange_poling_period(props);
                 
                 self.plotOpts.set({
                     'grid_size': 100,
@@ -185,8 +186,8 @@ define(
                     'pump_theta_stop': props.theta + 10*Math.PI/180,
                     'pump_phi_start': 0,
                     'pump_phi_stop': Math.PI/2,
-                    'poling_period_start': 10e-6,
-                    'poling_period_stop': 50e-6,
+                    'poling_period_start': poling_limits[0],
+                    'poling_period_stop': poling_limits[1],
 
                 });
             },
