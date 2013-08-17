@@ -32,7 +32,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         P.lambda_i = lambda_i[index_i];
         
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-
+        // P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
         // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         if (P.brute_force) {
            P.brute_force_theta_i(P); //use a search. could be time consuming. 
@@ -72,9 +72,9 @@ PhaseMatch.calc_PM_Curves = function calc_PM_Curves(props, l_start, l_stop, lp_s
     }
 
     var i;
+    var lambda_p = PhaseMatch.linspace(lp_start, lp_stop, dim); 
     // lambda_s is either the signal or idler wavelength
     var lambda_s = PhaseMatch.linspace(l_stop, l_start, dim);
-    var lambda_p = PhaseMatch.linspace(lp_start, lp_stop, dim); 
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -91,18 +91,6 @@ PhaseMatch.calc_PM_Curves = function calc_PM_Curves(props, l_start, l_stop, lp_s
             P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
             P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-
-            // // P.optimum_idler(P); //Need to find the optimum idler for each angle.
-            // if (P.brute_force) {
-            //    P.brute_force_theta_i(P); //use a search. could be time consuming. 
-            // }
-            // else {
-            //     //calculate the correct idler angle analytically.
-            //     // P.optimum_idler(P);
-            //     // P.theta_i = P.theta_s;
-            //     // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-            //     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-            // }
             
             PM[i] = PhaseMatch.phasematch_Int_Phase(P);
         }
@@ -114,9 +102,7 @@ PhaseMatch.calc_PM_Curves = function calc_PM_Curves(props, l_start, l_stop, lp_s
 };
 
 
-/* This plots the phasematching curve for the signal/idler vs the pump wavelength. It is simialar to the JSA calcualtion.
-*
-*
+/* The crystal theta vs signal wavelength. Somewhat redundant.
 */
 PhaseMatch.calc_PM_Crystal_Tilt = function calc_PM_Crystal_Tilt(props, ls_start, ls_stop, theta_start, theta_stop, dim){
 
@@ -142,7 +128,7 @@ PhaseMatch.calc_PM_Crystal_Tilt = function calc_PM_Crystal_Tilt(props, ls_start,
         var index_s = Math.floor(i / dim);
 
         P.lambda_s = lambda_s[index_s];
-        P.lambda_theta = theta[index_theta];
+        P.theta = theta[index_theta];
         P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
         
         //crystal has changed angle, so update all angles and indices
@@ -155,9 +141,7 @@ PhaseMatch.calc_PM_Crystal_Tilt = function calc_PM_Crystal_Tilt(props, ls_start,
 
 };
 
-/* This plots the phasematching curve for the signal/idler vs the pump wavelength. It is simialar to the JSA calcualtion.
-*
-*
+/* This plots the phasematching curve for crystal theta and phi.
 */
 PhaseMatch.calc_PM_Pump_Theta_Phi = function calc_PM_Pump_Theta_Phi(props, theta_start, theta_stop, phi_start, phi_stop, dim){
 
@@ -188,11 +172,41 @@ PhaseMatch.calc_PM_Pump_Theta_Phi = function calc_PM_Pump_Theta_Phi(props, theta
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
     }
-
-    // var theta_deg = PhaseMatch.linspace(theta_start*180/Math.PI, theta_stop*180/Math.PI, dim);
-    // console.log("theta_deg ", theta_deg);
     return PM;
+};
 
+/* This plots the phasematching curve for Poling Period vs crystal theta.
+*/
+PhaseMatch.calc_PM_Pump_Theta_Poling = function calc_PM_Pump_Theta_Poling(props, poling_start, poling_stop, theta_start, theta_stop, dim){
+
+    props.update_all_angles();
+    var P = props.clone();    
+
+    // if (P.brute_force){
+    //     dim = P.brute_dim;
+    // }
+
+    var i;
+    var poling = PhaseMatch.linspace(poling_start, poling_stop, dim);
+    var theta = PhaseMatch.linspace(theta_stop, theta_start, dim); 
+
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+
+ 
+    for (i=0; i<N; i++){
+        var index_poling = i % dim;
+        var index_theta = Math.floor(i / dim);
+
+        P.poling_period = poling[index_poling];
+        P.theta = theta[index_theta];
+        
+        //crystal has changed angle, so update all angles and indices
+        P.update_all_angles();
+        
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+    }
+    return PM;
 };
 
 
@@ -529,9 +543,9 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
     var P = props.clone();
 
 
-    if (P.brute_force && dim>P.brute_dim){
-        dim = P.brute_dim;
-    }
+    // if (P.brute_force && dim>P.brute_dim){
+    //     dim = P.brute_dim;
+    // }
 
     var xrange = PhaseMatch.linspace(x_start, x_stop, dim);
     var yrange = PhaseMatch.linspace(y_stop, y_start, dim); 

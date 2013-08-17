@@ -40,7 +40,8 @@ define(
                 // 'idler-wavelength',
                 'pump-wavelength',
                 'pump-theta',
-                'pump-phi'
+                'pump-phi',
+                'poling_period'
             ],
 
             initEvents : function(){
@@ -106,22 +107,37 @@ define(
 
                 self.elplotSignal = $(self.plotSignal.el);
 
-                // Phasematching angle vs signal wavelength
-                self.plotTheta = new HeatMap({
+                // // Phasematching angle vs signal wavelength
+                // self.plotTheta = new HeatMap({
+                //     title: 'Phasematching',
+                //     el: self.el.find('.curve-crystal-wrapper').get( 0 ),
+                //     labels: {
+                //         y: 'Signal Wavelength (nm)',
+                //         x: 'Angle of optic axis with respect to pump direction (deg)'
+                //     },
+                //     format: {
+                //         y: '.0f'
+                //     }
+                // });
+
+                // self.elplotTheta = $(self.plotTheta.el);
+
+                // Phasematching poling period vs theta
+                self.plotPolingTheta = new HeatMap({
                     title: 'Phasematching',
-                    el: self.el.find('.curve-crystal-wrapper').get( 0 ),
+                    el: self.el.find('.curve-poling-wrapper').get( 0 ),
                     labels: {
-                        y: 'Signal Wavelength (nm)',
-                        x: 'Angle of optic axis with respect to pump direction (deg)'
+                        x: 'Poling Period (um)',
+                        y: 'Angle of optic axis with respect to pump direction (deg)'
                     },
                     format: {
                         y: '.0f'
                     }
                 });
 
-                self.elplotTheta = $(self.plotTheta.el);
+                self.elplotPolingTheta = $(self.plotPolingTheta.el);
 
-                // Difference between the above two curves.
+                // Phasematching curve for theta and phi.
                 self.plotThetaPhi = new HeatMap({
                     title: 'Phasematching',
                     el: self.el.find('.curve-theta-phi-wrapper').get( 0 ),
@@ -135,7 +151,8 @@ define(
 
 
                 self.addPlot( self.plotSignal );
-                self.addPlot( self.plotTheta );
+                // self.addPlot( self.plotTheta );
+                self.addPlot( self.plotPolingTheta );
                 self.addPlot( self.plotThetaPhi );
                 self.initEvents();
             },
@@ -168,6 +185,8 @@ define(
                     'pump_theta_stop': props.theta + 10*Math.PI/180,
                     'pump_phi_start': 0,
                     'pump_phi_stop': Math.PI/2,
+                    'poling_period_start': 10e-6,
+                    'poling_period_stop': 50e-6,
 
                 });
             },
@@ -199,22 +218,22 @@ define(
             self.plotSignal.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
 
 
-            var PMTheta = PhaseMatch.calc_PM_Crystal_Tilt(
-                    props, 
-                    po.get('pm_signal_wavelength_start'),
-                    po.get('pm_signal_wavelength_stop'),
-                    po.get('pump_theta_start'),
-                    po.get('pump_theta_stop'),
-                    // props.theta - 2*Math.PI/180,
-                    // props.theta + 2*Math.PI/180,
-                    // 399e-9,
-                    // 401e-9,
-                    po.get('grid_size')
-                );
-            // console.log("finished", PMTheta);
-            self.dataTheta = PMTheta;
-            self.plotTheta.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
-            self.plotTheta.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
+            // var PMTheta = PhaseMatch.calc_PM_Crystal_Tilt(
+            //         props, 
+            //         po.get('pm_signal_wavelength_start'),
+            //         po.get('pm_signal_wavelength_stop'),
+            //         po.get('pump_theta_start'),
+            //         po.get('pump_theta_stop'),
+            //         // props.theta - 2*Math.PI/180,
+            //         // props.theta + 2*Math.PI/180,
+            //         // 399e-9,
+            //         // 401e-9,
+            //         po.get('grid_size')
+            //     );
+            // // console.log("finished", PMTheta);
+            // self.dataTheta = PMTheta;
+            // self.plotTheta.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
+            // self.plotTheta.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
 
             var PMThetaPhi = PhaseMatch.calc_PM_Pump_Theta_Phi(
                     props, 
@@ -236,12 +255,18 @@ define(
             self.plotThetaPhi.setYRange([ converter.to('deg',  po.get('pump_phi_start')),converter.to('deg', po.get('pump_phi_stop')) ]);
 
 
-
+            var PMPolingTheta = PhaseMatch.calc_PM_Pump_Theta_Poling(
+                    props, 
+                    po.get('poling_period_start'),
+                    po.get('poling_period_stop'),
+                    po.get('pump_theta_start'),
+                    po.get('pump_theta_stop'),
+                    po.get('grid_size')
+                );
+            self.dataPolingTheta = PMPolingTheta;
+            self.plotPolingTheta.setXRange([ converter.to('micro',  po.get('poling_period_start')),converter.to('micro', po.get('poling_period_stop')) ]);
+            self.plotPolingTheta.setYRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
                 
-                // console.log('inside calculate',self.dataSignal[1]);
-                
-                // self.draw();
-
             },
 
             draw: function(){
@@ -258,7 +283,8 @@ define(
 
                 self.plotSignal.plotData( self.dataSignal );
                 // console.log("fort the plot", self.dataSignal[2])
-                self.plotTheta.plotData( self.dataTheta );
+                // self.plotTheta.plotData( self.dataTheta );
+                self.plotPolingTheta.plotData( self.dataPolingTheta );
                 self.plotThetaPhi.plotData( self.dataThetaPhi);
 
             }

@@ -179,7 +179,7 @@
                 Start (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pump_theta_start" value="{{= this.converter.to('nano', parseFloat( it.pump_theta_start )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="pump_theta_start" value="{{= this.converter.to('deg', parseFloat( it.pump_theta_start )) }}" />
             </div>
         </div>
 
@@ -188,7 +188,7 @@
                 Stop (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pump_theta_stop" value="{{= this.converter.to('nano', parseFloat( it.pump_theta_stop )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="pump_theta_stop" value="{{= this.converter.to('deg', parseFloat( it.pump_theta_stop )) }}" />
             </div>
         </div>
     </div>
@@ -196,13 +196,13 @@
 
     <!-- Pump Phi range to plot for PM curves -->
     <div id="plot-opt-pump-phi">
-        <label class="plot_pump_phi">Crystal phi Range</label>
+        <label class="plot_pump_phi">Crystal Phi Range</label>
         <div class="control-group">
             <label class="control-label">
                 Start (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pump_phi_start" value="{{= this.converter.to('nano', parseFloat( it.pump_phi_start )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="pump_phi_start" value="{{= this.converter.to('deg', parseFloat( it.pump_phi_start )) }}" />
             </div>
         </div>
 
@@ -211,10 +211,33 @@
                 Stop (deg)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pump_phi_stop" value="{{= this.converter.to('nano', parseFloat( it.pump_phi_stop )) }}" />
+                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="pump_phi_stop" value="{{= this.converter.to('deg', parseFloat( it.pump_phi_stop )) }}" />
             </div>
         </div>
     </div>
+
+    <!-- Poling Period range to plot for PM curves -->
+    <div id="plot-opt-poling-period">
+        <label class="plot_poling_period">Poling Period Range</label>
+        <div class="control-group">
+            <label class="control-label">
+                Start (um)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period_start" value="{{= this.converter.to('micro', parseFloat( it.poling_period_start )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Stop (um)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="poling_period_stop" value="{{= this.converter.to('micro', parseFloat( it.poling_period_stop )) }}" />
+            </div>
+        </div>
+    </div>
+
 
     <!-- Signal Wavelength Range for the Phasematching curves.  -->
     <div id="plot-opt-pm-signal-wavelength">
