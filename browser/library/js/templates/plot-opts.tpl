@@ -260,4 +260,19 @@
             </div>
         </div>
     </div>
+
+
+    <!-- Modesolver Signal bandwidth.  -->
+    <div id="plot-opt-collection-bw">
+        <!-- <label class="plot_pm_signal_wavelength">Signal Wavelength Range</label> -->
+        <div class="control-group">
+            <label class="control-label">
+                FWHM Filter bandwidth (nm)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="collection_bw" value="{{= this.converter.to('nano', parseFloat( it.collection_bw )) }}" />
+            </div>
+        </div>
+
+    </div>
 </section>

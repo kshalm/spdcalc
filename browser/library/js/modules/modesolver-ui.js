@@ -36,7 +36,8 @@ define(
                 'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
-                'theta'
+                'theta',
+                "collection-bw"
             ],
 
             initEvents : function(){
@@ -110,7 +111,8 @@ define(
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
-                    'li_stop': lim.lambda_i.max
+                    'li_stop': lim.lambda_i.max,
+                    'collection_bw': 20e-9
                 });
             },
 
@@ -119,30 +121,22 @@ define(
                 var self = this;
                 var po = this.plotOpts;
 
-                // var dim = 100;
-
-                // if (props.brute_force){
-                //     dim = props.brute_dim;
-                    
-                // }
-                // console.log("BF = ", props.brute_force);
-                // console.log("DIM", dim, props.brute_dim);
-
                 var scale = 5;
-                var BW = 20e-12;
+                var BW = 1e-9;
 
-                // props.W_sx = .1*Math.PI/180;
-                // props.W_sy = props.W_sx;
-                // console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
+
                 //make sure the angles are correct so we can calculate the right ranges
                 props.phi_i = props.phi_s + Math.PI;
                 props.update_all_angles(); 
                 //find the external idler angle
                 props.theta_i_e = PhaseMatch.find_external_angle(props,'idler');
 
-                var X_0 = Math.sin(props.theta_i_e)* Math.cos(props.phi_i);
-                var Y_0 = Math.sin(props.theta_i_e)* Math.sin(props.phi_i);
+                var X_0 = Math.asin(Math.sin(props.theta_i_e)* Math.cos(props.phi_i));
+                var Y_0 = Math.asin(Math.sin(props.theta_i_e)* Math.sin(props.phi_i));
 
+                console.log("central idler angles:", props.theta_i_e *180/Math.PI);
+                console.log(po.get('collection_bw')/1e-9);
+                
                 // var W = Math.max(props.W_sx, props.W_sy);
                 var W = props.W_sx;
 
@@ -158,7 +152,7 @@ define(
                     x_stop,
                     y_start,
                     y_stop,
-                    BW,
+                    po.get('collection_bw'),
                     po.get('grid_size')
                 );
                 // console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);

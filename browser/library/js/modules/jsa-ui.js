@@ -132,8 +132,9 @@ define(
                     )
                     ;
 
-                var endTime = new Date();
-                var timeDiff = (endTime - startTime);
+                console.log(PhaseMatch.find_internal_angle(props,"signal")*180/Math.PI);
+                // var endTime = new Date();
+                // var timeDiff = (endTime - startTime);
                 // console.log("time", timeDiff);
 
                 //calculate the Schmidt number
