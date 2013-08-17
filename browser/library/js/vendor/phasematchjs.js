@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-08-14
+ * phasematchjs v0.0.1a - 2013-08-16
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -3556,72 +3556,6 @@ PhaseMatch.Crystals('LiNbO3-1', {
 })();
 
 
-// PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
-
-//     props.update_all_angles();
-//     console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
-//     var P = props.clone();
-//     var theta_s_o = P.theta_s;
-//     var theta_i_o = P.theta_i;
-    
-
-//     if (P.brute_force){
-//         dim = P.brute_dim;
-//     }
-
-//     var i;
-//     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
-//     var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim); 
-
-//     var N = dim * dim;
-//     var PM = new Float64Array( N );
-
-//     var maxpm = 0;
-    
-//     for (i=0; i<N; i++){
-//         var index_s = i % dim;
-//         var index_i = Math.floor(i / dim);
-
-//         P.lambda_s = lambda_s[index_s];
-//         P.lambda_i = lambda_i[index_i];
-
-//         P.theta_s = theta_s_o;
-//         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-//         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-//         P.optimum_idler(P);
-//         var PM_s_optim = PhaseMatch.phasematch_Int_Phase(P);
-
-//         P.theta_i = theta_i_o;
-//         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-//         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-//         P.optimum_signal(P);
-//         var PM_i_optim = PhaseMatch.phasematch_Int_Phase(P);
-
-//         // // P.optimum_idler(P); //Need to find the optimum idler for each angle.
-//         // if (P.brute_force) {
-//         //    P.brute_force_theta_i(P); //use a search. could be time consuming. 
-//         // }
-//         // else {
-//         //     //calculate the correct idler angle analytically.
-//         //     // P.optimum_idler(P);
-//         //     // P.theta_i = P.theta_s;
-//         //     P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-//         //     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-//         // }
-        
-//         PM[i] = Math.max(PM_s_optim, PM_i_optim);
-
-//         if (PM[i]>maxpm){maxpm = PM[i];}
-//     }
-    
-//     // console.log("max pm value = ", maxpm);
-//     // console.log("");
-//     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
-//     console.log(P.theta_s*180/Math.PI, P.theta_i*180/Math.PI );
-//     return PM;
-
-// };
-
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
 
     props.update_all_angles();
@@ -3676,6 +3610,108 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     return PM;
 
 };
+
+/* This plots the phasematching curve for the signal/idler vs the pump wavelength. It is simialar to the JSA calcualtion.
+*
+*
+*/
+PhaseMatch.calc_PM_Curves = function calc_PM_Curves(props, l_start, l_stop, lp_start, lp_stop, type, dim){
+
+    props.update_all_angles();
+    var P = props.clone();    
+
+    if (P.brute_force){
+        dim = P.brute_dim;
+    }
+
+    var i;
+    // lambda_s is either the signal or idler wavelength
+    var lambda_s = PhaseMatch.linspace(l_stop, l_start, dim);
+    var lambda_p = PhaseMatch.linspace(lp_start, lp_stop, dim); 
+
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+
+    if (type === 'signal'){
+        for (i=0; i<N; i++){
+            var index_p = i % dim;
+            var index_s = Math.floor(i / dim);
+
+            P.lambda_s = lambda_s[index_s];
+            P.lambda_p = lambda_p[index_p];
+            P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
+            
+            P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+            P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+            // // P.optimum_idler(P); //Need to find the optimum idler for each angle.
+            // if (P.brute_force) {
+            //    P.brute_force_theta_i(P); //use a search. could be time consuming. 
+            // }
+            // else {
+            //     //calculate the correct idler angle analytically.
+            //     // P.optimum_idler(P);
+            //     // P.theta_i = P.theta_s;
+            //     // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+            //     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+            // }
+            
+            PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        }
+    }
+    console.log(P.lambda_p, P.lambda_s, P.lambda_i);
+
+    return PM;
+
+};
+
+
+/* This plots the phasematching curve for the signal/idler vs the pump wavelength. It is simialar to the JSA calcualtion.
+*
+*
+*/
+PhaseMatch.calc_PM_Crystal_Tilt = function calc_PM_Crystal_Tilt(props, ls_start, ls_stop, theta_start, theta_stop, dim){
+
+    props.update_all_angles();
+    var P = props.clone();    
+
+    // if (P.brute_force){
+    //     dim = P.brute_dim;
+    // }
+
+    var i;
+    // lambda_s is either the signal or idler wavelength
+    var lambda_s = PhaseMatch.linspace(ls_stop, ls_start, dim);
+    var theta = PhaseMatch.linspace(theta_start, theta_stop, dim); 
+
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+
+ 
+    for (i=0; i<N; i++){
+        var index_theta = i % dim;
+        var index_s = Math.floor(i / dim);
+
+        P.lambda_s = lambda_s[index_s];
+        P.lambda_theta = theta[index_theta];
+        P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
+        
+        //crystal has changed angle, so update all angles and indices
+        P.update_all_angles();
+        
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+    }
+    
+    // console.log(P.lambda_p, P.lambda_s, P.lambda_i);
+    // console.log("max pm value = ", maxpm);
+    // console.log("");
+    // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
+    // console.log(P.theta_s*180/Math.PI, P.theta_i*180/Math.PI );
+    return PM;
+
+};
+
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
     console.log('inside calc_xy',props.phi*180/Math.PI);

@@ -63,6 +63,27 @@
         </div>
     </div>
 
+    <div id="plot-opt-pump-wavelength">
+        <label class="plot_lambda_p">Pump Wavelength</label>
+        <div class="control-group">
+            <label class="control-label">
+                Start (nm)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lp_start" value="{{= this.converter.to('nano', parseFloat( it.lp_start )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Stop (nm)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lp_stop" value="{{= this.converter.to('nano', parseFloat( it.lp_stop )) }}" />
+            </div>
+        </div>
+    </div>
+
     <div id="plot-opt-theta">
         <label class="plot_theta_s">Signal Theta Range</label>
         <div class="control-group">

@@ -11,6 +11,7 @@
             <div class="ui-module-wrap pull-left">
                 <select tabindex="1" class="span3" id="ui-modules">
                     <option value="jsa">Joint Spectral Amplitude</option>
+                    <option value="curves">Phasematching Curves</option>
                     <option value="xy">Emission Angle</option>
                     <option value="jsa-hom">Hong-Ou-Mandel</option>
                     <option value="modesolver">Mode Solver</option>

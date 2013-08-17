@@ -25,7 +25,8 @@ define(
         'modules/kitchen-sink-ui',
         'modules/xy-ui',
         'modules/schmidt-2d-ui',
-        'modules/modesolver-ui'
+        'modules/modesolver-ui',
+        'modules/pm-curves-ui'
     ],
     function(
         $,
@@ -53,7 +54,8 @@ define(
         ksUI,
         xyUI,
         schmidtUI,
-        msUI
+        msUI,
+        curvesUI
     ) {
 
         'use strict';
@@ -412,6 +414,8 @@ define(
                 self.set('schmidt-2d', schmidtUI());
                 // Mode solver view
                 self.set('modesolver', msUI());
+                // Phase matching curves view
+                self.set('curves', curvesUI());
             },
 
             /**
