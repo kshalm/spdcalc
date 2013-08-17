@@ -169,4 +169,72 @@
             </div>
         </div>
     </div>
+
+
+    <!-- Theta range to plot for PM curves -->
+    <div id="plot-opt-pump-theta">
+        <label class="plot_pump_theta">Crystal Theta Range</label>
+        <div class="control-group">
+            <label class="control-label">
+                Start (deg)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pump_theta_start" value="{{= this.converter.to('nano', parseFloat( it.pump_theta_start )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Stop (deg)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pump_theta_stop" value="{{= this.converter.to('nano', parseFloat( it.pump_theta_stop )) }}" />
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Pump Phi range to plot for PM curves -->
+    <div id="plot-opt-pump-phi">
+        <label class="plot_pump_phi">Crystal phi Range</label>
+        <div class="control-group">
+            <label class="control-label">
+                Start (deg)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pump_phi_start" value="{{= this.converter.to('nano', parseFloat( it.pump_phi_start )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Stop (deg)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pump_phi_stop" value="{{= this.converter.to('nano', parseFloat( it.pump_phi_stop )) }}" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Signal Wavelength Range for the Phasematching curves.  -->
+    <div id="plot-opt-pm-signal-wavelength">
+        <label class="plot_pm_signal_wavelength">Signal Wavelength Range</label>
+        <div class="control-group">
+            <label class="control-label">
+                Start (deg)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pm_signal_wavelength_start" value="{{= this.converter.to('nano', parseFloat( it.pm_signal_wavelength_start )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Stop (deg)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pm_signal_wavelength_stop" value="{{= this.converter.to('nano', parseFloat( it.pm_signal_wavelength_stop )) }}" />
+            </div>
+        </div>
+    </div>
 </section>

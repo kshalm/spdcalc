@@ -134,7 +134,7 @@ define(
 
                 var endTime = new Date();
                 var timeDiff = (endTime - startTime);
-                console.log("time", timeDiff);
+                // console.log("time", timeDiff);
 
                 //calculate the Schmidt number
                 if (props.brute_force){

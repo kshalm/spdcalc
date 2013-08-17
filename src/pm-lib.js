@@ -429,14 +429,14 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     // console.log(l1/1e-9, l2/1e-9);
 
     var dif = Math.abs(ans-props.lambda_s);
-    console.log(ans/1e-9, ans2/1e-9, P.lambda_s/1e-9, dif/1e-9);
+    // console.log(ans/1e-9, ans2/1e-9, P.lambda_s/1e-9, dif/1e-9);
 
     //Now try to find sensible limits. We want to make sure the range of values isn't too big,
     //but also ensure that if the pump bandwidth is small, that the resulting JSA is visible.
     //This is important for calculating things like the Hong-Ou-Mandel.
     var difmax = 2e-9 * P.lambda_p/775e-9 * P.p_bw/1e-9 ;
 
-    console.log("diff = ", dif/1e-9, difmax/1e-9);
+    // console.log("diff = ", dif/1e-9, difmax/1e-9);
     
     if (difmax>35e-9){
         difmax = 35e-9;
@@ -488,7 +488,7 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
     var gv_i = props.get_group_velocity(props.lambda_i, props.type, props.S_i, "idler");
 
     var zero_delay = props.L * (1/gv_i - 1/gv_s)/2;
-    console.log("minimum of HOM dip = ", zero_delay/1e-15);
+    // console.log("minimum of HOM dip = ", zero_delay/1e-15);
 
     var bw = Math.abs(lambda_stop - lambda_start);
     var coh_time = 1/ (2*Math.PI*con.c / sq(lambda_start + bw/2) * bw); 
@@ -509,7 +509,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     theta_start = Math.max(0, theta_start);
     var theta_end = P.theta_s + P.theta_s*.4;
     theta_end = Math.max(2*Math.PI/180, theta_end);
-    console.log("Before", theta_start*180/Math.PI, theta_end*180/Math.PI);
+    // console.log("Before", theta_start*180/Math.PI, theta_end*180/Math.PI);
     P.theta_s = theta_start;
     P.update_all_angles();
     theta_start = PhaseMatch.find_external_angle(P,"signal");
@@ -517,7 +517,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     P.theta_s = theta_end;
     P.update_all_angles();
     theta_end = PhaseMatch.find_external_angle(P,"signal");
-    console.log("after", theta_start*180/Math.PI, theta_end*180/Math.PI);
+    // console.log("after", theta_start*180/Math.PI, theta_end*180/Math.PI);
 
     // console.log("optimal theta", theta_start*180/Math.PI, theta_end*theta_start*180/Math.PI);
 

@@ -146,7 +146,7 @@ define(
                     z: options.colorScale(this.logplot, [0,1]).copy()
                 };
             }
-            console.log("initalize",this.logplot);
+            // console.log("initalize",this.logplot);
 
             
 

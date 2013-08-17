@@ -163,7 +163,7 @@ define(
                     // params);
 
                 var Tstop = new Date();
-                console.log("Schmidt time = ", Tstop - Tstart);
+                // console.log("Schmidt time = ", Tstop - Tstart);
                 // console.log(PM);
                 self.data = PM;
 

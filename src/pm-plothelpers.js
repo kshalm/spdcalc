@@ -107,7 +107,7 @@ PhaseMatch.calc_PM_Curves = function calc_PM_Curves(props, l_start, l_stop, lp_s
             PM[i] = PhaseMatch.phasematch_Int_Phase(P);
         }
     }
-    console.log(P.lambda_p, P.lambda_s, P.lambda_i);
+    // console.log(P.lambda_p, P.lambda_s, P.lambda_i);
 
     return PM;
 
@@ -130,6 +130,7 @@ PhaseMatch.calc_PM_Crystal_Tilt = function calc_PM_Crystal_Tilt(props, ls_start,
     var i;
     // lambda_s is either the signal or idler wavelength
     var lambda_s = PhaseMatch.linspace(ls_stop, ls_start, dim);
+    // internal angle of the optic axis wrt to the pump direction.
     var theta = PhaseMatch.linspace(theta_start, theta_stop, dim); 
 
     var N = dim * dim;
@@ -149,19 +150,54 @@ PhaseMatch.calc_PM_Crystal_Tilt = function calc_PM_Crystal_Tilt(props, ls_start,
         
         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
     }
-    
-    // console.log(P.lambda_p, P.lambda_s, P.lambda_i);
-    // console.log("max pm value = ", maxpm);
-    // console.log("");
-    // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
-    // console.log(P.theta_s*180/Math.PI, P.theta_i*180/Math.PI );
+
+    return PM;
+
+};
+
+/* This plots the phasematching curve for the signal/idler vs the pump wavelength. It is simialar to the JSA calcualtion.
+*
+*
+*/
+PhaseMatch.calc_PM_Pump_Theta_Phi = function calc_PM_Pump_Theta_Phi(props, theta_start, theta_stop, phi_start, phi_stop, dim){
+
+    props.update_all_angles();
+    var P = props.clone();    
+
+    // if (P.brute_force){
+    //     dim = P.brute_dim;
+    // }
+
+    var i;
+    var theta = PhaseMatch.linspace(theta_start, theta_stop, dim); 
+    var phi = PhaseMatch.linspace(phi_stop, phi_start, dim);
+
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+
+ 
+    for (i=0; i<N; i++){
+        var index_theta = i % dim;
+        var index_phi = Math.floor(i / dim);
+
+        P.theta = theta[index_theta];
+        P.phi = phi[index_phi];
+
+        //crystal has changed angle, so update all angles and indices
+        P.update_all_angles();
+        
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+    }
+
+    // var theta_deg = PhaseMatch.linspace(theta_start*180/Math.PI, theta_stop*180/Math.PI, dim);
+    // console.log("theta_deg ", theta_deg);
     return PM;
 
 };
 
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
-    console.log('inside calc_xy',props.phi*180/Math.PI);
+    // console.log('inside calc_xy',props.phi*180/Math.PI);
 
     props.update_all_angles();
     var P = props.clone();
@@ -174,8 +210,6 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     }
 
     var i;
-    // var X = PhaseMatch.linspace(x_start, x_stop, dim);
-    // var Y = PhaseMatch.linspace(y_start, y_stop, dim); 
 
     var theta_x_e = PhaseMatch.linspace(x_start, x_stop, dim);
     var theta_y_e = PhaseMatch.linspace(y_stop, y_start, dim);
@@ -234,8 +268,8 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         // console.log('inside !',props.phi*180/Math.PI);
 
     }
-    var endTime = new Date();
-    var timeDiff = (endTime - startTime);
+    // var endTime = new Date();
+    // var timeDiff = (endTime - startTime);
     return PM;
 
 };
@@ -562,7 +596,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
     }
     
     // console.log("max pm value = ", maxpm);
-    console.log("Lowest Schmidt = ", maxschmidt, " , X = ", x_ideal, ", Y = ", y_ideal);
+    // console.log("Lowest Schmidt = ", maxschmidt, " , X = ", x_ideal, ", Y = ", y_ideal);
     // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
     
     return S;
@@ -657,7 +691,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     W_sy = W_sx;
     // W_sy = W_sy /(2 * Math.sqrt(2*Math.log(2)));
 
-    console.log("Angluar FWHM =", W_sx *180/Math.PI, W_sy * 180/Math.PI, P.theta_s_e*180/Math.PI);
+    // console.log("Angluar FWHM =", W_sx *180/Math.PI, W_sy * 180/Math.PI, P.theta_s_e*180/Math.PI);
 
     P.optimum_idler(P);
     P.phi_i = P.phi_s + Math.PI;

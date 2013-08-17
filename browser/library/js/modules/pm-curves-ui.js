@@ -35,16 +35,19 @@ define(
             tplPlots: tplCurvesLayout,
             showPlotOpts: [
                 'grid_size',
-                'signal-wavelength',
-                'idler-wavelength',
-                'pump-wavelength'
+                // 'signal-wavelength',
+                'pm_signal_wavelength',
+                // 'idler-wavelength',
+                'pump-wavelength',
+                'pump-theta',
+                'pump-phi'
             ],
 
             initEvents : function(){
                 var self = this;
                 // self.el = $(tplPlots.render());
                 // collapse button for JSA module plot
-                self.el.on('click', '#collapse-signal', function(e){
+                self.el.on('click', '#collapse-curve-signal', function(e){
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = $(this).parent().parent().parent()
@@ -55,7 +58,7 @@ define(
                     target.toggleClass('collapsed');
                 });
 
-                self.el.on('click', '#collapse-crystal', function(e){
+                self.el.on('click', '#collapse-curve-crystal', function(e){
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = $(this).parent().parent().parent()
@@ -66,7 +69,7 @@ define(
                     target.toggleClass('collapsed');
                 });
 
-                self.el.on('click', '#collapse-both', function(e){
+                self.el.on('click', '#collapse-curve-theta-phi', function(e){
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = $(this).parent().parent().parent()
@@ -92,8 +95,8 @@ define(
                     title: 'Phasematching',
                     el: self.el.find('.curve-signal-wrapper').get( 0 ),
                     labels: {
-                        y: 'Pump Wavelength (nm)',
-                        x: 'Signal Wavelength (nm)'
+                        x: 'Pump Wavelength (nm)',
+                        y: 'Signal Wavelength (nm)'
                     },
                     format: {
                         x: '.0f',
@@ -108,7 +111,7 @@ define(
                     title: 'Phasematching',
                     el: self.el.find('.curve-crystal-wrapper').get( 0 ),
                     labels: {
-                        y: 'Pump Wavelength (nm)',
+                        y: 'Signal Wavelength (nm)',
                         x: 'Angle of optic axis with respect to pump direction (deg)'
                     },
                     format: {
@@ -119,21 +122,21 @@ define(
                 self.elplotTheta = $(self.plotTheta.el);
 
                 // Difference between the above two curves.
-                self.plotBoth = new HeatMap({
+                self.plotThetaPhi = new HeatMap({
                     title: 'Phasematching',
-                    el: self.el.find('.curve-both-wrapper').get( 0 ),
+                    el: self.el.find('.curve-theta-phi-wrapper').get( 0 ),
                     labels: {
-                        y: 'Signal/Idler Wavelength (nm)',
-                        x: 'Idler Wavelength (nm)'
+                        x: 'Theta of pump with respect to optic axis (deg)',
+                        y: 'Phi of pump with respect to optic axis (deg)'
                     }
                 });
                 
-                self.elplotBoth = $(self.plotBoth.el);
+                self.elplotThetaPhi = $(self.plotThetaPhi.el);
 
 
                 self.addPlot( self.plotSignal );
                 self.addPlot( self.plotTheta );
-                self.addPlot( self.plotBoth );
+                self.addPlot( self.plotThetaPhi );
                 self.initEvents();
             },
 
@@ -157,9 +160,14 @@ define(
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
                     'li_stop': lim.lambda_i.max,
+                    'pm_signal_wavelength_start': lim.lambda_s.min-100e-9, 
+                    'pm_signal_wavelength_stop': lim.lambda_s.min+100e-9, 
                     'lp_start': props.lambda_p - 4e-9,
-                    'lp_stop': props.lambda_p + 4e-9
-
+                    'lp_stop': props.lambda_p + 4e-9,
+                    'pump_theta_start': props.theta - 10*Math.PI/180,
+                    'pump_theta_stop': props.theta + 10*Math.PI/180,
+                    'pump_phi_start': 0,
+                    'pump_phi_stop': Math.PI/2,
 
                 });
             },
@@ -176,50 +184,56 @@ define(
                     ,l_stop =  converter.to('nano', po.get('ls_stop'))
                     ;
 
-                // var PMSignal = PhaseMatch.calc_XY(
-                //     props, 
-                //     -1 * po.get('theta_stop'), 
-                //     po.get('theta_stop'), 
-                //     -1 * po.get('theta_stop'), 
-                //     po.get('theta_stop'), 
-                //     po.get('grid_size')
-                // );
-
             var PMSignal = PhaseMatch.calc_PM_Curves(
                     props, 
-                    po.get('ls_start'),
-                    po.get('ls_stop'),
+                    po.get('pm_signal_wavelength_start'),
+                    po.get('pm_signal_wavelength_stop'),
                     po.get('lp_start'),
                     po.get('lp_stop'),
-                    // 399e-9,
-                    // 401e-9,
-                    // po.get('ls_start')/2,
-                    // po.get('ls_stop')/2,
                     "signal",
                     po.get('grid_size')
                 );
 
             self.dataSignal = PMSignal;
             self.plotSignal.setXRange([ converter.to('nano', po.get('lp_start')),converter.to('nano', po.get('lp_stop')) ]);
-            self.plotSignal.setYRange([ l_start, l_stop ]);
+            self.plotSignal.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
 
 
             var PMTheta = PhaseMatch.calc_PM_Crystal_Tilt(
                     props, 
-                    po.get('ls_start'),
-                    po.get('ls_stop'),
-                    // po.get('lp_start'),
-                    // po.get('lp_stop'),
-                    props.theta - 2*Math.PI/180,
-                    props.theta + 2*Math.PI/180,
+                    po.get('pm_signal_wavelength_start'),
+                    po.get('pm_signal_wavelength_stop'),
+                    po.get('pump_theta_start'),
+                    po.get('pump_theta_stop'),
+                    // props.theta - 2*Math.PI/180,
+                    // props.theta + 2*Math.PI/180,
                     // 399e-9,
                     // 401e-9,
                     po.get('grid_size')
                 );
             // console.log("finished", PMTheta);
             self.dataTheta = PMTheta;
-            self.plotTheta.setXRange([ converter.to('deg', props.theta - 2*Math.PI/180),converter.to('deg',props.theta +2*Math.PI/180) ]);
-            self.plotTheta.setYRange([ l_start, l_stop ]);
+            self.plotTheta.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
+            self.plotTheta.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
+
+            var PMThetaPhi = PhaseMatch.calc_PM_Pump_Theta_Phi(
+                    props, 
+    
+                    po.get('pump_theta_start'),
+                    po.get('pump_theta_stop'),
+                    po.get('pump_phi_start'),
+                    po.get('pump_phi_stop'),
+                    // 0,
+                    // Math.PI/2,
+                    // 0,
+                    // Math.PI,
+
+                    po.get('grid_size')
+                );
+            // console.log("finished", PMThetaPhi);
+            self.dataThetaPhi = PMThetaPhi;
+            self.plotThetaPhi.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
+            self.plotThetaPhi.setYRange([ converter.to('deg',  po.get('pump_phi_start')),converter.to('deg', po.get('pump_phi_stop')) ]);
 
 
 
@@ -245,7 +259,7 @@ define(
                 self.plotSignal.plotData( self.dataSignal );
                 // console.log("fort the plot", self.dataSignal[2])
                 self.plotTheta.plotData( self.dataTheta );
-                self.plotBoth.plotData( self.dataBoth);
+                self.plotThetaPhi.plotData( self.dataThetaPhi);
 
             }
         });

@@ -266,7 +266,7 @@ define(
                     ;
 
                  var endtime = new Date();
-                 console.log("Time to run HOM scan code: ", endtime-starttime);
+                 // console.log("Time to run HOM scan code: ", endtime-starttime);
 
                 for ( var i = 0, l = HOM.length; i < l; i ++){
                     data1d.push({
@@ -280,7 +280,7 @@ define(
                 // Calculate visibility
                 // title: 'Hong-Ou-Mandel Dip'
                 var vis = (0.5 -  Math.min.apply(null, HOM))/0.5;
-                console.log("visibility", vis);
+                // console.log("visibility", vis);
                 self.plot1d.setTitle("Hong-Ou-Mandel visibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
 
 

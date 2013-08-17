@@ -133,7 +133,7 @@ define(
 
                 // props.W_sx = .1*Math.PI/180;
                 // props.W_sy = props.W_sx;
-                console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
+                // console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
                 //make sure the angles are correct so we can calculate the right ranges
                 props.phi_i = props.phi_s + Math.PI;
                 props.update_all_angles(); 
@@ -196,7 +196,7 @@ define(
                 var xx = self.plot2dSignal.scales.x;
                 var yy = self.plot2dSignal.scales.y;
 
-                console.log("refreshing: ", xx(1*data[0].X0*deg), xx(1*X0*deg), Math.abs( xx(data[0].X0 + data[0].r) - xx(data[0].X0) ));
+                // console.log("refreshing: ", xx(1*data[0].X0*deg), xx(1*X0*deg), Math.abs( xx(data[0].X0 + data[0].r) - xx(data[0].X0) ));
 
                 var extension = 0.15; // percentage of yrange to extend label line through
 
@@ -278,12 +278,12 @@ define(
                 // update the circle based on data
                 overlays.selectAll('circle')
                     .attr('r', function( d ){ 
-                        console.log("circle Radius", Math.abs( xx(d.X0 + d.r) - xx(d.X0) ));
+                        // console.log("circle Radius", Math.abs( xx(d.X0 + d.r) - xx(d.X0) ));
 
                         return Math.abs( xx(d.X0 + d.r) - xx(d.X0) ); 
                     })
                     .attr('cx', function( d ) {
-                        console.log("circle x: ", d.X0, ( X0 * deg ));
+                        // console.log("circle x: ", d.X0, ( X0 * deg ));
                         return xx( d.X0 );
                     })
                     .attr('cy', function( d ) {

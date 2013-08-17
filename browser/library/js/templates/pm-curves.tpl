@@ -4,7 +4,7 @@
             <h2 class="title">Signal wavelength as a function of pump wavelength</h2>
                 
                 <div class="btn-wrap ">
-                    <button class="btn collapse-ctrl" id="collapse-signal">&#x2296;</button>
+                    <button class="btn collapse-ctrl" id="collapse-curve-signal">&#x2296;</button>
                 </div>
         </div>
          <div class="curve-signal-wrapper">
@@ -17,7 +17,7 @@
             <h2 class="title">Signal wavelength as a function of crystal tilt</h2>
                 
                 <div class="btn-wrap ">
-                    <button class="btn collapse-ctrl" id="collapse-crystal">&#x2296;</button>
+                    <button class="btn collapse-ctrl" id="collapse-curve-crystal">&#x2296;</button>
                 </div>
         </div>
     
@@ -28,15 +28,14 @@
 
     <div class="plot-wrapper span7 offset1">
         <div class="row-fluid">
-            <h2 class="title">Difference in the phasematching curves for the signal and idler</h2>
+            <h2 class="title">Phasematching as a function of the crystal angles</h2>
                 
                 <div class="btn-wrap ">
-                    <button class="btn collapse-ctrl" id="collapse-both">&#x2296;</button>
+                    <button class="btn collapse-ctrl" id="collapse-curve-theta-phi">&#x2296;</button>
                 </div>
         </div>
 
-        <div class="curve-both-wrapper">
-            <!-- lambda_signal vs theta signal -->
+        <div class="curve-theta-phi-wrapper">
         </div>
     </div>
 </div>
