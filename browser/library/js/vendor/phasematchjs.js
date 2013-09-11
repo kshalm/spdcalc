@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-08-17
+ * phasematchjs v0.0.1a - 2013-09-10
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2566,16 +2566,35 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
     // var PM2D = PhaseMatch.create2Darray(PM, dim,dim);
 
-    var svd = PhaseMatch.svdcmp(PM);
+    var l = PM.length;
+    var PMsqrt = new Array(l);
+
+    for (var i = 0; i<l; i++){
+        PMsqrt[i]= new Array(l);
+        for (var j = 0; j<l; j++){
+            PMsqrt[i][j] = Math.sqrt(PM[i][j]);
+        }
+        
+    }
+    // console.log(PMsqrt);
+
+    var svd = PhaseMatch.svdcmp(PMsqrt);
     // @TODO: add in logic to test if the SVD converged. It will return false if it did not.
     var D = svd.W;
     // console.log("D", D);
-    var Norm = PhaseMatch.Sum(D); // Normalization
-    // console.log("normalization", Norm);
     var l = D.length;
+    //do the Normalization
+    var Norm = 0;
+    for (var j=0; j<l; j++){
+        Norm += sq(D[j]);
+    }
+
+    // var Norm = PhaseMatch.Sum(D); // Normalization
+    // console.log("normalization", Norm);
+    
     var Kinv = 0;
     for (var i = 0; i<l; i++){
-        Kinv += sq(D[i]/Norm); //calculate the inverse of the Schmidt number
+        Kinv += sq(sq(D[i])/Norm); //calculate the inverse of the Schmidt number
     } 
     return 1/Kinv;
 };
@@ -2714,13 +2733,14 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
 
 PhaseMatch.autorange_poling_period = function autorange_poling_period(props){
     var P = props.clone();
+    P.theta = Math.PI/2; //set the angle to 0
     P.update_all_angles();
     P.calc_poling_period();
-    var diff = 10e-6;
+    var diff = 50e-6;
     var poling_start = P.poling_period - diff;
     var poling_end = P.poling_period +diff;
 
-    if (poling_start<0){poling_start = 0.1;}
+    if (poling_start<0){poling_start = 1e-6;}
 
     return [poling_start, poling_end];
 };
