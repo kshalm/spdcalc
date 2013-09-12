@@ -102,13 +102,13 @@ define(
             initEvents : function(){
 
                 var self = this;
-                
+
                 self.on({
 
                     'domready': self.onDomReady,
 
                     'ready': function(){
-                        
+
                         // default
                         self.load('jsa');
 
@@ -150,7 +150,7 @@ define(
                                     };
 
                                     if (data.type === 'heat-map'){
-                                        
+
                                         tpl.render = tplHeatMapAsCSV;
 
                                     } else {
@@ -179,7 +179,7 @@ define(
                         if (!self.autocalc){
                             return;
                         }
-                        
+
                         self.emit('calculate');
                     }
                 });
@@ -335,7 +335,7 @@ define(
                     // update the corresponding boolean property in the parameters object
                     self.parameters.set( key, val );
                 });
-                
+
 
                 var to;
                 $(window).on('resize', function(){
@@ -347,7 +347,7 @@ define(
                     // wait until stopped resizing before triggering resize
                     to = setTimeout(function(){
 
-                        self.emit('resize');    
+                        self.emit('resize');
                     }, 100);
                 });
             },
@@ -359,7 +359,7 @@ define(
 
                 self.elMain = self.el.find('#main');
                 self.elParameters = self.el.find('#parameters');
-                
+
                 self.elLogs = self.el.find('#logs');
                 self.elDocs = self.el.find('#docs');
 
@@ -377,7 +377,7 @@ define(
             },
 
             initParameters: function(){
-                
+
                 var self = this;
                 self.parameters = Parameters();
             },
@@ -398,7 +398,7 @@ define(
             },
 
             initModules: function(){
-                
+
                 var self = this;
 
                 // JSA
@@ -409,7 +409,7 @@ define(
                 self.set('kitchen_sink', ksUI());
                 // XY
                 self.set('xy', xyUI());
-                // Schmidt Spectral Purity  
+                // Schmidt Spectral Purity
                 // self.set('schmidt-2d', schmidtUI);
                 self.set('schmidt-2d', schmidtUI());
                 // Mode solver view

@@ -64,7 +64,7 @@ define(
             };
 
             this.clear();
-                
+
             // init svg
             this.svg = d3.select( this.el.get(0) ).append("svg");
             this.svgPlot = this.svg.append("g");
@@ -188,14 +188,20 @@ define(
                   ;
             },
 
+            getLogPlot: function(){
+
+            },
+
             exportData: function(){
 
-                if (!this.data){
+                if (!this.series[0].data){
+                    console.log("hello");
                     return [];
                 }
 
                 // clone
-                var data = $.map(this.data, $.proxy($.extend, $, true));
+                var data = $.map(this.series[0].data, $.proxy($.extend, $, true));
+
 
                 return {
                     title: this.elTitle.text(),
@@ -219,7 +225,7 @@ define(
                 var all = [];
 
                 for ( var i = 0, l = this.series.length; i < l; ++i ){
-                    
+
                     all.push.apply(all, this.series[ i ].data);
                 }
 
@@ -250,7 +256,7 @@ define(
                         cfg = {
                             title: cfg || 'Series ' + this.series.length,
                             color: this.colors( this.series.length )
-                        };    
+                        };
                     }
                 }
 
@@ -294,14 +300,14 @@ define(
                 svg.selectAll('.line').remove();
 
                 for ( var i = 0, l = this.series.length; i < l; ++i ){
-                    
+
                     series = this.series[ i ];
 
                     line = d3.svg.line( series.data )
                         .x(function(d) { return x(d.x); })
                         .y(function(d) { return y(d.y); })
                         ;
-                    
+
                     svg.append('path')
                         .datum( series.data )
                         .attr("class", "line")

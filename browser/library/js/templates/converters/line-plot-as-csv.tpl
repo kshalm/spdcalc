@@ -21,3 +21,4 @@ Apodization FWHM: {{=it.meta.apodization_FWHM}}
 {{=it.plot.x.label}}, {{=it.plot.y.label}}
 {{~it.plot.data :val:idx}}{{=val.x}}, {{=val.y}}
 {{~}}
+

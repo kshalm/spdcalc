@@ -27,7 +27,7 @@ define(
         var delTConversion = 1e-15;
 
         var con = PhaseMatch.constants;
-        
+
         /**
          * @module JSAUI
          * @implements {Stapes}
@@ -84,7 +84,7 @@ define(
                 self.elPlot1d = $(self.plot1d.el);
 
                 self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el.find('.heat-map-wrapper') );
-                
+
                 self.eldelT.slider({
                     min: -800,
                     max: 800,
@@ -124,7 +124,7 @@ define(
                 self.on('change:delT', function( delT ){
 
                     self.refreshLine( delT );
-                    
+
                     clearTimeout( to );
                     to = setTimeout(function(){
 
@@ -214,7 +214,7 @@ define(
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
                 lim = PhaseMatch.autorange_lambda(props, threshold);
                 tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max);
-                
+
                 self.set_slider_values(tsi[0], tsi[1], tsi[2]);
 
                 self.plotOpts.set({
@@ -234,7 +234,7 @@ define(
                 var self = this,
                     threshold = 0.5
                     ,props = self.parameters.getProps();
-                    
+
                 var lim = PhaseMatch.autorange_lambda(props, threshold);
                 var tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max);
 
@@ -243,24 +243,24 @@ define(
                 // Hong-Ou-Mandel dip
                 // var t_start = 0e-15;
                 // var t_stop = 10000e-15;
-                
+
                 var starttime = new Date();
                 var data1d = []
                     ,dim = 200
                     ,po = self.plotOpts
                     ,delT = PhaseMatch.linspace(
-                        po.get('delT_start'), 
-                        po.get('delT_stop'), 
+                        po.get('delT_start'),
+                        po.get('delT_stop'),
                         dim
                     )
                     ,HOM = PhaseMatch.calc_HOM_scan(
-                        props, 
-                        po.get('delT_start'), 
-                        po.get('delT_stop'), 
-                        po.get('ls_start'), 
+                        props,
+                        po.get('delT_start'),
+                        po.get('delT_stop'),
+                        po.get('ls_start'),
                         po.get('ls_stop'),
                         po.get('li_start'),
-                        po.get('li_stop'), 
+                        po.get('li_stop'),
                         dim
                     )
                     ;
@@ -305,10 +305,10 @@ define(
                     ,po = self.plotOpts
                     ,PM = PhaseMatch.calc_HOM_JSA(
                         props,
-                        po.get('ls_start'), 
+                        po.get('ls_start'),
                         po.get('ls_stop'),
                         po.get('li_start'),
-                        po.get('li_stop'), 
+                        po.get('li_stop'),
                         self.get('delT'),
                         po.get('grid_size')
                     )
@@ -318,6 +318,7 @@ define(
 
                 self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
+                self.plot1d.setTitle("Time delay = " + self.get('delT')/1e-15);
             },
 
             draw: function(){
