@@ -26,7 +26,8 @@ define(
         'modules/xy-ui',
         'modules/schmidt-2d-ui',
         'modules/modesolver-ui',
-        'modules/pm-curves-ui'
+        'modules/pm-curves-ui',
+        'modules/jsa-2hom-ui',
     ],
     function(
         $,
@@ -55,7 +56,8 @@ define(
         xyUI,
         schmidtUI,
         msUI,
-        curvesUI
+        curvesUI,
+        jsa2homUI
     ) {
 
         'use strict';
@@ -416,6 +418,8 @@ define(
                 self.set('modesolver', msUI());
                 // Phase matching curves view
                 self.set('curves', curvesUI());
+                // Two source hom
+                self.set('jsa-2hom', jsa2homUI());
             },
 
             /**

@@ -14,12 +14,13 @@
                     <option value="curves">Phasematching Curves</option>
                     <option value="xy">Emission Angle</option>
                     <option value="jsa-hom">Hong-Ou-Mandel</option>
+                    <option value="jsa-2hom">Two Source Hong-Ou-Mandel</option>
                     <!-- <option value="modesolver">Mode Solver</option> -->
                     <option value="schmidt-2d">Spectral Purity</option>
                     <!-- <option value="kitchen_sink">Kitchen Sink</option> -->
                 </select>
             </div>
-            
+
             <!-- <ul class="nav">
                 <li>
                   <a href="#">
@@ -34,10 +35,10 @@
                         <li><a href="#">Element One</a></li>
                         <li><a href="#">Element Two</a></li>
                         <li><a href="#">Element Three</a></li>
-                      </ul> 
+                      </ul>
                     </li>
                     <li><a href="#">Element Three</a></li>
-                  </ul> 
+                  </ul>
                 </li>
                 <li>
                   <a href="#">
@@ -49,7 +50,7 @@
           </div>
         </div>
     </div>
-    
+
     <div class="upper row">
 
         <div class="options-wrap span3">
@@ -59,7 +60,7 @@
 
             <div class="row-fluid">
                 <h2 class="title"></h2>
-                    
+
             </div>
                 <section class="form-horizontal">
 
@@ -75,25 +76,25 @@
                         <div class="control-group">
                             <div class="">
                                 <label class="checkbox" for="autocalc"> Auto calculate
-                                    <input type="checkbox" value="" id="autocalc" checked="checked"> 
+                                    <input type="checkbox" value="" id="autocalc" checked="checked">
                                 </label>
                             </div>
                         </div>
                     </div>
-                        
+
                    <div class="row-fluid">
                             <div class="control-group">
                                 <button class="btn ctrl-share">Share</button>
-                                <input type="text" value="" id="share-url"> 
+                                <input type="text" value="" id="share-url">
                             </div>
-                    </div> 
+                    </div>
                 </section>
-            
+
             </div>
 
             <!-- <div class="row-fluid">
                 <h2 class="title"></h2>
-                    
+
                 </div>
                     <section class="form-horizontal">
                             <div class="control-group ">
@@ -101,18 +102,18 @@
                                     <button class="btn ctrl-share">Share</button>
                                 </div>
                                 <div class="controls">
-                                    <input type="text" value="" id="share-url"> 
+                                    <input type="text" value="" id="share-url">
                                 </div>
                             </div>
 
                             <div class="control-group">
                                 <div class="calccheckbox">
                                     <label class="checkbox" for="autocalc"> Auto calculate
-                                        <input type="checkbox" value="" id="autocalc" checked="checked"> 
+                                        <input type="checkbox" value="" id="autocalc" checked="checked">
                                     </label>
                                 </div>
                             </div>
-                            
+
                             <div class="control-group">
                                 <div class="calcbutton">
                                     <button class="btn btn-success ctrl-calc">Calculate</button>
@@ -120,7 +121,7 @@
                             </div>
 
                         </section>
-            
+
             </div> -->
 
 
@@ -131,7 +132,7 @@
 
     </div>
     <div class="lower">
-        
+
         <div id="logs"></div>
         <div id="docs"></div>
     </div>
