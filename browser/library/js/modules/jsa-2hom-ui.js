@@ -75,7 +75,7 @@ define(
                     format: {x: '.0f'},
                     width: 400,
                     height: 200,
-                    yrange: [0,.65]
+                    yrange: [0, 0.65]
                 });
 
                 self.plot1d.resize(400,150);
@@ -145,7 +145,7 @@ define(
             refreshJSA: function(){
 
                 var self = this;
-                self.calc_HOM_JSA( self.parameters.getProps() );
+                // self.calc_HOM_JSA( self.parameters.getProps() );
                 self.draw();
             },
 
@@ -246,14 +246,14 @@ define(
 
                 var starttime = new Date();
                 var data1d = []
-                    ,dim = 200
+                    ,dim = 50
                     ,po = self.plotOpts
                     ,delT = PhaseMatch.linspace(
                         po.get('delT_start'),
                         po.get('delT_stop'),
                         dim
                     )
-                    ,HOM = PhaseMatch.calc_HOM_scan(
+                    ,HOM = PhaseMatch.calc_2HOM_scan(
                         props,
                         po.get('delT_start'),
                         po.get('delT_stop'),
@@ -264,7 +264,7 @@ define(
                         dim
                     )
                     ;
-
+                console.log(HOM);
                  var endtime = new Date();
                  // console.log("Time to run HOM scan code: ", endtime-starttime);
 

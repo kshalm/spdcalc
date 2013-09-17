@@ -360,13 +360,162 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 
     // Calculate normalization
     var norm = new Float64Array(npts*npts);
-    norm = PhaseMatch.calc_JSA(P,ls_start, ls_stop, li_start,li_stop, npts);
+    norm = PhaseMatch.calc_JSI(P,ls_start, ls_stop, li_start,li_stop, npts);
     var N = PhaseMatch.Sum(norm);
 
     for (i=0; i<dim; i++){
         PM_JSA = PhaseMatch.calc_HOM_JSA(P, ls_start, ls_stop, li_start, li_stop, delT[i], npts);
         var total = PhaseMatch.Sum(PM_JSA)/N;
         HOM_values[i] = total;
+    }
+
+    return HOM_values;
+
+};
+
+/*
+ * calc_2HOM_rate()
+ * Calculates the coincidence rate for two source HOM at a given time value
+ * P is SPDC Properties object
+ * PM_JSA is the joint spectral amplitude:
+ */
+PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_start, li_stop, PM_JSA, dim){
+    var con = PhaseMatch.constants;
+
+    var lambda_s = PhaseMatch.linspace(ls_start,ls_stop, dim);
+    var lambda_i = PhaseMatch.linspace(li_start,li_stop, dim);
+    var rate = 0;
+
+    var PM_JSA_real = PhaseMatch.create_2d_array(PM_JSA[0], dim, dim);
+    var PM_JSA_imag = PhaseMatch.create_2d_array(PM_JSA[1], dim, dim);
+
+    // Now create the ws, wi arrays for the two crystals. Because the crystals are identical, we can get away with
+    // using just one array for both ws and wi.
+    // loop over ws1
+    for (var j=0; j<dim; j++){
+
+        // loop over wi1
+        for (var k=0; k<dim; k++){
+            var A_real = PM_JSA_real[j][k]
+            var A_imag = PM_JSA_imag[j][k]
+
+            // loop over ws2
+            for (var l=0; l<dim; l++){
+                var C_real = PM_JSA_real[l][k]
+                var C_imag = PM_JSA_imag[l][k]
+
+                // loop over wi2
+                for (var m=0; m<dim; m++){
+
+                    var ARG = 2*Math.PI*con.c *(1/lambda_s[j] - 1/lambda_i[k])*delT;
+                    var Phase_real = Math.cos(ARG);
+                    var Phase_imag = Math.sin(ARG);
+
+                    var B_real = PM_JSA_real[l][m]
+                    var B_imag = PM_JSA_imag[l][m]
+
+                    var D_real = PM_JSA_real[j][m]
+                    var D_imag = PM_JSA_imag[j][m]
+
+                    var Arg1_real = A_real*B_real - A_imag*B_imag;
+                    var Arg1_imag = A_real*B_imag - A_imag*B_real; //minus here b/c of complex conjugate
+
+                    var Arg2_real = C_real*D_real - C_imag*D_imag;
+                    var Arg2_imag = C_real*D_imag - C_imag*D_real; //minus here b/c of complex conjugate
+
+                    var HOM_real = (Arg1_real - (Phase_real * Arg2_real - Phase_imag*Arg2_imag))/2;
+                    var HOM_imag = (Arg1_imag - (Phase_real * Arg2_imag + Phase_imag * Arg2_real))/2;
+
+                    rate += sq(HOM_real) + sq(HOM_imag);
+
+                }
+            }
+        }
+    }
+    return rate;
+};
+
+/*
+ * calc_2HOM_norm()
+ * Calculates the normalization value
+ * P is SPDC Properties object
+ */
+PhaseMatch.calc_2HOM_norm = function calc_HOM_norm(PM_JSA, dim){
+    var rate = 0;
+
+    var PM_JSA_real = PhaseMatch.create_2d_array(PM_JSA[0], dim, dim);
+    var PM_JSA_imag = PhaseMatch.create_2d_array(PM_JSA[1], dim, dim);
+
+    // Now create the ws, wi arrays for the two crystals. Because the crystals are identical, we can get away with
+    // using just one array for both ws and wi.
+    // loop over ws1
+    for (var j=0; j<dim; j++){
+
+        // loop over wi1
+        for (var k=0; k<dim; k++){
+            var A_real = PM_JSA_real[j][k]
+            var A_imag = PM_JSA_imag[j][k]
+
+            // loop over ws2
+            for (var l=0; l<dim; l++){
+                // var C_real = PM_JSA_real[l][k]
+                // var C_imag = PM_JSA_imag[l][k]
+
+                // loop over wi2
+                for (var m=0; m<dim; m++){
+
+                    // var ARG = 2*Math.PI*con.c *(1/lambda_s[j] - 1/lambda_i[k])*delT;
+                    // var Phase_real = Math.cos(ARG);
+                    // var Phase_imag = Math.sin(ARG);
+
+                    var B_real = PM_JSA_real[l][m]
+                    var B_imag = PM_JSA_imag[l][m]
+
+                    // var D_real = PM_JSA_real[j][m]
+                    // var D_imag = PM_JSA_imag[j][m]
+
+                    var Arg1_real = A_real*B_real - A_imag*B_imag;
+                    var Arg1_imag = A_real*B_imag - A_imag*B_real; //minus here b/c of complex conjugate
+
+                    // var Arg2_real = C_real*D_real - C_imag*D_imag;
+                    // var Arg2_imag = C_real*D_imag - C_imag*D_real; //minus here b/c of complex conjugate
+
+                    // var HOM_real = Arg1_real - (Phase_real * Arg2_real - Phase_imag*Arg2_imag);
+                    // var HOM_imag = Arg1_imag - (Phase_real * Arg2_imag + Phase_imag * Arg2_real);
+
+                    rate += sq(Arg1_real) + sq(Arg1_imag);
+
+                }
+            }
+        }
+    }
+    return rate;
+};
+
+/*
+ * calc_2HOM_scan()
+ * Calculates the HOM probability of coincidences over range of times for two identical sources.
+ * P is SPDC Properties object
+ * delT is the time delay between signal and idler
+ */
+PhaseMatch.calc_2HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, ls_stop, li_start, li_stop, dim){
+
+    var npts = 50;  //number of points to pass to calc_JSA()
+    var delT = PhaseMatch.linspace(t_start, t_stop, dim);
+
+    var HOM_values = PhaseMatch.linspace(t_start, t_stop, dim);
+    var PM_JSA = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, npts); // Returns the complex JSA
+
+    // Calculate normalization
+    // var norm = new Float64Array(npts*npts);
+    // norm = PhaseMatch.calc_JSA(P,ls_start, ls_stop, li_start,li_stop, npts);
+    var N = PhaseMatch.calc_2HOM_norm(PM_JSA, npts);
+    // var N = 1;
+
+    for (var i=0; i<dim; i++){
+        // PM_JSA = PhaseMatch.calc_HOM_JSA(P, ls_start, ls_stop, li_start, li_stop, delT[i], npts);
+        // var total = PhaseMatch.Sum(PM_JSA)/N;
+        HOM_values[i] = PhaseMatch.calc_2HOM_rate(delT[i], ls_start, ls_stop, li_start, li_stop, PM_JSA, npts)/N;
     }
 
     return HOM_values;

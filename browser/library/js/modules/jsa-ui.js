@@ -25,7 +25,7 @@ define(
         'use strict';
 
         var con = PhaseMatch.constants;
-        
+
         /**
          * @module JSAUI
          * @implements {Stapes}
@@ -122,17 +122,16 @@ define(
 
                 var startTime = new Date();
                 var dim = 100
-                    ,PM = PhaseMatch.calc_JSA(
-                        props, 
-                        self.plotOpts.get('ls_start'), 
+                    ,PM = PhaseMatch.calc_JSI(
+                        props,
+                        self.plotOpts.get('ls_start'),
                         self.plotOpts.get('ls_stop'),
                         self.plotOpts.get('li_start'),
-                        self.plotOpts.get('li_stop'), 
+                        self.plotOpts.get('li_stop'),
                         self.plotOpts.get('grid_size')
                     )
                     ;
 
-                console.log(PhaseMatch.find_internal_angle(props,"signal")*180/Math.PI);
                 // var endTime = new Date();
                 // var timeDiff = (endTime - startTime);
                 // console.log("time", timeDiff);
@@ -149,7 +148,7 @@ define(
                 // console.log(jsa2d[25]);
                 self.data = PM;
                 // console.log(PM);
-                
+
                 // self.plot.setZRange([0, 180]);
                 self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
