@@ -74,70 +74,70 @@ define(
                     },
                     format: {x: '.0f'},
                     width: 400,
-                    height: 200,
+                    height: 400,
                     yrange: [0, 0.65]
                 });
 
-                self.plot1d.resize(400,150);
+                self.plot1d.resize(400,250);
                 // self.plot1d.setTitle("boo");
 
                 self.elPlot1d = $(self.plot1d.el);
 
                 self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el.find('.heat-map-wrapper') );
 
-                self.eldelT.slider({
-                    min: -800,
-                    max: 800,
-                    value: 0,
-                    orientation: "horizontal",
-                    range: "min",
-                    change: function(){
+                // self.eldelT.slider({
+                //     min: -800,
+                //     max: 800,
+                //     value: 0,
+                //     orientation: "horizontal",
+                //     range: "min",
+                //     change: function(){
 
-                        // set local prop and convert
-                        self.set( 'delT', (parseFloat(self.eldelT.slider( 'value' )) * delTConversion ));
-                    },
-                    slide: function(){
+                //         // set local prop and convert
+                //         self.set( 'delT', (parseFloat(self.eldelT.slider( 'value' )) * delTConversion ));
+                //     },
+                //     slide: function(){
 
-                        // set local prop and convert
-                        self.set( 'delT', (parseFloat(self.eldelT.slider( 'value' )) * delTConversion ));
-                    }
-                });
+                //         // set local prop and convert
+                //         self.set( 'delT', (parseFloat(self.eldelT.slider( 'value' )) * delTConversion ));
+                //     }
+                // });
 
                 self.set('delT', 0);
 
-                // init plot
-                self.plot = new HeatMap({
-                    title: 'Joint spectral amplitude',
-                    el: self.el.find('.heat-map-wrapper').get( 0 ),
-                    labels: {
-                        x: 'Signal Wavelength(nm)',
-                        y: 'Idler Wavelength(nm)'
-                    },
-                    format: {
-                        x: '.0f',
-                        y: '.0f'
-                    }
-                });
+                // // init plot
+                // self.plot = new HeatMap({
+                //     title: 'Joint spectral amplitude',
+                //     el: self.el.find('.heat-map-wrapper').get( 0 ),
+                //     labels: {
+                //         x: 'Signal Wavelength(nm)',
+                //         y: 'Idler Wavelength(nm)'
+                //     },
+                //     format: {
+                //         x: '.0f',
+                //         y: '.0f'
+                //     }
+                // });
 
                 // internal events
                 var to;
-                self.on('change:delT', function( delT ){
+                // self.on('change:delT', function( delT ){
 
-                    self.refreshLine( delT );
+                //     self.refreshLine( delT );
 
-                    clearTimeout( to );
-                    to = setTimeout(function(){
+                //     clearTimeout( to );
+                //     to = setTimeout(function(){
 
-                        // only refresh plots after a time delay
-                        self.refreshJSA();
-                    }, 50);
-                });
+                //         // only refresh plots after a time delay
+                //         self.refreshJSA();
+                //     }, 50);
+                // });
 
-                self.on('refresh', function(){
-                    self.refreshLine( self.get('delT') );
-                });
+                // self.on('refresh', function(){
+                //     self.refreshLine( self.get('delT') );
+                // });
 
-                self.addPlot( self.plot );
+                // self.addPlot( self.plot );
                 self.addPlot( self.plot1d );
                 self.initEvents();
             },
@@ -213,7 +213,7 @@ define(
                 // this does nothing... need to use .set()
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
                 lim = PhaseMatch.autorange_lambda(props, threshold);
-                tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max);
+                tsi = PhaseMatch.autorange_delT_2crystal(props, lim.lambda_s.min, lim.lambda_s.max);
 
                 self.set_slider_values(tsi[0], tsi[1], tsi[2]);
 
@@ -245,8 +245,10 @@ define(
                 // var t_stop = 10000e-15;
 
                 var starttime = new Date();
-                var data1d = []
-                    ,dim = 50
+                var data_ss = []
+                    ,data_ii = []
+                    ,data_si = []
+                    ,dim = 100
                     ,po = self.plotOpts
                     ,delT = PhaseMatch.linspace(
                         po.get('delT_start'),
@@ -264,24 +266,41 @@ define(
                         dim
                     )
                     ;
-                console.log(HOM);
                  var endtime = new Date();
                  // console.log("Time to run HOM scan code: ", endtime-starttime);
 
-                for ( var i = 0, l = HOM.length; i < l; i ++){
-                    data1d.push({
+                for ( var i = 0, l = HOM['ss'].length; i < l; i ++){
+                    data_ss.push({
                         x: delT[i]/1e-15,
-                        y: HOM[i]
+                        y: HOM['ss'][i]
                     })
                 }
 
-                self.data1d = data1d;
+                for (i = 0, l = HOM['ii'].length; i < l; i ++){
+                    data_ii.push({
+                        x: delT[i]/1e-15,
+                        y: HOM['ii'][i]
+                    })
+                }
+
+                for (i = 0, l = HOM['si'].length; i < l; i ++){
+                    data_si.push({
+                        x: delT[i]/1e-15,
+                        y: HOM['si'][i]
+                    })
+                }
+
+                self.data1d = data_ss;
+                self.data_ii = data_ii;
+                self.data_si = data_si;
 
                 // Calculate visibility
                 // title: 'Hong-Ou-Mandel Dip'
-                var vis = (0.5 -  Math.min.apply(null, HOM))/0.5;
+                var vis = (0.5 -  Math.min.apply(null, HOM['ss']))/0.5;
                 // console.log("visibility", vis);
                 self.plot1d.setTitle("Hong-Ou-Mandel visibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
+
+                // self.plot1d.addSeries( data_ii, 'idler-idler' );
 
 
                 self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
@@ -328,22 +347,24 @@ define(
                     ;
 
                 // other plot
-                var data1d = self.data1d;
+                // var data1d = self.data1d;
+                self.plot1d.clear();
+                self.plot1d.addSeries( self.data1d , 'signal-signal');
+                self.plot1d.addSeries( self.data_ii, 'idler-idler');
+                self.plot1d.addSeries( self.data_si, 'signal-idler' );
+                self.plot1d.plotData( );
 
-                if (!data1d){
-                    return this;
-                }
+                // if (!data1d){
+                //     return this;
+                // }
 
-                self.plot1d.plotData( data1d );
-
-
-                if (!data){
-                    return this;
-                }
-
-                self.plot.plotData( data );
+                // self.plot1d.plotData( data1d );
 
 
+
+                // if (!data){
+                //     return this;
+                // }
             }
         });
 

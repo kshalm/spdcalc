@@ -94,10 +94,10 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     }
     else {
         var PMz = Math.sin(arg)/arg;
-        // PMz_real =  PMz * Math.cos(arg);
-        // PMz_imag = PMz * Math.sin(arg);
-        PMz_real =  PMz;// * Math.cos(arg);
-        PMz_imag = 0;// * Math.sin(arg);
+        PMz_real =  PMz * Math.cos(arg);
+        PMz_imag = PMz * Math.sin(arg);
+        // PMz_real =  PMz;// * Math.cos(arg);
+        // PMz_imag = 0;// * Math.sin(arg);
     }
 
 
@@ -504,18 +504,21 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(P, ls_start, ls_stop, li_start, 
  * P is SPDC Properties object
  * PM_JSA is the joint spectral amplitude:
  */
-PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_start, li_stop, PM_JSA, dim){
+PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_start, li_stop, PM_JSA_real, PM_JSA_imag, dim){
     var con = PhaseMatch.constants;
 
     var lambda_s = PhaseMatch.linspace(ls_start,ls_stop, dim);
     var lambda_i = PhaseMatch.linspace(li_start,li_stop, dim);
-    var rate = 0;
+    var rate_ss = 0;
+    var rate_ii = 0;
+    var rate_si = 0;
 
-    var PM_JSA_real = PhaseMatch.create_2d_array(PM_JSA[0], dim, dim);
-    var PM_JSA_imag = PhaseMatch.create_2d_array(PM_JSA[1], dim, dim);
+    // var PM_JSA_real = PhaseMatch.create_2d_array(PM_JSA[0], dim, dim);
+    // var PM_JSA_imag = PhaseMatch.create_2d_array(PM_JSA[1], dim, dim);
 
     // Now create the ws, wi arrays for the two crystals. Because the crystals are identical, we can get away with
     // using just one array for both ws and wi.
+
     // loop over ws1
     for (var j=0; j<dim; j++){
 
@@ -532,9 +535,20 @@ PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_s
                 // loop over wi2
                 for (var m=0; m<dim; m++){
 
-                    var ARG = 2*Math.PI*con.c *(1/lambda_s[j] - 1/lambda_i[l])*delT;
-                    var Phase_real = Math.cos(ARG);
-                    var Phase_imag = Math.sin(ARG);
+                    // for the signal signal phase
+                    var ARG_ss = 2*Math.PI*con.c *(1/lambda_s[j] - 1/lambda_i[l])*delT;
+                    var Phase_ss_real = Math.cos(ARG_ss);
+                    var Phase_ss_imag = Math.sin(ARG_ss);
+
+                    // for the idler idler phase
+                    var ARG_ii = 2*Math.PI*con.c *(1/lambda_s[k] - 1/lambda_i[m])*delT;
+                    var Phase_ii_real = Math.cos(ARG_ii);
+                    var Phase_ii_imag = Math.sin(ARG_ii);
+
+                    // for the signal/idler phase
+                    var ARG_si = 2*Math.PI*con.c *(1/lambda_s[j] - 1/lambda_i[m])*delT;
+                    var Phase_si_real = Math.cos(ARG_si);
+                    var Phase_si_imag = Math.sin(ARG_si);
 
                     var B_real = PM_JSA_real[l][m]
                     var B_imag = PM_JSA_imag[l][m]
@@ -543,21 +557,30 @@ PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_s
                     var D_imag = PM_JSA_imag[j][m]
 
                     var Arg1_real = A_real*B_real - A_imag*B_imag;
-                    var Arg1_imag = A_real*B_imag - A_imag*B_real; //minus here b/c of complex conjugate
+                    var Arg1_imag = A_real*B_imag + A_imag*B_real; //minus here b/c of complex conjugate
 
                     var Arg2_real = C_real*D_real - C_imag*D_imag;
-                    var Arg2_imag = C_real*D_imag - C_imag*D_real; //minus here b/c of complex conjugate
+                    var Arg2_imag = C_real*D_imag + C_imag*D_real; //minus here b/c of complex conjugate
 
-                    var HOM_real = (Arg1_real - (Phase_real * Arg2_real - Phase_imag*Arg2_imag))/2;
-                    var HOM_imag = (Arg1_imag - (Phase_real * Arg2_imag + Phase_imag * Arg2_real))/2;
+                    var Intf_ss_real = (Arg1_real - (Phase_ss_real * Arg2_real - Phase_ss_imag*Arg2_imag))/2;
+                    var Intf_ss_imag = (Arg1_imag - (Phase_ss_real * Arg2_imag + Phase_ss_imag * Arg2_real))/2;
 
-                    rate += sq(HOM_real) + sq(HOM_imag);
+                    var Intf_ii_real = (Arg1_real - (Phase_ii_real * Arg2_real - Phase_ii_imag*Arg2_imag))/2;
+                    var Intf_ii_imag = (Arg1_imag - (Phase_ii_real * Arg2_imag + Phase_ii_imag * Arg2_real))/2;
+
+                    var Intf_si_real = (Arg1_real - (Phase_si_real * Arg2_real - Phase_si_imag*Arg2_imag))/2;
+                    var Intf_si_imag = (Arg1_imag - (Phase_si_real * Arg2_imag + Phase_si_imag * Arg2_real))/2;
+
+                    rate_ss += sq(Intf_ss_real) + sq(Intf_ss_imag);
+                    rate_ii += sq(Intf_ii_real) + sq(Intf_ii_imag);
+                    rate_si += sq(Intf_si_real) + sq(Intf_si_imag);
+                    // rate += HOM_real;
 
                 }
             }
         }
     }
-    return rate;
+    return {"ss":rate_ss, "ii":rate_ii, "si":rate_si};
 };
 
 /*
@@ -565,11 +588,11 @@ PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_s
  * Calculates the normalization value
  * P is SPDC Properties object
  */
-PhaseMatch.calc_2HOM_norm = function calc_HOM_norm(PM_JSA, dim){
+PhaseMatch.calc_2HOM_norm = function calc_HOM_norm(PM_JSA_real, PM_JSA_imag, dim){
     var rate = 0;
 
-    var PM_JSA_real = PhaseMatch.create_2d_array(PM_JSA[0], dim, dim);
-    var PM_JSA_imag = PhaseMatch.create_2d_array(PM_JSA[1], dim, dim);
+    // var PM_JSA_real = PhaseMatch.create_2d_array(PM_JSA[0], dim, dim);
+    // var PM_JSA_imag = PhaseMatch.create_2d_array(PM_JSA[1], dim, dim);
 
     // Now create the ws, wi arrays for the two crystals. Because the crystals are identical, we can get away with
     // using just one array for both ws and wi.
@@ -612,25 +635,33 @@ PhaseMatch.calc_2HOM_norm = function calc_HOM_norm(PM_JSA, dim){
  */
 PhaseMatch.calc_2HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, ls_stop, li_start, li_stop, dim){
 
-    var npts = 50;  //number of points to pass to calc_JSA()
+    var npts = 30;  //number of points to pass to calc_JSA()
+    // dim = 20;
     var delT = PhaseMatch.linspace(t_start, t_stop, dim);
 
-    var HOM_values = PhaseMatch.linspace(t_start, t_stop, dim);
+    var HOM_values_ss =new Float64Array(dim);
+    var HOM_values_ii =new Float64Array(dim);
+    var HOM_values_si =new Float64Array(dim);
+
     var PM_JSA = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, npts); // Returns the complex JSA
 
+    var PM_JSA_real = PhaseMatch.create_2d_array(PM_JSA[0], npts, npts);
+    var PM_JSA_imag = PhaseMatch.create_2d_array(PM_JSA[1], npts, npts);
+
     // Calculate normalization
-    // var norm = new Float64Array(npts*npts);
-    // norm = PhaseMatch.calc_JSA(P,ls_start, ls_stop, li_start,li_stop, npts);
-    var N = PhaseMatch.calc_2HOM_norm(PM_JSA, npts);
+    var N = PhaseMatch.calc_2HOM_norm(PM_JSA_real, PM_JSA_imag, npts);
     // var N = 1;
 
     for (var i=0; i<dim; i++){
         // PM_JSA = PhaseMatch.calc_HOM_JSA(P, ls_start, ls_stop, li_start, li_stop, delT[i], npts);
         // var total = PhaseMatch.Sum(PM_JSA)/N;
-        HOM_values[i] = PhaseMatch.calc_2HOM_rate(delT[i], ls_start, ls_stop, li_start, li_stop, PM_JSA, npts)/N;
+        var rates = PhaseMatch.calc_2HOM_rate(delT[i], ls_start, ls_stop, li_start, li_stop, PM_JSA_real, PM_JSA_imag, npts);
+        HOM_values_ss[i] = rates["ss"]/N;
+        HOM_values_ii[i] = rates["ii"]/N;
+        HOM_values_si[i] = rates["si"]/N;
     }
 
-    return HOM_values;
+    return {"ss":HOM_values_ss, "ii":HOM_values_ii, "si":HOM_values_si};
 
 };
 
@@ -770,6 +801,27 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
     var gv_i = props.get_group_velocity(props.lambda_i, props.type, props.S_i, "idler");
 
     var zero_delay = props.L * (1/gv_i - 1/gv_s)/2;
+    // console.log("minimum of HOM dip = ", zero_delay/1e-15);
+
+    var bw = Math.abs(lambda_stop - lambda_start);
+    var coh_time = 1/ (2*Math.PI*con.c / sq(lambda_start + bw/2) * bw);
+
+    var t_start = zero_delay - 40*coh_time;
+    var t_stop = zero_delay + 40*coh_time;
+
+    return [zero_delay, t_start, t_stop];
+
+};
+
+PhaseMatch.autorange_delT_2crystal = function autorange_delT_2crystal(props, lambda_start, lambda_stop){
+    // var P = props.clone();
+    var con = PhaseMatch.constants;
+
+    var gv_s = props.get_group_velocity(props.lambda_s, props.type, props.S_s, "signal");
+    var gv_i = props.get_group_velocity(props.lambda_i, props.type, props.S_i, "idler");
+
+    // var zero_delay = props.L * (1/gv_i - 1/gv_s)/2;
+    var zero_delay = 0;
     // console.log("minimum of HOM dip = ", zero_delay/1e-15);
 
     var bw = Math.abs(lambda_stop - lambda_start);
