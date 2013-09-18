@@ -264,7 +264,7 @@ define(
                         dim
                     )
                     ;
-
+                    console.log(HOM);
                  var endtime = new Date();
                  // console.log("Time to run HOM scan code: ", endtime-starttime);
 
