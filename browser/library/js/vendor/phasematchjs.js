@@ -2464,7 +2464,7 @@ PhaseMatch.calc_HOM_rate = function calc_HOM_rate(ls_start, ls_stop, li_start, l
     var PM_JSA1_imag = JSA['PM_JSA1_imag'];
     var PM_JSA2_real = JSA['PM_JSA2_real'];
     var PM_JSA2_imag = JSA['PM_JSA2_imag'];
-
+;
     var N = dim*dim;
     var JSI = new Float64Array(N);
 
@@ -2480,8 +2480,8 @@ PhaseMatch.calc_HOM_rate = function calc_HOM_rate(ls_start, ls_stop, li_start, l
         // rate = arg2_real;
         var arg2_imag = Tosc_real*PM_JSA2_imag[index_s][index_i] + Tosc_imag*PM_JSA2_real[index_s][index_i];
 
-        var PM_real = (PM_JSA1_real[index_s][index_i] - arg2_real)/2;///Math.sqrt(2);
-        var PM_imag = (PM_JSA1_imag[index_s][index_i] - arg2_imag)/2; //Math.sqrt(2);
+        var PM_real = (PM_JSA1_real[index_s][index_i] + arg2_real)/2;///Math.sqrt(2);
+        var PM_imag = (PM_JSA1_imag[index_s][index_i] + arg2_imag)/2; //Math.sqrt(2);
 
         var val= sq(PM_real) + sq(PM_imag);
         JSI[i] = val;
@@ -2711,13 +2711,13 @@ PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_s
 
         // loop over wi1
         for (var k=0; k<dim; k++){
-            var A_real = PM_JSA_real[j][k]
-            var A_imag = PM_JSA_imag[j][k]
+            var A_real = PM_JSA_real[j][k];
+            var A_imag = PM_JSA_imag[j][k];
 
             // loop over ws2
             for (var l=0; l<dim; l++){
-                var C_real = PM_JSA_real[l][k]
-                var C_imag = PM_JSA_imag[l][k]
+                var C_real = PM_JSA_real[l][k];
+                var C_imag = PM_JSA_imag[l][k];
 
                 // loop over wi2
                 for (var m=0; m<dim; m++){
@@ -2737,11 +2737,11 @@ PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_s
                     var Phase_si_real = Math.cos(ARG_si);
                     var Phase_si_imag = Math.sin(ARG_si);
 
-                    var B_real = PM_JSA_real[l][m]
-                    var B_imag = PM_JSA_imag[l][m]
+                    var B_real = PM_JSA_real[l][m];
+                    var B_imag = PM_JSA_imag[l][m];
 
-                    var D_real = PM_JSA_real[j][m]
-                    var D_imag = PM_JSA_imag[j][m]
+                    var D_real = PM_JSA_real[j][m];
+                    var D_imag = PM_JSA_imag[j][m];
 
                     var Arg1_real = A_real*B_real - A_imag*B_imag;
                     var Arg1_imag = A_real*B_imag + A_imag*B_real; //minus here b/c of complex conjugate
@@ -2788,19 +2788,19 @@ PhaseMatch.calc_2HOM_norm = function calc_HOM_norm(PM_JSA_real, PM_JSA_imag, dim
 
         // loop over wi1
         for (var k=0; k<dim; k++){
-            var A_real = PM_JSA_real[j][k]
-            var A_imag = PM_JSA_imag[j][k]
+            var A_real = PM_JSA_real[j][k];
+            var A_imag = PM_JSA_imag[j][k];
 
             // loop over ws2
             for (var l=0; l<dim; l++){
-                // var C_real = PM_JSA_real[l][k]
-                // var C_imag = PM_JSA_imag[l][k]
+                // var C_real = PM_JSA_real[l][k];
+                // var C_imag = PM_JSA_imag[l][k];
 
                 // loop over wi2
                 for (var m=0; m<dim; m++){
 
-                    var B_real = PM_JSA_real[l][m]
-                    var B_imag = PM_JSA_imag[l][m]
+                    var B_real = PM_JSA_real[l][m];
+                    var B_imag = PM_JSA_imag[l][m];
 
                     var Arg1_real = A_real*B_real - A_imag*B_imag;
                     var Arg1_imag = A_real*B_imag + A_imag*B_real;

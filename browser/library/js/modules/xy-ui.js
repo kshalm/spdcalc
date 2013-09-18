@@ -24,7 +24,7 @@ define(
 
 
         var con = PhaseMatch.constants;
-        
+
         /**
          * @module JSAUI
          * @implements {Stapes}
@@ -131,7 +131,7 @@ define(
                         y: 'Phi Signal (deg)'
                     }
                 });
-                
+
                 self.elplotThetaPhi = $(self.plotThetaPhi.el);
 
                 // Theta/Phi in the crystal
@@ -143,7 +143,7 @@ define(
                         y: 'Theta Idler (deg)'
                     }
                 });
-                
+
                 self.elplotThetaTheta = $(self.plotThetaTheta.el);
 
                 self.addPlot( self.plotPMXY );
@@ -166,7 +166,7 @@ define(
                 props.lambda_i = 1/(1/props.lambda_p - 1/props.lambda_s);
                 lim = PhaseMatch.autorange_lambda(props, threshold);
                 lim_theta = PhaseMatch.autorange_theta(props);
-                
+
                 self.plotOpts.set({
                     'grid_size': 100,
                     'ls_start': lim.lambda_s.min,
@@ -199,11 +199,11 @@ define(
                     ;
 
                 var PMXY = PhaseMatch.calc_XY(
-                    props, 
-                    -1 * po.get('theta_stop'), 
-                    po.get('theta_stop'), 
-                    -1 * po.get('theta_stop'), 
-                    po.get('theta_stop'), 
+                    props,
+                    -1 * po.get('theta_stop'),
+                    po.get('theta_stop'),
+                    -1 * po.get('theta_stop'),
+                    po.get('theta_stop'),
                     po.get('grid_size')
                 );
 
@@ -250,7 +250,7 @@ define(
                     po.get('theta_stop'),
                     po.get('grid_size')
                 );
-                
+
                 // t_start = 0;
                 // t_stop = Math.PI/180;
 
@@ -262,7 +262,7 @@ define(
                 //     Math.PI + t_stop,
                 //     dim
                 // );
-                
+
                 self.dataThetaTheta = PMThetaTheta;
                 self.plotThetaTheta.setXRange([ t_start, t_stop ]);
                 self.plotThetaTheta.setYRange([ t_start, t_stop ]);
@@ -272,10 +272,10 @@ define(
             draw: function(){
 
                 var self = this;
-                    
+
                 // PMXY plot
-                if (!self.dataPMXY || 
-                    !self.dataLambdasThetas || 
+                if (!self.dataPMXY ||
+                    !self.dataLambdasThetas ||
                     !self.dataThetaPhi ||
                     !self.dataThetaTheta
                 ){

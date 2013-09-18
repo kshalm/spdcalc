@@ -33,7 +33,7 @@ define(
                 z: '.1f'
             },
 
-            // use antialiasing when scaling the data 
+            // use antialiasing when scaling the data
             antialias: true,
 
             //show log plot
@@ -66,6 +66,8 @@ define(
 
                 return colorsc;
             }
+
+
         };
 
         function create2DArray(data, dimx, dimy){
@@ -73,9 +75,9 @@ define(
             var index = 0;
 
             for (var i = 0; i<dimy; i++){
-                
+
                 var row = new Float64Array(dimx);
-                
+
                 for  (var j = 0; j<dimx; j++){
                     row[j] = data[index];
                     index += 1;
@@ -130,8 +132,9 @@ define(
             this.logplot = new Boolean();
             this.logplot = options.logplot;
 
+
             // init scales
-            
+
             if (this.logplot){
                 this.scales = {
                     x: d3.scale.linear().domain( options.xrange ).nice(),
@@ -148,16 +151,29 @@ define(
             }
             // console.log("initalize",this.logplot);
 
-            
+
 
             this.margin = defaults.margins;
             this.setFormat(options.format);
             this.resize( options.width, options.height );
             this.setMargins( options.margins );
-            
+
             this.hiddenCtx = this.hiddenCanvas.getContext('2d');
             this.ctx = this.canvas.getContext('2d');
+
+            $(this.canvas).mousemove(function(e){
+                console.log('moving!');
+                var xcoord = this.scales.x( e.offsetX );
+                console.log(xcoord);
+                this.setTitle("xcoord: ", xcoord);
+            });
+
         }
+            // mouseenter
+            // mouseleave
+            // CSS:
+            // .heatmap canvas {
+            // cursor: crosshair;
 
         HeatMap.prototype = {
 
@@ -168,7 +184,7 @@ define(
                 if (typeof fmt === 'object'){
 
                     this.format = $.extend( this.format, fmt );
-                    
+
                 } else {
 
                     this.format.x = fmt;
@@ -354,7 +370,7 @@ define(
 
                 var vals = [].concat(dom);
                 // console.log(defaults.logplot);
-                if (this.logplot){ 
+                if (this.logplot){
                     vals.splice(1, 0, (dom[1]-dom[0]) / 10);
                     var zAxis = d3.svg.axis()
                     // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
@@ -410,7 +426,7 @@ define(
                 // for every data point, get its color
                 // and write the pixel data
                 for ( var i = 0, l = data.length; i < l; ++i ){
-                            
+
                     val = data[ i ];
                     color = d3.rgb(colorScale( val ));
                     idx = 4 * i;
@@ -448,7 +464,7 @@ define(
                 rows = Math.floor(rows);
 
                 for ( var i = 0; i < cols; ++i ){
-                    
+
                     xvals.push( x.invert( i / scale ) );
                 }
 
@@ -502,6 +518,7 @@ define(
 
             plotData: function( data ){
 
+
                 var l = data.length
                     ,cols = this.width
                     ,rows = this.height
@@ -521,12 +538,12 @@ define(
                 img = this.makeImageData( cols, rows, data );
 
                 if (this.antialias){
-                    
+
                     this.hiddenCtx.putImageData(img, 0, 0);
 
                     // draw to the visible canvas
                     this.ctx.save();
-                    
+
                     if ( scale < 1 ){
                         // scale it if necessary
                         this.ctx.scale( 1/scale, 1/scale );
@@ -542,6 +559,7 @@ define(
                 }
             }
         };
+
 
         return HeatMap;
     }

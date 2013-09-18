@@ -283,7 +283,6 @@ define(
                 // console.log("visibility", vis);
                 self.plot1d.setTitle("Hong-Ou-Mandel visibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
 
-
                 self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
             },
 
@@ -315,6 +314,9 @@ define(
                     ;
 
                 self.data = PM;
+
+                // var S= PhaseMatch.calc_Schmidt(PM);
+                // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
 
                 self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);

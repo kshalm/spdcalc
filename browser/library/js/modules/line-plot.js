@@ -186,6 +186,33 @@ define(
                   .style("text-anchor", "middle")
                   .text( labels.y )
                   ;
+
+
+                // add in the legend
+                svg.selectAll('.legend').remove();
+
+                var legend = svg.append('g')
+                        .attr('class', 'legend');
+
+                for ( var i = 0, l = this.series.length; i < l; ++i ){
+
+                    var title = this.series[i]['title'];
+                    var color = this.series[i]['color'];
+                    var ycoord = i*20;
+
+                    legend.append('rect')
+                        .attr('x', width - 60)
+                        .attr('y', ycoord)
+                        .attr('width', 10)
+                        .attr('height', 4)
+                        .style('fill', color);
+
+                    legend.append("text")
+                      .attr("x", width - 45)
+                      .attr("y", ycoord +2)
+                      .attr("dy", ".35em")
+                      .text(title); //function(d) { return  });
+                }
             },
 
             getLogPlot: function(){
@@ -195,7 +222,6 @@ define(
             exportData: function(){
 
                 if (!this.series[0].data){
-                    console.log("hello");
                     return [];
                 }
 
@@ -263,6 +289,7 @@ define(
                 cfg.data = data;
 
                 this.series.push( cfg );
+                console.log(this.series[0]['title']);
             },
 
             clear: function(){

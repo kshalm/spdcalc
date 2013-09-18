@@ -517,6 +517,8 @@ define(
 
                 });
 
+
+
                 $(window).on('click', function(e){
 
                     var tgt = $(e.target);
