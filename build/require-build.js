@@ -28,7 +28,7 @@ module.exports = ({
 
     // If set to true, any files that were combined into a build layer will be
     // removed from the output folder.
-    removeCombined: true,
+    // removeCombined: true,
 
     // uncomment to include conditionally loaded modules
     // findNestedDependencies: true,
@@ -53,7 +53,7 @@ module.exports = ({
         },
         // page level dependencies.
         {
-            name: 'page-boilerplate',
+            name: 'page-pm-ui',
             // this usually is used for creating
             // modules that don't exist in the optimized
             // source yet. Instead, we're using it to
@@ -71,8 +71,8 @@ module.exports = ({
             // at the bottom. Used in conjunction with
             // create: true as described above.
             include: [
-                'mediators/boilerplate',
-                'page-boilerplate'
+                'mediators/pm-ui',
+                'page-pm-ui'
             ],
 
             // Exclude anything already included

@@ -129,9 +129,7 @@ define(
             this.el.append( $(this.canvas).css('zIndex', 1).css('position', 'relative') );
             this.hiddenCanvas = document.createElement('canvas');
 
-            this.logplot = new Boolean();
             this.logplot = options.logplot;
-
 
             // init scales
 
@@ -152,7 +150,6 @@ define(
             // console.log("initalize",this.logplot);
 
 
-
             this.margin = defaults.margins;
             this.setFormat(options.format);
             this.resize( options.width, options.height );
@@ -161,11 +158,12 @@ define(
             this.hiddenCtx = this.hiddenCanvas.getContext('2d');
             this.ctx = this.canvas.getContext('2d');
 
-            $(this.canvas).mousemove(function(e){
-                console.log('moving!');
-                var xcoord = this.scales.x( e.offsetX );
-                console.log(xcoord);
-                this.setTitle("xcoord: ", xcoord);
+            var self = this;
+            $(this.el).on('mousemove', function(e){
+                var offset = $(self.canvas).offset();
+                var xcoord = self.scales.x.invert( e.pageX - offset.left );
+                var ycoord = self.scales.y.invert( e.pageY - offset.top );
+                self.setTitle('coord: (' + xcoord.toFixed(0) + ', ' + ycoord.toFixed(0) + ')');
             });
 
         }

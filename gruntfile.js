@@ -111,6 +111,11 @@ module.exports = function(grunt) {
                 bg: true
             },
 
+            httpserverDist: {
+                cmd: 'node node_modules/http-server/bin/http-server -p 8080 <%= config.browserDistDir %>',
+                bg: true
+            },
+
             cleanCompass: {
                 cmd: 'compass clean --config <%= compass.browser.options.config %>',
                 options: {
@@ -182,6 +187,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('cleanup', ['clean', 'bgShell:cleanCompass']);
     grunt.registerTask('dev', [ 'bgShell:watchCompass', 'bgShell:httpserver', 'watch']);
+    grunt.registerTask('server-dist', [ 'bgShell:httpserverDist', 'watch' ]);
     grunt.registerTask('build-browser', ['cleanup', 'jshint:browser', 'compass', 'requirejs:browser']);
 
     grunt.registerTask('build-phasematch', ['clean', 'lodash', 'concat:phasematch', 'copy:phasematch', 'jshint:phasematch', 'uglify', 'jasmine']);
