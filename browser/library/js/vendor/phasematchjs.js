@@ -2480,6 +2480,53 @@ PhaseMatch.calc_HOM_rate = function calc_HOM_rate(ls_start, ls_stop, li_start, l
         // rate = arg2_real;
         var arg2_imag = Tosc_real*PM_JSA2_imag[index_s][index_i] + Tosc_imag*PM_JSA2_real[index_s][index_i];
 
+        var PM_real = (PM_JSA1_real[index_s][index_i] - arg2_real)/2;///Math.sqrt(2);
+        var PM_imag = (PM_JSA1_imag[index_s][index_i] - arg2_imag)/2; //Math.sqrt(2);
+
+        var val= sq(PM_real) + sq(PM_imag);
+        JSI[i] = val;
+        rate +=val;
+    }
+
+    return {"rate":rate, "JSI":JSI};
+};
+
+
+/*
+ * calc_HOM_bunch_JSA()
+ * Calculates the Joint Spectra Amplitude of the HOM at a particluar time delay
+ * P is SPDC Properties object
+ * ls_start ... li_stop are the signal/idler wavelength ranges to calculate over
+ * delT is the time delay between signal and idler
+ */
+PhaseMatch.calc_HOM_bunch_rate = function calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, dim){
+    var con = PhaseMatch.constants;
+
+    var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+    var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
+
+    var rate = 0;
+
+    var PM_JSA1_real = JSA['PM_JSA1_real'];
+    var PM_JSA1_imag = JSA['PM_JSA1_imag'];
+    var PM_JSA2_real = JSA['PM_JSA2_real'];
+    var PM_JSA2_imag = JSA['PM_JSA2_imag'];
+;
+    var N = dim*dim;
+    var JSI = new Float64Array(N);
+
+    for (var i=0; i<N; i++){
+        var index_s = i % dim;
+        var index_i = Math.floor(i / dim);
+
+        var ARG = 2*Math.PI*con.c *(1/lambda_s[index_s] - 1/lambda_i[index_i])*delT;
+        var Tosc_real = Math.cos(ARG);
+        var Tosc_imag = Math.sin(ARG);
+
+        var arg2_real = Tosc_real*PM_JSA2_real[index_s][index_i] - Tosc_imag*PM_JSA2_imag[index_s][index_i];
+        // rate = arg2_real;
+        var arg2_imag = Tosc_real*PM_JSA2_imag[index_s][index_i] + Tosc_imag*PM_JSA2_real[index_s][index_i];
+
         var PM_real = (PM_JSA1_real[index_s][index_i] + arg2_real)/2;///Math.sqrt(2);
         var PM_imag = (PM_JSA1_imag[index_s][index_i] + arg2_imag)/2; //Math.sqrt(2);
 
@@ -2490,14 +2537,17 @@ PhaseMatch.calc_HOM_rate = function calc_HOM_rate(ls_start, ls_stop, li_start, l
 
     return {"rate":rate, "JSI":JSI};
 };
-
 /*
  * calc_HOM_scan()
  * Calculates the HOM probability of coincidences over range of times.
  * P is SPDC Properties object
  * delT is the time delay between signal and idler
  */
-PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, ls_stop, li_start, li_stop, dim){
+PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, ls_stop, li_start, li_stop, dim, dip){
+    // console.log(dip);
+    // dip = dip || true;
+    // console.log(dip);
+
 
     var npts = 100;  //number of points to pass to the calc_HOM_JSA
 
@@ -2525,10 +2575,15 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
     var N = PhaseMatch.Sum(PM_JSI);
 
     for (var i=0; i<dim; i++){
-        var rate = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT[i], JSA, npts);
+        if (dip){
+            var rate = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT[i], JSA, npts);
+        }
+        else {
+            var rate = PhaseMatch.calc_HOM_bunch_rate(ls_start, ls_stop, li_start, li_stop, delT[i], JSA, npts);
+        }
+
         HOM_values[i] = (rate["rate"])/N;
     }
-    console.log("Hom values", HOM_values);
     return HOM_values;
 
 };
@@ -2540,7 +2595,7 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
  * ls_start ... li_stop are the signal/idler wavelength ranges to calculate over
  * delT is the time delay between signal and idler
  */
-PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(P, ls_start, ls_stop, li_start, li_stop, delT, dim){
+PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(P, ls_start, ls_stop, li_start, li_stop, delT, dim, dip){
     var PM_JSA1 = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, dim);
     var PM_JSA2 = PhaseMatch.calc_JSA(P, li_start, li_stop, ls_start, ls_stop, dim);
 
@@ -2555,135 +2610,17 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(P, ls_start, ls_stop, li_start, 
         ,'PM_JSA2_real': PM_JSA2_real
         ,'PM_JSA2_imag': PM_JSA2_imag
         };
-    var JSI = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, dim);
+
+    if (dip){
+        var JSI = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, dim);
+    }
+    else {
+        var JSI = PhaseMatch.calc_HOM_bunch_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, dim);
+    }
+
     return JSI["JSI"];
 }
 
-// /*
-//  * calc_HOM_JSA()
-//  * Calculates the Joint Spectra Amplitude of the HOM at a particluar time delay
-//  * P is SPDC Properties object
-//  * ls_start ... li_stop are the signal/idler wavelength ranges to calculate over
-//  * delT is the time delay between signal and idler
-//  */
-// PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(props, ls_start, ls_stop, li_start, li_stop, delT, dim){
-//     var con = PhaseMatch.constants;
-//     var P = props.clone();
-//     P.update_all_angles();
-
-//     var i;
-//     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
-//     var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
-
-//     var N = dim * dim;
-//     var THETA1_real = new Float64Array( N );
-//     var THETA1_imag = new Float64Array( N );
-//     var THETA2_real  = new Float64Array( N ); // The transposed version of THETA1
-//     var THETA2_imag  = new Float64Array( N );
-//     var Tosc_real = new Float64Array( N ); // Real/Imag components of phase shift
-//     var Tosc_imag = new Float64Array( N );
-//     var PM2 = new Float64Array( N );
-//     var ARG = 0;
-
-//     var PM_JSI1 = PhaseMatch.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, dim);
-//     var PM_JSI2 = PhaseMatch.calc_JSI(P, li_start, li_stop, ls_start, ls_stop, dim);
-//     PM_JSI2 = PhaseMatch.AntiTranspose(PM_JSI2,dim);
-
-//     var PM = new Float64Array( N );
-
-
-//     for (i=0; i<N; i++){
-//         var index_s = i % dim;
-//         var index_i = Math.floor(i / dim);
-
-//         //First calculate PM(ws,wi)
-//         P.lambda_s = lambda_s[index_s];
-//         P.lambda_i = lambda_i[index_i];
-//         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-//         // P.optimum_idler(P); //Need to find the optimum idler.
-//         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-
-
-//         var PMtmp = PhaseMatch.phasematch(P);
-//         THETA1_real[i] = PMtmp[0];
-//         THETA1_imag[i] = PMtmp[1];
-
-//         //Next calculate PM(wi,ws)
-//         P.lambda_s = lambda_i[index_i];
-//         P.lambda_i = lambda_s[index_s];
-//         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-//         // P.optimum_idler(P); //Need to find the optimum idler.
-//         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-
-//         PMtmp = PhaseMatch.phasematch(P);
-//         THETA2_real[i] = PMtmp[0];
-//         THETA2_imag[i] = PMtmp[1];
-
-//         // THETA2_real[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[0]; //Transpose
-//         // THETA2_imag[(dim -1 - index_s) * dim + (dim - 1 -index_s)] = PMtmp[1];
-
-//         ARG = 2*Math.PI*con.c *(1/lambda_s[index_s] - 1/lambda_i[index_i])*delT;
-//         Tosc_real[i] = Math.cos(ARG);
-//         Tosc_imag[i] = Math.sin(ARG);
-//         // Tosc_real[i] = 1;
-//         // Tosc_imag[i] = 0;
-//     }
-
-//     // THETA2_real = PhaseMatch.AntiTranspose(THETA1_real,dim);
-//     // THETA2_imag = PhaseMatch.AntiTranspose(THETA1_imag,dim);
-
-
-//     var maxval = 0;
-//     for (i=0; i<N; i++){
-
-//         PM2[i] = sq(THETA2_real[i]) + sq(THETA2_imag[i]);
-//         PM[i] = Math.abs(PM_JSI2[i] - PM2[i]);
-
-//         // var arg2_real = Tosc_real[i]*THETA2_real[i] - Tosc_imag[i]*THETA2_imag[i];
-//         // var arg2_imag = Tosc_real[i]*THETA2_imag[i] + Tosc_imag[i]*THETA2_real[i];
-
-//         // var PM_real = (THETA1_real[i] - arg2_real)/2;///Math.sqrt(2);
-//         // var PM_imag = (THETA1_imag[i] - arg2_imag)/2; //Math.sqrt(2);
-
-//         // PM[i] = sq(PM_real) + sq(PM_imag);
-//         // if (PM[i] > maxval) {maxval = PM[i];}
-//     }
-
-//     // console.log("Max PM value = ", maxval);
-
-//     return PM;
-// };
-
-// /*
-//  * calc_HOM_scan()
-//  * Calculates the HOM probability of coincidences over range of times.
-//  * P is SPDC Properties object
-//  * delT is the time delay between signal and idler
-//  */
-// PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, ls_stop, li_start, li_stop, dim){
-
-//     var npts = 50;  //number of points to pass to the calc_HOM_JSA
-
-//     var i;
-//     var delT = PhaseMatch.linspace(t_start, t_stop, dim);
-
-//     var HOM_values = PhaseMatch.linspace(t_start, t_stop, dim);
-//     var PM_JSA = new Float64Array(npts*npts);
-
-//     // Calculate normalization
-//     var norm = new Float64Array(npts*npts);
-//     norm = PhaseMatch.calc_JSI(P,ls_start, ls_stop, li_start,li_stop, npts);
-//     var N = PhaseMatch.Sum(norm);
-
-//     for (i=0; i<dim; i++){
-//         PM_JSA = PhaseMatch.calc_HOM_JSA(P, ls_start, ls_stop, li_start, li_stop, delT[i], npts);
-//         var total = PhaseMatch.Sum(PM_JSA)/N;
-//         HOM_values[i] = total;
-//     }
-
-//     return HOM_values;
-
-// };
 
 /*
  * calc_2HOM_rate()
@@ -2767,7 +2704,7 @@ PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_s
             }
         }
     }
-    return {"ss":rate_ss, "ii":rate_ii, "si":rate_si};
+    return {"ii":rate_ss, "ss":rate_ii, "si":rate_si};
 };
 
 /*

@@ -28,6 +28,7 @@ define(
         'modules/modesolver-ui',
         'modules/pm-curves-ui',
         'modules/jsa-2hom-ui',
+        'modules/jsa-hom-bunching-ui'
     ],
     function(
         $,
@@ -57,7 +58,8 @@ define(
         schmidtUI,
         msUI,
         curvesUI,
-        jsa2homUI
+        jsa2homUI,
+        jsahomBunchUI
     ) {
 
         'use strict';
@@ -420,6 +422,8 @@ define(
                 self.set('curves', curvesUI());
                 // Two source hom
                 self.set('jsa-2hom', jsa2homUI());
+                // Two source hom
+                self.set('jsa-hom-bunch', jsahomBunchUI());
             },
 
             /**

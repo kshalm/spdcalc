@@ -261,10 +261,10 @@ define(
                         po.get('ls_stop'),
                         po.get('li_start'),
                         po.get('li_stop'),
-                        dim
+                        dim,
+                        true
                     )
                     ;
-                    console.log(HOM);
                  var endtime = new Date();
                  // console.log("Time to run HOM scan code: ", endtime-starttime);
 
@@ -309,7 +309,8 @@ define(
                         po.get('li_start'),
                         po.get('li_stop'),
                         self.get('delT'),
-                        po.get('grid_size')
+                        po.get('grid_size'),
+                        true
                     )
                     ;
 

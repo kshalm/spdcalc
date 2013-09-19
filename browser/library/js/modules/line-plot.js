@@ -29,6 +29,8 @@ define(
                 bottom: 60
             },
 
+            legend: false,
+
             // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
             format: null
 
@@ -72,6 +74,9 @@ define(
             this.margin = defaults.margins;
             this.resize( options.width, options.height );
             this.setMargins( options.margins );
+
+            this.showlegend = new Boolean();
+            this.showlegend = options.legend;
         }
 
         LinePlot.prototype = {
@@ -187,8 +192,24 @@ define(
                   .text( labels.y )
                   ;
 
+                if (this.showlegend){
+                    this.drawLegend();
+                }
+            },
 
-                // add in the legend
+            displayLegend: function(bool){
+                this.showlegend = bool;
+            },
+
+            drawLegend: function(){
+                var svg = this.svgPlot
+                    ,x = this.scales.x
+                    ,y = this.scales.y
+                    ,labels = this.labels
+                    ,width = this.width
+                    ,height = this.height
+                    ;
+
                 svg.selectAll('.legend').remove();
 
                 var legend = svg.append('g')
@@ -214,6 +235,7 @@ define(
                       .text(title); //function(d) { return  });
                 }
             },
+
 
             getLogPlot: function(){
 
@@ -289,7 +311,6 @@ define(
                 cfg.data = data;
 
                 this.series.push( cfg );
-                console.log(this.series[0]['title']);
             },
 
             clear: function(){
