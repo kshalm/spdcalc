@@ -158,12 +158,46 @@ define(
             this.hiddenCtx = this.hiddenCanvas.getContext('2d');
             this.ctx = this.canvas.getContext('2d');
 
+            var calcXindex = function(val){
+                    var range = self.scales.x.domain();
+                    var index = Math.floor(((val-range[0])/(range[1]- range[0]))*self.cols);
+                    // console.log(val, range, index, self.cols);
+                    return index;
+            };
+
+            var calcYindex = function(val){
+                    var range = self.scales.y.domain();
+                    var index = Math.floor(((val-range[0])/(range[1]- range[0]))*self.rows);
+                    // console.log(val, range, index, self.cols);
+                    return index;
+            };
+
             var self = this;
             $(this.el).on('mousemove', function(e){
                 var offset = $(self.canvas).offset();
-                var xcoord = self.scales.x.invert( e.pageX - offset.left );
-                var ycoord = self.scales.y.invert( e.pageY - offset.top );
-                self.setTitle('coord: (' + xcoord.toFixed(0) + ', ' + ycoord.toFixed(0) + ')');
+                // console.log(( e.pageX - offset.left ), e.pageY - offset.top);
+                var x = e.pageX - offset.left;
+                var y = e.pageY - offset.top;
+                self.el.css("cursor", "auto");
+
+                if (x>=0 && y>=0 && x<self.width && y<self.height){
+                    self.el.css("cursor", "crosshair");
+                    var xcoord = self.scales.x.invert( e.pageX - offset.left );
+                    var ycoord = self.scales.y.invert( e.pageY - offset.top );
+                    var indexX = calcXindex(xcoord);
+                    var indexY = calcYindex(ycoord);
+                    var zcoord = self.data[self.cols*((self.cols-indexY)-1) + indexX];
+
+                    self.setTitle('Coordinates: (' + xcoord.toFixed(0) + ', ' + ycoord.toFixed(0) + ', ' + zcoord.toFixed(3)+')');
+                }
+            });
+
+            $(this.el).on('mouseenter', function(e){
+                self.backuptitle = self.elTitle.text();
+            });
+
+            $(this.el).on('mouseleave', function(e){
+                self.setTitle(self.backuptitle);
             });
 
         }
@@ -524,6 +558,7 @@ define(
                     ,img
                     ;
 
+
                 this.data = data;
 
                 cols *= scale;
@@ -531,6 +566,9 @@ define(
 
                 cols = Math.floor(cols);
                 rows = Math.floor(rows);
+
+                this.cols = cols;
+                this.rows = rows;
 
                 // write the image data to the hidden canvas
                 img = this.makeImageData( cols, rows, data );
