@@ -206,81 +206,18 @@ define(
 
                 });
 
-                // collapse button
-                self.el.on('click', '#collapse-crystal', function(e){
+                //////////////////////////////////////////////
+                // collapse buttons
+                self.el.on('click', '.collapse-ctrl', function(e){
                     e.preventDefault();
                     // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-crystal').parent().parent().parent()
+                    var target = $(this).parent().parent().parent()
                         ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
                         ;
 
                     $(this).text( text );
                     target.toggleClass('collapsed');
                 });
-
-                // collapse button pump properties
-                self.el.on('click', '#collapse-pump', function(e){
-                    e.preventDefault();
-                    // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-pump').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                        ;
-
-                    $(this).text( text );
-                    target.toggleClass('collapsed');
-                });
-
-                // collapse button signal properties
-                self.el.on('click', '#collapse-signal', function(e){
-                    e.preventDefault();
-                    // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-signal').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                        ;
-
-                    $(this).text( text );
-                    target.toggleClass('collapsed');
-                });
-
-                // collapse button poling properties
-                self.el.on('click', '#collapse-poling', function(e){
-                    e.preventDefault();
-                    // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-poling').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                        ;
-
-                    $(this).text( text );
-                    target.toggleClass('collapsed');
-                });
-
-                // collapse button plot options
-                self.el.on('click', '#collapse-plotopts', function(e){
-                    e.preventDefault();
-                    // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-plotopts').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                        ;
-
-                    $(this).text( text );
-                    target.toggleClass('collapsed');
-                });
-
-                // // collapse button for JSA module plot
-                // self.el.on('click', '#collapse-jsa', function(e){
-                //     e.preventDefault();
-                //     // var target = self.elParameters.parent()
-                //     var target = self.el.find('#collapse-JSA').parent().parent().parent()
-                //         ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                //         ;
-
-                //     $(this).text( text );
-                //     target.toggleClass('collapsed');
-                // });
-
-
-
-
 
                 //////////////////////////////////////////////////////////////////////////////////
                 // autocalc checkbox
@@ -291,7 +228,7 @@ define(
                     self.autocalc = enabled;
                 });
 
-                 //////////////////////////////////////////////////////////////////////////////////
+                //////////////////////////////////////////////////////////////////////////////////
                 // Enable the periodic poling options
                 self.el.on('change', '#enable-calc-pp', function(){
 
