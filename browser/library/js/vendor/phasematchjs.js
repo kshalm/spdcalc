@@ -4102,6 +4102,10 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 
     props.update_all_angles();
     var P = props.clone();
+    P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
+    // console.log(P.lambda_i);
+    // P.update_all_angles();
+    // console.log(P);
     // console.log('After clone',props.phi*180/Math.PI);
 
     P.phi_i = (P.phi_s + Math.PI);
@@ -4151,8 +4155,10 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         P.phi_i = (P.phi_s + Math.PI);
 
         P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-        // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+
+        // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+        // P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
 
         if (P.brute_force) {
