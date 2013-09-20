@@ -19,6 +19,6 @@ Apodization: {{=it.meta.apodization}}
 Apodization FWHM: {{=it.meta.apodization_FWHM}}
 
 {{=it.plot.x.label}}, {{=it.plot.y.label}}
-{{~it.plot.data :val:idx}}{{=val.x}}, {{=val.y}}
+{{~it.plot.data :val:idx}}{{~val :coord:i}}{{=coord}}{{? i < val.length - 1 }}, {{?}}{{~}}
 {{~}}
 

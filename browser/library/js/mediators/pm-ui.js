@@ -160,6 +160,34 @@ define(
                                     } else {
 
                                         tpl.render = tplLinePlotAsCSV;
+
+                                        // ... too many datas...
+                                        var dataNew;
+                                        $.each(data.data, function( idx, series ){
+                                            if ( idx === 0 ){
+                                                // create an array of coordinates
+                                                // [
+                                                //      [ xval, yval ],
+                                                //      ...
+                                                // ]
+                                                dataNew = $.map(series.data, function( el ){
+                                                    return [[ el.x, el.y ]]; // jquery is weird...
+                                                });
+                                                return;
+                                            }
+
+                                            // append series yvals
+                                            $.each( series.data, function( i, el ){
+                                                dataNew[ i ].push( el.y );
+                                            });
+                                        });
+                                        // add titles
+                                        var titles = $.map(data.data, function( series ){
+                                            return series.title;
+                                        });
+                                        titles.unshift( data.x.label );
+                                        dataNew.unshift( titles );
+                                        data.data = dataNew;
                                     }
 
                                     var csv = tpl.render({
@@ -218,81 +246,18 @@ define(
 
                 });
 
-                // collapse button
-                self.el.on('click', '#collapse-crystal', function(e){
+                //////////////////////////////////////////////
+                // collapse buttons
+                self.el.on('click', '.collapse-ctrl', function(e){
                     e.preventDefault();
                     // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-crystal').parent().parent().parent()
+                    var target = $(this).parent().parent().parent()
                         ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
                         ;
 
                     $(this).text( text );
                     target.toggleClass('collapsed');
                 });
-
-                // collapse button pump properties
-                self.el.on('click', '#collapse-pump', function(e){
-                    e.preventDefault();
-                    // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-pump').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                        ;
-
-                    $(this).text( text );
-                    target.toggleClass('collapsed');
-                });
-
-                // collapse button signal properties
-                self.el.on('click', '#collapse-signal', function(e){
-                    e.preventDefault();
-                    // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-signal').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                        ;
-
-                    $(this).text( text );
-                    target.toggleClass('collapsed');
-                });
-
-                // collapse button poling properties
-                self.el.on('click', '#collapse-poling', function(e){
-                    e.preventDefault();
-                    // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-poling').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                        ;
-
-                    $(this).text( text );
-                    target.toggleClass('collapsed');
-                });
-
-                // collapse button plot options
-                self.el.on('click', '#collapse-plotopts', function(e){
-                    e.preventDefault();
-                    // var target = self.elParameters.parent()
-                    var target = self.el.find('#collapse-plotopts').parent().parent().parent()
-                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                        ;
-
-                    $(this).text( text );
-                    target.toggleClass('collapsed');
-                });
-
-                // // collapse button for JSA module plot
-                // self.el.on('click', '#collapse-jsa', function(e){
-                //     e.preventDefault();
-                //     // var target = self.elParameters.parent()
-                //     var target = self.el.find('#collapse-JSA').parent().parent().parent()
-                //         ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
-                //         ;
-
-                //     $(this).text( text );
-                //     target.toggleClass('collapsed');
-                // });
-
-
-
-
 
                 //////////////////////////////////////////////////////////////////////////////////
                 // autocalc checkbox
@@ -303,7 +268,7 @@ define(
                     self.autocalc = enabled;
                 });
 
-                 //////////////////////////////////////////////////////////////////////////////////
+                //////////////////////////////////////////////////////////////////////////////////
                 // Enable the periodic poling options
                 self.el.on('change', '#enable-calc-pp', function(){
 
@@ -549,156 +514,16 @@ define(
                     // }
                 });
 
-                // self.elParameters.find('label[title]').tooltip();
+                //////////////////////////////////////////////////////
+                // Setup the tooltips
+                // 
+                $.each(config.tooltips, function( label, html ){
 
-                self.elParameters.find('label.calc_theta').tooltip({
-                    title: config.tooltips.calc_theta,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.theta').tooltip({
-                    title: config.tooltips.theta,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.phi').tooltip({
-                    title: config.tooltips.phi,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.length').tooltip({
-                    title: config.tooltips.length,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.temperature').tooltip({
-                    title: config.tooltips.temperature,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.lambda_p').tooltip({
-                    title: config.tooltips.lambda_p,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.pump_bw').tooltip({
-                    title: config.tooltips.pump_bw,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.waist_p').tooltip({
-                    title: config.tooltips.waist_p,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.lambda_s').tooltip({
-                    title: config.tooltips.lambda_s,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.theta_s').tooltip({
-                    title: config.tooltips.theta_s,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.phi_s').tooltip({
-                    title: config.tooltips.phi_s,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.brute_force').tooltip({
-                    title: config.tooltips.brute_force,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.calc_pp').tooltip({
-                    title: config.tooltips.calc_pp,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.poling_period').tooltip({
-                    title: config.tooltips.poling_period,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.calc_apodization').tooltip({
-                    title: config.tooltips.calc_apodization,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.apodization_fwhm').tooltip({
-                    title: config.tooltips.apodization_fwhm,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.apodization_steps').tooltip({
-                    title: config.tooltips.apodization_steps,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.calc_plotopts').tooltip({
-                    title: config.tooltips.calc_plotopts,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.grid_size').tooltip({
-                    title: config.tooltips.grid_size,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.plot_lambda_s').tooltip({
-                    title: config.tooltips.plot_lambda_s,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.plot_lambda_i').tooltip({
-                    title: config.tooltips.plot_lambda_i,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.plot_theta_s').tooltip({
-                    title: config.tooltips.plot_theta_s,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.plot_time_delay').tooltip({
-                    title: config.tooltips.plot_time_delay,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.plot_crystal_length').tooltip({
-                    title: config.tooltips.plot_crystal_length,
-                    html: true,
-                    placement: 'top'
-                });
-
-                self.elParameters.find('label.plot_pump_bw').tooltip({
-                    title: config.tooltips.plot_pump_bw,
-                    html: true,
-                    placement: 'top'
+                    self.elParameters.find('label.' + label).tooltip({
+                        title: html,
+                        html: true,
+                        placement: 'top'
+                    });
                 });
 
                 self.emit('ready');
