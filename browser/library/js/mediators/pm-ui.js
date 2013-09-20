@@ -160,6 +160,34 @@ define(
                                     } else {
 
                                         tpl.render = tplLinePlotAsCSV;
+
+                                        // ... too many datas...
+                                        var dataNew;
+                                        $.each(data.data, function( idx, series ){
+                                            if ( idx === 0 ){
+                                                // create an array of coordinates
+                                                // [
+                                                //      [ xval, yval ],
+                                                //      ...
+                                                // ]
+                                                dataNew = $.map(series.data, function( el ){
+                                                    return [[ el.x, el.y ]]; // jquery is weird...
+                                                });
+                                                return;
+                                            }
+
+                                            // append series yvals
+                                            $.each( series.data, function( i, el ){
+                                                dataNew[ i ].push( el.y );
+                                            });
+                                        });
+                                        // add titles
+                                        var titles = $.map(data.data, function( series ){
+                                            return series.title;
+                                        });
+                                        titles.unshift( data.x.label );
+                                        dataNew.unshift( titles );
+                                        data.data = dataNew;
                                     }
 
                                     var csv = tpl.render({

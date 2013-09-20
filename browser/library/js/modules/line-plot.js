@@ -243,13 +243,8 @@ define(
 
             exportData: function(){
 
-                if (!this.series[0].data){
-                    return [];
-                }
-
                 // clone
-                var data = $.map(this.series[0].data, $.proxy($.extend, $, true));
-
+                // var data = $.map(this.series[0].data, $.proxy($.extend, $, true));
 
                 return {
                     title: this.elTitle.text(),
@@ -260,7 +255,7 @@ define(
                     y: {
                         label: this.labels.y
                     },
-                    data: data
+                    data: [].concat( this.series )
                 };
             },
 
