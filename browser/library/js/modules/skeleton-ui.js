@@ -22,7 +22,7 @@ define(
 
         var to;
         var defaults = {
-            
+
         };
 
         function checkRecalc(){
@@ -108,14 +108,14 @@ define(
                 dd.on('click', '.log-plot-ctrl', function(e){
 
                     // self.emit('log-plot', function(){
-                        console.log('inside emit', plot.getLogPlot());
+                        // console.log('inside emit', plot.getLogPlot());
                         if (plot.getLogPlot() === true){
                             plot.setLogPlot(false);
-                        }   
+                        }
                         else if(plot.getLogPlot() === false){
                             plot.setLogPlot(true);
                         }
-                    
+
                 });
             },
 
@@ -148,7 +148,7 @@ define(
 
                 // auto draw
                 self.refresh();
-                
+
             },
 
             disconnect: function( app ){
@@ -171,15 +171,15 @@ define(
                 //     ,dim = Math.min( width, height ) - 100 // - margin
                 //     ;
 
-                // if (dim > 400){ 
+                // if (dim > 400){
                 //     dim = 400;
                 // }
 
                 // for ( var i = 0, l = self.plots.length; i < l; ++i ){
-                    
+
                 //     self.plots[ i ].resize( dim );
                 // }
-                
+
                 // self.draw();
             },
 
@@ -193,11 +193,11 @@ define(
                 self.calculating = true;
 
                 if ( self.plotOpts.get('autocalc_plotopts') ){
-
                     self.autocalcPlotOpts();
                 }
 
                 self.calc( self.parameters.getProps() );
+
                 self.calculating = false;
 
                 self.draw();
@@ -212,7 +212,7 @@ define(
 
             calc: function( props ){
 
-                throw 'You must override the calc() method.';             
+                throw 'You must override the calc() method.';
             },
 
             draw: function(){

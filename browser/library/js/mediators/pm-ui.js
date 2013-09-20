@@ -200,8 +200,20 @@ define(
                         if (unit){
                             val  = converter.to( unit, val );
                         }
-                        // console.log(val, key);
-                        el.val( val );
+
+                        // keeps the plot options from incorrectly refreshing if
+                        // autocalc plot options is checked.
+                        if (self.elPlotOpts.find('[name="'+key+'"]').length>0){
+
+                            if ( !self.plotOpts.get('autocalc_plotopts') ){
+                                el.val( val );
+                            }
+                        }
+                        else {
+                            el.val( val );
+                        }
+
+                        //
                     });
 
                 });
@@ -327,7 +339,7 @@ define(
                     }
                     // console.log("in PM-ui", key, val);
                     // update the corresponding property in the parameters object
-                    console.log(key,val);
+                    // console.log(key,val)
                     self.parameters.set( key, val );
                 });
 

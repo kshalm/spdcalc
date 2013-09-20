@@ -30,7 +30,7 @@ define(
                 var args = Array.prototype.slice.call( arguments );
 
                 to = setTimeout(function(){
-                    
+
                     ret = fn.apply(ctx, args);
 
                 }, 100);
@@ -41,7 +41,7 @@ define(
 
         var con = PhaseMatch.constants;
         var defaults = {
-            
+
         };
 
         var types = {
@@ -75,7 +75,7 @@ define(
 
                 // this ensures that .refresh() calls
                 // get throttled so they don't do double refreshes
-                
+
                 self.refresh = debounce( self.refresh, 100, self );
                 self.checkautocalc = debounce( self.checkautocalc, 50, self );
             },
@@ -93,7 +93,7 @@ define(
 
                         if (key === 'theta_s_e'){
                             var theta_s = PhaseMatch.find_internal_angle(self.props, "signal");
-                            console.log("theta_s int", theta_s*180/Math.PI);
+                            // console.log("theta_s int", theta_s*180/Math.PI);
                             self.props.set("theta_s", theta_s);
                         }
                         if (key === 'theta_i_e'){
@@ -101,10 +101,6 @@ define(
                             // console.log("theta_s int", val);
                             self.props.set("theta_i", theta_i);
                         }
-                        // if (name === "theta_i_e"){
-                        //     var theta_i = PhaseMatch.find_external_angle(this, "idler");
-                        //     this.set("theta_i", theta_i);
-                        // }
 
                         self.checkautocalc();
                         self.refresh();
@@ -165,7 +161,7 @@ define(
                     pfx = types[ tp ];
 
                     if (    pfx &&
-                            val !== null && 
+                            val !== null &&
                             val !== ''
                     ){
                         ser += '&' + encodeURIComponent( key ) + '=' + encodeURIComponent( pfx + val );
@@ -181,7 +177,7 @@ define(
 
                 if (self.props.autocalctheta){
                     self.props.auto_calc_Theta( self.props );
-                } 
+                }
 
                 if (self.props.autocalcpp){
                     self.props.calc_poling_period( self.props );
