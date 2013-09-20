@@ -40,7 +40,6 @@ define(
                 'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
-                'theta',
                 'time-delay'
             ],
 
@@ -301,6 +300,7 @@ define(
                 var vis = (0.5 -  Math.min.apply(null, HOM['ss']))/0.5;
                 // console.log("visibility", vis);
                 self.plot1d.setTitle("Hong-Ou-Mandel visibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
+                self.plot1d.setYRange([0, Math.max.apply(null,HOM['ss'])*1.3]);
 
                 // self.plot1d.addSeries( data_ii, 'idler-idler' );
 
@@ -340,6 +340,7 @@ define(
                 self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
                 self.plot1d.setTitle("Time delay = " + self.get('delT')/1e-15);
+
             },
 
             draw: function(){

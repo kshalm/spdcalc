@@ -23,7 +23,7 @@ define(
         'use strict';
 
         var con = PhaseMatch.constants;
-        
+
         /**
          * @module schmidtUI
          * @implements {Stapes}
@@ -138,28 +138,28 @@ define(
 
                 var Tstart = new Date();
                 var PM = PhaseMatch.calc_schmidt_plot(
-                     props, 
+                     props,
                     self.plotOpts.get('xtal_l_start'),
                     self.plotOpts.get('xtal_l_stop'),
                     self.plotOpts.get('bw_start'),
                     self.plotOpts.get('bw_stop'),
-                    self.plotOpts.get('ls_start'), 
+                    self.plotOpts.get('ls_start'),
                     self.plotOpts.get('ls_stop'),
-                    self.plotOpts.get('li_start'), 
-                    self.plotOpts.get('li_stop'), 
-                    po.get('grid_size'), 
+                    self.plotOpts.get('li_start'),
+                    self.plotOpts.get('li_stop'),
+                    po.get('grid_size'),
                     params);
 
-                    // props, 
-                    // x_start, 
-                    // x_stop, 
-                    // y_start, 
-                    // y_stop, 
-                    // self.plotOpts.get('ls_start'), 
+                    // props,
+                    // x_start,
+                    // x_stop,
+                    // y_start,
+                    // y_stop,
+                    // self.plotOpts.get('ls_start'),
                     // self.plotOpts.get('ls_stop'),
-                    // self.plotOpts.get('li_start'), 
-                    // self.plotOpts.get('li_stop'), 
-                    // po.get('grid_size'), 
+                    // self.plotOpts.get('li_start'),
+                    // self.plotOpts.get('li_stop'),
+                    // po.get('grid_size'),
                     // params);
 
                 var Tstop = new Date();
@@ -169,10 +169,10 @@ define(
 
 
                 // self.plot.scales.z = d3.scale.linear().domain([0, 50]);
-                self.plot.setZRange([1,5]);
+                self.plot.setZRange([1,Math.max.apply(null,PM)*1.1]);
                 self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('xtal_l_start')), converter.to('micro',self.plotOpts.get('xtal_l_stop'))]);
                 self.plot.setYRange( [ converter.to('nano',self.plotOpts.get('bw_start')), converter.to('nano',self.plotOpts.get('bw_stop'))]);
-                
+
                 // self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 // self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
             },

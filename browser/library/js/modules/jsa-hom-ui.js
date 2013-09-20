@@ -40,7 +40,6 @@ define(
                 'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
-                'theta',
                 'time-delay'
             ],
 
@@ -282,6 +281,7 @@ define(
                 var vis = (0.5 -  Math.min.apply(null, HOM))/0.5;
                 // console.log("visibility", vis);
                 self.plot1d.setTitle("Hong-Ou-Mandel visibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
+                self.plot1d.setYRange([0, Math.max.apply(null,HOM)*1.2]);
 
                 self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
             },

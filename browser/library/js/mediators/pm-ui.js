@@ -200,7 +200,7 @@ define(
                         if (unit){
                             val  = converter.to( unit, val );
                         }
-
+                        // console.log(val, key);
                         el.val( val );
                     });
 
@@ -327,6 +327,7 @@ define(
                     }
                     // console.log("in PM-ui", key, val);
                     // update the corresponding property in the parameters object
+                    console.log(key,val);
                     self.parameters.set( key, val );
                 });
 

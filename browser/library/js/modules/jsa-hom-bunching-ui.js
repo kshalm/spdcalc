@@ -40,7 +40,6 @@ define(
                 'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
-                'theta',
                 'time-delay'
             ],
 
@@ -276,6 +275,8 @@ define(
                 }
 
                 self.data1d = data1d;
+
+                self.plot1d.setYRange([0.4, Math.max.apply(null,HOM)*1.2]);
 
                 // Calculate visibility
                 // title: 'Hong-Ou-Mandel Dip'

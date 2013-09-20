@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-09-18
+ * phasematchjs v0.0.1a - 2013-09-20
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -3848,6 +3848,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
     var P = props.clone();
+    console.log(P);
     // P.theta_i = P.theta_s;
 
 
