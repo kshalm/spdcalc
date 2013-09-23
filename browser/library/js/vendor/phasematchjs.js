@@ -3402,7 +3402,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
         poling_period: 1000000,
         poling_sign: 1,
         calc_apodization: false,
-        apodization: 7,
+        apodization: 30,
         apodization_FWHM: 1600 * con.um,
         use_guassian_approx: false,
         crystal: PhaseMatch.Crystals('KTP-3'),
