@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-09-20
+ * phasematchjs v0.0.1a - 2013-09-23
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -3366,9 +3366,9 @@ PhaseMatch.Crystals('LiNbO3-1', {
     // These are the names associated with the types
     // The "type" property is stored as an integer
     PhaseMatch.PMTypes = [
-        "Type 0:   o -> o + o", 
-        "Type 1:   e -> o + o", 
-        "Type 2:   e -> e + o", 
+        "Type 0:   o -> o + o",
+        "Type 1:   e -> o + o",
+        "Type 2:   e -> e + o",
         "Type 2:   e -> o + e"
     ];
 
@@ -3435,7 +3435,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
     SPDCprop.prototype = {
 
         init: function( cfg ){
-                
+
             // set properties or fall back to defaults
             this.set( PhaseMatch.util.extend({}, spdcDefaults, cfg) );
 
@@ -3457,7 +3457,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
             this.set_apodization_coeff();
 
         },
-            
+
         calc_Coordinate_Transform : function (theta, phi, theta_s, phi_s){
             //Should save some calculation time by defining these variables.
             var SIN_THETA = Math.sin(theta);
@@ -3466,7 +3466,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
             var COS_THETA_S = Math.cos(theta_s);
             var SIN_PHI = Math.sin(phi);
             var COS_PHI = Math.cos(phi);
-            
+
             var SIN_PHI_S = Math.sin(phi_s);
             var COS_PHI_S = Math.cos(phi_s);
 
@@ -3479,7 +3479,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
             var SR_x = COS_THETA*COS_PHI*S_x - SIN_PHI*S_y + SIN_THETA*COS_PHI*S_z;
             var SR_y = COS_THETA*SIN_PHI*S_x + COS_PHI*S_y + SIN_THETA*SIN_PHI*S_z;
             var SR_z = -SIN_THETA*S_x                      + COS_THETA*S_z;
-            
+
             // Normalambda_ize the unit vector
             // @TODO: When theta = 0, Norm goes to infinity. This messes up the rest of the calculations. In this
             // case I think the correct behaviour is for Norm = 1 ?
@@ -3555,12 +3555,12 @@ PhaseMatch.Crystals('LiNbO3-1', {
         get_group_velocity : function(lambda, Type, S, photon){
             // var props = this;
             var con = PhaseMatch.constants;
-            var bw = 1e-11; 
+            var bw = 1e-11;
             // var P = props.clone();
-            
+
             var n1 = this.calc_Index_PMType(lambda - bw, Type, S, photon);
             var n2 = this.calc_Index_PMType(lambda + bw, Type, S, photon);
-            
+
             var dn = (n2 - n1)/(2*bw);
 
             var gv = con.c/(n1 - lambda*dn);
@@ -3585,7 +3585,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
             var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
             var endTime = new Date();
-            
+
 
             var timeDiff = (endTime - startTime)/1000;
             // console.log("Theta autocalc = ", timeDiff);
@@ -3596,7 +3596,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
         calc_poling_period : function (){
             var props = this;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
-            props.poling_period = 1e12;  // Set this to a large number 
+            props.poling_period = 1e12;  // Set this to a large number
             props.update_all_angles(props);
             var P = props.clone();
 
@@ -3635,7 +3635,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
             var delKpp = P.lambda_s/(P.poling_period*P.poling_sign);
 
-            var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);    
+            var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);
             arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
             arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
             arg = Math.sqrt(arg);
@@ -3665,7 +3665,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
             var delKpp = P.lambda_i/(P.poling_period*P.poling_sign);
 
-            var arg = sq(P.n_i) + sq(P.n_p*P.lambda_i/P.lambda_p);    
+            var arg = sq(P.n_i) + sq(P.n_p*P.lambda_i/P.lambda_p);
             arg += -2*P.n_i*P.n_p*(P.lambda_i/P.lambda_p)*Math.cos(P.theta_i) - 2*P.n_p*P.lambda_i/P.lambda_p*delKpp;
             arg += 2*P.n_i*Math.cos(P.theta_i)*delKpp + sq(delKpp);
             arg = Math.sqrt(arg);
@@ -3753,9 +3753,9 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
             //normalize
             for (i=0; i<dim; i++){
-                this.apodization_coeff[i] = this.apodization_coeff[i]/total; 
+                this.apodization_coeff[i] = this.apodization_coeff[i]/total;
             }
-    
+
         },
 
         /**
@@ -3776,7 +3776,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
                 if ( name in spdcDefaults ){
 
                     if ( name === 'type' ){
-                        
+
                         val = ~~val;
 
                     } else if ( name === 'crystal' && typeof val !== 'object' ){
@@ -3786,8 +3786,11 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
                     this[ name ] = val;
 
-                    
+
                     if (name === 'apodization' || name === 'apodization_FWHM' || name === 'L'){//} || name = 'calc_apodization')){
+                        if (isNaN(this["apodization"]) || isNaN(this["apodization_FWHM"])  || isNaN(this["L"])){
+                            return;
+                        }
                         this.set_apodization_L();
                         this.set_apodization_coeff();
                     }
@@ -3801,7 +3804,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
                 }
             }
 
-            // @TODO: add logic for refreshing autocalc values?            
+            // @TODO: add logic for refreshing autocalc values?
 
             // for chaining calls
             return this;
@@ -3816,7 +3819,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
             if ( key ){
 
-                return (key in spdcDefaults) ? PhaseMatch.util.clone(this[ key ], true) : undefined; 
+                return (key in spdcDefaults) ? PhaseMatch.util.clone(this[ key ], true) : undefined;
             }
 
             var vals = PhaseMatch.util.clone( PhaseMatch.util.pick( this, spdcDefaultKeys ), true );
