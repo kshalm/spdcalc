@@ -3851,6 +3851,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
     var P = props.clone();
+    P.optimum_idler(P);
     // P.theta_i = P.theta_s;
 
 
@@ -4180,6 +4181,109 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     }
     // var endTime = new Date();
     // var timeDiff = (endTime - startTime);
+    return PM;
+
+};
+
+PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start, y_stop, dim){
+    // console.log('inside calc_xy',props.phi*180/Math.PI);
+
+    props.update_all_angles();
+    var P = props.clone();
+    P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
+    // console.log(P.lambda_i);
+    // P.update_all_angles();
+    // console.log(P);
+    // console.log('After clone',props.phi*180/Math.PI);
+
+    P.phi_i = (P.phi_s + Math.PI);
+
+    if (P.brute_force){
+        dim = P.brute_dim;
+    }
+
+    var i;
+
+    var theta_x_e = PhaseMatch.linspace(x_start, x_stop, dim);
+    var theta_y_e = PhaseMatch.linspace(y_stop, y_start, dim);
+    var X = theta_x_e;
+    var Y = theta_y_e;
+
+    for (var k = 0; k<dim; k++){
+        if (theta_x_e[k] < 0){
+            P.theta_s_e = -1*theta_x_e[k];
+            X[k] = -1*PhaseMatch.find_internal_angle(P,"signal");
+            Y[dim - k -1] = X[k];
+        }
+        else {
+            P.theta_s_e = theta_x_e[k];
+            X[k] = PhaseMatch.find_internal_angle(P,"signal");
+            Y[dim - k -1] = X[k];
+        }
+
+    }
+
+    var N = dim * dim;
+    var PM = new Float64Array( N );
+
+    // Find Signal distribution
+    for (i=0; i<N; i++){
+        var index_x = i % dim;
+        var index_y = Math.floor(i / dim);
+
+        P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
+        P.phi_s = Math.atan2(Y[index_y],X[index_x]);
+        P.phi_i = (P.phi_s + Math.PI);
+
+        P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+
+        if (P.brute_force) {
+           P.brute_force_theta_i(P); //use a search. could be time consuming.
+        }
+        else {
+            //calculate the correct idler angle analytically.
+            P.optimum_idler(P);
+        }
+
+
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+
+    }
+
+    // Find Idler distribution
+    if (P.type === 2){
+        console.log("switching");
+        P.type = 3;
+    }
+    else if (P.type === 3){
+        console.log("other way");
+        P.type = 2;
+    }
+
+    for (i=0; i<N; i++){
+        var index_x = i % dim;
+        var index_y = Math.floor(i / dim);
+
+        P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
+        P.phi_s = Math.atan2(Y[index_y],X[index_x]);
+        P.phi_i = (P.phi_s + Math.PI);
+
+        P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+
+        if (P.brute_force) {
+           P.brute_force_theta_i(P); //use a search. could be time consuming.
+        }
+        else {
+            //calculate the correct idler angle analytically.
+            P.optimum_idler(P);
+        }
+
+        PM[i] += PhaseMatch.phasematch_Int_Phase(P);
+
+    }
+
     return PM;
 
 };

@@ -188,7 +188,7 @@ define(
                     var indexY = calcYindex(ycoord);
                     var zcoord = self.data[self.cols*((self.cols-indexY)-1) + indexX];
 
-                    self.setTitle('Coordinates: (' + xcoord.toFixed(0) + ', ' + ycoord.toFixed(0) + ', ' + zcoord.toFixed(3)+')');
+                    self.setTitle('Coordinates: (' + xcoord.toFixed(3) + ', ' + ycoord.toFixed(3) + ', ' + zcoord.toFixed(3)+')');
                 }
             });
 

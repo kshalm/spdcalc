@@ -109,6 +109,21 @@ define(
 
                 self.elplotPMXY = $(self.plotPMXY.el);
 
+
+                // PMXY_both plot
+                self.plotPMXYBoth = new HeatMap({
+                    title: 'Signal and Idler',
+                    el: self.el.find('.PMXYBoth-wrapper').get( 0 ),
+                    labels: {
+                        x: 'X Emission Angle (deg)',
+                        y: 'Y Emission Angle (deg)'
+                    }
+                });
+
+                self.elplotPMXYBoth = $(self.plotPMXYBoth.el);
+
+
+
                 // Lambda_s vs theta_s plot
                 self.plotLambdasThetas = new HeatMap({
                     title: 'Wavelength vs emission angle',
@@ -147,6 +162,7 @@ define(
                 self.elplotThetaTheta = $(self.plotThetaTheta.el);
 
                 self.addPlot( self.plotPMXY );
+                self.addPlot( self.plotPMXYBoth );
                 self.addPlot( self.plotLambdasThetas );
                 self.addPlot( self.plotThetaPhi );
                 self.addPlot( self.plotThetaTheta );
@@ -209,9 +225,23 @@ define(
 
 
                 self.dataPMXY = PMXY;
-
                 self.plotPMXY.setXRange([ x_start, x_stop ]);
                 self.plotPMXY.setYRange([ x_start, x_stop ]);
+
+
+                var PMXYBoth = PhaseMatch.calc_XY_both(
+                    props,
+                    -2 * po.get('theta_stop'),
+                    2 * po.get('theta_stop'),
+                    -2 * po.get('theta_stop'),
+                    2* po.get('theta_stop'),
+                    po.get('grid_size')
+                );
+
+                self.dataPMXYBoth = PMXYBoth;
+                self.plotPMXYBoth.setXRange([ 2 * x_start, 2 * x_stop ]);
+                self.plotPMXYBoth.setYRange([ 2 * x_start, 2 * x_stop ]);
+                self.plotPMXYBoth.setZRange([ 0, 2 ]);
 
                 // Lambda signal vs theta signal
                 var PMLambdasThetas = PhaseMatch.calc_lambda_s_vs_theta_s(
@@ -283,6 +313,7 @@ define(
                 }
 
                 self.plotPMXY.plotData( self.dataPMXY );
+                 self.plotPMXYBoth.plotData( self.dataPMXYBoth );
 
                 // lambda signal vs theta signal plot
                 self.plotLambdasThetas.plotData( self.dataLambdasThetas );

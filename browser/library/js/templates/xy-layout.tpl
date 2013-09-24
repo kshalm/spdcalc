@@ -1,4 +1,18 @@
 <div>
+
+    <div class="plot-wrapper span7 offset1">
+        <div class="row-fluid">
+            <h2 class="title">Emission angles of both the signal and idler photons in the XY lab frame</h2>
+
+                <div class="btn-wrap ">
+                    <button class="btn collapse-ctrl-plot" id="collapse-xy-emission">&#x2296;</button>
+                </div>
+        </div>
+         <div class="PMXYBoth-wrapper">
+            <!-- angular emissio XY -->
+        </div>
+    </div>
+
     <div class="plot-wrapper span7 offset1">
         <div class="row-fluid">
             <h2 class="title">Emission angles of the signal photon in the XY lab frame</h2>
