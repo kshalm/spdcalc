@@ -460,6 +460,9 @@ define(
                 for ( var i = 0, l = data.length; i < l; ++i ){
 
                     val = data[ i ];
+                    if (isNaN(val)){
+                        val = Math.min.apply(null,this.scales.z.domain());
+                    }
                     color = d3.rgb(colorScale( val ));
                     idx = 4 * i;
                     img.data[ idx ] = color.r; //red
