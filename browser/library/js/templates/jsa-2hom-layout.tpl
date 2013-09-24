@@ -3,7 +3,7 @@
     	<h2 class="title">Hong-Ou-Mandel interference between signal and idler photons</h2>
 
             <div class="btn-wrap ">
-                <button class="btn collapse-ctrl" id="collapse-homjsa">&#x2296;</button>
+                <button class="btn collapse-ctrl-plot" id="collapse-homjsa">&#x2296;</button>
             </div>
     </div>
 	<div class="heat-map-wrapper">

@@ -227,7 +227,7 @@ body {
         vertical-align: middle;
         margin-right: 0.5em;
     }
-    .collapse-ctrl{
+    .collapse-ctrl, .collapse-ctrl-plot{
         float: right;
         /*width:26px;*/
     /*    -webkit-border-radius: 13px;
@@ -244,7 +244,7 @@ body {
 
     }
 
-    .collapse-ctrl:hover{
+    .collapse-ctrl:hover, collapse-ctrl-plot:hover{
         color: #2C3E50pm
     }
 
