@@ -69,9 +69,18 @@
     var PMz_real = 0;
     var PMz_imag = 0;
 
+    var convfromFWHM = 1/(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
+
+    if (P.calcfibercoupling){
+        var W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
+    }
+    else {
+       W_s = 2^20; //Arbitrary large number 
+    }
+    
     // Setup constants
-    var Wp_SQ = sq(P.W / 2.3548); // convert from FWHM to sigma
-    var Ws_SQ = sq(P.W_sx / 2.3548); // convert from FWHM to sigma
+    var Wp_SQ = sq(P.W * convfromFWHM); // convert from FWHM to sigma
+    var Ws_SQ = sq(W_s * convfromFWHM); // convert from FWHM to sigma
     var COS_2THETAs = Math.cos(2*P.theta_s);
     var COS_2THETAi = Math.cos(2*P.theta_i);
     var COS_2PHIs = Math.cos(2*P.phi_s);
@@ -132,10 +141,10 @@
     var C = Cnum / Cden;
 
     // Check to see if the approximation is valid that will let us use the Sinc function.
-    var C_check = Math.sqrt(-C*2)*P.L;
-    if (C_check > 0.5){
-        console.log("APPROX NOT VALID",  C_check);
-    }
+    var C_check = Math.sqrt(Math.abs(C)*2)*P.L;
+    // if (C_check > 0.5){
+    //     // console.log("APPROX NOT VALID",  C_check);
+    // }
     // console.log(Cnum, Cden, C, C_check);
     // console.log(arg, B*P.L/2, arg-4*B*P.L/2);
     var arg = B*P.L/2;
@@ -180,7 +189,7 @@
     // var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     // console.log(A);
     var PMt = Math.exp(-A);
-    return [PMz_real, PMz_imag, PMt, C_check];
+    return [PMz_real, PMz_imag, PMt, C];
 };
 
 // PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
@@ -282,7 +291,9 @@ PhaseMatch.phasematch = function phasematch (P){
     var PMz_imag = pm[1];
     // Transverse component of PM
     var PMt = pm[2];
-    // var C_check = pm[2];
+
+    var C_check = pm[3];
+    // console.log(C_check);
     // if (C_check>0.5){
     //     console.log("approx not valid," C_check);
     // }
@@ -290,7 +301,7 @@ PhaseMatch.phasematch = function phasematch (P){
     var alpha = PhaseMatch.pump_spectrum(P);
 
     //return the real and imaginary parts of Phase matching function
-    return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag];
+    return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag, C_check];
 };
 
 
@@ -322,7 +333,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         PM = sq(PM[0]) + sq(PM[1]);
     }
     // console.log(PM)
-    return PM;
+    return [PM, PM[2]];
 };
 
 /*

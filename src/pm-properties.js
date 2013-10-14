@@ -49,7 +49,8 @@
         use_guassian_approx: false,
         crystal: PhaseMatch.Crystals('KTP-3'),
         temp: 20,
-        enable_pp: true
+        enable_pp: true,
+        calcfibercoupling: true
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );

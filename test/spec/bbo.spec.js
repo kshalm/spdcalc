@@ -47,7 +47,7 @@ describe("SPDCprop", function() {
 
         var pm = PhaseMatch.phasematch_Int_Phase( props );
         // assertion
-        expect( pm ).toBeGreaterThan( 0.99 );
+        expect( pm[0] ).toBeGreaterThan( 0.99 );
     });
 
 });
