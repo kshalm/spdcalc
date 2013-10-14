@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-09-25
+ * phasematchjs v0.0.1a - 2013-10-13
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2303,7 +2303,7 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     // }
 
     // Phasematching along transverse directions
-    var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
+    var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W / 2.355));
 
     return [PMz_real, PMz_imag, PMt];
 };
