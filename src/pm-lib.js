@@ -50,7 +50,8 @@
  * calc_PM_tz
  * Returns Phasematching function for the transverse and longitudinal directions
  */
-PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
+
+ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
@@ -68,6 +69,78 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
     var PMz_real = 0;
     var PMz_imag = 0;
 
+    // Setup constants
+    var Wp_SQ = sq(P.W / 2.3548); // convert from FWHM to sigma
+    var Ws_SQ = sq(P.W_sx / 2.3548); // convert from FWHM to sigma
+    var COS_2THETAs = Math.cos(2*P.theta_s);
+    var COS_2THETAi = Math.cos(2*P.theta_i);
+    var COS_2PHIs = Math.cos(2*P.phi_s);
+    var COS_THETAs = Math.cos(P.theta_s);
+    var COS_THETAi = Math.cos(P.theta_i);
+    var COS_PHIs = Math.cos(P.phi_s);
+
+    var SIN_2THETAs = Math.sin(2*P.theta_s);
+    var SIN_2THETAi = Math.sin(2*P.theta_i);
+    var SIN_2PHIs = Math.sin(2*P.phi_s);
+    var SIN_THETAs = Math.sin(P.theta_s);
+    var SIN_THETAi = Math.sin(P.theta_i);
+    var SIN_PHIs = Math.sin(P.phi_s);
+
+    var COS_2THETAi_minus_PHIs = Math.cos(2*(P.theta_i-P.phi_s));
+    var COS_2THETAs_minus_PHIs = Math.cos(2*(P.theta_s-P.phi_s));
+    var COS_2THETAs_plus_PHIs = Math.cos(2*(P.theta_s+P.phi_s));
+    var COS_2THETAi_plus_PHIs = Math.cos(2*(P.theta_i+P.phi_s));
+    var COS_2THETAi_plus_THETAs = Math.cos(2*(P.theta_i+P.theta_s));
+    var SIN_2THETAi_plus_THETAs = Math.sin(2*(P.theta_i+P.theta_s));
+
+    var RHOpx = 0; //pump walkoff angle.
+    RHOpx = -RHOpx; //Take the negative value. This is due to how things are defined later.
+
+    // Deal with the constant term without z dependence
+
+    var Anum1 = 8 * Ws_SQ *(sq(delK[0]) + sq(delK[1]));
+    var Anum2 = sq(delK[0])*(12 + 2*COS_2THETAi + 2* COS_THETAs + COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs - 4*COS_2PHIs + COS_2THETAs_plus_PHIs + COS_2THETAi_plus_PHIs);
+    var Anum3 = -4*SIN_2PHIs*delK[0]*delK[1]*(-2+COS_2THETAi + COS_2THETAs);
+    var Anum4 = -sq(delK[1])*(-12 -2*COS_2THETAi - 2*COS_2THETAs +COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs -4*COS_2PHIs +COS_2THETAi_plus_PHIs+COS_2THETAs_plus_PHIs);
+    var Anum = Wp_SQ*Ws_SQ*(Anum1 + Wp_SQ*(Anum2 + Anum3 + Anum4));
+
+    var Aden = 8*( 2* Wp_SQ + Ws_SQ )*( (2+ COS_2THETAi + COS_2THETAs)*Wp_SQ +2*Ws_SQ);
+
+    var A = Anum / Aden;
+
+    // Deal with the z term coefficient. It is imaginary.
+
+    var Bnum1 = 8*sq(Wp_SQ)*((SIN_2THETAi - SIN_2THETAs)*SIN_PHIs*delK[0] + COS_PHIs*(SIN_2THETAi - SIN_2THETAs)*delK[1] + (2+COS_2THETAi + COS_2THETAs)*delK[2] );
+    var Bnum2 = 8*sq(Ws_SQ)*(delK[2] - delK[0]*RHOpx);
+    var Bnum3 = -4*(6+COS_2THETAi+COS_2THETAs)*delK[2];
+    Bnum3 += delK[0]*(4*(-SIN_2THETAi + SIN_2THETAs)*SIN_PHIs);
+    Bnum3 += delK[0]*RHOpx * (12 +2*COS_2THETAs + 2*COS_2THETAi + COS_2THETAi_minus_PHIs+ COS_2THETAs_minus_PHIs -4*COS_2PHIs+COS_2THETAi_plus_PHIs +COS_2THETAs_plus_PHIs);
+    Bnum3 += -4*COS_PHIs*delK[1]*(SIN_2THETAi- SIN_2THETAs + (-2+ COS_2THETAi + COS_2THETAs)*SIN_PHIs*RHOpx );
+    Bnum3 = Wp_SQ*Ws_SQ*Bnum3;
+
+    var Bnum = Bnum1 + Bnum2 + Bnum3;
+
+    var B = 2*Bnum / (Aden);
+
+    // Deal with the z^2 term coefficient. It is real. Drop all terms where the walkoff angle is squared (small angle approx)
+
+    var Cnum = -2*Wp_SQ*sq(SIN_2THETAi_plus_THETAs)
+    Cnum += Ws_SQ*(-2+ COS_2THETAi + COS_2THETAs -2*RHOpx*(SIN_2THETAi - SIN_2THETAs)*SIN_PHIs);
+
+    var Cden = 2*( Ws_SQ )*( (2+ COS_2THETAi + COS_2THETAs)*Wp_SQ +2*Ws_SQ);
+
+    var C = Cnum / Cden;
+
+    // Check to see if the approximation is valid that will let us use the Sinc function.
+    var C_check = Math.sqrt(-C*2)*P.L;
+    if (C_check > 0.5){
+        console.log("APPROX NOT VALID",  C_check);
+    }
+    // console.log(Cnum, Cden, C, C_check);
+    // console.log(arg, B*P.L/2, arg-4*B*P.L/2);
+    var arg = B*P.L/2;
+
+
     //More advanced calculation of phasematching in the z direction. Don't need it now.
     if (P.calc_apodization && P.enable_pp){
         var gauss_norm = 1;
@@ -81,15 +154,6 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
 
         PMz_real = PMz_real/(delK[2]*delL * gauss_norm);
         PMz_imag = PMz_imag/(delK[2]*delL * gauss_norm);
-
-        // var PMz_int = Math.sqrt(sq(PMz_real) + sq(PMz_imag));
-
-        // var PMz_ref = Math.sin(arg)/arg;
-        // var PMz_real_ref =  PMz_ref * Math.cos(arg);
-        // var PMz_imag_ref =  PMz_ref * Math.sin(arg);
-        // var norm = PMz_ref / PMz_int;
-        // PMz_real = PMz_real*norm;
-        // PMz_imag = PMz_imag*norm;
         var t;
     }
     else {
@@ -110,15 +174,13 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
         PMz_real = Math.exp(-0.193*sq(arg));
         PMz_imag = 0;
     }
-    // else{
-    //     PMz_real =  PMz * Math.cos(arg);
-    //     PMz_imag = PMz * Math.sin(arg);
-    // }
+
 
     // Phasematching along transverse directions
-    var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
-
-    return [PMz_real, PMz_imag, PMt];
+    // var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
+    // console.log(A);
+    var PMt = Math.exp(-A);
+    return [PMz_real, PMz_imag, PMt, C_check];
 };
 
 // PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
@@ -140,16 +202,14 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
 //     var PMz_imag = 0;
 
 //     //More advanced calculation of phasematching in the z direction. Don't need it now.
-//     if (P.calc_apodization ){
-//         var l_range = PhaseMatch.linspace(0,P.L,P.apodization+1);
-//         var delL = Math.abs(l_range[1] - l_range[0]);
-//         var gauss_norm = 0;
+//     if (P.calc_apodization && P.enable_pp){
+//         var gauss_norm = 1;
+//         var delL = Math.abs(P.apodization_L[0] - P.apodization_L[1]);
 
 //         for (var m = 0; m<P.apodization; m++){
-//             var A =  P.get_apodization(l_range[m]);
-//             PMz_real += A*(Math.sin(delK[2]*l_range[m+1]) - Math.sin(delK[2]*l_range[m]));///P.apodization;
-//             PMz_imag += A*(Math.cos(delK[2]*l_range[m]) - Math.cos(-delK[2]*l_range[m+1]));///P.apodization;
-//             gauss_norm += A;
+//             PMz_real += P.apodization_coeff[m]*(Math.sin(delK[2]*P.apodization_L[m+1]) - Math.sin(delK[2]*P.apodization_L[m]));///P.apodization;
+//             PMz_imag += P.apodization_coeff[m]*(Math.cos(delK[2]*P.apodization_L[m]) - Math.cos(-delK[2]*P.apodization_L[m+1]));///P.apodization;
+//             // gauss_norm += P.apodization_coeff[m];
 //         }
 
 //         PMz_real = PMz_real/(delK[2]*delL * gauss_norm);
@@ -169,6 +229,8 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
 //         var PMz = Math.sin(arg)/arg;
 //         PMz_real =  PMz * Math.cos(arg);
 //         PMz_imag = PMz * Math.sin(arg);
+//         // PMz_real =  PMz;// * Math.cos(arg);
+//         // PMz_imag = 0;// * Math.sin(arg);
 //     }
 
 
@@ -191,6 +253,7 @@ PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
 
 //     return [PMz_real, PMz_imag, PMt];
 // };
+
 
 /*
  * pump_spectrum
@@ -219,6 +282,10 @@ PhaseMatch.phasematch = function phasematch (P){
     var PMz_imag = pm[1];
     // Transverse component of PM
     var PMt = pm[2];
+    // var C_check = pm[2];
+    // if (C_check>0.5){
+    //     console.log("approx not valid," C_check);
+    // }
     // Pump spectrum
     var alpha = PhaseMatch.pump_spectrum(P);
 

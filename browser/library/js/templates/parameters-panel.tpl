@@ -152,10 +152,10 @@
         </div>
         <div class="control-group">   
             <label class="control-label">
-                Waist x dir (deg)
+                Waist x dir (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sx" value="{{= this.converter.to('deg', parseFloat( it.W_sx )) }}" />
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W_sx" value="{{= this.converter.to('micro', parseFloat( it.W_sx )) }}" />
             </div>
         </div>
         <div class="control-group">   
