@@ -25,6 +25,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     var PMimag = new Float64Array( N );
 
     var maxpm = 0;
+    var C_check = -1;
 
     for (i=0; i<N; i++){
         var index_s = i % dim;
@@ -50,10 +51,11 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         var PM = PhaseMatch.phasematch(P);
         PMreal[i] = PM[0];
         PMimag[i] = PM[1];
-
+        C_check = PM[2];
         // if (PM[i]>maxpm){maxpm = PM[i];}
     }
 
+    console.log("Approx Check, ", C_check);
     return [PMreal, PMimag];
 
 };
@@ -106,7 +108,7 @@ PhaseMatch.calc_PM_Curves = function calc_PM_Curves(props, l_start, l_stop, lp_s
             P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-            PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+            PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
         }
     }
     // console.log(P.lambda_p, P.lambda_s, P.lambda_i);
@@ -148,7 +150,7 @@ PhaseMatch.calc_PM_Crystal_Tilt = function calc_PM_Crystal_Tilt(props, ls_start,
         //crystal has changed angle, so update all angles and indices
         P.update_all_angles();
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = "phasematch";
     }
 
     return PM;
@@ -184,7 +186,8 @@ PhaseMatch.calc_PM_Pump_Theta_Phi = function calc_PM_Pump_Theta_Phi(props, theta
         //crystal has changed angle, so update all angles and indices
         P.update_all_angles();
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+
     }
     return PM;
 };
@@ -218,7 +221,7 @@ PhaseMatch.calc_PM_Pump_Theta_Poling = function calc_PM_Pump_Theta_Poling(props,
         //crystal has changed angle, so update all angles and indices
         P.update_all_angles();
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
     }
     return PM;
 };
@@ -331,7 +334,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         }
 
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
 
         // console.log('inside !',props.phi*180/Math.PI);
 
@@ -404,7 +407,7 @@ PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start,
         }
 
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
 
     }
 
@@ -437,7 +440,7 @@ PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start,
             P.optimum_idler(P);
         }
 
-        PM[i] += PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] += PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
 
     }
 
@@ -499,7 +502,7 @@ PhaseMatch.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, l
         // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         // P.calc_wbar();
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
         // PM[i] = PhaseMatch.calc_delK(P);
 
     }
@@ -540,7 +543,7 @@ PhaseMatch.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_st
         P.optimum_idler(P);
         // P.calc_wbar();
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
 
     }
     return PM;
@@ -595,7 +598,7 @@ PhaseMatch.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x_
             P.optimum_idler(P);
         }
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
 
     }
     var endTime = new Date();
@@ -649,7 +652,7 @@ PhaseMatch.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idle
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
         // PM[i] = PhaseMatch.calc_delK(P);
 
     }
@@ -683,7 +686,7 @@ PhaseMatch.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi(
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
 
     }
 
@@ -824,7 +827,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
 //             P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 //             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-//             var PM_tmp = PhaseMatch.phasematch_Int_Phase(P);
+//             var PM_tmp = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
 //             if (PM_tmp>maxval){
 //                 maxval = PM_tmp;
 //             }

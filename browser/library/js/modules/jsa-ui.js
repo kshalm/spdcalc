@@ -152,6 +152,9 @@ define(
                     var S= PhaseMatch.calc_Schmidt(jsa2d);
                 }
 
+                props.calc_walkoff_angles();
+                console.log("Walkoff anlge", props.walkoff_p*180/Math.PI);
+
                 self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
                 // console.log(jsa2d[25]);
                 self.data = PM;

@@ -33,6 +33,7 @@
         L: 2000 * con.um,
         W: 500 * con.um,
         p_bw: 5.35 * con.nm,
+        walkoff_p: 0,
         // W_sx: .2 * Math.PI/180,
         W_sx: 100 * con.um,
         W_sy: .2 * Math.PI/180,
@@ -233,6 +234,8 @@
             var timeDiff = (endTime - startTime)/1000;
             // console.log("Theta autocalc = ", timeDiff);
             props.theta = ans;
+            // calculate the walkoff angle
+            this.calc_walkoff_angles();
         },
 
 
@@ -334,7 +337,7 @@
                 props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
 
                 var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
-                return 1-PMtmp;
+                return 1-PMtmp[0];
             };
 
             //Initial guess
@@ -356,7 +359,7 @@
                 props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
 
                 var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
-                return 1-PMtmp;
+                return 1-PMtmp[0];
             };
 
             //Initial guess
@@ -400,6 +403,30 @@
             }
 
         },
+
+         calc_walkoff_angles: function(){
+            // Calculate the pump walkoff angle
+            var P = this;
+            var ne_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+            var origin_theta = P.theta;
+
+            //calculate the derivative
+            var deltheta = .1*Math.PI/180; 
+
+            var theta = P.theta - deltheta/2;
+            this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
+            var ne1_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+
+            theta = theta + deltheta;
+            this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
+            var ne2_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+
+            //set back to original theta
+            theta = origin_theta;
+            this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
+
+            this.walkoff_p = -1/ne_p *(ne1_p - ne2_p)/deltheta;
+         },
 
         /**
          * Set config value or many values that are allowed (ie: defined in spdcDefaults )

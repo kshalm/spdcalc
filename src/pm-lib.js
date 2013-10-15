@@ -102,7 +102,7 @@
     var COS_2THETAi_plus_THETAs = Math.cos(2*(P.theta_i+P.theta_s));
     var SIN_2THETAi_plus_THETAs = Math.sin(2*(P.theta_i+P.theta_s));
 
-    var RHOpx = 0; //pump walkoff angle.
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
     RHOpx = -RHOpx; //Take the negative value. This is due to how things are defined later.
 
     // Deal with the constant term without z dependence
@@ -189,7 +189,7 @@
     // var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     // console.log(A);
     var PMt = Math.exp(-A);
-    return [PMz_real, PMz_imag, PMt, C];
+    return [PMz_real, PMz_imag, PMt, C_check];
 };
 
 // PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
@@ -315,6 +315,8 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
     // PM is a complex array. First element is real part, second element is imaginary.
     var PM = PhaseMatch.phasematch(P);
 
+    var C_check = PM[2];
+
     // var PMInt = sq(PM[0]) + sq(PM[1])
 
     if (P.phase){
@@ -333,7 +335,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         PM = sq(PM[0]) + sq(PM[1]);
     }
     // console.log(PM)
-    return [PM, PM[2]];
+    return {"phasematch":PM, "approxcheck":C_check};
 };
 
 /*
@@ -745,7 +747,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
 
         var PM = PhaseMatch.phasematch_Int_Phase(P);
         // console.log(P.lambda_p/1e-9, P.lambda_s/1e-9, P.lambda_i/1e-9, PM)
-        return Math.abs(PM - threshold);
+        return Math.abs(PM["phasematch"] - threshold);
     };
 
     var guess = P.lambda_s - 1e-9;
