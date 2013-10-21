@@ -121,7 +121,7 @@ define(
                 // var externalangle = PhaseMatch.find_external_angle(props, 'signal');
 
                 // var startTime = new Date();
-                var dim = 100
+                var dim = 10
                     ,PM = PhaseMatch.calc_JSI(
                         props,
                         self.plotOpts.get('ls_start'),
