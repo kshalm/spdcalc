@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-10-14
+ * phasematchjs v0.0.1a - 2013-10-20
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2268,6 +2268,8 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
     // Setup constants
     var Wp_SQ = sq(P.W * convfromFWHM); // convert from FWHM to sigma
     var Ws_SQ = sq(W_s * convfromFWHM); // convert from FWHM to sigma
+    var Wi_SQ = sq(W_s * convfromFWHM); // convert from FWHM to sigma @TODO: Change to P.W_i
+
     var COS_2THETAs = Math.cos(2*P.theta_s);
     var COS_2THETAi = Math.cos(2*P.theta_i);
     var COS_2PHIs = Math.cos(2*P.phi_s);
@@ -2288,44 +2290,112 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
     var COS_2THETAi_plus_PHIs = Math.cos(2*(P.theta_i+P.phi_s));
     var COS_2THETAi_plus_THETAs = Math.cos(2*(P.theta_i+P.theta_s));
     var SIN_2THETAi_plus_THETAs = Math.sin(2*(P.theta_i+P.theta_s));
+    var SIN_THETAi_plus_THETAs = Math.sin(P.theta_i+P.theta_s);
 
-    var RHOpx = P.walkoff_p; //pump walkoff angle.
+
+    // var RHOpx = P.walkoff_p; //pump walkoff angle.
+    var RHOpx = 0; //pump walkoff angle.
+
     RHOpx = -RHOpx; //Take the negative value. This is due to how things are defined later.
 
     // Deal with the constant term without z dependence
 
-    var Anum1 = 8 * Ws_SQ *(sq(delK[0]) + sq(delK[1]));
-    var Anum2 = sq(delK[0])*(12 + 2*COS_2THETAi + 2* COS_THETAs + COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs - 4*COS_2PHIs + COS_2THETAs_plus_PHIs + COS_2THETAi_plus_PHIs);
-    var Anum3 = -4*SIN_2PHIs*delK[0]*delK[1]*(-2+COS_2THETAi + COS_2THETAs);
-    var Anum4 = -sq(delK[1])*(-12 -2*COS_2THETAi - 2*COS_2THETAs +COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs -4*COS_2PHIs +COS_2THETAi_plus_PHIs+COS_2THETAs_plus_PHIs);
-    var Anum = Wp_SQ*Ws_SQ*(Anum1 + Wp_SQ*(Anum2 + Anum3 + Anum4));
+    //Calculation where W_s = W_i
+    // var Anum1 = 8 * Ws_SQ *(sq(delK[0]) + sq(delK[1]));
+    // var Anum2 = sq(delK[0])*(12 + 2*COS_2THETAi + 2* COS_2THETAs + COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs - 4*COS_2PHIs + COS_2THETAs_plus_PHIs + COS_2THETAi_plus_PHIs);
+    // var Anum3 = -4*SIN_2PHIs*delK[0]*delK[1]*(-2+COS_2THETAi + COS_2THETAs);
+    // var Anum4 = -sq(delK[1])*(-12 -2*COS_2THETAi - 2*COS_2THETAs +COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs -4*COS_2PHIs +COS_2THETAi_plus_PHIs+COS_2THETAs_plus_PHIs);
+    // var Anum = Wp_SQ*Ws_SQ*(Anum1 + Wp_SQ*(Anum2 + Anum3 + Anum4));
 
-    var Aden = 8*( 2* Wp_SQ + Ws_SQ )*( (2+ COS_2THETAi + COS_2THETAs)*Wp_SQ +2*Ws_SQ);
+    // var Adens = 8*( 2* Wp_SQ + Ws_SQ )*( (2+ COS_2THETAi + COS_2THETAs)*Wp_SQ +2*Ws_SQ);
+    // // var Aden = 16*(Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*( sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ));
 
+    // var As = Anum / Adens;
+
+
+    // Expanded version where W_s does not have to equal W_i
+    // var Axx1 = Wp_SQ*Ws_SQ*(6 + 2*COS_2THETAi  + COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs - 2*COS_2PHIs + COS_2THETAi_plus_PHIs);
+    // var Axx2 = Wi_SQ*((6 + 2*COS_2THETAs  + COS_2THETAs_minus_PHIs + COS_2THETAs_minus_PHIs - 2*COS_2PHIs + COS_2THETAs_plus_PHIs)*Wp_SQ + 8*Ws_SQ);
+    // var Axx = Wi_SQ*Ws_SQ*Wp_SQ*(Axx1 + Axx2) * sq(delK[0]);
+    // // Wi_SQ = sq(W_s * convfromFWHM); 
+
+    // var Axy = 8*Wi_SQ*Ws_SQ*sq(Wp_SQ)*SIN_2PHIs*delK[0]*delK[1]*(sq(SIN_THETAs)*Wi_SQ +sq(SIN_THETAi)*Ws_SQ);
+
+    // var Ayy1 = (6+2*COS_2THETAi-COS_2THETAi_minus_PHIs+2*COS_2PHIs-COS_2THETAi_plus_PHIs)*Wp_SQ*Ws_SQ;
+    // var Ayy2 = ((6+2*COS_2THETAs-COS_2THETAs_minus_PHIs+2*COS_2PHIs-COS_2THETAs_plus_PHIs)*Wp_SQ +8*Ws_SQ)*Wi_SQ;
+    // var Ayy = sq(delK[1])*Wi_SQ*Ws_SQ*Wp_SQ*(Ayy1 + Ayy2);
+
+    // var Anum = Axx + Axy + Ayy;
+
+    var Anum1a = (6 + 2*COS_2THETAi  + COS_2THETAi_minus_PHIs  - 2*COS_2PHIs + COS_2THETAi_plus_PHIs)*sq(delK[0]);
+    var Anum1b = 8*sq(SIN_THETAi)*SIN_2PHIs*delK[0]*delK[1];
+    var Anum1c = (6 + 2*COS_2THETAi  - COS_2THETAi_minus_PHIs  + 2*COS_2PHIs - COS_2THETAi_plus_PHIs)*sq(delK[1]);
+    var Anum1 = Wp_SQ*Ws_SQ*(Anum1a + Anum1b + Anum1c);
+
+    var Anum2a = 8*Ws_SQ*(sq(delK[0])+ sq(delK[1]));
+    var Anum2b = (6 + 2*COS_2THETAs  + COS_2THETAs_minus_PHIs + COS_2THETAs_plus_PHIs - 2*COS_2PHIs)*sq(delK[0]);
+    var Anum2c = 8*sq(SIN_THETAi)*SIN_2PHIs*delK[0]*delK[1];
+    var Anum2d = (6 + 2*COS_2THETAs  - COS_2THETAs_minus_PHIs - COS_2THETAs_plus_PHIs + 2*COS_2PHIs)*sq(delK[1]);
+    var Anum2 = Wi_SQ*(Anum2a + Wp_SQ*(Anum2b + Anum2c + Anum2d));
+
+    var Anum = Wi_SQ*Ws_SQ*Wp_SQ*(Anum1 + Anum2);
+    var Aden = 16*(Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*( sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ));
     var A = Anum / Aden;
 
-    // Deal with the z term coefficient. It is imaginary.
 
-    var Bnum1 = 8*sq(Wp_SQ)*((SIN_2THETAi - SIN_2THETAs)*SIN_PHIs*delK[0] + COS_PHIs*(SIN_2THETAi - SIN_2THETAs)*delK[1] + (2+COS_2THETAi + COS_2THETAs)*delK[2] );
-    var Bnum2 = 8*sq(Ws_SQ)*(delK[2] - delK[0]*RHOpx);
-    var Bnum3 = -4*(6+COS_2THETAi+COS_2THETAs)*delK[2];
-    Bnum3 += delK[0]*(4*(-SIN_2THETAi + SIN_2THETAs)*SIN_PHIs);
-    Bnum3 += delK[0]*RHOpx * (12 +2*COS_2THETAs + 2*COS_2THETAi + COS_2THETAi_minus_PHIs+ COS_2THETAs_minus_PHIs -4*COS_2PHIs+COS_2THETAi_plus_PHIs +COS_2THETAs_plus_PHIs);
-    Bnum3 += -4*COS_PHIs*delK[1]*(SIN_2THETAi- SIN_2THETAs + (-2+ COS_2THETAi + COS_2THETAs)*SIN_PHIs*RHOpx );
-    Bnum3 = Wp_SQ*Ws_SQ*Bnum3;
+    // // Deal with the z term coefficient. It is imaginary.
+    // var Bnum1 = 8*sq(Wp_SQ)*((SIN_2THETAi - SIN_2THETAs)*SIN_PHIs*delK[0] + COS_PHIs*(SIN_2THETAi - SIN_2THETAs)*delK[1] + (2+COS_2THETAi + COS_2THETAs)*delK[2] );
+    // var Bnum2 = 8*sq(Ws_SQ)*(delK[2] - delK[0]*RHOpx);
+    // var Bnum3 = -4*(6+COS_2THETAi+COS_2THETAs)*delK[2];
+    // Bnum3 += delK[0]*(4*(-SIN_2THETAi + SIN_2THETAs)*SIN_PHIs);
+    // Bnum3 += delK[0]*RHOpx * (12 +2*COS_2THETAs + 2*COS_2THETAi + COS_2THETAi_minus_PHIs+ COS_2THETAs_minus_PHIs -4*COS_2PHIs+COS_2THETAi_plus_PHIs +COS_2THETAs_plus_PHIs);
+    // Bnum3 += -4*COS_PHIs*delK[1]*(SIN_2THETAi- SIN_2THETAs + (-2+ COS_2THETAi + COS_2THETAs)*SIN_PHIs*RHOpx );
+    // Bnum3 = Wp_SQ*Ws_SQ*Bnum3;
 
-    var Bnum = Bnum1 + Bnum2 + Bnum3;
+    // var Bnum = Bnum1 + Bnum2 + Bnum3;
+
+    // var Bs = 2*Bnum / (Adens);
+
+     // Deal with the z term coefficient. It is imaginary. Version with W_s and W_i independent
+    var Bnum1 = 4*sq(Wp_SQ)*sq(Ws_SQ)*(SIN_2THETAi*SIN_PHIs*delK[0] + COS_PHIs*SIN_2THETAi*delK[1] +2*sq(COS_THETAi)*delK[2]);
+
+    var Bnum2a = 4*Wp_SQ*((SIN_2THETAi - SIN_2THETAs)*SIN_PHIs*delK[0] +COS_PHIs*(SIN_2THETAi- SIN_2THETAs)*delK[1] + (2+COS_2THETAi+COS_2THETAs)*delK[2]);
+    var Bnum2b = Ws_SQ*(4*(3 + COS_2THETAi)*delK[2] +delK[0]*(4*SIN_2THETAi*SIN_PHIs + (6+2*COS_2THETAi+COS_2THETAi_minus_PHIs-2*COS_2PHIs+COS_2THETAi_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAi*delK[1]*(COS_THETAi+SIN_THETAi*SIN_PHIs*RHOpx));
+    var Bnum2 = Wi_SQ*Wp_SQ*Ws_SQ*(Bnum2a + Bnum2b);
+
+    var Bnum3a = -4*sq(Wp_SQ)*(SIN_2THETAs*SIN_PHIs*delK[0]+COS_PHIs*SIN_2THETAs*delK[1]-2*sq(COS_THETAs)*delK[2]) + 8*sq(Ws_SQ)*(delK[2]+delK[1]*RHOpx);
+    var Bnum3b = Wp_SQ* Ws_SQ*(4*(3 + COS_2THETAs)*delK[2] +delK[0]*(-4*SIN_2THETAs*SIN_PHIs + (6+2*COS_2THETAs+COS_2THETAs_minus_PHIs-2*COS_2PHIs+COS_2THETAs_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAs*delK[1]*(-COS_THETAs+SIN_THETAs*SIN_PHIs*RHOpx));
+    var Bnum3 = sq(Wi_SQ)*(Bnum3a + Bnum3b);
+
+    var Bnum = Bnum1 + Bnum2 +Bnum3;
+
+    // Try again typing them in
 
     var B = 2*Bnum / (Aden);
 
+    // B= Bs;
+    // A = As;
+
+    // console.log(As/Adens,A/Aden, Bs/Adens,B/Aden);
+
     // Deal with the z^2 term coefficient. It is real. Drop all terms where the walkoff angle is squared (small angle approx)
+    // var Cnums = 2*Wp_SQ*sq(SIN_THETAi_plus_THETAs)
+    // // Cnums += Ws_SQ*(-2+ COS_2THETAi + COS_2THETAs -2*RHOpx*(SIN_2THETAi - SIN_2THETAs)*SIN_PHIs);
+    // Cnums += -Ws_SQ*(-2+ COS_2THETAi + COS_2THETAs +2*RHOpx*(SIN_2THETAi - SIN_2THETAs)*SIN_PHIs);
 
-    var Cnum = -2*Wp_SQ*sq(SIN_2THETAi_plus_THETAs)
-    Cnum += Ws_SQ*(-2+ COS_2THETAi + COS_2THETAs -2*RHOpx*(SIN_2THETAi - SIN_2THETAs)*SIN_PHIs);
+    // var Cdens = 2*( Ws_SQ )*( (2+ COS_2THETAi + COS_2THETAs)*Wp_SQ +2*Ws_SQ);
+    // var Cs = Cnums / Cdens;
 
-    var Cden = 2*( Ws_SQ )*( (2+ COS_2THETAi + COS_2THETAs)*Wp_SQ +2*Ws_SQ);
 
+    // Deal with the z^2 term coefficient. It is real. Drop all terms where the walkoff angle is squared (small angle approx)
+    // version where W_s and W_i are different
+    var Cnum = sq(SIN_THETAi_plus_THETAs)*Wp_SQ + Ws_SQ*(sq(SIN_THETAi) - SIN_2THETAi*SIN_PHIs*RHOpx)+Wi_SQ*(sq(SIN_THETAs)+SIN_2THETAs*SIN_PHIs*RHOpx);
+
+    // var Cden = 2*(sq(COS_THETAi)*Wp_SQ+Wi_SQ*(COS_THETAs*Wp_SQ+Ws_SQ));
+    var Cden = 2*(sq(COS_THETAi)*Wp_SQ*Ws_SQ +Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ));
     var C = Cnum / Cden;
+
+    // console.log(Cs,C);
 
     // Check to see if the approximation is valid that will let us use the Sinc function.
     var C_check = Math.sqrt(Math.abs(C)*2)*P.L;
@@ -3683,36 +3753,38 @@ PhaseMatch.Crystals('LiNbO3-1', {
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             props.poling_period = 1e12;  // Set this to a large number
             props.update_all_angles(props);
-            var P = props.clone();
+            if (props.enable_pp){
+                var P = props.clone();
 
-            var find_pp = function(x){
-                // if (x<0){ return 1e12;}  // arbitrary large number
-                P.poling_period = x;
-                // Calculate the angle for the idler photon
-                P.optimum_idler();
-                var delK = PhaseMatch.calc_delK(P);
-                return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
-            };
+                var find_pp = function(x){
+                    // if (x<0){ return 1e12;}  // arbitrary large number
+                    P.poling_period = x;
+                    // Calculate the angle for the idler photon
+                    P.optimum_idler();
+                    var delK = PhaseMatch.calc_delK(P);
+                    return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
+                };
 
-            var delK_guess = (PhaseMatch.calc_delK(P)[2]);
-            var guess = 2*Math.PI/delK_guess;
+                var delK_guess = (PhaseMatch.calc_delK(P)[2]);
+                var guess = 2*Math.PI/delK_guess;
 
-            if (guess<0){
-                P.poling_sign = -1;
-                guess = guess*-1;
+                if (guess<0){
+                    P.poling_sign = -1;
+                    guess = guess*-1;
+                }
+                else{
+                    P.poling_sign = 1;
+                }
+
+                //finds the minimum theta
+                var startTime = new Date();
+                PhaseMatch.nelderMead(find_pp, guess, 100);
+                var endTime = new Date();
+                // console.log("calculation time for periodic poling calc", endTime - startTime);
+
+                props.poling_period = P.poling_period;
+                props.poling_sign = P.poling_sign;
             }
-            else{
-                P.poling_sign = 1;
-            }
-
-            //finds the minimum theta
-            var startTime = new Date();
-            PhaseMatch.nelderMead(find_pp, guess, 100);
-            var endTime = new Date();
-            // console.log("calculation time for periodic poling calc", endTime - startTime);
-
-            props.poling_period = P.poling_period;
-            props.poling_sign = P.poling_sign;
         },
 
         optimum_idler : function (){
@@ -3893,6 +3965,12 @@ PhaseMatch.Crystals('LiNbO3-1', {
                         val = PhaseMatch.Crystals( val );
                     }
 
+                    if (name === 'poling_period'){
+                        if(val===0 || isNaN(val)){
+                            val === 1E12;
+                        } 
+                    }
+                    
                     this[ name ] = val;
 
 
@@ -3903,6 +3981,8 @@ PhaseMatch.Crystals('LiNbO3-1', {
                         this.set_apodization_L();
                         this.set_apodization_coeff();
                     }
+
+
 
                     // if (name === 'L'){
                     //     this.set
@@ -4139,6 +4219,9 @@ PhaseMatch.calc_PM_Pump_Theta_Phi = function calc_PM_Pump_Theta_Phi(props, theta
         P.update_all_angles();
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        // if (isNaN(PM[i])){
+        //     // console.log("theta", P.theta*180/Math.PI, P.phi*180/Math.PI);
+        // }
 
     }
     return PM;

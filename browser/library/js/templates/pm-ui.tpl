@@ -10,7 +10,7 @@
 
             <div class="ui-module-wrap pull-left">
                 <select tabindex="1" class="span3" id="ui-modules">
-                    <option value="jsa">Joint Spectral Amplitude</option>
+                    <option value="jsa">Joint Spectral Intensity</option>
                     <option value="curves">Phasematching Curves</option>
                     <option value="xy">Emission Angle</option>
                     <option value="jsa-hom">Hong-Ou-Mandel dip</option>
@@ -134,7 +134,7 @@
     </div>
     <div class="lower">
 
-        <div id="logs"></div>
+        <!-- <div id="logs"></div> -->
         <div id="docs"></div>
     </div>
 </div>

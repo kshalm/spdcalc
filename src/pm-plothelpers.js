@@ -187,6 +187,9 @@ PhaseMatch.calc_PM_Pump_Theta_Phi = function calc_PM_Pump_Theta_Phi(props, theta
         P.update_all_angles();
 
         PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        // if (isNaN(PM[i])){
+        //     // console.log("theta", P.theta*180/Math.PI, P.phi*180/Math.PI);
+        // }
 
     }
     return PM;

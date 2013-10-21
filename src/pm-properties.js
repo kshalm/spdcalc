@@ -244,36 +244,38 @@
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             props.poling_period = 1e12;  // Set this to a large number
             props.update_all_angles(props);
-            var P = props.clone();
+            if (props.enable_pp){
+                var P = props.clone();
 
-            var find_pp = function(x){
-                // if (x<0){ return 1e12;}  // arbitrary large number
-                P.poling_period = x;
-                // Calculate the angle for the idler photon
-                P.optimum_idler();
-                var delK = PhaseMatch.calc_delK(P);
-                return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
-            };
+                var find_pp = function(x){
+                    // if (x<0){ return 1e12;}  // arbitrary large number
+                    P.poling_period = x;
+                    // Calculate the angle for the idler photon
+                    P.optimum_idler();
+                    var delK = PhaseMatch.calc_delK(P);
+                    return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
+                };
 
-            var delK_guess = (PhaseMatch.calc_delK(P)[2]);
-            var guess = 2*Math.PI/delK_guess;
+                var delK_guess = (PhaseMatch.calc_delK(P)[2]);
+                var guess = 2*Math.PI/delK_guess;
 
-            if (guess<0){
-                P.poling_sign = -1;
-                guess = guess*-1;
+                if (guess<0){
+                    P.poling_sign = -1;
+                    guess = guess*-1;
+                }
+                else{
+                    P.poling_sign = 1;
+                }
+
+                //finds the minimum theta
+                var startTime = new Date();
+                PhaseMatch.nelderMead(find_pp, guess, 100);
+                var endTime = new Date();
+                // console.log("calculation time for periodic poling calc", endTime - startTime);
+
+                props.poling_period = P.poling_period;
+                props.poling_sign = P.poling_sign;
             }
-            else{
-                P.poling_sign = 1;
-            }
-
-            //finds the minimum theta
-            var startTime = new Date();
-            PhaseMatch.nelderMead(find_pp, guess, 100);
-            var endTime = new Date();
-            // console.log("calculation time for periodic poling calc", endTime - startTime);
-
-            props.poling_period = P.poling_period;
-            props.poling_sign = P.poling_sign;
         },
 
         optimum_idler : function (){
@@ -454,6 +456,12 @@
                         val = PhaseMatch.Crystals( val );
                     }
 
+                    if (name === 'poling_period'){
+                        if(val===0 || isNaN(val)){
+                            val === 1E12;
+                        } 
+                    }
+                    
                     this[ name ] = val;
 
 
@@ -464,6 +472,8 @@
                         this.set_apodization_L();
                         this.set_apodization_coeff();
                     }
+
+
 
                     // if (name === 'L'){
                     //     this.set
