@@ -75,9 +75,9 @@
         var W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
     }
     else {
-       W_s = 2^20; //Arbitrary large number 
+       W_s = 2^20; //Arbitrary large number
     }
-    
+
     // Setup constants
     var Wp_SQ = sq(P.W * convfromFWHM); // convert from FWHM to sigma
     var Ws_SQ = sq(W_s * convfromFWHM); // convert from FWHM to sigma
@@ -106,8 +106,8 @@
     var SIN_THETAi_plus_THETAs = Math.sin(P.theta_i+P.theta_s);
 
 
-    // var RHOpx = P.walkoff_p; //pump walkoff angle.
-    var RHOpx = 0; //pump walkoff angle.
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx = 0; //pump walkoff angle.
 
     RHOpx = -RHOpx; //Take the negative value. This is due to how things are defined later.
 
@@ -130,7 +130,7 @@
     // var Axx1 = Wp_SQ*Ws_SQ*(6 + 2*COS_2THETAi  + COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs - 2*COS_2PHIs + COS_2THETAi_plus_PHIs);
     // var Axx2 = Wi_SQ*((6 + 2*COS_2THETAs  + COS_2THETAs_minus_PHIs + COS_2THETAs_minus_PHIs - 2*COS_2PHIs + COS_2THETAs_plus_PHIs)*Wp_SQ + 8*Ws_SQ);
     // var Axx = Wi_SQ*Ws_SQ*Wp_SQ*(Axx1 + Axx2) * sq(delK[0]);
-    // // Wi_SQ = sq(W_s * convfromFWHM); 
+    // // Wi_SQ = sq(W_s * convfromFWHM);
 
     // var Axy = 8*Wi_SQ*Ws_SQ*sq(Wp_SQ)*SIN_2PHIs*delK[0]*delK[1]*(sq(SIN_THETAs)*Wi_SQ +sq(SIN_THETAi)*Ws_SQ);
 
@@ -182,19 +182,19 @@
 
     var Bs = 2*Bnum / (Adens);
 
-    // Modified to be more in line with the "errors" from the other version. It seems to work, but I am not confident in it.
-    var Bnum1 = 4*sq(Wp_SQ)*sq(Ws_SQ)*(SIN_2THETAi*SIN_PHIs*delK[0] - COS_PHIs*SIN_2THETAi*delK[1] +2*sq(COS_THETAi)*delK[2]);
+    // // Modified to be more in line with the "errors" from the other version. It seems to work, but I am not confident in it.
+    // var Bnum1 = 4*sq(Wp_SQ)*sq(Ws_SQ)*(SIN_2THETAi*SIN_PHIs*delK[0] - COS_PHIs*SIN_2THETAi*delK[1] +2*sq(COS_THETAi)*delK[2]);
 
-    var Bnum2a = 4*Wp_SQ*((-SIN_2THETAi + SIN_2THETAs)*SIN_PHIs*delK[0] +COS_PHIs*(SIN_2THETAi- SIN_2THETAs)*delK[1] + (2+COS_2THETAi+COS_2THETAs)*delK[2]);
-    var Bnum2b = Ws_SQ*(4*-(3 + COS_2THETAi)*delK[2] +delK[0]*(4*SIN_2THETAi*SIN_PHIs + (6+2*COS_2THETAi+COS_2THETAi_minus_PHIs-2*COS_2PHIs+COS_2THETAi_plus_PHIs)*RHOpx) -8*COS_PHIs*SIN_THETAi*delK[1]*(COS_THETAi+SIN_THETAi*SIN_PHIs*RHOpx));
-    var Bnum2 = Wi_SQ*Wp_SQ*Ws_SQ*(Bnum2a + Bnum2b);
+    // var Bnum2a = 4*Wp_SQ*((-SIN_2THETAi + SIN_2THETAs)*SIN_PHIs*delK[0] +COS_PHIs*(SIN_2THETAi- SIN_2THETAs)*delK[1] + (2+COS_2THETAi+COS_2THETAs)*delK[2]);
+    // var Bnum2b = Ws_SQ*(4*-(3 + COS_2THETAi)*delK[2] +delK[0]*(4*SIN_2THETAi*SIN_PHIs + (6+2*COS_2THETAi+COS_2THETAi_minus_PHIs-2*COS_2PHIs+COS_2THETAi_plus_PHIs)*RHOpx) -8*COS_PHIs*SIN_THETAi*delK[1]*(COS_THETAi+SIN_THETAi*SIN_PHIs*RHOpx));
+    // var Bnum2 = Wi_SQ*Wp_SQ*Ws_SQ*(Bnum2a + Bnum2b);
 
-    var Bnum3a = -4*sq(Wp_SQ)*(SIN_2THETAs*SIN_PHIs*delK[0]-COS_PHIs*SIN_2THETAs*delK[1]-2*sq(COS_THETAs)*delK[2]) + 8*sq(Ws_SQ)*(delK[2]+delK[1]*RHOpx);
-    var Bnum3b = Wp_SQ* Ws_SQ*(4*-(3 + COS_2THETAs)*delK[2] +delK[0]*(-4*SIN_2THETAs*SIN_PHIs + (6+2*COS_2THETAs+COS_2THETAs_minus_PHIs-2*COS_2PHIs+COS_2THETAs_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAs*delK[1]*(-COS_THETAs+SIN_THETAs*SIN_PHIs*RHOpx));
-    var Bnum3 = sq(Wi_SQ)*(Bnum3a + Bnum3b);
+    // var Bnum3a = -4*sq(Wp_SQ)*(SIN_2THETAs*SIN_PHIs*delK[0]-COS_PHIs*SIN_2THETAs*delK[1]-2*sq(COS_THETAs)*delK[2]) + 8*sq(Ws_SQ)*(delK[2]+delK[1]*RHOpx);
+    // var Bnum3b = Wp_SQ* Ws_SQ*(4*-(3 + COS_2THETAs)*delK[2] +delK[0]*(-4*SIN_2THETAs*SIN_PHIs + (6+2*COS_2THETAs+COS_2THETAs_minus_PHIs-2*COS_2PHIs+COS_2THETAs_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAs*delK[1]*(-COS_THETAs+SIN_THETAs*SIN_PHIs*RHOpx));
+    // var Bnum3 = sq(Wi_SQ)*(Bnum3a + Bnum3b);
 
-    var Bnum = Bnum1 + Bnum2 +Bnum3;
-    var B = 2*Bnum / (Aden);
+    // var Bnum = Bnum1 + Bnum2 +Bnum3;
+    // var B = 2*Bnum / (Aden);
 
 
 
@@ -212,18 +212,18 @@
     // var Bnum = Bnum1 + Bnum2 +Bnum3;
 
     // Correct I think
-    // var Bnum1 = 4*sq(Wp_SQ)*sq(Ws_SQ)*(SIN_2THETAi*SIN_PHIs*delK[0] + COS_PHIs*SIN_2THETAi*delK[1] +2*sq(COS_THETAi)*delK[2]);
+    var Bnum1 = 4*sq(Wp_SQ)*sq(Ws_SQ)*(SIN_2THETAi*SIN_PHIs*delK[0] + COS_PHIs*SIN_2THETAi*delK[1] +2*sq(COS_THETAi)*delK[2]);
 
-    // var Bnum2a = 4*Wp_SQ*((SIN_2THETAi - SIN_2THETAs)*SIN_PHIs*delK[0] +COS_PHIs*(SIN_2THETAi- SIN_2THETAs)*delK[1] + (2+COS_2THETAi+COS_2THETAs)*delK[2]);
-    // var Bnum2b = Ws_SQ*(4*(3 + COS_2THETAi)*delK[2] +delK[0]*(4*SIN_2THETAi*SIN_PHIs + (6+2*COS_2THETAi+COS_2THETAi_minus_PHIs-2*COS_2PHIs+COS_2THETAi_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAi*delK[1]*(COS_THETAi+SIN_THETAi*SIN_PHIs*RHOpx));
-    // var Bnum2 = Wi_SQ*Wp_SQ*Ws_SQ*(Bnum2a + Bnum2b);
+    var Bnum2a = 4*Wp_SQ*((SIN_2THETAi - SIN_2THETAs)*SIN_PHIs*delK[0] +COS_PHIs*(SIN_2THETAi- SIN_2THETAs)*delK[1] + (2+COS_2THETAi+COS_2THETAs)*delK[2]);
+    var Bnum2b = Ws_SQ*(4*(3 + COS_2THETAi)*delK[2] +delK[0]*(4*SIN_2THETAi*SIN_PHIs + (6+2*COS_2THETAi+COS_2THETAi_minus_PHIs-2*COS_2PHIs+COS_2THETAi_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAi*delK[1]*(COS_THETAi+SIN_THETAi*SIN_PHIs*RHOpx));
+    var Bnum2 = Wi_SQ*Wp_SQ*Ws_SQ*(Bnum2a + Bnum2b);
 
-    // var Bnum3a = -4*sq(Wp_SQ)*(SIN_2THETAs*SIN_PHIs*delK[0]+COS_PHIs*SIN_2THETAs*delK[1]-2*sq(COS_THETAs)*delK[2]) + 8*sq(Ws_SQ)*(delK[2]+delK[1]*RHOpx);
-    // var Bnum3b = Wp_SQ* Ws_SQ*(4*(3 + COS_2THETAs)*delK[2] +delK[0]*(-4*SIN_2THETAs*SIN_PHIs + (6+2*COS_2THETAs+COS_2THETAs_minus_PHIs-2*COS_2PHIs+COS_2THETAs_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAs*delK[1]*(-COS_THETAs+SIN_THETAs*SIN_PHIs*RHOpx));
-    // var Bnum3 = sq(Wi_SQ)*(Bnum3a + Bnum3b);
+    var Bnum3a = -4*sq(Wp_SQ)*(SIN_2THETAs*SIN_PHIs*delK[0]+COS_PHIs*SIN_2THETAs*delK[1]-2*sq(COS_THETAs)*delK[2]) + 8*sq(Ws_SQ)*(delK[2]+delK[1]*RHOpx);
+    var Bnum3b = Wp_SQ* Ws_SQ*(4*(3 + COS_2THETAs)*delK[2] +delK[0]*(-4*SIN_2THETAs*SIN_PHIs + (6+2*COS_2THETAs+COS_2THETAs_minus_PHIs-2*COS_2PHIs+COS_2THETAs_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAs*delK[1]*(-COS_THETAs+SIN_THETAs*SIN_PHIs*RHOpx));
+    var Bnum3 = sq(Wi_SQ)*(Bnum3a + Bnum3b);
 
-    // var Bnum = Bnum1 + Bnum2 +Bnum3;
-    // var B = 2*Bnum / (Aden);
+    var Bnum = Bnum1 + Bnum2 +Bnum3;
+    var B = 2*Bnum / (Aden);
 
 
     // console.log(Bs,B);
