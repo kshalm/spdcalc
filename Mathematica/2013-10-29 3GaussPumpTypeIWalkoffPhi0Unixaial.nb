@@ -3532,8 +3532,8 @@ Cell[BoxData["\[IndentingNewLine]"], "Input",
 Cell[BoxData[""], "Input",
  CellChangeTimes->{{3.582581217412138*^9, 3.582581217435742*^9}}]
 },
-WindowSize->{1440, 415},
-WindowMargins->{{0, Automatic}, {0, Automatic}},
+WindowSize->{1440, 852},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
 FrontEndVersion->"8.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (October 5, \
 2011)",
 StyleDefinitions->"Default.nb"
@@ -3553,16 +3553,16 @@ Cell[557, 20, 6230, 142, 358, "Input"],
 Cell[CellGroupData[{
 Cell[6812, 166, 11065, 246, 508, "Input"],
 Cell[17880, 414, 2675, 47, 27, "Output"],
-Cell[20558, 463, 3621, 73, 73, "Output"],
+Cell[20558, 463, 3621, 73, 33, "Output"],
 Cell[24182, 538, 2303, 37, 27, "Output"],
 Cell[26488, 577, 2021, 28, 27, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
 Cell[28546, 610, 2860, 80, 178, "Input"],
-Cell[31409, 692, 2909, 75, 83, "Output"]
+Cell[31409, 692, 2909, 75, 53, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[34355, 772, 12088, 326, 904, "Input"],
+Cell[34355, 772, 12088, 326, 874, "Input"],
 Cell[46446, 1100, 469, 12, 27, "Output"],
 Cell[46918, 1114, 708, 19, 27, "Output"],
 Cell[47629, 1135, 689, 18, 27, "Output"]

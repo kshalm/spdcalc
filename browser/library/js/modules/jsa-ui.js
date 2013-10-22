@@ -161,6 +161,7 @@ define(
                 // console.log(PM);
 
                 // self.plot.setZRange([0, 180]);
+                self.plot.setZRange([0,Math.max.apply(null,PM)]);
                 self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
             },

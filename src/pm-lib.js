@@ -112,33 +112,7 @@
     RHOpx = -RHOpx; //Take the negative value. This is due to how things are defined later.
 
     // Deal with the constant term without z dependence
-
-    //Calculation where W_s = W_i
-    var Anum1 = 8 * Ws_SQ *(sq(delK[0]) + sq(delK[1]));
-    var Anum2 = sq(delK[0])*(12 + 2*COS_2THETAi + 2* COS_2THETAs + COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs - 4*COS_2PHIs + COS_2THETAs_plus_PHIs + COS_2THETAi_plus_PHIs);
-    var Anum3 = -4*SIN_2PHIs*delK[0]*delK[1]*(-2+COS_2THETAi + COS_2THETAs);
-    var Anum4 = -sq(delK[1])*(-12 -2*COS_2THETAi - 2*COS_2THETAs +COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs -4*COS_2PHIs +COS_2THETAi_plus_PHIs+COS_2THETAs_plus_PHIs);
-    var Anum = Wp_SQ*Ws_SQ*(Anum1 + Wp_SQ*(Anum2 + Anum3 + Anum4));
-
-    var Adens = 8*( 2* Wp_SQ + Ws_SQ )*( (2+ COS_2THETAi + COS_2THETAs)*Wp_SQ +2*Ws_SQ);
-    // var Aden = 16*(Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*( sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ));
-
-    var As = Anum / Adens;
-
-
     // Expanded version where W_s does not have to equal W_i
-    // var Axx1 = Wp_SQ*Ws_SQ*(6 + 2*COS_2THETAi  + COS_2THETAi_minus_PHIs + COS_2THETAs_minus_PHIs - 2*COS_2PHIs + COS_2THETAi_plus_PHIs);
-    // var Axx2 = Wi_SQ*((6 + 2*COS_2THETAs  + COS_2THETAs_minus_PHIs + COS_2THETAs_minus_PHIs - 2*COS_2PHIs + COS_2THETAs_plus_PHIs)*Wp_SQ + 8*Ws_SQ);
-    // var Axx = Wi_SQ*Ws_SQ*Wp_SQ*(Axx1 + Axx2) * sq(delK[0]);
-    // // Wi_SQ = sq(W_s * convfromFWHM);
-
-    // var Axy = 8*Wi_SQ*Ws_SQ*sq(Wp_SQ)*SIN_2PHIs*delK[0]*delK[1]*(sq(SIN_THETAs)*Wi_SQ +sq(SIN_THETAi)*Ws_SQ);
-
-    // var Ayy1 = (6+2*COS_2THETAi-COS_2THETAi_minus_PHIs+2*COS_2PHIs-COS_2THETAi_plus_PHIs)*Wp_SQ*Ws_SQ;
-    // var Ayy2 = ((6+2*COS_2THETAs-COS_2THETAs_minus_PHIs+2*COS_2PHIs-COS_2THETAs_plus_PHIs)*Wp_SQ +8*Ws_SQ)*Wi_SQ;
-    // var Ayy = sq(delK[1])*Wi_SQ*Ws_SQ*Wp_SQ*(Ayy1 + Ayy2);
-
-    // var Anum = Axx + Axy + Ayy;
 
     var Anum1a = (6 + 2*COS_2THETAi  + COS_2THETAi_minus_PHIs  - 2*COS_2PHIs + COS_2THETAi_plus_PHIs)*sq(delK[0]);
     var Anum1b = 8*sq(SIN_THETAi)*SIN_2PHIs*delK[0]*delK[1];
@@ -156,61 +130,7 @@
     var A = Anum / Aden;
 
 
-    // Deal with the z term coefficient. It is imaginary.
-    var Bnum1 = 8*sq(Wp_SQ)*((SIN_2THETAi - SIN_2THETAs)*SIN_PHIs*delK[0] + COS_PHIs*(SIN_2THETAi - SIN_2THETAs)*delK[1] + (2+COS_2THETAi + COS_2THETAs)*delK[2] );
-    var Bnum2 = 8*sq(Ws_SQ)*(delK[2] - delK[0]*RHOpx);
-    var Bnum3 = -4*(6+COS_2THETAi+COS_2THETAs)*delK[2];
-    Bnum3 += delK[0]*(4*(-SIN_2THETAi + SIN_2THETAs)*SIN_PHIs);
-    Bnum3 += delK[0]*RHOpx * (12 +2*COS_2THETAs + 2*COS_2THETAi + COS_2THETAi_minus_PHIs+ COS_2THETAs_minus_PHIs -4*COS_2PHIs+COS_2THETAi_plus_PHIs +COS_2THETAs_plus_PHIs);
-    Bnum3 += -4*COS_PHIs*delK[1]*(SIN_2THETAi- SIN_2THETAs + (-2+ COS_2THETAi + COS_2THETAs)*SIN_PHIs*RHOpx );
-    Bnum3 = Wp_SQ*Ws_SQ*Bnum3;
-
-    var Bnum = Bnum1 + Bnum2 + Bnum3;
-
-    var Bss = 2*Bnum / (Adens);
-
-    // Deal with the z term coefficient. It is imaginary.
-    var Bnum1 = 8*sq(Wp_SQ)*((SIN_2THETAi - SIN_2THETAs)*SIN_PHIs*delK[0] + COS_PHIs*(SIN_2THETAi - SIN_2THETAs)*delK[1] + (2+COS_2THETAi + COS_2THETAs)*delK[2] );
-    var Bnum2 = 8*sq(Ws_SQ)*(delK[2] - delK[0]*RHOpx);
-    var Bnum3 = 4*(6+COS_2THETAi+COS_2THETAs)*delK[2];
-    Bnum3 += delK[0]*(4*(SIN_2THETAi - SIN_2THETAs)*SIN_PHIs);
-    Bnum3 += delK[0]*RHOpx * (12 +2*COS_2THETAs + 2*COS_2THETAi + COS_2THETAi_minus_PHIs+ COS_2THETAs_minus_PHIs -4*COS_2PHIs+COS_2THETAi_plus_PHIs +COS_2THETAs_plus_PHIs);
-    Bnum3 += 4*COS_PHIs*delK[1]*(SIN_2THETAi- SIN_2THETAs - (-2+ COS_2THETAi + COS_2THETAs)*SIN_PHIs*RHOpx );
-    Bnum3 = Wp_SQ*Ws_SQ*Bnum3;
-
-    var Bnum = Bnum1 + Bnum2 + Bnum3;
-
-    var Bs = 2*Bnum / (Adens);
-
-    // // Modified to be more in line with the "errors" from the other version. It seems to work, but I am not confident in it.
-    // var Bnum1 = 4*sq(Wp_SQ)*sq(Ws_SQ)*(SIN_2THETAi*SIN_PHIs*delK[0] - COS_PHIs*SIN_2THETAi*delK[1] +2*sq(COS_THETAi)*delK[2]);
-
-    // var Bnum2a = 4*Wp_SQ*((-SIN_2THETAi + SIN_2THETAs)*SIN_PHIs*delK[0] +COS_PHIs*(SIN_2THETAi- SIN_2THETAs)*delK[1] + (2+COS_2THETAi+COS_2THETAs)*delK[2]);
-    // var Bnum2b = Ws_SQ*(4*-(3 + COS_2THETAi)*delK[2] +delK[0]*(4*SIN_2THETAi*SIN_PHIs + (6+2*COS_2THETAi+COS_2THETAi_minus_PHIs-2*COS_2PHIs+COS_2THETAi_plus_PHIs)*RHOpx) -8*COS_PHIs*SIN_THETAi*delK[1]*(COS_THETAi+SIN_THETAi*SIN_PHIs*RHOpx));
-    // var Bnum2 = Wi_SQ*Wp_SQ*Ws_SQ*(Bnum2a + Bnum2b);
-
-    // var Bnum3a = -4*sq(Wp_SQ)*(SIN_2THETAs*SIN_PHIs*delK[0]-COS_PHIs*SIN_2THETAs*delK[1]-2*sq(COS_THETAs)*delK[2]) + 8*sq(Ws_SQ)*(delK[2]+delK[1]*RHOpx);
-    // var Bnum3b = Wp_SQ* Ws_SQ*(4*-(3 + COS_2THETAs)*delK[2] +delK[0]*(-4*SIN_2THETAs*SIN_PHIs + (6+2*COS_2THETAs+COS_2THETAs_minus_PHIs-2*COS_2PHIs+COS_2THETAs_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAs*delK[1]*(-COS_THETAs+SIN_THETAs*SIN_PHIs*RHOpx));
-    // var Bnum3 = sq(Wi_SQ)*(Bnum3a + Bnum3b);
-
-    // var Bnum = Bnum1 + Bnum2 +Bnum3;
-    // var B = 2*Bnum / (Aden);
-
-
-
      // Deal with the z term coefficient. It is imaginary. Version with W_s and W_i independent
-    // var Bnum1 = 4*sq(Wp_SQ)*sq(Ws_SQ)*(SIN_2THETAi*SIN_PHIs*delK[0] + COS_PHIs*SIN_2THETAi*delK[1] +2*sq(COS_THETAi)*delK[2]);
-
-    // var Bnum2a = 4*Wp_SQ*((SIN_2THETAi - SIN_2THETAs)*SIN_PHIs*delK[0] +COS_PHIs*(SIN_2THETAi- SIN_2THETAs)*delK[1] + (2+COS_2THETAi+COS_2THETAs)*delK[2]);
-    // var Bnum2b = Ws_SQ*(4*(3 + COS_2THETAi)*delK[2] +delK[0]*(4*SIN_2THETAi*SIN_PHIs + (6+2*COS_2THETAi+COS_2THETAi_minus_PHIs-2*COS_2PHIs+COS_2THETAi_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAi*delK[1]*(COS_THETAi+SIN_THETAi*SIN_PHIs*RHOpx));
-    // var Bnum2 = Wi_SQ*Wp_SQ*Ws_SQ*(Bnum2a + Bnum2b);
-
-    // var Bnum3a = -4*sq(Wp_SQ)*(SIN_2THETAs*SIN_PHIs*delK[0]+COS_PHIs*SIN_2THETAs*delK[1]-2*sq(COS_THETAs)*delK[2]) + 8*sq(Ws_SQ)*(delK[2]+delK[1]*RHOpx);
-    // var Bnum3b = Wp_SQ* Ws_SQ*(4*(3 + COS_2THETAs)*delK[2] +delK[0]*(-4*SIN_2THETAs*SIN_PHIs + (6+2*COS_2THETAs+COS_2THETAs_minus_PHIs-2*COS_2PHIs+COS_2THETAs_plus_PHIs)*RHOpx) +8*COS_PHIs*SIN_THETAs*delK[1]*(-COS_THETAs+SIN_THETAs*SIN_PHIs*RHOpx));
-    // var Bnum3 = sq(Wi_SQ)*(Bnum3a + Bnum3b);
-
-    // var Bnum = Bnum1 + Bnum2 +Bnum3;
-
     // Correct I think
     var Bnum1 = 4*sq(Wp_SQ)*sq(Ws_SQ)*(SIN_2THETAi*SIN_PHIs*delK[0] + COS_PHIs*SIN_2THETAi*delK[1] +2*sq(COS_THETAi)*delK[2]);
 
@@ -226,20 +146,6 @@
     var B = 2*Bnum / (Aden);
 
 
-    // console.log(Bs,B);
-
-    // B= Bs;
-    // A = As;
-
-    // Deal with the z^2 term coefficient. It is real. Drop all terms where the walkoff angle is squared (small angle approx)
-    // var Cnums = 2*Wp_SQ*sq(SIN_THETAi_plus_THETAs)
-    // // Cnums += Ws_SQ*(-2+ COS_2THETAi + COS_2THETAs -2*RHOpx*(SIN_2THETAi - SIN_2THETAs)*SIN_PHIs);
-    // Cnums += -Ws_SQ*(-2+ COS_2THETAi + COS_2THETAs +2*RHOpx*(SIN_2THETAi - SIN_2THETAs)*SIN_PHIs);
-
-    // var Cdens = 2*( Ws_SQ )*( (2+ COS_2THETAi + COS_2THETAs)*Wp_SQ +2*Ws_SQ);
-    // var Cs = Cnums / Cdens;
-
-
     // Deal with the z^2 term coefficient. It is real. Drop all terms where the walkoff angle is squared (small angle approx)
     // version where W_s and W_i are different
     var Cnum = sq(SIN_THETAi_plus_THETAs)*Wp_SQ + Ws_SQ*(sq(SIN_THETAi) - SIN_2THETAi*SIN_PHIs*RHOpx)+Wi_SQ*(sq(SIN_THETAs)+SIN_2THETAs*SIN_PHIs*RHOpx);
@@ -252,12 +158,31 @@
 
     // Check to see if the approximation is valid that will let us use the Sinc function.
     var C_check = Math.sqrt(Math.abs(C)*2)*P.L;
-    // if (C_check > 0.5){
-    //     // console.log("APPROX NOT VALID",  C_check);
-    // }
-    // console.log(Cnum, Cden, C, C_check);
-    // console.log(arg, B*P.L/2, arg-4*B*P.L/2);
+    var C_check = C*P.L/B;
+
     var arg = B*P.L/2;
+    var numz =30;
+    var z = PhaseMatch.linspace(0,P.L, numz);
+    var pmzcoeff = 0;
+    var pmzcoeffMax = 0;
+
+    for (var k=0; k<numz; k++){
+        pmzcoeff = Math.exp(-sq(z[k])*C);
+        PMz_real += pmzcoeff*Math.cos(B*z[k]);
+        PMz_imag += pmzcoeff*Math.sin(B*z[k]);
+
+        // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
+        // if (pmzcoeffabs>pmzcoeffMax){
+        //     pmzcoeffMax = pmzcoeffabs;
+        // }
+    }
+
+    // var PMzNorm1 = Math.sin(arg)/arg;
+    // var PMz_realNorm =  PMzNorm1 * Math.cos(arg);
+    // var PMz_imagNorm = PMzNorm1 * Math.sin(arg);
+
+    PMz_real = PMz_real/numz;
+    PMz_imag = PMz_imag/numz;
 
 
     //More advanced calculation of phasematching in the z direction. Don't need it now.
@@ -276,11 +201,11 @@
         var t;
     }
     else {
-        var PMz = Math.sin(arg)/arg;
-        PMz_real =  PMz * Math.cos(arg);
-        PMz_imag = PMz * Math.sin(arg);
-        // PMz_real =  PMz;// * Math.cos(arg);
-        // PMz_imag = 0;// * Math.sin(arg);
+        // var PMz = Math.sin(arg)/arg;
+        // PMz_real =  PMz * Math.cos(arg);
+        // PMz_imag = PMz * Math.sin(arg);
+        // // PMz_real =  PMz;// * Math.cos(arg);
+        // // PMz_imag = 0;// * Math.sin(arg);
     }
 
 
@@ -846,8 +771,19 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
  */
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     var P = props.clone();
+    P.update_all_angles();
     //eliminates sinc side lobes which cause problems.
     P.use_guassian_approx = true;
+
+    var PMmax = PhaseMatch.phasematch_Int_Phase(P);
+    console.log(P,PMmax['phasematch']);
+    // threshold = PMmax*threshold*20;
+    // threshold = threshold;
+    //
+
+
+    threshold = threshold*PMmax['phasematch'];
+    // console.log(th)
 
     var lambda_limit = function(lambda_s){
         P.lambda_s = lambda_s;
@@ -869,7 +805,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     // console.log(l1/1e-9, l2/1e-9);
 
     var dif = Math.abs(ans-props.lambda_s);
-    // console.log(ans/1e-9, ans2/1e-9, P.lambda_s/1e-9, dif/1e-9);
+    console.log(PMmax,threshold,ans/1e-9, ans2/1e-9, P.lambda_s/1e-9, dif/1e-9);
 
     //Now try to find sensible limits. We want to make sure the range of values isn't too big,
     //but also ensure that if the pump bandwidth is small, that the resulting JSA is visible.
