@@ -379,11 +379,19 @@ define(
                     .attr('transform', 'translate('+[width-colorBarWidth, -2*colorBarHeight].join(',')+')')
                     ;
 
+                // console.log(xColorBar(colorBarVals[20]));
+                // console.log(dom[0], dom[1], Math.abs(dom[1]-dom[0])/colorBarWidth);
+
+                var xColorBarInv = function(v){
+
+                }
+
                 colorbar.selectAll('rect')
                     .data(colorBarVals)
                    .enter()
                     .append("rect")
                     .attr("x", xColorBar)
+                    // .attr("width", 1)
                     .attr("width", xColorBar.rangeBand())
                     .attr("height", colorBarHeight)
                     .style("fill", function( v ){
@@ -408,7 +416,7 @@ define(
                     // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
                     .scale( d3.scale.log().domain( dom ).nice().range([0, colorBarWidth]) )
                     .tickValues( vals )
-                    .tickFormat( d3.format( '.1f' ) )
+                    .tickFormat( d3.format( '.2f' ) )
                     .orient("top")
                     ;
                     // console.log("Inside log plot");
@@ -418,7 +426,7 @@ define(
                     var zAxis = d3.svg.axis()
                     .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
                     .tickValues( vals )
-                    .tickFormat( d3.format( '.1f' ) )
+                    .tickFormat( d3.format( '.2f' ) )
                     .orient("top")
                     ;
                 }

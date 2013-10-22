@@ -106,8 +106,8 @@
     var SIN_THETAi_plus_THETAs = Math.sin(P.theta_i+P.theta_s);
 
 
-    var RHOpx = P.walkoff_p; //pump walkoff angle.
-    // var RHOpx = 0; //pump walkoff angle.
+    // var RHOpx = P.walkoff_p; //pump walkoff angle.
+    var RHOpx = 0; //pump walkoff angle.
 
     RHOpx = -RHOpx; //Take the negative value. This is due to how things are defined later.
 
@@ -165,24 +165,20 @@
     var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0;
     var pmzcoeffMax = 0;
-    // var apodization_coeff = P.apodization_coeff;
-    if (P.calc_apodization && P.enable_pp){
-        var apodization_coeff = P.apodization_coeff;
-    }
-    else {
-        var apodization_coeff = new Array(numz);
-        for (var j=0; j<numz; j++){
-            apodization_coeff[j] = 1;
-        }
-    }
-
-    // var apodization_coeff = new Array(numz);
+    // // var apodization_coeff = P.apodization_coeff;
+    // if (P.calc_apodization && P.enable_pp){
+    //     var apodization_coeff = P.apodization_coeff;
+    // }
+    // else {
+    //     var apodization_coeff = new Array(numz);
     //     for (var j=0; j<numz; j++){
     //         apodization_coeff[j] = 1;
     //     }
+    // }
+
 
     for (var k=0; k<numz; k++){
-        pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
+        pmzcoeff = Math.exp(-sq(z[k])*C);//*apodization_coeff[k];
         PMz_real += pmzcoeff*Math.cos(B*z[k]);
         PMz_imag += pmzcoeff*Math.sin(B*z[k]);
 
@@ -242,78 +238,6 @@
     var PMt = Math.exp(-A);
     return [PMz_real, PMz_imag, PMt, C_check];
 };
-
-// PhaseMatch.calc_PM_tz = function calc_PM_tz (P){
-//     var con = PhaseMatch.constants;
-//     var lambda_p = P.lambda_p; //store the original lambda_p
-//     var n_p = P.n_p;
-
-//     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
-//     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
-
-//     var delK = PhaseMatch.calc_delK(P);
-
-//     P.lambda_p = lambda_p; //set back to the original lambda_p
-//     P.n_p = n_p;
-
-//     var arg = P.L/2*(delK[2]);
-
-//     var PMz_real = 0;
-//     var PMz_imag = 0;
-
-//     //More advanced calculation of phasematching in the z direction. Don't need it now.
-//     if (P.calc_apodization && P.enable_pp){
-//         var gauss_norm = 1;
-//         var delL = Math.abs(P.apodization_L[0] - P.apodization_L[1]);
-
-//         for (var m = 0; m<P.apodization; m++){
-//             PMz_real += P.apodization_coeff[m]*(Math.sin(delK[2]*P.apodization_L[m+1]) - Math.sin(delK[2]*P.apodization_L[m]));///P.apodization;
-//             PMz_imag += P.apodization_coeff[m]*(Math.cos(delK[2]*P.apodization_L[m]) - Math.cos(-delK[2]*P.apodization_L[m+1]));///P.apodization;
-//             // gauss_norm += P.apodization_coeff[m];
-//         }
-
-//         PMz_real = PMz_real/(delK[2]*delL * gauss_norm);
-//         PMz_imag = PMz_imag/(delK[2]*delL * gauss_norm);
-
-//         // var PMz_int = Math.sqrt(sq(PMz_real) + sq(PMz_imag));
-
-//         // var PMz_ref = Math.sin(arg)/arg;
-//         // var PMz_real_ref =  PMz_ref * Math.cos(arg);
-//         // var PMz_imag_ref =  PMz_ref * Math.sin(arg);
-//         // var norm = PMz_ref / PMz_int;
-//         // PMz_real = PMz_real*norm;
-//         // PMz_imag = PMz_imag*norm;
-//         var t;
-//     }
-//     else {
-//         var PMz = Math.sin(arg)/arg;
-//         PMz_real =  PMz * Math.cos(arg);
-//         PMz_imag = PMz * Math.sin(arg);
-//         // PMz_real =  PMz;// * Math.cos(arg);
-//         // PMz_imag = 0;// * Math.sin(arg);
-//     }
-
-
-//     // // Phasematching along z dir
-//     // var PMz = Math.sin(arg)/arg; //* Math.exp(1j*arg)
-//     // var PMz_real = 0;
-//     // var PMz_imag = 0;
-//     if (P.use_guassian_approx){
-//         // console.log('approx');
-//         PMz_real = Math.exp(-0.193*sq(arg));
-//         PMz_imag = 0;
-//     }
-//     // else{
-//     //     PMz_real =  PMz * Math.cos(arg);
-//     //     PMz_imag = PMz * Math.sin(arg);
-//     // }
-
-//     // Phasematching along transverse directions
-//     var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
-
-//     return [PMz_real, PMz_imag, PMt];
-// };
-
 
 /*
  * pump_spectrum
