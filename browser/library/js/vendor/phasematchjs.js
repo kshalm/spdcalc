@@ -2349,23 +2349,23 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
 
     var arg = B*P.L/2;
     var numz =P.apodization;
-    var z = PhaseMatch.linspace(0,P.L, numz);
-    var pmzcoeff = 0;
-    var pmzcoeffMax = 0;
-    // // var apodization_coeff = P.apodization_coeff;
-    // if (P.calc_apodization && P.enable_pp){
-    //     var apodization_coeff = P.apodization_coeff;
-    // }
-    // else {
-    //     var apodization_coeff = new Array(numz);
-    //     for (var j=0; j<numz; j++){
-    //         apodization_coeff[j] = 1;
-    //     }
-    // }
 
+    var z = PhaseMatch.linspace(0,P.L, numz);
+
+    if (P.calc_apodization && P.enable_pp){
+        var apodization_coeff = P.apodization_coeff;
+    }
+    else {
+        var apodization_coeff = new Array(numz);
+        for (var j=0; j<numz; j++){
+            apodization_coeff[j] = 1;
+        }
+    }
+
+    var pmzcoeff = 0;
 
     for (var k=0; k<numz; k++){
-        pmzcoeff = Math.exp(-sq(z[k])*C);//*apodization_coeff[k];
+        pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
         PMz_real += pmzcoeff*Math.cos(B*z[k]);
         PMz_imag += pmzcoeff*Math.sin(B*z[k]);
 
@@ -3877,9 +3877,10 @@ PhaseMatch.Crystals('LiNbO3-1', {
                     }
 
                     if (name === 'apodization'){
-                        if (val < 30){
-                            val = 30;
+                        if (val < 31){
+                            val = 31;
                         }
+                        // val = 25;
                     }
 
                     this[ name ] = val;
@@ -3998,7 +3999,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         // if (PM[i]>maxpm){maxpm = PM[i];}
     }
 
-    console.log("Approx Check, ", C_check);
+    // console.log("Approx Check, ", C_check);
     return [PMreal, PMimag];
 
 };

@@ -372,19 +372,12 @@ define(
                 var colorBarVals = d3.range( dom[0], dom[1], Math.abs(dom[1]-dom[0])/colorBarWidth );
                 var xColorBar = d3.scale.ordinal()
                     .domain( colorBarVals )
-                    .rangeRoundBands([0, colorBarWidth])
+                    .rangeRoundBands([0, colorBarWidth],0)
                     ;
 
                 var colorbar = svg.append("g").attr("class", "z axis")
                     .attr('transform', 'translate('+[width-colorBarWidth, -2*colorBarHeight].join(',')+')')
                     ;
-
-                // console.log(xColorBar(colorBarVals[20]));
-                // console.log(dom[0], dom[1], Math.abs(dom[1]-dom[0])/colorBarWidth);
-
-                var xColorBarInv = function(v){
-
-                }
 
                 colorbar.selectAll('rect')
                     .data(colorBarVals)
@@ -409,7 +402,6 @@ define(
                     ;
 
                 var vals = [].concat(dom);
-                // console.log(defaults.logplot);
                 if (this.logplot){
                     vals.splice(1, 0, (dom[1]-dom[0]) / 10);
                     var zAxis = d3.svg.axis()

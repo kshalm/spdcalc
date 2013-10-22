@@ -452,9 +452,10 @@
                     }
 
                     if (name === 'apodization'){
-                        if (val < 30){
-                            val = 30;
+                        if (val < 31){
+                            val = 31;
                         }
+                        // val = 25;
                     }
 
                     this[ name ] = val;

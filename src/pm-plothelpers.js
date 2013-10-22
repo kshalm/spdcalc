@@ -55,7 +55,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         // if (PM[i]>maxpm){maxpm = PM[i];}
     }
 
-    console.log("Approx Check, ", C_check);
+    // console.log("Approx Check, ", C_check);
     return [PMreal, PMimag];
 
 };
