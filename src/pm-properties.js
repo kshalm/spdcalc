@@ -371,17 +371,6 @@
             var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
         },
 
-        // get_apodization : PhaseMatch.util.memoize(function (l){
-        //     // var l_range = PhaseMatch.linspace(0,this.L,this.apodization+1);
-        //     // var delL = Math.abs(l_range[1] - l_range[0]);
-        //     // var A = Math.exp(-sq((l_range[m] - this.L/2))/2/sq(this.apodization_FWHM));
-        //     // var bw = this.apodization_FWHM /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-        //     var bw = this.apodization_FWHM  / 2.3548;
-        //     // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(2*p_bw)));
-        //     var A = Math.exp(-sq((l - this.L/2)/(bw))/2);
-        //     // A = A / ( bw *Math.sqrt(2*Math.PI)); //normalization
-        //     return A;
-        // }),
 
         set_apodization_L : function (){
             this.apodization_L = PhaseMatch.linspace(0,this.L,this.apodization+1);
@@ -400,9 +389,9 @@
             var total = PhaseMatch.Sum(this.apodization_coeff);
 
             //normalize
-            for (i=0; i<dim; i++){
-                this.apodization_coeff[i] = this.apodization_coeff[i]/total;
-            }
+            // for (i=0; i<dim; i++){
+            //     this.apodization_coeff[i] = this.apodization_coeff[i]/total;
+            // }
 
         },
 
@@ -413,7 +402,7 @@
             var origin_theta = P.theta;
 
             //calculate the derivative
-            var deltheta = .1*Math.PI/180; 
+            var deltheta = .1*Math.PI/180;
 
             var theta = P.theta - deltheta/2;
             this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
@@ -459,9 +448,9 @@
                     if (name === 'poling_period'){
                         if(val===0 || isNaN(val)){
                             val === 1E12;
-                        } 
+                        }
                     }
-                    
+
                     this[ name ] = val;
 
 

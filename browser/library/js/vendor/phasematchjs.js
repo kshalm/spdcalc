@@ -2348,13 +2348,28 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
     var C_check = C*P.L/B;
 
     var arg = B*P.L/2;
-    var numz =30;
+    var numz =P.apodization;
     var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0;
     var pmzcoeffMax = 0;
+    // var apodization_coeff = P.apodization_coeff;
+    if (P.calc_apodization && P.enable_pp){
+        var apodization_coeff = P.apodization_coeff;
+    }
+    else {
+        var apodization_coeff = new Array(numz);
+        for (var j=0; j<numz; j++){
+            apodization_coeff[j] = 1;
+        }
+    }
+
+    // var apodization_coeff = new Array(numz);
+    //     for (var j=0; j<numz; j++){
+    //         apodization_coeff[j] = 1;
+    //     }
 
     for (var k=0; k<numz; k++){
-        pmzcoeff = Math.exp(-sq(z[k])*C);
+        pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
         PMz_real += pmzcoeff*Math.cos(B*z[k]);
         PMz_imag += pmzcoeff*Math.sin(B*z[k]);
 
@@ -2367,33 +2382,34 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
     // var PMzNorm1 = Math.sin(arg)/arg;
     // var PMz_realNorm =  PMzNorm1 * Math.cos(arg);
     // var PMz_imagNorm = PMzNorm1 * Math.sin(arg);
+    //  var delL = Math.abs(P.apodization_L[0] - P.apodization_L[1]);
 
     PMz_real = PMz_real/numz;
     PMz_imag = PMz_imag/numz;
 
 
-    //More advanced calculation of phasematching in the z direction. Don't need it now.
-    if (P.calc_apodization && P.enable_pp){
-        var gauss_norm = 1;
-        var delL = Math.abs(P.apodization_L[0] - P.apodization_L[1]);
+    // //More advanced calculation of phasematching in the z direction. Don't need it now.
+    // if (P.calc_apodization && P.enable_pp){
+    //     var gauss_norm = 1;
+    //     var delL = Math.abs(P.apodization_L[0] - P.apodization_L[1]);
 
-        for (var m = 0; m<P.apodization; m++){
-            PMz_real += P.apodization_coeff[m]*(Math.sin(delK[2]*P.apodization_L[m+1]) - Math.sin(delK[2]*P.apodization_L[m]));///P.apodization;
-            PMz_imag += P.apodization_coeff[m]*(Math.cos(delK[2]*P.apodization_L[m]) - Math.cos(-delK[2]*P.apodization_L[m+1]));///P.apodization;
-            // gauss_norm += P.apodization_coeff[m];
-        }
+    //     for (var m = 0; m<P.apodization; m++){
+    //         PMz_real += P.apodization_coeff[m]*(Math.sin(delK[2]*P.apodization_L[m+1]) - Math.sin(delK[2]*P.apodization_L[m]));///P.apodization;
+    //         PMz_imag += P.apodization_coeff[m]*(Math.cos(delK[2]*P.apodization_L[m]) - Math.cos(-delK[2]*P.apodization_L[m+1]));///P.apodization;
+    //         // gauss_norm += P.apodization_coeff[m];
+    //     }
 
-        PMz_real = PMz_real/(delK[2]*delL * gauss_norm);
-        PMz_imag = PMz_imag/(delK[2]*delL * gauss_norm);
-        var t;
-    }
-    else {
-        // var PMz = Math.sin(arg)/arg;
-        // PMz_real =  PMz * Math.cos(arg);
-        // PMz_imag = PMz * Math.sin(arg);
-        // // PMz_real =  PMz;// * Math.cos(arg);
-        // // PMz_imag = 0;// * Math.sin(arg);
-    }
+    //     PMz_real = PMz_real/(delK[2]*delL * gauss_norm);
+    //     PMz_imag = PMz_imag/(delK[2]*delL * gauss_norm);
+    //     var t;
+    // }
+    // else {
+    //     // var PMz = Math.sin(arg)/arg;
+    //     // PMz_real =  PMz * Math.cos(arg);
+    //     // PMz_imag = PMz * Math.sin(arg);
+    //     // // PMz_real =  PMz;// * Math.cos(arg);
+    //     // // PMz_imag = 0;// * Math.sin(arg);
+    // }
 
 
     // // Phasematching along z dir
@@ -2963,7 +2979,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     P.use_guassian_approx = true;
 
     var PMmax = PhaseMatch.phasematch_Int_Phase(P);
-    console.log(P,PMmax['phasematch']);
+    // console.log(P,PMmax['phasematch']);
     // threshold = PMmax*threshold*20;
     // threshold = threshold;
     //
@@ -2992,7 +3008,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     // console.log(l1/1e-9, l2/1e-9);
 
     var dif = Math.abs(ans-props.lambda_s);
-    console.log(PMmax,threshold,ans/1e-9, ans2/1e-9, P.lambda_s/1e-9, dif/1e-9);
+    // console.log(PMmax,threshold,ans/1e-9, ans2/1e-9, P.lambda_s/1e-9, dif/1e-9);
 
     //Now try to find sensible limits. We want to make sure the range of values isn't too big,
     //but also ensure that if the pump bandwidth is small, that the resulting JSA is visible.
@@ -3856,17 +3872,6 @@ PhaseMatch.Crystals('LiNbO3-1', {
             var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
         },
 
-        // get_apodization : PhaseMatch.util.memoize(function (l){
-        //     // var l_range = PhaseMatch.linspace(0,this.L,this.apodization+1);
-        //     // var delL = Math.abs(l_range[1] - l_range[0]);
-        //     // var A = Math.exp(-sq((l_range[m] - this.L/2))/2/sq(this.apodization_FWHM));
-        //     // var bw = this.apodization_FWHM /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-        //     var bw = this.apodization_FWHM  / 2.3548;
-        //     // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(2*p_bw)));
-        //     var A = Math.exp(-sq((l - this.L/2)/(bw))/2);
-        //     // A = A / ( bw *Math.sqrt(2*Math.PI)); //normalization
-        //     return A;
-        // }),
 
         set_apodization_L : function (){
             this.apodization_L = PhaseMatch.linspace(0,this.L,this.apodization+1);
@@ -3885,9 +3890,9 @@ PhaseMatch.Crystals('LiNbO3-1', {
             var total = PhaseMatch.Sum(this.apodization_coeff);
 
             //normalize
-            for (i=0; i<dim; i++){
-                this.apodization_coeff[i] = this.apodization_coeff[i]/total;
-            }
+            // for (i=0; i<dim; i++){
+            //     this.apodization_coeff[i] = this.apodization_coeff[i]/total;
+            // }
 
         },
 
@@ -3898,7 +3903,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
             var origin_theta = P.theta;
 
             //calculate the derivative
-            var deltheta = .1*Math.PI/180; 
+            var deltheta = .1*Math.PI/180;
 
             var theta = P.theta - deltheta/2;
             this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
@@ -3944,9 +3949,9 @@ PhaseMatch.Crystals('LiNbO3-1', {
                     if (name === 'poling_period'){
                         if(val===0 || isNaN(val)){
                             val === 1E12;
-                        } 
+                        }
                     }
-                    
+
                     this[ name ] = val;
 
 
