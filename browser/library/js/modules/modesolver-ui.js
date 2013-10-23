@@ -107,7 +107,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 100,
+                    'grid_size': 30,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -121,8 +121,7 @@ define(
                 var self = this;
                 var po = this.plotOpts;
 
-                var scale = 5;
-                var BW = 1e-9;
+                var scale = 6;
 
 
                 //make sure the angles are correct so we can calculate the right ranges
@@ -134,25 +133,33 @@ define(
                 var X_0 = Math.asin(Math.sin(props.theta_i_e)* Math.cos(props.phi_i));
                 var Y_0 = Math.asin(Math.sin(props.theta_i_e)* Math.sin(props.phi_i));
 
-                console.log("central idler angles:", props.theta_i_e *180/Math.PI);
-                console.log(po.get('collection_bw')/1e-9);
+                // console.log("central idler angles:", props.theta_i_e *180/Math.PI);
+                // console.log(po.get('collection_bw')/1e-9);
                 
                 // var W = Math.max(props.W_sx, props.W_sy);
-                var W = props.W_sx;
+
+                var W = props.W_sx /(2 * Math.sqrt(2*Math.log(2)));
+                var W = props.lambda_s/(Math.PI * W); // angular spread
 
                 var x_start = X_0 - scale*W/2;
                 var x_stop = X_0 + scale*W/2;
                 var y_start = Y_0 - scale*W/2;
                 var y_stop = Y_0 + scale*W/2;
                     
-
+                var wavelengths = {
+                    "ls_start":po.get("ls_start")
+                    ,"ls_stop":po.get("ls_stop")
+                    ,"li_start":po.get("li_start")
+                    ,"li_stop":po.get("li_stop")
+                };
+                console.log("going in");
                 var PM_s = PhaseMatch.calc_XY_mode_solver2(
                     props, 
                     x_start,
                     x_stop,
                     y_start,
                     y_stop,
-                    po.get('collection_bw'),
+                    wavelengths,
                     po.get('grid_size')
                 );
                 // console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
@@ -167,7 +174,7 @@ define(
                 // );
 
                 self.data = PM_s;
-                
+                self.plot2dSignal.setZRange([0,Math.max.apply(null,PM_s)]);
                 self.plot2dSignal.setXRange([ converter.to('deg', x_start), converter.to('deg', x_stop) ]);
                 self.plot2dSignal.setYRange([ converter.to('deg', y_start), converter.to('deg', y_stop) ]);
 
@@ -184,8 +191,8 @@ define(
                 var data =[];
 
                 data = [ 
-                    { X0: X0 * deg, Y0: Y0 * deg, r: W/2 * deg, opacity: .9, title: 'Signal FWHM', labelX: (X0)*deg, labelY: (Y0+2*W)*deg},
-                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W/2 * deg, opacity: 0.3, title: 'Signal 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+2*W)*deg },
+                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: .9, title: 'Signal FWHM', labelX: (X0)*deg, labelY: (Y0+3*W)*deg},
+                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W * deg, opacity: 0.3, title: 'Signal 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+3*W)*deg },
                 ];
                 var xx = self.plot2dSignal.scales.x;
                 var yy = self.plot2dSignal.scales.y;

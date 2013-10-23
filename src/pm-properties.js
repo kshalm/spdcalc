@@ -37,6 +37,7 @@
         // W_sx: .2 * Math.PI/180,
         W_sx: 100 * con.um,
         W_sy: .2 * Math.PI/180,
+        W_ix: 100 * con.um,
         phase: false,
         brute_force: false,
         brute_dim: 50,

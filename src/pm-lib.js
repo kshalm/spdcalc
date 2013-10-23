@@ -73,15 +73,17 @@
 
     if (P.calcfibercoupling){
         var W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
+        var W_i = 2*Math.asin( Math.cos(P.theta_i_e)*Math.sin(P.W_ix/2)/(P.n_i * Math.cos(P.theta_i)));
     }
     else {
-       W_s = 2^20; //Arbitrary large number
+       W_s = Math.pow(2,20); //Arbitrary large number
+       W_i = Math.pow(2,20); //Arbitrary large number
     }
 
     // Setup constants
     var Wp_SQ = sq(P.W * convfromFWHM); // convert from FWHM to sigma
     var Ws_SQ = sq(W_s * convfromFWHM); // convert from FWHM to sigma
-    var Wi_SQ = sq(W_s * convfromFWHM); // convert from FWHM to sigma @TODO: Change to P.W_i
+    var Wi_SQ = sq(W_i * convfromFWHM); // convert from FWHM to sigma @TODO: Change to P.W_i
 
     var COS_2THETAs = Math.cos(2*P.theta_s);
     var COS_2THETAi = Math.cos(2*P.theta_i);
@@ -162,8 +164,9 @@
 
     var arg = B*P.L/2;
     var numz =P.apodization;
-
     var z = PhaseMatch.linspace(0,P.L, numz);
+    var pmzcoeff = 0;
+    var pmzcoeffMax = 0;
 
     if (P.calc_apodization && P.enable_pp){
         var apodization_coeff = P.apodization_coeff;
@@ -175,7 +178,6 @@
         }
     }
 
-    var pmzcoeff = 0;
 
     for (var k=0; k<numz; k++){
         pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
