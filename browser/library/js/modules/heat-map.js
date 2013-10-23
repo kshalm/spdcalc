@@ -372,7 +372,7 @@ define(
                 var colorBarVals = d3.range( dom[0], dom[1], Math.abs(dom[1]-dom[0])/colorBarWidth );
                 var xColorBar = d3.scale.ordinal()
                     .domain( colorBarVals )
-                    .rangeRoundBands([0, colorBarWidth])
+                    .rangeRoundBands([0, colorBarWidth],0)
                     ;
 
                 var colorbar = svg.append("g").attr("class", "z axis")
@@ -411,7 +411,7 @@ define(
                 var vals = [].concat(dom);
                 // console.log(defaults.logplot);
                 if (this.logplot){
-                    vals.splice(1, 0, (dom[1]-dom[0]) / 10);
+                    vals.splice(1, 0, (dom[1]-dom[0]) / 10 + dom[0]);
                     var zAxis = d3.svg.axis()
                     // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
                     .scale( d3.scale.log().domain( dom ).nice().range([0, colorBarWidth]) )
@@ -422,7 +422,7 @@ define(
                     // console.log("Inside log plot");
                 }
                 else{
-                    vals.splice(1, 0, (dom[1]-dom[0]) / 2);
+                    vals.splice(1, 0, (dom[1]-dom[0]) / 2 +dom[0]);
                     var zAxis = d3.svg.axis()
                     .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
                     .tickValues( vals )
