@@ -169,7 +169,7 @@ define(
 
 
                 // self.plot.scales.z = d3.scale.linear().domain([0, 50]);
-                self.plot.setZRange([1,Math.max.apply(null,PM)*1.1]);
+                self.plot.setZRange([1,Math.max.apply(null,PM)*1]);
                 self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('xtal_l_start')), converter.to('micro',self.plotOpts.get('xtal_l_stop'))]);
                 self.plot.setYRange( [ converter.to('nano',self.plotOpts.get('bw_start')), converter.to('nano',self.plotOpts.get('bw_stop'))]);
 
