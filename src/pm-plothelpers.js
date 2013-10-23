@@ -15,10 +15,6 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     // P.theta_i = P.theta_s;
 
 
-    if (P.brute_force){
-        dim = P.brute_dim;
-    }
-
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
     var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
@@ -40,23 +36,10 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-        // P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-        // P.optimum_idler(P); //Need to find the optimum idler for each angle.
-        // if (P.brute_force) {
-        //    P.brute_force_theta_i(P); //use a search. could be time consuming.
-        // }
-        // else {
-        //     //calculate the correct idler angle analytically.
-        //     // P.optimum_idler(P);
-        //     // P.theta_i = P.theta_s;
-        //     // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        //     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-        // }
-
         var PM = PhaseMatch.phasematch(P);
         PMreal[i] = PM[0];
         PMimag[i] = PM[1];
-        C_check = PM[2];
+        // C_check = PM[2];
         // if (PM[i]>maxpm){maxpm = PM[i];}
     }
 
@@ -973,9 +956,14 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         }
 
     }
+    // var convfromFWHM = 1/(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
+    var convfromFWHM = 1/(2 * Math.sqrt(Math.log(2)));
+    var W_ix = P.lambda_i/(Math.PI*P.W_sx*convfromFWHM); // Convert to angular bandwidth
+    // account for refraction to get new waist size
+    W_ix = 2*Math.asin( Math.cos(P.theta_i_e)*Math.sin(W_ix/2)/(P.n_i * Math.cos(P.theta_i)));
 
-    // var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);
-    // var lambda_i = PhaseMatch.linspace(P.lambda_i - BW/2, P.lambda_i + BW/2, dim_lambda);
+    // console.log(W_ix*180/Math.PI, X_0_i*180/Math.PI, Y_0_i*180/Math.PI);
+    console.log(W_ix*180/Math.PI, P.lambda_i/(Math.PI*P.W_sx*convfromFWHM)*180/Math.PI);
 
 
     var N = dim * dim;
@@ -986,6 +974,9 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     var maxalpha = 0;
     var dim_lambda_sq = sq(dim_lambda);
 
+    var pmmax = 0;
+    P.singles = true;
+
     // for every point on the idler spatial grid, loop through and calculate the maximum phasematching probability.
     for (var i=0; i<N; i++){
         var index_x = i % dim;
@@ -995,10 +986,10 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         P.theta_i = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
         P.phi_i = Math.atan2(Y[index_y],X[index_x]);
         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        var ang = [P.theta_i * 180/Math.PI, P.phi_i * 180/Math.PI]
+        // var ang = [P.theta_i * 180/Math.PI, P.phi_i * 180/Math.PI]
         // P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
         P.W_ix =  Math.pow(2,20); //Treat the idler as a plane wave
-        // P.W_ix = P.W_sx;
+        // P.W_ix = 1.5*P.W_sx;
 
         // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
 
@@ -1006,17 +997,56 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         var pmsum = PhaseMatch.Sum(PM_jsi);
         PMsingles[i]= pmsum;
 
-        P.W_ix = P.W_sx;
-        PM_jsi = PhaseMatch.calc_JSI(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
-        pmsum = PhaseMatch.Sum(PM_jsi);
-        PMcoinc[i]= pmsum;
-        // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI,pmsum);
-        // console.log(index_x, index_y, X[index_x], Y[index_y]);
+        // if (pmmax<pmsum){
+        //     pmmax = pmsum;
+        // }
+
+        // var x = Math.sin(P.theta_i)*Math.cos(P.phi_i);
+        // var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
+        var x = X[index_x];
+        var y = Y[index_y];
+        PMcoinc[i] = pmsum*Math.exp(-1*sq((X_0_i - x )/(2*W_ix)) - 1*sq((Y_0_i - y)/(2*W_ix)));
+
+        // P.W_ix = P.W_sx;
+        // P.optimum_idler();
+        // // P.phi_i = Math.atan2(Y[index_y],X[index_x]);
+        // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+        // PM_jsi = PhaseMatch.calc_JSI(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
+        // pmsum = PhaseMatch.Sum(PM_jsi);
+        // PMcoinc[i]= pmsum;
+
+        // if (pmmax<pmsum){
+        //     pmmax = pmsum;
+        // }
 
     }
-    // console.log("singles", singles, "coinc: ", coinc, "eff:", coinc/singles);
-    var singles = PhaseMatch.Sum(PMsingles);
-    var coinc = PhaseMatch.Sum(PMcoinc)
+
+    P.singles = false;
+    // P.W_ix = P.W_sx;
+    // P.phi_i = P.phi_s + Math.PI;
+    // P.optimum_idler();
+    // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+
+    // PM_jsi = PhaseMatch.calc_JSI(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
+
+    // // Find max value at center
+    // var PMcoincMax = Math.max.apply(null,PM_jsi);
+
+    // // Normalize the singles counts
+    // for (var j=0; j<N; j++){
+    //     // PMcoinc[j] = PMcoinc[j]*PMcoincMax/pmmax;
+    // }
+
+    // // // Normalize the singles counts
+    // // for (var j=0; j<N; j++){
+    // //     PMsingles[j] = PMsingles[j]*PMcoincMax/pmmax;
+    // // }
+
+
+
+    var coinc = PhaseMatch.Sum(PMcoinc);
+    var singles = PhaseMatch.Sum(PMsingles); //*Math.abs((X[1]-X[0])*(Y[1]-Y[0]));
+    // var coinc = PhaseMatch.Sum(PMcoinc)/N;
     console.log(singles, coinc, coinc/singles);
-    return PMsingles;
+    return PMcoinc;
 };

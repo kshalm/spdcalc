@@ -69,8 +69,7 @@
     var PMz_real = 0;
     var PMz_imag = 0;
 
-    // var convfromFWHM = 1/(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-    var convfromFWHM = 1/(2 * Math.sqrt(Math.log(2)))
+    var convfromFWHM = 1/(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
 
     if (P.calcfibercoupling){
         var W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
@@ -159,50 +158,16 @@
 
     // console.log(Cs,C);
 
-    // // Check to see if the approximation is valid that will let us use the Sinc function.
-    // var C_check = Math.sqrt(Math.abs(C)*2)*P.L;
+    // Check to see if the approximation is valid that will let us use the Sinc function.
+    var C_check = Math.sqrt(Math.abs(C)*2)*P.L;
     var C_check = C*P.L/B;
-    // C_check = 0;
-
-
-    // Now calculate the normalization coefficients.
-    // First the constant that remains after analytically integrating over x
-
-    if (P.singles){
-        var xconst1 = 1/Wp_SQ;
-        xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-        var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
-
-        // Next the constant that remains after analytically integrating over y
-        var yconst1 = (Wp_SQ+Ws_SQ)*(sq(COS_THETAs)*Wp_SQ+Ws_SQ);
-        var yconst2 = Wp_SQ*Ws_SQ*( (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ);
-        var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
-
-        // Normalization from the Gaussian terms in the integral.
-        var pi2 = 2*Math.PI;
-        var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
-    }
-    else{
-        var xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
-        xconst1 += 1/Wp_SQ;
-        xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-        var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
-
-        // Next the constant that remains after analytically integrating over y
-        var yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ );
-        var yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
-        var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
-
-        // Normalization from the Gaussian terms in the integral.
-        var pi2 = 2*Math.PI;
-        var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
-    }
-
-    // var gaussnorm =1;
 
     var arg = B*P.L/2;
     var numz =P.apodization;
+
     var z = PhaseMatch.linspace(0,P.L, numz);
+<<<<<<< HEAD
+=======
     var pmzcoeff = 0;
     var pmzcoeffMax = 0;
 
@@ -215,7 +180,19 @@
             apodization_coeff[j] = 1;
         }
     }
+>>>>>>> 4db162067e94310b7718caa464ab3852863fe597
 
+    if (P.calc_apodization && P.enable_pp){
+        var apodization_coeff = P.apodization_coeff;
+    }
+    else {
+        var apodization_coeff = new Array(numz);
+        for (var j=0; j<numz; j++){
+            apodization_coeff[j] = 1;
+        }
+    }
+
+    var pmzcoeff = 0;
 
     for (var k=0; k<numz; k++){
         pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
@@ -275,8 +252,7 @@
     // Phasematching along transverse directions
     // var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     // console.log(A);
-    // var PMt = Math.exp(-A);
-    var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
+    var PMt = Math.exp(-A);
     return [PMz_real, PMz_imag, PMt, C_check];
 };
 

@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[    156593,       3630]
-NotebookOptionsPosition[    153469,       3534]
-NotebookOutlinePosition[    153823,       3550]
-CellTagsIndexPosition[    153780,       3547]
+NotebookDataLength[    165217,       3779]
+NotebookOptionsPosition[    160200,       3639]
+NotebookOutlinePosition[    160560,       3655]
+CellTagsIndexPosition[    160517,       3652]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -1017,23 +1017,24 @@ Cell[BoxData[
       RowBox[{
        SubscriptBox["q", "i"], " ", "\[Rule]", " ", 
        SuperscriptBox[
-        SubscriptBox["W", "i"], "2"]}]}], " ", "}"}]}], "\n", " ", 
-   RowBox[{"rules2", " ", ":=", 
-    RowBox[{"{", 
-     RowBox[{
+        SubscriptBox["W", "i"], "2"]}]}], " ", "}"}]}], "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
+    RowBox[{"rules2", " ", ":=", 
+     RowBox[{"{", 
       RowBox[{
-       SubscriptBox["q", "ppp"], " ", "\[Rule]", " ", 
-       SuperscriptBox[
-        SubscriptBox["W", "ppp"], "2"]}], " ", ",", " ", 
-      RowBox[{
-       SubscriptBox["q", "s"], " ", "\[Rule]", " ", 
-       SuperscriptBox[
-        SubscriptBox["W", "s"], "2"]}], " ", ",", " ", 
-      RowBox[{
-       SubscriptBox["q", "i"], " ", "\[Rule]", " ", 
-       SuperscriptBox[
-        SubscriptBox["W", "s"], "2"]}]}], " ", "}"}]}], "\[IndentingNewLine]",
-    "\[IndentingNewLine]", 
+       RowBox[{
+        SubscriptBox["q", "ppp"], " ", "\[Rule]", " ", 
+        SuperscriptBox[
+         SubscriptBox["W", "ppp"], "2"]}], " ", ",", " ", 
+       RowBox[{
+        SubscriptBox["q", "s"], " ", "\[Rule]", " ", 
+        SuperscriptBox[
+         SubscriptBox["W", "s"], "2"]}], " ", ",", " ", 
+       RowBox[{
+        SubscriptBox["q", "i"], " ", "\[Rule]", " ", 
+        SuperscriptBox[
+         SubscriptBox["W", "s"], "2"]}]}], " ", "}"}]}], "*)"}], 
+   "\[IndentingNewLine]", "\n", 
    RowBox[{"rulesq", " ", ":=", " ", "rules2"}], "\[IndentingNewLine]", 
    RowBox[{"rulesanlge", " ", ":=", " ", 
     RowBox[{"{", " ", 
@@ -1096,7 +1097,7 @@ Cell[BoxData[
    3.59052357123062*^9}, {3.590524142763977*^9, 3.590524235646515*^9}, {
    3.590524266636819*^9, 3.59052431042937*^9}, {3.590525182345914*^9, 
    3.590525193486434*^9}, {3.590526011602631*^9, 3.5905260146674767`*^9}, {
-   3.5905307140862923`*^9, 3.590530718259025*^9}}],
+   3.5905307140862923`*^9, 3.590530718259025*^9}, 3.591532968535356*^9}],
 
 Cell[BoxData[
  RowBox[{
@@ -1478,26 +1479,24 @@ Cell[BoxData[
     " ", "to", " ", "the", " ", "following", " ", "constants"}], 
    "\[IndentingNewLine]", "*)"}], "\[IndentingNewLine]", 
   RowBox[{
-   RowBox[{
-    RowBox[{"xconst", "=", " ", 
-     RowBox[{"Simplify", "[", 
+   RowBox[{"xconst", "=", " ", 
+    RowBox[{"Simplify", "[", 
+     RowBox[{
       RowBox[{
-       RowBox[{
-        RowBox[{"\[Sqrt]", "\[Pi]"}], "/", 
-        RowBox[{"\[Sqrt]", 
-         RowBox[{"(", 
-          RowBox[{"-", "coeffx"}], ")"}]}]}], " ", "//.", "rules2"}], "]"}]}],
-     ";"}], "\[IndentingNewLine]", 
-   RowBox[{
-    RowBox[{"yconst", "=", " ", 
-     RowBox[{"Simplify", "[", 
+       RowBox[{"\[Sqrt]", "\[Pi]"}], "/", 
+       RowBox[{"\[Sqrt]", 
+        RowBox[{"(", 
+         RowBox[{"-", "coeffx"}], ")"}]}]}], " ", "//.", "rules2"}], "]"}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"yconst", "=", " ", 
+    RowBox[{"Simplify", "[", 
+     RowBox[{
       RowBox[{
-       RowBox[{
-        RowBox[{"\[Sqrt]", "\[Pi]"}], "/", 
-        RowBox[{"\[Sqrt]", 
-         RowBox[{"(", 
-          RowBox[{"-", "coeffy"}], ")"}]}]}], " ", "//.", "rules2"}], "]"}]}],
-     ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"\[Sqrt]", "\[Pi]"}], "/", 
+       RowBox[{"\[Sqrt]", 
+        RowBox[{"(", 
+         RowBox[{"-", "coeffy"}], ")"}]}]}], " ", "//.", "rules2"}], "]"}]}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
    RowBox[{
     RowBox[{"xonst", " ", "=", " ", 
      RowBox[{"xconst", " ", "/.", " ", "rulesq"}]}], " ", ";"}], 
@@ -1567,482 +1566,588 @@ Cell[BoxData[
    3.590523413863852*^9, 3.590523415430471*^9}, {3.5905239933074703`*^9, 
    3.5905240292587843`*^9}, {3.590524432754696*^9, 3.590524439607706*^9}, {
    3.590524976308745*^9, 3.5905249835840483`*^9}, {3.5905250784201393`*^9, 
-   3.590525091618764*^9}, {3.590537426599852*^9, 3.590537465847196*^9}}],
+   3.590525091618764*^9}, {3.590537426599852*^9, 3.590537465847196*^9}, {
+   3.591532942233149*^9, 3.591532943862817*^9}}],
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{"(", 
-   RowBox[{
-    SubsuperscriptBox["W", "ppp", "2"], " ", 
-    SubsuperscriptBox["W", "s", "2"], " ", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{"8", " ", 
-       SubsuperscriptBox["W", "s", "2"], " ", 
-       RowBox[{"(", 
-        RowBox[{
-         SubsuperscriptBox["\[CapitalDelta]K", "x", "2"], "+", 
-         SubsuperscriptBox["\[CapitalDelta]K", "y", "2"]}], ")"}]}], "+", 
-      RowBox[{
-       SubsuperscriptBox["W", "ppp", "2"], " ", 
-       RowBox[{"(", 
-        RowBox[{
-         RowBox[{
-          RowBox[{"(", 
-           RowBox[{"12", "+", 
-            RowBox[{"2", " ", 
-             RowBox[{"Cos", "[", 
-              RowBox[{"2", " ", 
-               SubscriptBox["\[Theta]", "i"]}], "]"}]}], "+", 
-            RowBox[{"2", " ", 
-             RowBox[{"Cos", "[", 
-              RowBox[{"2", " ", 
-               SubscriptBox["\[Theta]", "s"]}], "]"}]}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              RowBox[{"(", 
-               RowBox[{
-                SubscriptBox["\[Theta]", "i"], "-", 
-                SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              RowBox[{"(", 
-               RowBox[{
-                SubscriptBox["\[Theta]", "s"], "-", 
-                SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "-", 
-            RowBox[{"4", " ", 
-             RowBox[{"Cos", "[", 
-              RowBox[{"2", " ", 
-               SubscriptBox["\[Phi]", "s"]}], "]"}]}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              RowBox[{"(", 
-               RowBox[{
-                SubscriptBox["\[Theta]", "i"], "+", 
-                SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              RowBox[{"(", 
-               RowBox[{
-                SubscriptBox["\[Theta]", "s"], "+", 
-                SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}]}], ")"}], " ", 
-          SubsuperscriptBox["\[CapitalDelta]K", "x", "2"]}], "-", 
-         RowBox[{"4", " ", 
-          RowBox[{"(", 
-           RowBox[{
-            RowBox[{"-", "2"}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "i"]}], "]"}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-          RowBox[{"Sin", "[", 
-           RowBox[{"2", " ", 
-            SubscriptBox["\[Phi]", "s"]}], "]"}], " ", 
-          SubscriptBox["\[CapitalDelta]K", "x"], " ", 
-          SubscriptBox["\[CapitalDelta]K", "y"]}], "-", 
-         RowBox[{
-          RowBox[{"(", 
-           RowBox[{
-            RowBox[{"-", "12"}], "-", 
-            RowBox[{"2", " ", 
-             RowBox[{"Cos", "[", 
-              RowBox[{"2", " ", 
-               SubscriptBox["\[Theta]", "i"]}], "]"}]}], "-", 
-            RowBox[{"2", " ", 
-             RowBox[{"Cos", "[", 
-              RowBox[{"2", " ", 
-               SubscriptBox["\[Theta]", "s"]}], "]"}]}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              RowBox[{"(", 
-               RowBox[{
-                SubscriptBox["\[Theta]", "i"], "-", 
-                SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              RowBox[{"(", 
-               RowBox[{
-                SubscriptBox["\[Theta]", "s"], "-", 
-                SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "-", 
-            RowBox[{"4", " ", 
-             RowBox[{"Cos", "[", 
-              RowBox[{"2", " ", 
-               SubscriptBox["\[Phi]", "s"]}], "]"}]}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              RowBox[{"(", 
-               RowBox[{
-                SubscriptBox["\[Theta]", "i"], "+", 
-                SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              RowBox[{"(", 
-               RowBox[{
-                SubscriptBox["\[Theta]", "s"], "+", 
-                SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}]}], ")"}], " ", 
-          SubsuperscriptBox["\[CapitalDelta]K", "y", "2"]}]}], ")"}]}]}], 
-     ")"}]}], ")"}], "/", 
-  RowBox[{"(", 
-   RowBox[{"8", " ", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{"2", " ", 
-       SubsuperscriptBox["W", "ppp", "2"]}], "+", 
-      SubsuperscriptBox["W", "s", "2"]}], ")"}], " ", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{
-       RowBox[{"(", 
-        RowBox[{"2", "+", 
-         RowBox[{"Cos", "[", 
-          RowBox[{"2", " ", 
-           SubscriptBox["\[Theta]", "i"]}], "]"}], "+", 
-         RowBox[{"Cos", "[", 
-          RowBox[{"2", " ", 
-           SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-       SubsuperscriptBox["W", "ppp", "2"]}], "+", 
-      RowBox[{"2", " ", 
-       SubsuperscriptBox["W", "s", "2"]}]}], ")"}]}], ")"}]}]], "Output",
+  StyleBox[
+   RowBox[{"ReplaceRepeated", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rules2}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/ReplaceRepeated/reps\\\", ButtonNote -> \\\
+\"ReplaceRepeated::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945465296*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  FractionBox[
+   SqrtBox["\[Pi]"], 
+   SqrtBox[
+    RowBox[{"-", "coeffx"}]]], "//.", "\[VeryThinSpace]", 
+  "rules2"}]], "Output",
  CellChangeTimes->{
   3.5893112708803997`*^9, 3.5893277087944317`*^9, {3.590523459667925*^9, 
    3.590523459761807*^9}, 3.5905237701122513`*^9, 3.5905239938687973`*^9, 
    3.590524030252717*^9, {3.590524411049635*^9, 3.590524440169916*^9}, {
    3.590524976910121*^9, 3.590524984112225*^9}, {3.5905250789111843`*^9, 
    3.590525092199316*^9}, 3.590525281881671*^9, 3.590526070416944*^9, 
-   3.5905307744785213`*^9}],
+   3.5905307744785213`*^9, 3.591532945469767*^9}],
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{"(", 
-   RowBox[{"\[ImaginaryI]", " ", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{"8", " ", 
-       SubsuperscriptBox["W", "ppp", "4"], " ", 
-       RowBox[{"(", 
-        RowBox[{
-         RowBox[{
-          RowBox[{"(", 
-           RowBox[{
-            RowBox[{"Sin", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "i"]}], "]"}], "-", 
-            RowBox[{"Sin", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-          RowBox[{"Sin", "[", 
-           SubscriptBox["\[Phi]", "s"], "]"}], " ", 
-          SubscriptBox["\[CapitalDelta]K", "x"]}], "+", 
-         RowBox[{
-          RowBox[{"Cos", "[", 
-           SubscriptBox["\[Phi]", "s"], "]"}], " ", 
-          RowBox[{"(", 
-           RowBox[{
-            RowBox[{"Sin", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "i"]}], "]"}], "-", 
-            RowBox[{"Sin", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-          SubscriptBox["\[CapitalDelta]K", "y"]}], "+", 
-         RowBox[{
-          RowBox[{"(", 
-           RowBox[{"2", "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "i"]}], "]"}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-          SubscriptBox["\[CapitalDelta]K", "z"]}]}], ")"}]}], "+", 
-      RowBox[{"8", " ", 
-       SubsuperscriptBox["W", "s", "4"], " ", 
-       RowBox[{"(", 
-        RowBox[{
-         SubscriptBox["\[CapitalDelta]K", "z"], "-", 
-         RowBox[{
-          SubscriptBox["\[CapitalDelta]K", "x"], " ", 
-          SubscriptBox["\[Rho]", "px"]}]}], ")"}]}], "-", 
-      RowBox[{
-       SubsuperscriptBox["W", "ppp", "2"], " ", 
-       SubsuperscriptBox["W", "s", "2"], " ", 
-       RowBox[{"(", 
-        RowBox[{
-         RowBox[{
-          RowBox[{"-", "4"}], " ", 
-          RowBox[{"(", 
-           RowBox[{"6", "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "i"]}], "]"}], "+", 
-            RowBox[{"Cos", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-          SubscriptBox["\[CapitalDelta]K", "z"]}], "+", 
-         RowBox[{
-          SubscriptBox["\[CapitalDelta]K", "x"], " ", 
-          RowBox[{"(", 
-           RowBox[{
-            RowBox[{"4", " ", 
-             RowBox[{"(", 
-              RowBox[{
-               RowBox[{"-", 
-                RowBox[{"Sin", "[", 
-                 RowBox[{"2", " ", 
-                  SubscriptBox["\[Theta]", "i"]}], "]"}]}], "+", 
-               RowBox[{"Sin", "[", 
-                RowBox[{"2", " ", 
-                 SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-             RowBox[{"Sin", "[", 
-              SubscriptBox["\[Phi]", "s"], "]"}]}], "+", 
-            RowBox[{
-             RowBox[{"(", 
-              RowBox[{"12", "+", 
-               RowBox[{"2", " ", 
-                RowBox[{"Cos", "[", 
-                 RowBox[{"2", " ", 
-                  SubscriptBox["\[Theta]", "i"]}], "]"}]}], "+", 
-               RowBox[{"2", " ", 
-                RowBox[{"Cos", "[", 
-                 RowBox[{"2", " ", 
-                  SubscriptBox["\[Theta]", "s"]}], "]"}]}], "+", 
-               RowBox[{"Cos", "[", 
-                RowBox[{"2", " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   SubscriptBox["\[Theta]", "i"], "-", 
-                   SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "+", 
-               RowBox[{"Cos", "[", 
-                RowBox[{"2", " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   SubscriptBox["\[Theta]", "s"], "-", 
-                   SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "-", 
-               RowBox[{"4", " ", 
-                RowBox[{"Cos", "[", 
-                 RowBox[{"2", " ", 
-                  SubscriptBox["\[Phi]", "s"]}], "]"}]}], "+", 
-               RowBox[{"Cos", "[", 
-                RowBox[{"2", " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   SubscriptBox["\[Theta]", "i"], "+", 
-                   SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "+", 
-               RowBox[{"Cos", "[", 
-                RowBox[{"2", " ", 
-                 RowBox[{"(", 
-                  RowBox[{
-                   SubscriptBox["\[Theta]", "s"], "+", 
-                   SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}]}], ")"}], 
-             " ", 
-             SubscriptBox["\[Rho]", "px"]}]}], ")"}]}], "-", 
-         RowBox[{"4", " ", 
-          RowBox[{"Cos", "[", 
-           SubscriptBox["\[Phi]", "s"], "]"}], " ", 
-          SubscriptBox["\[CapitalDelta]K", "y"], " ", 
-          RowBox[{"(", 
-           RowBox[{
-            RowBox[{"Sin", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "i"]}], "]"}], "-", 
-            RowBox[{"Sin", "[", 
-             RowBox[{"2", " ", 
-              SubscriptBox["\[Theta]", "s"]}], "]"}], "+", 
-            RowBox[{
-             RowBox[{"(", 
-              RowBox[{
-               RowBox[{"-", "2"}], "+", 
-               RowBox[{"Cos", "[", 
-                RowBox[{"2", " ", 
-                 SubscriptBox["\[Theta]", "i"]}], "]"}], "+", 
-               RowBox[{"Cos", "[", 
-                RowBox[{"2", " ", 
-                 SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-             RowBox[{"Sin", "[", 
-              SubscriptBox["\[Phi]", "s"], "]"}], " ", 
-             SubscriptBox["\[Rho]", "px"]}]}], ")"}]}]}], ")"}]}]}], ")"}]}], 
-   ")"}], "/", 
-  RowBox[{"(", 
-   RowBox[{"4", " ", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{"2", " ", 
-       SubsuperscriptBox["W", "ppp", "2"]}], "+", 
-      SubsuperscriptBox["W", "s", "2"]}], ")"}], " ", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{
-       RowBox[{"(", 
-        RowBox[{"2", "+", 
-         RowBox[{"Cos", "[", 
-          RowBox[{"2", " ", 
-           SubscriptBox["\[Theta]", "i"]}], "]"}], "+", 
-         RowBox[{"Cos", "[", 
-          RowBox[{"2", " ", 
-           SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-       SubsuperscriptBox["W", "ppp", "2"]}], "+", 
-      RowBox[{"2", " ", 
-       SubsuperscriptBox["W", "s", "2"]}]}], ")"}]}], ")"}]}]], "Output",
+  StyleBox[
+   RowBox[{"ReplaceRepeated", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rules2}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/ReplaceRepeated/reps\\\", ButtonNote -> \\\
+\"ReplaceRepeated::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.59153294547194*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  FractionBox[
+   SqrtBox["\[Pi]"], 
+   SqrtBox[
+    RowBox[{"-", "coeffy"}]]], "//.", "\[VeryThinSpace]", 
+  "rules2"}]], "Output",
  CellChangeTimes->{
   3.5893112708803997`*^9, 3.5893277087944317`*^9, {3.590523459667925*^9, 
    3.590523459761807*^9}, 3.5905237701122513`*^9, 3.5905239938687973`*^9, 
    3.590524030252717*^9, {3.590524411049635*^9, 3.590524440169916*^9}, {
    3.590524976910121*^9, 3.590524984112225*^9}, {3.5905250789111843`*^9, 
    3.590525092199316*^9}, 3.590525281881671*^9, 3.590526070416944*^9, 
-   3.5905307769288588`*^9}],
+   3.5905307744785213`*^9, 3.59153294547307*^9}],
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{"(", 
-   RowBox[{
-    RowBox[{"16", " ", 
-     SuperscriptBox[
-      RowBox[{"Sin", "[", 
-       RowBox[{
-        SubscriptBox["\[Theta]", "i"], "+", 
-        SubscriptBox["\[Theta]", "s"]}], "]"}], "2"], " ", 
-     SubsuperscriptBox["W", "ppp", "4"]}], "-", 
-    RowBox[{"4", " ", 
-     SubsuperscriptBox["W", "ppp", "2"], " ", 
-     SubsuperscriptBox["W", "s", "2"], " ", 
-     RowBox[{"(", 
-      RowBox[{
-       RowBox[{"-", "5"}], "+", 
-       RowBox[{"2", " ", 
-        RowBox[{"Cos", "[", 
-         RowBox[{"2", " ", 
-          SubscriptBox["\[Theta]", "i"]}], "]"}]}], "+", 
-       RowBox[{"2", " ", 
-        RowBox[{"Cos", "[", 
-         RowBox[{"2", " ", 
-          SubscriptBox["\[Theta]", "s"]}], "]"}]}], "+", 
-       RowBox[{"Cos", "[", 
-        RowBox[{"2", " ", 
-         RowBox[{"(", 
-          RowBox[{
-           SubscriptBox["\[Theta]", "i"], "+", 
-           SubscriptBox["\[Theta]", "s"]}], ")"}]}], "]"}], "-", 
-       RowBox[{"4", " ", 
-        RowBox[{"(", 
-         RowBox[{
-          RowBox[{"Sin", "[", 
-           RowBox[{"2", " ", 
-            SubscriptBox["\[Theta]", "i"]}], "]"}], "-", 
-          RowBox[{"Sin", "[", 
-           RowBox[{"2", " ", 
-            SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-        RowBox[{"Sin", "[", 
-         SubscriptBox["\[Phi]", "s"], "]"}], " ", 
-        SubscriptBox["\[Rho]", "px"]}], "-", 
-       RowBox[{"2", " ", 
-        RowBox[{"(", 
-         RowBox[{"2", "+", 
-          RowBox[{"Cos", "[", 
-           RowBox[{"2", " ", 
-            SubscriptBox["\[Theta]", "i"]}], "]"}], "+", 
-          RowBox[{"Cos", "[", 
-           RowBox[{"2", " ", 
-            SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-        SubsuperscriptBox["\[Rho]", "px", "2"]}]}], ")"}]}], "+", 
-    RowBox[{
-     SubsuperscriptBox["W", "s", "4"], " ", 
-     RowBox[{"(", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"-", "4"}], " ", 
-        RowBox[{"(", 
-         RowBox[{
-          RowBox[{"-", "2"}], "+", 
-          RowBox[{"Cos", "[", 
-           RowBox[{"2", " ", 
-            SubscriptBox["\[Theta]", "i"]}], "]"}], "+", 
-          RowBox[{"Cos", "[", 
-           RowBox[{"2", " ", 
-            SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}]}], "+", 
-       RowBox[{"8", " ", 
-        RowBox[{"(", 
-         RowBox[{
-          RowBox[{"Sin", "[", 
-           RowBox[{"2", " ", 
-            SubscriptBox["\[Theta]", "i"]}], "]"}], "-", 
-          RowBox[{"Sin", "[", 
-           RowBox[{"2", " ", 
-            SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-        RowBox[{"Sin", "[", 
-         SubscriptBox["\[Phi]", "s"], "]"}], " ", 
-        SubscriptBox["\[Rho]", "px"]}], "-", 
-       RowBox[{
-        RowBox[{"(", 
-         RowBox[{
-          RowBox[{"-", "12"}], "-", 
-          RowBox[{"2", " ", 
-           RowBox[{"Cos", "[", 
-            RowBox[{"2", " ", 
-             SubscriptBox["\[Theta]", "i"]}], "]"}]}], "-", 
-          RowBox[{"2", " ", 
-           RowBox[{"Cos", "[", 
-            RowBox[{"2", " ", 
-             SubscriptBox["\[Theta]", "s"]}], "]"}]}], "+", 
-          RowBox[{"Cos", "[", 
-           RowBox[{"2", " ", 
-            RowBox[{"(", 
-             RowBox[{
-              SubscriptBox["\[Theta]", "i"], "-", 
-              SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "+", 
-          RowBox[{"Cos", "[", 
-           RowBox[{"2", " ", 
-            RowBox[{"(", 
-             RowBox[{
-              SubscriptBox["\[Theta]", "s"], "-", 
-              SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "-", 
-          RowBox[{"4", " ", 
-           RowBox[{"Cos", "[", 
-            RowBox[{"2", " ", 
-             SubscriptBox["\[Phi]", "s"]}], "]"}]}], "+", 
-          RowBox[{"Cos", "[", 
-           RowBox[{"2", " ", 
-            RowBox[{"(", 
-             RowBox[{
-              SubscriptBox["\[Theta]", "i"], "+", 
-              SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}], "+", 
-          RowBox[{"Cos", "[", 
-           RowBox[{"2", " ", 
-            RowBox[{"(", 
-             RowBox[{
-              SubscriptBox["\[Theta]", "s"], "+", 
-              SubscriptBox["\[Phi]", "s"]}], ")"}]}], "]"}]}], ")"}], " ", 
-        SubsuperscriptBox["\[Rho]", "px", "2"]}]}], ")"}]}]}], ")"}], "/", 
-  RowBox[{"(", 
-   RowBox[{"8", " ", 
-    SubsuperscriptBox["W", "s", "2"], " ", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{"2", " ", 
-       SubsuperscriptBox["W", "ppp", "2"]}], "+", 
-      SubsuperscriptBox["W", "s", "2"]}], ")"}], " ", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{
-       RowBox[{"(", 
-        RowBox[{"2", "+", 
-         RowBox[{"Cos", "[", 
-          RowBox[{"2", " ", 
-           SubscriptBox["\[Theta]", "i"]}], "]"}], "+", 
-         RowBox[{"Cos", "[", 
-          RowBox[{"2", " ", 
-           SubscriptBox["\[Theta]", "s"]}], "]"}]}], ")"}], " ", 
-       SubsuperscriptBox["W", "ppp", "2"]}], "+", 
-      RowBox[{"2", " ", 
-       SubsuperscriptBox["W", "s", "2"]}]}], ")"}]}], ")"}]}]], "Output",
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945511994*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945514175*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945516604*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945519977*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945520914*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945522141*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \
+\[NoBreak]\\!\\(\\*StyleBox[\\($RecursionLimit :: reclim\\), \
+\\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this calculation. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/stop\\\", \
+ButtonNote -> \\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945523363*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5915329455260067`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945527178*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.59153294552835*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \
+\[NoBreak]\\!\\(\\*StyleBox[\\($RecursionLimit :: reclim\\), \
+\\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this calculation. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/stop\\\", \
+ButtonNote -> \\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945529471*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945530655*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945531852*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5915329455330467`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \
+\[NoBreak]\\!\\(\\*StyleBox[\\(ReplaceAll :: reps\\), \\\"MessageName\\\"]\\)\
+\[NoBreak] will be suppressed during this calculation. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/stop\\\", \
+ButtonNote -> \\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5915329455341883`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945535322*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945536482*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5915329455374327`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \
+\[NoBreak]\\!\\(\\*StyleBox[\\($RecursionLimit :: reclim\\), \
+\\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this calculation. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/stop\\\", \
+ButtonNote -> \\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5915329455383577`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945539365*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945540278*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5915329455411987`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \
+\[NoBreak]\\!\\(\\*StyleBox[\\($RecursionLimit :: reclim\\), \
+\\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this calculation. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/stop\\\", \
+ButtonNote -> \\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.59153294554213*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945543159*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.59153294554419*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945545187*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \
+\[NoBreak]\\!\\(\\*StyleBox[\\(ReplaceAll :: reps\\), \\\"MessageName\\\"]\\)\
+\[NoBreak] will be suppressed during this calculation. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/stop\\\", \
+ButtonNote -> \\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.59153294554617*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945547205*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945548164*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.59153294554911*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \
+\[NoBreak]\\!\\(\\*StyleBox[\\($RecursionLimit :: reclim\\), \
+\\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this calculation. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/stop\\\", \
+ButtonNote -> \\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945550075*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945551141*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945552064*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"$RecursionLimit", "::", "reclim"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Recursion depth of \[NoBreak]\\!\\(256\\)\[NoBreak] \
+exceeded. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/$RecursionLimit/reclim\\\", ButtonNote -> \
+\\\"$RecursionLimit::reclim\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945552985*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \
+\[NoBreak]\\!\\(\\*StyleBox[\\($RecursionLimit :: reclim\\), \
+\\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this calculation. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/stop\\\", \
+ButtonNote -> \\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5915329455539103`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945554907*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945555887*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"ReplaceAll", "::", "reps"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\({rulesq}\\)\[NoBreak] is neither a list of \
+replacement rules nor a valid dispatch table, and so cannot be used for \
+replacing. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\
+\\\", ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/ReplaceAll/reps\\\
+\", ButtonNote -> \\\"ReplaceAll::reps\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945556848*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \
+\[NoBreak]\\!\\(\\*StyleBox[\\(ReplaceAll :: reps\\), \\\"MessageName\\\"]\\)\
+\[NoBreak] will be suppressed during this calculation. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/stop\\\", \
+ButtonNote -> \\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945557829*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Set", "::", "shape"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Lists \[NoBreak]\\!\\({az, bz, cz}\\)\[NoBreak] and \
+\[NoBreak]\\!\\({\\(\\(\\(\\(\\(\\(\\(\\(\\(\\(\\(\\(ReplaceAll[\\(\\(\
+\[LeftSkeleton] 2 \[RightSkeleton]\\)\\)]\\)\\)/.\[VeryThinSpace] \
+rulesq\\)\\)/.\[VeryThinSpace] rulesq\\)\\)/.\[VeryThinSpace] rulesq\\)\\)/.\
+\[VeryThinSpace] rulesq\\)\\)/.\[VeryThinSpace] \
+rulesq\\)\\)/.\[VeryThinSpace] rulesq}\\)\\n\[NoBreak] are not the same \
+shape. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/Set/shape\\\", ButtonNote -> \
+\\\"Set::shape\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.591532945558833*^9}],
+
+Cell[BoxData[
+ RowBox[{"-", "az"}]], "Output",
  CellChangeTimes->{
   3.5893112708803997`*^9, 3.5893277087944317`*^9, {3.590523459667925*^9, 
    3.590523459761807*^9}, 3.5905237701122513`*^9, 3.5905239938687973`*^9, 
    3.590524030252717*^9, {3.590524411049635*^9, 3.590524440169916*^9}, {
    3.590524976910121*^9, 3.590524984112225*^9}, {3.5905250789111843`*^9, 
    3.590525092199316*^9}, 3.590525281881671*^9, 3.590526070416944*^9, 
-   3.590530778144228*^9}]
+   3.5905307744785213`*^9, 3.591532945560543*^9}],
+
+Cell[BoxData[
+ RowBox[{"-", "bz"}]], "Output",
+ CellChangeTimes->{
+  3.5893112708803997`*^9, 3.5893277087944317`*^9, {3.590523459667925*^9, 
+   3.590523459761807*^9}, 3.5905237701122513`*^9, 3.5905239938687973`*^9, 
+   3.590524030252717*^9, {3.590524411049635*^9, 3.590524440169916*^9}, {
+   3.590524976910121*^9, 3.590524984112225*^9}, {3.5905250789111843`*^9, 
+   3.590525092199316*^9}, 3.590525281881671*^9, 3.590526070416944*^9, 
+   3.5905307744785213`*^9, 3.591532945561585*^9}],
+
+Cell[BoxData[
+ RowBox[{"-", "cz"}]], "Output",
+ CellChangeTimes->{
+  3.5893112708803997`*^9, 3.5893277087944317`*^9, {3.590523459667925*^9, 
+   3.590523459761807*^9}, 3.5905237701122513`*^9, 3.5905239938687973`*^9, 
+   3.590524030252717*^9, {3.590524411049635*^9, 3.590524440169916*^9}, {
+   3.590524976910121*^9, 3.590524984112225*^9}, {3.5905250789111843`*^9, 
+   3.590525092199316*^9}, 3.590525281881671*^9, 3.590526070416944*^9, 
+   3.5905307744785213`*^9, 3.591532945562611*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -3532,8 +3637,8 @@ Cell[BoxData["\[IndentingNewLine]"], "Input",
 Cell[BoxData[""], "Input",
  CellChangeTimes->{{3.582581217412138*^9, 3.582581217435742*^9}}]
 },
-WindowSize->{1440, 852},
-WindowMargins->{{0, Automatic}, {Automatic, 0}},
+WindowSize->{1341, 1050},
+WindowMargins->{{-227, Automatic}, {904, Automatic}},
 FrontEndVersion->"8.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (October 5, \
 2011)",
 StyleDefinitions->"Default.nb"
@@ -3553,7 +3658,7 @@ Cell[557, 20, 6230, 142, 358, "Input"],
 Cell[CellGroupData[{
 Cell[6812, 166, 11065, 246, 508, "Input"],
 Cell[17880, 414, 2675, 47, 27, "Output"],
-Cell[20558, 463, 3621, 73, 33, "Output"],
+Cell[20558, 463, 3621, 73, 53, "Output"],
 Cell[24182, 538, 2303, 37, 27, "Output"],
 Cell[26488, 577, 2021, 28, 27, "Output"]
 }, Open  ]],
@@ -3562,76 +3667,120 @@ Cell[28546, 610, 2860, 80, 178, "Input"],
 Cell[31409, 692, 2909, 75, 53, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[34355, 772, 12088, 326, 874, "Input"],
-Cell[46446, 1100, 469, 12, 27, "Output"],
-Cell[46918, 1114, 708, 19, 27, "Output"],
-Cell[47629, 1135, 689, 18, 27, "Output"]
+Cell[34355, 772, 12151, 327, 889, "Input"],
+Cell[46509, 1101, 469, 12, 27, "Output"],
+Cell[46981, 1115, 708, 19, 27, "Output"],
+Cell[47692, 1136, 689, 18, 27, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[48355, 1158, 2547, 68, 79, "Input"],
-Cell[50905, 1228, 2748, 84, 56, "Output"]
+Cell[48418, 1159, 2547, 68, 79, "Input"],
+Cell[50968, 1229, 2748, 84, 99, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[53690, 1317, 4133, 104, 302, "Input"],
-Cell[57826, 1423, 1294, 41, 54, "Output"]
+Cell[53753, 1318, 4133, 104, 302, "Input"],
+Cell[57889, 1424, 1294, 41, 54, "Output"]
 }, Open  ]],
-Cell[59135, 1467, 94, 1, 27, "Input"],
+Cell[59198, 1468, 94, 1, 27, "Input"],
 Cell[CellGroupData[{
-Cell[59254, 1472, 4671, 97, 309, "Input"],
-Cell[63928, 1571, 5459, 142, 56, "Output"],
-Cell[69390, 1715, 6859, 178, 78, "Output"],
-Cell[76252, 1895, 5390, 149, 78, "Output"]
+Cell[59317, 1473, 4665, 96, 309, "Input"],
+Cell[63985, 1571, 549, 11, 23, "Message"],
+Cell[64537, 1584, 593, 13, 55, "Output"],
+Cell[65133, 1599, 548, 11, 23, "Message"],
+Cell[65684, 1612, 592, 13, 60, "Output"],
+Cell[66279, 1627, 532, 10, 23, "Message"],
+Cell[66814, 1639, 532, 10, 23, "Message"],
+Cell[67349, 1651, 532, 10, 23, "Message"],
+Cell[67884, 1663, 473, 10, 23, "Message"],
+Cell[68360, 1675, 473, 10, 23, "Message"],
+Cell[68836, 1687, 473, 10, 23, "Message"],
+Cell[69312, 1699, 540, 11, 23, "Message"],
+Cell[69855, 1712, 475, 10, 23, "Message"],
+Cell[70333, 1724, 473, 10, 23, "Message"],
+Cell[70809, 1736, 472, 10, 23, "Message"],
+Cell[71284, 1748, 540, 11, 23, "Message"],
+Cell[71827, 1761, 532, 10, 23, "Message"],
+Cell[72362, 1773, 532, 10, 23, "Message"],
+Cell[72897, 1785, 534, 10, 23, "Message"],
+Cell[73434, 1797, 535, 11, 23, "Message"],
+Cell[73972, 1810, 473, 10, 23, "Message"],
+Cell[74448, 1822, 473, 10, 23, "Message"],
+Cell[74924, 1834, 475, 10, 23, "Message"],
+Cell[75402, 1846, 542, 11, 23, "Message"],
+Cell[75947, 1859, 473, 10, 23, "Message"],
+Cell[76423, 1871, 473, 10, 23, "Message"],
+Cell[76899, 1883, 475, 10, 23, "Message"],
+Cell[77377, 1895, 539, 11, 23, "Message"],
+Cell[77919, 1908, 532, 10, 23, "Message"],
+Cell[78454, 1920, 531, 10, 23, "Message"],
+Cell[78988, 1932, 532, 10, 23, "Message"],
+Cell[79523, 1944, 532, 11, 23, "Message"],
+Cell[80058, 1957, 473, 10, 23, "Message"],
+Cell[80534, 1969, 473, 10, 23, "Message"],
+Cell[81010, 1981, 472, 10, 23, "Message"],
+Cell[81485, 1993, 540, 11, 23, "Message"],
+Cell[82028, 2006, 473, 10, 23, "Message"],
+Cell[82504, 2018, 473, 10, 23, "Message"],
+Cell[82980, 2030, 473, 10, 23, "Message"],
+Cell[83456, 2042, 542, 11, 23, "Message"],
+Cell[84001, 2055, 532, 10, 23, "Message"],
+Cell[84536, 2067, 532, 10, 23, "Message"],
+Cell[85071, 2079, 532, 10, 23, "Message"],
+Cell[85606, 2091, 533, 11, 23, "Message"],
+Cell[86142, 2104, 773, 15, 40, "Message"],
+Cell[86918, 2121, 483, 8, 27, "Output"],
+Cell[87404, 2131, 483, 8, 27, "Output"],
+Cell[87890, 2141, 483, 8, 27, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[81679, 2049, 908, 20, 84, "Input"],
-Cell[82590, 2071, 1969, 55, 59, "Output"]
+Cell[88410, 2154, 908, 20, 84, "Input"],
+Cell[89321, 2176, 1969, 55, 59, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[84596, 2131, 4393, 102, 118, "Input"],
-Cell[88992, 2235, 1275, 33, 72, "Output"]
+Cell[91327, 2236, 4393, 102, 118, "Input"],
+Cell[95723, 2340, 1275, 33, 72, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[90304, 2273, 634, 9, 27, "Input"],
-Cell[90941, 2284, 1007, 35, 72, "Output"]
+Cell[97035, 2378, 634, 9, 27, "Input"],
+Cell[97672, 2389, 1007, 35, 72, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[91985, 2324, 2007, 50, 94, "Input"],
-Cell[93995, 2376, 219, 3, 27, "Output"],
-Cell[94217, 2381, 313, 5, 27, "Output"],
-Cell[94533, 2388, 242, 3, 30, "Output"],
-Cell[94778, 2393, 311, 6, 27, "Output"]
+Cell[98716, 2429, 2007, 50, 94, "Input"],
+Cell[100726, 2481, 219, 3, 27, "Output"],
+Cell[100948, 2486, 313, 5, 27, "Output"],
+Cell[101264, 2493, 242, 3, 30, "Output"],
+Cell[101509, 2498, 311, 6, 27, "Output"]
 }, Open  ]],
-Cell[95104, 2402, 92, 1, 27, "Input"],
+Cell[101835, 2507, 92, 1, 27, "Input"],
 Cell[CellGroupData[{
-Cell[95221, 2407, 10931, 216, 463, "Input"],
-Cell[106155, 2625, 2364, 40, 123, "Message"],
-Cell[108522, 2667, 1973, 28, 27, "Output"],
-Cell[110498, 2697, 1973, 28, 27, "Output"],
-Cell[112474, 2727, 2064, 31, 30, "Output"],
-Cell[114541, 2760, 2010, 29, 29, "Output"],
-Cell[116554, 2791, 1974, 28, 27, "Output"],
-Cell[118531, 2821, 2106, 32, 30, "Output"]
+Cell[101952, 2512, 10931, 216, 463, "Input"],
+Cell[112886, 2730, 2364, 40, 123, "Message"],
+Cell[115253, 2772, 1973, 28, 27, "Output"],
+Cell[117229, 2802, 1973, 28, 27, "Output"],
+Cell[119205, 2832, 2064, 31, 30, "Output"],
+Cell[121272, 2865, 2010, 29, 29, "Output"],
+Cell[123285, 2896, 1974, 28, 27, "Output"],
+Cell[125262, 2926, 2106, 32, 30, "Output"]
 }, Open  ]],
-Cell[120652, 2856, 94, 1, 27, "Input"],
-Cell[120749, 2859, 10498, 249, 264, "Input"],
+Cell[127383, 2961, 94, 1, 27, "Input"],
+Cell[127480, 2964, 10498, 249, 264, "Input"],
 Cell[CellGroupData[{
-Cell[131272, 3112, 11769, 244, 566, "Input"],
-Cell[143044, 3358, 1142, 15, 27, "Output"],
-Cell[144189, 3375, 663, 13, 40, "Message"],
-Cell[144855, 3390, 693, 13, 23, "Message"],
-Cell[145551, 3405, 1138, 15, 27, "Output"],
-Cell[146692, 3422, 1140, 15, 27, "Output"],
-Cell[147835, 3439, 1147, 15, 27, "Output"],
-Cell[148985, 3456, 1147, 15, 27, "Output"],
-Cell[150135, 3473, 1189, 17, 49, "Output"]
+Cell[138003, 3217, 11769, 244, 566, "Input"],
+Cell[149775, 3463, 1142, 15, 27, "Output"],
+Cell[150920, 3480, 663, 13, 40, "Message"],
+Cell[151586, 3495, 693, 13, 23, "Message"],
+Cell[152282, 3510, 1138, 15, 27, "Output"],
+Cell[153423, 3527, 1140, 15, 27, "Output"],
+Cell[154566, 3544, 1147, 15, 27, "Output"],
+Cell[155716, 3561, 1147, 15, 27, "Output"],
+Cell[156866, 3578, 1189, 17, 49, "Output"]
 }, Open  ]],
-Cell[151339, 3493, 94, 1, 27, "Input"],
-Cell[151436, 3496, 94, 1, 27, "Input"],
-Cell[151533, 3499, 1428, 19, 27, "Input"],
-Cell[152964, 3520, 92, 1, 27, "Input"],
-Cell[153059, 3523, 167, 2, 27, "Input"],
-Cell[153229, 3527, 141, 2, 43, "Input"],
-Cell[153373, 3531, 92, 1, 27, "Input"]
+Cell[158070, 3598, 94, 1, 27, "Input"],
+Cell[158167, 3601, 94, 1, 27, "Input"],
+Cell[158264, 3604, 1428, 19, 27, "Input"],
+Cell[159695, 3625, 92, 1, 27, "Input"],
+Cell[159790, 3628, 167, 2, 27, "Input"],
+Cell[159960, 3632, 141, 2, 43, "Input"],
+Cell[160104, 3636, 92, 1, 27, "Input"]
 }
 ]
 *)

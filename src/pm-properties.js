@@ -52,7 +52,8 @@
         crystal: PhaseMatch.Crystals('KTP-3'),
         temp: 20,
         enable_pp: true,
-        calcfibercoupling: true
+        calcfibercoupling: true,
+        singles: false
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
