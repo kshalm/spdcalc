@@ -460,6 +460,12 @@
                         // val = 25;
                     }
 
+                    if (name === 'poling_period'){
+                        if (isNaN(val)){
+                            val = Math.pow(2,20);
+                        }
+                    }
+
                     this[ name ] = val;
 
 

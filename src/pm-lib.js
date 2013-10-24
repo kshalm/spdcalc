@@ -301,10 +301,10 @@
 
 
     // Phasematching along transverse directions
-    var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
+    // var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     // console.log(A);
-    // var PMt = Math.exp(-A);
-    // var PMt = Math.Nintegrate2Dexp(-A) * xconst * yconst *gaussnorm;
+    var PMt = Math.exp(-A);
+    // var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
     return [PMz_real, PMz_imag, PMt, C_check];
 };
 

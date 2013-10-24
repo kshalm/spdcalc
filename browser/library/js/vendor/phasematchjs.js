@@ -2606,10 +2606,10 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
 
 
     // Phasematching along transverse directions
-    var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
+    // var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     // console.log(A);
-    // var PMt = Math.exp(-A);
-    // var PMt = Math.Nintegrate2Dexp(-A) * xconst * yconst *gaussnorm;
+    var PMt = Math.exp(-A);
+    // var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
     return [PMz_real, PMz_imag, PMt, C_check];
 };
 
@@ -4072,6 +4072,12 @@ PhaseMatch.Crystals('LiNbO3-1', {
                         // val = 25;
                     }
 
+                    if (name === 'poling_period'){
+                        if (isNaN(val)){
+                            val = Math.pow(2,20);
+                        }
+                    }
+
                     this[ name ] = val;
 
 
@@ -4138,7 +4144,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
 
-    props.update_all_angles();
+    // props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
     var P = props.clone();
     // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
@@ -5124,7 +5130,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         // var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
         var x = X[index_x];
         var y = Y[index_y];
-        PMcoinc[i] = Math.exp(-1*sq((X_0_i - x )/(W_ix)) - 1*sq((Y_0_i - y)/(W_ix)));//*sq(1/Math.sqrt(2*Math.PI)/W_ix);
+        PMcoinc[i] = pmsum*Math.exp(-1*sq((X_0_i - x )/(W_ix)) - 1*sq((Y_0_i - y)/(W_ix)))* Math.sqrt(Math.PI);//*(1/Math.sqrt(2*Math.PI)/W_ix);
 
 
     }
