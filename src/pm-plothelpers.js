@@ -1005,7 +1005,8 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         // var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
         var x = X[index_x];
         var y = Y[index_y];
-        PMcoinc[i] = pmsum*Math.exp(-1*sq((X_0_i - x )/(2*W_ix)) - 1*sq((Y_0_i - y)/(2*W_ix)));
+        PMcoinc[i] = Math.exp(-1*sq((X_0_i - x )/(2*W_ix)) - 1*sq((Y_0_i - y)/(2*W_ix)));
+        // PMcoinc[i] = sq(PMsingles[i]);
 
         // P.W_ix = P.W_sx;
         // P.optimum_idler();
@@ -1021,13 +1022,24 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
     }
 
-    P.singles = false;
-    // P.W_ix = P.W_sx;
-    // P.phi_i = P.phi_s + Math.PI;
-    // P.optimum_idler();
-    // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+    // Now normalize both PMsingles and PMcoinc
+    var SinglesNorm = PhaseMatch.Sum(PMsingles);
+    var CoincNorm = PhaseMatch.Sum(PMcoinc);
 
-    // PM_jsi = PhaseMatch.calc_JSI(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
+    for (var i=0; i<N; i++){
+        // PMcoinc[i]= PMcoinc[i]*PMsingles[i]/SinglesNorm/CoincNorm;
+        PMcoinc[i]= PMcoinc[i]*PMsingles[i]/(SinglesNorm);
+
+    }
+
+
+    P.singles = false;
+    P.W_ix = P.W_sx;
+    P.phi_i = P.phi_s + Math.PI;
+    P.optimum_idler();
+    P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+
+    PM_jsi = PhaseMatch.calc_JSI(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
 
     // // Find max value at center
     // var PMcoincMax = Math.max.apply(null,PM_jsi);
@@ -1042,11 +1054,12 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     // //     PMsingles[j] = PMsingles[j]*PMcoincMax/pmmax;
     // // }
 
+    var dw = Math.abs((wavelengths['ls_start']- wavelengths['ls_stop'])*(wavelengths['li_start']- wavelengths['li_stop']))/sq(dim_lambda);
+    dw=1;
 
-
-    var coinc = PhaseMatch.Sum(PMcoinc);
-    var singles = PhaseMatch.Sum(PMsingles); //*Math.abs((X[1]-X[0])*(Y[1]-Y[0]));
+    var coinc = PhaseMatch.Sum(PM_jsi)*dw;
+    var singles = PhaseMatch.Sum(PMsingles)*dw*Math.abs((X[dim-1]-X[0])*(Y[dim-1]-Y[0]))/N;
     // var coinc = PhaseMatch.Sum(PMcoinc)/N;
     console.log(singles, coinc, coinc/singles);
-    return PMcoinc;
+    return PMsingles;
 };

@@ -31,7 +31,7 @@
         phi_s: 0,
         phi_i: Math.PI ,
         L: 2000 * con.um,
-        W: 500 * con.um,
+        W: 100 * con.um,
         p_bw: 5.35 * con.nm,
         walkoff_p: 0,
         // W_sx: .2 * Math.PI/180,
@@ -375,7 +375,7 @@
 
 
         set_apodization_L : function (){
-            this.apodization_L = PhaseMatch.linspace(0,this.L,this.apodization+1);
+            this.apodization_L = PhaseMatch.linspace(-this.L/2,this.L/2,this.apodization+1);
         },
 
         set_apodization_coeff : function (){
@@ -385,7 +385,7 @@
             this.apodization_coeff = [];
             var delL = Math.abs(this.apodization_L[0] - this.apodization_L[1]);
             for (var i=0; i<dim; i++){
-                this.apodization_coeff[i] =  Math.exp(-sq((this.apodization_L[i] - this.L/2)/(bw))/2);
+                this.apodization_coeff[i] =  Math.exp(-sq((this.apodization_L[i] )/(bw))/2);
             }
 
             var total = PhaseMatch.Sum(this.apodization_coeff);

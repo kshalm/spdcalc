@@ -109,8 +109,8 @@
     var SIN_THETAi_plus_THETAs = Math.sin(P.theta_i+P.theta_s);
 
 
-    // var RHOpx = P.walkoff_p; //pump walkoff angle.
-    var RHOpx = 0; //pump walkoff angle.
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx = 0; //pump walkoff angle.
 
     RHOpx = -RHOpx; //Take the negative value. This is due to how things are defined later.
 
