@@ -2,6 +2,32 @@ require([ 'jquery', 'phasematch' ], function( $, PhaseMatch ){
 
     'use strict';
     // Initial variables for testing. Eventually these will be moved.
+    //
+    var gauss2d = function(x,y){
+        var sigma = 1;
+        var N = 1/(sq(sigma)*2*Math.PI);
+        return N *Math.Exp(-1/(2*sq(sigma))*(sq(x) + sq(y)));
+    }
+
+    simps = PhaseMatch.Nintegrate2D(gauss2d,0,1,0,1,10);
+
+    var RiemmanSum = function(f, a, b, c, d, n){
+        var dx = (b-a)/n;
+        var dy = (d-c)/n;
+        var result = 0;
+
+        for (var j=0; j<n; j++){
+            for (var k=0; k<n; k++){
+                result +=f(a +j*dx, c+k*dy);
+            }
+        }
+
+        return result*dx*dy;
+    }
+
+    reiemman = RiemmanSum(gauss2d,0,1,0,1,10);
+    console.log(simps, reiemman);
+
     var con = PhaseMatch.constants;
     var lambda_p = 775 * con.nm;
     var lambda_s = 2 * lambda_p;
@@ -59,9 +85,9 @@ require([ 'jquery', 'phasematch' ], function( $, PhaseMatch ){
     var endTime = new Date();
     // time difference in ms
     var timeDiff = (endTime - startTime)/1000;
-    
+
     $(function(){
-        
+
         $('#viewport').append('<p>Timediff: '+timeDiff+'</p>');
     });
 

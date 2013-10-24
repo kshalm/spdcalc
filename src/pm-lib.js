@@ -201,32 +201,62 @@
     // var gaussnorm =1;
 
     var arg = B*P.L/2;
-    var numz =P.apodization;
+    // var numz =P.apodization;
+    var numz = 16;
     var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0;
     var pmzcoeffMax = 0;
 
     if (P.calc_apodization && P.enable_pp){
         var apodization_coeff = P.apodization_coeff;
+        var bw = this.apodization_FWHM  / 2.3548;
     }
     else {
         var apodization_coeff = new Array(numz);
         for (var j=0; j<numz; j++){
             apodization_coeff[j] = 1;
         }
+        var bw = Math.pow(2,20);
     }
 
 
-    for (var k=0; k<numz; k++){
-        pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
-        PMz_real += pmzcoeff*Math.cos(B*z[k]);
-        PMz_imag += pmzcoeff*Math.sin(B*z[k]);
+    // for (var k=0; k<numz; k++){
+    //     pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
+    //     PMz_real += pmzcoeff*Math.cos(B*z[k]);
+    //     PMz_imag += pmzcoeff*Math.sin(B*z[k]);
 
-        // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
-        // if (pmzcoeffabs>pmzcoeffMax){
-        //     pmzcoeffMax = pmzcoeffabs;
-        // }
+    //     // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
+    //     // if (pmzcoeffabs>pmzcoeffMax){
+    //     //     pmzcoeffMax = pmzcoeffabs;
+    //     // }
+    // }
+
+
+            // var dim = this.apodization_L.length;
+            // this.apodization_coeff = [];
+            // var delL = Math.abs(this.apodization_L[0] - this.apodization_L[1]);
+            // for (var i=0; i<dim; i++){
+            //     this.apodization_coeff[i] =  Math.exp(-sq((this.apodization_L[i] )/(bw))/2);
+
+
+    var zintReal = function(z){
+        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+        return pmzcoeff*Math.cos(B*z);
+        // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
     }
+
+    var zintImag = function(z){
+        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+        return  pmzcoeff*Math.sin(B*z);
+    }
+
+    var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz);
+    // var PMz_real = zintReal(0);
+    var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz);
+
+    // console.log(PMz_real, PMz_imag);
+
+
 
     // var PMzNorm1 = Math.sin(arg)/arg;
     // var PMz_realNorm =  PMzNorm1 * Math.cos(arg);

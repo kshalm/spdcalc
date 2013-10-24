@@ -121,7 +121,7 @@ define(
                 // var externalangle = PhaseMatch.find_external_angle(props, 'signal');
 
                 // var startTime = new Date();
-                var dim = 10
+                var dim = 100
                     ,PM = PhaseMatch.calc_JSI(
                         props,
                         self.plotOpts.get('ls_start'),
@@ -164,6 +164,41 @@ define(
                 self.plot.setZRange([0,Math.max.apply(null,PM)]);
                 self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+
+                // testing numerical integration
+                //
+                var c =9
+                 var gauss2d = function(x,y){
+                    var sigma = 1;
+                    var N = 1/(sigma*sigma*2*Math.PI);
+                    return N *Math.exp(-1/(2*sigma*sigma)*(x*x + y*y));
+                    // return Math.cos(x*x +y*y);
+                    // return x*x +y*y;
+                    // return 8*Math.exp(-x*x-y*y*y*y);
+                }
+
+                var gauss = function(x){
+                    // var sigma = 1;
+                    // var N = 1/(sigma*sigma*2*Math.PI);
+                    // return N *Math.exp(-1/(2*sigma*sigma)*(x*x + y*y));
+                    return c*Math.cos(x*x);
+                    // return x*x +y*y;
+                    // return 8*Math.exp(-x*x-y*y*y*y);
+                }
+
+                var nn = 10;
+                var a = -1;
+                var b = 1;
+
+                var simps = PhaseMatch.Nintegrate2D(gauss2d,a,b,a,b,nn);
+                var simpshigh = PhaseMatch.Nintegrate2D(gauss2d,a,b,a,b,1000);
+
+
+                var riemman = PhaseMatch.RiemannSum2D(gauss2d,a,b,a,b,nn);
+                var realresult = 0.466065;
+
+                var simps1d = PhaseMatch.Nintegrate(gauss,a,b,nn);
+                console.log(simps1d, simpshigh, simps, Math.abs(simps-simpshigh)/simpshigh*100, Math.abs(riemman-simpshigh)/simpshigh*100);
             },
 
             draw: function(){

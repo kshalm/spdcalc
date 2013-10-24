@@ -13,8 +13,8 @@ A series of helper functions
 PhaseMatch.Sum = function Sum(A){
     var total=0;
     var l = A.length;
-    for(var i=0; i<l; i++) { 
-        total += A[i]; 
+    for(var i=0; i<l; i++) {
+        total += A[i];
     }
     return total;
 };
@@ -27,7 +27,7 @@ PhaseMatch.Sum = function Sum(A){
 PhaseMatch.Transpose = function Transpose(A, dim){
     var Trans = new Float64Array(dim*dim);
     var l = A.length;
-    for(var i=0; i<l; i++) { 
+    for(var i=0; i<l; i++) {
         var index_c = i % dim;
         var index_r = Math.floor(i / dim);
         //swap rows with columns
@@ -40,7 +40,7 @@ PhaseMatch.Transpose = function Transpose(A, dim){
 PhaseMatch.AntiTranspose = function Transpose(A, dim){
     var Trans = new Float64Array(dim*dim);
     var l = A.length;
-    for(var i=0; i<l; i++) { 
+    for(var i=0; i<l; i++) {
         var index_c = i % dim;
         var index_r = Math.floor(i / dim);
         //swap rows with columns
@@ -81,7 +81,7 @@ PhaseMatch.create_2d_array_view = function create_2d_array_view(data, dimx, dimy
   if (data.buffer && data.buffer.byteLength){
 
     for ( var i = 0; i < dimy; i++ ){
-      
+
       data2D[ i ] = new Float64Array(data.buffer, i * 16, dimx);
     }
 
@@ -108,6 +108,124 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
 };
 
 
+/*
+Perform a numerical 1D integration using Simpson's rule.
+
+f(x) is the function to be evaluated
+a,b are the x start and stop points of the range
+
+The 1D simpson's integrator has weights that are of the form
+(1 4 2 4 ... 2 4 1)
+ */
+PhaseMatch.Nintegrate = function Nintegrate(f,a,b,n){
+    if (n%2 !== 0){
+        n = n+1; //guarantee that n is even
+    }
+
+    var weights = new Array(n+1);
+    weights[0] = 1;
+    weights[n] = 1;
+    for (var i=1; i<n; i++){
+        if(i%2===0){
+            //even case
+            weights[i] = 2;
+        }
+        else{
+            weights[i] = 4;
+        }
+    }
+
+    // if (n<50){
+    //     console.log(weights);
+    // }
+
+    var dx = (b-a)/n;
+    var result = 0;
+
+    for (var j=0; j<n+1; j++){
+        result +=f(a +j*dx)*weights[j];
+    }
+
+    return result*dx/3;
+
+};
+
+
+
+/*
+Perform a numerical 2D integration using Simpson's rule.
+http://math.fullerton.edu/mathews/n2003/simpsonsrule2dmod.html
+http://www.mathworks.com/matlabcentral/fileexchange/23204-2d-simpsons-integrator/content/simp2D.m
+
+Assume a square grid of nxn points.
+f(x,y) is the function to be evaluated
+a,b are the x start and stop points of the range
+c,d are the y start and stop points of the range
+The 2D simpson's integrator has weights that are most easily determined
+by taking the outer product of the vector of weights for the 1D simpson's
+rule. For example let's say we have the vector (1 4 2 4 2 4 1) for 6 intervals.
+In 2D we now get an array of weights that is given by:
+   | 1  4  2  4  2  4  1 |
+   | 4 16  8 16  8 16  4 |
+   | 2  8  4  8  4  8  2 |
+   | 4 16  8 16  8 16  4 |
+   | 2  8  4  8  4  8  2 |
+   | 4 16  8 16  8 16  4 |
+   | 1  4  2  4  2  4  1 |
+Notice how the usual 1D simpson's weights appear around the sides of the array
+ */
+PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n){
+
+    if (n%2 !== 0){
+        n = n+1; //guarantee that n is even
+    }
+
+    var weights = new Array(n+1);
+    weights[0] = 1;
+    weights[n] = 1;
+    for (var i=1; i<n; i++){
+        if(i%2===0){
+            //even case
+            weights[i] = 2;
+        }
+        else{
+            weights[i] = 4;
+        }
+    }
+
+    if (n<50){
+        console.log(weights);
+    }
+
+    var dx = (b-a)/n;
+    var dy = (d-c)/n;
+    var result = 0;
+
+    for (var j=0; j<n+1; j++){
+        for (var k=0; k<n+1; k++){
+            result +=f(a +j*dx, c+k*dy)*weights[j]*weights[k];
+        }
+    }
+
+    return result*dx*dy/9;
+
+};
+
+
+PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
+    var dx = (b-a)/n;
+    var dy = (d-c)/n;
+    var result = 0;
+
+    for (var j=0; j<n; j++){
+        for (var k=0; k<n; k++){
+            result +=f(a +j*dx, c+k*dy);
+        }
+    }
+
+    return result*dx*dy;
+};
+
 (function(){
 
     //Implementation of Nelder-Mead Simplex Linear Optimizer
@@ -129,7 +247,7 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
     Simplex.prototype.sortByCost = function (objFunc) {
         this.vertices.sort(function (a, b) {
             var a_cost = objFunc(a), b_cost = objFunc(b);
-                
+
             if (a_cost < b_cost) {
                 return -1;
             } else if (a_cost > b_cost) {
@@ -148,7 +266,7 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
         for (i = 0; i < centroid_n; i += 1) {
             centroid_sum += this.vertices[i];
         }
-        
+
         this.centroid = centroid_sum / centroid_n;
     };
 
@@ -181,7 +299,7 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
         }
     };
 
-    Simplex.prototype.reflect = function () {    
+    Simplex.prototype.reflect = function () {
         this.vertices[this.vertices.length - 1] = this.reflect_point; //replace the worst vertex with the reflect vertex
     };
 
@@ -189,11 +307,11 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
         this.vertices[this.vertices.length - 1] = this.expand_point; //replace the worst vertex with the expand vertex
     };
 
-    Simplex.prototype.contract = function () {    
+    Simplex.prototype.contract = function () {
         this.vertices[this.vertices.length - 1] = this.contract_point; //replace the worst vertex with the contract vertex
     };
 
-    Simplex.prototype.reduce = function () {    
+    Simplex.prototype.reduce = function () {
         var best_x = this.vertices[0],  a;
         for (a = 1; a < this.vertices.length; a += 1) {
             this.vertices[a] = best_x + 0.5 * (this.vertices[a] - best_x); //0.1 + 0.5(0.1-0.1)
@@ -206,21 +324,21 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
         var S = new Simplex([x0, x0 + 1, x0 + 2]), itr, x;
 
         for (itr = 0; itr < numIters; itr += 1) {
-            
+
             S.updateCentroid(objFunc); //needs to know which objFunc to hand to sortByCost
             S.updateReflectPoint(objFunc);
 
             x = S.vertices[0];
-            
+
             if (S.reflect_cost < S.getVertexCost(objFunc, 'secondWorst') && S.reflect_cost > S.getVertexCost(objFunc, 'best')) {
                 S.reflect();
             } else if (S.reflect_cost < S.getVertexCost(objFunc, 'best')) { //new point is better than previous best: expand
 
                 S.updateExpandPoint(objFunc);
-               
+
                 if (S.expand_cost < S.reflect_cost) {
                     S.expand();
-                } else {           
+                } else {
                     S.reflect();
                 }
             } else { //new point was worse than all current points: contract
@@ -229,8 +347,8 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
 
                 if (S.contract_cost < S.getVertexCost(objFunc, 'worst')) {
                     S.contract();
-                } else {                
-                    S.reduce();            
+                } else {
+                    S.reduce();
                 }
             }
         }
@@ -280,7 +398,7 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
         ct = bt / at;
         return at * Math.sqrt(1.0 + ct * ct);
       }
-        
+
       if (0.0 === bt){
         return 0.0;
       }
@@ -304,7 +422,7 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
           var v = PhaseMatch.zeros(m,n);
           // var v = PhaseMatch.util.clone(a,true);
           var w = [];
-          
+
       //Householder reduction to bidiagonal form
       for (i = 0; i < n; ++ i){
         l = i + 1;
