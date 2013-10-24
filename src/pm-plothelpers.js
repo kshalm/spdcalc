@@ -5,7 +5,7 @@
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
 
-    // props.update_all_angles();
+    props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
     var P = props.clone();
     // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
@@ -991,7 +991,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         // var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
         var x = X[index_x];
         var y = Y[index_y];
-        PMcoinc[i] = pmsum*Math.exp(-1*sq((X_0_i - x )/(W_ix)) - 1*sq((Y_0_i - y)/(W_ix)));//*sq(1/Math.sqrt(2*Math.PI)/W_ix);
+        PMcoinc[i] = Math.exp(-1*sq((X_0_i - x )/(W_ix)) - 1*sq((Y_0_i - y)/(W_ix)));//*sq(1/Math.sqrt(2*Math.PI)/W_ix);
 
 
     }
@@ -999,7 +999,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     var singles = PhaseMatch.Sum(PMsingles);//*dw*Math.abs((X[dim-1]-X[0])*(Y[dim-1]-Y[0]))/N;
     var coinc = PhaseMatch.Sum(PMcoinc);
     console.log(singles, coinc, coinc/singles);
-    return PMcoinc;
+    return PMsingles;
 };
 
 
