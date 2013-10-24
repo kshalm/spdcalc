@@ -201,59 +201,58 @@
     // var gaussnorm =1;
 
     var arg = B*P.L/2;
-    // var numz =P.apodization;
-    var numz = 16;
+
+    var numz =P.apodization;
     var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0;
     var pmzcoeffMax = 0;
 
     if (P.calc_apodization && P.enable_pp){
         var apodization_coeff = P.apodization_coeff;
-        var bw = this.apodization_FWHM  / 2.3548;
+        // var bw = P.apodization_FWHM  / 2.3548;
     }
     else {
         var apodization_coeff = new Array(numz);
         for (var j=0; j<numz; j++){
             apodization_coeff[j] = 1;
         }
-        var bw = Math.pow(2,20);
+        // var bw = Math.pow(2,20);
     }
 
 
-    // for (var k=0; k<numz; k++){
-    //     pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
-    //     PMz_real += pmzcoeff*Math.cos(B*z[k]);
-    //     PMz_imag += pmzcoeff*Math.sin(B*z[k]);
+    for (var k=0; k<numz; k++){
+        pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
+        PMz_real += pmzcoeff*Math.cos(B*z[k]);
+        PMz_imag += pmzcoeff*Math.sin(B*z[k]);
 
-    //     // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
-    //     // if (pmzcoeffabs>pmzcoeffMax){
-    //     //     pmzcoeffMax = pmzcoeffabs;
-    //     // }
+        // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
+        // if (pmzcoeffabs>pmzcoeffMax){
+        //     pmzcoeffMax = pmzcoeffabs;
+        // }
+    }
+
+    PMz_real = PMz_real/numz;
+    PMz_imag = PMz_imag/numz;
+
+
+
+    // var zintReal = function(z){
+    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+    //     return pmzcoeff*Math.cos(B*z);
+    //     // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
     // }
 
+    // var zintImag = function(z){
+    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+    //     return  pmzcoeff*Math.sin(B*z);
+    // }
+    // // var numz = 16;
+    // var dz = P.L/numz;
+    // var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
+    // // var PMz_real = zintReal(0);
+    // var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
 
-            // var dim = this.apodization_L.length;
-            // this.apodization_coeff = [];
-            // var delL = Math.abs(this.apodization_L[0] - this.apodization_L[1]);
-            // for (var i=0; i<dim; i++){
-            //     this.apodization_coeff[i] =  Math.exp(-sq((this.apodization_L[i] )/(bw))/2);
-
-
-    var zintReal = function(z){
-        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-        return pmzcoeff*Math.cos(B*z);
-        // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    }
-
-    var zintImag = function(z){
-        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-        return  pmzcoeff*Math.sin(B*z);
-    }
-
-    var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz);
-    // var PMz_real = zintReal(0);
-    var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz);
-
+    // console.log(zintReal(0), bw);
     // console.log(PMz_real, PMz_imag);
 
 
@@ -263,8 +262,7 @@
     // var PMz_imagNorm = PMzNorm1 * Math.sin(arg);
     //  var delL = Math.abs(P.apodization_L[0] - P.apodization_L[1]);
 
-    PMz_real = PMz_real/numz;
-    PMz_imag = PMz_imag/numz;
+
 
 
     // //More advanced calculation of phasematching in the z direction. Don't need it now.
@@ -305,8 +303,8 @@
     // Phasematching along transverse directions
     // var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     // console.log(A);
-    // var PMt = Math.exp(-A);
-    var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
+    var PMt = Math.exp(-A);
+    // var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
     return [PMz_real, PMz_imag, PMt, C_check];
 };
 
