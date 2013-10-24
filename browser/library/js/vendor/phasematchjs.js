@@ -2606,10 +2606,10 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
 
 
     // Phasematching along transverse directions
-    // var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
+    var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     // console.log(A);
-    var PMt = Math.exp(-A);
-    // var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
+    // var PMt = Math.exp(-A);
+    // var PMt = Math.Nintegrate2Dexp(-A) * xconst * yconst *gaussnorm;
     return [PMz_real, PMz_imag, PMt, C_check];
 };
 
@@ -5053,13 +5053,6 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     var P = props.clone();
 
     var dim_lambda = 20;
-    // dim = 5
-
-    // P.optimum_idler(P);
-    // P.phi_i = P.phi_s + Math.PI;
-
-    // var X_0_s = Math.sin(P.theta_s)* Math.cos(P.phi_s);
-    // var Y_0_s = Math.sin(P.theta_s)* Math.sin(P.phi_s);
 
     var X_0_i = Math.sin(P.theta_i)* Math.cos(P.phi_i);
     var Y_0_i = Math.sin(P.theta_i)* Math.sin(P.phi_i);
@@ -5119,82 +5112,27 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         P.theta_i = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
         P.phi_i = Math.atan2(Y[index_y],X[index_x]);
         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        // var ang = [P.theta_i * 180/Math.PI, P.phi_i * 180/Math.PI]
         // P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
         P.W_ix =  Math.pow(2,20); //Treat the idler as a plane wave
-        // P.W_ix = 1.5*P.W_sx;
 
-        // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
 
         var PM_jsi = PhaseMatch.calc_JSI(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
         var pmsum = PhaseMatch.Sum(PM_jsi);
         PMsingles[i]= pmsum;
 
-        // if (pmmax<pmsum){
-        //     pmmax = pmsum;
-        // }
-
         // var x = Math.sin(P.theta_i)*Math.cos(P.phi_i);
         // var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
         var x = X[index_x];
         var y = Y[index_y];
-        PMcoinc[i] = Math.exp(-1*sq((X_0_i - x )/(2*W_ix)) - 1*sq((Y_0_i - y)/(2*W_ix)));
-        // PMcoinc[i] = sq(PMsingles[i]);
+        PMcoinc[i] = pmsum*Math.exp(-1*sq((X_0_i - x )/(W_ix)) - 1*sq((Y_0_i - y)/(W_ix)));//*sq(1/Math.sqrt(2*Math.PI)/W_ix);
 
-        // P.W_ix = P.W_sx;
-        // P.optimum_idler();
-        // // P.phi_i = Math.atan2(Y[index_y],X[index_x]);
-        // P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-        // PM_jsi = PhaseMatch.calc_JSI(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
-        // pmsum = PhaseMatch.Sum(PM_jsi);
-        // PMcoinc[i]= pmsum;
-
-        // if (pmmax<pmsum){
-        //     pmmax = pmsum;
-        // }
 
     }
 
-    // Now normalize both PMsingles and PMcoinc
-    var SinglesNorm = PhaseMatch.Sum(PMsingles);
-    var CoincNorm = PhaseMatch.Sum(PMcoinc);
-
-    for (var i=0; i<N; i++){
-        // PMcoinc[i]= PMcoinc[i]*PMsingles[i]/SinglesNorm/CoincNorm;
-        PMcoinc[i]= PMcoinc[i]*PMsingles[i]/(SinglesNorm);
-
-    }
-
-
-    P.singles = false;
-    P.W_ix = P.W_sx;
-    P.phi_i = P.phi_s + Math.PI;
-    P.optimum_idler();
-    P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-
-    PM_jsi = PhaseMatch.calc_JSI(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
-
-    // // Find max value at center
-    // var PMcoincMax = Math.max.apply(null,PM_jsi);
-
-    // // Normalize the singles counts
-    // for (var j=0; j<N; j++){
-    //     // PMcoinc[j] = PMcoinc[j]*PMcoincMax/pmmax;
-    // }
-
-    // // // Normalize the singles counts
-    // // for (var j=0; j<N; j++){
-    // //     PMsingles[j] = PMsingles[j]*PMcoincMax/pmmax;
-    // // }
-
-    var dw = Math.abs((wavelengths['ls_start']- wavelengths['ls_stop'])*(wavelengths['li_start']- wavelengths['li_stop']))/sq(dim_lambda);
-    dw=1;
-
-    var coinc = PhaseMatch.Sum(PM_jsi)*dw;
-    var singles = PhaseMatch.Sum(PMsingles)*dw*Math.abs((X[dim-1]-X[0])*(Y[dim-1]-Y[0]))/N;
-    // var coinc = PhaseMatch.Sum(PMcoinc)/N;
+    var singles = PhaseMatch.Sum(PMsingles);//*dw*Math.abs((X[dim-1]-X[0])*(Y[dim-1]-Y[0]))/N;
+    var coinc = PhaseMatch.Sum(PMcoinc);
     console.log(singles, coinc, coinc/singles);
-    return PMsingles;
+    return PMcoinc;
 };
 
 
