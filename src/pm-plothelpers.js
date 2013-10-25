@@ -5,7 +5,7 @@
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
 
-    // props.update_all_angles();
+    props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
     var P = props.clone();
     // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
@@ -913,6 +913,46 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
 //     return PM;
 // };
 
+PhaseMatch.calc_JSI_formode = function calc_JSI_formode(props, ls_start, ls_stop, li_start, li_stop, dim){
+
+    // props.update_all_angles();
+    // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
+    var P = props.clone();
+    
+    var i;
+    var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+    var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
+
+    var N = dim * dim;
+    // var PMreal = new Float64Array( N );
+    // var PMimag = new Float64Array( N );
+    var PMint = new Float64Array( N );
+
+    var maxpm = 0;
+    var C_check = -1;
+
+    for (i=0; i<N; i++){
+        var index_s = i % dim;
+        var index_i = Math.floor(i / dim);
+
+        P.lambda_s = lambda_s[index_s];
+        P.lambda_i = lambda_i[index_i];
+
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+        var PM = PhaseMatch.phasematch(P);
+        PMint[i] = sq(PM[0]) + sq(PM[1]);
+
+        // C_check = PM[2];
+        // if (PM[i]>maxpm){maxpm = PM[i];}
+    }
+
+    // console.log("Approx Check, ", C_check);
+    return PMint;
+
+};
+
 
 PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, x_stop, y_start, y_stop, wavelengths, dim){
 
@@ -983,7 +1023,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         P.W_ix =  Math.pow(2,20); //Treat the idler as a plane wave
 
 
-        var PM_jsi = PhaseMatch.calc_JSI(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
+        var PM_jsi = PhaseMatch.calc_JSI_formode(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
         var pmsum = PhaseMatch.Sum(PM_jsi);
         PMsingles[i]= pmsum;
 
