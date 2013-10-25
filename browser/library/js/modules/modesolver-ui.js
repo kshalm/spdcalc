@@ -172,13 +172,15 @@ define(
                 //     po.get('theta_stop'),
                 //     po.get('grid_size')
                 // );
-
-                self.data = PM_s;
-                self.plot2dSignal.setZRange([0,Math.max.apply(null,PM_s)]);
+                // console.log(PM_s[0]);
+                self.data = PM_s['pmsingles'];
+                self.plot2dSignal.setZRange([0,Math.max.apply(null,PM_s['pmsingles'])]);
                 self.plot2dSignal.setXRange([ converter.to('deg', x_start), converter.to('deg', x_stop) ]);
                 self.plot2dSignal.setYRange([ converter.to('deg', y_start), converter.to('deg', y_stop) ]);
 
                 self.refreshSignalFWHMCircle(W,  X_0, Y_0, props);
+
+                self.plot2dSignal.setTitle("Idler coupling efficiency  = " + Math.round(1000*PM_s['eff'])/10 + "%");
 
             },
 

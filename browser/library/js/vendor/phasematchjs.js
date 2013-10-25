@@ -5138,7 +5138,11 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     var singles = PhaseMatch.Sum(PMsingles);//*dw*Math.abs((X[dim-1]-X[0])*(Y[dim-1]-Y[0]))/N;
     var coinc = PhaseMatch.Sum(PMcoinc);
     console.log(singles, coinc, coinc/singles);
-    return PMsingles;
+    var eff = coinc/singles;
+
+    return {"pmsingles":PMsingles, "eff":eff}
+    // return {'PMSingles':PMsingles};//, 'Eff':(coinc/singles)};
+    // return [PMsingles, eff];
 };
 
 
