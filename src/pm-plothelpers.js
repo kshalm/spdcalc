@@ -1001,7 +1001,16 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     console.log(singles, coinc, coinc/singles);
     var eff = coinc/singles;
 
-    return {"pmsingles":PMsingles, "eff":eff}
+    var validregimewaring = false;
+
+    if (eff>1){
+        if (eff>1.05){
+            validregimewaring = true;
+        }
+        eff = 1;
+    }
+
+    return {"pmsingles":PMsingles, "eff":eff, "warning":validregimewaring}
     // return {'PMSingles':PMsingles};//, 'Eff':(coinc/singles)};
     // return [PMsingles, eff];
 };

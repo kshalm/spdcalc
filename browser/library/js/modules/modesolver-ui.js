@@ -182,6 +182,10 @@ define(
 
                 self.plot2dSignal.setTitle("Idler coupling efficiency  = " + Math.round(1000*PM_s['eff'])/10 + "%");
 
+                if (PM_s['warning']){
+                    alert("Warning: this calculation should be treated with suspiscion. The parameters chosen are outside the approximations used in the program. Most likely the crystal is too long, or focusing is too tight.");
+                }
+
             },
 
             // draw circle outlining FWHM of the signal photon
@@ -193,8 +197,8 @@ define(
                 var data =[];
 
                 data = [
-                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: .9, title: 'Signal FWHM', labelX: (X0)*deg, labelY: (Y0+3*W)*deg},
-                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W * deg, opacity: 0.3, title: 'Signal 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+3*W)*deg },
+                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: .9, title: 'Idler collection FWHM', labelX: (X0)*deg, labelY: (Y0+5*W/2)*deg},
+                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W * deg, opacity: 0.3, title: 'Idler collection 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+5*W/2)*deg },
                 ];
                 var xx = self.plot2dSignal.scales.x;
                 var yy = self.plot2dSignal.scales.y;
