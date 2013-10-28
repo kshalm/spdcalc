@@ -122,7 +122,7 @@ define(
                 var po = this.plotOpts;
 
                 var scale = 6;
-
+                var dimlambda = 15;
 
                 //make sure the angles are correct so we can calculate the right ranges
                 props.phi_i = props.phi_s + Math.PI;
@@ -152,7 +152,6 @@ define(
                     ,"li_start":po.get("li_start")
                     ,"li_stop":po.get("li_stop")
                 };
-                console.log("going in");
                 var PM_s = PhaseMatch.calc_XY_mode_solver2(
                     props,
                     x_start,
@@ -160,7 +159,8 @@ define(
                     y_start,
                     y_stop,
                     wavelengths,
-                    po.get('grid_size')
+                    po.get('grid_size'),
+                    dimlambda
                 );
                 // console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
 

@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-10-24
+ * phasematchjs v0.0.1a - 2013-10-28
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -5057,7 +5057,7 @@ PhaseMatch.calc_JSI_formode = function calc_JSI_formode(props, ls_start, ls_stop
     // props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
     var P = props.clone();
-    
+
     var i;
     var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
     var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
@@ -5070,6 +5070,10 @@ PhaseMatch.calc_JSI_formode = function calc_JSI_formode(props, ls_start, ls_stop
     var maxpm = 0;
     var C_check = -1;
 
+    var dls = Math.abs(ls_stop - ls_start)/dim;
+    var dli = Math.abs(li_stop - li_start)/dim;
+
+
     for (i=0; i<N; i++){
         var index_s = i % dim;
         var index_i = Math.floor(i / dim);
@@ -5081,7 +5085,7 @@ PhaseMatch.calc_JSI_formode = function calc_JSI_formode(props, ls_start, ls_stop
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         var PM = PhaseMatch.phasematch(P);
-        PMint[i] = sq(PM[0]) + sq(PM[1]);
+        PMint[i] = sq(PM[0]*dls*dli) + sq(PM[1]*dls*dli);
 
         // C_check = PM[2];
         // if (PM[i]>maxpm){maxpm = PM[i];}
@@ -5093,7 +5097,7 @@ PhaseMatch.calc_JSI_formode = function calc_JSI_formode(props, ls_start, ls_stop
 };
 
 
-PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, x_stop, y_start, y_stop, wavelengths, dim){
+PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, x_stop, y_start, y_stop, wavelengths, dim, dim_lambda){
 
     props.update_all_angles();
     var P = props.clone();
@@ -5149,6 +5153,19 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     var pmmax = 0;
     P.singles = true;
 
+    var lambda_s_start_singles = 1/(1/P.lambda_p - 1/wavelengths['li_stop']);
+    var lambda_s_stop_singles = 1/(1/P.lambda_p - 1/wavelengths['li_start']);
+
+    if (lambda_s_start_singles > wavelengths['ls_start']){
+        lambda_s_start_singles = wavelengths['ls_start']
+    }
+
+    if (lambda_s_stop_singles < wavelengths['ls_stop']){
+        lambda_s_stop_singles = wavelengths['ls_stop']
+    }
+
+
+
     // for every point on the idler spatial grid, loop through and calculate the maximum phasematching probability.
     for (var i=0; i<N; i++){
         var index_x = i % dim;
@@ -5161,10 +5178,16 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         // P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
         P.W_ix =  Math.pow(2,20); //Treat the idler as a plane wave
 
+        // Calculate the singles rate with the idler bandwidth integrated out.
+
+        var PM_jsi_singles = PhaseMatch.calc_JSI_formode(P,lambda_s_start_singles, lambda_s_stop_singles, wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
+        var pmsum_singles = PhaseMatch.Sum(PM_jsi_singles);
+        PMsingles[i]= pmsum_singles;
+
+
 
         var PM_jsi = PhaseMatch.calc_JSI_formode(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
         var pmsum = PhaseMatch.Sum(PM_jsi);
-        PMsingles[i]= pmsum;
 
         // var x = Math.sin(P.theta_i)*Math.cos(P.phi_i);
         // var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
