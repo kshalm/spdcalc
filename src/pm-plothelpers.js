@@ -963,7 +963,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     props.update_all_angles();
     var P = props.clone();
 
-    var dim_lambda = 20;
+    // var dim_lambda = 10;
 
     var X_0_i = Math.sin(P.theta_i)* Math.cos(P.phi_i);
     var Y_0_i = Math.sin(P.theta_i)* Math.sin(P.phi_i);
@@ -1000,7 +1000,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     W_ix = 2*Math.asin( Math.cos(P.theta_i_e)*Math.sin(W_ix/2)/(P.n_i * Math.cos(P.theta_i)));
 
     // console.log(W_ix*180/Math.PI, X_0_i*180/Math.PI, Y_0_i*180/Math.PI);
-    console.log(W_ix*180/Math.PI, P.lambda_i/(Math.PI*P.W_sx*convfromFWHM)*180/Math.PI);
+    // console.log(W_ix*180/Math.PI, P.lambda_i/(Math.PI*P.W_sx*convfromFWHM)*180/Math.PI);
 
 
     var N = dim * dim;
@@ -1025,7 +1025,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         lambda_s_stop_singles = wavelengths['ls_stop']
     }
 
-
+    console.log(lambda_s_start_singles*10E9, lambda_s_stop_singles*10E9);
 
     // for every point on the idler spatial grid, loop through and calculate the maximum phasematching probability.
     for (var i=0; i<N; i++){
