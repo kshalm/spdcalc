@@ -150,7 +150,31 @@ PhaseMatch.Nintegrate = function Nintegrate(f,a,b,n){
 
 };
 
+/*
+Perform a numerical 2D integration using Simpson's rule.
+Calculate the array of weights for Simpson's rule.
+ */
+PhaseMatch.Nintegrate2DWeights = function Nintegrate2DWeights(n){
 
+    if (n%2 !== 0){
+        n = n+1; //guarantee that n is even
+    }
+
+    var weights = new Array(n+1);
+    weights[0] = 1;
+    weights[n] = 1;
+    for (var i=1; i<n; i++){
+        if(i%2===0){
+            //even case
+            weights[i] = 2;
+        }
+        else{
+            weights[i] = 4;
+        }
+    }
+
+    return weights;
+};
 
 /*
 Perform a numerical 2D integration using Simpson's rule.
@@ -174,28 +198,33 @@ In 2D we now get an array of weights that is given by:
    | 1  4  2  4  2  4  1 |
 Notice how the usual 1D simpson's weights appear around the sides of the array
  */
-PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n){
+PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n,w){
 
     if (n%2 !== 0){
         n = n+1; //guarantee that n is even
     }
 
-    var weights = new Array(n+1);
-    weights[0] = 1;
-    weights[n] = 1;
-    for (var i=1; i<n; i++){
-        if(i%2===0){
-            //even case
-            weights[i] = 2;
-        }
-        else{
-            weights[i] = 4;
-        }
-    }
+    if (w === null || w === undefined){
+      var weights = new Array(n+1);
+      weights[0] = 1;
+      weights[n] = 1;
+      for (var i=1; i<n; i++){
+          if(i%2===0){
+              //even case
+              weights[i] = 2;
+          }
+          else{
+              weights[i] = 4;
+          }
+      }
+  }
+  else {
+    var weights = w;
+  }
 
-    if (n<50){
-        console.log(weights);
-    }
+    // if (n<50){
+    //     console.log(weights);
+    // }
 
     var dx = (b-a)/n;
     var dy = (d-c)/n;

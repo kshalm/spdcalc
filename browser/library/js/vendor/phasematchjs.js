@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-10-28
+ * phasematchjs v0.0.1a - 2013-10-29
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -1806,7 +1806,31 @@ PhaseMatch.Nintegrate = function Nintegrate(f,a,b,n){
 
 };
 
+/*
+Perform a numerical 2D integration using Simpson's rule.
+Calculate the array of weights for Simpson's rule.
+ */
+PhaseMatch.Nintegrate2DWeights = function Nintegrate2DWeights(n){
 
+    if (n%2 !== 0){
+        n = n+1; //guarantee that n is even
+    }
+
+    var weights = new Array(n+1);
+    weights[0] = 1;
+    weights[n] = 1;
+    for (var i=1; i<n; i++){
+        if(i%2===0){
+            //even case
+            weights[i] = 2;
+        }
+        else{
+            weights[i] = 4;
+        }
+    }
+
+    return weights;
+};
 
 /*
 Perform a numerical 2D integration using Simpson's rule.
@@ -1830,28 +1854,33 @@ In 2D we now get an array of weights that is given by:
    | 1  4  2  4  2  4  1 |
 Notice how the usual 1D simpson's weights appear around the sides of the array
  */
-PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n){
+PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n,w){
 
     if (n%2 !== 0){
         n = n+1; //guarantee that n is even
     }
 
-    var weights = new Array(n+1);
-    weights[0] = 1;
-    weights[n] = 1;
-    for (var i=1; i<n; i++){
-        if(i%2===0){
-            //even case
-            weights[i] = 2;
-        }
-        else{
-            weights[i] = 4;
-        }
-    }
+    if (w === null || w === undefined){
+      var weights = new Array(n+1);
+      weights[0] = 1;
+      weights[n] = 1;
+      for (var i=1; i<n; i++){
+          if(i%2===0){
+              //even case
+              weights[i] = 2;
+          }
+          else{
+              weights[i] = 4;
+          }
+      }
+  }
+  else {
+    var weights = w;
+  }
 
-    if (n<50){
-        console.log(weights);
-    }
+    // if (n<50){
+    //     console.log(weights);
+    // }
 
     var dx = (b-a)/n;
     var dy = (d-c)/n;
@@ -5085,7 +5114,8 @@ PhaseMatch.calc_JSI_formode = function calc_JSI_formode(props, ls_start, ls_stop
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         var PM = PhaseMatch.phasematch(P);
-        PMint[i] = sq(PM[0]*dls*dli) + sq(PM[1]*dls*dli);
+        // PMint[i] = sq(PM[0]*dls*dli) + sq(PM[1]*dls*dli);
+        PMint[i] = sq(PM[0]) + sq(PM[1]);
 
         // C_check = PM[2];
         // if (PM[i]>maxpm){maxpm = PM[i];}
@@ -5096,13 +5126,25 @@ PhaseMatch.calc_JSI_formode = function calc_JSI_formode(props, ls_start, ls_stop
 
 };
 
+// PhaseMatch.calcPM_ws_wi = function calcPM_ws_wi(P, ls, li){
+
+//     P.lambda_s = ls;
+//     P.lambda_i = li;
+
+//     P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+//     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+//     var PM = PhaseMatch.phasematch(P);
+//     return PM[0]*PM[0] + PM[1]*PM[1];
+// };
+
 
 PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, x_stop, y_start, y_stop, wavelengths, dim, dim_lambda){
 
     props.update_all_angles();
     var P = props.clone();
 
-    // var dim_lambda = 10;
+    var dim_lambda = 26;
 
     var X_0_i = Math.sin(P.theta_i)* Math.cos(P.phi_i);
     var Y_0_i = Math.sin(P.theta_i)* Math.sin(P.phi_i);
@@ -5164,6 +5206,20 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         lambda_s_stop_singles = wavelengths['ls_stop']
     }
 
+    var calcPM_ws_wi = function(ls, li){
+
+        P.lambda_s = ls;
+        P.lambda_i = li;
+
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+        var PM = PhaseMatch.phasematch(P);
+        return PM[0]*PM[0] + PM[1]*PM[1];
+    };
+
+    var weights = PhaseMatch.Nintegrate2DWeights(dim_lambda);
+
     console.log(lambda_s_start_singles*10E9, lambda_s_stop_singles*10E9);
 
     // for every point on the idler spatial grid, loop through and calculate the maximum phasematching probability.
@@ -5180,14 +5236,34 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
         // Calculate the singles rate with the idler bandwidth integrated out.
 
-        var PM_jsi_singles = PhaseMatch.calc_JSI_formode(P,lambda_s_start_singles, lambda_s_stop_singles, wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
-        var pmsum_singles = PhaseMatch.Sum(PM_jsi_singles);
+        // var PM_jsi_singles = PhaseMatch.calc_JSI_formode(P,lambda_s_start_singles, lambda_s_stop_singles, wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
+        // var pmsum_singles = PhaseMatch.Sum(PM_jsi_singles);
+        var pmsum_singles = PhaseMatch.Nintegrate2D(
+                calcPM_ws_wi,
+                lambda_s_start_singles,
+                lambda_s_stop_singles,
+                wavelengths['li_start'], 
+                wavelengths['li_stop'], 
+                dim_lambda,
+                weights
+                );
+
         PMsingles[i]= pmsum_singles;
 
 
 
-        var PM_jsi = PhaseMatch.calc_JSI_formode(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
-        var pmsum = PhaseMatch.Sum(PM_jsi);
+        // var PM_jsi = PhaseMatch.calc_JSI_formode(P, wavelengths['ls_start'], wavelengths['ls_stop'], wavelengths['li_start'], wavelengths['li_stop'], dim_lambda);
+        // var pmsum = PhaseMatch.Sum(PM_jsi);
+
+        var pmsum = PhaseMatch.Nintegrate2D(
+                calcPM_ws_wi,
+                wavelengths['ls_start'], 
+                wavelengths['ls_stop'], 
+                wavelengths['li_start'], 
+                wavelengths['li_stop'], 
+                dim_lambda,
+                weights
+                );
 
         // var x = Math.sin(P.theta_i)*Math.cos(P.phi_i);
         // var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
