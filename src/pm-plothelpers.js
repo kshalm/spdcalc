@@ -10,8 +10,9 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     var P = props.clone();
     // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
     // P.theta_i = 0.6*Math.PI/180;
-    // P.update_all_angles;
-    // P.optimum_idler(P);
+    P.phi_i = P.phi_s + Math.PI;
+    P.update_all_angles;
+    P.optimum_idler(P);
     // P.theta_i = P.theta_s;
 
 
@@ -976,7 +977,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     props.update_all_angles();
     var P = props.clone();
 
-    var dim_lambda = 26;
+    // var dim_lambda = 30;
 
     var X_0_i = Math.sin(P.theta_i)* Math.cos(P.phi_i);
     var Y_0_i = Math.sin(P.theta_i)* Math.sin(P.phi_i);
@@ -1052,7 +1053,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
     var weights = PhaseMatch.Nintegrate2DWeights(dim_lambda);
 
-    console.log(lambda_s_start_singles*10E9, lambda_s_stop_singles*10E9);
+    // console.log(lambda_s_start_singles*10E9, lambda_s_stop_singles*10E9);
 
     // for every point on the idler spatial grid, loop through and calculate the maximum phasematching probability.
     for (var i=0; i<N; i++){
@@ -1074,8 +1075,8 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
                 calcPM_ws_wi,
                 lambda_s_start_singles,
                 lambda_s_stop_singles,
-                wavelengths['li_start'], 
-                wavelengths['li_stop'], 
+                wavelengths['li_start'],
+                wavelengths['li_stop'],
                 dim_lambda,
                 weights
                 );
@@ -1089,10 +1090,10 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
         var pmsum = PhaseMatch.Nintegrate2D(
                 calcPM_ws_wi,
-                wavelengths['ls_start'], 
-                wavelengths['ls_stop'], 
-                wavelengths['li_start'], 
-                wavelengths['li_stop'], 
+                wavelengths['ls_start'],
+                wavelengths['ls_stop'],
+                wavelengths['li_start'],
+                wavelengths['li_stop'],
                 dim_lambda,
                 weights
                 );
@@ -1125,5 +1126,11 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
     // return [PMsingles, eff];
 };
 
+/*
+* calc_efficiency_grid
+* Calculates the fiber coupling efficiency for a range of pump and Signal/Idler waist sizes.
+ */
 
+PhaseMatch.calc_efficiency_grid = function calc_efficiency_grid(props, x_start, x_stop, y_start, y_stop, wavelengths, dim, dim_lambda){
 
+}

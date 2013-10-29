@@ -7,7 +7,7 @@ define(
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
-        'tpl!templates/modesolver-layout.tpl'
+        'tpl!templates/couplingefficiency-layout.tpl'
     ],
     function(
         $,
@@ -77,8 +77,8 @@ define(
                     el: self.el.find('.signalmode').get( 0 ),
                     margins: margins,
                     labels: {
-                        x: 'X emission angle (deg)',
-                        y: 'Y emission angle (deg)'
+                        x: 'Pump Waist (um)',
+                        y: 'Signal/Idler Waist (um)'
                     },
                     xrange: [ 0, 200 ],
                     yrange: [ 0, 100 ],
@@ -105,11 +105,11 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 16,
+                    'grid_size': 8,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
-                    'li_stop': lim.lambda_i.max
+                    'li_stop': lim.lambda_i.max,
                 });
             },
 
@@ -118,13 +118,8 @@ define(
                 var self = this;
                 var po = this.plotOpts;
 
-                // Make sure fiber coupling is enabled.
-                var isfibercoupled = props.calcfibercoupling;
-                props.calcfibercoupling = true;
-
                 var scale = 6;
-
-
+                var dimlambda = 10;
 
                 //make sure the angles are correct so we can calculate the right ranges
                 props.phi_i = props.phi_s + Math.PI;
@@ -140,24 +135,8 @@ define(
 
                 // var W = Math.max(props.W_sx, props.W_sy);
                 var convertfromFWHM = 1/(2 * Math.sqrt(Math.log(2)));
-                var Ws = props.W_sx * convertfromFWHM;
-                //calculate Rayleigh range
-                var zrs = Math.PI * (Ws*Ws)/props.lambda_s;
-                Ws = props.lambda_s/(Math.PI * Ws); // angular spread
-
-                var Wp = props.W * convertfromFWHM;
-                //calculate Rayleigh range
-                var zrp = Math.PI * (Wp*Wp)/props.lambda_p;
-                Wp = props.lambda_p/(Math.PI * Wp); // angular spread
-
-                // var W = 1/(1/Ws + 1/Wp);
-                var W = (Ws + Wp/4);
-                // console.log(Ws, Wp, W);
-
-
-
-                console.log("rayleigh Range", zrs/props.L, zrp/props.L);
-
+                var W = props.W_sx * convertfromFWHM;
+                var W = props.lambda_s/(Math.PI * W); // angular spread
 
                 var x_start = X_0 - scale*W/2;
                 var x_stop = X_0 + scale*W/2;
@@ -170,21 +149,6 @@ define(
                     ,"li_start":po.get("li_start")
                     ,"li_stop":po.get("li_stop")
                 };
-
-                // If the filters are mismatched, we need to integrate over more points.
-                var lambdadiff = Math.abs(po.get("ls_stop") - po.get("ls_start")) - Math.abs(po.get("li_stop") - po.get("li_start"));
-                lambdadiff = lambdadiff / Math.abs(po.get("ls_stop") - po.get("ls_start")) + Math.abs(po.get("li_stop") - po.get("li_start")) /2;
-                console.log("lambda diff", lambdadiff);
-                if (Math.abs(lambdadiff) > 0.5){
-                    var dimlambda = 32;
-                }
-                else if (Math.abs(lambdadiff) > 0.25){
-                    var dimlambda = 24;
-                }
-                else {
-                    dimlambda = 16;
-                }
-
 
                 var startTime = new Date();
 
@@ -218,22 +182,14 @@ define(
                 self.plot2dSignal.setXRange([ converter.to('deg', x_start), converter.to('deg', x_stop) ]);
                 self.plot2dSignal.setYRange([ converter.to('deg', y_start), converter.to('deg', y_stop) ]);
 
-                self.refreshSignalFWHMCircle(Ws,  X_0, Y_0, props);
+                self.refreshSignalFWHMCircle(W,  X_0, Y_0, props);
 
                 self.plot2dSignal.setTitle("Idler coupling efficiency  = " + Math.round(1000*PM_s['eff'])/10 + "%");
 
-                // if (PM_s['warning'] || zrp/props.L <5 || zrs/props.L <5){
-                //     alert("Warning: this calculation should be treated with suspiscion. The parameters chosen are outside the approximations used in the program. Most likely the crystal is too long, or focusing is too tight.");
-                // }
-
-                if (zrs/props.L <2){
-                    alert("Warning: this calculation should be treated with suspiscion.  The Rayleigh range of the idler collection mode is too small compared to the length of the crystal.");
-                }
-                else if(zrp/props.L <2){
-                    alert("Warning: this calculation should be treated with suspiscion. The Rayleigh range of the pump mode is too small compared to the length of the crystal.");
+                if (PM_s['warning']){
+                    alert("Warning: this calculation should be treated with suspiscion. The parameters chosen are outside the approximations used in the program. Most likely the crystal is too long, or focusing is too tight.");
                 }
 
-                props.calcfibercoupling = isfibercoupled;
             },
 
             // draw circle outlining FWHM of the signal photon
@@ -245,8 +201,8 @@ define(
                 var data =[];
 
                 data = [
-                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: .9, title: 'Idler collection FWHM', labelX: (X0)*deg, labelY: (Y0+6*W/2)*deg},
-                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W * deg, opacity: 0.3, title: 'Idler collection 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+6*W/2)*deg },
+                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: .9, title: 'Idler collection FWHM', labelX: (X0)*deg, labelY: (Y0+5*W/2)*deg},
+                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W * deg, opacity: 0.3, title: 'Idler collection 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+5*W/2)*deg },
                 ];
                 var xx = self.plot2dSignal.scales.x;
                 var yy = self.plot2dSignal.scales.y;

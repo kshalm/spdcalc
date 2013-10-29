@@ -241,6 +241,79 @@ PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n,w){
 };
 
 
+/*
+Calculate the array of weights for Simpson's 3/8 rule.
+ */
+PhaseMatch.Nintegrate2DWeights_3_8 = function Nintegrate2DWeights_3_8(n){
+
+    // if (n%3 !== 0){
+    //     n = n+n%3; //guarantee that n is divisible by 3
+    // }
+
+    // n = n+(3- n%3) -3; //guarantee that n is divisible by 3
+
+    // console.log(n);
+
+    var weights = new Array(n+1);
+    weights[0] = 1;
+    weights[n+1] = 1;
+    for (var i=1; i<n+1; i++){
+        if(i%3===0){
+            weights[i] = 2;
+        }
+        else{
+            weights[i] = 3;
+        }
+    }
+
+    return weights;
+};
+
+/*
+Perform a numerical 2D integration using Simpson's 3/8 rule.
+
+Assume a square grid of nxn points.
+f(x,y) is the function to be evaluated
+a,b are the x start and stop points of the range
+c,d are the y start and stop points of the range
+The 2D simpson's integrator has weights that are most easily determined
+by taking the outer product of the vector of weights for the 1D simpson's
+rule. For example let's say we have the vector (1 4 2 4 2 4 1) for 6 intervals.
+In 2D we now get an array of weights that is given by:
+   | 1  3  3  2  3  3  2  1 | and so on
+
+ */
+PhaseMatch.Nintegrate2D_3_8 = function Nintegrate2D_3_8(f,a,b,c,d,n,w){
+
+    n = n+(3- n%3); //guarantee that n is divisible by 3
+
+    if (w === null || w === undefined){
+      var weights = PhaseMatch.Nintegrate2DWeights_3_8(n);
+
+    }
+    else {
+      var weights = w;
+    }
+
+    if (n<50){
+        // console.log(weights);
+    }
+
+    var dx = (b-a)/n;
+    var dy = (d-c)/n;
+    var result = 0;
+
+    for (var j=0; j<n+2; j++){
+        for (var k=0; k<n+2; k++){
+            result +=f(a +j*dx, c+k*dy)*weights[j]*weights[k];
+        }
+    }
+
+    return result*dx*dy*9/64;
+
+};
+
+
 PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
     var dx = (b-a)/n;
     var dy = (d-c)/n;
