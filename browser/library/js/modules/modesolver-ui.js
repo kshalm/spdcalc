@@ -199,6 +199,7 @@ define(
                     dimlambda
                 );
 
+
                 var endTime = new Date();
                 var timeDiff = (endTime - startTime);
                 console.log(timeDiff);
@@ -213,7 +214,7 @@ define(
                 //     po.get('grid_size')
                 // );
                 // console.log(PM_s[0]);
-                self.data = PM_s['pmsingles'];
+                self.data = PhaseMatch.normalize(PM_s['pmsingles']);
                 self.plot2dSignal.setZRange([0,Math.max.apply(null,PM_s['pmsingles'])]);
                 self.plot2dSignal.setXRange([ converter.to('deg', x_start), converter.to('deg', x_stop) ]);
                 self.plot2dSignal.setYRange([ converter.to('deg', y_start), converter.to('deg', y_stop) ]);

@@ -109,6 +109,20 @@ PhaseMatch.zeros = function zeros(dimx, dimy){
 
 
 /*
+* Takes an array and normalizes it using the max value in the array.
+*/
+PhaseMatch.normalize = function normalize(data){
+    var maxval = Math.max.apply(null,data);
+    var n = data.length;
+
+    for (var i = 0; i<n; i++){
+      data[i] = data[i]/maxval;
+    }
+    return data;
+};
+
+
+/*
 Perform a numerical 1D integration using Simpson's rule.
 
 f(x) is the function to be evaluated
