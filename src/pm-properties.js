@@ -223,7 +223,7 @@
                 props.update_all_angles(props);
                 var delK =  PhaseMatch.calc_delK(props);
                 // Returning all 3 delK components can lead to errors in the search
-                // return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) ); 
+                // return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
                 return Math.sqrt(sq(delK[2]) );
             };
 
@@ -256,7 +256,8 @@
                     // Calculate the angle for the idler photon
                     P.optimum_idler();
                     var delK = PhaseMatch.calc_delK(P);
-                    return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
+                    return Math.sqrt(sq(delK[2]) );
+                    // return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
                 };
 
                 var delK_guess = (PhaseMatch.calc_delK(P)[2]);
