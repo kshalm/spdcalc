@@ -164,51 +164,51 @@ define(
                 self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
-                /*
-                For integration purposes
-                 */
-                var P = props.clone();
-                var calcPM_ws_wi = function ( ls, li){
+                // /*
+                // For integration purposes
+                //  */
+                // var P = props.clone();
+                // var calcPM_ws_wi = function ( ls, li){
 
-                        P.lambda_s = ls;
-                        P.lambda_i = li;
+                //         P.lambda_s = ls;
+                //         P.lambda_i = li;
 
-                        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-                        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+                //         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+                //         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-                        var PM = PhaseMatch.phasematch(P);
-                        return PM[0]*PM[0] + PM[1]*PM[1];
-                }
+                //         var PM = PhaseMatch.phasematch(P);
+                //         return PM[0]*PM[0] + PM[1]*PM[1];
+                // }
 
-                var startTime = new Date();
-                var nn = self.plotOpts.get('grid_size');
-                var simps = PhaseMatch.Nintegrate2D(
-                    calcPM_ws_wi,
-                    self.plotOpts.get('ls_start'),
-                    self.plotOpts.get('ls_stop'),
-                    self.plotOpts.get('li_start'),
-                    self.plotOpts.get('li_stop'),
-                    nn
-                );
+                // var startTime = new Date();
+                // var nn = self.plotOpts.get('grid_size');
+                // var simps = PhaseMatch.Nintegrate2D(
+                //     calcPM_ws_wi,
+                //     self.plotOpts.get('ls_start'),
+                //     self.plotOpts.get('ls_stop'),
+                //     self.plotOpts.get('li_start'),
+                //     self.plotOpts.get('li_stop'),
+                //     nn
+                // );
 
-                var endTime = new Date();
-                var timeDiff = (endTime - startTime);
+                // var endTime = new Date();
+                // var timeDiff = (endTime - startTime);
 
 
 
-                var startTime = new Date();
-                var simps38 = PhaseMatch.Nintegrate2D_3_8(
-                    calcPM_ws_wi,
-                    self.plotOpts.get('ls_start'),
-                    self.plotOpts.get('ls_stop'),
-                    self.plotOpts.get('li_start'),
-                    self.plotOpts.get('li_stop'),
-                    nn
-                );
+                // var startTime = new Date();
+                // var simps38 = PhaseMatch.Nintegrate2D_3_8(
+                //     calcPM_ws_wi,
+                //     self.plotOpts.get('ls_start'),
+                //     self.plotOpts.get('ls_stop'),
+                //     self.plotOpts.get('li_start'),
+                //     self.plotOpts.get('li_stop'),
+                //     nn
+                // );
 
-                var endTime = new Date();
-                var timeDiff2 = (endTime - startTime);
-                console.log("time", timeDiff, " val = ", simps, "time38", timeDiff2, " val = ", simps38);
+                // var endTime = new Date();
+                // var timeDiff2 = (endTime - startTime);
+                // console.log("time", timeDiff, " val = ", simps, "time38", timeDiff2, " val = ", simps38);
 
                 // var pmjsa = PhaseMatch.Sum(PM)*(self.plotOpts.get('ls_stop') -self.plotOpts.get('ls_start')) * (self.plotOpts.get('li_stop') -self.plotOpts.get('li_start'))/self.plotOpts.get('grid_size')/self.plotOpts.get('grid_size');
                 // console.log(pmjsa, simps);

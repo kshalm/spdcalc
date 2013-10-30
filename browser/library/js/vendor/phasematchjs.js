@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-10-29
+ * phasematchjs v0.0.1a - 2013-10-30
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2441,13 +2441,6 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
         delKz -= twoPI / (P.poling_period * P.poling_sign);
     }
 
-    // if (delKz>0){
-    //     delKz = delKz - 2*Math.PI/P.poling_period;
-    // }
-    // else{
-    //     delKz = delKz + 2*Math.PI/P.poling_period;
-    // }
-
     return [delKx, delKy, delKz];
 
 };
@@ -3187,6 +3180,7 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
  */
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     var P = props.clone();
+    P.phi_i = P.phi_s + Math.PI;
     P.update_all_angles();
     //eliminates sinc side lobes which cause problems.
     P.use_guassian_approx = true;
@@ -3936,29 +3930,30 @@ PhaseMatch.Crystals('LiNbO3-1', {
                 props.theta = x;
                 props.update_all_angles(props);
                 var delK =  PhaseMatch.calc_delK(props);
-
-                return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
+                // Returning all 3 delK components can lead to errors in the search
+                // return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) ); 
+                return Math.sqrt(sq(delK[2]) );
             };
 
-            var guess = Math.PI/8;
+            var guess = Math.PI/6;
             var startTime = new Date();
 
-            var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
+            var ans = PhaseMatch.nelderMead(min_delK, guess, 20);
             var endTime = new Date();
 
 
             var timeDiff = (endTime - startTime)/1000;
-            // console.log("Theta autocalc = ", timeDiff);
+            // console.log("Theta autocalc = ", timeDiff, ans);
             props.theta = ans;
             // calculate the walkoff angle
-            this.calc_walkoff_angles();
+            // this.calc_walkoff_angles();
         },
 
 
         calc_poling_period : function (){
             var props = this;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
-            props.poling_period = 1e12;  // Set this to a large number
+            props.poling_period = Math.pow(2,30);  // Set this to a large number
             props.update_all_angles(props);
             if (props.enable_pp){
                 var P = props.clone();
@@ -4176,7 +4171,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
 
                     if (name === 'poling_period'){
                         if (isNaN(val)){
-                            val = Math.pow(2,20);
+                            val = Math.pow(2,30);
                         }
                     }
 
@@ -4255,12 +4250,15 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     P.update_all_angles;
     P.optimum_idler(P);
 
-    var centerpm = PhaseMatch.phasematch(P);
-    console.log(sq(centerpm[0]) + sq(centerpm[1]));
+    // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
+    // P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
+    
     var todeg = 180/Math.PI;
     // console.log(P.phi_i*todeg, P.phi_s*todeg);
-    P.theta_i = P.theta_s;
+    // P.theta_i = P.theta_s;
+    // var centerpm = PhaseMatch.phasematch(P);
+    // console.log(sq(centerpm[0]) + sq(centerpm[1]));
 
 
     var i;

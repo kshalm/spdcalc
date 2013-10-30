@@ -14,12 +14,15 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     P.update_all_angles;
     P.optimum_idler(P);
 
-    var centerpm = PhaseMatch.phasematch(P);
-    console.log(sq(centerpm[0]) + sq(centerpm[1]));
+    // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
+    // P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
+    
     var todeg = 180/Math.PI;
     // console.log(P.phi_i*todeg, P.phi_s*todeg);
-    P.theta_i = P.theta_s;
+    // P.theta_i = P.theta_s;
+    // var centerpm = PhaseMatch.phasematch(P);
+    // console.log(sq(centerpm[0]) + sq(centerpm[1]));
 
 
     var i;

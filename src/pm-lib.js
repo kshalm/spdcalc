@@ -34,13 +34,6 @@
         delKz -= twoPI / (P.poling_period * P.poling_sign);
     }
 
-    // if (delKz>0){
-    //     delKz = delKz - 2*Math.PI/P.poling_period;
-    // }
-    // else{
-    //     delKz = delKz + 2*Math.PI/P.poling_period;
-    // }
-
     return [delKx, delKy, delKz];
 
 };
@@ -780,6 +773,7 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
  */
 PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     var P = props.clone();
+    P.phi_i = P.phi_s + Math.PI;
     P.update_all_angles();
     //eliminates sinc side lobes which cause problems.
     P.use_guassian_approx = true;

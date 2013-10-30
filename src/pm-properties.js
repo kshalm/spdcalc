@@ -222,29 +222,30 @@
                 props.theta = x;
                 props.update_all_angles(props);
                 var delK =  PhaseMatch.calc_delK(props);
-
-                return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
+                // Returning all 3 delK components can lead to errors in the search
+                // return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) ); 
+                return Math.sqrt(sq(delK[2]) );
             };
 
-            var guess = Math.PI/8;
+            var guess = Math.PI/6;
             var startTime = new Date();
 
-            var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
+            var ans = PhaseMatch.nelderMead(min_delK, guess, 20);
             var endTime = new Date();
 
 
             var timeDiff = (endTime - startTime)/1000;
-            // console.log("Theta autocalc = ", timeDiff);
+            // console.log("Theta autocalc = ", timeDiff, ans);
             props.theta = ans;
             // calculate the walkoff angle
-            this.calc_walkoff_angles();
+            // this.calc_walkoff_angles();
         },
 
 
         calc_poling_period : function (){
             var props = this;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
-            props.poling_period = 1e12;  // Set this to a large number
+            props.poling_period = Math.pow(2,30);  // Set this to a large number
             props.update_all_angles(props);
             if (props.enable_pp){
                 var P = props.clone();
@@ -462,7 +463,7 @@
 
                     if (name === 'poling_period'){
                         if (isNaN(val)){
-                            val = Math.pow(2,20);
+                            val = Math.pow(2,30);
                         }
                     }
 
