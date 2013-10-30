@@ -24,7 +24,7 @@ define(
 
 
         var con = PhaseMatch.constants;
-        
+
         /**
          * @module JSAUI
          * @implements {Stapes}
@@ -146,7 +146,7 @@ define(
                         y: 'Phi of pump with respect to optic axis (deg)'
                     }
                 });
-                
+
                 self.elplotThetaPhi = $(self.plotThetaPhi.el);
 
 
@@ -171,15 +171,15 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
                 lim_theta = PhaseMatch.autorange_theta(props);
                 var poling_limits = PhaseMatch.autorange_poling_period(props);
-                
+
                 self.plotOpts.set({
                     'grid_size': 100,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
                     'li_stop': lim.lambda_i.max,
-                    'pm_signal_wavelength_start': lim.lambda_s.min-100e-9, 
-                    'pm_signal_wavelength_stop': lim.lambda_s.min+100e-9, 
+                    'pm_signal_wavelength_start': lim.lambda_s.min-100e-9,
+                    'pm_signal_wavelength_stop': lim.lambda_s.min+100e-9,
                     'lp_start': props.lambda_p - 4e-9,
                     'lp_stop': props.lambda_p + 4e-9,
                     'pump_theta_start': props.theta - 10*Math.PI/180,
@@ -204,8 +204,12 @@ define(
                     ,l_stop =  converter.to('nano', po.get('ls_stop'))
                     ;
 
+            // Turn off fiber coupling to get accurate results
+            var isfibercoupled = props.calcfibercoupling;
+            props.calcfibercoupling = false;
+
             var PMSignal = PhaseMatch.calc_PM_Curves(
-                    props, 
+                    props,
                     po.get('pm_signal_wavelength_start'),
                     po.get('pm_signal_wavelength_stop'),
                     po.get('lp_start'),
@@ -220,7 +224,7 @@ define(
 
 
             // var PMTheta = PhaseMatch.calc_PM_Crystal_Tilt(
-            //         props, 
+            //         props,
             //         po.get('pm_signal_wavelength_start'),
             //         po.get('pm_signal_wavelength_stop'),
             //         po.get('pump_theta_start'),
@@ -237,8 +241,8 @@ define(
             // self.plotTheta.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
 
             var PMThetaPhi = PhaseMatch.calc_PM_Pump_Theta_Phi(
-                    props, 
-    
+                    props,
+
                     po.get('pump_theta_start'),
                     po.get('pump_theta_stop'),
                     po.get('pump_phi_start'),
@@ -257,7 +261,7 @@ define(
 
 
             var PMPolingTheta = PhaseMatch.calc_PM_Pump_Theta_Poling(
-                    props, 
+                    props,
                     po.get('poling_period_start'),
                     po.get('poling_period_stop'),
                     po.get('pump_theta_start'),
@@ -267,16 +271,19 @@ define(
             self.dataPolingTheta = PMPolingTheta;
             self.plotPolingTheta.setXRange([ converter.to('micro',  po.get('poling_period_start')),converter.to('micro', po.get('poling_period_stop')) ]);
             self.plotPolingTheta.setYRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
-                
+
+            props.calcfibercoupling = isfibercoupled;
             },
+
+
 
             draw: function(){
 
                 var self = this;
-                    
+
                 // // PMXY plot
-                // if (!self.dataSignal || 
-                //     !self.theta || 
+                // if (!self.dataSignal ||
+                //     !self.theta ||
                 //     !self.dataBoth
                 // ){
                 //     return this;
