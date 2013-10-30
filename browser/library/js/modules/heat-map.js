@@ -379,13 +379,28 @@ define(
                     .attr('transform', 'translate('+[width-colorBarWidth, -2*colorBarHeight].join(',')+')')
                     ;
 
+                console.log(d3.scale.ordinal()
+                    .domain( colorBarVals ).rangeRoundBands([0, colorBarWidth],0)(.9));
+
+                // This is a hacky way to replace the xColorBar from d3.js which occasionally fails.
+                var xpos = 0;
+                var xColorBarPos = function(){
+                    xpos = xpos+(colorBarWidth/colorBarVals.length);
+                    return xpos;
+                }
+
+                var barwidth = colorBarWidth/colorBarVals.length;
+
                 colorbar.selectAll('rect')
                     .data(colorBarVals)
                    .enter()
                     .append("rect")
-                    .attr("x", xColorBar)
-                    // .attr("width", 1)
-                    .attr("width", xColorBar.rangeBand())
+                    // .attr("x", xColorBar)
+                    .attr("x", function(x){
+                            return xColorBarPos();
+                        })
+                    .attr("width", barwidth)
+                    // .attr("width", xColorBar.rangeBand())
                     .attr("height", colorBarHeight)
                     .style("fill", function( v ){
                         return z( v );
