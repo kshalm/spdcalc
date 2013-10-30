@@ -379,8 +379,7 @@ define(
                     .attr('transform', 'translate('+[width-colorBarWidth, -2*colorBarHeight].join(',')+')')
                     ;
 
-                console.log(d3.scale.ordinal()
-                    .domain( colorBarVals ).rangeRoundBands([0, colorBarWidth],0)(.9));
+
 
                 // This is a hacky way to replace the xColorBar from d3.js which occasionally fails.
                 var xpos = 0;
