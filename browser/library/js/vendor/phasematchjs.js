@@ -4254,7 +4254,13 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     P.phi_i = P.phi_s + Math.PI;
     P.update_all_angles;
     P.optimum_idler(P);
-    // P.theta_i = P.theta_s;
+
+    var centerpm = PhaseMatch.phasematch(P);
+    console.log(sq(centerpm[0]) + sq(centerpm[1]));
+
+    var todeg = 180/Math.PI;
+    // console.log(P.phi_i*todeg, P.phi_s*todeg);
+    P.theta_i = P.theta_s;
 
 
     var i;
