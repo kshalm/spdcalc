@@ -52,7 +52,7 @@
 
 
 /**
- * BBO indicies. 
+ * BBO indicies.
  */
 PhaseMatch.Crystals('BBO-1', {
     name: 'BBO ref 1',
@@ -85,7 +85,7 @@ PhaseMatch.Crystals('BBO-1', {
 //         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
 
 //         // http://www.redoptronics.com/KTP-crystal.html
-//         var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda)); 
+//         var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
 //         var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
 //         var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
 
@@ -118,7 +118,7 @@ PhaseMatch.Crystals('BBO-1', {
 
 // *
 //  * KTP Ref 2 indicies.
- 
+
 // PhaseMatch.Crystals('KTP-2', {
 //     name: 'KTP ref 2',
 //     // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
@@ -127,7 +127,7 @@ PhaseMatch.Crystals('BBO-1', {
 //         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
 
 //         // http://www.redoptronics.com/KTP-crystal.html
-//         // var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda)); 
+//         // var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
 //         // var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
 //         // var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
 
@@ -177,7 +177,7 @@ PhaseMatch.Crystals('KTP-3', {
         else {
             var ny= Math.sqrt(2.0993 + 0.922683*sq(lambda)/(sq(lambda)-0.0467695)-0.0138408*sq(lambda));
         }
-        
+
         var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
 
         var dnx= 1.1e-5;
@@ -278,6 +278,46 @@ PhaseMatch.Crystals('LiNbO3-1', {
         var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
         var ny = nx;
         var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
+
+        // http://www.redoptronics.com/linbo3-crystals.html
+        // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));
+        // var ny = nx
+        // var nz = Math.sqrt(4.5820+0.099169/(sq(lambda)- 0.04443) - 0.021950 * sq(lambda));
+
+        //http://www.newlightphotonics.com/LN-crystal.html
+        var dnx = -0.874e-6;
+        var dny = dnx;
+        var dnz = 39.073e-6;
+
+
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+
+        return [nx, ny, nz];
+    }
+});
+
+
+/**
+ * LiNbO3 indicies.
+ */
+PhaseMatch.Crystals('KDP-1', {
+    name: 'KDP ref 1',
+    info: 'http://www.newlightphotonics.com/KDP-crystal.html',
+    type: 'Negative Uniaxial',
+    cls: 'class_3m',
+    lambda_min: 200*1e-9,
+    lambda_max: 1500*1e-9,
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
+        // var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
+        var nx = Math.sqrt(2.259276 + 13.005522 * sq(lambda)/(sq(lambda) - 400)+0.01008956/(sq(lambda) - 0.012942625));
+        var ny = nx;
+        // var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
+        var nz = Math.sqrt(2.132668 +3.2279924 * sq(lambda)/(sq(lambda) - 400) + 0.008637494/(sq(lambda)- 0.012281043))
 
         // http://www.redoptronics.com/linbo3-crystals.html
         // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));
