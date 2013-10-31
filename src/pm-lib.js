@@ -154,50 +154,50 @@
 
     // // Check to see if the approximation is valid that will let us use the Sinc function.
     // var C_check = Math.sqrt(Math.abs(C)*2)*P.L;
-    var C_check = C*P.L/B;
+    // var C_check = C*P.L/B;
     // C_check = 0;
 
 
-    // Now calculate the normalization coefficients.
-    // First the constant that remains after analytically integrating over x
+    // // Now calculate the normalization coefficients.
+    // // First the constant that remains after analytically integrating over x
 
-    if (P.singles){
-        var xconst1 = 1/Wp_SQ;
-        xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-        var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
+    // if (P.singles){
+    //     var xconst1 = 1/Wp_SQ;
+    //     xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
+    //     var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
 
-        // Next the constant that remains after analytically integrating over y
-        var yconst1 = (Wp_SQ+Ws_SQ)*(sq(COS_THETAs)*Wp_SQ+Ws_SQ);
-        var yconst2 = Wp_SQ*Ws_SQ*( (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ);
-        var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
+    //     // Next the constant that remains after analytically integrating over y
+    //     var yconst1 = (Wp_SQ+Ws_SQ)*(sq(COS_THETAs)*Wp_SQ+Ws_SQ);
+    //     var yconst2 = Wp_SQ*Ws_SQ*( (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ);
+    //     var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
 
-        // Normalization from the Gaussian terms in the integral.
-        var pi2 = 2*Math.PI;
-        var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
-    }
-    else{
-        var xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
-        xconst1 += 1/Wp_SQ;
-        xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-        var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
+    //     // Normalization from the Gaussian terms in the integral.
+    //     var pi2 = 2*Math.PI;
+    //     var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
+    // }
+    // else{
+    //     var xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
+    //     xconst1 += 1/Wp_SQ;
+    //     xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
+    //     var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
 
-        // Next the constant that remains after analytically integrating over y
-        var yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ );
-        var yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
-        var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
+    //     // Next the constant that remains after analytically integrating over y
+    //     var yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ );
+    //     var yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
+    //     var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
 
-        // Normalization from the Gaussian terms in the integral.
-        var pi2 = 2*Math.PI;
-        var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
-    }
+    //     // Normalization from the Gaussian terms in the integral.
+    //     var pi2 = 2*Math.PI;
+    //     var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
+    // }
 
-    // var gaussnorm =1;
+    var gaussnorm =1;
 
-    var arg = B*P.L/2;
+    // var arg = B*P.L/2;
 
     // var numz =P.apodization;
-    var numz = 40;
-    var z = PhaseMatch.linspace(0,P.L, numz);
+    // var numz = 40;
+    // var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0;
     // var pmzcoeffMax = 0;
 
@@ -230,16 +230,16 @@
 
 
 
-    var zintReal = function(z){
-        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-        return pmzcoeff*Math.cos(B*z);
-        // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    }
+    // var zintReal = function(z){
+    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+    //     return pmzcoeff*Math.cos(B*z);
+    //     // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+    // }
 
-    var zintImag = function(z){
-        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-        return  pmzcoeff*Math.sin(B*z);
-    }
+    // var zintImag = function(z){
+    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+    //     return  pmzcoeff*Math.sin(B*z);
+    // }
 
     var zintfunc = function(z){
         var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
@@ -248,57 +248,26 @@
         return [real,imag];
     }
 
-    // var numz = 16;
-    var dz = P.L/numz;
-
-    var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-P.L/2, P.L/2,dz,P.numzint,P.zweights);
-    var PMz_real = pmintz[0]/P.L;
-    var PMz_imag = pmintz[1]/P.L;
+    if (P.calcfibercoupling){
+        var dz = P.L/P.numzint;
+        var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-P.L/2, P.L/2,dz,P.numzint,P.zweights);
+        var PMz_real = pmintz[0]/P.L;
+        var PMz_imag = pmintz[1]/P.L;
+    }
+    else{
+        var PMzNorm1 = Math.sin(arg)/arg;
+        // var PMz_real =  PMzNorm1 * Math.cos(arg);
+        // var PMz_imag = PMzNorm1 * Math.sin(arg);
+        var PMz_real =  PMzNorm1 ;
+        var PMz_imag = 0;
+    }
     // var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
-    // // var PMz_real = zintReal(0);
     // var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
 
     // console.log(zintReal(0), bw);
     // console.log(PMz_real, PMz_imag);
 
 
-
-    // var PMzNorm1 = Math.sin(arg)/arg;
-    // var PMz_realNorm =  PMzNorm1 * Math.cos(arg);
-    // var PMz_imagNorm = PMzNorm1 * Math.sin(arg);
-    //  var delL = Math.abs(P.apodization_L[0] - P.apodization_L[1]);
-
-
-
-
-    // //More advanced calculation of phasematching in the z direction. Don't need it now.
-    // if (P.calc_apodization && P.enable_pp){
-    //     var gauss_norm = 1;
-    //     var delL = Math.abs(P.apodization_L[0] - P.apodization_L[1]);
-
-    //     for (var m = 0; m<P.apodization; m++){
-    //         PMz_real += P.apodization_coeff[m]*(Math.sin(delK[2]*P.apodization_L[m+1]) - Math.sin(delK[2]*P.apodization_L[m]));///P.apodization;
-    //         PMz_imag += P.apodization_coeff[m]*(Math.cos(delK[2]*P.apodization_L[m]) - Math.cos(-delK[2]*P.apodization_L[m+1]));///P.apodization;
-    //         // gauss_norm += P.apodization_coeff[m];
-    //     }
-
-    //     PMz_real = PMz_real/(delK[2]*delL * gauss_norm);
-    //     PMz_imag = PMz_imag/(delK[2]*delL * gauss_norm);
-    //     var t;
-    // }
-    // else {
-    //     // var PMz = Math.sin(arg)/arg;
-    //     // PMz_real =  PMz * Math.cos(arg);
-    //     // PMz_imag = PMz * Math.sin(arg);
-    //     // // PMz_real =  PMz;// * Math.cos(arg);
-    //     // // PMz_imag = 0;// * Math.sin(arg);
-    // }
-
-
-    // // Phasematching along z dir
-    // var PMz = Math.sin(arg)/arg; //* Math.exp(1j*arg)
-    // var PMz_real = 0;
-    // var PMz_imag = 0;
     if (P.use_guassian_approx){
         // console.log('approx');
         PMz_real = Math.exp(-0.193*sq(arg));
@@ -311,7 +280,7 @@
     // console.log(A);
     var PMt = Math.exp(-A);
     // var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
-    return [PMz_real, PMz_imag, PMt, C_check];
+    return [PMz_real, PMz_imag, PMt];
 };
 
 /*
@@ -385,7 +354,7 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
         PM = sq(PM[0]) + sq(PM[1]);
     }
     // console.log(PM)
-    return {"phasematch":PM, "approxcheck":C_check};
+    return {"phasematch":PM};
 };
 
 /*
@@ -879,7 +848,8 @@ PhaseMatch.autorange_delT = function autorange_delT(props, lambda_start, lambda_
     var gv_s = props.get_group_velocity(props.lambda_s, props.type, props.S_s, "signal");
     var gv_i = props.get_group_velocity(props.lambda_i, props.type, props.S_i, "idler");
 
-    var zero_delay = props.L * (1/gv_i - 1/gv_s)/2;
+    // var zero_delay = props.L * (1/gv_i - 1/gv_s)/2;
+    var zero_delay = 0;
     // console.log("minimum of HOM dip = ", zero_delay/1e-15);
 
     var bw = Math.abs(lambda_stop - lambda_start);

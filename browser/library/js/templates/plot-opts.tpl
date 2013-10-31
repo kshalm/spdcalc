@@ -21,6 +21,17 @@
         </div>
     </div>
 
+    <div id="plot-opt-grid_size_ms">
+        <div class="control-group">
+            <label class="control-label grid_size_ms">
+                Grid size
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="" class="inputbox" name="grid_size_ms" value="{{= parseFloat( it.grid_size_ms ) }}" />
+            </div>
+        </div>
+    </div>
+
     <div id="plot-opt-signal-wavelength">
         <label class="plot_lambda_s">Signal Wavelength</label>
         <div class="control-group">

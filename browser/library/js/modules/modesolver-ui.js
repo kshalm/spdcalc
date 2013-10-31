@@ -33,7 +33,7 @@ define(
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplMSLayout,
             showPlotOpts: [
-                'grid_size',
+                'grid_size_ms',
                 'signal-wavelength',
                 'idler-wavelength',
             ],
@@ -105,7 +105,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 16,
+                    'grid_size_ms': 16,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -174,17 +174,17 @@ define(
                 // If the filters are mismatched, we need to integrate over more points.
                 var lambdadiff = Math.abs(po.get("ls_stop") - po.get("ls_start")) - Math.abs(po.get("li_stop") - po.get("li_start"));
                 lambdadiff = lambdadiff / Math.abs(po.get("ls_stop") - po.get("ls_start")) + Math.abs(po.get("li_stop") - po.get("li_start")) /2;
-                console.log("lambda diff", lambdadiff);
-                if (Math.abs(lambdadiff) > 0.5){
+                // console.log("lambda diff", lambdadiff);
+                if (Math.abs(lambdadiff) > 0.3){
                     var dimlambda = 32;
                 }
-                else if (Math.abs(lambdadiff) > 0.25){
+                else if (Math.abs(lambdadiff) > 0.1){
                     var dimlambda = 24;
                 }
                 else {
                     dimlambda = 16;
                 }
-
+                
 
                 var startTime = new Date();
 
@@ -195,7 +195,7 @@ define(
                     y_start,
                     y_stop,
                     wavelengths,
-                    po.get('grid_size'),
+                    po.get('grid_size_ms'),
                     dimlambda
                 );
 

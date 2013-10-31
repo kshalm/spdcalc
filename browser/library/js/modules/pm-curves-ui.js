@@ -217,7 +217,7 @@ define(
                     "signal",
                     po.get('grid_size')
                 );
-
+            console.log(props.calcfibercoupling);
             self.dataSignal = PMSignal;
             self.plotSignal.setXRange([ converter.to('nano', po.get('lp_start')),converter.to('nano', po.get('lp_stop')) ]);
             self.plotSignal.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);

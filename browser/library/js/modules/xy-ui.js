@@ -214,6 +214,9 @@ define(
                     ,x_stop = t_stop
                     ;
 
+                var isfibercoupled = props.calcfibercoupling;
+                props.calcfibercoupling = false;
+
                 var PMXY = PhaseMatch.calc_XY(
                     props,
                     -1 * po.get('theta_stop'),
@@ -297,6 +300,8 @@ define(
                 self.plotThetaTheta.setXRange([ t_start, t_stop ]);
                 self.plotThetaTheta.setYRange([ t_start, t_stop ]);
                 // self.plotThetaTheta.setYRange([ t_start+Math.PI, t_stop+Math.PI ]);
+
+                props.calcfibercoupling = isfibercoupled;
             },
 
             draw: function(){
