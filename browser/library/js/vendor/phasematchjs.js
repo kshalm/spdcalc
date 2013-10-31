@@ -4209,6 +4209,11 @@ PhaseMatch.Crystals('KDP-1', {
             if (nslices < 10){
                 nslices = 10;
             }
+
+            if (nslices>30){
+                nslices = 30;
+            }
+            
             if (nslices%2 != 0){
                 nslices +=1;
             }
