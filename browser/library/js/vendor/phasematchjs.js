@@ -1777,6 +1777,59 @@ PhaseMatch.normalize = function normalize(data){
     return data;
 };
 
+/*
+* Create a special purpose, high speed version of Simpson's rule to
+* integrate the z direction in the phasematching function. The function
+* returns two arguments corresponding to the real and imag components of
+* the number being summed.
+*/
+
+/*
+* The weights for the 1D Simpson's rule.
+ */
+ PhaseMatch.NintegrateWeights = function NintegrateWeights(n){
+    var weights = new Array(n+1);
+    weights[0] = 1;
+    weights[n] = 1;
+    for (var i=1; i<n; i++){
+        if(i%2===0){
+            //even case
+            weights[i] = 2;
+        }
+        else{
+            weights[i] = 4;
+        }
+    }
+    return weights;
+};
+
+/*
+Perform a numerical 1D integration using Simpson's rule.
+
+f(x) is the function to be evaluated
+a,b are the x start and stop points of the range
+
+The 1D simpson's integrator has weights that are of the form
+(1 4 2 4 ... 2 4 1)
+ */
+PhaseMatch.Nintegrate2arg = function Nintegrate2arg(f,a,b,dx,n,w){
+    // we remove the check of n being even for speed. Be careful to only
+    // input n that are even.
+
+    var dx = (b-a)/n;
+    var result_real = 0;
+    var result_imag = 0;
+
+    for (var j=0; j<n+1; j++){
+        var feval = f(a +j*dx); // f must return two element array
+        result_real +=feval[0]*w[j];
+        result_imag +=feval[1]*w[j];
+    }
+
+    return [result_real*dx/3, result_imag*dx/3];
+
+};
+
 
 /*
 Perform a numerical 1D integration using Simpson's rule.
@@ -2616,53 +2669,65 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
 
     var arg = B*P.L/2;
 
-    var numz =P.apodization;
-    var numz = 300;
+    // var numz =P.apodization;
+    var numz = 40;
     var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0;
-    var pmzcoeffMax = 0;
+    // var pmzcoeffMax = 0;
 
     if (P.calc_apodization && P.enable_pp){
-        var apodization_coeff = P.apodization_coeff;
-        // var bw = P.apodization_FWHM  / 2.3548;
+        // var apodization_coeff = P.apodization_coeff;
+        var bw = P.apodization_FWHM  / 2.3548;
     }
     else {
-        var apodization_coeff = new Array(numz);
-        for (var j=0; j<numz; j++){
-            apodization_coeff[j] = 1;
-        }
-        // var bw = Math.pow(2,20);
-    }
-
-
-    for (var k=0; k<numz; k++){
-        pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
-        PMz_real += pmzcoeff*Math.cos(B*z[k]);
-        PMz_imag += pmzcoeff*Math.sin(B*z[k]);
-
-        // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
-        // if (pmzcoeffabs>pmzcoeffMax){
-        //     pmzcoeffMax = pmzcoeffabs;
+        // var apodization_coeff = new Array(numz);
+        // for (var j=0; j<numz; j++){
+        //     apodization_coeff[j] = 1;
         // }
+        var bw = Math.pow(2,20);
     }
 
-    PMz_real = PMz_real/numz;
-    PMz_imag = PMz_imag/numz;
 
+    // for (var k=0; k<numz; k++){
+    //     pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
+    //     PMz_real += pmzcoeff*Math.cos(B*z[k]);
+    //     PMz_imag += pmzcoeff*Math.sin(B*z[k]);
 
-
-    // var zintReal = function(z){
-    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    //     return pmzcoeff*Math.cos(B*z);
-    //     // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+    //     // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
+    //     // if (pmzcoeffabs>pmzcoeffMax){
+    //     //     pmzcoeffMax = pmzcoeffabs;
+    //     // }
     // }
 
-    // var zintImag = function(z){
-    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    //     return  pmzcoeff*Math.sin(B*z);
-    // }
-    // // var numz = 16;
-    // var dz = P.L/numz;
+    // PMz_real = PMz_real/numz;
+    // PMz_imag = PMz_imag/numz;
+
+
+
+    var zintReal = function(z){
+        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+        return pmzcoeff*Math.cos(B*z);
+        // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+    }
+
+    var zintImag = function(z){
+        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+        return  pmzcoeff*Math.sin(B*z);
+    }
+
+    var zintfunc = function(z){
+        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+        var real = pmzcoeff*Math.cos(B*z);
+        var imag = pmzcoeff*Math.sin(B*z);
+        return [real,imag];
+    }
+
+    // var numz = 16;
+    var dz = P.L/numz;
+
+    var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-P.L/2, P.L/2,dz,P.numzint,P.zweights);
+    var PMz_real = pmintz[0]/P.L;
+    var PMz_imag = pmintz[1]/P.L;
     // var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
     // // var PMz_real = zintReal(0);
     // var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
@@ -3778,6 +3843,7 @@ PhaseMatch.Crystals('KDP-1', {
 
     PhaseMatch.apodization_L = [];
     PhaseMatch.apodization_coeff = [];
+    // PhaseMatch.zweights = [];
 
     var con = PhaseMatch.constants;
     var spdcDefaults = {
@@ -3864,6 +3930,11 @@ PhaseMatch.Crystals('KDP-1', {
             //set the apodization length and Gaussian profile
             this.set_apodization_L();
             this.set_apodization_coeff();
+
+            this.numzint = 50;
+            this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+
+            // console.log(this.zweights);
 
         },
 

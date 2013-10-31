@@ -15,6 +15,7 @@
 
     PhaseMatch.apodization_L = [];
     PhaseMatch.apodization_coeff = [];
+    // PhaseMatch.zweights = [];
 
     var con = PhaseMatch.constants;
     var spdcDefaults = {
@@ -101,6 +102,11 @@
             //set the apodization length and Gaussian profile
             this.set_apodization_L();
             this.set_apodization_coeff();
+
+            this.numzint = 50;
+            this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+
+            // console.log(this.zweights);
 
         },
 

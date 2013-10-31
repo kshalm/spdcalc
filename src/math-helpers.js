@@ -121,6 +121,59 @@ PhaseMatch.normalize = function normalize(data){
     return data;
 };
 
+/*
+* Create a special purpose, high speed version of Simpson's rule to
+* integrate the z direction in the phasematching function. The function
+* returns two arguments corresponding to the real and imag components of
+* the number being summed.
+*/
+
+/*
+* The weights for the 1D Simpson's rule.
+ */
+ PhaseMatch.NintegrateWeights = function NintegrateWeights(n){
+    var weights = new Array(n+1);
+    weights[0] = 1;
+    weights[n] = 1;
+    for (var i=1; i<n; i++){
+        if(i%2===0){
+            //even case
+            weights[i] = 2;
+        }
+        else{
+            weights[i] = 4;
+        }
+    }
+    return weights;
+};
+
+/*
+Perform a numerical 1D integration using Simpson's rule.
+
+f(x) is the function to be evaluated
+a,b are the x start and stop points of the range
+
+The 1D simpson's integrator has weights that are of the form
+(1 4 2 4 ... 2 4 1)
+ */
+PhaseMatch.Nintegrate2arg = function Nintegrate2arg(f,a,b,dx,n,w){
+    // we remove the check of n being even for speed. Be careful to only
+    // input n that are even.
+
+    var dx = (b-a)/n;
+    var result_real = 0;
+    var result_imag = 0;
+
+    for (var j=0; j<n+1; j++){
+        var feval = f(a +j*dx); // f must return two element array
+        result_real +=feval[0]*w[j];
+        result_imag +=feval[1]*w[j];
+    }
+
+    return [result_real*dx/3, result_imag*dx/3];
+
+};
+
 
 /*
 Perform a numerical 1D integration using Simpson's rule.

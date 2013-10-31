@@ -195,22 +195,22 @@
 
     var arg = B*P.L/2;
 
-    var numz =P.apodization;
-    var numz = 20;
+    // var numz =P.apodization;
+    var numz = 40;
     var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0;
-    var pmzcoeffMax = 0;
+    // var pmzcoeffMax = 0;
 
     if (P.calc_apodization && P.enable_pp){
-        var apodization_coeff = P.apodization_coeff;
-        // var bw = P.apodization_FWHM  / 2.3548;
+        // var apodization_coeff = P.apodization_coeff;
+        var bw = P.apodization_FWHM  / 2.3548;
     }
     else {
-        var apodization_coeff = new Array(numz);
-        for (var j=0; j<numz; j++){
-            apodization_coeff[j] = 1;
-        }
-        // var bw = Math.pow(2,20);
+        // var apodization_coeff = new Array(numz);
+        // for (var j=0; j<numz; j++){
+        //     apodization_coeff[j] = 1;
+        // }
+        var bw = Math.pow(2,20);
     }
 
 
@@ -240,11 +240,23 @@
         var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
         return  pmzcoeff*Math.sin(B*z);
     }
+
+    var zintfunc = function(z){
+        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+        var real = pmzcoeff*Math.cos(B*z);
+        var imag = pmzcoeff*Math.sin(B*z);
+        return [real,imag];
+    }
+
     // var numz = 16;
     var dz = P.L/numz;
-    var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
-    // var PMz_real = zintReal(0);
-    var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
+
+    var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-P.L/2, P.L/2,dz,P.numzint,P.zweights);
+    var PMz_real = pmintz[0]/P.L;
+    var PMz_imag = pmintz[1]/P.L;
+    // var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
+    // // var PMz_real = zintReal(0);
+    // var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
 
     // console.log(zintReal(0), bw);
     // console.log(PMz_real, PMz_imag);
