@@ -2617,6 +2617,7 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
     var arg = B*P.L/2;
 
     var numz =P.apodization;
+    var numz = 300;
     var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0;
     var pmzcoeffMax = 0;

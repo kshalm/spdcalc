@@ -196,6 +196,7 @@
     var arg = B*P.L/2;
 
     var numz =P.apodization;
+    var numz = 20;
     var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0;
     var pmzcoeffMax = 0;
@@ -213,37 +214,37 @@
     }
 
 
-    for (var k=0; k<numz; k++){
-        pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
-        PMz_real += pmzcoeff*Math.cos(B*z[k]);
-        PMz_imag += pmzcoeff*Math.sin(B*z[k]);
+    // for (var k=0; k<numz; k++){
+    //     pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
+    //     PMz_real += pmzcoeff*Math.cos(B*z[k]);
+    //     PMz_imag += pmzcoeff*Math.sin(B*z[k]);
 
-        // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
-        // if (pmzcoeffabs>pmzcoeffMax){
-        //     pmzcoeffMax = pmzcoeffabs;
-        // }
+    //     // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
+    //     // if (pmzcoeffabs>pmzcoeffMax){
+    //     //     pmzcoeffMax = pmzcoeffabs;
+    //     // }
+    // }
+
+    // PMz_real = PMz_real/numz;
+    // PMz_imag = PMz_imag/numz;
+
+
+
+    var zintReal = function(z){
+        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+        return pmzcoeff*Math.cos(B*z);
+        // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
     }
 
-    PMz_real = PMz_real/numz;
-    PMz_imag = PMz_imag/numz;
-
-
-
-    // var zintReal = function(z){
-    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    //     return pmzcoeff*Math.cos(B*z);
-    //     // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    // }
-
-    // var zintImag = function(z){
-    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    //     return  pmzcoeff*Math.sin(B*z);
-    // }
-    // // var numz = 16;
-    // var dz = P.L/numz;
-    // var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
-    // // var PMz_real = zintReal(0);
-    // var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
+    var zintImag = function(z){
+        var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
+        return  pmzcoeff*Math.sin(B*z);
+    }
+    // var numz = 16;
+    var dz = P.L/numz;
+    var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
+    // var PMz_real = zintReal(0);
+    var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
 
     // console.log(zintReal(0), bw);
     // console.log(PMz_real, PMz_imag);
