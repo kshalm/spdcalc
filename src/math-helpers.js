@@ -307,6 +307,36 @@ PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n,w){
 
 };
 
+/*
+* Special version of Simpsons 2D integral for use with the mode solver.
+* Accepts a function that returns two arguments. Integrates thses two results
+* separately. For speed, we strip out the weights code and assume it is provided.
+ */
+
+PhaseMatch.Nintegrate2DModeSolver = function Nintegrate2DModeSolver(f,a,b,c,d,n,w){
+
+    var weights = w;
+
+    var dx = (b-a)/n;
+    var dy = (d-c)/n;
+    var result1 = 0;
+    var result2 = 0;
+    var result = 0;
+
+    for (var j=0; j<n+1; j++){
+        for (var k=0; k<n+1; k++){
+            // console.log(f(a +j*dx, c+k*dy)*weights[k] );
+            result =f(a +j*dx, c+k*dy);
+            result1 += result[0]*weights[j]*weights[k];
+            result2 += result[1]*weights[j]*weights[k];
+        }
+    }
+
+    return [result1*dx*dy/9, result2*dx*dy/9];
+
+};
+
+
 
 /*
 Calculate the array of weights for Simpson's 3/8 rule.

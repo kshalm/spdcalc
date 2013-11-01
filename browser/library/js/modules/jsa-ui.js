@@ -240,13 +240,13 @@ define(
 
                 // console.log(simps, riemann, realval, Math.abs(simps-realval)/realval *100, Math.abs(riemann-realval)/realval *100);
 
-                // // testing numerical integration
-                // //
+                // testing numerical integration
+                //
                 // var c =9
                 //  var gauss2d = function(x,y){
                 //     var sigma = 1;
-                //     var N = 1/(sigma*sigma*2*Math.PI);
-                //     return N *Math.exp(-1/(2*sigma*sigma)*(x*x + y*y));
+                //     var N = 1/(sigma*sigma*Math.PI);
+                //     return N *Math.exp(-1/(sigma*sigma)*(x*x + y*y));
                 //     // return Math.cos(x*x +y*y);
                 //     // return x*x +y*y;
                 //     // return 8*Math.exp(-x*x-y*y*y*y);
@@ -261,16 +261,18 @@ define(
                 //     // return 8*Math.exp(-x*x-y*y*y*y);
                 // }
 
-                // var nn = 10;
-                // var a = -1;
-                // var b = 1;
+                // var nn = 20;
+                // var a = -3;
+                // var b = 3;
 
                 // var simps = PhaseMatch.Nintegrate2D(gauss2d,a,b,a,b,nn);
-                // var simpshigh = PhaseMatch.Nintegrate2D(gauss2d,a,b,a,b,1000);
+                // // var simpshigh = PhaseMatch.Nintegrate2D(gauss2d,a,b,a,b,1000);
 
 
                 // var riemman = PhaseMatch.RiemannSum2D(gauss2d,a,b,a,b,nn);
-                // var realresult = 0.466065;
+                // // var realresult = 0.466065;
+                // //
+                // console.log(simps, riemman);
 
                 // var simps1d = PhaseMatch.Nintegrate(gauss,a,b,nn);
                 // console.log(simps1d, simpshigh, simps, Math.abs(simps-simpshigh)/simpshigh*100, Math.abs(riemman-simpshigh)/simpshigh*100);

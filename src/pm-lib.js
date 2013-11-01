@@ -161,37 +161,37 @@
     // // Now calculate the normalization coefficients.
     // // First the constant that remains after analytically integrating over x
 
-    // if (P.singles){
-    //     var xconst1 = 1/Wp_SQ;
-    //     xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-    //     var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
+    if (P.singles){
+        var xconst1 = 1/Wp_SQ;
+        xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
+        var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
 
-    //     // Next the constant that remains after analytically integrating over y
-    //     var yconst1 = (Wp_SQ+Ws_SQ)*(sq(COS_THETAs)*Wp_SQ+Ws_SQ);
-    //     var yconst2 = Wp_SQ*Ws_SQ*( (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ);
-    //     var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
+        // Next the constant that remains after analytically integrating over y
+        var yconst1 = (Wp_SQ+Ws_SQ)*(sq(COS_THETAs)*Wp_SQ+Ws_SQ);
+        var yconst2 = Wp_SQ*Ws_SQ*( (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ);
+        var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
 
-    //     // Normalization from the Gaussian terms in the integral.
-    //     var pi2 = 2*Math.PI;
-    //     var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
-    // }
-    // else{
-    //     var xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
-    //     xconst1 += 1/Wp_SQ;
-    //     xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-    //     var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
+        // Normalization from the Gaussian terms in the integral.
+        var pi2 = 2*Math.PI;
+        var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
+    }
+    else{
+        var xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
+        xconst1 += 1/Wp_SQ;
+        xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
+        var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
 
-    //     // Next the constant that remains after analytically integrating over y
-    //     var yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ );
-    //     var yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
-    //     var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
+        // Next the constant that remains after analytically integrating over y
+        var yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ );
+        var yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
+        var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
 
-    //     // Normalization from the Gaussian terms in the integral.
-    //     var pi2 = 2*Math.PI;
-    //     var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
-    // }
+        // Normalization from the Gaussian terms in the integral.
+        var pi2 = 2*Math.PI;
+        var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
+    }
 
-    var gaussnorm =1;
+    // var gaussnorm =1;
 
     // var arg = B*P.L/2;
 

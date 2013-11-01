@@ -103,8 +103,10 @@
             this.set_apodization_L();
             this.set_apodization_coeff();
 
-            this.numzint = 50;
-            this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+            // this.numzint = 16;
+            // this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+
+            this.set_zint();
 
             // console.log(this.zweights);
 
@@ -406,26 +408,26 @@
         },
 
         set_zint : function (){
-            var zslice = 100e-6; //length of each crystal slice
+            var zslice = 200e-6; //length of each crystal slice
             var nslices = Math.round(this.L/zslice);
             if (nslices < 10){
                 nslices = 10;
             }
 
-            if (nslices>30){
-                nslices = 30;
-            }
-            
+            // if (nslices>30){
+            //     nslices = 30;
+            // }
+
             if (nslices%2 != 0){
                 nslices +=1;
             }
             this.numzint = nslices;
             // this.numzint = 10;
 
-            this.zweights = PhaseMatch.NintegrateWeights(this.numzint);  
-            console.log(nslices);    
+            this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+            console.log(nslices);
         },
-        
+
 
          calc_walkoff_angles: function(){
             // Calculate the pump walkoff angle

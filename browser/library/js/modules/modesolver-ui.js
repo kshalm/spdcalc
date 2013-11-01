@@ -122,7 +122,7 @@ define(
                 var isfibercoupled = props.calcfibercoupling;
                 props.calcfibercoupling = true;
 
-                var scale = 6;
+                var scale = 3;
 
 
 
@@ -159,10 +159,10 @@ define(
                 console.log("rayleigh Range", zrs/props.L, zrp/props.L);
 
 
-                var x_start = X_0 - scale*W/2;
-                var x_stop = X_0 + scale*W/2;
-                var y_start = Y_0 - scale*W/2;
-                var y_stop = Y_0 + scale*W/2;
+                var x_start = X_0 - scale*W;
+                var x_stop = X_0 + scale*W;
+                var y_start = Y_0 - scale*W;
+                var y_stop = Y_0 + scale*W;
 
                 var wavelengths = {
                     "ls_start":po.get("ls_start")
@@ -174,7 +174,7 @@ define(
                 // If the filters are mismatched, we need to integrate over more points.
                 var lambdadiff = Math.abs(po.get("ls_stop") - po.get("ls_start")) - Math.abs(po.get("li_stop") - po.get("li_start"));
                 lambdadiff = lambdadiff / Math.abs(po.get("ls_stop") - po.get("ls_start")) + Math.abs(po.get("li_stop") - po.get("li_start")) /2;
-                // console.log("lambda diff", lambdadiff);
+                console.log("lambda diff", lambdadiff);
                 if (Math.abs(lambdadiff) > 0.3){
                     var dimlambda = 32;
                 }
@@ -184,7 +184,7 @@ define(
                 else {
                     dimlambda = 16;
                 }
-                
+                // dimlambda = 60;
 
                 var startTime = new Date();
 
@@ -232,6 +232,9 @@ define(
                 }
                 else if(zrp/props.L <2){
                     alert("Warning: this calculation should be treated with suspiscion. The Rayleigh range of the pump mode is too small compared to the length of the crystal.");
+                }
+                else if (PM_s['warning']){
+                    alert("Warning: this calculation should be treated with suspiscion. The parameters chosen are outside the approximations used in the program. Most likely the crystal is too long, or focusing is too tight.");
                 }
 
                 props.calcfibercoupling = isfibercoupled;

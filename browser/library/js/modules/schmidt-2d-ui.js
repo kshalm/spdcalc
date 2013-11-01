@@ -33,7 +33,7 @@ define(
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplSchmidtLayout,
             showPlotOpts: [
-                'grid_size',
+                'grid_size_schmidt',
                 'signal-wavelength',
                 'idler-wavelength',
                 'xtal_length_range',
@@ -107,7 +107,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 20,
+                    'grid_size_schmidt': 10,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -147,7 +147,7 @@ define(
                     self.plotOpts.get('ls_stop'),
                     self.plotOpts.get('li_start'),
                     self.plotOpts.get('li_stop'),
-                    po.get('grid_size'),
+                    po.get('grid_size_schmidt'),
                     params);
 
                     // props,
