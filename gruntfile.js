@@ -21,6 +21,8 @@ module.exports = function(grunt) {
             'build/intro.js',
             'build/lodash.js',
             'src/constants.js',
+            'src/complex.js',
+            'src/scratchpad.js',
             'src/math-helpers.js',
             'src/pm-lib.js',
             'src/pm-crystals.js',
