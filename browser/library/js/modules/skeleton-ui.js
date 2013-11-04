@@ -138,8 +138,6 @@ define(
 
                 }, self);
 
-                app.plotOpts.on('change', checkRecalc, self);
-
                 app.plotOpts.els.find( '[id^="plot-opt-"]' ).hide();
                 // show plot opts if needed
                 if (self.showPlotOpts){
@@ -157,9 +155,6 @@ define(
 
                 // disconnect from app events
                 app.off( 'calculate', self.refresh );
-
-                // self.plotOpts.detachView( self.elPlotOpts );
-                app.plotOpts.off('change', checkRecalc);
             },
 
             resize: function(){
