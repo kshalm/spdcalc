@@ -1532,6 +1532,46 @@ var PhaseMatch = { util: {} };
   /*--------------------------------------------------------------------------*/
 
   /**
+   * Iterates over elements of a collection, executing the callback for each
+   * element. The callback is bound to `thisArg` and invoked with three arguments;
+   * (value, index|key, collection). Callbacks may exit iteration early by
+   * explicitly returning `false`.
+   *
+   * @static
+   * @memberOf _
+   * @alias each
+   * @category Collections
+   * @param {Array|Object|string} collection The collection to iterate over.
+   * @param {Function} [callback=identity] The function called per iteration.
+   * @param {*} [thisArg] The `this` binding of `callback`.
+   * @returns {Array|Object|string} Returns `collection`.
+   * @example
+   *
+   * _([1, 2, 3]).forEach(function(num) { console.log(num); }).join(',');
+   * // => logs each number and returns '1,2,3'
+   *
+   * _.forEach({ 'one': 1, 'two': 2, 'three': 3 }, function(num) { console.log(num); });
+   * // => logs each number and returns the object (property order is not guaranteed across environments)
+   */
+  function forEach(collection, callback, thisArg) {
+    if (callback && typeof thisArg == 'undefined' && isArray(collection)) {
+      var index = -1,
+          length = collection.length;
+
+      while (++index < length) {
+        if (callback(collection[index], index, collection) === false) {
+          break;
+        }
+      }
+    } else {
+      baseEach(collection, callback, thisArg);
+    }
+    return collection;
+  }
+
+  /*--------------------------------------------------------------------------*/
+
+  /**
    * Creates a function that, when called, invokes `func` with the `this`
    * binding of `thisArg` and prepends any additional `bind` arguments to those
    * provided to the bound function.
@@ -1702,12 +1742,14 @@ var PhaseMatch = { util: {} };
   lodash.assign = assign;
   lodash.bind = bind;
   lodash.createCallback = createCallback;
+  lodash.forEach = forEach;
   lodash.forIn = forIn;
   lodash.forOwn = forOwn;
   lodash.keys = keys;
   lodash.memoize = memoize;
   lodash.pick = pick;
 
+  lodash.each = forEach;
   lodash.extend = assign;
 
   /*--------------------------------------------------------------------------*/
