@@ -5,6 +5,9 @@
             <div class="btn-wrap ">
                 <button class="btn collapse-ctrl-plot" id="collapse-modesolver">&#x2296;</button>
             </div>
+            <p>
+    		WARNING: This module is under heavy development. Do not trus ANY of the results you obtain from it.
+    	</p>
     </div>
 	<div class="signalmode">
 	        <!-- heat map goes here -->
