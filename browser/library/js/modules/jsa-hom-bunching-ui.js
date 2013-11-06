@@ -317,6 +317,17 @@ define(
 
                 self.data = PM;
 
+                var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
+
+                if (isNaN(PM[0])){
+                    var S = 0;
+                }
+                else {
+                    var S= PhaseMatch.calc_Schmidt(jsa2d);
+                }
+
+                self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
+
                 // var S= PhaseMatch.calc_Schmidt(PM);
                 // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
 
