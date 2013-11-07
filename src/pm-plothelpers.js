@@ -11,7 +11,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
     // P.theta_i = 0.6*Math.PI/180;
     P.phi_i = P.phi_s + Math.PI;
-    P.update_all_angles;
+    P.update_all_angles();
     P.optimum_idler(P);
 
     // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
@@ -385,12 +385,14 @@ PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start,
     }
 
     var N = dim * dim;
-    var PM = new Float64Array( N );
+    var PM = new Float64Array( N ),
+        index_x,
+        index_y;
 
     // Find Signal distribution
     for (i=0; i<N; i++){
-        var index_x = i % dim;
-        var index_y = Math.floor(i / dim);
+        index_x = i % dim;
+        index_y = Math.floor(i / dim);
 
         P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
         P.phi_s = Math.atan2(Y[index_y],X[index_x]);
@@ -414,17 +416,17 @@ PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start,
 
     // Find Idler distribution
     if (P.type === 2){
-        console.log("switching");
+        // console.log("switching");
         P.type = 3;
     }
     else if (P.type === 3){
-        console.log("other way");
+        // console.log("other way");
         P.type = 2;
     }
 
     for (i=0; i<N; i++){
-        var index_x = i % dim;
-        var index_y = Math.floor(i / dim);
+        index_x = i % dim;
+        index_y = Math.floor(i / dim);
 
         P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
         P.phi_s = Math.atan2(Y[index_y],X[index_x]);
@@ -1086,12 +1088,12 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
     if (lambda_s_start_singles > wavelengths['ls_start']){
         // console.log("lambda_start > input");
-        lambda_s_start_singles = wavelengths['ls_start']
+        lambda_s_start_singles = wavelengths['ls_start'];
     }
 
     if (lambda_s_stop_singles < wavelengths['ls_stop']){
         // lambda_s_stop_singles = wavelengths['ls_stop']
-        console.log("lambda_stop > input");
+        // console.log("lambda_stop > input");
     }
 
     var calcPM_ws_wi = function(ls, li){
@@ -1107,7 +1109,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         return PM[0]*PM[0] + PM[1]*PM[1];
     };
 
-    var pmmax = 0;
+
 
     //calculate coincidence rate
     // var coinc = PhaseMatch.Nintegrate2D(
@@ -1172,7 +1174,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
                 weightslambda
                 );
 
-       
+
 
         var idlerspatialmode = Math.exp(-1/2*sq((X_0_i - x )/(W_ix)) - 1/2*sq((Y_0_i - y)/(W_ix)));// /(Math.PI*sq(W_ix));
         // gauss += sq(idlerspatialmode);
@@ -1252,8 +1254,8 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         PMsingles[i]= pmsum;
         var x = Math.sin(P.theta_i)*Math.cos(P.phi_i);
         var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
-        var x = X[index_x];
-        var y = Y[index_y];
+        x = X[index_x];
+        y = Y[index_y];
         var idlerspatialmode = Math.exp(-1/2*sq((X_0_i - x )/(W_ix)) - 1/2*sq((Y_0_i - y)/(W_ix)));//*Math.sqrt(Math.PI);
         PMcoinc[i] = Math.sqrt(pmsum)*(idlerspatialmode);//*(1/Math.sqrt(2*Math.PI)/W_ix);
 
@@ -1277,11 +1279,11 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
     // var pmcoinc = PhaseMatch.Sum(PMcoinc);
     // var singles = PhaseMatch.Sum(PMsingles);
-    console.log("singles", singles, "coin", pmcoinc, "eff", pmcoinc/singles);
+    // console.log("singles", singles, "coin", pmcoinc, "eff", pmcoinc/singles);
 
 
     var validregimewaring = false;
-    return {"pmsingles":PMcoinc, "eff":eff, "warning":validregimewaring}
+    return {"pmsingles":PMcoinc, "eff":eff, "warning":validregimewaring};
     // return {'PMSingles':PMsingles};//, 'Eff':(coinc/singles)};
     // return [PMsingles, eff];
 };
@@ -1293,4 +1295,4 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
 PhaseMatch.calc_efficiency_grid = function calc_efficiency_grid(props, x_start, x_stop, y_start, y_stop, wavelengths, dim, dim_lambda){
 
-}
+};

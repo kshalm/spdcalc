@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-11-04
+ * phasematchjs v0.0.1a - 2013-11-06
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2409,7 +2409,7 @@ PhaseMatch.Nintegrate2arg = function Nintegrate2arg(f,a,b,dx,n,w){
     // we remove the check of n being even for speed. Be careful to only
     // input n that are even.
 
-    var dx = (b-a)/n;
+    dx = (b-a)/n;
     var result_real = 0;
     var result_imag = 0;
 
@@ -2515,13 +2515,14 @@ In 2D we now get an array of weights that is given by:
 Notice how the usual 1D simpson's weights appear around the sides of the array
  */
 PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n,w){
+    var weights;
 
     if (n%2 !== 0){
         n = n+1; //guarantee that n is even
     }
 
     if (w === null || w === undefined){
-      var weights = new Array(n+1);
+      weights = new Array(n+1);
       weights[0] = 1;
       weights[n] = 1;
       for (var i=1; i<n; i++){
@@ -2535,7 +2536,7 @@ PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n,w){
       }
   }
   else {
-    var weights = w;
+    weights = w;
   }
 
     // if (n<50){
@@ -2630,15 +2631,15 @@ In 2D we now get an array of weights that is given by:
 
  */
 PhaseMatch.Nintegrate2D_3_8 = function Nintegrate2D_3_8(f,a,b,c,d,n,w){
-
+    var weights;
     n = n+(3- n%3); //guarantee that n is divisible by 3
 
     if (w === null || w === undefined){
-      var weights = PhaseMatch.Nintegrate2DWeights_3_8(n);
+      weights = PhaseMatch.Nintegrate2DWeights_3_8(n);
 
     }
     else {
-      var weights = w;
+      weights = w;
     }
 
     if (n<50){
@@ -3160,11 +3161,14 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
     var PMz_imag = 0;
 
     // var convfromFWHM = 1/(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-    var convfromFWHM = 1/(2 * Math.sqrt(Math.log(2)))
+    var convfromFWHM = 1/(2 * Math.sqrt(Math.log(2)));
+
+    var W_s,
+        W_i;
 
     if (P.calcfibercoupling){
-        var W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
-        var W_i = 2*Math.asin( Math.cos(P.theta_i_e)*Math.sin(P.W_ix/2)/(P.n_i * Math.cos(P.theta_i)));
+        W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
+        W_i = 2*Math.asin( Math.cos(P.theta_i_e)*Math.sin(P.W_ix/2)/(P.n_i * Math.cos(P.theta_i)));
     }
     else {
        W_s = Math.pow(2,20); //Arbitrary large number
@@ -3199,7 +3203,7 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
     var SIN_THETAi_plus_THETAs = Math.sin(P.theta_i+P.theta_s);
 
 
-    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx = P.walkoff_p; //pump walkoff angle.
     var RHOpx = 0; //pump walkoff angle.
 
     RHOpx = -RHOpx; //Take the negative value. This is due to how things are defined later.
@@ -3257,35 +3261,41 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
 
     // // Now calculate the normalization coefficients.
     // // First the constant that remains after analytically integrating over x
+    var xconst1,
+        yconst1,
+        yconst2,
+        xconst,
+        yconst,
+        pi2 = 2*Math.PI,
+        gaussnorm
+        ;
 
     if (P.singles){
-        var xconst1 = 1/Wp_SQ;
+        xconst1 = 1/Wp_SQ;
         xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-        var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
+        xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
 
         // Next the constant that remains after analytically integrating over y
-        var yconst1 = (Wp_SQ+Ws_SQ)*(sq(COS_THETAs)*Wp_SQ+Ws_SQ);
-        var yconst2 = Wp_SQ*Ws_SQ*( (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ);
-        var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
+        yconst1 = (Wp_SQ+Ws_SQ)*(sq(COS_THETAs)*Wp_SQ+Ws_SQ);
+        yconst2 = Wp_SQ*Ws_SQ*( (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ);
+        yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
 
         // Normalization from the Gaussian terms in the integral.
-        var pi2 = 2*Math.PI;
-        var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
+        gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
     }
     else{
-        var xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
+        xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
         xconst1 += 1/Wp_SQ;
         xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-        var xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
+        xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
 
         // Next the constant that remains after analytically integrating over y
-        var yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ );
-        var yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
-        var yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
+        yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ );
+        yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
+        yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
 
         // Normalization from the Gaussian terms in the integral.
-        var pi2 = 2*Math.PI;
-        var gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
+        gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
     }
 
     // var gaussnorm =1;
@@ -3295,19 +3305,20 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
     // var numz =P.apodization;
     // var numz = 40;
     // var z = PhaseMatch.linspace(0,P.L, numz);
-    var pmzcoeff = 0;
+    var pmzcoeff = 0,
+        bw;
     // var pmzcoeffMax = 0;
 
     if (P.calc_apodization && P.enable_pp){
         // var apodization_coeff = P.apodization_coeff;
-        var bw = P.apodization_FWHM  / 2.3548;
+        bw = P.apodization_FWHM  / 2.3548;
     }
     else {
         // var apodization_coeff = new Array(numz);
         // for (var j=0; j<numz; j++){
         //     apodization_coeff[j] = 1;
         // }
-        var bw = Math.pow(2,20);
+        bw = Math.pow(2,20);
     }
 
 
@@ -3343,20 +3354,20 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
         var real = pmzcoeff*Math.cos(B*z);
         var imag = pmzcoeff*Math.sin(B*z);
         return [real,imag];
-    }
+    };
 
     if (P.calcfibercoupling){
         var dz = P.L/P.numzint;
         var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-P.L/2, P.L/2,dz,P.numzint,P.zweights);
-        var PMz_real = pmintz[0]/P.L;
-        var PMz_imag = pmintz[1]/P.L;
+        PMz_real = pmintz[0]/P.L;
+        PMz_imag = pmintz[1]/P.L;
     }
     else{
         var PMzNorm1 = Math.sin(arg)/arg;
         // var PMz_real =  PMzNorm1 * Math.cos(arg);
         // var PMz_imag = PMzNorm1 * Math.sin(arg);
-        var PMz_real =  PMzNorm1 ;
-        var PMz_imag = 0;
+        PMz_real =  PMzNorm1 ;
+        PMz_imag = 0;
     }
     // var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
     // var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
@@ -3473,7 +3484,7 @@ PhaseMatch.calc_HOM_rate = function calc_HOM_rate(ls_start, ls_stop, li_start, l
     var PM_JSA1_imag = JSA['PM_JSA1_imag'];
     var PM_JSA2_real = JSA['PM_JSA2_real'];
     var PM_JSA2_imag = JSA['PM_JSA2_imag'];
-;
+
     var N = dim*dim;
     var JSI = new Float64Array(N);
 
@@ -3520,7 +3531,7 @@ PhaseMatch.calc_HOM_bunch_rate = function calc_HOM_rate(ls_start, ls_stop, li_st
     var PM_JSA1_imag = JSA['PM_JSA1_imag'];
     var PM_JSA2_real = JSA['PM_JSA2_real'];
     var PM_JSA2_imag = JSA['PM_JSA2_imag'];
-;
+
     var N = dim*dim;
     var JSI = new Float64Array(N);
 
@@ -3581,14 +3592,15 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
     var PM_JSI = PhaseMatch.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, npts);
 
     // Calculate normalization
-    var N = PhaseMatch.Sum(PM_JSI);
+    var N = PhaseMatch.Sum(PM_JSI),
+        rate;
 
     for (var i=0; i<dim; i++){
         if (dip){
-            var rate = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT[i], JSA, npts);
+            rate = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT[i], JSA, npts);
         }
         else {
-            var rate = PhaseMatch.calc_HOM_bunch_rate(ls_start, ls_stop, li_start, li_stop, delT[i], JSA, npts);
+            rate = PhaseMatch.calc_HOM_bunch_rate(ls_start, ls_stop, li_start, li_stop, delT[i], JSA, npts);
         }
 
         HOM_values[i] = (rate["rate"])/N;
@@ -3620,15 +3632,17 @@ PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(P, ls_start, ls_stop, li_start, 
         ,'PM_JSA2_imag': PM_JSA2_imag
         };
 
+    var JSI;
+
     if (dip){
-        var JSI = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, dim);
+        JSI = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, dim);
     }
     else {
-        var JSI = PhaseMatch.calc_HOM_bunch_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, dim);
+        JSI = PhaseMatch.calc_HOM_bunch_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, dim);
     }
 
     return JSI["JSI"];
-}
+};
 
 
 /*
@@ -3807,11 +3821,13 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
     // var PM2D = PhaseMatch.create2Darray(PM, dim,dim);
 
     var l = PM.length;
-    var PMsqrt = new Array(l);
+    var PMsqrt = new Array(l),
+        j,
+        i;
 
-    for (var i = 0; i<l; i++){
+    for (i = 0; i<l; i++){
         PMsqrt[i]= new Array(l);
-        for (var j = 0; j<l; j++){
+        for (j = 0; j<l; j++){
             PMsqrt[i][j] = Math.sqrt(PM[i][j]);
         }
 
@@ -3822,10 +3838,10 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
     // @TODO: add in logic to test if the SVD converged. It will return false if it did not.
     var D = svd.W;
     // console.log("D", D);
-    var l = D.length;
+    l = D.length;
     //do the Normalization
     var Norm = 0;
-    for (var j=0; j<l; j++){
+    for (j=0; j<l; j++){
         Norm += sq(D[j]);
     }
 
@@ -3833,7 +3849,7 @@ PhaseMatch.calc_Schmidt = function calc_Schmidt(PM){
     // console.log("normalization", Norm);
 
     var Kinv = 0;
-    for (var i = 0; i<l; i++){
+    for (i = 0; i<l; i++){
         Kinv += sq(sq(D[i])/Norm); //calculate the inverse of the Schmidt number
     }
     return 1/Kinv;
@@ -3984,10 +4000,10 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     var P = props.clone();
     P.update_all_angles();
     var offset = 2* Math.PI/180;
-    var dif = (P.theta_s - P.theta_s*.4);
+    var dif = (P.theta_s - P.theta_s*0.4);
     var theta_start =dif*(1-(1e-6/P.W));
     theta_start = Math.max(0, theta_start);
-    var theta_end = P.theta_s + P.theta_s*.4;
+    var theta_end = P.theta_s + P.theta_s*0.4;
     theta_end = Math.max(2*Math.PI/180, theta_end);
     // console.log("Before", theta_start*180/Math.PI, theta_end*180/Math.PI);
     P.theta_s = theta_start;
@@ -4021,12 +4037,15 @@ PhaseMatch.autorange_poling_period = function autorange_poling_period(props){
 
 
 PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
-    var P = props.clone();
+    var P = props.clone(),
+        snell_external,
+        guess,
+        min_snells_law;
 
     if (photon === 'signal'){
-        var snell_external = (Math.sin(props.theta_s_e));
+        snell_external = (Math.sin(props.theta_s_e));
 
-        var min_snells_law = function(theta_internal){
+        min_snells_law = function(theta_internal){
             if (theta_internal>Math.PI/2 || theta_internal<0){return 1e12;}
             P.theta_s = theta_internal;
 
@@ -4037,12 +4056,12 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         };
 
         //Initial guess
-        var guess = props.theta_s;
+        guess = props.theta_s;
     }
     if (photon === 'idler'){
-        var snell_external = (Math.sin(props.theta_i_e));
+        snell_external = (Math.sin(props.theta_i_e));
 
-        var min_snells_law = function(theta_internal){
+        min_snells_law = function(theta_internal){
             if (theta_internal>Math.PI/2 || theta_internal<0){return 1e12;}
             P.theta_i = theta_internal;
 
@@ -4053,7 +4072,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         };
 
         //Initial guess
-        var guess = props.theta_i;
+        guess = props.theta_i;
     }
     var ans = PhaseMatch.nelderMead(min_snells_law, guess, 30);
     // console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
@@ -4061,14 +4080,15 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
 };
 
 PhaseMatch.find_external_angle = function find_external_angle (props, photon){
-    var theta_external = 0;
+    var theta_external = 0,
+        arg;
 
     if (photon === 'signal'){
-        var arg = (props.n_s * Math.sin(props.theta_s));
+        arg = (props.n_s * Math.sin(props.theta_s));
         theta_external = Math.asin(arg);
     }
     if (photon === 'idler'){
-        var arg = (props.n_i * Math.sin(props.theta_i));
+        arg = (props.n_i * Math.sin(props.theta_i));
         theta_external = Math.asin(arg);
     }
 
@@ -4252,12 +4272,13 @@ PhaseMatch.Crystals('KTP-3', {
 
         // http://www.redoptronics.com/KTP-crystal.html
         var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
+        var ny;
 
         if (lambda< 1.2){
-            var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
+            ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
         }
         else {
-            var ny= Math.sqrt(2.0993 + 0.922683*sq(lambda)/(sq(lambda)-0.0467695)-0.0138408*sq(lambda));
+            ny= Math.sqrt(2.0993 + 0.922683*sq(lambda)/(sq(lambda)-0.0467695)-0.0138408*sq(lambda));
         }
 
         var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
@@ -4399,7 +4420,7 @@ PhaseMatch.Crystals('KDP-1', {
         var nx = Math.sqrt(2.259276 + 13.005522 * sq(lambda)/(sq(lambda) - 400)+0.01008956/(sq(lambda) - 0.012942625));
         var ny = nx;
         // var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
-        var nz = Math.sqrt(2.132668 +3.2279924 * sq(lambda)/(sq(lambda) - 400) + 0.008637494/(sq(lambda)- 0.012281043))
+        var nz = Math.sqrt(2.132668 +3.2279924 * sq(lambda)/(sq(lambda) - 400) + 0.008637494/(sq(lambda)- 0.012281043));
 
         // http://www.redoptronics.com/linbo3-crystals.html
         // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));
@@ -4458,7 +4479,7 @@ PhaseMatch.Crystals('KDP-1', {
         walkoff_p: 0,
         // W_sx: .2 * Math.PI/180,
         W_sx: 100 * con.um,
-        W_sy: .2 * Math.PI/180,
+        W_sy: 0.2 * Math.PI/180,
         W_ix: 100 * con.um,
         phase: false,
         brute_force: false,
@@ -4839,14 +4860,14 @@ PhaseMatch.Crystals('KDP-1', {
             //     nslices = 30;
             // }
 
-            if (nslices%2 != 0){
+            if (nslices%2 !== 0){
                 nslices +=1;
             }
             this.numzint = nslices;
             // this.numzint = 10;
 
             this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
-            console.log(nslices);
+            // console.log(nslices);
         },
 
 
@@ -4857,7 +4878,7 @@ PhaseMatch.Crystals('KDP-1', {
             var origin_theta = P.theta;
 
             //calculate the derivative
-            var deltheta = .1*Math.PI/180;
+            var deltheta = 0.1*Math.PI/180;
 
             var theta = P.theta - deltheta/2;
             this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
@@ -4901,8 +4922,8 @@ PhaseMatch.Crystals('KDP-1', {
                     }
 
                     if (name === 'poling_period'){
-                        if(val===0 || isNaN(val)){
-                            val === 1E12;
+                        if (val===0 || isNaN(val)){
+                            val = Math.pow(2,20);
                         }
                     }
 
@@ -4995,7 +5016,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
     // P.theta_i = 0.6*Math.PI/180;
     P.phi_i = P.phi_s + Math.PI;
-    P.update_all_angles;
+    P.update_all_angles();
     P.optimum_idler(P);
 
     // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
@@ -5369,12 +5390,14 @@ PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start,
     }
 
     var N = dim * dim;
-    var PM = new Float64Array( N );
+    var PM = new Float64Array( N ),
+        index_x,
+        index_y;
 
     // Find Signal distribution
     for (i=0; i<N; i++){
-        var index_x = i % dim;
-        var index_y = Math.floor(i / dim);
+        index_x = i % dim;
+        index_y = Math.floor(i / dim);
 
         P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
         P.phi_s = Math.atan2(Y[index_y],X[index_x]);
@@ -5398,17 +5421,17 @@ PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start,
 
     // Find Idler distribution
     if (P.type === 2){
-        console.log("switching");
+        // console.log("switching");
         P.type = 3;
     }
     else if (P.type === 3){
-        console.log("other way");
+        // console.log("other way");
         P.type = 2;
     }
 
     for (i=0; i<N; i++){
-        var index_x = i % dim;
-        var index_y = Math.floor(i / dim);
+        index_x = i % dim;
+        index_y = Math.floor(i / dim);
 
         P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
         P.phi_s = Math.atan2(Y[index_y],X[index_x]);
@@ -6070,12 +6093,12 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
     if (lambda_s_start_singles > wavelengths['ls_start']){
         // console.log("lambda_start > input");
-        lambda_s_start_singles = wavelengths['ls_start']
+        lambda_s_start_singles = wavelengths['ls_start'];
     }
 
     if (lambda_s_stop_singles < wavelengths['ls_stop']){
         // lambda_s_stop_singles = wavelengths['ls_stop']
-        console.log("lambda_stop > input");
+        // console.log("lambda_stop > input");
     }
 
     var calcPM_ws_wi = function(ls, li){
@@ -6091,7 +6114,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         return PM[0]*PM[0] + PM[1]*PM[1];
     };
 
-    var pmmax = 0;
+
 
     //calculate coincidence rate
     // var coinc = PhaseMatch.Nintegrate2D(
@@ -6156,7 +6179,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
                 weightslambda
                 );
 
-       
+
 
         var idlerspatialmode = Math.exp(-1/2*sq((X_0_i - x )/(W_ix)) - 1/2*sq((Y_0_i - y)/(W_ix)));// /(Math.PI*sq(W_ix));
         // gauss += sq(idlerspatialmode);
@@ -6236,8 +6259,8 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
         PMsingles[i]= pmsum;
         var x = Math.sin(P.theta_i)*Math.cos(P.phi_i);
         var y = Math.sin(P.theta_i)*Math.sin(P.phi_i);
-        var x = X[index_x];
-        var y = Y[index_y];
+        x = X[index_x];
+        y = Y[index_y];
         var idlerspatialmode = Math.exp(-1/2*sq((X_0_i - x )/(W_ix)) - 1/2*sq((Y_0_i - y)/(W_ix)));//*Math.sqrt(Math.PI);
         PMcoinc[i] = Math.sqrt(pmsum)*(idlerspatialmode);//*(1/Math.sqrt(2*Math.PI)/W_ix);
 
@@ -6261,11 +6284,11 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
     // var pmcoinc = PhaseMatch.Sum(PMcoinc);
     // var singles = PhaseMatch.Sum(PMsingles);
-    console.log("singles", singles, "coin", pmcoinc, "eff", pmcoinc/singles);
+    // console.log("singles", singles, "coin", pmcoinc, "eff", pmcoinc/singles);
 
 
     var validregimewaring = false;
-    return {"pmsingles":PMcoinc, "eff":eff, "warning":validregimewaring}
+    return {"pmsingles":PMcoinc, "eff":eff, "warning":validregimewaring};
     // return {'PMSingles':PMsingles};//, 'Eff':(coinc/singles)};
     // return [PMsingles, eff];
 };
@@ -6277,7 +6300,7 @@ PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, 
 
 PhaseMatch.calc_efficiency_grid = function calc_efficiency_grid(props, x_start, x_stop, y_start, y_stop, wavelengths, dim, dim_lambda){
 
-}
+};
 
 
 return PhaseMatch;

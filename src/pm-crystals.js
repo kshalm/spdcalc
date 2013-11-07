@@ -170,12 +170,13 @@ PhaseMatch.Crystals('KTP-3', {
 
         // http://www.redoptronics.com/KTP-crystal.html
         var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
+        var ny;
 
         if (lambda< 1.2){
-            var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
+            ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
         }
         else {
-            var ny= Math.sqrt(2.0993 + 0.922683*sq(lambda)/(sq(lambda)-0.0467695)-0.0138408*sq(lambda));
+            ny= Math.sqrt(2.0993 + 0.922683*sq(lambda)/(sq(lambda)-0.0467695)-0.0138408*sq(lambda));
         }
 
         var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
@@ -317,7 +318,7 @@ PhaseMatch.Crystals('KDP-1', {
         var nx = Math.sqrt(2.259276 + 13.005522 * sq(lambda)/(sq(lambda) - 400)+0.01008956/(sq(lambda) - 0.012942625));
         var ny = nx;
         // var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
-        var nz = Math.sqrt(2.132668 +3.2279924 * sq(lambda)/(sq(lambda) - 400) + 0.008637494/(sq(lambda)- 0.012281043))
+        var nz = Math.sqrt(2.132668 +3.2279924 * sq(lambda)/(sq(lambda) - 400) + 0.008637494/(sq(lambda)- 0.012281043));
 
         // http://www.redoptronics.com/linbo3-crystals.html
         // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));

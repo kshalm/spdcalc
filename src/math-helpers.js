@@ -160,7 +160,7 @@ PhaseMatch.Nintegrate2arg = function Nintegrate2arg(f,a,b,dx,n,w){
     // we remove the check of n being even for speed. Be careful to only
     // input n that are even.
 
-    var dx = (b-a)/n;
+    dx = (b-a)/n;
     var result_real = 0;
     var result_imag = 0;
 
@@ -266,13 +266,14 @@ In 2D we now get an array of weights that is given by:
 Notice how the usual 1D simpson's weights appear around the sides of the array
  */
 PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n,w){
+    var weights;
 
     if (n%2 !== 0){
         n = n+1; //guarantee that n is even
     }
 
     if (w === null || w === undefined){
-      var weights = new Array(n+1);
+      weights = new Array(n+1);
       weights[0] = 1;
       weights[n] = 1;
       for (var i=1; i<n; i++){
@@ -286,7 +287,7 @@ PhaseMatch.Nintegrate2D = function Nintegrate2D(f,a,b,c,d,n,w){
       }
   }
   else {
-    var weights = w;
+    weights = w;
   }
 
     // if (n<50){
@@ -381,15 +382,15 @@ In 2D we now get an array of weights that is given by:
 
  */
 PhaseMatch.Nintegrate2D_3_8 = function Nintegrate2D_3_8(f,a,b,c,d,n,w){
-
+    var weights;
     n = n+(3- n%3); //guarantee that n is divisible by 3
 
     if (w === null || w === undefined){
-      var weights = PhaseMatch.Nintegrate2DWeights_3_8(n);
+      weights = PhaseMatch.Nintegrate2DWeights_3_8(n);
 
     }
     else {
-      var weights = w;
+      weights = w;
     }
 
     if (n<50){

@@ -37,7 +37,7 @@
         walkoff_p: 0,
         // W_sx: .2 * Math.PI/180,
         W_sx: 100 * con.um,
-        W_sy: .2 * Math.PI/180,
+        W_sy: 0.2 * Math.PI/180,
         W_ix: 100 * con.um,
         phase: false,
         brute_force: false,
@@ -418,14 +418,14 @@
             //     nslices = 30;
             // }
 
-            if (nslices%2 != 0){
+            if (nslices%2 !== 0){
                 nslices +=1;
             }
             this.numzint = nslices;
             // this.numzint = 10;
 
             this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
-            console.log(nslices);
+            // console.log(nslices);
         },
 
 
@@ -436,7 +436,7 @@
             var origin_theta = P.theta;
 
             //calculate the derivative
-            var deltheta = .1*Math.PI/180;
+            var deltheta = 0.1*Math.PI/180;
 
             var theta = P.theta - deltheta/2;
             this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
@@ -480,8 +480,8 @@
                     }
 
                     if (name === 'poling_period'){
-                        if(val===0 || isNaN(val)){
-                            val === 1E12;
+                        if (val===0 || isNaN(val)){
+                            val = Math.pow(2,20);
                         }
                     }
 
