@@ -2678,12 +2678,12 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
 
 
 // Complex number handling
-PhaseMatch.cmultiplyR = function cmultiplyR(a,ai,b,bi){
-  return a*a -b*b;
+PhaseMatch.cmultiplyR = function cmultiplyR(a,b,c,d){
+  return a*c - b*d;
 };
 
-PhaseMatch.cmultiplyI = function cmultiplyI(a,ai,b,bi){
-   return 2*ai*bi;
+PhaseMatch.cmultiplyI = function cmultiplyI(a,b,c,d){
+   return a*d + b*c;
 };
 
 PhaseMatch.cdivideR = function cdivideR(a,b,c,d){
@@ -3241,16 +3241,108 @@ PhaseMatch.caddI = function caddI(a,ai,b,bi){
     var Anum1a = (6 + 2*COS_2THETAi  + COS_2THETAi_minus_PHIs  - 2*COS_2PHIs + COS_2THETAi_plus_PHIs)*sq(delK[0]);
     var Anum1b = 8*sq(SIN_THETAi)*SIN_2PHIs*delK[0]*delK[1];
     var Anum1c = (6 + 2*COS_2THETAi  - COS_2THETAi_minus_PHIs  + 2*COS_2PHIs - COS_2THETAi_plus_PHIs)*sq(delK[1]);
-    var Anum1 = Wp_SQ*Ws_SQ*(Anum1a + Anum1b + Anum1c);
+    var Anum1 = (Anum1a + Anum1b + Anum1c);
+    
+    // var Anum1 = Wp_SQ*Ws_SQ*(Anum1a + Anum1b + Anum1c);
 
-    var Anum2a = 8*Ws_SQ*(sq(delK[0])+ sq(delK[1]));
+    // var Anum2a = 8*Ws_SQ*(sq(delK[0])+ sq(delK[1]));
+
+    var Anum2a = 8*(sq(delK[0])+ sq(delK[1]));
     var Anum2b = (6 + 2*COS_2THETAs  + COS_2THETAs_minus_PHIs + COS_2THETAs_plus_PHIs - 2*COS_2PHIs)*sq(delK[0]);
     var Anum2c = 8*sq(SIN_THETAi)*SIN_2PHIs*delK[0]*delK[1];
     var Anum2d = (6 + 2*COS_2THETAs  - COS_2THETAs_minus_PHIs - COS_2THETAs_plus_PHIs + 2*COS_2PHIs)*sq(delK[1]);
+    var Anum2e = (Anum2b + Anum2c + Anum2d);
     var Anum2 = Wi_SQ*(Anum2a + Wp_SQ*(Anum2b + Anum2c + Anum2d));
 
-    var Anum = Wi_SQ*Ws_SQ*Wp_SQ*(Anum1 + Anum2);
+    // var Anum = Wi_SQ*Ws_SQ*Wp_SQ*(Anum1 + Anum2);
+
+    // var Aden = 16*(Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*( sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ));
+    // var A = Anum / Aden;
+
+    var ki = P.n_i * 2 * Math.PI/P.lambda_i;
+    var ks = P.n_s * 2 * Math.PI/P.lambda_s;
+    var kp = P.n_p * 2 * Math.PI/P.lambda_p;
+
+    var z = 0;
+
+    var Q_sR = Ws_SQ,
+        Q_sI = 2*z/ks,
+        Q_iR = Wi_SQ,
+        Q_iI = 2*z/ki,
+        Q_pR = Wp_SQ,
+        Q_pI = 2*z/kp;
+
+    var Q_isR = PhaseMatch.cmultiplyR(Q_iR,Q_iI,Q_sR, Q_sI);
+    var Q_isI = PhaseMatch.cmultiplyI(Q_iR,Q_iI,Q_sR, Q_sI);
+
+    var Q_ispR = PhaseMatch.cmultiplyR(Q_pR,Q_pI,Q_isR, Q_isI);
+    var Q_ispI = PhaseMatch.cmultiplyI(Q_pR,Q_pI,Q_isR, Q_isI);
+
+    var Q_ipR = PhaseMatch.cmultiplyR(Q_iR,Q_iI,Q_pR, Q_pI);
+    var Q_ipI = PhaseMatch.cmultiplyI(Q_iR,Q_iI,Q_pR, Q_pI);
+
+    var Q_spR = PhaseMatch.cmultiplyR(Q_sR,Q_sI,Q_pR, Q_pI);
+    var Q_spI = PhaseMatch.cmultiplyI(Q_sR,Q_sI,Q_pR, Q_pI);
+
+    var Anum1R = Q_spR*Anum1;
+    var Anum1I = Q_spI*Anum1;
+
+    var Anum2aR = Q_sR*Anum2a;
+    var Anum2aI = Q_sI*Anum2a;
+
+    // var Anum2 = Wi_SQ*(Anum2a + Wp_SQ*(Anum2b + Anum2c + Anum2d));
+    var Anum2c1R = Q_sR*Anum2e;
+    var Anum2c1I = Q_sI*Anum2e;
+
+    var Anum2c2R = PhaseMatch.caddR(Anum2aR, Anum2aI, Anum2c1R, Anum2c1I);
+    var Anum2c2I = PhaseMatch.caddI(Anum2aR, Anum2aI, Anum2c1R, Anum2c1I);
+
+    var Anum2R = PhaseMatch.cmultiplyR(Anum2c2R, Anum2c2I, Q_iR, Q_iI);
+    var Anum2I = PhaseMatch.cmultiplyI(Anum2c2R, Anum2c2I, Q_iR, Q_iI);
+
+    // var Anum = Wi_SQ*Ws_SQ*Wp_SQ*(Anum1 + Anum2);
+    var Anum12R = PhaseMatch.caddR(Anum1R, Anum1I, Anum2R, Anum2I);
+    var Anum12I = PhaseMatch.caddI(Anum1R, Anum1I, Anum2R, Anum2I);
+
+    var AnumR = PhaseMatch.cmultiplyR(Q_ispR, Q_ispI, Anum12R, Anum12I);
+    var AnumI = PhaseMatch.cmultiplyI(Q_ispR, Q_ispI, Anum12R, Anum12I);
+
+    var Anum = AnumR;
+    // var Anum = 1;
     var Aden = 16*(Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*( sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ));
+
+    var Aden1R = PhaseMatch.caddR(Q_spR,Q_spI,Q_ipR, Q_ipI);
+    var Aden1I = PhaseMatch.caddI(Q_spR,Q_spI,Q_ipR, Q_ipI);
+
+    var Aden2R = PhaseMatch.caddR(Aden1R,Aden1I,Q_isR, Q_isI);
+    var Aden2I = PhaseMatch.caddI(Aden1R,Aden1I,Q_isR, Q_isI);
+
+    var Aden3R = sq(COS_THETAi)*Q_spR;
+    var Aden3I = sq(COS_THETAi)*Q_spI;
+
+
+    var Aden4R = sq(COS_THETAs)*Q_ipR;
+    var Aden4I = sq(COS_THETAs)*Q_ipI;
+
+    // console.log(Aden4R, ( sq(COS_THETAi)*Wp_SQ*Ws_SQ ));
+
+    var Aden5R = PhaseMatch.caddR(Aden3R, Aden3I, Aden4R, Aden4I);
+    var Aden5I = PhaseMatch.caddI(Aden3R, Aden3I, Aden4R, Aden4I);
+
+    var Aden6R = PhaseMatch.caddR(Aden5R, Aden5I, Q_isR, Q_isI);
+    var Aden6I = PhaseMatch.caddI(Aden5R, Aden5I, Q_isR, Q_isI);
+
+    var Aden7R = PhaseMatch.cmultiplyR(Aden6R, Aden6I, Aden2R,Aden2I);
+    var Aden7I = PhaseMatch.cmultiplyI(Aden6R, Aden6I, Aden2R,Aden2I);
+
+
+
+    var AdenR = Aden7R * 16;
+    var AdenI = Aden7I *16;
+
+    // console.log(Anum, AnumR, Aden, AdenR);
+    var Aden = AdenR;
+
     var A = Anum / Aden;
 
 

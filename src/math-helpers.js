@@ -429,12 +429,12 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
 
 
 // Complex number handling
-PhaseMatch.cmultiplyR = function cmultiplyR(a,ai,b,bi){
-  return a*a -b*b;
+PhaseMatch.cmultiplyR = function cmultiplyR(a,b,c,d){
+  return a*c - b*d;
 };
 
-PhaseMatch.cmultiplyI = function cmultiplyI(a,ai,b,bi){
-   return 2*ai*bi;
+PhaseMatch.cmultiplyI = function cmultiplyI(a,b,c,d){
+   return a*d + b*c;
 };
 
 PhaseMatch.cdivideR = function cdivideR(a,b,c,d){
