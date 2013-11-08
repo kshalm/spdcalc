@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-11-06
+ * phasematchjs v0.0.1a - 2013-11-07
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -2673,6 +2673,33 @@ PhaseMatch.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
     }
 
     return result*dx*dy;
+};
+
+
+
+// Complex number handling
+PhaseMatch.cmultiplyR = function cmultiplyR(a,ai,b,bi){
+  return a*a -b*b;
+};
+
+PhaseMatch.cmultiplyI = function cmultiplyI(a,ai,b,bi){
+   return 2*ai*bi;
+};
+
+PhaseMatch.cdivideR = function cdivideR(a,b,c,d){
+  return (a*c+b*d)/(sq(c)+sq(d));
+};
+
+PhaseMatch.cdivideI = function cdivideI(a,b,c,d){
+  return (b*c-a*d)/(sq(c)+sq(d));
+};
+
+PhaseMatch.caddR = function caddR(a,ai,b,bi){
+  return a+b;
+};
+
+PhaseMatch.caddI = function caddI(a,ai,b,bi){
+  return ai+bi;
 };
 
 (function(){
