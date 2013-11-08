@@ -408,7 +408,7 @@
         },
 
         set_zint : function (){
-            var zslice = 200e-6; //length of each crystal slice
+            var zslice = 50e-6; //length of each crystal slice
             var nslices = Math.round(this.L/zslice);
             if (nslices < 10){
                 nslices = 10;

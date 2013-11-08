@@ -131,6 +131,7 @@ define(
                     )
                     ;
 
+                PM = PhaseMatch.normalize(PM);
                 // console.log(PM);
                 // var endTime = new Date();
                 // var timeDiff = (endTime - startTime);
