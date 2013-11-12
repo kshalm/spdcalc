@@ -453,6 +453,30 @@ PhaseMatch.caddI = function caddI(a,ai,b,bi){
   return ai+bi;
 };
 
+// Returns real part of the principal square root of a complex number
+PhaseMatch.csqrtR = function csqrtR(a,ai){
+  var r = Math.sqrt(sq(a)+sq(ai));
+  var arg = Math.atan(ai,a);
+  var real = Math.sqrt(r)*Math.cos(arg/2);
+  // return -real;
+  return PhaseMatch.sign(real)*real; //returns the real value
+};
+
+// Returns imag part of the principal square root of a complex number
+PhaseMatch.csqrtI = function csqrtI(a,ai){
+  var r = Math.sqrt(sq(a)+sq(ai));
+  var arg = Math.atan(ai,a);
+  var real = Math.sqrt(r)*Math.cos(arg/2);
+  var imag = Math.sqrt(r)*Math.cos(arg/2);
+  // return imag;
+  return PhaseMatch.sign(real)*imag; //returns the imag value
+};
+
+// http://jsperf.com/signs/3
+PhaseMatch.sign = function sign(x) {
+  return typeof x === 'number' ? x ? x < 0 ? -1 : 1 : x === x ? 0 : NaN : NaN;
+};
+
 (function(){
 
     //Implementation of Nelder-Mead Simplex Linear Optimizer

@@ -68,6 +68,7 @@ PhaseMatch.calc_JSI = function calc_JSI(props, ls_start, ls_stop, li_start, li_s
 
         JSI[i] = sq(JSA[0][i]) + sq(JSA[1][i]);
     }
+    JSI = PhaseMatch.normalize(JSI);
     return JSI;
 
 };
