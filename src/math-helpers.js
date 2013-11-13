@@ -458,7 +458,7 @@ PhaseMatch.csqrtR = function csqrtR(a,ai){
   var r = Math.sqrt(sq(a)+sq(ai));
   var arg = Math.atan2(ai,a);
   var real = Math.sqrt(r)*Math.cos(arg/2);
-  // return -real;
+  // return real;
   return PhaseMatch.sign(real)*real; //returns the real value
 };
 

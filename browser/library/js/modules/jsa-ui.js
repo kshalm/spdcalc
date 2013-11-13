@@ -131,7 +131,7 @@ define(
                     )
                     ;
 
-                PM = PhaseMatch.normalize(PM);
+                // PM = PhaseMatch.normalize(PM);
                 // console.log(PM);
                 // var endTime = new Date();
                 // var timeDiff = (endTime - startTime);
@@ -165,8 +165,8 @@ define(
                 self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
-                var A = 4;
-                var B = 9;
+                // var A = 4;
+                // var B = 9;
 
                 // console.log(PhaseMatch.csqrtR(A,B), PhaseMatch.csqrtI(A,B));
 

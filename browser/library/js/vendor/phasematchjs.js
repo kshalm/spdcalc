@@ -2707,7 +2707,7 @@ PhaseMatch.csqrtR = function csqrtR(a,ai){
   var r = Math.sqrt(sq(a)+sq(ai));
   var arg = Math.atan2(ai,a);
   var real = Math.sqrt(r)*Math.cos(arg/2);
-  // return -real;
+  // return real;
   return PhaseMatch.sign(real)*real; //returns the real value
 };
 
@@ -5388,7 +5388,11 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
     var PMimag = new Float64Array( N );
 
     var maxpm = 0;
-    var C_check = -1;
+
+    // calculate normalization
+    var PMN = PhaseMatch.phasematch(P);
+    var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
+
 
     for (i=0; i<N; i++){
         var index_s = i % dim;
@@ -5401,11 +5405,13 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         var PM = PhaseMatch.phasematch(P);
-        PMreal[i] = PM[0];
-        PMimag[i] = PM[1];
+        PMreal[i] = PM[0]/norm;
+        PMimag[i] = PM[1]/norm;
         // C_check = PM[2];
         // if (PM[i]>maxpm){maxpm = PM[i];}
     }
+
+
 
     // console.log("Approx Check, ", C_check);
     return [PMreal, PMimag];
@@ -5770,6 +5776,12 @@ PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start,
     }
 
     // Find Idler distribution
+    if (P.type === 0 || P.type === 1){
+        //swap signal and idler frequencies.
+        var lambda_s = P.lambda_s;
+        P.lambda_s = P.lambda_i;
+        P.lambda_i = lambda_s;
+    }
     if (P.type === 2){
         // console.log("switching");
         P.type = 3;
