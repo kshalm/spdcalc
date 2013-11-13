@@ -165,6 +165,11 @@ define(
                 self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
+                var A = 4;
+                var B = 9;
+
+                // console.log(PhaseMatch.csqrtR(A,B), PhaseMatch.csqrtI(A,B));
+
                 // console.log(PM);
                 // for (var j=0; j<PM.length; j++){
                 //     if (PM[j]>0){
