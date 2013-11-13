@@ -2705,7 +2705,7 @@ PhaseMatch.caddI = function caddI(a,ai,b,bi){
 // Returns real part of the principal square root of a complex number
 PhaseMatch.csqrtR = function csqrtR(a,ai){
   var r = Math.sqrt(sq(a)+sq(ai));
-  var arg = Math.atan(ai,a);
+  var arg = Math.atan2(ai,a);
   var real = Math.sqrt(r)*Math.cos(arg/2);
   // return -real;
   return PhaseMatch.sign(real)*real; //returns the real value
@@ -2714,9 +2714,9 @@ PhaseMatch.csqrtR = function csqrtR(a,ai){
 // Returns imag part of the principal square root of a complex number
 PhaseMatch.csqrtI = function csqrtI(a,ai){
   var r = Math.sqrt(sq(a)+sq(ai));
-  var arg = Math.atan(ai,a);
+  var arg = Math.atan2(ai,a);
   var real = Math.sqrt(r)*Math.cos(arg/2);
-  var imag = Math.sqrt(r)*Math.cos(arg/2);
+  var imag = Math.sqrt(r)*Math.sin(arg/2);
   // return imag;
   return PhaseMatch.sign(real)*imag; //returns the imag value
 };
@@ -3582,101 +3582,83 @@ PhaseMatch.sign = function sign(x) {
         var CR = PhaseMatch.cdivideR(CnumR, CnumI, CdenR, CdenI),
             CI = PhaseMatch.cdivideI(CnumR, CnumI, CdenR, CdenI);
 
-        var coeff1R = PhaseMatch.caddR(Q_isR, Q_isI, Q_ipR, Q_ipI);
-        var coeff1I = PhaseMatch.caddI(Q_isR, Q_isI, Q_ipR, Q_ipI);
+        // var coeff1R = PhaseMatch.caddR(Q_isR, Q_isI, Q_ipR, Q_ipI);
+        // var coeff1I = PhaseMatch.caddI(Q_isR, Q_isI, Q_ipR, Q_ipI);
 
-        var coeffinvR = PhaseMatch.caddR(coeff1R, coeff1I, Q_spR, Q_spI);
-        var coeffinvI = PhaseMatch.caddI(coeff1R, coeff1I, Q_spR, Q_spI);
-        // Math.sqrt(Wp_SQ*Ws_SQ*Wi_SQ)
-        var coeffR = PhaseMatch.cdivideR(Math.sqrt(Wp_SQ*Ws_SQ*Wi_SQ), 0, coeffinvR, coeffinvI);
-        var coeffI = PhaseMatch.cdivideI(Math.sqrt(Wp_SQ*Ws_SQ*Wi_SQ), 0, coeffinvR, coeffinvI);
+        // var coeffinvR = PhaseMatch.caddR(coeff1R, coeff1I, Q_spR, Q_spI);
+        // var coeffinvI = PhaseMatch.caddI(coeff1R, coeff1I, Q_spR, Q_spI);
+        // // Math.sqrt(Wp_SQ*Ws_SQ*Wi_SQ)
+        // var coeffR = PhaseMatch.cdivideR(Math.sqrt(Wp_SQ*Ws_SQ*Wi_SQ), 0, coeffinvR, coeffinvI);
+        // var coeffI = PhaseMatch.cdivideI(Math.sqrt(Wp_SQ*Ws_SQ*Wi_SQ), 0, coeffinvR, coeffinvI);
 
-        // // gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
-        // var gaussR = PhaseMatch.cdivideR(1/Math.sqrt(Math.PI*2) * Math.sqrt(Ws_SQ * Wi_SQ *Wp_SQ), 0 , Q_ispR,Q_ispI),
-        //     gaussI = PhaseMatch.cdivideI(1/Math.sqrt(Math.PI*2) * Math.sqrt(Ws_SQ * Wi_SQ *Wp_SQ), 0 , Q_ispR,Q_ispI);
+        // gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
+        var gN = sq(1/Math.sqrt(Math.PI*2))*1/Math.sqrt(Math.PI*2),
+            gaussR = PhaseMatch.cdivideR(gN * Math.sqrt(Ws_SQ * Wi_SQ *Wp_SQ), 0 , Q_ispR,Q_ispI),
+            gaussI = PhaseMatch.cdivideI(gN * Math.sqrt(Ws_SQ * Wi_SQ *Wp_SQ), 0 , Q_ispR,Q_ispI);
 
-        // // xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
-        // var xconst1R = PhaseMatch.cdivideR((sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs)), 0, Q_iR, Q_iI),
-        //     xconst1I = PhaseMatch.cdivideI((sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs)), 0, Q_iR, Q_iI),
-        //     // xconst1 += 1/Wp_SQ;
-        //     xconst2R = PhaseMatch.cdivideR(1, 0, Q_pR, Q_pI),
-        //     xconst2I = PhaseMatch.cdivideI(1, 0, Q_pR, Q_pI),
-        //     xconst3R = PhaseMatch.caddR(xconst1R,xconst1I,xconst2R,xconst2I),
-        //     xconst3I = PhaseMatch.caddI(xconst1R,xconst1I,xconst2R,xconst2I),
-        //     // xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-        //     xconst4R = PhaseMatch.cdivideR(sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs), 0, Q_sR, Q_sI),
-        //     xconst4I = PhaseMatch.cdivideI(sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs), 0, Q_sR, Q_sI),
-        //     xconst5R = PhaseMatch.caddR(xconst3R,xconst3I,xconst4R,xconst4I),
-        //     xconst5I = PhaseMatch.caddI(xconst3R,xconst3I,xconst4R,xconst4I),
-        //     // Math.sqrt(xconst1);
-        //     xconst6R = PhaseMatch.csqrtR(xconst5R, xconst5I),
-        //     xconst6I = PhaseMatch.csqrtI(xconst5R, xconst5I),
-        //     // xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
-        //     xconstR = PhaseMatch.cdivideR(Math.sqrt(2*Math.PI),0,xconst6R, xconst6I),
-        //     xconstI = PhaseMatch.cdivideI(Math.sqrt(2*Math.PI),0,xconst6R, xconst6I);
+        // xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
+        var xconst1R = PhaseMatch.cdivideR((sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs)), 0, Q_iR, Q_iI),
+            xconst1I = PhaseMatch.cdivideI((sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs)), 0, Q_iR, Q_iI),
+            // xconst1 += 1/Wp_SQ;
+            xconst2R = PhaseMatch.cdivideR(1, 0, Q_pR, Q_pI),
+            xconst2I = PhaseMatch.cdivideI(1, 0, Q_pR, Q_pI),
+            xconst3R = PhaseMatch.caddR(xconst1R,xconst1I,xconst2R,xconst2I),
+            xconst3I = PhaseMatch.caddI(xconst1R,xconst1I,xconst2R,xconst2I),
+            // xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
+            xconst4R = PhaseMatch.cdivideR(sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs), 0, Q_sR, Q_sI),
+            xconst4I = PhaseMatch.cdivideI(sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs), 0, Q_sR, Q_sI),
+            xconst5R = PhaseMatch.caddR(xconst3R,xconst3I,xconst4R,xconst4I),
+            xconst5I = PhaseMatch.caddI(xconst3R,xconst3I,xconst4R,xconst4I),
+            // Math.sqrt(xconst1);
+            xconst6R = PhaseMatch.csqrtR(xconst5R, xconst5I),
+            xconst6I = PhaseMatch.csqrtI(xconst5R, xconst5I),
+            // xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
+            xconstR = PhaseMatch.cdivideR(Math.sqrt(2*Math.PI),0,xconst6R, xconst6I),
+            xconstI = PhaseMatch.cdivideI(Math.sqrt(2*Math.PI),0,xconst6R, xconst6I);
 
-        // // yconst numerator
-        // // yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ ));
-        // //
-        // // (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))
-        // //
-        // var ynum1R = PhaseMatch.caddR(Q_spR,Q_spI,Q_ipR,Q_ipI),
-        //     ynum1I = PhaseMatch.caddI(Q_spR,Q_spI,Q_ipR,Q_ipI),
-        //     ynum2R = PhaseMatch.caddR(ynum1R,ynum1I,Q_isR,Q_isI),
-        //     ynum2I = PhaseMatch.caddI(ynum1R,ynum1I,Q_isR,Q_isI),
-        //     // (sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ )
-        //     ynum3R = PhaseMatch.caddR(sq(COS_THETAs)*Q_ipR, sq(COS_THETAs)*Q_ipI, Q_isR, Q_isI),
-        //     ynum3I = PhaseMatch.caddI(sq(COS_THETAs)*Q_ipR, sq(COS_THETAs)*Q_ipI, Q_isR, Q_isI),
-        //     ynum4R = PhaseMatch.caddR(ynum3R, ynum3I, sq(COS_THETAi)*Q_spR, sq(COS_THETAi)*Q_spI),
-        //     ynum4I = PhaseMatch.caddI(ynum3R, ynum3I, sq(COS_THETAi)*Q_spR, sq(COS_THETAi)*Q_spI),
-        //     // (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ ));
-        //     ynumR = PhaseMatch.cmultiplyR(ynum2R,ynum2I,ynum4R,ynum4I),
-        //     ynumI = PhaseMatch.cmultiplyI(ynum2R,ynum2I,ynum4R,ynum4I);
-
-
-        // // var ycoeffaR = sq(COS_THETAi)*Q_spR,
-        // //     ycoeffaI = sq(COS_THETAi)*Q_spI,
-        // //     ycoeffbR = sq(COS_THETAi)*Q_ipR,
-        // //     ycoeffbI = sq(COS_THETAi)*Q_ipI,
-        // //     ycoeffcR = sq(COS_THETAi)*Q_isR,
-        // //     ycoeffcI = sq(COS_THETAi)*Q_isI,
-        // //     ycoeffdR = PhaseMatch.caddR(ycoeffaR, ycoeffaI, ycoeffbR, ycoeffbI),
-        // //     ycoeffdI = PhaseMatch.caddI(ycoeffaR, ycoeffaI, ycoeffbR, ycoeffbI),
-        // //     ycoeffeR = PhaseMatch.caddR(ycoeffdR, ycoeffdI, ycoeffcR, ycoeffcI),
-        // //     ycoeffeI = PhaseMatch.caddI(ycoeffdR, ycoeffdI, ycoeffcR, ycoeffcI),
-        // //     ycoeffgR = sq(COS_THETAs) * Q_ipR,
-        // //     ycoeffgI = sq(COS_THETAs) * Q_ipI,
-        // //     ycoeffhR = PhaseMatch.caddR(ycoeffgR, ycoeffgI, Q_isR, Q_isI),
-        // //     ycoeffhI = PhaseMatch.caddI(ycoeffgR, ycoeffgI, Q_isR, Q_isI),
-        // //     ycoeffiR = PhaseMatch.caddR(ycoeffhR, ycoeffhI, Q_spR, Q_spI),
-        // //     ycoeffiI = PhaseMatch.caddI(ycoeffhR, ycoeffhI, Q_spR, Q_spI),
-        // //     ynumR = PhaseMatch.cmultiplyR(ycoeffeR, ycoeffeI, ycoeffiR, ycoeffiI),
-        // //     ynumI = PhaseMatch.cmultiplyI(ycoeffeR, ycoeffeI, ycoeffiR, ycoeffiI);
-
-        // // // yconst denominator
-        // // // yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
-        // var c1 = (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)),
-        //     yden1R = PhaseMatch.caddR(c1*Q_ipR, c1*Q_ipI, Q_isR, Q_isI),
-        //     yden1I = PhaseMatch.caddI(c1*Q_ipR, c1*Q_ipI, Q_isR, Q_isI),
-        //     c2 = (sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs)),
-        //     yden2R = PhaseMatch.caddR(c2*Q_spR, c2*Q_spI, yden1R, yden1I),
-        //     yden2I = PhaseMatch.caddI(c2*Q_spR, c2*Q_spI, yden1R, yden1I),
-        //     ydenR = PhaseMatch.cmultiplyR(Q_ispR,Q_ispI, yden2R, yden2I),
-        //     ydenI = PhaseMatch.cmultiplyI(Q_ispR,Q_ispI, yden2R, yden2I);
-
-        // // yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
-        // var yconstd1R = PhaseMatch.cdivideR(ynumR, ynumI, ydenR, ydenI),
-        //     yconstd1I = PhaseMatch.cdivideI(ynumR, ynumI, ydenR, ydenI),
-        //     yconstd2R = PhaseMatch.csqrtR(yconstd1R, yconstd1I),
-        //     yconstd2I = PhaseMatch.csqrtI(yconstd1R, yconstd1I),
-        //     yconstR = PhaseMatch.cdivideR(Math.sqrt(2*Math.PI), 0, yconstd2R, yconstd2I),
-        //     yconstI = PhaseMatch.cdivideI(Math.sqrt(2*Math.PI), 0, yconstd2R, yconstd2I);
+        // yconst numerator
+        // yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ ));
+        //
+        // (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))
+        //
+        var ynum1R = PhaseMatch.caddR(Q_spR,Q_spI,Q_ipR,Q_ipI),
+            ynum1I = PhaseMatch.caddI(Q_spR,Q_spI,Q_ipR,Q_ipI),
+            ynum2R = PhaseMatch.caddR(ynum1R,ynum1I,Q_isR,Q_isI),
+            ynum2I = PhaseMatch.caddI(ynum1R,ynum1I,Q_isR,Q_isI),
+            // (sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ )
+            ynum3R = PhaseMatch.caddR(sq(COS_THETAs)*Q_ipR, sq(COS_THETAs)*Q_ipI, Q_isR, Q_isI),
+            ynum3I = PhaseMatch.caddI(sq(COS_THETAs)*Q_ipR, sq(COS_THETAs)*Q_ipI, Q_isR, Q_isI),
+            ynum4R = PhaseMatch.caddR(ynum3R, ynum3I, sq(COS_THETAi)*Q_spR, sq(COS_THETAi)*Q_spI),
+            ynum4I = PhaseMatch.caddI(ynum3R, ynum3I, sq(COS_THETAi)*Q_spR, sq(COS_THETAi)*Q_spI),
+            // (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ ));
+            ynumR = PhaseMatch.cmultiplyR(ynum2R,ynum2I,ynum4R,ynum4I),
+            ynumI = PhaseMatch.cmultiplyI(ynum2R,ynum2I,ynum4R,ynum4I);
 
 
-        // var coeffaR = PhaseMatch.cmultiplyR(gaussR, gaussI, xconstR, xconstI),
-        //     coeffaI = PhaseMatch.cmultiplyI(gaussR, gaussI, xconstR, xconstI),
-        //     coeffR = PhaseMatch.cmultiplyR(coeffaR, coeffaI, yconstR, yconstI),
-        //     coeffI = PhaseMatch.cmultiplyI(coeffaR, coeffaI, yconstR, yconstI);
+        // // yconst denominator
+        // // yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
+        var c1 = (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)),
+            yden1R = PhaseMatch.caddR(c1*Q_ipR, c1*Q_ipI, Q_isR, Q_isI),
+            yden1I = PhaseMatch.caddI(c1*Q_ipR, c1*Q_ipI, Q_isR, Q_isI),
+            c2 = (sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs)),
+            yden2R = PhaseMatch.caddR(c2*Q_spR, c2*Q_spI, yden1R, yden1I),
+            yden2I = PhaseMatch.caddI(c2*Q_spR, c2*Q_spI, yden1R, yden1I),
+            ydenR = PhaseMatch.cmultiplyR(Q_ispR,Q_ispI, yden2R, yden2I),
+            ydenI = PhaseMatch.cmultiplyI(Q_ispR,Q_ispI, yden2R, yden2I);
+
+        // yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
+        var yconstd1R = PhaseMatch.cdivideR(ynumR, ynumI, ydenR, ydenI),
+            yconstd1I = PhaseMatch.cdivideI(ynumR, ynumI, ydenR, ydenI),
+            yconstd2R = PhaseMatch.csqrtR(yconstd1R, yconstd1I),
+            yconstd2I = PhaseMatch.csqrtI(yconstd1R, yconstd1I),
+            yconstR = PhaseMatch.cdivideR(Math.sqrt(2*Math.PI), 0, yconstd2R, yconstd2I),
+            yconstI = PhaseMatch.cdivideI(Math.sqrt(2*Math.PI), 0, yconstd2R, yconstd2I);
+
+
+        var coeffaR = PhaseMatch.cmultiplyR(gaussR, gaussI, xconstR, xconstI),
+            coeffaI = PhaseMatch.cmultiplyI(gaussR, gaussI, xconstR, xconstI),
+            coeffR = PhaseMatch.cmultiplyR(coeffaR, coeffaI, yconstR, yconstI),
+            coeffI = PhaseMatch.cmultiplyI(coeffaR, coeffaI, yconstR, yconstI);
 
 
         // // Next the constant that remains after analytically integrating over y
@@ -5217,10 +5199,10 @@ PhaseMatch.Crystals('KDP-1', {
         },
 
         set_zint : function (){
-            var zslice = 50e-6; //length of each crystal slice
+            var zslice = 100e-6; //length of each crystal slice
             var nslices = Math.round(this.L/zslice);
-            if (nslices < 10){
-                nslices = 10;
+            if (nslices < 4){
+                nslices = 4;
             }
 
             // if (nslices>30){

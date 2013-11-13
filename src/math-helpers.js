@@ -456,7 +456,7 @@ PhaseMatch.caddI = function caddI(a,ai,b,bi){
 // Returns real part of the principal square root of a complex number
 PhaseMatch.csqrtR = function csqrtR(a,ai){
   var r = Math.sqrt(sq(a)+sq(ai));
-  var arg = Math.atan(ai,a);
+  var arg = Math.atan2(ai,a);
   var real = Math.sqrt(r)*Math.cos(arg/2);
   // return -real;
   return PhaseMatch.sign(real)*real; //returns the real value
@@ -465,9 +465,9 @@ PhaseMatch.csqrtR = function csqrtR(a,ai){
 // Returns imag part of the principal square root of a complex number
 PhaseMatch.csqrtI = function csqrtI(a,ai){
   var r = Math.sqrt(sq(a)+sq(ai));
-  var arg = Math.atan(ai,a);
+  var arg = Math.atan2(ai,a);
   var real = Math.sqrt(r)*Math.cos(arg/2);
-  var imag = Math.sqrt(r)*Math.cos(arg/2);
+  var imag = Math.sqrt(r)*Math.sin(arg/2);
   // return imag;
   return PhaseMatch.sign(real)*imag; //returns the imag value
 };
