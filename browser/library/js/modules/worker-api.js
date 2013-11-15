@@ -82,8 +82,28 @@ define(
                 return self.ready.then(function(){
 
                     var send = {
-                        id: self.id,
                         args: args
+                    };
+
+                    if (typeof what === 'string'){
+                        send.method = what;
+                    } else {
+                        send.fn = what.toString();
+                    }
+
+                    return self.worker.exec(self.name, send);
+                });
+            },
+            map: function( what, args, transfer ){
+
+                var self = this;
+
+                return self.ready.then(function(){
+
+                    var send = {
+                        args: args,
+                        map: true,
+                        transfer: transfer
                     };
 
                     if (typeof what === 'string'){

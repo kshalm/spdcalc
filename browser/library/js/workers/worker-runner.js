@@ -28,6 +28,47 @@ function runner( name, schema ){
 }
 
 
+function execute( cap, cmd, args ){
+    if ( args.method ){
+
+        return cap[ args.method ]( args.args );
+
+    } else if ( args.fn ){
+        
+        var fn = eval( '(' + args.fn + ')' );
+        return fn( cap );
+    }
+}
+
+function map( cap, cmd, args ){
+    var result, i, l;
+    var arr = args.args;
+    if (args.transfer){
+        result = new Float64Array( arr.length );
+    } else {
+        result = [];
+    }
+
+
+    if ( args.method ){
+
+        for ( i = 0, l = arr.length; i < l; ++i ){
+            
+            result[ i ] = cap[ args.method ]( arr[ i ] );
+        }
+        return result;
+
+    } else if ( args.fn ){
+        
+        var fn = eval( '(' + args.fn + ')' );
+        for ( i = 0, l = arr.length; i < l; ++i ){
+            
+            result[ i ] = fn( cap, arr[ i ] );
+        }
+        return result;
+    }
+}
+
 var _runners = {};
 
 function run( cmd, args ){
@@ -49,15 +90,11 @@ function run( cmd, args ){
 
     } else if ( cap ){
 
-        if ( args.method ){
+        if ( args.map ){
+            return map( cap, cmd, args );
+        } else {
 
-            return cap[ args.method ]( args.args );
-
-        } else if ( args.fn ){
-            // not implemented
-            return {
-                error: 'Not implemented'
-            };
+            return execute( cap, cmd, args );
         }
 
     } else {
@@ -69,7 +106,7 @@ function run( cmd, args ){
 
 function W( name, schema ){
 
-	return runner( name, schema );
+    return runner( name, schema );
 }
 
 self.addEventListener('message', function( e ){
@@ -77,8 +114,9 @@ self.addEventListener('message', function( e ){
     var jobId = e.data.jobId;
     var cmd = e.data.cmd;
     var args = e.data.args;
+    var result = run( cmd, args );
     
-    self.postMessage({ jobId: jobId, result: run( cmd, args ) });
+    self.postMessage({ jobId: jobId, result: result }, result.buffer? [result.buffer] : undefined);
 }, false);
 
 
