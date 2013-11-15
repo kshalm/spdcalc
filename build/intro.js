@@ -11,5 +11,6 @@
     }
 }(this, function() {
 
-'use strict';
+var window = window || self || this;
+// 'use strict';
 var PhaseMatch = { util: {} };

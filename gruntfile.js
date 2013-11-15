@@ -63,7 +63,7 @@ module.exports = function(grunt) {
             main: {
                 // modifiers for prepared builds
                 // backbone, csp, legacy, mobile, strict, underscore
-                // modifier: 'modern',
+                modifier: 'modern',
                 // output location
                 dest: 'build/lodash.js',
                 options: {
