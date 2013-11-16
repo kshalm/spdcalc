@@ -125,8 +125,15 @@ define(
             },
 
             updateTitle: function( PM ){
+                var self = this;
+                console.log("starting the title");
+                // return 0;
+                return self.asyncJSA.exec('doCalcSchmidt', [PM], true)
+                        .then(function( S ){
+                            console.log("finished the title");
+                            self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
+                        });
 
-                return myAlg.exec('calc_Schmidt', [PM]);
             },
 
             calc: function( props ){
@@ -146,44 +153,31 @@ define(
                     ])
                     .then(function( PM ){
                         
-                        // var p = updateTitle( PM );
+                        
                         // doplot();
-                        // return p;
-                        
-
-                        return PM; // this value is passed on to the next "then()"
-
-                    }).then(function( PM ){
-
-                        console.log(PM)
-                        
-                        if (props.brute_force){
-                            var jsa2d = PhaseMatch.create_2d_array(PM, props.brute_dim, props.brute_dim);
-                        }
-                        else{
-                            var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
-                        }
-
-                        if (isNaN(PM[0])){
-                            var S = 0;
-                        }
-                        else {
-                            var S= PhaseMatch.calc_Schmidt(jsa2d);
-                        }
-
-                        // props.calc_walkoff_angles();
-                        // console.log("Walkoff anlge", props.walkoff_p*180/Math.PI);
-
-                        self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
-                        // console.log(jsa2d[25]);
+                        var p = self.updateTitle( PM );
                         self.data = PM;
-                        // console.log(PM);
-
-                        // self.plot.setZRange([0, 180]);
                         self.plot.setZRange([0,Math.max.apply(null,PM)]);
                         self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+                        self.draw();
+                        return p;
                     });
+                       
+                    // }).then(function( PM ){
+
+                    //     // console.log(PM)
+                        
+                        
+                    //     // console.log(jsa2d[25]);
+                    //     
+                    //     // console.log(PM);
+
+                    //     // self.plot.setZRange([0, 180]);
+                    //     self.plot.setZRange([0,Math.max.apply(null,PM)]);
+                    //     self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
+                    //     self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+                    // });
 
 
 
@@ -355,7 +349,7 @@ define(
             },
 
             draw: function(){
-
+                // console.log('drawing');
                 var self = this
                     ,data = self.data
                     ;

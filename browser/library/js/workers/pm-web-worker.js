@@ -29,6 +29,23 @@ W('jsaWorker', {
             li_stop,
             grid_size
         );
-    }
+    }, 
+
+    doCalcSchmidt: function( args ){
+    	// console.log("working");
+    	var PM = args[0];
+    	console.log(args);
+    	// assumes PM is an array with dim^2 elements
+    	var dim = Math.sqrt(PM.length);
+        var jsa2d = PhaseMatch.create_2d_array(PM, dim, dim);
+
+    	if (isNaN(PM[0])){
+            return  0;
+        }
+        else {
+        	return  PhaseMatch.calc_Schmidt(jsa2d);
+   		}
+
+   	}
 });
 
