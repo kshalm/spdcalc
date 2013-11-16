@@ -199,10 +199,11 @@ define(
 
                     self.calculating = false;
 
-                    self.draw();
+                    when(self.draw()).then(function(){
 
-                    self.spinner( false );
-                    self.emit('refresh');
+                        self.spinner( false );
+                        self.emit('refresh');
+                    });
                 });
             },
 
