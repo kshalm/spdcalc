@@ -193,14 +193,23 @@ define(
                     self.autocalcPlotOpts();
                 }
 
+                self.spinner( true );
+
                 when(self.calc( self.parameters.getProps() )).then(function(){
 
                     self.calculating = false;
 
-                    self.draw();
+                    when(self.draw()).then(function(){
 
-                    self.emit('refresh');
+                        self.spinner( false );
+                        self.emit('refresh');
+                    });
                 });
+            },
+
+            spinner: function( tog ){
+
+                this.getMainPanel().toggleClass('spinner', tog);
             },
 
             autocalcPlotOpts: function(){
