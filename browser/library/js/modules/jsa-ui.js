@@ -10,7 +10,6 @@ define(
         'modules/converter',
 
         'worker!workers/pm-web-worker.js',
-        'modules/worker-api',
 
         'tpl!templates/jsa-layout.tpl',
         'tpl!templates/jsa-docs.tpl'
@@ -26,7 +25,6 @@ define(
         converter,
 
         pmWorker,
-        W,
 
         tplJSALayout,
         tplDocsJSA
@@ -44,7 +42,10 @@ define(
 
             constructor: function(){
                 SkeletonUI.prototype.constructor.apply(this, arguments);
-                this.asyncJSA = W( 'jsaWorker', pmWorker );
+                this.asyncJSA1 = pmWorker.spawn( 'jsaWorker' );
+                this.asyncJSA2 = pmWorker.spawn( 'jsaWorker' );
+                this.asyncJSA3 = pmWorker.spawn( 'jsaWorker' );
+                this.asyncJSA4 = pmWorker.spawn( 'jsaWorker' );
             },
             tplPlots: tplJSALayout,
             tplDoc: tplDocsJSA,
@@ -136,24 +137,76 @@ define(
                 
                 var self = this;
 
-                // IMPORTANT: we need to return the final promise
-                // so that the Skeleton UI knows when to run the draw command
-                return self.asyncJSA.exec('doJSACalc', [
-                        props.get(),
+                var propsJSON = props.get()
+                    ,ls_range = (self.plotOpts.get('ls_stop') - self.plotOpts.get('ls_start'))
+                    ,li_range = (self.plotOpts.get('li_stop') - self.plotOpts.get('li_start'))
+                    ,ls_mid = 0.5 * ls_range + self.plotOpts.get('ls_start')
+                    ,li_mid = 0.5 * li_range + self.plotOpts.get('li_start')
+                    ,grid_size = self.plotOpts.get('grid_size')/2
+                    ;
+
+                // I think this is causing some rounding errors in the ls,li ranges.
+                // I think that can be dealt with in the calc_JSA function and appropriately
+                // Math.floor or Math.ceil the chunks in a predictable manner.
+                var p1 = self.asyncJSA1.exec('doJSACalc', [
+                        propsJSON,
                         self.plotOpts.get('ls_start'),
+                        ls_mid,
+                        self.plotOpts.get('li_start'),
+                        li_mid,
+                        grid_size
+                    ]);
+
+                var p2 = self.asyncJSA2.exec('doJSACalc', [
+                        propsJSON,
+                        ls_mid,
                         self.plotOpts.get('ls_stop'),
                         self.plotOpts.get('li_start'),
-                        self.plotOpts.get('li_stop'),
-                        self.plotOpts.get('grid_size')
-                    ])
-                    .then(function( PM ){
-                        
-                        // var p = updateTitle( PM );
-                        // doplot();
-                        // return p;
-                        
+                        li_mid,
+                        grid_size
+                    ]);
 
-                        return PM; // this value is passed on to the next "then()"
+                var p3 = self.asyncJSA3.exec('doJSACalc', [
+                        propsJSON,
+                        self.plotOpts.get('ls_start'),
+                        ls_mid,
+                        li_mid,
+                        self.plotOpts.get('li_stop'),
+                        grid_size
+                    ]);
+
+                var p4 = self.asyncJSA4.exec('doJSACalc', [
+                        propsJSON,
+                        ls_mid,
+                        self.plotOpts.get('ls_stop'),
+                        li_mid,
+                        self.plotOpts.get('li_stop'),
+                        grid_size
+                    ]);
+                   
+                // IMPORTANT: we need to return the final promise
+                // so that the Skeleton UI knows when to run the draw command
+                return when.join( p1, p2, p3, p4 ).then(function( values ){
+                        
+                        // put the results back together
+                        var result1 = new Float64Array( 2 * grid_size * grid_size );
+                        var result2 = new Float64Array( 2 * grid_size * grid_size );
+                        
+                        for ( var i = 0, l = grid_size; i < l; i++ ){
+                            
+                            result1.set(values[0].subarray(l * i, l * (i+1)), 2*i * l);
+                            result1.set(values[1].subarray(l * i, l * (i+1)), (2*i+1) * l);
+
+                            result2.set(values[2].subarray(l * i, l * (i+1)), 2*i * l);
+                            result2.set(values[3].subarray(l * i, l * (i+1)), (2*i+1) * l);
+                        }
+
+                        var arr = new Float64Array( 4 * grid_size * grid_size );
+
+                        arr.set( result2, 0 );
+                        arr.set( result1, result1.length );
+                        
+                        return arr; // this value is passed on to the next "then()"
 
                     }).then(function( PM ){
 
@@ -183,6 +236,8 @@ define(
                         self.plot.setZRange([0,Math.max.apply(null,PM)]);
                         self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+                    }).otherwise(function(){
+                        console.log('error', arguments)
                     });
 
 

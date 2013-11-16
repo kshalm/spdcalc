@@ -41,7 +41,7 @@ require.config({
         'json': 'plugins/json',
         'tpl' : 'plugins/tpl',
         'async' : 'plugins/async',
-        'worker' : 'plugins/webworker',
+        'worker' : 'modules/worker-api',
 
         // Templating
         'dot' : 'vendor/doT',
