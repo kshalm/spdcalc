@@ -17,13 +17,15 @@ W('jsaWorker', {
         var lambda_s = args[1],
         	lambda_i = args[2],
             grid_size = args[3]
+            norm = args[4];
             ;
 
         return PhaseMatch.calc_JSI_p(
             this.props,
             lambda_s,
             lambda_i,
-            grid_size
+            grid_size,
+            norm
         );
     }, 
 

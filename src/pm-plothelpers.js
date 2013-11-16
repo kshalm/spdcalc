@@ -81,7 +81,7 @@ PhaseMatch.calc_JSI = function calc_JSI(props, ls_start, ls_stop, li_start, li_s
 
 };
 
-PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim){
+PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
 
     props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
@@ -114,8 +114,10 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim){
     var maxpm = 0;
 
     // calculate normalization
-    var PMN = PhaseMatch.phasematch(P);
-    var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
+    // var PMN = PhaseMatch.phasematch(P);
+    // var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
+
+
 
 
     for (i=0; i<N; i++){
@@ -144,12 +146,11 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim){
 
 
 
-PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim){
+PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm){
     var N = dim * dim;
-    console.log("dimension",dim, "lambda_S", lambda_s);
     var JSI = new Float64Array( N );
 
-    var JSA = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim);
+    var JSA = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
 
     for (var i=0; i<N; i++){
 

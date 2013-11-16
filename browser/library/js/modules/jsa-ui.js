@@ -164,6 +164,14 @@ define(
                     lambda_i1 = lambda_i.subarray(0,mid),
                     lambda_i2 = lambda_i.subarray(mid, 2*grid_size);
 
+                // Get the normalization
+                var P = props.clone();
+                P.phi_i = P.phi_s + Math.PI;
+                P.update_all_angles();
+                P.optimum_idler(P);
+                var PMN =  PhaseMatch.phasematch(props);
+                var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
+
                 // I think this is causing some rounding errors in the ls,li ranges.
                 // I think that can be dealt with in the calc_JSA function and appropriately
                 // Math.floor or Math.ceil the chunks in a predictable manner.
@@ -173,28 +181,32 @@ define(
                         propsJSON,
                         lambda_s1,
                         lambda_i1,
-                        grid_size
+                        grid_size,
+                        norm
                     ]);
                 // Top Right corner of plot
                 var p2 = self.asyncJSA2.exec('doJSACalc', [
                         propsJSON,
                         lambda_s2,
                         lambda_i1,
-                        grid_size
+                        grid_size,
+                        norm
                     ]);
                 // Bottom left corner of plot
                 var p3 = self.asyncJSA3.exec('doJSACalc', [
                         propsJSON,
                         lambda_s1,
                         lambda_i2,
-                        grid_size
+                        grid_size,
+                        norm
                     ]);
                 // Bottom right corner of plot
                 var p4 = self.asyncJSA4.exec('doJSACalc', [
                         propsJSON,
                         lambda_s2,
                         lambda_i2,
-                        grid_size
+                        grid_size,
+                        norm
                     ]);
                    
                 // IMPORTANT: we need to return the final promise
