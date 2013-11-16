@@ -2,6 +2,7 @@ define(
     [
         'jquery',
         'stapes',
+        'when',
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
@@ -17,6 +18,7 @@ define(
     function(
         $,
         Stapes,
+        when,
         PhaseMatch,
         HeatMap,
         LinePlot,
@@ -356,13 +358,21 @@ define(
 
                 var self = this
                     ,data = self.data
+                    ,dfd = when.defer()
                     ;
 
                 if (!data){
                     return this;
                 }
 
-                self.plot.plotData( data );
+                
+                // async... but not inside webworker
+                setTimeout(function(){
+                    self.plot.plotData( data );
+                    dfd.resolve();
+                }, 10);
+                   
+                return dfd.promise; 
             }
 
 
