@@ -1,4 +1,4 @@
-require(['worker!workers/pm-web-worker.js', 'modules/worker-api', 'when'], function( pmWorker, W, when ){
+require(['worker!workers/pm-web-worker.js', 'worker!workers/pm-web-worker.js', 'modules/worker-api', 'when'], function( pmWorker, pmWorker2, W, when ){
     
     function log(){
         document.body.innerHTML += Array.prototype.join.call(arguments, ' ') + '<br/>';
@@ -7,6 +7,9 @@ require(['worker!workers/pm-web-worker.js', 'modules/worker-api', 'when'], funct
     function now(){
         return (new Date()).getTime();
     }
+
+    log('equal?', pmWorker === pmWorker2);
+    window.w = pmWorker;
 
     var myAlg = W( 'alg', pmWorker );
 

@@ -7,6 +7,10 @@ define(
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
+
+        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
+
         'tpl!templates/jsa-layout.tpl',
         'tpl!templates/jsa-docs.tpl'
     ],
@@ -18,6 +22,10 @@ define(
         LinePlot,
         SkeletonUI,
         converter,
+
+        pmWorker,
+        W,
+
         tplJSALayout,
         tplDocsJSA
     ) {
@@ -32,7 +40,10 @@ define(
          */
         var jsaUI = SkeletonUI.subclass({
 
-            constructor: SkeletonUI.prototype.constructor,
+            constructor: function(){
+                SkeletonUI.prototype.constructor.apply(this, arguments);
+                this.asyncJSA = W( 'jsaWorker', pmWorker );
+            },
             tplPlots: tplJSALayout,
             tplDoc: tplDocsJSA,
             showPlotOpts: [
@@ -113,23 +124,82 @@ define(
                 });
             },
 
+            updateTitle: function( PM ){
+
+                return myAlg.exec('calc_Schmidt', [PM]);
+            },
+
             calc: function( props ){
 
+                
                 var self = this;
 
-                // var internalangle = PhaseMatch.find_internal_angle(props, 'signal');
-                // var externalangle = PhaseMatch.find_external_angle(props, 'signal');
-
-                // var startTime = new Date();
-                var PM = PhaseMatch.calc_JSI(
-                        props,
+                // IMPORTANT: we need to return the final promise
+                // so that the Skeleton UI knows when to run the draw command
+                return self.asyncJSA.exec('doJSACalc', [
+                        props.get(),
                         self.plotOpts.get('ls_start'),
                         self.plotOpts.get('ls_stop'),
                         self.plotOpts.get('li_start'),
                         self.plotOpts.get('li_stop'),
                         self.plotOpts.get('grid_size')
-                    )
-                    ;
+                    ])
+                    .then(function( PM ){
+                        
+                        // var p = updateTitle( PM );
+                        // doplot();
+                        // return p;
+                        
+
+                        return PM; // this value is passed on to the next "then()"
+
+                    }).then(function( PM ){
+
+                        console.log(PM)
+                        
+                        if (props.brute_force){
+                            var jsa2d = PhaseMatch.create_2d_array(PM, props.brute_dim, props.brute_dim);
+                        }
+                        else{
+                            var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
+                        }
+
+                        if (isNaN(PM[0])){
+                            var S = 0;
+                        }
+                        else {
+                            var S= PhaseMatch.calc_Schmidt(jsa2d);
+                        }
+
+                        // props.calc_walkoff_angles();
+                        // console.log("Walkoff anlge", props.walkoff_p*180/Math.PI);
+
+                        self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
+                        // console.log(jsa2d[25]);
+                        self.data = PM;
+                        // console.log(PM);
+
+                        // self.plot.setZRange([0, 180]);
+                        self.plot.setZRange([0,Math.max.apply(null,PM)]);
+                        self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
+                        self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+                    });
+
+
+
+                // var internalangle = PhaseMatch.find_internal_angle(props, 'signal');
+                // var externalangle = PhaseMatch.find_external_angle(props, 'signal');
+
+                // var startTime = new Date();
+                // var PM = PhaseMatch.calc_JSI(
+                //         props,
+                //         self.plotOpts.get('ls_start'),
+                //         self.plotOpts.get('ls_stop'),
+                //         self.plotOpts.get('li_start'),
+                //         self.plotOpts.get('li_stop'),
+                //         self.plotOpts.get('grid_size')
+                //     )
+                //     ;
 
                 // PM = PhaseMatch.normalize(PM);
                 // console.log(PM);
@@ -138,32 +208,32 @@ define(
                 // console.log("time", timeDiff);
 
                 //calculate the Schmidt number
-                if (props.brute_force){
-                    var jsa2d = PhaseMatch.create_2d_array(PM, props.brute_dim, props.brute_dim);
-                }
-                else{
-                    var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
-                }
+                // if (props.brute_force){
+                //     var jsa2d = PhaseMatch.create_2d_array(PM, props.brute_dim, props.brute_dim);
+                // }
+                // else{
+                //     var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
+                // }
 
-                if (isNaN(PM[0])){
-                    var S = 0;
-                }
-                else {
-                    var S= PhaseMatch.calc_Schmidt(jsa2d);
-                }
+                // if (isNaN(PM[0])){
+                //     var S = 0;
+                // }
+                // else {
+                //     var S= PhaseMatch.calc_Schmidt(jsa2d);
+                // }
 
                 // props.calc_walkoff_angles();
                 // console.log("Walkoff anlge", props.walkoff_p*180/Math.PI);
 
-                self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
+                // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
                 // console.log(jsa2d[25]);
-                self.data = PM;
+                // self.data = PM;
                 // console.log(PM);
 
                 // self.plot.setZRange([0, 180]);
-                self.plot.setZRange([0,Math.max.apply(null,PM)]);
-                self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
-                self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+                // self.plot.setZRange([0,Math.max.apply(null,PM)]);
+                // self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
+                // self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
                 // var A = 4;
                 // var B = 9;

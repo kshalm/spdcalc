@@ -2,6 +2,7 @@ define(
     [
         'jquery',
         'stapes',
+        'when',
         'modules/converter',
         'modules/panel',
         'modules/ddmenu',
@@ -11,6 +12,7 @@ define(
     function(
         $,
         Stapes,
+        when,
         converter,
         Panel,
         ddmenu,
@@ -191,13 +193,14 @@ define(
                     self.autocalcPlotOpts();
                 }
 
-                self.calc( self.parameters.getProps() );
+                when(self.calc( self.parameters.getProps() )).then(function(){
 
-                self.calculating = false;
+                    self.calculating = false;
 
-                self.draw();
+                    self.draw();
 
-                self.emit('refresh');
+                    self.emit('refresh');
+                });
             },
 
             autocalcPlotOpts: function(){
