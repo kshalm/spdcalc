@@ -238,13 +238,13 @@ define(
 
                     }).then(function( PM ){
 
-                        // var p = self.updateTitle( PM );
+                        var p = self.updateTitle( PM );
                         self.data = PM;
                         self.plot.setZRange([0,Math.max.apply(null,PM)]);
                         self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
-                        // return p;
+                        return p;
 
                     }).otherwise(function(){
                         console.log('error', arguments)
