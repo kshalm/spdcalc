@@ -155,8 +155,6 @@ define(
 
                     }).then(function( PM ){
 
-                        console.log(PM)
-                        
                         if (props.brute_force){
                             var jsa2d = PhaseMatch.create_2d_array(PM, props.brute_dim, props.brute_dim);
                         }
