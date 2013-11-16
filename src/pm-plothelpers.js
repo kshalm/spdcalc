@@ -64,8 +64,10 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
 
 };
 
+
 PhaseMatch.calc_JSI = function calc_JSI(props, ls_start, ls_stop, li_start, li_stop, dim){
     var N = dim * dim;
+
     var JSI = new Float64Array( N );
 
     var JSA = PhaseMatch.calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim);
@@ -75,6 +77,85 @@ PhaseMatch.calc_JSI = function calc_JSI(props, ls_start, ls_stop, li_start, li_s
         JSI[i] = sq(JSA[0][i]) + sq(JSA[1][i]);
     }
     JSI = PhaseMatch.normalize(JSI);
+    return JSI;
+
+};
+
+PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim){
+
+    props.update_all_angles();
+    // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
+    var P = props.clone();
+    // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
+    // P.theta_i = 0.6*Math.PI/180;
+    P.phi_i = P.phi_s + Math.PI;
+    P.update_all_angles();
+    P.optimum_idler(P);
+
+    // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
+    // P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+
+
+    var todeg = 180/Math.PI;
+    // console.log(P.phi_i*todeg, P.phi_s*todeg);
+    // P.theta_i = P.theta_s;
+    // var centerpm = PhaseMatch.phasematch(P);
+    // console.log(sq(centerpm[0]) + sq(centerpm[1]));
+
+
+    var i;
+    // var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+    // var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
+
+    var N = dim * dim;
+    var PMreal = new Float64Array( N );
+    var PMimag = new Float64Array( N );
+
+    var maxpm = 0;
+
+    // calculate normalization
+    var PMN = PhaseMatch.phasematch(P);
+    var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
+
+
+    for (i=0; i<N; i++){
+        var index_s = i % dim;
+        var index_i = Math.floor(i / dim);
+
+        P.lambda_s = lambda_s[index_s];
+        P.lambda_i = lambda_i[index_i];
+
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+        var PM = PhaseMatch.phasematch(P);
+        PMreal[i] = PM[0]/norm;
+        PMimag[i] = PM[1]/norm;
+        // C_check = PM[2];
+        // if (PM[i]>maxpm){maxpm = PM[i];}
+    }
+
+
+
+    // console.log("Approx Check, ", C_check);
+    return [PMreal, PMimag];
+
+};
+
+
+
+PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim){
+    var N = dim * dim;
+    console.log("dimension",dim, "lambda_S", lambda_s);
+    var JSI = new Float64Array( N );
+
+    var JSA = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim);
+
+    for (var i=0; i<N; i++){
+
+        JSI[i] = sq(JSA[0][i]) + sq(JSA[1][i]);
+    }
+    // JSI = PhaseMatch.normalize(JSI);
     return JSI;
 
 };

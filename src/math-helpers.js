@@ -19,6 +19,18 @@ PhaseMatch.Sum = function Sum(A){
     return total;
 };
 
+/*
+Reverses a typed array
+ */
+PhaseMatch.reverse = function reverse(A){
+    var rev = new Float64Array(A.length);
+    var l = A.length;
+    for(var i=0; i<l; i++) {
+        rev[i] = A[l-1-i];
+    }
+    return rev;
+};
+
 /* Note:
     Use: Math.max.apply(null, [1,5,2,7,8])
     instead of creating your own
