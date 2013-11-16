@@ -154,78 +154,15 @@ define(
                         self.plotOpts.get('grid_size')
                     ])
                     .then(function( PM ){
-                        
-                        
-                        // doplot();
                         var p = self.updateTitle( PM );
                         self.data = PM;
                         self.plot.setZRange([0,Math.max.apply(null,PM)]);
                         self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
-                        // self.draw();
+
                         return p;
                     });
                        
-                    // }).then(function( PM ){
-
-                    //     // console.log(PM)
-                        
-                        
-                    //     // console.log(jsa2d[25]);
-                    //     
-                    //     // console.log(PM);
-
-                    //     // self.plot.setZRange([0, 180]);
-                    //     self.plot.setZRange([0,Math.max.apply(null,PM)]);
-                    //     self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
-                    //     self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
-                    // });
-
-                // var startTime = new Date();
-                // var PM = PhaseMatch.calc_JSI(
-                //         props,
-                //         self.plotOpts.get('ls_start'),
-                //         self.plotOpts.get('ls_stop'),
-                //         self.plotOpts.get('li_start'),
-                //         self.plotOpts.get('li_stop'),
-                //         self.plotOpts.get('grid_size')
-                //     )
-                //     ;
-
-                // PM = PhaseMatch.normalize(PM);
-                // console.log(PM);
-                // var endTime = new Date();
-                // var timeDiff = (endTime - startTime);
-                // console.log("time", timeDiff);
-
-                //calculate the Schmidt number
-                // if (props.brute_force){
-                //     var jsa2d = PhaseMatch.create_2d_array(PM, props.brute_dim, props.brute_dim);
-                // }
-                // else{
-                //     var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
-                // }
-
-                // if (isNaN(PM[0])){
-                //     var S = 0;
-                // }
-                // else {
-                //     var S= PhaseMatch.calc_Schmidt(jsa2d);
-                // }
-
-                // props.calc_walkoff_angles();
-                // console.log("Walkoff anlge", props.walkoff_p*180/Math.PI);
-
-                // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
-                // console.log(jsa2d[25]);
-                // self.data = PM;
-                // console.log(PM);
-
-                // self.plot.setZRange([0, 180]);
-                // self.plot.setZRange([0,Math.max.apply(null,PM)]);
-                // self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
-                // self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
-
             },
 
             draw: function(){
