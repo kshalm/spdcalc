@@ -42,10 +42,16 @@ define(
 
             constructor: function(){
                 SkeletonUI.prototype.constructor.apply(this, arguments);
-                this.asyncJSA1 = pmWorker.spawn( 'jsaWorker' );
-                this.asyncJSA2 = pmWorker.spawn( 'jsaWorker' );
-                this.asyncJSA3 = pmWorker.spawn( 'jsaWorker' );
-                this.asyncJSA4 = pmWorker.spawn( 'jsaWorker' );
+                // this.Nthreads = 8;
+
+                // this.asyncJSA1 = pmWorker.spawn( 'jsaWorker' );
+                // this.asyncJSA2 = pmWorker.spawn( 'jsaWorker' );
+                // this.asyncJSA3 = pmWorker.spawn( 'jsaWorker' );
+                // this.asyncJSA4 = pmWorker.spawn( 'jsaWorker' );
+                // this.asyncJSA5 = pmWorker.spawn( 'jsaWorker' );
+                // this.asyncJSA6 = pmWorker.spawn( 'jsaWorker' );
+                // this.asyncJSA7 = pmWorker.spawn( 'jsaWorker' );
+                // this.asyncJSA8 = pmWorker.spawn( 'jsaWorker' );
             },
             tplPlots: tplJSALayout,
             tplDoc: tplDocsJSA,
@@ -127,20 +133,17 @@ define(
                 });
             },
 
-            updateTitle: function( PM ){
+            updateTitle: function( worker, PM ){
                 var self = this;
-                console.log("starting the title");
-                // return 0;
-                return self.asyncJSA1.exec('doCalcSchmidt', [PM], true)
+                return worker.exec('doCalcSchmidt', [PM], true)
                         .then(function( S ){
-                            console.log("finished the title");
                             self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
                         });
 
             },
 
             calc: function( props ){
-
+                var starttime = new Date();
                 
                 var self = this;
 
@@ -149,20 +152,23 @@ define(
                     ,li_range = (self.plotOpts.get('li_stop') - self.plotOpts.get('li_start'))
                     ,ls_mid = 0.5 * ls_range + self.plotOpts.get('ls_start')
                     ,li_mid = 0.5 * li_range + self.plotOpts.get('li_start')
-                    ,grid_size = self.plotOpts.get('grid_size')/2
+                    ,grid_size = self.plotOpts.get('grid_size')
                     ;
 
-                var lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), 2*grid_size),
-                    lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), 2*grid_size);
+                var lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), grid_size),
+                    lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), grid_size);
 
-                var Nthreads = 4;
-                // var mid = dim / (Nthreads/2);
-                var mid = Math.floor(grid_size);
-                // console.log("mid", mid, PhaseMatch.reverse(lambda_s.subarray(0,mid+5 )), lambda_s.subarray(mid, mid +3).length)
-                var lambda_s1 = lambda_s.subarray(0,mid),
-                    lambda_s2 = lambda_s.subarray(mid, 2*grid_size),
-                    lambda_i1 = lambda_i.subarray(0,mid),
-                    lambda_i2 = lambda_i.subarray(mid, 2*grid_size);
+                var Nthreads = 8;
+
+                var divisions = Math.floor(grid_size/Nthreads);
+
+
+                var lambda_i_range = new Array( );
+
+                for (var i= 0; i<Nthreads-1; i++){
+                    lambda_i_range.push(lambda_i.subarray(i*divisions,i*divisions + divisions));
+                }
+                lambda_i_range.push( lambda_i.subarray((Nthreads-1)*divisions, lambda_i.length)); //make up the slack with the last one
 
                 // Get the normalization
                 var P = props.clone();
@@ -172,83 +178,78 @@ define(
                 var PMN =  PhaseMatch.phasematch(props);
                 var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
 
-                // I think this is causing some rounding errors in the ls,li ranges.
-                // I think that can be dealt with in the calc_JSA function and appropriately
-                // Math.floor or Math.ceil the chunks in a predictable manner.
+                // Create an array of workers to carry out the calculation
+                var workers = new Array(Nthreads);
+                // The calculation is split up and reutrned as a series of promises
+                var promises = new Array(Nthreads);
+                for (var j=0; j<Nthreads; j++){
 
-                // Top left corner of plot
-                var p1 = self.asyncJSA1.exec('doJSACalc', [
+                    workers[j] = pmWorker.spawn( 'jsaWorker' );
+                    promises[j]= workers[j].exec('doJSACalc', [
                         propsJSON,
-                        lambda_s1,
-                        lambda_i1,
+                        lambda_s,
+                        lambda_i_range[j],
                         grid_size,
                         norm
                     ]);
-                // Top Right corner of plot
-                var p2 = self.asyncJSA2.exec('doJSACalc', [
-                        propsJSON,
-                        lambda_s2,
-                        lambda_i1,
-                        grid_size,
-                        norm
-                    ]);
-                // Bottom left corner of plot
-                var p3 = self.asyncJSA3.exec('doJSACalc', [
-                        propsJSON,
-                        lambda_s1,
-                        lambda_i2,
-                        grid_size,
-                        norm
-                    ]);
-                // Bottom right corner of plot
-                var p4 = self.asyncJSA4.exec('doJSACalc', [
-                        propsJSON,
-                        lambda_s2,
-                        lambda_i2,
-                        grid_size,
-                        norm
-                    ]);
-                   
-                // IMPORTANT: we need to return the final promise
-                // so that the Skeleton UI knows when to run the draw command
-                return when.join( p1, p2, p3, p4 ).then(function( values ){
-                        // console.log(values[0]);
-                        
+                }
+
+                return when.all( promises    ).then(function( values ){
                         // put the results back together
-                        var result1 = new Float64Array( 2 * grid_size * grid_size );
-                        var result2 = new Float64Array( 2 * grid_size * grid_size );
+                        var arr = new Float64Array( grid_size *  grid_size );
+                        var startindex = 0;
                         
-                        for ( var i = 0, l = grid_size; i < l; i++ ){
-                            
-                            result1.set(values[3].subarray(l * i, l * (i+1)),  (2*i+1) * l);
-                            result1.set(values[2].subarray(l * i, l * (i+1)), 2*i * l);
+                        for (j = 0; j<Nthreads; j++){
+                            // console.log(j, j*lambda_s.length*lambda_i_range[j].length, values[j].length +  j*lambda_s.length*lambda_i_range[j].length);
 
-                            result2.set(values[0].subarray(l * i, l * (i+1)), 2*i * l);
-                            result2.set(values[1].subarray(l * i, l * (i+1)), (2*i+1) * l);
+                             arr.set(values[j], startindex);
+                             startindex += lambda_s.length*lambda_i_range[j].length;
+
                         }
-
-                        var arr = new Float64Array( 4 * grid_size * grid_size );
-
-                        arr.set( result2, 0 );
-                        arr.set( result1, result1.length );
-
-                        PhaseMatch.normalize(arr);  
+                        PhaseMatch.normalize(arr); 
                         
                         return arr; // this value is passed on to the next "then()"
 
                     }).then(function( PM ){
 
-                        var p = self.updateTitle( PM );
+                        // var p = self.updateTitle(workers[0], PM );
                         self.data = PM;
                         self.plot.setZRange([0,Math.max.apply(null,PM)]);
                         self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
-                        return p;
+                        var endtime = new Date();
+                        console.log("Elapsed time: ", endtime - starttime); 
+                        // return p;
+                        return true;
+
+                    }).then(function() {
+                        // terminate all the workers to free up memory
+                        for (j = 0; j< Nthreads; j++)   {
+                            workers[j].close();
+                        }
+
+                        return true;
+
+                    
+                    }).then(function(){
+                        //test to see if the workers are still active.
+                        console.log(workers[0]);
+                        // var pp = workers[0].exec('doJSACalc', [
+                        //     propsJSON,
+                        //     lambda_s,
+                        //     lambda_i_range[0],
+                        //     grid_size,
+                        //     norm]);
+                        // console.log("trying to terminate!", pp)
 
                     }).otherwise(function(){
                         console.log('error', arguments)
                     });
+
+                    
+
+
 
                        
             },
