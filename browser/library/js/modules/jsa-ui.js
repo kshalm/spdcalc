@@ -180,6 +180,7 @@ define(
 
                 // Create an array of workers to carry out the calculation
                 var workers = new Array(Nthreads);
+                console.log("before", workers);
                 // The calculation is split up and reutrned as a series of promises
                 var promises = new Array(Nthreads);
                 for (var j=0; j<Nthreads; j++){
@@ -193,6 +194,8 @@ define(
                         norm
                     ]);
                 }
+
+                console.log("after", workers);
 
                 return when.all( promises    ).then(function( values ){
                         // put the results back together
@@ -234,7 +237,7 @@ define(
                     
                     }).then(function(){
                         //test to see if the workers are still active.
-                        console.log(workers[0]);
+                        // console.log(workers[0]);
                         // var pp = workers[0].exec('doJSACalc', [
                         //     propsJSON,
                         //     lambda_s,
