@@ -114,7 +114,14 @@ define(
 
                     return self.worker.exec(self.name, send);
                 });
-            }
+            },
+            close: function( ){
+                var self = this;
+                // return self.worker.terminate();
+                return self.ready.then(function(){
+                    return self.worker.terminate();
+                });
+            },
         };        
 
         // api

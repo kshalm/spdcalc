@@ -107,7 +107,7 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
     // var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
     // var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
 
-    var N = dim * dim;
+    var N = lambda_s.length * (lambda_i.length);
     var PMreal = new Float64Array( N );
     var PMimag = new Float64Array( N );
 
@@ -117,24 +117,22 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
     // var PMN = PhaseMatch.phasematch(P);
     // var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
 
+    
+    for (j=0; j<lambda_i.length; j++){
+        for (i=0; i<lambda_s.length; i++){
+            var index_s = i;
+            var index_i = j;
 
+            P.lambda_s = lambda_s[index_s];
+            P.lambda_i = lambda_i[index_i];
 
+            P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-    for (i=0; i<N; i++){
-        var index_s = i % dim;
-        var index_i = Math.floor(i / dim);
-
-        P.lambda_s = lambda_s[index_s];
-        P.lambda_i = lambda_i[index_i];
-
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-        P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-
-        var PM = PhaseMatch.phasematch(P);
-        PMreal[i] = PM[0]/norm;
-        PMimag[i] = PM[1]/norm;
-        // C_check = PM[2];
-        // if (PM[i]>maxpm){maxpm = PM[i];}
+            var PM = PhaseMatch.phasematch(P);
+            PMreal[i + lambda_s.length*j] = PM[0]/norm;
+            PMimag[i + lambda_s.length*j] = PM[1]/norm;
+        }
     }
 
 
@@ -147,7 +145,7 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
 
 
 PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm){
-    var N = dim * dim;
+    var N = lambda_s.length * (lambda_i.length);
     var JSI = new Float64Array( N );
 
     var JSA = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
