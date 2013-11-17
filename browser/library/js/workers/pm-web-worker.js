@@ -3,7 +3,7 @@ importScripts('../vendor/phasematchjs.js');
 
 
 // declare a worker helper for the JSA calculations
-W('jsaWorker', {
+W('jsaHelper', {
 
     init: function(){
 
@@ -46,7 +46,7 @@ W('jsaWorker', {
    	},
 
    	doCalcSchmidtPlot: function( args ){
-   		console.log("starting calc");
+   		
    		this.props.set( args[0] );
 
    		var xtal_l_start = args[1],
@@ -54,9 +54,11 @@ W('jsaWorker', {
    			bw_start = args[3],
    			bw_stop = args[4],
    			ls_start = args[5],
-   			li_stop = args[6],
-   			grid_size_schmidt = args[7],
-   			params = args[8];
+            ls_stop = args[6],
+            li_start = args[7],
+   			li_stop = args[8],
+   			grid_size_schmidt = args[9],
+   			params = args[10];
 
    		return PhaseMatch.calc_schmidt_plot(
                     this.props,

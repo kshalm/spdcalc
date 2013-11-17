@@ -8,9 +8,6 @@ define(
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
-
-        'worker!workers/pm-web-worker.js',
-
         'tpl!templates/jsa-layout.tpl',
         'tpl!templates/jsa-docs.tpl'
     ],
@@ -23,9 +20,6 @@ define(
         LinePlot,
         SkeletonUI,
         converter,
-
-        pmWorker,
-
         tplJSALayout,
         tplDocsJSA
     ) {
@@ -40,19 +34,8 @@ define(
          */
         var jsaUI = SkeletonUI.subclass({
 
-            constructor: function(){
-                SkeletonUI.prototype.constructor.apply(this, arguments);
-                // this.Nthreads = 8;
-
-                // this.asyncJSA1 = pmWorker.spawn( 'jsaWorker' );
-                // this.asyncJSA2 = pmWorker.spawn( 'jsaWorker' );
-                // this.asyncJSA3 = pmWorker.spawn( 'jsaWorker' );
-                // this.asyncJSA4 = pmWorker.spawn( 'jsaWorker' );
-                // this.asyncJSA5 = pmWorker.spawn( 'jsaWorker' );
-                // this.asyncJSA6 = pmWorker.spawn( 'jsaWorker' );
-                // this.asyncJSA7 = pmWorker.spawn( 'jsaWorker' );
-                // this.asyncJSA8 = pmWorker.spawn( 'jsaWorker' );
-            },
+            constructor: SkeletonUI.prototype.constructor,
+            nWorkers: 4,
             tplPlots: tplJSALayout,
             tplDoc: tplDocsJSA,
             showPlotOpts: [
@@ -143,9 +126,9 @@ define(
             },
 
             calc: function( props ){
-                var starttime = new Date();
                 
                 var self = this;
+                var starttime = new Date();
 
                 var propsJSON = props.get()
                     ,ls_range = (self.plotOpts.get('ls_stop') - self.plotOpts.get('ls_start'))
@@ -158,12 +141,11 @@ define(
                 var lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), grid_size),
                     lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), grid_size);
 
-                var Nthreads = 8;
+                var Nthreads = self.nWorkers;
 
-                var divisions = Math.floor(grid_size/Nthreads);
+                var divisions = Math.floor(grid_size / Nthreads);
 
-
-                var lambda_i_range = new Array( );
+                var lambda_i_range = [];
 
                 for (var i= 0; i<Nthreads-1; i++){
                     lambda_i_range.push(lambda_i.subarray(i*divisions,i*divisions + divisions));
@@ -178,14 +160,11 @@ define(
                 var PMN =  PhaseMatch.phasematch(props);
                 var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
 
-                // Create an array of workers to carry out the calculation
-                var workers = new Array(Nthreads);
                 // The calculation is split up and reutrned as a series of promises
-                var promises = new Array(Nthreads);
-                for (var j=0; j<Nthreads; j++){
+                var promises = [];
+                for (var j = 0; j < Nthreads; j++){
 
-                    workers[j] = pmWorker.spawn( 'jsaWorker' );
-                    promises[j] = workers[j].exec('doJSACalc', [
+                    promises[j] = self.workers[j].exec('jsaHelper.doJSACalc', [
                         propsJSON,
                         lambda_s,
                         lambda_i_range[j],
@@ -223,35 +202,7 @@ define(
                         // return p;
                         return true;
 
-                    }).then(function() {
-                        // terminate all the workers to free up memory
-                        for (j = 0; j< Nthreads; j++)   {
-                            workers[j].close();
-                        }
-
-                        return true;
-
-                    
-                    }).then(function(){
-                        //test to see if the workers are still active.
-                        console.log(workers[0]);
-                        // var pp = workers[0].exec('doJSACalc', [
-                        //     propsJSON,
-                        //     lambda_s,
-                        //     lambda_i_range[0],
-                        //     grid_size,
-                        //     norm]);
-                        // console.log("trying to terminate!", pp)
-
-                    }).otherwise(function(){
-                        console.log('error', arguments)
                     });
-
-                    
-
-
-
-                       
             },
 
             draw: function(){
