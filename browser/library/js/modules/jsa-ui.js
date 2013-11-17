@@ -158,7 +158,7 @@ define(
                 var lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), grid_size),
                     lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), grid_size);
 
-                var Nthreads = 8;
+                var Nthreads = 4;
 
                 var divisions = Math.floor(grid_size/Nthreads);
 
@@ -180,7 +180,6 @@ define(
 
                 // Create an array of workers to carry out the calculation
                 var workers = new Array(Nthreads);
-                console.log("before", workers);
                 // The calculation is split up and reutrned as a series of promises
                 var promises = new Array(Nthreads);
                 for (var j=0; j<Nthreads; j++){
@@ -195,7 +194,6 @@ define(
                     ]);
                 }
 
-                console.log("after", workers);
 
                 return when.all( promises    ).then(function( values ){
                         // put the results back together
@@ -209,7 +207,7 @@ define(
                              startindex += lambda_s.length*lambda_i_range[j].length;
 
                         }
-                        PhaseMatch.normalize(arr); 
+                        // PhaseMatch.normalize(arr); 
                         
                         return arr; // this value is passed on to the next "then()"
 
@@ -222,7 +220,7 @@ define(
                         self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
                         var endtime = new Date();
-                        console.log("Elapsed time: ", endtime - starttime); 
+                        console.log("Grid Size:", grid_size, " Elapsed time: ", endtime - starttime); 
                         // return p;
                         return true;
 
