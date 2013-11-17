@@ -14,20 +14,18 @@ W('jsaWorker', {
 
         this.props.set( args[0] );
 
-        var ls_start = args[1]
-            ,ls_stop = args[2]
-            ,li_start = args[3]
-            ,li_stop = args[4]
-            ,grid_size = args[5]
+        var lambda_s = args[1],
+        	lambda_i = args[2],
+            grid_size = args[3]
+            norm = args[4];
             ;
 
-        return PhaseMatch.calc_JSI(
+        return PhaseMatch.calc_JSI_p(
             this.props,
-            ls_start,
-            ls_stop,
-            li_start,
-            li_stop,
-            grid_size
+            lambda_s,
+            lambda_i,
+            grid_size,
+            norm
         );
     }, 
 

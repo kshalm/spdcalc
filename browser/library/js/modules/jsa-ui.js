@@ -152,48 +152,67 @@ define(
                     ,grid_size = self.plotOpts.get('grid_size')/2
                     ;
 
+                var lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), 2*grid_size),
+                    lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), 2*grid_size);
+
+                var Nthreads = 4;
+                // var mid = dim / (Nthreads/2);
+                var mid = Math.floor(grid_size);
+                // console.log("mid", mid, PhaseMatch.reverse(lambda_s.subarray(0,mid+5 )), lambda_s.subarray(mid, mid +3).length)
+                var lambda_s1 = lambda_s.subarray(0,mid),
+                    lambda_s2 = lambda_s.subarray(mid, 2*grid_size),
+                    lambda_i1 = lambda_i.subarray(0,mid),
+                    lambda_i2 = lambda_i.subarray(mid, 2*grid_size);
+
+                // Get the normalization
+                var P = props.clone();
+                P.phi_i = P.phi_s + Math.PI;
+                P.update_all_angles();
+                P.optimum_idler(P);
+                var PMN =  PhaseMatch.phasematch(props);
+                var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
+
                 // I think this is causing some rounding errors in the ls,li ranges.
                 // I think that can be dealt with in the calc_JSA function and appropriately
                 // Math.floor or Math.ceil the chunks in a predictable manner.
+
+                // Top left corner of plot
                 var p1 = self.asyncJSA1.exec('doJSACalc', [
                         propsJSON,
-                        self.plotOpts.get('ls_start'),
-                        ls_mid,
-                        self.plotOpts.get('li_start'),
-                        li_mid,
-                        grid_size
+                        lambda_s1,
+                        lambda_i1,
+                        grid_size,
+                        norm
                     ]);
-
+                // Top Right corner of plot
                 var p2 = self.asyncJSA2.exec('doJSACalc', [
                         propsJSON,
-                        ls_mid,
-                        self.plotOpts.get('ls_stop'),
-                        self.plotOpts.get('li_start'),
-                        li_mid,
-                        grid_size
+                        lambda_s2,
+                        lambda_i1,
+                        grid_size,
+                        norm
                     ]);
-
+                // Bottom left corner of plot
                 var p3 = self.asyncJSA3.exec('doJSACalc', [
                         propsJSON,
-                        self.plotOpts.get('ls_start'),
-                        ls_mid,
-                        li_mid,
-                        self.plotOpts.get('li_stop'),
-                        grid_size
+                        lambda_s1,
+                        lambda_i2,
+                        grid_size,
+                        norm
                     ]);
-
+                // Bottom right corner of plot
                 var p4 = self.asyncJSA4.exec('doJSACalc', [
                         propsJSON,
-                        ls_mid,
-                        self.plotOpts.get('ls_stop'),
-                        li_mid,
-                        self.plotOpts.get('li_stop'),
-                        grid_size
+                        lambda_s2,
+                        lambda_i2,
+                        grid_size,
+                        norm
                     ]);
                    
                 // IMPORTANT: we need to return the final promise
                 // so that the Skeleton UI knows when to run the draw command
                 return when.join( p1, p2, p3, p4 ).then(function( values ){
+                        // console.log(values[0]);
                         
                         // put the results back together
                         var result1 = new Float64Array( 2 * grid_size * grid_size );
@@ -201,17 +220,19 @@ define(
                         
                         for ( var i = 0, l = grid_size; i < l; i++ ){
                             
-                            result1.set(values[0].subarray(l * i, l * (i+1)), 2*i * l);
-                            result1.set(values[1].subarray(l * i, l * (i+1)), (2*i+1) * l);
+                            result1.set(values[3].subarray(l * i, l * (i+1)),  (2*i+1) * l);
+                            result1.set(values[2].subarray(l * i, l * (i+1)), 2*i * l);
 
-                            result2.set(values[2].subarray(l * i, l * (i+1)), 2*i * l);
-                            result2.set(values[3].subarray(l * i, l * (i+1)), (2*i+1) * l);
+                            result2.set(values[0].subarray(l * i, l * (i+1)), 2*i * l);
+                            result2.set(values[1].subarray(l * i, l * (i+1)), (2*i+1) * l);
                         }
 
                         var arr = new Float64Array( 4 * grid_size * grid_size );
 
                         arr.set( result2, 0 );
                         arr.set( result1, result1.length );
+
+                        PhaseMatch.normalize(arr);  
                         
                         return arr; // this value is passed on to the next "then()"
 
