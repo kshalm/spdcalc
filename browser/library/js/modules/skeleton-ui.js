@@ -236,12 +236,10 @@ define(
                         self.spinner( false );
                         self.emit('refresh');
                     });
-                }, function(){
+                }, function( msg ){
 
                     // error callback
-                    if (console.error) {
-                        console.error('Error: ', arguments);
-                    }
+                    console.error( msg );
                     self.spinner( false );
                 });
             },

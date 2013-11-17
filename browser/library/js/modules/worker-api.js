@@ -30,7 +30,7 @@ define(
             return {
 
                 exec: function( cmd, args ){
-                    console.log('worker', cmd, args)
+                    
                     var dfd = when.defer();
                     var jobId = _nJobs++;
                     var send;
@@ -38,15 +38,27 @@ define(
                     var callback = function( e ) {
                         e.data.jobId = e.data.jobId|0; // int
                         if (e.data.jobId === jobId){
+
                             if ( e.data.result && e.data.result.error ){
                                 dfd.reject( e.data.result.error );
                             } else {
                                 dfd.resolve( e.data.result );
                             }
                             _worker.removeEventListener('message', callback);
+                            _worker.removeEventListener('error', errback);
                         }
-                    };
+                    }
+                    ,errback = function( e ){
+                        var msg = [
+                            'Webworker ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
+                        ].join('');
+                        _worker.removeEventListener('message', callback);
+                        _worker.removeEventListener('error', errback);
+                        dfd.reject( msg );
+                    }
+                    ;
 
+                    _worker.addEventListener('error', errback, false);
                     _worker.addEventListener('message', callback, false);
 
                     send = {

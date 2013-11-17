@@ -1,3 +1,6 @@
+var ffVersion = self.navigator && self.navigator.userAgent.match(/firefox\/(\d+(\.\d+)?)/i);
+var ffBug = ffVersion && (+ffVersion[ 1 ]) < 28;
+
 // WORKER CODE
 // Runner
 
@@ -7,9 +10,12 @@ function runner( name, schema ){
     var cls;
 
     if ( !schema ){
-        if ( _registry[ name ] ){
 
-            return new (_registry[ name ]);
+        cls = _registry[ name ];
+        
+        if ( cls ){
+
+            return new cls();
         } else {
 
             return false;
@@ -30,13 +36,13 @@ function runner( name, schema ){
 
 function execute( helper, args ){
     if ( args.method ){
-
+        
         return helper[ args.method ]( args.args );
 
     } else if ( args.fn ){
         
         var fn = eval( '(' + args.fn + ')' );
-        return fn( helper );
+        return fn();
     }
 }
 
@@ -48,7 +54,6 @@ function map( helper, args ){
     } else {
         result = [];
     }
-
 
     if ( args.method ){
 
@@ -63,7 +68,7 @@ function map( helper, args ){
         var fn = eval( '(' + args.fn + ')' );
         for ( i = 0, l = arr.length; i < l; ++i ){
             
-            result[ i ] = fn( helper, arr[ i ] );
+            result[ i ] = fn( arr[ i ] );
         }
         return result;
     }
@@ -76,7 +81,11 @@ function run( cmd, args ){
     
     if ( cmd === 'exec' ){
 
-        helper = _runners[ args.name ];
+        if ( args.fn ){
+            helper = {};// dummy
+        } else {
+            helper = _runners[ args.name ];
+        }
         
         if ( !helper ){
             helper = runner( args.name );
@@ -126,7 +135,7 @@ self.addEventListener('message', function( e ){
     var args = e.data.args;
     var result = run( cmd, args );
     
-    self.postMessage({ jobId: jobId, result: result }, result.buffer? [result.buffer] : undefined);
+    self.postMessage({ jobId: jobId, result: result }, !ffBug && result && result.buffer? [result.buffer] : undefined);
 }, false);
 
 
