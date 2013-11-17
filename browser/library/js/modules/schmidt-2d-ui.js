@@ -163,7 +163,6 @@ define(
                 // self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 // self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
            
-
                 return  self.asyncSchmidtPlot.exec('doCalcSchmidtPlot', [
                         props,
                         self.plotOpts.get('xtal_l_start'),
