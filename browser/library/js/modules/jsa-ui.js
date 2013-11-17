@@ -194,7 +194,7 @@ define(
                 // IMPORTANT: we need to return the final promise
                 // so that the Skeleton UI knows when to run the draw command
                 return when.join( p1, p2, p3, p4 ).then(function( values ){
-                        console.log( values)
+                        
                         // put the results back together
                         var result1 = new Float64Array( 2 * grid_size * grid_size );
                         var result2 = new Float64Array( 2 * grid_size * grid_size );
