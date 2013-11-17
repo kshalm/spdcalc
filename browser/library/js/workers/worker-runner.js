@@ -1,3 +1,6 @@
+var ffVersion = self.navigator && self.navigator.userAgent.match(/firefox\/(\d+(\.\d+)?)/i);
+var ffBug = ffVersion && (+ffVersion[ 1 ]) < 28;
+
 // WORKER CODE
 // Runner
 
@@ -7,9 +10,12 @@ function runner( name, schema ){
     var cls;
 
     if ( !schema ){
-        if ( _registry[ name ] ){
 
-            return new (_registry[ name ]);
+        cls = _registry[ name ];
+        
+        if ( cls ){
+
+            return new cls();
         } else {
 
             return false;
@@ -28,19 +34,19 @@ function runner( name, schema ){
 }
 
 
-function execute( cap, cmd, args ){
+function execute( helper, args ){
     if ( args.method ){
-
-        return cap[ args.method ]( args.args );
+        
+        return helper[ args.method ]( args.args );
 
     } else if ( args.fn ){
         
         var fn = eval( '(' + args.fn + ')' );
-        return fn( cap );
+        return fn();
     }
 }
 
-function map( cap, cmd, args ){
+function map( helper, args ){
     var result, i, l;
     var arr = args.args;
     if (args.transfer){
@@ -49,12 +55,11 @@ function map( cap, cmd, args ){
         result = [];
     }
 
-
     if ( args.method ){
 
         for ( i = 0, l = arr.length; i < l; ++i ){
             
-            result[ i ] = cap[ args.method ]( arr[ i ] );
+            result[ i ] = helper[ args.method ]( arr[ i ] );
         }
         return result;
 
@@ -63,7 +68,7 @@ function map( cap, cmd, args ){
         var fn = eval( '(' + args.fn + ')' );
         for ( i = 0, l = arr.length; i < l; ++i ){
             
-            result[ i ] = fn( cap, arr[ i ] );
+            result[ i ] = fn( arr[ i ] );
         }
         return result;
     }
@@ -72,34 +77,48 @@ function map( cap, cmd, args ){
 var _runners = {};
 
 function run( cmd, args ){
-    var cap;
-    cap = _runners[ cmd ];
+    var helper;
     
-    if ( cmd === 'create' ){
+    if ( cmd === 'exec' ){
+
+        if ( args.fn ){
+            helper = {};// dummy
+        } else {
+            helper = _runners[ args.name ];
+        }
         
-        cap = runner( args.name );
+        if ( !helper ){
+            helper = runner( args.name );
+        }
         
-        if ( cap ){
-            _runners[ args.name ] = cap;
-            return args.name;
+        if ( helper ){
+
+            _runners[ args.name ] = helper;
+
         } else {
             return {
                 error: 'Runner "'+args.name+'" is not defined'
             };
         }
 
-    } else if ( cap ){
+        if ( helper ){
 
-        if ( args.map ){
-            return map( cap, cmd, args );
+            if ( args.map ){
+
+                return map( helper, args );
+            } else {
+
+                return execute( helper, args );
+            }
+
         } else {
-
-            return execute( cap, cmd, args );
+            return {
+                error: 'Runner with name "'+cmd+'" not created'
+            };
         }
-
     } else {
         return {
-            error: 'Runner with name "'+cmd+'" not created'
+            error: 'Command "'+cmd+'" not implemented'
         };
     }
 }
@@ -116,7 +135,7 @@ self.addEventListener('message', function( e ){
     var args = e.data.args;
     var result = run( cmd, args );
     
-    self.postMessage({ jobId: jobId, result: result }, result.buffer? [result.buffer] : undefined);
+    self.postMessage({ jobId: jobId, result: result }, !ffBug && result && result.buffer? [result.buffer] : undefined);
 }, false);
 
 

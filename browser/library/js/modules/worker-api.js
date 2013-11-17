@@ -30,20 +30,35 @@ define(
             return {
 
                 exec: function( cmd, args ){
+                    
                     var dfd = when.defer();
                     var jobId = _nJobs++;
                     var send;
 
                     var callback = function( e ) {
+                        e.data.jobId = e.data.jobId|0; // int
                         if (e.data.jobId === jobId){
+
                             if ( e.data.result && e.data.result.error ){
                                 dfd.reject( e.data.result.error );
                             } else {
                                 dfd.resolve( e.data.result );
                             }
                             _worker.removeEventListener('message', callback);
+                            _worker.removeEventListener('error', errback);
                         }
-                    };
+                    }
+                    ,errback = function( e ){
+                        var msg = [
+                            'Webworker ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
+                        ].join('');
+                        _worker.removeEventListener('message', callback);
+                        _worker.removeEventListener('error', errback);
+                        dfd.reject( msg );
+                    }
+                    ;
+
+                    _worker.addEventListener('error', errback, false);
                     _worker.addEventListener('message', callback, false);
 
                     send = {
@@ -55,80 +70,79 @@ define(
                     _worker.postMessage( send );
 
                     return dfd.promise;
+                },
+
+                destroy: function(){
+
+                    _worker.terminate();
                 }
             };
         };
 
         // Wrapper
-        function Wrapper( name, _worker ){
+        function Wrapper( _worker ){
 
             var self = this;
-            var dfd = when.defer();
-            self.name = name;
-            self.ready = dfd.promise;
             self.worker = relay( _worker );
-
-            self.worker.exec('create', {
-                name: name
-            }).then(function( arg ){
-                dfd.resolve();
-            }, onError);
         }
 
         Wrapper.prototype = {
             exec: function( what, args ){
+                
                 var self = this;
+                var send = {
+                    args: args
+                };
 
-                return self.ready.then(function(){
+                if (typeof what === 'string'){
 
-                    var send = {
-                        args: args
-                    };
+                    what = what.split('.');
+                    send.name = what[ 0 ]
+                    send.method = what[ 1 ];
 
-                    if (typeof what === 'string'){
-                        send.method = what;
-                    } else {
-                        send.fn = what.toString();
-                    }
+                } else {
 
-                    return self.worker.exec(self.name, send);
-                });
+                    send.fn = what.toString();
+                }
+
+                return self.worker.exec('exec', send);
             },
+
             map: function( what, args, transfer ){
 
                 var self = this;
+                var send = {
+                    args: args,
+                    map: true,
+                    transfer: transfer
+                };
 
-                return self.ready.then(function(){
+                if (typeof what === 'string'){
 
-                    var send = {
-                        args: args,
-                        map: true,
-                        transfer: transfer
-                    };
+                    what = what.split('.');
+                    send.name = what[ 0 ]
+                    send.method = what[ 1 ];
 
-                    if (typeof what === 'string'){
-                        send.method = what;
-                    } else {
-                        send.fn = what.toString();
-                    }
+                } else {
 
-                    return self.worker.exec(self.name, send);
-                });
+                    send.fn = what.toString();
+                }
+
+                return self.worker.exec('exec', send);
             },
-            close: function( ){
+
+            destroy: function(){
+
                 var self = this;
-                // return self.worker.terminate();
-                return self.ready.then(function(){
-                    return self.worker.terminate();
-                });
+                self.worker.destroy();
             },
         };        
 
         // api
-        var W = function W( name, obj ){
+        var W = function W( obj ){
 
             // connect to a worker
-            return new Wrapper( name, obj );
+            return new Wrapper( obj );
 
         };
 
@@ -144,15 +158,15 @@ define(
 
             if (window.Worker) {
                 onLoad({
-                    spawn: function( name ){
-                        return W(name, new Worker(url));
+                    spawn: function(){
+                        return W( new Worker(url) );
                     }
                 });
             } else {
                 req(["plugins/worker-fake"], function () {
                     onLoad({
                         spawn: function( name ){
-                            return W(name, new Worker(url));
+                            return W( new Worker(url) );
                         }
                     });
                 });

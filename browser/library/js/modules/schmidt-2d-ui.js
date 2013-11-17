@@ -38,10 +38,8 @@ define(
          */
         var schmidtUI = SkeletonUI.subclass({
 
-            constructor: function(){
-                SkeletonUI.prototype.constructor.apply(this, arguments);
-                this.asyncSchmidtPlot = pmWorker.spawn( 'jsaWorker' );
-            },
+            constructor: SkeletonUI.prototype.constructor,
+            nWorkers: 1,
             tplPlots: tplSchmidtLayout,
             showPlotOpts: [
                 'grid_size_schmidt',
@@ -163,9 +161,8 @@ define(
                 // self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                 // self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
            
-                console.log("setting up");
-                return  self.asyncSchmidtPlot.exec('doCalcSchmidtPlot', [
-                        props,
+                return  self.workers[0].exec('jsaHelper.doCalcSchmidtPlot', [
+                        props.get(),
                         self.plotOpts.get('xtal_l_start'),
                         self.plotOpts.get('xtal_l_stop'),
                         self.plotOpts.get('bw_start'),

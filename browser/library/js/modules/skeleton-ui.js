@@ -7,6 +7,9 @@ define(
         'modules/panel',
         'modules/ddmenu',
         'custom-checkbox',
+
+        'worker!workers/pm-web-worker.js',
+
         'tpl!templates/plot-menu.tpl'
     ],
     function(
@@ -17,6 +20,9 @@ define(
         Panel,
         ddmenu,
         customCheckbox,
+
+        pmWorker,
+
         tplPlotMenu
     ) {
 
@@ -132,6 +138,7 @@ define(
 
                 self.parameters = app.parameters;
                 self.plotOpts = app.plotOpts;
+                self.initWorkers( self.nWorkers );
 
                 // connect to the app events
                 app.on({
@@ -155,8 +162,33 @@ define(
 
                 var self = this;
 
+                // close all workers
+                self.initWorkers( 0 );
                 // disconnect from app events
                 app.off( 'calculate', self.refresh );
+            },
+
+            initWorkers: function( n ){
+
+                var self = this
+                    ,leftovers
+                    ;
+
+                self.workers = self.workers || [];
+
+                if ( self.workers.length > n ){
+                    leftovers = self.workers.splice(0, (self.workers.length - n));
+                    for ( var i = 0, l = leftovers.length; i < l; ++i ){
+                        
+                        leftovers[ i ].destroy();
+                    }
+                } else {
+                    while ( self.workers.length < n ){
+                        self.workers.push( pmWorker.spawn() );
+                    }
+                }
+
+                return self;
             },
 
             resize: function(){
@@ -199,11 +231,16 @@ define(
 
                     self.calculating = false;
 
-                    when(self.draw()).then(function(){
+                    return when(self.draw()).then(function(){
 
                         self.spinner( false );
                         self.emit('refresh');
                     });
+                }, function( msg ){
+
+                    // error callback
+                    console.error( msg );
+                    self.spinner( false );
                 });
             },
 
