@@ -874,7 +874,7 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
 };
 
 /*
-* calc_schmidt_plot
+* calc_schmidt_plot_p
 * Params is a JSON string of the form { x: "L/W/BW", y:"L/W/BW"}
 */
 PhaseMatch.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yrange, ls_start, ls_stop, li_start, li_stop, dim, params){

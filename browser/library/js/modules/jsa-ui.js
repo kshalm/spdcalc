@@ -35,7 +35,7 @@ define(
         var jsaUI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
-            nWorkers: 5,
+            nWorkers: 2,
             tplPlots: tplJSALayout,
             tplDoc: tplDocsJSA,
             showPlotOpts: [

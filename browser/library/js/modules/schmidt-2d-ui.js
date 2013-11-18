@@ -116,7 +116,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size_schmidt': 4,
+                    'grid_size_schmidt': 10,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -201,45 +201,7 @@ define(
                         return true;
                 });  
 
-                // return  self.workers[0].exec('jsaHelper.doCalcSchmidtPlot', [
-                //         props.get(),
-                        
-                //         self.plotOpts.get('ls_start'),
-                //         self.plotOpts.get('ls_stop'),
-                //         self.plotOpts.get('li_start'),
-                //         self.plotOpts.get('li_stop'),
-                //         self.plotOpts.get('grid_size_schmidt'),
-                //         params
-                // ])
-                // .then(function( PM ){
-                //     console.log("done calc");
-                //     self.data = PM;
-                //     self.plot.setZRange([1,Math.max.apply(null,PM)*1]);
-                //     self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('xtal_l_start')), converter.to('micro',self.plotOpts.get('xtal_l_stop'))]);
-                //     self.plot.setYRange( [ converter.to('nano',self.plotOpts.get('bw_start')), converter.to('nano',self.plotOpts.get('bw_stop'))]);
-
-                //     return true;
-                // });
                 
-
-                // var PM = PhaseMatch.calc_schmidt_plot(
-                //      props,
-                //     self.plotOpts.get('xtal_l_start'),
-                //     self.plotOpts.get('xtal_l_stop'),
-                //     self.plotOpts.get('bw_start'),
-                //     self.plotOpts.get('bw_stop'),
-                //     self.plotOpts.get('ls_start'),
-                //     self.plotOpts.get('ls_stop'),
-                //     self.plotOpts.get('li_start'),
-                //     self.plotOpts.get('li_stop'),
-                //     po.get('grid_size_schmidt'),
-                //     params);
-
-                // console.log("Schmidt time = ", Tstop - Tstart);
-                // console.log(PM);
-                
-                // self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
-                // self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
             },
 
             draw: function(){

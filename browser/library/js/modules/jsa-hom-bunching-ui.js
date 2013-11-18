@@ -43,7 +43,7 @@ define(
         var jsahomBunchUI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
-            nWorkers: 6,
+            nWorkers: 3,
             tplPlots: tplJSALayout,
             showPlotOpts: [
                 'T_2HOM',
@@ -133,6 +133,7 @@ define(
                 self.on('change:delT', function( delT ){
 
                     self.refreshLine( delT );
+                    self.plot1d.setTitle("Time delay = " + delT/1e-15);
 
                     clearTimeout( to );
                     to = setTimeout(function(){
