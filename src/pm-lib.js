@@ -1013,6 +1013,46 @@ PhaseMatch.calc_2HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start,
 };
 
 /*
+ * calc_2HOM_scan()
+ * Calculates the HOM probability of coincidences over range of times for two identical sources.
+ * P is SPDC Properties object
+ * delT is the time delay between signal and idler
+ */
+PhaseMatch.calc_2HOM_scan_p = function calc_HOM_scan(P, delT, ls_start, ls_stop, li_start, li_stop, dim){
+
+    var npts = 30;  //number of points to pass to calc_JSA()
+    // dim = 20;
+    // var delT = PhaseMatch.linspace(t_start, t_stop, dim);
+    dim = delT.length;
+
+    var HOM_values_ss =new Float64Array(dim);
+    var HOM_values_ii =new Float64Array(dim);
+    var HOM_values_si =new Float64Array(dim);
+
+    var PM_JSA = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, npts); // Returns the complex JSA
+
+    var PM_JSA_real = PhaseMatch.create_2d_array(PM_JSA[0], npts, npts);
+    var PM_JSA_imag = PhaseMatch.create_2d_array(PM_JSA[1], npts, npts);
+
+    // Calculate normalization
+    var N = PhaseMatch.calc_2HOM_norm(PM_JSA_real, PM_JSA_imag, npts);
+    // var N = 1;
+
+    for (var i=0; i<dim; i++){
+        // PM_JSA = PhaseMatch.calc_HOM_JSA(P, ls_start, ls_stop, li_start, li_stop, delT[i], npts);
+        // var total = PhaseMatch.Sum(PM_JSA)/N;
+        var rates = PhaseMatch.calc_2HOM_rate(delT[i], ls_start, ls_stop, li_start, li_stop, PM_JSA_real, PM_JSA_imag, npts);
+        HOM_values_ss[i] = rates["ss"]/N;
+        HOM_values_ii[i] = rates["ii"]/N;
+        HOM_values_si[i] = rates["si"]/N;
+    }
+
+    // return {"ss":HOM_values_ss, "ii":HOM_values_ii, "si":HOM_values_si};
+    return [HOM_values_ss, HOM_values_ii,HOM_values_si];
+
+};
+
+/*
  * calc_Schmidt
  * Calculates the Schmidt number for a 2D matrix
  * NOTE: The SVD routine has problems with odd dimensions

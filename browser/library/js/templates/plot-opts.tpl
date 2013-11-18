@@ -21,6 +21,17 @@
         </div>
     </div>
 
+    <div id="plot-opt-T_2HOM">
+        <div class="control-group">
+            <label class="control-label T_2HOM">
+                Number of points
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="" class="inputbox" name="T_2HOM" value="{{= parseFloat( it.T_2HOM ) }}" />
+            </div>
+        </div>
+    </div>
+
     <div id="plot-opt-grid_size_ms">
         <div class="control-group">
             <label class="control-label grid_size_ms">

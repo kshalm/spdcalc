@@ -67,6 +67,26 @@ W('jsaHelper', {
                     li_stop,
                     grid_size_schmidt,
                     params);
-   	}
+   	},
+
+    do2HOM: function( args ){
+      this.props.set( args[0] );
+
+      var delT = args[1],
+          ls_start = args[2],
+          ls_stop = args[3],
+          li_start = args[4],
+          li_stop = args[5],
+          dim = args[6];
+
+      return  PhaseMatch.calc_2HOM_scan_p(
+                    this.props,
+                    delT,
+                    ls_start,
+                    ls_stop,
+                    li_start,
+                    li_stop,
+                    dim);
+    }
 });
 
