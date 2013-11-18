@@ -99,7 +99,6 @@ W('jsaHelper', {
           li_stop = args[5],
           dim = args[6],
           dip = args[7];
-          console.log(dip);
 
       return  PhaseMatch.calc_HOM_scan_p(
                     this.props,

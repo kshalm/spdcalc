@@ -3981,7 +3981,7 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 PhaseMatch.calc_HOM_scan_p = function calc_HOM_scan(P, delT, ls_start, ls_stop, li_start, li_stop, dim, dip){
     // console.log(dip);
     // dip = dip || true;
-    console.log(dip);
+    // console.log(dip);
 
 
     var npts = 100;  //number of points to pass to the calc_HOM_JSA

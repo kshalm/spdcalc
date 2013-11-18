@@ -132,6 +132,7 @@ define(
                 self.on('change:delT', function( delT ){
 
                     self.refreshLine( delT );
+                    self.plot1d.setTitle("Time delay = " + delT/1e-15);
 
                     clearTimeout( to );
                     to = setTimeout(function(){
@@ -251,7 +252,6 @@ define(
 
                 var starttime = new Date();
                 var data1d = []
-                    ,dim = 200
                     ,po = self.plotOpts
                     // ,dim = po.get('T_2HOM')
                     , dim = 60
@@ -298,7 +298,7 @@ define(
                         }   
 
                         var endtime = new Date();
-                        console.log("2HOM Elapsed time: ", endtime - starttime);
+                        console.log("HOM dip Elapsed time: ", endtime - starttime);
 
                         return arr; // this value is passed on to the next "then()"
 
@@ -358,47 +358,64 @@ define(
                     ,delT = self.get('delT')
                     ,po = self.plotOpts;
 
+                var st = new Date();
+                    // console.log("calHOMJSA", self.get('delT') );
+                
+
+
                 return  self.workers[self.nWorkers-1].exec('jsaHelper.doCalcHOMJSA', [
                             props.get(),
                             po.get('ls_start'),
                             po.get('ls_stop'),
                             po.get('li_start'),
                             po.get('li_stop'),
-                            self.get('delT'),
+                            delT,
                             po.get('grid_size'),
                             true
                 ]).then(function(PM){
-                        console.log("inside!");
+                        // console.log("finished JSA calc");
                         self.data = PM;
+                        self.draw();
 
                         // var S= PhaseMatch.calc_Schmidt(PM);
                         // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
 
                         self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
-                        self.plot1d.setTitle("Time delay = " + self.get('delT')/1e-15);
-
+                        var sp = new Date();
+                        console.log("time jsa", sp -st);
                 });
 
-                    // var PM = PhaseMatch.calc_HOM_JSA(
-                    //     props,
-                    //     po.get('ls_start'),
-                    //     po.get('ls_stop'),
-                    //     po.get('li_start'),
-                    //     po.get('li_stop'),
-                    //     self.get('delT'),
-                    //     po.get('grid_size'),
-                    //     true
-                    // )
-                    // ;
+                
+                
+                // var PM = PhaseMatch.calc_HOM_JSA(
+                //     props,
+                //     po.get('ls_start'),
+                //     po.get('ls_stop'),
+                //     po.get('li_start'),
+                //     po.get('li_stop'),
+                //     self.get('delT'),
+                //     po.get('grid_size'),
+                //     true
+                // )
+                // ;
 
                 
+                // self.data = PM;
+
+                // // var S= PhaseMatch.calc_Schmidt(PM);
+                // // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
+
+                // self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
+                // self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
+                // self.plot1d.setTitle("Time delay = " + self.get('delT')/1e-15);
             },
 
             draw: function(){
 
                 var self = this
                     ,data = self.data
+                    ,dfd = when.defer()
                     ;
 
                 if (!data){
@@ -414,7 +431,14 @@ define(
                     return this;
                 }
 
-                self.plot1d.plotData( data1d );
+                setTimeout(function(){
+                    self.plot1d.plotData( data1d );
+                    dfd.resolve();
+                }, 50);
+                   
+                return dfd.promise; 
+
+                // self.plot1d.plotData( data1d );
             }
         });
 
