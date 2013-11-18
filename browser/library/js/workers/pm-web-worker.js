@@ -87,6 +87,51 @@ W('jsaHelper', {
                     li_start,
                     li_stop,
                     dim);
+    },
+
+    doHOM: function( args ){
+      this.props.set( args[0] );
+
+      var delT = args[1],
+          ls_start = args[2],
+          ls_stop = args[3],
+          li_start = args[4],
+          li_stop = args[5],
+          dim = args[6],
+          dip = args[7];
+          console.log(dip);
+
+      return  PhaseMatch.calc_HOM_scan_p(
+                    this.props,
+                    delT,
+                    ls_start,
+                    ls_stop,
+                    li_start,
+                    li_stop,
+                    dim,
+                    dip);
+    },
+
+    doCalcHOMJSA: function( args ){
+      this.props.set( args[0] );
+
+      var ls_start = args[1],
+          ls_stop = args[2],
+          li_start = args[3],
+          li_stop = args[4],
+          delT = args[5],
+          grid_size = args[6], 
+          dip = args[7];
+
+      return  PhaseMatch.calc_HOM_JSA(
+                this.props,
+                ls_start,
+                ls_stop,
+                li_start,
+                li_stop,
+                delT,
+                grid_size,
+                dip);
     }
 });
 

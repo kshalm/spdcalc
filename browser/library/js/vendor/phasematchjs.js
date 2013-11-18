@@ -3971,6 +3971,60 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
 
 };
 
+
+/*
+ * calc_HOM_scan()
+ * Calculates the HOM probability of coincidences over range of times.
+ * P is SPDC Properties object
+ * delT is the time delay between signal and idler
+ */
+PhaseMatch.calc_HOM_scan_p = function calc_HOM_scan(P, delT, ls_start, ls_stop, li_start, li_stop, dim, dip){
+    // console.log(dip);
+    // dip = dip || true;
+    console.log(dip);
+
+
+    var npts = 100;  //number of points to pass to the calc_HOM_JSA
+    var dim = delT.length;
+
+    // var delT = PhaseMatch.linspace(t_start, t_stop, dim);
+
+    var HOM_values = new Float64Array(dim);
+    var PM_JSA1 = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, npts);
+    var PM_JSA2 = PhaseMatch.calc_JSA(P, li_start, li_stop, ls_start, ls_stop, npts);
+
+    var PM_JSA1_real = PhaseMatch.create_2d_array(PM_JSA1[0], npts,npts);
+    var PM_JSA1_imag = PhaseMatch.create_2d_array(PM_JSA1[1], npts,npts);
+    var PM_JSA2_real = PhaseMatch.create_2d_array(PhaseMatch.AntiTranspose(PM_JSA2[0],npts), npts,npts);
+    var PM_JSA2_imag = PhaseMatch.create_2d_array(PhaseMatch.AntiTranspose(PM_JSA2[1],npts), npts,npts);
+
+    var JSA = {
+        'PM_JSA1_real': PM_JSA1_real
+        ,'PM_JSA1_imag': PM_JSA1_imag
+        ,'PM_JSA2_real': PM_JSA2_real
+        ,'PM_JSA2_imag': PM_JSA2_imag
+        };
+
+    var PM_JSI = PhaseMatch.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, npts);
+
+    // Calculate normalization
+    var N = PhaseMatch.Sum(PM_JSI),
+        rate;
+
+    for (var i=0; i<dim; i++){
+        if (dip){
+            rate = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT[i], JSA, npts);
+        }
+        else {
+            rate = PhaseMatch.calc_HOM_bunch_rate(ls_start, ls_stop, li_start, li_stop, delT[i], JSA, npts);
+        }
+
+        HOM_values[i] = (rate["rate"])/N;
+    }
+    return HOM_values;
+
+};
+
 /*
  * calc_HOM_JSA()
  * Calculates the Joint Spectra Amplitude of the HOM at a particluar time delay
