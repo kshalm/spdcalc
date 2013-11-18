@@ -262,7 +262,7 @@ define(
                         po.get('ls_stop'),
                         po.get('li_start'),
                         po.get('li_stop'),
-                        dim,
+                        po.get('grid_size'),
                         true
                     ]);
                 }
@@ -280,7 +280,7 @@ define(
                         }   
 
                         var endtime = new Date();
-                        // console.log("HOM dip Elapsed time: ", endtime - starttime);
+                        console.log("HOM dip Elapsed time: ", endtime - starttime);
 
                         return arr; // this value is passed on to the next "then()"
 
@@ -306,10 +306,6 @@ define(
 
                         return true;
                 });  
-
-                
-
-                
             },
 
             set_slider_values: function(zero_delay, t_start, t_stop){

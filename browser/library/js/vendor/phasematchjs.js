@@ -3978,13 +3978,13 @@ PhaseMatch.calc_HOM_scan = function calc_HOM_scan(P, t_start, t_stop, ls_start, 
  * P is SPDC Properties object
  * delT is the time delay between signal and idler
  */
-PhaseMatch.calc_HOM_scan_p = function calc_HOM_scan(P, delT, ls_start, ls_stop, li_start, li_stop, dim, dip){
+PhaseMatch.calc_HOM_scan_p = function calc_HOM_scan(P, delT, ls_start, ls_stop, li_start, li_stop, npts, dip){
     // console.log(dip);
     // dip = dip || true;
     // console.log(dip);
 
 
-    var npts = 100;  //number of points to pass to the calc_HOM_JSA
+    // var npts = 50;  //number of points to pass to the calc_HOM_JSA
     var dim = delT.length;
 
     // var delT = PhaseMatch.linspace(t_start, t_stop, dim);

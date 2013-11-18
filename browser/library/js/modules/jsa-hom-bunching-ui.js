@@ -279,7 +279,7 @@ define(
                         po.get('ls_stop'),
                         po.get('li_start'),
                         po.get('li_stop'),
-                        dim,
+                        po.get('grid_size'),
                         false
                     ]);
                 }
@@ -297,7 +297,7 @@ define(
                         }   
 
                         var endtime = new Date();
-                        // console.log("HOM dip Elapsed time: ", endtime - starttime);
+                        console.log("HOM bunching Elapsed time: ", endtime - starttime);
 
                         return arr; // this value is passed on to the next "then()"
 
@@ -341,10 +341,8 @@ define(
 
             updateJSATitle: function( PM ){
                 var self = this;
-                console.log("updating tigtle");
                 return self.workers[self.nWorkers-1].exec('jsaHelper.doCalcSchmidt', [PM], true)
                         .then(function( S ){
-                            console.log("schmidt number = ", S);
                             self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
                         });
 
