@@ -6240,6 +6240,90 @@ PhaseMatch.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_stop
 
 };
 
+/*
+* calc_schmidt_plot
+* Params is a JSON string of the form { x: "L/W/BW", y:"L/W/BW"}
+*/
+PhaseMatch.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yrange, ls_start, ls_stop, li_start, li_stop, dim, params){
+    props.update_all_angles();
+    var P = props.clone();
+
+
+    // if (P.brute_force && dim>P.brute_dim){
+    //     dim = P.brute_dim;
+    // }
+
+    // var xrange = PhaseMatch.linspace(x_start, x_stop, dim);
+    // var yrange = PhaseMatch.linspace(y_stop, y_start, dim);
+    var i;
+    var N = xrange.length*yrange.length;
+    var S = new Float64Array( N );
+
+    var dimjsa = 50; //make sure this is even
+
+    var maxpm = 0;
+    var maxschmidt = 10;
+    var x_ideal = 0;
+    var y_ideal = 0;
+
+
+    for (i=0; i<N; i++){
+        var index_x = i % xrange.length;
+        var index_y = Math.floor(i / xrange.length);
+
+        // Figure out what to plot in the x dimension
+        switch (params.x){
+            case "L":
+                P.L = xrange[index_x];
+            break;
+            case "W":
+                P.W = xrange[index_x];
+            break;
+            case "BW":
+                P.p_bw = xrange[index_x];
+            break;
+            default:
+                throw "Error: x input type";
+        }
+
+        // Figure out what to plot in the y dimension
+        switch (params.y){
+            case "L":
+                P.L = yrange[index_y];
+            break;
+            case "W":
+                P.W = yrange[index_y];
+            break;
+            case "BW":
+                P.p_bw = yrange[index_y];
+            break;
+            default:
+                throw "Error: y input type";
+        }
+
+        //now calculate the JSI for these values
+        var jsa = PhaseMatch.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, dimjsa);
+        var jsa2d = PhaseMatch.create_2d_array(jsa, dimjsa, dimjsa);
+        S[i] = PhaseMatch.calc_Schmidt(jsa2d);
+        // console.log(S[i]);
+
+        if (S[i]<maxschmidt){
+            maxschmidt = S[i];
+            x_ideal = xrange[index_x];
+            y_ideal = yrange[index_y];
+        }
+
+
+    }
+
+    // console.log("max pm value = ", maxpm);
+    // console.log("Lowest Schmidt = ", maxschmidt, " , X = ", x_ideal, ", Y = ", y_ideal);
+    // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
+    // console.log(S[0]);
+    return S;
+
+};
+
 
 // PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, x_stop, y_start, y_stop, BW, dim){
 

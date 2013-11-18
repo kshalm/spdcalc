@@ -131,10 +131,6 @@ define(
                 var starttime = new Date();
 
                 var propsJSON = props.get()
-                    ,ls_range = (self.plotOpts.get('ls_stop') - self.plotOpts.get('ls_start'))
-                    ,li_range = (self.plotOpts.get('li_stop') - self.plotOpts.get('li_start'))
-                    ,ls_mid = 0.5 * ls_range + self.plotOpts.get('ls_start')
-                    ,li_mid = 0.5 * li_range + self.plotOpts.get('li_start')
                     ,grid_size = self.plotOpts.get('grid_size')
                     ;
 
