@@ -35,7 +35,7 @@ define(
         var jsaUI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
-            nWorkers: 4,
+            nWorkers: 5,
             tplPlots: tplJSALayout,
             tplDoc: tplDocsJSA,
             showPlotOpts: [
@@ -116,9 +116,9 @@ define(
                 });
             },
 
-            updateTitle: function( worker, PM ){
+            updateTitle: function( PM ){
                 var self = this;
-                return worker.exec('doCalcSchmidt', [PM], true)
+                return self.workers[this.nWorkers-1].exec('jsaHelper.doCalcSchmidt', [PM])
                         .then(function( S ){
                             self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
                         });
@@ -137,7 +137,7 @@ define(
                 var lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), grid_size),
                     lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), grid_size);
 
-                var Nthreads = self.nWorkers;
+                var Nthreads = self.nWorkers-1;
 
                 var divisions = Math.floor(grid_size / Nthreads);
 
@@ -188,7 +188,7 @@ define(
 
                     }).then(function( PM ){
 
-                        // var p = self.updateTitle(workers[0], PM );
+                        var p = self.updateTitle( PM );
                         self.data = PM;
                         self.plot.setZRange([0,Math.max.apply(null,PM)]);
                         self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
