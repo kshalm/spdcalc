@@ -153,7 +153,7 @@ W('jsaHelper', {
                 );
     },
 
-    doPMXYBoth: function( args ){
+    doXYBoth: function( args ){
       this.props.set( args[0] );
 
       var xstart = args[1],
@@ -173,7 +173,7 @@ W('jsaHelper', {
                 );
     },
 
-    doPMLambdasThetas: function( args ){
+    doXYLambdasThetas: function( args ){
       this.props.set( args[0] );
 
       var xstart = args[1],
@@ -193,7 +193,7 @@ W('jsaHelper', {
                 );
     },
 
-    doPMThetaPhi: function( args ){
+    doXYThetavsPhi: function( args ){
       this.props.set( args[0] );
 
       var xstart = args[1],
@@ -213,7 +213,7 @@ W('jsaHelper', {
                 );
     },
 
-    doPMThetaTheta: function( args ){
+    doXYThetaTheta: function( args ){
       this.props.set( args[0] );
 
       var xstart = args[1],

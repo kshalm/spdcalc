@@ -236,7 +236,7 @@ define(
                     
                 ]);
 
-                promises[1] = self.workers[0].exec('jsaHelper.doPMXYBoth', [
+                promises[1] = self.workers[0].exec('jsaHelper.doXYBoth', [
                         propsJSON,
                         -2 * po.get('theta_stop'),
                         2 * po.get('theta_stop'),
@@ -247,7 +247,7 @@ define(
                 ]);
 
                 // Lambda signal vs theta signal
-                promises[2] = self.workers[0].exec('jsaHelper.doPMLambdasThetas', [
+                promises[2] = self.workers[0].exec('jsaHelper.doXYLambdasThetas', [
                         propsJSON,
                         po.get('ls_start'),
                         po.get('ls_stop'),
@@ -258,7 +258,7 @@ define(
                 ]);
 
                  // Theta vs Phi in crystal
-                promises[3] = self.workers[0].exec('jsaHelper.doPMThetaPhi', [
+                promises[3] = self.workers[0].exec('jsaHelper.doXYThetavsPhi', [
                         propsJSON,
                         po.get('theta_start'),
                         po.get('theta_stop'),
@@ -268,8 +268,20 @@ define(
                     
                 ]);
 
+                // var XYThetaPhi = PhaseMatch.calc_signal_theta_phi(
+                //     props,
+                //     po.get('theta_start'),
+                //     po.get('theta_stop'),
+                //     0,
+                //     0.5 * Math.PI,
+                //     po.get('grid_size')
+                // );
+                // self.dataThetaPhi = XYThetaPhi;
+                // self.plotThetaPhi.setXRange([ t_start, t_stop ]);
+                // self.plotThetaPhi.setYRange([0 ,90]);
+
                // Signal Theta vs Idler Theta in crystal
-                promises[4] = self.workers[0].exec('jsaHelper.doPMThetaTheta', [
+                promises[4] = self.workers[0].exec('jsaHelper.doXYThetaTheta', [
                         propsJSON,
                         po.get('theta_start'),
                         po.get('theta_stop'),
