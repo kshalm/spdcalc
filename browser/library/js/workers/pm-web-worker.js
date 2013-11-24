@@ -231,6 +231,68 @@ W('jsaHelper', {
                 ystop,
                 grid_size
                 );
+    },
+
+    doPMSignal: function( args ){
+      this.props.set( args[0] );
+
+      var xstart = args[1],
+          xstop = args[2],
+          ystart = args[3],
+          ystop = args[4],
+          photon = args[5],
+          grid_size = args[6]
+          ; 
+
+      return  PhaseMatch.calc_PM_Curves(
+                this.props,
+                xstart,
+                xstop,
+                ystart,
+                ystop,
+                photon,
+                grid_size
+                );
+    },
+
+    doPMThetaPhi: function( args ){
+      this.props.set( args[0] );
+
+      var xstart = args[1],
+          xstop = args[2],
+          ystart = args[3],
+          ystop = args[4],
+          grid_size = args[5]
+          ; 
+
+      return  PhaseMatch.calc_PM_Pump_Theta_Phi(
+                this.props,
+                xstart,
+                xstop,
+                ystart,
+                ystop,
+                grid_size
+                );
+    },
+
+    doPMPolingTheta: function( args ){
+      this.props.set( args[0] );
+
+      var xstart = args[1],
+          xstop = args[2],
+          ystart = args[3],
+          ystop = args[4],
+          grid_size = args[5]
+          ; 
+
+      return  PhaseMatch.calc_PM_Pump_Theta_Poling(
+                this.props,
+                xstart,
+                xstop,
+                ystart,
+                ystop,
+                grid_size
+                );
     }
 
 });

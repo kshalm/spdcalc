@@ -2,20 +2,26 @@ define(
     [
         'jquery',
         'stapes',
+        'when',
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
         'modules/converter',
+        'worker!workers/pm-web-worker.js',
         'modules/skeleton-ui',
         'tpl!templates/pm-curves.tpl'
     ],
     function(
         $,
         Stapes,
+        when,
         PhaseMatch,
         HeatMap,
         LinePlot,
         converter,
+
+        pmWorker,
+
         SkeletonUI,
         tplCurvesLayout
     ) {
@@ -32,6 +38,7 @@ define(
         var xy_UI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
+            nWorkers: 3,
             tplPlots: tplCurvesLayout,
             showPlotOpts: [
                 'grid_size',
@@ -202,75 +209,111 @@ define(
                     // ,dataBoth = []
                     ,l_start = converter.to('nano', po.get('ls_start'))
                     ,l_stop =  converter.to('nano', po.get('ls_stop'))
+                    ,Nthreads = self.nWorkers
+                    ,promises = []
                     ;
 
             // Turn off fiber coupling to get accurate results
             var isfibercoupled = props.calcfibercoupling;
             props.calcfibercoupling = false;
+            var propsJSON = props.get();
 
-            var PMSignal = PhaseMatch.calc_PM_Curves(
-                    props,
+            promises[0] = self.workers[0].exec('jsaHelper.doPMSignal', [
+                    propsJSON,
                     po.get('pm_signal_wavelength_start'),
                     po.get('pm_signal_wavelength_stop'),
                     po.get('lp_start'),
                     po.get('lp_stop'),
                     "signal",
                     po.get('grid_size')
-                );
-            console.log(props.calcfibercoupling);
-            self.dataSignal = PMSignal;
-            self.plotSignal.setXRange([ converter.to('nano', po.get('lp_start')),converter.to('nano', po.get('lp_stop')) ]);
-            self.plotSignal.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
+                    
+            ]);
 
-
-            // var PMTheta = PhaseMatch.calc_PM_Crystal_Tilt(
-            //         props,
-            //         po.get('pm_signal_wavelength_start'),
-            //         po.get('pm_signal_wavelength_stop'),
-            //         po.get('pump_theta_start'),
-            //         po.get('pump_theta_stop'),
-            //         // props.theta - 2*Math.PI/180,
-            //         // props.theta + 2*Math.PI/180,
-            //         // 399e-9,
-            //         // 401e-9,
-            //         po.get('grid_size')
-            //     );
-            // // console.log("finished", PMTheta);
-            // self.dataTheta = PMTheta;
-            // self.plotTheta.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
-            // self.plotTheta.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
-
-            var PMThetaPhi = PhaseMatch.calc_PM_Pump_Theta_Phi(
-                    props,
-
-                    po.get('pump_theta_start'),
+            promises[1] = self.workers[1].exec('jsaHelper.doPMThetaPhi', [
+                    propsJSON,
+                   po.get('pump_theta_start'),
                     po.get('pump_theta_stop'),
                     po.get('pump_phi_start'),
                     po.get('pump_phi_stop'),
-                    // 0,
-                    // Math.PI/2,
-                    // 0,
-                    // Math.PI,
-
                     po.get('grid_size')
-                );
-            // console.log("finished", PMThetaPhi);
-            self.dataThetaPhi = PMThetaPhi;
-            self.plotThetaPhi.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
-            self.plotThetaPhi.setYRange([ converter.to('deg',  po.get('pump_phi_start')),converter.to('deg', po.get('pump_phi_stop')) ]);
+                    
+            ]);
 
-
-            var PMPolingTheta = PhaseMatch.calc_PM_Pump_Theta_Poling(
-                    props,
+            promises[2] = self.workers[2].exec('jsaHelper.doPMPolingTheta', [
+                    propsJSON,
                     po.get('poling_period_start'),
                     po.get('poling_period_stop'),
                     po.get('pump_theta_start'),
                     po.get('pump_theta_stop'),
                     po.get('grid_size')
-                );
-            self.dataPolingTheta = PMPolingTheta;
-            self.plotPolingTheta.setXRange([ converter.to('micro',  po.get('poling_period_start')),converter.to('micro', po.get('poling_period_stop')) ]);
-            self.plotPolingTheta.setYRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
+                    
+            ]);
+
+            return when.all( promises ).then(function( values ){
+                self.dataSignal = values[0];
+                self.plotSignal.setXRange([ converter.to('nano', po.get('lp_start')),converter.to('nano', po.get('lp_stop')) ]);
+                self.plotSignal.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
+
+                self.dataThetaPhi = values[1];
+                self.plotThetaPhi.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
+                self.plotThetaPhi.setYRange([ converter.to('deg',  po.get('pump_phi_start')),converter.to('deg', po.get('pump_phi_stop')) ]);
+
+                self.dataPolingTheta = values[2];
+                self.plotPolingTheta.setXRange([ converter.to('micro',  po.get('poling_period_start')),converter.to('micro', po.get('poling_period_stop')) ]);
+                self.plotPolingTheta.setYRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
+
+                        
+                return true; // this value is passed on to the next "then()"
+
+            });
+
+            // var PMSignal = PhaseMatch.calc_PM_Curves(
+            //         props,
+            //         po.get('pm_signal_wavelength_start'),
+            //         po.get('pm_signal_wavelength_stop'),
+            //         po.get('lp_start'),
+            //         po.get('lp_stop'),
+            //         "signal",
+            //         po.get('grid_size')
+            //     );
+            // // console.log(props.calcfibercoupling);
+            // self.dataSignal = PMSignal;
+            // self.plotSignal.setXRange([ converter.to('nano', po.get('lp_start')),converter.to('nano', po.get('lp_stop')) ]);
+            // self.plotSignal.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
+
+
+            
+            // var PMThetaPhi = PhaseMatch.calc_PM_Pump_Theta_Phi(
+            //         props,
+
+            //         po.get('pump_theta_start'),
+            //         po.get('pump_theta_stop'),
+            //         po.get('pump_phi_start'),
+            //         po.get('pump_phi_stop'),
+            //         // 0,
+            //         // Math.PI/2,
+            //         // 0,
+            //         // Math.PI,
+
+            //         po.get('grid_size')
+            //     );
+            // console.log("finished", PMThetaPhi);
+            // self.dataThetaPhi = PMThetaPhi;
+            // self.plotThetaPhi.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
+            // self.plotThetaPhi.setYRange([ converter.to('deg',  po.get('pump_phi_start')),converter.to('deg', po.get('pump_phi_stop')) ]);
+
+
+            // var PMPolingTheta = PhaseMatch.calc_PM_Pump_Theta_Poling(
+            //         props,
+            //         po.get('poling_period_start'),
+            //         po.get('poling_period_stop'),
+            //         po.get('pump_theta_start'),
+            //         po.get('pump_theta_stop'),
+            //         po.get('grid_size')
+            //     );
+            // self.dataPolingTheta = PMPolingTheta;
+            // self.plotPolingTheta.setXRange([ converter.to('micro',  po.get('poling_period_start')),converter.to('micro', po.get('poling_period_stop')) ]);
+            // self.plotPolingTheta.setYRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
 
             props.calcfibercoupling = isfibercoupled;
             },
@@ -279,21 +322,20 @@ define(
 
             draw: function(){
 
-                var self = this;
+                var self = this,
+                    dfd = when.defer()
+                    ;
+                // async... but not inside webworker
+                
+                setTimeout(function(){
+                    self.plotSignal.plotData( self.dataSignal );
+                    self.plotPolingTheta.plotData( self.dataPolingTheta );
+                    self.plotThetaPhi.plotData( self.dataThetaPhi);
+                    dfd.resolve();
+                }, 10);
+                return dfd.promise;
 
-                // // PMXY plot
-                // if (!self.dataSignal ||
-                //     !self.theta ||
-                //     !self.dataBoth
-                // ){
-                //     return this;
-                // }
-
-                self.plotSignal.plotData( self.dataSignal );
-                // console.log("fort the plot", self.dataSignal[2])
-                // self.plotTheta.plotData( self.dataTheta );
-                self.plotPolingTheta.plotData( self.dataPolingTheta );
-                self.plotThetaPhi.plotData( self.dataThetaPhi);
+                
 
             }
         });
