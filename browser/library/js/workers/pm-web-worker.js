@@ -131,6 +131,107 @@ W('jsaHelper', {
                 delT,
                 grid_size,
                 dip);
+    },
+
+    docalc_XY: function( args ){
+      this.props.set( args[0] );
+
+      var xstart = args[1],
+          xstop = args[2],
+          ystart = args[3],
+          ystop = args[4],
+          grid_size = args[5]
+          ; 
+
+      return  PhaseMatch.calc_XY(
+                this.props,
+                xstart,
+                xstop,
+                ystart,
+                ystop,
+                grid_size
+                );
+    },
+
+    doPMXYBoth: function( args ){
+      this.props.set( args[0] );
+
+      var xstart = args[1],
+          xstop = args[2],
+          ystart = args[3],
+          ystop = args[4],
+          grid_size = args[5]
+          ; 
+
+      return  PhaseMatch.calc_XY_both(
+                this.props,
+                xstart,
+                xstop,
+                ystart,
+                ystop,
+                grid_size
+                );
+    },
+
+    doPMLambdasThetas: function( args ){
+      this.props.set( args[0] );
+
+      var xstart = args[1],
+          xstop = args[2],
+          ystart = args[3],
+          ystop = args[4],
+          grid_size = args[5]
+          ; 
+
+      return  PhaseMatch.calc_lambda_s_vs_theta_s(
+                this.props,
+                xstart,
+                xstop,
+                ystart,
+                ystop,
+                grid_size
+                );
+    },
+
+    doPMThetaPhi: function( args ){
+      this.props.set( args[0] );
+
+      var xstart = args[1],
+          xstop = args[2],
+          ystart = args[3],
+          ystop = args[4],
+          grid_size = args[5]
+          ; 
+
+      return  PhaseMatch.calc_signal_theta_phi(
+                this.props,
+                xstart,
+                xstop,
+                ystart,
+                ystop,
+                grid_size
+                );
+    },
+
+    doPMThetaTheta: function( args ){
+      this.props.set( args[0] );
+
+      var xstart = args[1],
+          xstop = args[2],
+          ystart = args[3],
+          ystop = args[4],
+          grid_size = args[5]
+          ; 
+
+      return  PhaseMatch.calc_signal_theta_vs_idler_theta(
+                this.props,
+                xstart,
+                xstop,
+                ystart,
+                ystop,
+                grid_size
+                );
     }
+
 });
 
