@@ -2,20 +2,26 @@ define(
     [
         'jquery',
         'stapes',
+        'when',
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
         'modules/converter',
+        'worker!workers/pm-web-worker.js',
         'modules/skeleton-ui',
         'tpl!templates/xy-layout.tpl'
     ],
     function(
         $,
         Stapes,
+        when,
         PhaseMatch,
         HeatMap,
         LinePlot,
         converter,
+
+        pmWorker,
+
         SkeletonUI,
         tplXYLayout
     ) {
@@ -32,6 +38,7 @@ define(
         var xy_UI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
+            nWorkers: 5,
             tplPlots: tplXYLayout,
             showPlotOpts: [
                 'grid_size',
@@ -196,9 +203,7 @@ define(
             },
 
             calc: function( props ){
-
                 var self = this
-                    ,dim = 200
                     ,po = this.plotOpts
                     ,data1d = []
                     ,dataPMXY = []
@@ -212,118 +217,141 @@ define(
                     ,t_stop = converter.to('deg', po.get('theta_stop'))
                     ,x_start = -1 * t_stop
                     ,x_stop = t_stop
+                    ,Nthreads = self.nWorkers
+                    ,promises = []
                     ;
 
-                var PMXY = PhaseMatch.calc_XY(
-                    props,
-                    -1 * po.get('theta_stop'),
-                    po.get('theta_stop'),
-                    -1 * po.get('theta_stop'),
-                    po.get('theta_stop'),
-                    po.get('grid_size')
-                );
+                var isfibercoupled = props.calcfibercoupling;
+                props.calcfibercoupling = false;
+                var propsJSON = props.get();
 
 
-                self.dataPMXY = PMXY;
-                self.plotPMXY.setXRange([ x_start, x_stop ]);
-                self.plotPMXY.setYRange([ x_start, x_stop ]);
+                promises[0] = self.workers[0].exec('jsaHelper.docalc_XY', [
+                        propsJSON,
+                        -1 * po.get('theta_stop'),
+                        po.get('theta_stop'),
+                        -1 * po.get('theta_stop'),
+                        po.get('theta_stop'),
+                        po.get('grid_size')
+                    
+                ]);
 
-
-                var PMXYBoth = PhaseMatch.calc_XY_both(
-                    props,
-                    -2 * po.get('theta_stop'),
-                    2 * po.get('theta_stop'),
-                    -2 * po.get('theta_stop'),
-                    2* po.get('theta_stop'),
-                    po.get('grid_size')
-                );
-
-                self.dataPMXYBoth = PMXYBoth;
-                self.plotPMXYBoth.setXRange([ 2 * x_start, 2 * x_stop ]);
-                self.plotPMXYBoth.setYRange([ 2 * x_start, 2 * x_stop ]);
-                self.plotPMXYBoth.setZRange([ 0, 2 ]);
+                promises[1] = self.workers[0].exec('jsaHelper.doXYBoth', [
+                        propsJSON,
+                        -2 * po.get('theta_stop'),
+                        2 * po.get('theta_stop'),
+                        -2 * po.get('theta_stop'),
+                        2* po.get('theta_stop'),
+                        po.get('grid_size')
+                    
+                ]);
 
                 // Lambda signal vs theta signal
-                var PMLambdasThetas = PhaseMatch.calc_lambda_s_vs_theta_s(
-                    props,
-                    po.get('ls_start'),
-                    po.get('ls_stop'),
-                    po.get('theta_start'),
-                    po.get('theta_stop'),
-                    po.get('grid_size')
-                );
-                self.dataLambdasThetas = PMLambdasThetas.data;
-                self.plotLambdasThetas.setXRange([ l_start, l_stop ]);
-                self.plotLambdasThetas.setYRange([ t_start, t_stop ]);
-                // console.log('BLAH', po.get('theta_start'), po.get('theta_stop') * 180/Math.PI);
-                // self.plotLambdasThetas.setYRange(PMLambdasThetas.theta_s);
+                promises[2] = self.workers[0].exec('jsaHelper.doXYLambdasThetas', [
+                        propsJSON,
+                        po.get('ls_start'),
+                        po.get('ls_stop'),
+                        po.get('theta_start'),
+                        po.get('theta_stop'),
+                        po.get('grid_size')
+                    
+                ]);
 
-                // Theta vs Phi in crystal
-                var PMThetaPhi = PhaseMatch.calc_signal_theta_phi(
-                    props,
-                    po.get('theta_start'),
-                    po.get('theta_stop'),
-                    0,
-                    0.5 * Math.PI,
-                    po.get('grid_size')
-                );
-                self.dataThetaPhi = PMThetaPhi;
-                self.plotThetaPhi.setXRange([ t_start, t_stop ]);
-                self.plotThetaPhi.setYRange([0 ,90]);
+                 // Theta vs Phi in crystal
+                promises[3] = self.workers[0].exec('jsaHelper.doXYThetavsPhi', [
+                        propsJSON,
+                        po.get('theta_start'),
+                        po.get('theta_stop'),
+                        0,
+                        0.5 * Math.PI,
+                        po.get('grid_size')
+                    
+                ]);
 
-                // Signal Theta vs Idler Theta in crystal
-                var PMThetaTheta = PhaseMatch.calc_signal_theta_vs_idler_theta(
-                    props,
-                    po.get('theta_start'),
-                    po.get('theta_stop'),
-                    po.get('theta_start'),
-                    po.get('theta_stop'),
-                    po.get('grid_size')
-                );
-
-                // t_start = 0;
-                // t_stop = Math.PI/180;
-
-                // var PMThetaTheta = PhaseMatch.calc_signal_phi_vs_idler_phi(
+                // var XYThetaPhi = PhaseMatch.calc_signal_theta_phi(
                 //     props,
-                //     t_start,
-                //     t_stop,
-                //     t_start+Math.PI,
-                //     Math.PI + t_stop,
-                //     dim
+                //     po.get('theta_start'),
+                //     po.get('theta_stop'),
+                //     0,
+                //     0.5 * Math.PI,
+                //     po.get('grid_size')
                 // );
+                // self.dataThetaPhi = XYThetaPhi;
+                // self.plotThetaPhi.setXRange([ t_start, t_stop ]);
+                // self.plotThetaPhi.setYRange([0 ,90]);
 
-                self.dataThetaTheta = PMThetaTheta;
-                self.plotThetaTheta.setXRange([ t_start, t_stop ]);
-                self.plotThetaTheta.setYRange([ t_start, t_stop ]);
-                // self.plotThetaTheta.setYRange([ t_start+Math.PI, t_stop+Math.PI ]);
+               // Signal Theta vs Idler Theta in crystal
+                promises[4] = self.workers[0].exec('jsaHelper.doXYThetaTheta', [
+                        propsJSON,
+                        po.get('theta_start'),
+                        po.get('theta_stop'),
+                        po.get('theta_start'),
+                        po.get('theta_stop'),
+                        po.get('grid_size')
+                    
+                ]);
+
+                return when.all( promises ).then(function( values ){
+                        self.dataPMXY = values[0];
+                        self.plotPMXY.setXRange([ x_start, x_stop ]);
+                        self.plotPMXY.setYRange([ x_start, x_stop ]);
+                        
+                        self.dataPMXYBoth = values[1];
+                        self.plotPMXYBoth.setXRange([ 2 * x_start, 2 * x_stop ]);
+                        self.plotPMXYBoth.setYRange([ 2 * x_start, 2 * x_stop ]);
+                        self.plotPMXYBoth.setZRange([ 0, 2 ]);
+
+                        self.dataLambdasThetas = values[2].data;
+                        self.plotLambdasThetas.setXRange([ l_start, l_stop ]);
+                        self.plotLambdasThetas.setYRange([ t_start, t_stop ]);
+
+                        self.dataThetaPhi = values[3];
+                        self.plotThetaPhi.setXRange([ t_start, t_stop ]);
+                        self.plotThetaPhi.setYRange([0 ,90]);
+
+                        self.dataThetaTheta = values[4];
+                        self.plotThetaTheta.setXRange([ t_start, t_stop ]);
+                        self.plotThetaTheta.setYRange([ t_start, t_stop ]);
+                                
+                        return true; // this value is passed on to the next "then()"
+
+                    });
+
+                props.calcfibercoupling = isfibercoupled;
             },
 
             draw: function(){
 
-                var self = this;
+                var self = this,
+                    dfd = when.defer()
+                    ;
 
                 // PMXY plot
-                if (!self.dataPMXY ||
-                    !self.dataLambdasThetas ||
-                    !self.dataThetaPhi ||
-                    !self.dataThetaTheta
-                ){
-                    return this;
-                }
+                // if (!self.dataPMXY ||
+                //     !self.dataLambdasThetas ||
+                //     !self.dataThetaPhi ||
+                //     !self.dataThetaTheta
+                // ){
+                //     return this;
+                // }
 
-                self.plotPMXY.plotData( self.dataPMXY );
-                 self.plotPMXYBoth.plotData( self.dataPMXYBoth );
+                // async... but not inside webworker
+                
+                setTimeout(function(){
+                    self.plotPMXY.plotData( self.dataPMXY );
+                    self.plotPMXYBoth.plotData( self.dataPMXYBoth );
 
-                // lambda signal vs theta signal plot
-                self.plotLambdasThetas.plotData( self.dataLambdasThetas );
+                    // lambda signal vs theta signal plot
+                    self.plotLambdasThetas.plotData( self.dataLambdasThetas );
 
-                // Theta vs Phi in the crystal
-                self.plotThetaPhi.plotData( self.dataThetaPhi );
+                    // Theta vs Phi in the crystal
+                    self.plotThetaPhi.plotData( self.dataThetaPhi );
 
-                // Theta vs Phi in the crystal
-                self.plotThetaTheta.plotData( self.dataThetaTheta );
-
+                    // Theta vs Phi in the crystal
+                    self.plotThetaTheta.plotData( self.dataThetaTheta );
+                    dfd.resolve();
+                }, 10);
+                return dfd.promise;
             }
         });
 

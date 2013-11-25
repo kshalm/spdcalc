@@ -21,6 +21,8 @@ module.exports = function(grunt) {
             'build/intro.js',
             'build/lodash.js',
             'src/constants.js',
+            'src/complex.js',
+            'src/scratchpad.js',
             'src/math-helpers.js',
             'src/pm-lib.js',
             'src/pm-crystals.js',
@@ -58,25 +60,29 @@ module.exports = function(grunt) {
         },
         // build a custom version of the lodash library for utility functions
         lodash: {
-            // modifiers for prepared builds
-            // backbone, csp, legacy, mobile, strict, underscore
-            // modifier: 'modern',
-            // output location
-            dest: 'build/lodash.js',
-            // define a different Lo-Dash location
-            // useful if you wanna use a different Lo-Dash version (>= 0.7.0)
-            // by default, lodashbuilder uses always the latest version
-            // of Lo-Dash (that was in npm at the time of lodashbuilders installation)
-            // src: 'node_modules/lodash',
-            // More information can be found in the [Lo-Dash custom builds section](http://lodash.com/#custom-builds)
-            // category: ['collections', 'functions']
-            exports: ['none'],
-            iife: '(function(){%output%;lodash.extend(PhaseMatch.util, lodash);}());',
-            include: ['extend', 'bind', 'clone', 'keys', 'pick', 'memoize']
-            // minus: ['result', 'shuffle']
-            // plus: ['random', 'template'],
-            // template: './*.jst'
-            // settings: '{interpolate:/\\{\\{([\\s\\S]+?)\\}\\}/g}'
+            main: {
+                // modifiers for prepared builds
+                // backbone, csp, legacy, mobile, strict, underscore
+                modifier: 'modern',
+                // output location
+                dest: 'build/lodash.js',
+                options: {
+                    // define a different Lo-Dash location
+                    // useful if you wanna use a different Lo-Dash version (>= 0.7.0)
+                    // by default, lodashbuilder uses always the latest version
+                    // of Lo-Dash (that was in npm at the time of lodashbuilders installation)
+                    // src: 'node_modules/lodash',
+                    // More information can be found in the [Lo-Dash custom builds section](http://lodash.com/#custom-builds)
+                    // category: ['collections', 'functions']
+                    exports: ['none'],
+                    iife: '(function(){%output%;lodash.extend(PhaseMatch.util, lodash);}());',
+                    include: ['each', 'extend', 'bind', 'clone', 'keys', 'pick', 'memoize']
+                    // minus: ['result', 'shuffle']
+                    // plus: ['random', 'template'],
+                    // template: './*.jst'
+                    // settings: '{interpolate:/\\{\\{([\\s\\S]+?)\\}\\}/g}'
+                }
+            }
         },
         // concatenate files into one file
         concat : {
@@ -172,7 +178,7 @@ module.exports = function(grunt) {
     });
 
     // register grunt plugins
-    grunt.loadNpmTasks('grunt-lodashbuilder');
+    grunt.loadNpmTasks('grunt-lodash');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');

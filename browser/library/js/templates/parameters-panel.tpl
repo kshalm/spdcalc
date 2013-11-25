@@ -104,7 +104,7 @@
         </div>
         <div class="control-group">   
             <label class="control-label waist_p">
-                Waist (um)
+                Waist FWHM (um)
             </label>
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W" value="{{= this.converter.to('micro', parseFloat( it.W )) }}" />
@@ -125,6 +125,13 @@
     <section class="form-horizontal">
         <div class="control-group">
             <!-- <h4>Signal Properties</h4> -->
+        </div>
+
+        <div class="control-group">
+            <label class="checkbox control-label fibercouple">
+                Enable fiber coupling
+                <input id="fibercouple" type="checkbox" class="inputbox" name="calcfibercoupling" {{? it.calcfibercoupling }} checked="checked" {{?}} />
+            </label>
         </div>
         <div class="control-group">   
             <label class="control-label lambda_s">
@@ -152,26 +159,26 @@
         </div>
         <div class="control-group">   
             <label class="control-label">
-                Waist x dir (deg)
+                Waist FWHM (um)
             </label>
             <div class="controls">
-                <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sx" value="{{= this.converter.to('deg', parseFloat( it.W_sx )) }}" />
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W_sx" value="{{= this.converter.to('micro', parseFloat( it.W_sx )) }}" />
             </div>
         </div>
-        <div class="control-group">   
+       <!--  <div class="control-group">   
             <label class="control-label">
                 Waist y dir (deg)
             </label>
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="W_sy" value="{{= this.converter.to('deg', parseFloat( it.W_sy )) }}" />
             </div>
-        </div>
-        <div class="control-group">
+        </div> -->
+        <!-- <div class="control-group">
             <label class="checkbox control-label brute_force">
                 Brute force calculation
                 <input id="brute_force" type="checkbox" class="inputbox" name="brute_force" {{? it.brute_force }} checked="checked" {{?}} />
             </label>
-        </div>
+        </div> -->
     </section>
 </div>
 

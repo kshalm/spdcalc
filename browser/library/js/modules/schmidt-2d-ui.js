@@ -2,21 +2,29 @@ define(
     [
         'jquery',
         'stapes',
+        'when',
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
+
+        'worker!workers/pm-web-worker.js',
+
         'tpl!templates/schmidt-2d-layout.tpl'
     ],
     function(
         $,
         Stapes,
+        when,
         PhaseMatch,
         HeatMap,
         LinePlot,
         SkeletonUI,
         converter,
+
+        pmWorker,
+
         tplSchmidtLayout
     ) {
 
@@ -31,9 +39,10 @@ define(
         var schmidtUI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
+            nWorkers: 4,
             tplPlots: tplSchmidtLayout,
             showPlotOpts: [
-                'grid_size',
+                'grid_size_schmidt',
                 'signal-wavelength',
                 'idler-wavelength',
                 'xtal_length_range',
@@ -107,7 +116,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 20,
+                    'grid_size_schmidt': 10,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -121,73 +130,99 @@ define(
 
             calc: function( props ){
 
-                var self = this;
-                var po = this.plotOpts;
+                var self = this,
+                    Nthreads = self.nWorkers,
+                    grid_size = self.plotOpts.get('grid_size_schmidt'),
+                    divisions = Math.floor(grid_size / Nthreads),
+                    xrange = [], 
+                    yrange = [],
+                    promises = [];
 
-                var dim = 20;
                 var params = {
                     x: "L",
                     y: "BW"
                 };
 
-                // var x_start = 100e-6;
-                // var x_stop = 10000e-6;
-                var y_start = .1e-9;
-                var y_stop = 20e-9;
+                var xtalL = PhaseMatch.linspace(
+                            self.plotOpts.get('xtal_l_start'),
+                            self.plotOpts.get('xtal_l_stop'),
+                            grid_size
+                        ); 
+
+                // be sure to reverse the order of this array so the graph makes sense.
+                // Effectively, this moves the origin to the bottom right corner.
+                var bw = PhaseMatch.linspace(
+                            self.plotOpts.get('bw_stop'),
+                            self.plotOpts.get('bw_start'),
+                            grid_size
+                        ); 
+
+                var xrange = xtalL;
 
 
-                var Tstart = new Date();
-                var PM = PhaseMatch.calc_schmidt_plot(
-                     props,
-                    self.plotOpts.get('xtal_l_start'),
-                    self.plotOpts.get('xtal_l_stop'),
-                    self.plotOpts.get('bw_start'),
-                    self.plotOpts.get('bw_stop'),
-                    self.plotOpts.get('ls_start'),
-                    self.plotOpts.get('ls_stop'),
-                    self.plotOpts.get('li_start'),
-                    self.plotOpts.get('li_stop'),
-                    po.get('grid_size'),
-                    params);
+                for (var i = 0; i<Nthreads-1; i++){
+                    yrange.push(bw.subarray(i*divisions,i*divisions + divisions));
+                }
+                yrange.push( bw.subarray((Nthreads-1)*divisions, bw.length));
+               
+                // The calculation is split up and reutrned as a series of promises
+                for (var j = 0; j < Nthreads; j++){
+                    promises[j] = self.workers[j].exec('jsaHelper.doCalcSchmidtPlot', [
+                        props.get(),
+                        xrange,
+                        yrange[j],
+                        self.plotOpts.get('ls_start'),
+                        self.plotOpts.get('ls_stop'),
+                        self.plotOpts.get('li_start'),
+                        self.plotOpts.get('li_stop'),
+                        self.plotOpts.get('grid_size_schmidt'),
+                        params
+                    ]);
+                }
 
-                    // props,
-                    // x_start,
-                    // x_stop,
-                    // y_start,
-                    // y_stop,
-                    // self.plotOpts.get('ls_start'),
-                    // self.plotOpts.get('ls_stop'),
-                    // self.plotOpts.get('li_start'),
-                    // self.plotOpts.get('li_stop'),
-                    // po.get('grid_size'),
-                    // params);
+                var startindex =0;
+                return when.all( promises ).then(function( values ){
+                        // put the results back together
+                        var arr = new Float64Array( grid_size *  grid_size );
+                        var startindex = 0;
+                        
+                        for (j = 0; j<Nthreads; j++){
+                             arr.set(values[j], startindex);
+                            // console.log("arr val set");
+                             startindex += xrange.length*yrange[j].length;
+                        }                        
+                        return arr; // this value is passed on to the next "then()"
 
-                var Tstop = new Date();
-                // console.log("Schmidt time = ", Tstop - Tstart);
-                // console.log(PM);
-                self.data = PM;
+                    }).then(function( PM ){
+                        self.data = PM;
+                        self.plot.setZRange([1,Math.max.apply(null,PM)*1]);
+                        self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('xtal_l_start')), converter.to('micro',self.plotOpts.get('xtal_l_stop'))]);
+                        self.plot.setYRange( [ converter.to('nano',self.plotOpts.get('bw_start')), converter.to('nano',self.plotOpts.get('bw_stop'))]);
+                        return true;
+                });  
 
-
-                // self.plot.scales.z = d3.scale.linear().domain([0, 50]);
-                self.plot.setZRange([1,Math.max.apply(null,PM)*1.1]);
-                self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('xtal_l_start')), converter.to('micro',self.plotOpts.get('xtal_l_stop'))]);
-                self.plot.setYRange( [ converter.to('nano',self.plotOpts.get('bw_start')), converter.to('nano',self.plotOpts.get('bw_stop'))]);
-
-                // self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
-                // self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+                
             },
 
             draw: function(){
 
                 var self = this
                     ,data = self.data
+                    ,dfd = when.defer()
                     ;
 
                 if (!data){
                     return this;
                 }
 
-                self.plot.plotData( data );
+                // self.plot.plotData( data );
+                 // async... but not inside webworker
+                setTimeout(function(){
+                    self.plot.plotData( data );
+                    dfd.resolve();
+                }, 10);
+                   
+                return dfd.promise; 
             }
         });
 

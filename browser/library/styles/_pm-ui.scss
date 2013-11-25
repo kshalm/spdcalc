@@ -95,6 +95,7 @@ body {
         border: 0;
         color: $inverse;
         min-width: 180px;
+        height:auto;
 
         a {
             color: $inverse;
@@ -109,6 +110,9 @@ body {
     }
 
 
+}
+.dk_options_inner {
+    max-height: none;
 }
 
 .btn i {
@@ -266,6 +270,20 @@ body {
     .full {
         width: 100%;
     }
+}
+
+.plot-wrapper {
+    position: relative;
+}
+.plot-wrapper.spinner:after {
+    content: '';
+    background: rgba(255, 255, 255, 0.8) image-url("spinner.gif") no-repeat center center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
 }
 
 .plot-wrapper .title{

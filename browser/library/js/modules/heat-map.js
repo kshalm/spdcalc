@@ -372,19 +372,34 @@ define(
                 var colorBarVals = d3.range( dom[0], dom[1], Math.abs(dom[1]-dom[0])/colorBarWidth );
                 var xColorBar = d3.scale.ordinal()
                     .domain( colorBarVals )
-                    .rangeRoundBands([0, colorBarWidth])
+                    .rangeRoundBands([0, colorBarWidth],0)
                     ;
 
                 var colorbar = svg.append("g").attr("class", "z axis")
                     .attr('transform', 'translate('+[width-colorBarWidth, -2*colorBarHeight].join(',')+')')
                     ;
 
+
+
+                // This is a hacky way to replace the xColorBar from d3.js which occasionally fails.
+                var xpos = 0;
+                var xColorBarPos = function(){
+                    xpos = xpos+(colorBarWidth/colorBarVals.length);
+                    return xpos;
+                }
+
+                var barwidth = colorBarWidth/colorBarVals.length;
+
                 colorbar.selectAll('rect')
                     .data(colorBarVals)
                    .enter()
                     .append("rect")
-                    .attr("x", xColorBar)
-                    .attr("width", xColorBar.rangeBand())
+                    // .attr("x", xColorBar)
+                    .attr("x", function(x){
+                            return xColorBarPos();
+                        })
+                    .attr("width", barwidth)
+                    // .attr("width", xColorBar.rangeBand())
                     .attr("height", colorBarHeight)
                     .style("fill", function( v ){
                         return z( v );
@@ -401,24 +416,23 @@ define(
                     ;
 
                 var vals = [].concat(dom);
-                // console.log(defaults.logplot);
                 if (this.logplot){
-                    vals.splice(1, 0, (dom[1]-dom[0]) / 10);
+                    vals.splice(1, 0, dom[0]+dom[1]/10);
                     var zAxis = d3.svg.axis()
                     // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
                     .scale( d3.scale.log().domain( dom ).nice().range([0, colorBarWidth]) )
                     .tickValues( vals )
-                    .tickFormat( d3.format( '.1f' ) )
+                    .tickFormat( d3.format( '.2f' ) )
                     .orient("top")
                     ;
                     // console.log("Inside log plot");
                 }
                 else{
-                    vals.splice(1, 0, (dom[1]-dom[0]) / 2);
+                    vals.splice(1, 0, (dom[1]-dom[0]) / 2 +dom[0]);
                     var zAxis = d3.svg.axis()
                     .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
                     .tickValues( vals )
-                    .tickFormat( d3.format( '.1f' ) )
+                    .tickFormat( d3.format( '.2f' ) )
                     .orient("top")
                     ;
                 }

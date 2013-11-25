@@ -23,7 +23,7 @@ define(
         'use strict';
 
         var con = PhaseMatch.constants;
-        
+
         /**
          * @module JSAUI
          * @implements {Stapes}
@@ -33,11 +33,9 @@ define(
             constructor: SkeletonUI.prototype.constructor,
             tplPlots: tplMSLayout,
             showPlotOpts: [
-                'grid_size',
+                'grid_size_ms',
                 'signal-wavelength',
                 'idler-wavelength',
-                'theta',
-                "collection-bw"
             ],
 
             initEvents : function(){
@@ -107,12 +105,11 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 100,
+                    'grid_size_ms': 16,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
-                    'li_stop': lim.lambda_i.max,
-                    'collection_bw': 20e-9
+                    'li_stop': lim.lambda_i.max
                 });
             },
 
@@ -121,58 +118,126 @@ define(
                 var self = this;
                 var po = this.plotOpts;
 
-                var scale = 5;
-                var BW = 1e-9;
+                // Make sure fiber coupling is enabled.
+                var isfibercoupled = props.calcfibercoupling;
+                props.calcfibercoupling = true;
+
+                var scale = 3;
+
 
 
                 //make sure the angles are correct so we can calculate the right ranges
                 props.phi_i = props.phi_s + Math.PI;
-                props.update_all_angles(); 
+                props.update_all_angles();
                 //find the external idler angle
                 props.theta_i_e = PhaseMatch.find_external_angle(props,'idler');
 
                 var X_0 = Math.asin(Math.sin(props.theta_i_e)* Math.cos(props.phi_i));
                 var Y_0 = Math.asin(Math.sin(props.theta_i_e)* Math.sin(props.phi_i));
 
-                console.log("central idler angles:", props.theta_i_e *180/Math.PI);
-                console.log(po.get('collection_bw')/1e-9);
-                
-                // var W = Math.max(props.W_sx, props.W_sy);
-                var W = props.W_sx;
+                // console.log("central idler angles:", props.theta_i_e *180/Math.PI);
+                // console.log(po.get('collection_bw')/1e-9);
 
-                var x_start = X_0 - scale*W/2;
-                var x_stop = X_0 + scale*W/2;
-                var y_start = Y_0 - scale*W/2;
-                var y_stop = Y_0 + scale*W/2;
-                    
+                // var W = Math.max(props.W_sx, props.W_sy);
+                var convertfromFWHM = 1/(2 * Math.sqrt(Math.log(2)));
+                var Ws = props.W_sx * convertfromFWHM;
+                //calculate Rayleigh range
+                var zrs = Math.PI * (Ws*Ws)/props.lambda_s;
+                Ws = props.lambda_s/(Math.PI * Ws); // angular spread
+
+                var Wp = props.W * convertfromFWHM;
+                //calculate Rayleigh range
+                var zrp = Math.PI * (Wp*Wp)/props.lambda_p;
+                Wp = props.lambda_p/(Math.PI * Wp); // angular spread
+
+                // var W = 1/(1/Ws + 1/Wp);
+                var W = (Ws + Wp/4);
+                // console.log(Ws, Wp, W);
+
+
+
+                console.log("rayleigh Range", zrs/props.L, zrp/props.L);
+
+
+                var x_start = X_0 - scale*W;
+                var x_stop = X_0 + scale*W;
+                var y_start = Y_0 - scale*W;
+                var y_stop = Y_0 + scale*W;
+
+                var wavelengths = {
+                    "ls_start":po.get("ls_start")
+                    ,"ls_stop":po.get("ls_stop")
+                    ,"li_start":po.get("li_start")
+                    ,"li_stop":po.get("li_stop")
+                };
+
+                // If the filters are mismatched, we need to integrate over more points.
+                var lambdadiff = Math.abs(po.get("ls_stop") - po.get("ls_start")) - Math.abs(po.get("li_stop") - po.get("li_start"));
+                lambdadiff = lambdadiff / Math.abs(po.get("ls_stop") - po.get("ls_start")) + Math.abs(po.get("li_stop") - po.get("li_start")) /2;
+                console.log("lambda diff", lambdadiff);
+                if (Math.abs(lambdadiff) > 0.3){
+                    var dimlambda = 32;
+                }
+                else if (Math.abs(lambdadiff) > 0.1){
+                    var dimlambda = 24;
+                }
+                else {
+                    dimlambda = 16;
+                }
+                // dimlambda = 60;
+
+                var startTime = new Date();
 
                 var PM_s = PhaseMatch.calc_XY_mode_solver2(
-                    props, 
+                    props,
                     x_start,
                     x_stop,
                     y_start,
                     y_stop,
-                    po.get('collection_bw'),
-                    po.get('grid_size')
+                    wavelengths,
+                    po.get('grid_size_ms'),
+                    dimlambda
                 );
+
+
+                var endTime = new Date();
+                var timeDiff = (endTime - startTime);
+                console.log(timeDiff);
                 // console.log(scale, props.W_sx*180/Math.PI, props.W_sx*scale *180/Math.PI);
 
                 // var PM_s = PhaseMatch.calc_XY_mode_solver(
-                //     props, 
-                //     -1 * po.get('theta_stop'), 
-                //     po.get('theta_stop'), 
-                //     -1 * po.get('theta_stop'), 
-                //     po.get('theta_stop'), 
+                //     props,
+                //     -1 * po.get('theta_stop'),
+                //     po.get('theta_stop'),
+                //     -1 * po.get('theta_stop'),
+                //     po.get('theta_stop'),
                 //     po.get('grid_size')
                 // );
-
-                self.data = PM_s;
-                
+                // console.log(PM_s[0]);
+                self.data = PhaseMatch.normalize(PM_s['pmsingles']);
+                self.plot2dSignal.setZRange([0,Math.max.apply(null,PM_s['pmsingles'])]);
                 self.plot2dSignal.setXRange([ converter.to('deg', x_start), converter.to('deg', x_stop) ]);
                 self.plot2dSignal.setYRange([ converter.to('deg', y_start), converter.to('deg', y_stop) ]);
 
-                self.refreshSignalFWHMCircle(W,  X_0, Y_0, props);
+                self.refreshSignalFWHMCircle(Ws,  X_0, Y_0, props);
 
+                self.plot2dSignal.setTitle("Idler coupling efficiency  = " + Math.round(1000*PM_s['eff'])/10 + "%");
+
+                // if (PM_s['warning'] || zrp/props.L <5 || zrs/props.L <5){
+                //     alert("Warning: this calculation should be treated with suspiscion. The parameters chosen are outside the approximations used in the program. Most likely the crystal is too long, or focusing is too tight.");
+                // }
+
+                if (zrs/props.L <2){
+                    alert("Warning: this calculation should be treated with suspiscion.  The Rayleigh range of the idler collection mode is too small compared to the length of the crystal.");
+                }
+                else if(zrp/props.L <2){
+                    alert("Warning: this calculation should be treated with suspiscion. The Rayleigh range of the pump mode is too small compared to the length of the crystal.");
+                }
+                else if (PM_s['warning']){
+                    alert("Warning: this calculation should be treated with suspiscion. The parameters chosen are outside the approximations used in the program. Most likely the crystal is too long, or focusing is too tight.");
+                }
+
+                props.calcfibercoupling = isfibercoupled;
             },
 
             // draw circle outlining FWHM of the signal photon
@@ -183,9 +248,9 @@ define(
 
                 var data =[];
 
-                data = [ 
-                    { X0: X0 * deg, Y0: Y0 * deg, r: W/2 * deg, opacity: .9, title: 'Signal FWHM', labelX: (X0)*deg, labelY: (Y0+2*W)*deg},
-                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W/2 * deg, opacity: 0.3, title: 'Signal 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+2*W)*deg },
+                data = [
+                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: .9, title: 'Idler collection FWHM', labelX: (X0)*deg, labelY: (Y0+6*W/2)*deg},
+                    { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W * deg, opacity: 0.3, title: 'Idler collection 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+6*W/2)*deg },
                 ];
                 var xx = self.plot2dSignal.scales.x;
                 var yy = self.plot2dSignal.scales.y;
@@ -198,14 +263,14 @@ define(
                 self.plot2dSignal.svg.selectAll('.overlay').remove();
 
                 var overlays = self.plot2dSignal.svg.selectAll('.overlay').data( data );
-                
+
                 var overlaysEnter = overlays.enter()
                     .append('g')
                     // translate the whole group to correct for margins
                     .attr('transform', 'translate(' + this.heatmapmargins.left +',' + this.heatmapmargins.top +')')
                     .attr('class', 'overlay')
                     ;
-                
+
                 // create the circle on new data
                 overlaysEnter.append('circle')
                     .style('fill', 'transparent')
@@ -271,10 +336,10 @@ define(
 
                 // update the circle based on data
                 overlays.selectAll('circle')
-                    .attr('r', function( d ){ 
+                    .attr('r', function( d ){
                         // console.log("circle Radius", Math.abs( xx(d.X0 + d.r) - xx(d.X0) ));
 
-                        return Math.abs( xx(d.X0 + d.r) - xx(d.X0) ); 
+                        return Math.abs( xx(d.X0 + d.r) - xx(d.X0) );
                     })
                     .attr('cx', function( d ) {
                         // console.log("circle x: ", d.X0, ( X0 * deg ));

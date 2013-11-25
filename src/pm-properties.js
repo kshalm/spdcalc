@@ -15,6 +15,7 @@
 
     PhaseMatch.apodization_L = [];
     PhaseMatch.apodization_coeff = [];
+    // PhaseMatch.zweights = [];
 
     var con = PhaseMatch.constants;
     var spdcDefaults = {
@@ -31,10 +32,13 @@
         phi_s: 0,
         phi_i: Math.PI ,
         L: 2000 * con.um,
-        W: 500 * con.um,
+        W: 100 * con.um,
         p_bw: 5.35 * con.nm,
-        W_sx: .2 * Math.PI/180,
-        W_sy: .2 * Math.PI/180,
+        walkoff_p: 0,
+        // W_sx: .2 * Math.PI/180,
+        W_sx: 100 * con.um,
+        W_sy: 0.2 * Math.PI/180,
+        W_ix: 100 * con.um,
         phase: false,
         brute_force: false,
         brute_dim: 50,
@@ -48,7 +52,9 @@
         use_guassian_approx: false,
         crystal: PhaseMatch.Crystals('KTP-3'),
         temp: 20,
-        enable_pp: true
+        enable_pp: true,
+        calcfibercoupling: true,
+        singles: false
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
@@ -96,6 +102,13 @@
             //set the apodization length and Gaussian profile
             this.set_apodization_L();
             this.set_apodization_coeff();
+
+            // this.numzint = 16;
+            // this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+
+            this.set_zint();
+
+            // console.log(this.zweights);
 
         },
 
@@ -217,58 +230,64 @@
                 props.theta = x;
                 props.update_all_angles(props);
                 var delK =  PhaseMatch.calc_delK(props);
-
-                return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
+                // Returning all 3 delK components can lead to errors in the search
+                // return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
+                return Math.sqrt(sq(delK[2]) );
             };
 
-            var guess = Math.PI/8;
+            var guess = Math.PI/6;
             var startTime = new Date();
 
-            var ans = PhaseMatch.nelderMead(min_delK, guess, 1000);
+            var ans = PhaseMatch.nelderMead(min_delK, guess, 20);
             var endTime = new Date();
 
 
             var timeDiff = (endTime - startTime)/1000;
-            // console.log("Theta autocalc = ", timeDiff);
+            // console.log("Theta autocalc = ", timeDiff, ans);
             props.theta = ans;
+            // calculate the walkoff angle
+            // this.calc_walkoff_angles();
         },
 
 
         calc_poling_period : function (){
             var props = this;
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
-            props.poling_period = 1e12;  // Set this to a large number
+            props.poling_period = Math.pow(2,30);  // Set this to a large number
             props.update_all_angles(props);
-            var P = props.clone();
+            if (props.enable_pp){
+                var P = props.clone();
 
-            var find_pp = function(x){
-                // if (x<0){ return 1e12;}  // arbitrary large number
-                P.poling_period = x;
-                // Calculate the angle for the idler photon
-                P.optimum_idler();
-                var delK = PhaseMatch.calc_delK(P);
-                return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
-            };
+                var find_pp = function(x){
+                    // if (x<0){ return 1e12;}  // arbitrary large number
+                    P.poling_period = x;
+                    // Calculate the angle for the idler photon
+                    P.optimum_idler();
+                    var delK = PhaseMatch.calc_delK(P);
+                    return Math.sqrt(sq(delK[2]) );
+                    // return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
+                };
 
-            var delK_guess = (PhaseMatch.calc_delK(P)[2]);
-            var guess = 2*Math.PI/delK_guess;
+                var delK_guess = (PhaseMatch.calc_delK(P)[2]);
+                var guess = 2*Math.PI/delK_guess;
 
-            if (guess<0){
-                P.poling_sign = -1;
-                guess = guess*-1;
+                if (guess<0){
+                    P.poling_sign = -1;
+                    guess = guess*-1;
+                }
+                else{
+                    P.poling_sign = 1;
+                }
+
+                //finds the minimum theta
+                var startTime = new Date();
+                PhaseMatch.nelderMead(find_pp, guess, 100);
+                var endTime = new Date();
+                // console.log("calculation time for periodic poling calc", endTime - startTime);
+
+                props.poling_period = P.poling_period;
+                props.poling_sign = P.poling_sign;
             }
-            else{
-                P.poling_sign = 1;
-            }
-
-            //finds the minimum theta
-            var startTime = new Date();
-            PhaseMatch.nelderMead(find_pp, guess, 100);
-            var endTime = new Date();
-            // console.log("calculation time for periodic poling calc", endTime - startTime);
-
-            props.poling_period = P.poling_period;
-            props.poling_sign = P.poling_sign;
         },
 
         optimum_idler : function (){
@@ -332,7 +351,7 @@
                 props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
 
                 var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
-                return 1-PMtmp;
+                return 1-PMtmp[0];
             };
 
             //Initial guess
@@ -354,7 +373,7 @@
                 props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
 
                 var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
-                return 1-PMtmp;
+                return 1-PMtmp[0];
             };
 
             //Initial guess
@@ -364,20 +383,9 @@
             var ans = PhaseMatch.nelderMead(min_PM, guess, 25);
         },
 
-        // get_apodization : PhaseMatch.util.memoize(function (l){
-        //     // var l_range = PhaseMatch.linspace(0,this.L,this.apodization+1);
-        //     // var delL = Math.abs(l_range[1] - l_range[0]);
-        //     // var A = Math.exp(-sq((l_range[m] - this.L/2))/2/sq(this.apodization_FWHM));
-        //     // var bw = this.apodization_FWHM /(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-        //     var bw = this.apodization_FWHM  / 2.3548;
-        //     // var alpha = Math.exp(-1*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(2*p_bw)));
-        //     var A = Math.exp(-sq((l - this.L/2)/(bw))/2);
-        //     // A = A / ( bw *Math.sqrt(2*Math.PI)); //normalization
-        //     return A;
-        // }),
 
         set_apodization_L : function (){
-            this.apodization_L = PhaseMatch.linspace(0,this.L,this.apodization+1);
+            this.apodization_L = PhaseMatch.linspace(-this.L/2,this.L/2,this.apodization+1);
         },
 
         set_apodization_coeff : function (){
@@ -387,17 +395,63 @@
             this.apodization_coeff = [];
             var delL = Math.abs(this.apodization_L[0] - this.apodization_L[1]);
             for (var i=0; i<dim; i++){
-                this.apodization_coeff[i] =  Math.exp(-sq((this.apodization_L[i] - this.L/2)/(bw))/2);
+                this.apodization_coeff[i] =  Math.exp(-sq((this.apodization_L[i] )/(bw))/2);
             }
 
             var total = PhaseMatch.Sum(this.apodization_coeff);
 
             //normalize
-            for (i=0; i<dim; i++){
-                this.apodization_coeff[i] = this.apodization_coeff[i]/total;
-            }
+            // for (i=0; i<dim; i++){
+            //     this.apodization_coeff[i] = this.apodization_coeff[i]/total;
+            // }
 
         },
+
+        set_zint : function (){
+            var zslice = 100e-6; //length of each crystal slice
+            var nslices = Math.round(this.L/zslice);
+            if (nslices < 4){
+                nslices = 4;
+            }
+
+            // if (nslices>30){
+            //     nslices = 30;
+            // }
+
+            if (nslices%2 !== 0){
+                nslices +=1;
+            }
+            this.numzint = nslices;
+            // this.numzint = 10;
+
+            this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+            // console.log(nslices);
+        },
+
+
+         calc_walkoff_angles: function(){
+            // Calculate the pump walkoff angle
+            var P = this;
+            var ne_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+            var origin_theta = P.theta;
+
+            //calculate the derivative
+            var deltheta = 0.1*Math.PI/180;
+
+            var theta = P.theta - deltheta/2;
+            this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
+            var ne1_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+
+            theta = theta + deltheta;
+            this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
+            var ne2_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+
+            //set back to original theta
+            theta = origin_theta;
+            this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
+
+            this.walkoff_p = -1/ne_p *(ne1_p - ne2_p)/deltheta;
+         },
 
         /**
          * Set config value or many values that are allowed (ie: defined in spdcDefaults )
@@ -425,6 +479,25 @@
                         val = PhaseMatch.Crystals( val );
                     }
 
+                    if (name === 'poling_period'){
+                        if (val===0 || isNaN(val)){
+                            val = Math.pow(2,20);
+                        }
+                    }
+
+                    if (name === 'apodization'){
+                        if (val < 31){
+                            val = 31;
+                        }
+                        // val = 25;
+                    }
+
+                    if (name === 'poling_period'){
+                        if (isNaN(val)){
+                            val = Math.pow(2,30);
+                        }
+                    }
+
                     this[ name ] = val;
 
 
@@ -435,6 +508,12 @@
                         this.set_apodization_L();
                         this.set_apodization_coeff();
                     }
+
+                    if (name === "L"){
+                        this.set_zint();
+                    }
+
+
 
                     // if (name === 'L'){
                     //     this.set

@@ -4,9 +4,9 @@
     <!-- <h3>Plot Options</h3> -->
 
     <div class="control-group">
-        <label class="checkbox control-label calc_plotopts" for="autocalc_plotopts"> 
+        <label class="checkbox control-label calc_plotopts" for="autocalc_plotopts">
             Auto calculate plot options
-            <input type="checkbox" name="autocalc_plotopts" id="autocalc_plotopts" {{? it.autocalc_plotopts }}checked="checked"{{?}}> 
+            <input type="checkbox" name="autocalc_plotopts" id="autocalc_plotopts" {{? it.autocalc_plotopts }}checked="checked"{{?}}>
         </label>
     </div>
 
@@ -17,6 +17,39 @@
             </label>
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="" class="inputbox" name="grid_size" value="{{= parseFloat( it.grid_size ) }}" />
+            </div>
+        </div>
+    </div>
+
+    <div id="plot-opt-T_2HOM">
+        <div class="control-group">
+            <label class="control-label T_2HOM">
+                Number of time delay points
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="" class="inputbox" name="T_2HOM" value="{{= parseFloat( it.T_2HOM ) }}" />
+            </div>
+        </div>
+    </div>
+
+    <div id="plot-opt-grid_size_ms">
+        <div class="control-group">
+            <label class="control-label grid_size_ms">
+                Grid size
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="" class="inputbox" name="grid_size_ms" value="{{= parseFloat( it.grid_size_ms ) }}" />
+            </div>
+        </div>
+    </div>
+
+    <div id="plot-opt-grid_size_schmidt">
+        <div class="control-group">
+            <label class="control-label grid_size_schmidt">
+                Grid size
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="" class="inputbox" name="grid_size_schmidt" value="{{= parseFloat( it.grid_size_schmidt ) }}" />
             </div>
         </div>
     </div>

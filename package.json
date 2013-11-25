@@ -22,18 +22,18 @@
   "dependencies": {},
   "devDependencies": {
     "http-server": "*",
-    "grunt": "0.4.x",
-    "grunt-contrib-concat": "0.x.x",
-    "grunt-contrib-uglify": "0.x.x",
-    "grunt-contrib-jasmine": "0.4.x",
-    "grunt-contrib-clean": "0.x.x",
-    "grunt-contrib-copy": "0.x.x",
-    "grunt-contrib-jshint": "0.x.x",
+    "grunt": "latest",
+    "grunt-contrib-concat": "latest",
+    "grunt-contrib-uglify": "latest",
+    "grunt-contrib-jasmine": "latest",
+    "grunt-contrib-clean": "latest",
+    "grunt-contrib-copy": "latest",
+    "grunt-contrib-jshint": "latest",
     "grunt-contrib-requirejs": "*",
     "grunt-contrib-compass": "*",
     "grunt-bg-shell": "*",
     "grunt-contrib-watch": "~0.3.1",
-    "grunt-lodashbuilder": "~0.1.7"
+    "grunt-lodash": "~0.3.0"
   },
   "bundledDependencies": [],
   "license": "GPLv3"

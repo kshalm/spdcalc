@@ -28,7 +28,8 @@ define(
         'modules/modesolver-ui',
         'modules/pm-curves-ui',
         'modules/jsa-2hom-ui',
-        'modules/jsa-hom-bunching-ui'
+        'modules/jsa-hom-bunching-ui',
+        'modules/couplingefficiency-ui'
     ],
     function(
         $,
@@ -59,7 +60,8 @@ define(
         msUI,
         curvesUI,
         jsa2homUI,
-        jsahomBunchUI
+        jsahomBunchUI,
+        efficiencyUI
     ) {
 
         'use strict';
@@ -400,8 +402,10 @@ define(
                 self.set('curves', curvesUI());
                 // Two source hom
                 self.set('jsa-2hom', jsa2homUI());
-                // Two source hom
+                // HOM bunching
                 self.set('jsa-hom-bunch', jsahomBunchUI());
+                // Coupling effiency map
+                self.set('efficiency', efficiencyUI());
             },
 
             /**
@@ -516,7 +520,7 @@ define(
 
                 //////////////////////////////////////////////////////
                 // Setup the tooltips
-                // 
+                //
                 $.each(config.tooltips, function( label, html ){
 
                     self.elParameters.find('label.' + label).tooltip({

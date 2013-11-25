@@ -41,6 +41,7 @@ require.config({
         'json': 'plugins/json',
         'tpl' : 'plugins/tpl',
         'async' : 'plugins/async',
+        'worker' : 'modules/worker-api',
 
         // Templating
         'dot' : 'vendor/doT',
@@ -56,6 +57,10 @@ require.config({
         
         
     },
+
+    packages: [
+        { name: 'when', location: 'vendor/when', main: 'when' }
+    ],
 
     map: {
 

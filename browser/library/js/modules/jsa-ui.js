@@ -2,6 +2,7 @@ define(
     [
         'jquery',
         'stapes',
+        'when',
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
@@ -13,6 +14,7 @@ define(
     function(
         $,
         Stapes,
+        when,
         PhaseMatch,
         HeatMap,
         LinePlot,
@@ -33,6 +35,7 @@ define(
         var jsaUI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
+            nWorkers: 2,
             tplPlots: tplJSALayout,
             tplDoc: tplDocsJSA,
             showPlotOpts: [
@@ -113,66 +116,111 @@ define(
                 });
             },
 
-            calc: function( props ){
-
+            updateTitle: function( PM ){
                 var self = this;
+                return self.workers[this.nWorkers-1].exec('jsaHelper.doCalcSchmidt', [PM])
+                        .then(function( S ){
+                            self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
+                        });
 
-                // var internalangle = PhaseMatch.find_internal_angle(props, 'signal');
-                // var externalangle = PhaseMatch.find_external_angle(props, 'signal');
+            },
 
-                // var startTime = new Date();
-                var dim = 100
-                    ,PM = PhaseMatch.calc_JSI(
-                        props,
-                        self.plotOpts.get('ls_start'),
-                        self.plotOpts.get('ls_stop'),
-                        self.plotOpts.get('li_start'),
-                        self.plotOpts.get('li_stop'),
-                        self.plotOpts.get('grid_size')
-                    )
+            calc: function( props ){
+                
+                var self = this;
+                var starttime = new Date();
+
+                var propsJSON = props.get()
+                    ,grid_size = self.plotOpts.get('grid_size')
                     ;
 
-                // console.log(PM);
-                // var endTime = new Date();
-                // var timeDiff = (endTime - startTime);
-                // console.log("time", timeDiff);
+                var lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), grid_size),
+                    lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), grid_size);
 
-                //calculate the Schmidt number
-                if (props.brute_force){
-                    var jsa2d = PhaseMatch.create_2d_array(PM, props.brute_dim, props.brute_dim);
+                var Nthreads = self.nWorkers-1;
+
+                var divisions = Math.floor(grid_size / Nthreads);
+
+                var lambda_i_range = [];
+
+                for (var i= 0; i<Nthreads-1; i++){
+                    lambda_i_range.push(lambda_i.subarray(i*divisions,i*divisions + divisions));
                 }
-                else{
-                    var jsa2d = PhaseMatch.create_2d_array(PM, self.plotOpts.get('grid_size'), self.plotOpts.get('grid_size'));
+                lambda_i_range.push( lambda_i.subarray((Nthreads-1)*divisions, lambda_i.length)); //make up the slack with the last one
+
+                // Get the normalization
+                var P = props.clone();
+                P.phi_i = P.phi_s + Math.PI;
+                P.update_all_angles();
+                P.optimum_idler(P);
+                var PMN =  PhaseMatch.phasematch(props);
+                var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
+
+                // The calculation is split up and reutrned as a series of promises
+                var promises = [];
+                for (var j = 0; j < Nthreads; j++){
+
+                    promises[j] = self.workers[j].exec('jsaHelper.doJSACalc', [
+                        propsJSON,
+                        lambda_s,
+                        lambda_i_range[j],
+                        grid_size,
+                        norm
+                    ]);
                 }
 
-                if (isNaN(PM[0])){
-                    var S = 0;
-                }
-                else {
-                    var S= PhaseMatch.calc_Schmidt(jsa2d);
-                }
 
-                self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
-                // console.log(jsa2d[25]);
-                self.data = PM;
-                // console.log(PM);
+                return when.all( promises ).then(function( values ){
+                        // put the results back together
+                        var arr = new Float64Array( grid_size *  grid_size );
+                        var startindex = 0;
+                        
+                        for (j = 0; j<Nthreads; j++){
+                            // console.log(j, j*lambda_s.length*lambda_i_range[j].length, values[j].length +  j*lambda_s.length*lambda_i_range[j].length);
 
-                // self.plot.setZRange([0, 180]);
-                self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
-                self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+                             arr.set(values[j], startindex);
+                             startindex += lambda_s.length*lambda_i_range[j].length;
+
+                        }
+                        // PhaseMatch.normalize(arr); 
+                        
+                        return arr; // this value is passed on to the next "then()"
+
+                    }).then(function( PM ){
+
+                        var p = self.updateTitle( PM );
+                        self.data = PM;
+                        self.plot.setZRange([0,Math.max.apply(null,PM)]);
+                        self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
+                        self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+
+                        var endtime = new Date();
+                        console.log("Grid Size:", grid_size, " Elapsed time: ", endtime - starttime); 
+                        // return p;
+                        return true;
+
+                    });
             },
 
             draw: function(){
 
                 var self = this
                     ,data = self.data
+                    ,dfd = when.defer()
                     ;
 
                 if (!data){
                     return this;
                 }
 
-                self.plot.plotData( data );
+                
+                // async... but not inside webworker
+                setTimeout(function(){
+                    self.plot.plotData( data );
+                    dfd.resolve();
+                }, 10);
+                   
+                return dfd.promise; 
             }
 
 

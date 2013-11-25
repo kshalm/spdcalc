@@ -2,22 +2,30 @@ define(
     [
         'jquery',
         'stapes',
+        'when',
         'phasematch',
         'modules/heat-map',
         'modules/line-plot',
         'modules/skeleton-ui',
         'modules/converter',
+
+        'worker!workers/pm-web-worker.js',
+
         'tpl!templates/jsa-hom-layout.tpl',
         'tpl!templates/time-delay-ctrl.tpl'
     ],
     function(
         $,
         Stapes,
+        when,
         PhaseMatch,
         HeatMap,
         LinePlot,
         SkeletonUI,
         converter,
+
+        pmWorker,
+
         tplJSALayout,
         tplTimeDelayCtrl
     ) {
@@ -35,8 +43,10 @@ define(
         var jsahomUI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
+            nWorkers: 5,
             tplPlots: tplJSALayout,
             showPlotOpts: [
+                'T_2HOM',
                 'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
@@ -123,6 +133,7 @@ define(
                 self.on('change:delT', function( delT ){
 
                     self.refreshLine( delT );
+                    self.plot1d.setTitle("Time delay = " + delT/1e-15);
 
                     clearTimeout( to );
                     to = setTimeout(function(){
@@ -179,25 +190,6 @@ define(
 
                 line.exit().remove();
 
-                // var circle = self.plot1d.svgPlot.selectAll("circle").data([ delT ]);
-
-                // circle.enter()
-                //     .append('circle')
-                //     .attr("r", 4)
-                //     .style("fill", '#16A085');
-
-                // circle.attr('cx', function(d) {
-                //         return self.plot1d.scales.x( d / delTConversion );
-                //     })
-                //     ;
-
-                // // circle.attr('cy', function(d) {
-                // //         console.log("y pos", self.plot1d.scales.y( .1 ));
-                // //         return self.plot1d.scales.y( d/delTConversion );
-                // //     })
-                // //     ;
-
-                // circle.exit().remove();
             },
 
             autocalcPlotOpts: function(){
@@ -217,7 +209,8 @@ define(
                 self.set_slider_values(tsi[0], tsi[1], tsi[2]);
 
                 self.plotOpts.set({
-                    'grid_size': 100,
+                    'grid_size': 50,
+                    'T_2HOM': 200,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -232,58 +225,87 @@ define(
 
                 var self = this,
                     threshold = 0.5
-                    ,props = self.parameters.getProps();
-
-                var lim = PhaseMatch.autorange_lambda(props, threshold);
-                var tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max);
-
-                self.calc_HOM_JSA( props );
-
-                // Hong-Ou-Mandel dip
-                // var t_start = 0e-15;
-                // var t_stop = 10000e-15;
-
-                var starttime = new Date();
-                var data1d = []
-                    ,dim = 200
+                    ,props = self.parameters.getProps()
+                    ,lim = PhaseMatch.autorange_lambda(props, threshold)
+                    ,tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max)
+                    ,data1d = []
                     ,po = self.plotOpts
+                    ,dim = po.get('T_2HOM')
+                    ,trange = []
                     ,delT = PhaseMatch.linspace(
                         po.get('delT_start'),
                         po.get('delT_stop'),
                         dim
                     )
-                    ,HOM = PhaseMatch.calc_HOM_scan(
-                        props,
-                        po.get('delT_start'),
-                        po.get('delT_stop'),
+                    ,Nthreads = self.nWorkers -1
+                    ,divisions = Math.floor(dim / Nthreads)
+                    ,promises = [];
+
+                // First calc the joint spectrum.
+                self.calc_HOM_JSA( props );
+
+                // Next we begin the calculation of the HOM dip
+                var starttime = new Date();
+
+                for (var i = 0; i<Nthreads-1; i++){
+                    trange.push(delT.subarray(i*divisions,i*divisions + divisions));
+                }
+                trange.push( delT.subarray((Nthreads-1)*divisions, delT.length));
+                
+
+                // The calculation is split up and reutrned as a series of promises
+                for (var j = 0; j < Nthreads; j++){
+                    promises[j] = self.workers[j].exec('jsaHelper.doHOM', [
+                        props.get(),
+                        trange[j],
                         po.get('ls_start'),
                         po.get('ls_stop'),
                         po.get('li_start'),
                         po.get('li_stop'),
-                        dim,
+                        po.get('grid_size'),
                         true
-                    )
-                    ;
-                 var endtime = new Date();
-                 // console.log("Time to run HOM scan code: ", endtime-starttime);
-
-                for ( var i = 0, l = HOM.length; i < l; i ++){
-                    data1d.push({
-                        x: delT[i]/1e-15,
-                        y: HOM[i]
-                    })
+                    ]);
                 }
 
-                self.data1d = data1d;
+                return when.all( promises ).then(function( values ){
+                        // put the results back together
+                        var arr = new Float64Array( dim );
 
-                // Calculate visibility
-                // title: 'Hong-Ou-Mandel Dip'
-                var vis = (0.5 -  Math.min.apply(null, HOM))/0.5;
-                // console.log("visibility", vis);
-                self.plot1d.setTitle("Hong-Ou-Mandel visibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
-                self.plot1d.setYRange([0, Math.max.apply(null,HOM)*1.2]);
+                        var startindex = 0;
+                        
+                        for (j = 0; j<Nthreads; j++){
+                             arr.set(values[j], startindex);
+                             
+                             startindex += trange[j].length;
+                        }   
 
-                self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
+                        var endtime = new Date();
+                        console.log("HOM dip Elapsed time: ", endtime - starttime);
+
+                        return arr; // this value is passed on to the next "then()"
+
+                    }).then(function( HOM ){
+
+                        for ( var i = 0, l = HOM.length; i < l; i ++){
+                            data1d.push({
+                                x: delT[i]/1e-15,
+                                y: HOM[i]
+                            })
+                        }
+                        self.data1d = data1d;
+                        self.draw();
+
+                        // Calculate visibility
+                        var vis = (0.5 -  Math.min.apply(null, HOM))/0.5;
+                        self.plot1d.setTitle("Hong-Ou-Mandel visibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
+                        self.plot1d.setYRange([0, Math.max.apply(null,HOM)*1.2]);
+
+                        self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
+                        
+                         var endtime = new Date();
+
+                        return true;
+                });  
             },
 
             set_slider_values: function(zero_delay, t_start, t_stop){
@@ -301,33 +323,62 @@ define(
 
                 var self = this
                     ,delT = self.get('delT')
-                    ,po = self.plotOpts
-                    ,PM = PhaseMatch.calc_HOM_JSA(
-                        props,
-                        po.get('ls_start'),
-                        po.get('ls_stop'),
-                        po.get('li_start'),
-                        po.get('li_stop'),
-                        self.get('delT'),
-                        po.get('grid_size'),
-                        true
-                    )
-                    ;
+                    ,po = self.plotOpts;
 
-                self.data = PM;
+                var st = new Date();
+                
+                // Can only run in one thread. This graph is not easily parallizable. Need 
+                // the entire grid to do the computation.
+                return  self.workers[self.nWorkers-1].exec('jsaHelper.doCalcHOMJSA', [
+                            props.get(),
+                            po.get('ls_start'),
+                            po.get('ls_stop'),
+                            po.get('li_start'),
+                            po.get('li_stop'),
+                            delT,
+                            po.get('grid_size'),
+                            true
+                ]).then(function(PM){
+                        self.data = PM;
+                        self.draw();
+                        // var S= PhaseMatch.calc_Schmidt(PM);
+                        // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
+                        self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
+                        self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
+                        var sp = new Date();
+                        // console.log("time jsa", sp -st);
+                });
 
-                // var S= PhaseMatch.calc_Schmidt(PM);
-                // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
+                
+                
+                // var PM = PhaseMatch.calc_HOM_JSA(
+                //     props,
+                //     po.get('ls_start'),
+                //     po.get('ls_stop'),
+                //     po.get('li_start'),
+                //     po.get('li_stop'),
+                //     self.get('delT'),
+                //     po.get('grid_size'),
+                //     true
+                // )
+                // ;
 
-                self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
-                self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
-                self.plot1d.setTitle("Time delay = " + self.get('delT')/1e-15);
+                
+                // self.data = PM;
+
+                // // var S= PhaseMatch.calc_Schmidt(PM);
+                // // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
+
+                // self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
+                // self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
+                // self.plot1d.setTitle("Time delay = " + self.get('delT')/1e-15);
             },
 
             draw: function(){
 
                 var self = this
                     ,data = self.data
+                    ,dfd = when.defer()
                     ;
 
                 if (!data){
@@ -343,7 +394,14 @@ define(
                     return this;
                 }
 
-                self.plot1d.plotData( data1d );
+                setTimeout(function(){
+                    self.plot1d.plotData( data1d );
+                    dfd.resolve();
+                }, 50);
+                   
+                return dfd.promise; 
+
+                // self.plot1d.plotData( data1d );
             }
         });
 

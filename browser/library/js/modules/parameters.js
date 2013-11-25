@@ -182,6 +182,7 @@ define(
                 if (self.props.autocalcpp){
                     self.props.calc_poling_period( self.props );
                 }
+
             },
 
             // resync all values in the original self.props object
