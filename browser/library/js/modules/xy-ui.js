@@ -224,6 +224,7 @@ define(
                 var isfibercoupled = props.calcfibercoupling;
                 props.calcfibercoupling = false;
                 var propsJSON = props.get();
+                props.calcfibercoupling = isfibercoupled;
 
 
                 promises[0] = self.workers[0].exec('jsaHelper.docalc_XY', [
@@ -233,7 +234,7 @@ define(
                         -1 * po.get('theta_stop'),
                         po.get('theta_stop'),
                         po.get('grid_size')
-                    
+
                 ]);
 
                 promises[1] = self.workers[0].exec('jsaHelper.doXYBoth', [
@@ -243,7 +244,7 @@ define(
                         -2 * po.get('theta_stop'),
                         2* po.get('theta_stop'),
                         po.get('grid_size')
-                    
+
                 ]);
 
                 // Lambda signal vs theta signal
@@ -254,7 +255,7 @@ define(
                         po.get('theta_start'),
                         po.get('theta_stop'),
                         po.get('grid_size')
-                    
+
                 ]);
 
                  // Theta vs Phi in crystal
@@ -265,7 +266,7 @@ define(
                         0,
                         0.5 * Math.PI,
                         po.get('grid_size')
-                    
+
                 ]);
 
                 // var XYThetaPhi = PhaseMatch.calc_signal_theta_phi(
@@ -288,14 +289,14 @@ define(
                         po.get('theta_start'),
                         po.get('theta_stop'),
                         po.get('grid_size')
-                    
+
                 ]);
 
                 return when.all( promises ).then(function( values ){
                         self.dataPMXY = values[0];
                         self.plotPMXY.setXRange([ x_start, x_stop ]);
                         self.plotPMXY.setYRange([ x_start, x_stop ]);
-                        
+
                         self.dataPMXYBoth = values[1];
                         self.plotPMXYBoth.setXRange([ 2 * x_start, 2 * x_stop ]);
                         self.plotPMXYBoth.setYRange([ 2 * x_start, 2 * x_stop ]);
@@ -312,12 +313,12 @@ define(
                         self.dataThetaTheta = values[4];
                         self.plotThetaTheta.setXRange([ t_start, t_stop ]);
                         self.plotThetaTheta.setYRange([ t_start, t_stop ]);
-                                
+
                         return true; // this value is passed on to the next "then()"
 
                     });
 
-                props.calcfibercoupling = isfibercoupled;
+
             },
 
             draw: function(){
@@ -336,7 +337,7 @@ define(
                 // }
 
                 // async... but not inside webworker
-                
+
                 setTimeout(function(){
                     self.plotPMXY.plotData( self.dataPMXY );
                     self.plotPMXYBoth.plotData( self.dataPMXYBoth );

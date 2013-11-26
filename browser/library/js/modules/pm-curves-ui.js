@@ -217,6 +217,7 @@ define(
             var isfibercoupled = props.calcfibercoupling;
             props.calcfibercoupling = false;
             var propsJSON = props.get();
+            props.calcfibercoupling = isfibercoupled;
 
             promises[0] = self.workers[0].exec('jsaHelper.doPMSignal', [
                     propsJSON,
@@ -226,7 +227,7 @@ define(
                     po.get('lp_stop'),
                     "signal",
                     po.get('grid_size')
-                    
+
             ]);
 
             promises[1] = self.workers[1].exec('jsaHelper.doPMThetaPhi', [
@@ -236,7 +237,7 @@ define(
                     po.get('pump_phi_start'),
                     po.get('pump_phi_stop'),
                     po.get('grid_size')
-                    
+
             ]);
 
             promises[2] = self.workers[2].exec('jsaHelper.doPMPolingTheta', [
@@ -246,7 +247,7 @@ define(
                     po.get('pump_theta_start'),
                     po.get('pump_theta_stop'),
                     po.get('grid_size')
-                    
+
             ]);
 
             return when.all( promises ).then(function( values ){
@@ -262,7 +263,7 @@ define(
                 self.plotPolingTheta.setXRange([ converter.to('micro',  po.get('poling_period_start')),converter.to('micro', po.get('poling_period_stop')) ]);
                 self.plotPolingTheta.setYRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
 
-                        
+
                 return true; // this value is passed on to the next "then()"
 
             });
@@ -282,7 +283,7 @@ define(
             // self.plotSignal.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
 
 
-            
+
             // var PMThetaPhi = PhaseMatch.calc_PM_Pump_Theta_Phi(
             //         props,
 
@@ -315,7 +316,6 @@ define(
             // self.plotPolingTheta.setXRange([ converter.to('micro',  po.get('poling_period_start')),converter.to('micro', po.get('poling_period_stop')) ]);
             // self.plotPolingTheta.setYRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
 
-            props.calcfibercoupling = isfibercoupled;
             },
 
 
@@ -326,7 +326,7 @@ define(
                     dfd = when.defer()
                     ;
                 // async... but not inside webworker
-                
+
                 setTimeout(function(){
                     self.plotSignal.plotData( self.dataSignal );
                     self.plotPolingTheta.plotData( self.dataPolingTheta );
@@ -335,7 +335,7 @@ define(
                 }, 10);
                 return dfd.promise;
 
-                
+
 
             }
         });
