@@ -104,7 +104,7 @@
         </div>
         <div class="control-group">   
             <label class="control-label waist_p">
-                Waist FWHM (um)
+                Waist 1/e^2 (um)
             </label>
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W" value="{{= this.converter.to('micro', parseFloat( it.W )) }}" />
@@ -159,7 +159,7 @@
         </div>
         <div class="control-group">   
             <label class="control-label">
-                Waist FWHM (um)
+                Waist 1/e^2 (um)
             </label>
             <div class="controls">
                 <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W_sx" value="{{= this.converter.to('micro', parseFloat( it.W_sx )) }}" />

@@ -8,7 +8,7 @@
     	"length": "<p>Length of the crystal.</p>",
     	"lambda_p": "<p>Center Wavelength of the pump.</p>",
     	"pump_bw": "<p>Spectral bandwidth of the (FWHM) .</p>",	
-    	"waist_p": "<p>Pump waist in the center of the crystal (FWHM).</p>",
+    	"waist_p": "<p>Pump waist in the center of the crystal (1/e^2 in Intensity, 1/e in Amplitude).</p>",
     	"lambda_s": "<p>Wavelength of the signal. The idler wavelength is automatically calculated based on the pump and signal wavelengths.</p>",
     	"theta_s": "<p>Angle of emission of the signal with respect to the pump.</p>",
     	"phi_s": "<p>Azimuthal angle of emission.</p>",

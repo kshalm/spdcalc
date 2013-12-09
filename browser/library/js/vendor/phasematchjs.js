@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2013-11-25
+ * phasematchjs v0.0.1a - 2013-12-08
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2013 Krister Shalm <kshalm@gmail.com>
@@ -3225,7 +3225,8 @@ PhaseMatch.sign = function sign(x) {
     var PMz_imag = 0;
 
     // var convfromFWHM = 1/(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
-    var convfromFWHM = 1/(2 * Math.sqrt(Math.log(2)));
+    // var convfromFWHM = 1/(2 * Math.sqrt(Math.log(2)));
+    var convfromFWHM = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
 
     var W_s,
         W_i;
