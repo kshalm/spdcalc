@@ -126,7 +126,7 @@ define(
             },
 
             calc: function( props ){
-                
+
                 var self = this;
                 var starttime = new Date();
 
@@ -169,12 +169,14 @@ define(
                     ]);
                 }
 
+                console.log(PhaseMatch.linspace(0,10,10));
+
 
                 return when.all( promises ).then(function( values ){
                         // put the results back together
                         var arr = new Float64Array( grid_size *  grid_size );
                         var startindex = 0;
-                        
+
                         for (j = 0; j<Nthreads; j++){
                             // console.log(j, j*lambda_s.length*lambda_i_range[j].length, values[j].length +  j*lambda_s.length*lambda_i_range[j].length);
 
@@ -182,8 +184,8 @@ define(
                              startindex += lambda_s.length*lambda_i_range[j].length;
 
                         }
-                        // PhaseMatch.normalize(arr); 
-                        
+                        // PhaseMatch.normalize(arr);
+
                         return arr; // this value is passed on to the next "then()"
 
                     }).then(function( PM ){
@@ -195,7 +197,7 @@ define(
                         self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
                         var endtime = new Date();
-                        console.log("Grid Size:", grid_size, " Elapsed time: ", endtime - starttime); 
+                        console.log("Grid Size:", grid_size, " Elapsed time: ", endtime - starttime);
                         // return p;
                         return true;
 
@@ -213,14 +215,14 @@ define(
                     return this;
                 }
 
-                
+
                 // async... but not inside webworker
                 setTimeout(function(){
                     self.plot.plotData( data );
                     dfd.resolve();
                 }, 10);
-                   
-                return dfd.promise; 
+
+                return dfd.promise;
             }
 
 

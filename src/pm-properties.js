@@ -8,6 +8,7 @@
     // The "type" property is stored as an integer
     PhaseMatch.PMTypes = [
         "Type 0:   o -> o + o",
+        "Type 0:   e -> e + e",
         "Type 1:   e -> o + o",
         "Type 2:   e -> e + o",
         "Type 2:   e -> o + e"
@@ -22,7 +23,7 @@
         lambda_p: 785 * con.nm,
         lambda_s: 1570 * con.nm,
         lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
-        type: 2,
+        type: 3,
         theta: 90 *Math.PI / 180,
         phi: 0,
         theta_s: 0,
@@ -172,14 +173,17 @@
                     n = nfast;
                 break;
                 case 1:
+                    n= nslow;
+                break;
+                case 2:
                     if (photon === "pump") { n = nslow;}
                     else { n = nfast;}
                 break;
-                case 2:
+                case 3:
                     if (photon === "idler") { n = nfast;}
                     else {n = nslow;}
                 break;
-                case 3:
+                case 4:
                     if (photon === "signal") { n = nfast;}
                     else {n = nslow;}
                 break;
