@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-01-10
+ * phasematchjs v0.0.1a - 2014-01-21
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -4921,7 +4921,7 @@ PhaseMatch.Crystals('KDP-1', {
         lambda_p: 785 * con.nm,
         lambda_s: 1570 * con.nm,
         lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
-        type: 3,
+        type: "Type 2:   e -> e + o",
         theta: 90 *Math.PI / 180,
         phi: 0,
         theta_s: 0,
@@ -5045,6 +5045,7 @@ PhaseMatch.Crystals('KDP-1', {
         },
 
         calc_Index_PMType : function (lambda, Type, S, photon){
+            // console.log(PhaseMatch.PMTypes[0]);
             var ind = this.crystal.indicies(lambda, this.temp); //can I move this out to speed it up?
 
             var nx_squared_inv = 1/sq( ind[0] );
@@ -5067,21 +5068,21 @@ PhaseMatch.Crystals('KDP-1', {
             var n = 1;
 
             switch (Type){
-                case 0:
+                case PhaseMatch.PMTypes[0]:
                     n = nfast;
                 break;
-                case 1:
+                case PhaseMatch.PMTypes[1]:
                     n= nslow;
                 break;
-                case 2:
+                case PhaseMatch.PMTypes[2]:
                     if (photon === "pump") { n = nslow;}
                     else { n = nfast;}
                 break;
-                case 3:
+                case PhaseMatch.PMTypes[3]:
                     if (photon === "idler") { n = nfast;}
                     else {n = nslow;}
                 break;
-                case 4:
+                case PhaseMatch.PMTypes[4]:
                     if (photon === "signal") { n = nfast;}
                     else {n = nslow;}
                 break;
@@ -5374,7 +5375,7 @@ PhaseMatch.Crystals('KDP-1', {
 
                     if ( name === 'type' ){
 
-                        val = ~~val;
+                        val = val;
 
                     } else if ( name === 'crystal' && typeof val !== 'object' ){
 
