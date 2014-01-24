@@ -8,6 +8,7 @@
     // The "type" property is stored as an integer
     PhaseMatch.PMTypes = [
         "Type 0:   o -> o + o",
+        "Type 0:   e -> e + e",
         "Type 1:   e -> o + o",
         "Type 2:   e -> e + o",
         "Type 2:   e -> o + e"
@@ -22,7 +23,7 @@
         lambda_p: 785 * con.nm,
         lambda_s: 1570 * con.nm,
         lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
-        type: 2,
+        type: "Type 2:   e -> e + o",
         theta: 90 *Math.PI / 180,
         phi: 0,
         theta_s: 0,
@@ -146,6 +147,7 @@
         },
 
         calc_Index_PMType : function (lambda, Type, S, photon){
+            // console.log(PhaseMatch.PMTypes[0]);
             var ind = this.crystal.indicies(lambda, this.temp); //can I move this out to speed it up?
 
             var nx_squared_inv = 1/sq( ind[0] );
@@ -168,18 +170,21 @@
             var n = 1;
 
             switch (Type){
-                case 0:
+                case PhaseMatch.PMTypes[0]:
                     n = nfast;
                 break;
-                case 1:
+                case PhaseMatch.PMTypes[1]:
+                    n= nslow;
+                break;
+                case PhaseMatch.PMTypes[2]:
                     if (photon === "pump") { n = nslow;}
                     else { n = nfast;}
                 break;
-                case 2:
+                case PhaseMatch.PMTypes[3]:
                     if (photon === "idler") { n = nfast;}
                     else {n = nslow;}
                 break;
-                case 3:
+                case PhaseMatch.PMTypes[4]:
                     if (photon === "signal") { n = nfast;}
                     else {n = nslow;}
                 break;
@@ -472,7 +477,7 @@
 
                     if ( name === 'type' ){
 
-                        val = ~~val;
+                        val = val;
 
                     } else if ( name === 'crystal' && typeof val !== 'object' ){
 

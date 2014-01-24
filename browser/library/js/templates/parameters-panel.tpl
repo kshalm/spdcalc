@@ -3,7 +3,7 @@
     <div class="parameters-wrap">
         <div class="row-fluid">
             <h2 class="title">Crystal Options</h2>
-            
+
             <div class="btn-wrap ">
                 <button class="btn collapse-ctrl" id="collapse-crystal">&#x2296;</button>
             </div>
@@ -25,7 +25,7 @@
             <div class="control-group">
                 <select id="pm-type-dropdown" name="type" class="full">
                     {{~this.PhaseMatch.PMTypes :value:index}}
-                         <option value="{{=index}}" {{? index === it.type }} selected="selected" {{?}}>{{=value}}</option> 
+                         <option value="{{=value}}" {{? value === it.type }} selected="selected" {{?}}>{{=value}}</option>
                     {{~}}
                 </select>
             </div>
@@ -76,7 +76,7 @@
 <div class="parameters-wrap collapsed">
     <div class="row-fluid">
         <h2 class="title">Pump Options</h2>
-        
+
         <div class="btn-wrap ">
             <button class="btn collapse-ctrl" id="collapse-pump">&#x2295;</button>
         </div>
@@ -86,7 +86,7 @@
         <div class="control-group">
             <!-- <h4>Pump Properties</h4> -->
         </div>
-        <div class="control-group">   
+        <div class="control-group">
             <label class="control-label lambda_p">
                 Wavelength (nm)
             </label>
@@ -94,7 +94,7 @@
                 <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lambda_p" value="{{= this.converter.to('nano', parseFloat( it.lambda_p )) }}" />
             </div>
         </div>
-        <div class="control-group">   
+        <div class="control-group">
             <label class="control-label pump_bw">
                 Bandwidth FWHM (nm)
             </label>
@@ -102,7 +102,7 @@
                 <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="p_bw" value="{{= this.converter.to('nano', parseFloat( it.p_bw )) }}" />
             </div>
         </div>
-        <div class="control-group">   
+        <div class="control-group">
             <label class="control-label waist_p">
                 Waist 1/e^2 (um)
             </label>
@@ -116,7 +116,7 @@
 <div class="parameters-wrap collapsed">
     <div class="row-fluid">
         <h2 class="title">Signal Options</h2>
-        
+
         <div class="btn-wrap ">
             <button class="btn collapse-ctrl" id="collapse-signal">&#x2295;</button>
         </div>
@@ -133,7 +133,7 @@
                 <input id="fibercouple" type="checkbox" class="inputbox" name="calcfibercoupling" {{? it.calcfibercoupling }} checked="checked" {{?}} />
             </label>
         </div>
-        <div class="control-group">   
+        <div class="control-group">
             <label class="control-label lambda_s">
                 Wavelength (nm)
             </label>
@@ -141,7 +141,7 @@
                 <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="lambda_s" value="{{= this.converter.to('nano', parseFloat( it.lambda_s )) }}" />
             </div>
         </div>
-        <div class="control-group">   
+        <div class="control-group">
             <label class="control-label theta_s">
                 Theta (deg)
             </label>
@@ -149,7 +149,7 @@
                 <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="theta_s_e" value="{{= this.converter.to('deg', parseFloat( it.theta_s_e )) }}" />
             </div>
         </div>
-        <div class="control-group">   
+        <div class="control-group">
             <label class="control-label phi_s">
                 Phi (deg)
             </label>
@@ -157,7 +157,7 @@
                 <input type="text" data-parse="float" data-unit="deg" class="inputbox" name="phi_s" value="{{= this.converter.to('deg', parseFloat( it.phi_s )) }}" />
             </div>
         </div>
-        <div class="control-group">   
+        <div class="control-group">
             <label class="control-label">
                 Waist 1/e^2 (um)
             </label>
@@ -165,7 +165,7 @@
                 <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W_sx" value="{{= this.converter.to('micro', parseFloat( it.W_sx )) }}" />
             </div>
         </div>
-       <!--  <div class="control-group">   
+       <!--  <div class="control-group">
             <label class="control-label">
                 Waist y dir (deg)
             </label>
@@ -188,7 +188,7 @@
     <div class="parameters-wrap collapsed">
         <div class="row-fluid">
             <h2 class="title">Periodic Poling</h2>
-            
+
             <div class="btn-wrap ">
                 <button class="btn collapse-ctrl" id="collapse-poling">&#x2295;</button>
             </div>
@@ -214,7 +214,7 @@
                     </label>
                 </div>
 
-                <div class="control-group">   
+                <div class="control-group">
                     <label class="control-label poling_period">
                         Poling period (um)
                     </label>
@@ -230,7 +230,7 @@
                     </label>
                 </div>
 
-                <div class="control-group ">   
+                <div class="control-group ">
                     <label class="control-label apodization_fwhm">
                         Apodization FWHM (um)
                     </label>
@@ -239,7 +239,7 @@
                     </div>
                 </div>
 
-                <div class="control-group">   
+                <div class="control-group">
                     <label class="control-label apodization_steps">
                         Apodization steps
                     </label>
@@ -254,7 +254,7 @@
     <div class="parameters-wrap collapsed last-parameters">
         <div class="row-fluid">
             <h2 class="title">Plot Options</h2>
-            
+
             <div class="btn-wrap ">
                 <button class="btn collapse-ctrl" id="collapse-plotopts">&#x2295;</button>
             </div>
