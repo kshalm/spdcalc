@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-01-21
+ * phasematchjs v0.0.1a - 2014-01-28
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -4859,6 +4859,54 @@ PhaseMatch.Crystals('LiNbO3-1', {
     }
 });
 
+/**
+ * LiNbO3 MGO doped indicies.
+ */
+PhaseMatch.Crystals('LiNB-MgO', {
+    name: 'LiNbO3 (5% MgO doped)',
+    info: 'Applied Physics B May 2008,Volume 91,Issue 2,pp 343-348',
+    type: '',
+    cls: '',
+    lambda_min: 440*1e-9,
+    lambda_max: 4000*1e-9,
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        var F = (temp - 24.5)*(temp+570.82);
+
+        // Coefficients for the extraordinary index
+        var  a1 = 5.756
+            ,a2 = 0.0983
+            ,a3 = 0.2020
+            ,a4 = 189.32
+            ,a5 = 12.52
+            ,a6 = 1.32e-2
+            ,b1 = 2.86e-6
+            ,b2 = 4.7e-8
+            ,b3 = 6.113e-8
+            ,b4 = 1.516e-4
+            ;
+        var l2 = lambda*lambda;
+        var nz = Math.sqrt( a1 + b1*F + (a2 + b2*F)/(l2 - sq(a3+b3*F)) + (a4+b4*F)/(l2 -sq(a5)) - a6*l2 );
+        
+         // Coefficients for the oridnary index
+        var  a1 = 5.653
+            ,a2 = 0.1185
+            ,a3 = 0.2091
+            ,a4 = 89.61
+            ,a5 = 10.85
+            ,a6 = 1.97e-2
+            ,b1 = 7.941e-7
+            ,b2 = 3.134e-8
+            ,b3 = -4.641e-9
+            ,b4 = -2.188e-6
+            ;
+
+        var nx = Math.sqrt( a1 + b1*F + (a2 + b2*F)/(l2 - sq(a3+b3*F)) + (a4+b4*F)/(l2 -sq(a5)) - a6*l2 );
+        var ny = nx;
+
+        return [nx, ny, nz];
+    }
+});
 
 /**
  * LiNbO3 indicies.
@@ -5108,6 +5156,7 @@ PhaseMatch.Crystals('KDP-1', {
             props.optimum_idler();
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
             // props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
+            // console.log(props.n_s, props.n_s, props.n_i);
         },
 
         get_group_velocity : function(lambda, Type, S, photon){

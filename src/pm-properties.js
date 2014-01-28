@@ -209,6 +209,7 @@
             props.optimum_idler();
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
             // props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
+            // console.log(props.n_s, props.n_s, props.n_i);
         },
 
         get_group_velocity : function(lambda, Type, S, photon){
