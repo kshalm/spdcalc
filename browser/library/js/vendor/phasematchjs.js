@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-01-28
+ * phasematchjs v0.0.1a - 2014-02-03
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -3268,8 +3268,8 @@ PhaseMatch.sign = function sign(x) {
     var SIN_THETAi_plus_THETAs = Math.sin(P.theta_i+P.theta_s);
 
 
-    // var RHOpx = P.walkoff_p; //pump walkoff angle.
-    var RHOpx = 0; //pump walkoff angle.
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx = 0; //pump walkoff angle.
 
     RHOpx = -RHOpx; //Take the negative value. This is due to how things are defined later.
 
@@ -3723,6 +3723,7 @@ PhaseMatch.sign = function sign(x) {
         var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-P.L/2, P.L/2,dz,P.numzint,P.zweights);
         PMz_real = pmintz[0]/P.L;
         PMz_imag = pmintz[1]/P.L;
+        var PMt = 1;
     }
     else{
         var PMzNorm1 = Math.sin(arg)/arg;
@@ -3730,6 +3731,7 @@ PhaseMatch.sign = function sign(x) {
         // var PMz_imag = PMzNorm1 * Math.sin(arg);
         PMz_real =  PMzNorm1 ;
         PMz_imag = 0;
+        var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     }
     // var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
     // var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
@@ -3749,7 +3751,7 @@ PhaseMatch.sign = function sign(x) {
     // var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     // console.log(A);
     // var PMt = Math.exp(-A);
-    var PMt = 1;
+    // var PMt = 1;
     // var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
     return [PMz_real, PMz_imag, PMt];
 };
