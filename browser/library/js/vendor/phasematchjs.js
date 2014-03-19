@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-02-03
+ * phasematchjs v0.0.1a - 2014-03-19
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -4518,6 +4518,9 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         guess = props.theta_s;
     }
     if (photon === 'idler'){
+        // var offset = 0.45/180*Math.PI;
+        // props.theta_i_e = props.theta_i_e + offset;
+
         snell_external = (Math.sin(props.theta_i_e));
 
         min_snells_law = function(theta_internal){
@@ -4549,6 +4552,7 @@ PhaseMatch.find_external_angle = function find_external_angle (props, photon){
     if (photon === 'idler'){
         arg = (props.n_i * Math.sin(props.theta_i));
         theta_external = Math.asin(arg);
+
     }
 
     // console.log("External angle is: ", theta_external*180/Math.PI, props.theta_s*180/Math.PI );
@@ -5269,10 +5273,14 @@ PhaseMatch.Crystals('KDP-1', {
 
 
             // return theta_i;
-            P.theta_i = theta_i;
+
+            // P.theta_i = theta_i;
+            var offset = 0.3/180*Math.PI;
+            P.theta_i = theta_i + offset;
             //Update the index of refraction for the idler
             P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+            // console.log("External angle of the idler is:", PhaseMatch.find_external_angle(P,"idler")*180/Math.PI );
         },
 
         optimum_signal : function (){
@@ -5635,7 +5643,7 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
     // var PMN = PhaseMatch.phasematch(P);
     // var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
 
-    
+
     for (j=0; j<lambda_i.length; j++){
         for (i=0; i<lambda_s.length; i++){
             var index_s = i;
@@ -5665,7 +5673,6 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
 PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm){
     var N = lambda_s.length * (lambda_i.length);
     var JSI = new Float64Array( N );
-
     var JSA = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
 
     for (var i=0; i<N; i++){
@@ -5673,6 +5680,7 @@ PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm
         JSI[i] = sq(JSA[0][i]) + sq(JSA[1][i]);
     }
     // JSI = PhaseMatch.normalize(JSI);
+
     return JSI;
 
 };

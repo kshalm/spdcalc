@@ -153,6 +153,7 @@ define(
                 P.phi_i = P.phi_s + Math.PI;
                 P.update_all_angles();
                 P.optimum_idler(P);
+                console.log("External angle of the idler is:", PhaseMatch.find_external_angle(P,"idler")*180/Math.PI );
                 var PMN =  PhaseMatch.phasematch(props);
                 var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
 

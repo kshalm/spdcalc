@@ -117,7 +117,7 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
     // var PMN = PhaseMatch.phasematch(P);
     // var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
 
-    
+
     for (j=0; j<lambda_i.length; j++){
         for (i=0; i<lambda_s.length; i++){
             var index_s = i;
@@ -147,7 +147,6 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
 PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm){
     var N = lambda_s.length * (lambda_i.length);
     var JSI = new Float64Array( N );
-
     var JSA = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
 
     for (var i=0; i<N; i++){
@@ -155,6 +154,7 @@ PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm
         JSI[i] = sq(JSA[0][i]) + sq(JSA[1][i]);
     }
     // JSI = PhaseMatch.normalize(JSI);
+
     return JSI;
 
 };

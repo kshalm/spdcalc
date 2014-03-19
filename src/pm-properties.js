@@ -320,10 +320,14 @@
 
 
             // return theta_i;
-            P.theta_i = theta_i;
+
+            // P.theta_i = theta_i;
+            var offset = 0.3/180*Math.PI;
+            P.theta_i = theta_i + offset;
             //Update the index of refraction for the idler
             P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+            // console.log("External angle of the idler is:", PhaseMatch.find_external_angle(P,"idler")*180/Math.PI );
         },
 
         optimum_signal : function (){

@@ -1356,6 +1356,9 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
         guess = props.theta_s;
     }
     if (photon === 'idler'){
+        // var offset = 0.45/180*Math.PI;
+        // props.theta_i_e = props.theta_i_e + offset;
+
         snell_external = (Math.sin(props.theta_i_e));
 
         min_snells_law = function(theta_internal){
@@ -1387,6 +1390,7 @@ PhaseMatch.find_external_angle = function find_external_angle (props, photon){
     if (photon === 'idler'){
         arg = (props.n_i * Math.sin(props.theta_i));
         theta_external = Math.asin(arg);
+
     }
 
     // console.log("External angle is: ", theta_external*180/Math.PI, props.theta_s*180/Math.PI );
