@@ -1178,7 +1178,7 @@ PhaseMatch.calc_HOM_Angle = function calc_HOM_Angle(P, delT, ls_start, ls_stop, 
 
             var vis = (0.5-rate["rate"]/N)/0.5;
             var ang = P.theta_i * 180/ Math.PI;
-            console.log("Visibility: " + vis.toString() + "  Angle: " + ang.toString() );
+            // console.log("Visibility: " + vis.toString() + "  Angle: " + ang.toString() );
 
         }
         else {

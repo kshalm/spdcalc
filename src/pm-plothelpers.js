@@ -225,20 +225,36 @@ PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm
 
 };
 
-PhaseMatch.calc_JSI_diff_idler_angles = function calc_JSI_diff_idler_angles(props, lambda_s, lambda_i, dim, norm){
-    var N = lambda_s.length * (lambda_i.length);
+PhaseMatch.calc_JSI_diff_idler_angles = function calc_JSI_diff_idler_angles(props, ls_start, ls_stop, li_start, li_stop, dim){
+    var N = dim * dim;
+
     var JSI = new Float64Array( N );
-    var JSA = PhaseMatch.calc_JSA_diff_idler_angles(props, lambda_s,lambda_i, dim, norm);
+
+    var JSA = PhaseMatch.calc_JSA_diff_idler_angles(props, ls_start, ls_stop, li_start, li_stop, dim);
 
     for (var i=0; i<N; i++){
 
         JSI[i] = sq(JSA[0][i]) + sq(JSA[1][i]);
     }
-    // JSI = PhaseMatch.normalize(JSI);
-
+    JSI = PhaseMatch.normalize(JSI);
     return JSI;
 
 };
+
+// PhaseMatch.calc_JSI_diff_idler_angles = function calc_JSI_diff_idler_angles(props, lambda_s, lambda_i, dim, norm){
+//     var N = lambda_s.length * (lambda_i.length);
+//     var JSI = new Float64Array( N );
+//     var JSA = PhaseMatch.calc_JSA_diff_idler_angles(props, lambda_s,lambda_i, dim, norm);
+
+//     for (var i=0; i<N; i++){
+
+//         JSI[i] = sq(JSA[0][i]) + sq(JSA[1][i]);
+//     }
+//     // JSI = PhaseMatch.normalize(JSI);
+
+//     return JSI;
+
+// };
 
 /* This plots the phasematching curve for the signal/idler vs the pump wavelength. It is simialar to the JSA calcualtion.
 *

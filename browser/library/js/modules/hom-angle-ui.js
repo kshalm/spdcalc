@@ -75,11 +75,11 @@ define(
 
                 // init plot
                 self.plot1d = new LinePlot({
-                    title: 'Hong-Ou-Mandel Dip',
+                    title: 'HOM Visibility as a function of angular mode mismatch',
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     labels: {
-                        x: 'Time delay (fs)',
-                        y: 'Coincidence probability'
+                        x: 'External idler angle mismatch (deg)',
+                        y: 'HOM visibility'
                     },
                     format: {x: '.00f'},
                     width: 400,
@@ -133,7 +133,22 @@ define(
                 self.on('change:delT', function( delT ){
 
                     self.refreshLine( delT );
-                    self.plot1d.setTitle("Time delay = " + delT);
+                    var range = self.plot1d.scales.x.domain();
+
+                    // if (!self.data1d[index]){
+                    //     var vis = self.data1d[index];
+                    // }
+                    // else{
+                        //console.log("we are good", self.data1d);
+                        var index =Math.round(((delT-range[0])/(range[1]- range[0]))*(self.data1d.length-1));
+                        var vis = self.data1d[index].y;
+                        // //console.log("vis", vis, vis.y, index);
+                        vis = Math.round(vis*1000)/1000
+
+                        // //console.log("index:", index, self.data1d.length);
+                        // var vis = self.plot1d.scales.y.domain(delT);
+                        self.plot1d.setTitle("Angle: " + Math.round(delT*1000)/1000 + " , Visbibility: " + vis);
+                    // }
 
                     clearTimeout( to );
                     to = setTimeout(function(){
@@ -170,7 +185,7 @@ define(
                     ,dom = y.domain()
                     ;
 
-                // console.log("dom", dom)
+                // //console.log("dom", dom)
 
                 // create
                 line.enter()
@@ -187,6 +202,8 @@ define(
                         return self.plot1d.scales.x( d  );
                     })
                     ;
+
+                // self.plot.setTitle("Angle: " + delT*180/Math.PI);
 
                 line.exit().remove();
 
@@ -209,8 +226,8 @@ define(
                 self.set_slider_values(tsi[0], tsi[1], tsi[2]);
 
                 self.plotOpts.set({
-                    'grid_size': 50,
-                    'T_2HOM': 50,
+                    'grid_size': 100,
+                    'T_2HOM': 20,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -230,8 +247,7 @@ define(
                     ,tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max)
                     ,data1d = []
                     ,po = self.plotOpts
-                    // ,dim = po.get('T_2HOM')
-                    ,dim = 10
+                    ,dim = po.get('T_2HOM')
                     ,angleRange = []
                     ,delT = PhaseMatch.linspace(
                         po.get('delT_start'),
@@ -265,7 +281,7 @@ define(
 
 
                 // First calc the joint spectrum.
-                // self.calc_HOM_JSA( props );
+                self.calc_JSA( props );
 
                 // Next we begin the calculation of the HOM dip
                 var starttime = new Date();
@@ -278,7 +294,7 @@ define(
 
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
-                    console.log("angleRange: ", angleRange[j], Nthreads)
+                    //console.log("angleRange: ", angleRange[j], Nthreads)
                     promises[j] = self.workers[j].exec('jsaHelper.doCalcHOMAngle', [
                         props.get(),
                         0,
@@ -286,7 +302,8 @@ define(
                         po.get('ls_stop'),
                         po.get('li_start'),
                         po.get('li_stop'),
-                        po.get('grid_size'),
+                        // po.get('grid_size'),
+                        50,
                         true,
                         angleRange[j]
                     ]);
@@ -305,7 +322,7 @@ define(
                         }
 
                         var endtime = new Date();
-                        console.log("HOM dip Elapsed time: ", endtime - starttime);
+                        //console.log("HOM dip Elapsed time: ", endtime - starttime);
 
                         return arr; // this value is passed on to the next "then()"
 
@@ -319,12 +336,12 @@ define(
                         }
                         self.data1d = data1d;
                         self.draw();
-                        // console.log("results," + self.data1d[3].y)
+                        // //console.log("results," + self.data1d[3].y)
                         self.plot1d.plotData( self.data1d );
 
                         // Calculate visibility
                         var vis = (0.5 -  Math.min.apply(null, HOM))/0.5;
-                        self.plot1d.setTitle("Hong-Ou-Mandel visibility = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
+                        // self.plot1d.setTitle("Idler angle = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
                         self.plot1d.setYRange([0, 1]);
 
                         // self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
@@ -381,22 +398,29 @@ define(
             calc_JSA: function( props ){
 
                 var self = this
-                    ,delT = self.get('delT')
+                    ,angles_external = self.get('delT')*Math.PI/180
                     ,po = self.plotOpts;
 
                 var st = new Date();
+
+                // Set the angle up for the idler
+                props.phi_i = props.phi_s + Math.PI;
+                props.update_all_angles();
+                props.theta_i_e = angles_external;
+                props.theta_i = PhaseMatch.find_internal_angle (props, 'idler');
+                //console.log("internal angle = ", props.theta_i_e);
+
                 var JSI = PhaseMatch.calc_JSI_diff_idler_angles(
                             props,
                             po.get('ls_start'),
                             po.get('ls_stop'),
                             po.get('li_start'),
                             po.get('li_stop'),
-                            0,
-                            po.get('grid_size'),
-                            true
+                            po.get('grid_size')
                             );
+
                 self.data = JSI;
-                console.log(JSI);
+                // //console.log(JSI);
                 self.draw();
                 self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
@@ -420,7 +444,7 @@ define(
                 //         self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                 //         self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
                 //         var sp = new Date();
-                //         // console.log("time jsa", sp -st);
+                        //console.log("time jsa", sp -st);
                 // });
 
 
@@ -467,12 +491,12 @@ define(
                 self.plot1d.plotData( data1d );
 
                 if (!data1d){
-                    cosnole.log("failed to plot");
+                    //console.log("failed to plot");
                     return this;
                 }
 
                 setTimeout(function(){
-                     cosnole.log("setTimeout");
+                     //console.log("setTimeout");
                     self.plot1d.plotData( data1d );
                     dfd.resolve();
                 }, 50);
