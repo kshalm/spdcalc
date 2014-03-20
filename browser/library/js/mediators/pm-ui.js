@@ -29,7 +29,8 @@ define(
         'modules/pm-curves-ui',
         'modules/jsa-2hom-ui',
         'modules/jsa-hom-bunching-ui',
-        'modules/couplingefficiency-ui'
+        'modules/couplingefficiency-ui',
+        'modules/hom-angle-ui'
     ],
     function(
         $,
@@ -61,7 +62,8 @@ define(
         curvesUI,
         jsa2homUI,
         jsahomBunchUI,
-        efficiencyUI
+        efficiencyUI,
+        homAngleUI
     ) {
 
         'use strict';
@@ -406,6 +408,8 @@ define(
                 self.set('jsa-hom-bunch', jsahomBunchUI());
                 // Coupling effiency map
                 self.set('efficiency', efficiencyUI());
+                // HOM visibility as a function of mismatched angle collection
+                self.set('homangle', homAngleUI());
             },
 
             /**

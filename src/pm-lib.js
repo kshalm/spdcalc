@@ -1110,6 +1110,83 @@ PhaseMatch.calc_2HOM_scan_p = function calc_HOM_scan(P, delT, ls_start, ls_stop,
 };
 
 /*
+ * calc_HOM_Angle()
+ * Calculates the HOM visibility as a function of the mode mismatch due to the idler photon being collected
+ * at a nonoptimal angle, theta.
+ * P is SPDC Properties object
+ * delT is the time delay between signal and idler. Here it is set to 0 to find the minimum in the dip.
+ */
+PhaseMatch.calc_HOM_Angle = function calc_HOM_Angle(P, delT, ls_start, ls_stop, li_start, li_stop, npts, dip, theta){
+
+    // var npts = 50;  //number of points to pass to the calc_HOM_JSA
+    var dim = theta.length;
+    delT = 0.0;
+    // var delT = PhaseMatch.linspace(t_start, t_stop, dim);
+
+    var HOM_values = new Float64Array(dim);
+    // var PM_JSA1 = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, npts);
+    // var PM_JSA2 = PhaseMatch.calc_JSA(P, li_start, li_stop, ls_start, ls_stop, npts);
+
+    // var PM_JSA1_real = PhaseMatch.create_2d_array(PM_JSA1[0], npts,npts);
+    // var PM_JSA1_imag = PhaseMatch.create_2d_array(PM_JSA1[1], npts,npts);
+    // var PM_JSA2_real = PhaseMatch.create_2d_array(PhaseMatch.AntiTranspose(PM_JSA2[0],npts), npts,npts);
+    // var PM_JSA2_imag = PhaseMatch.create_2d_array(PhaseMatch.AntiTranspose(PM_JSA2[1],npts), npts,npts);
+
+    // var JSA = {
+    //     'PM_JSA1_real': PM_JSA1_real
+    //     ,'PM_JSA1_imag': PM_JSA1_imag
+    //     ,'PM_JSA2_real': PM_JSA2_real
+    //     ,'PM_JSA2_imag': PM_JSA2_imag
+    //     };
+
+    // var PM_JSI = PhaseMatch.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, npts);
+
+    // Calculate normalization
+    // var N = PhaseMatch.Sum(PM_JSI),
+    var rate;
+
+    for (var i=0; i<dim; i++){
+        if (dip){
+            // Set the angle of the idler.
+            P.theta_i = theta[i];
+            P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+            // Calculate the visibility in the HOM dip. This requires calculating the JSA
+            var PM_JSA1 = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, npts);
+            var PM_JSA2 = PhaseMatch.calc_JSA(P, li_start, li_stop, ls_start, ls_stop, npts);
+
+            var PM_JSA1_real = PhaseMatch.create_2d_array(PM_JSA1[0], npts,npts);
+            var PM_JSA1_imag = PhaseMatch.create_2d_array(PM_JSA1[1], npts,npts);
+            var PM_JSA2_real = PhaseMatch.create_2d_array(PhaseMatch.AntiTranspose(PM_JSA2[0],npts), npts,npts);
+            var PM_JSA2_imag = PhaseMatch.create_2d_array(PhaseMatch.AntiTranspose(PM_JSA2[1],npts), npts,npts);
+
+            var JSA = {
+                'PM_JSA1_real': PM_JSA1_real
+                ,'PM_JSA1_imag': PM_JSA1_imag
+                ,'PM_JSA2_real': PM_JSA2_real
+                ,'PM_JSA2_imag': PM_JSA2_imag
+                };
+
+            var PM_JSI = PhaseMatch.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, npts);
+            var N = PhaseMatch.Sum(PM_JSI);
+
+            rate = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, npts)/N;
+            rate = (0.5-rate)/0.5;
+        }
+        else {
+            // rate = PhaseMatch.calc_HOM_bunch_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, npts);
+            rate = 0.0;
+        }
+
+        HOM_values[i] = (rate["rate"]);
+    }
+    return HOM_values;
+
+};
+
+
+/*
  * calc_Schmidt
  * Calculates the Schmidt number for a 2D matrix
  * NOTE: The SVD routine has problems with odd dimensions
