@@ -1148,13 +1148,15 @@ PhaseMatch.calc_HOM_Angle = function calc_HOM_Angle(P, delT, ls_start, ls_stop, 
     for (var i=0; i<dim; i++){
         if (dip){
             // Set the angle of the idler.
+            P.phi_i = P.phi_s + Math.PI;
+            P.update_all_angles();
             P.theta_i = theta[i];
             P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
             // Calculate the visibility in the HOM dip. This requires calculating the JSA
-            var PM_JSA1 = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, npts);
-            var PM_JSA2 = PhaseMatch.calc_JSA(P, li_start, li_stop, ls_start, ls_stop, npts);
+            var PM_JSA1 = PhaseMatch.calc_JSA_diff_idler_angles(P, ls_start, ls_stop, li_start, li_stop, npts);
+            var PM_JSA2 = PhaseMatch.calc_JSA_diff_idler_angles(P, li_start, li_stop, ls_start, ls_stop, npts);
 
             var PM_JSA1_real = PhaseMatch.create_2d_array(PM_JSA1[0], npts,npts);
             var PM_JSA1_imag = PhaseMatch.create_2d_array(PM_JSA1[1], npts,npts);
@@ -1170,16 +1172,22 @@ PhaseMatch.calc_HOM_Angle = function calc_HOM_Angle(P, delT, ls_start, ls_stop, 
 
             var PM_JSI = PhaseMatch.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, npts);
             var N = PhaseMatch.Sum(PM_JSI);
+            // var strN =
 
-            rate = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, npts)/N;
-            rate = (0.5-rate)/0.5;
+            rate = PhaseMatch.calc_HOM_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, npts);
+
+            var vis = (0.5-rate["rate"]/N)/0.5;
+            var ang = P.theta_i * 180/ Math.PI;
+            console.log("Visibility: " + vis.toString() + "  Angle: " + ang.toString() );
+
         }
         else {
             // rate = PhaseMatch.calc_HOM_bunch_rate(ls_start, ls_stop, li_start, li_stop, delT, JSA, npts);
             rate = 0.0;
         }
 
-        HOM_values[i] = (rate["rate"]);
+        // HOM_values[i] = (rate["rate"]);
+        HOM_values[i] = (vis);
     }
     return HOM_values;
 
