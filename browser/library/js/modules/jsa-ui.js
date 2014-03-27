@@ -92,6 +92,44 @@ define(
                 });
 
                 self.addPlot( self.plot );
+
+                // Add in the X marginal Line plot
+                self.plotMargX = new LinePlot({
+                    title: 'X Marginal (delete title)',
+                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    labels: {
+                        x: 'Whatever the xlabel for the heatmap is',
+                        y: 'a.u.'
+                    },
+                    format: {x: '.0f'},
+                    width: 400,
+                    height: 200,
+                    yrange: [0,1]
+                });
+
+                self.plotMargX.resize(400,150);
+                self.elPlotMargX = $(self.plotMargX.el);
+                self.addPlot( self.plotMargX );
+
+                // Add in the Y marginal Line plot
+                self.plotMargY = new LinePlot({
+                    title: 'Y Marginal (delete title)',
+                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    labels: {
+                        x: 'No label',
+                        y: 'a.u.'
+                    },
+                    format: {x: '.0f'},
+                    width: 400,
+                    height: 200,
+                    yrange: [0,1]
+                });
+
+                self.plotMargY.resize(400,150);
+                self.elPlotMargY = $(self.plotMargY.el);
+                self.addPlot( self.plotMargY );
+
+
                 self.initEvents();
             },
 
