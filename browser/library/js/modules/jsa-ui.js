@@ -93,6 +93,12 @@ define(
 
                 self.addPlot( self.plot );
 
+                //@ToDo: Jasper
+                //Here are the marginal plots that need to be added.
+                //The first is the x marginal that should be placed directly
+                //beneath the heat map. The y marginal gets placed to the left
+                //of the heatmap and is rotated.
+
                 // Add in the X marginal Line plot
                 self.plotMargX = new LinePlot({
                     title: 'X Marginal (delete title)',
@@ -103,11 +109,11 @@ define(
                     },
                     format: {x: '.0f'},
                     width: 400,
-                    height: 200,
+                    height: 75,
                     yrange: [0,1]
                 });
 
-                self.plotMargX.resize(400,150);
+                self.plotMargX.resize(400,75);
                 self.elPlotMargX = $(self.plotMargX.el);
                 self.addPlot( self.plotMargX );
 
@@ -121,11 +127,11 @@ define(
                     },
                     format: {x: '.0f'},
                     width: 400,
-                    height: 200,
+                    height: 75,
                     yrange: [0,1]
                 });
 
-                self.plotMargY.resize(400,150);
+                self.plotMargY.resize(400,75);
                 self.elPlotMargY = $(self.plotMargY.el);
                 self.addPlot( self.plotMargY );
 
@@ -242,6 +248,61 @@ define(
                     });
             },
 
+            calcMarginals: function(){
+                var self = this
+                    ,data =self.data
+                    ,rows = this.plot.rows
+                    ,cols = this.plot.cols
+                    ,xmarg = new Float64Array(cols)
+                    ,ymarg = new Float64Array(rows)
+                    ,xmargPlotData = []
+                    ,ymargPlotData = []
+                    ;
+
+                console.log("number of rows", rows);
+
+                if (!data){
+                    return this;
+                }
+
+                // Calc X marginals
+                for (var i = 0; i<cols; i++){
+                    for (var j = 0; j<rows; j++){
+                        xmarg[i] += self.data[i+j*rows];
+                    }
+                }
+
+                // Calc Y marginals
+                for (var i = 0; i<rows; i++){
+                    for (var j = 0; j<cols; j++){
+                        ymarg[i] += self.data[i+j*cols];
+                    }
+                }
+
+                // Normalize
+                xmarg = PhaseMatch.normalize(xmarg);
+                ymarg = PhaseMatch.normalize(ymarg);
+                // console.log("number of rows", rows, xmarg, ymarg);
+
+                for ( var i = 0, l = rows; i < l; i ++){
+                    xmargPlotData.push({
+                        x: i,
+                        y: xmarg[i]
+                    })
+                }
+
+                for ( var i = 0, l = rows; i < l; i ++){
+                    ymargPlotData.push({
+                        x: i,
+                        y: ymarg[i]
+                    })
+                }
+
+                self.plotMargX.plotData( xmargPlotData );
+                self.plotMargY.plotData( ymargPlotData );
+
+            },
+
             draw: function(){
 
                 var self = this
@@ -258,6 +319,7 @@ define(
                 setTimeout(function(){
                     self.plot.plotData( data );
                     dfd.resolve();
+                    self.calcMarginals();
                 }, 10);
 
                 return dfd.promise;
