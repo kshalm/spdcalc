@@ -6,19 +6,6 @@
                 <button class="btn collapse-ctrl-plot" id="collapse-homjsa">&#x2296;</button>
             </div>
     </div>
-    <!-- <div class="control-group">
-        <label class="checkbox control-label hom-bunch" for="hom-bunch">
-            Bunching
-            <input type="checkbox" name="hom-bunch" id="hom-bunch" >
-        </label>
-    </div> -->
-
-    <!-- <div class="control-group"> -->
-        <!-- <label class="checkbox" for="autocalc_plotopts">
-            Bunching
-            <input type="checkbox" name="autocalc_plotopts" id="autocalc_plotopts" checked="checked">
-        </label> -->
-<!--     </div> -->
 
 	<div class="heat-map-wrapper">
 	        <!-- heat map goes here -->

@@ -128,6 +128,24 @@ define(
                     }
                 });
 
+                // BW plot
+                self.plotBW = new LinePlot({
+                    title: 'HOM Visibility as a function of bandwidth',
+                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    labels: {
+                        x: 'Bandwidth (nm)',
+                        y: 'HOM visibility'
+                    },
+                    format: {x: '.00f'},
+                    width: 400,
+                    height: 200,
+                    yrange: [0,1]
+                });
+
+                self.plotBW.resize(400,150);
+                self.elPlotBW = $(self.plotBW.el);
+
+                /////////////////////////////////////////////
                 // internal events
                 var to;
                 self.on('change:delT', function( delT ){
@@ -171,6 +189,7 @@ define(
 
                 var self = this;
                 self.calc_JSA( self.parameters.getProps() );
+                self.calcBW( self.parameters.getProps() );
                 self.draw();
             },
 
@@ -282,6 +301,7 @@ define(
 
                 // First calc the joint spectrum.
                 self.calc_JSA( props );
+                self.calcBW( props );
 
                 // Next we begin the calculation of the HOM dip
                 var starttime = new Date();
@@ -365,35 +385,7 @@ define(
                 });
             },
 
-            // calc_JSA_only: function( props ){
-            //     var self = this
-            //         ,delT = self.get('delT')
-            //         ,po = self.plotOpts;
 
-            //     // Can only run in one thread. This graph is not easily parallizable. Need
-            //     // the entire grid to do the computation.
-            //     return  self.workers[self.nWorkers-1].exec('jsaHelper.doCalcHOMJSA', [
-            //                 props.get(),
-            //                 po.get('ls_start'),
-            //                 po.get('ls_stop'),
-            //                 po.get('li_start'),
-            //                 po.get('li_stop'),
-            //                 delT,
-            //                 po.get('grid_size'),
-            //                 true
-            //     ]).then(function(PM){
-            //             self.data = PM;
-            //             // self.draw();
-            //             // var S= PhaseMatch.calc_Schmidt(PM);
-            //             // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
-            //             // self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
-            //             // self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
-            //             // var sp = new Date();
-            //         };
-
-            // },
-            //
-            // PhaseMatch.calc_JSA_diff_idler_angles
 
             calc_JSA: function( props ){
 
@@ -424,53 +416,120 @@ define(
                 self.draw();
                 self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                 self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
-                // // Can only run in one thread. This graph is not easily parallizable. Need
-                // // the entire grid to do the computation.
-                // return  self.workers[self.nWorkers-1].exec('jsaHelper.doCalcHOMJSA', [
-                //             props.get(),
-                //             po.get('ls_start'),
-                //             po.get('ls_stop'),
-                //             po.get('li_start'),
-                //             po.get('li_stop'),
-                //             delT,
-                //             po.get('grid_size'),
-                //             true
-                // ]).then(function(PM){
-                //         self.data = PM;
-                //         self.draw();
 
-                //         // var S= PhaseMatch.calc_Schmidt(PM);
-                //         // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
-                //         self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
-                //         self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
-                //         var sp = new Date();
-                        //console.log("time jsa", sp -st);
-                // });
+            },
 
+            // Calculate the HOM VIS as a function of BW for a particular angular mismatch
+            calcBW: function( props ){
 
-
-
-                // var PM = PhaseMatch.calc_HOM_JSA(
-                //     props,
-                //     po.get('ls_start'),
-                //     po.get('ls_stop'),
-                //     po.get('li_start'),
-                //     po.get('li_stop'),
-                //     self.get('delT'),
-                //     po.get('grid_size'),
-                //     true
-                // )
-                // ;
+                var self = this,
+                    threshold = 0.5
+                    ,props = self.parameters.getProps()
+                    ,lim = PhaseMatch.autorange_lambda(props, threshold)
+                    ,tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max)
+                    ,dataBW = []
+                    ,po = self.plotOpts
+                    ,dim = po.get('T_2HOM')
+                    ,angleRange = []
+                    ,delT = PhaseMatch.linspace(
+                        po.get('delT_start'),
+                        po.get('delT_stop'),
+                        dim
+                    )
+                    ,dim = 40
+                    ,Nthreads = self.nWorkers -1
+                    // ,Nthreads = 1
+                    ,divisions = Math.floor(dim / Nthreads)
+                    ,promises = []
+                    ,maxBW_s = Math.abs(po.get('ls_start') - po.get('ls_stop'))
+                    ,maxBW_i = Math.abs(po.get('li_start') - po.get('li_stop'))
+                    ,startBW = 1e-9
+                    ,angle_external = self.get('delT')*Math.PI/180
+                    ,bwRange = []
+                    ;
 
 
-                // self.data = PM;
+                // Convert the external mismatch angle to an internal angle
+                var ptemp = props.clone();
 
-                // // var S= PhaseMatch.calc_Schmidt(PM);
-                // // self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
+                ptemp.theta_i_e = angle_external;
+                var angle = PhaseMatch.find_internal_angle (ptemp, 'idler');
+                console.log("angle is: ",angle_external*180/Math.PI, angle*180/Math.PI)
 
-                // self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
-                // self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
-                // self.plot1d.setTitle("Time delay = " + self.get('delT')/1e-15);
+                var BW_max = Math.max(maxBW_i, maxBW_s);
+                var BW = PhaseMatch.linspace(
+                        startBW,
+                        BW_max,
+                        dim
+                        );
+
+
+                // Next we begin the calculation of the HOM dip
+                var starttime = new Date();
+
+                for (var i = 0; i<Nthreads-1; i++){
+                    bwRange.push(BW.subarray(i*divisions,i*divisions + divisions));
+                }
+                bwRange.push( BW.subarray((Nthreads-1)*divisions, BW.length));
+
+                console.log("starting the BW calculation");
+                // The calculation is split up and reutrned as a series of promises
+                for (var j = 0; j < Nthreads; j++){
+                    // console.log("bwRange: ", bwRange[j], j)
+                    promises[j] = self.workers[j].exec('jsaHelper.doCalcHOMAngleBW', [
+                        props.get()
+                        ,bwRange[j]
+                        ,0
+                        // po.get('grid_size'),
+                        ,50
+                        ,true
+                        ,angle
+
+                    ]);
+                }
+
+                return when.all( promises ).then(function( values ){
+                        // put the results back together
+                        // console.log("putting promises back together", values)
+                        var arr = new Float64Array( dim );
+
+                        var startindex = 0;
+
+                        for (j = 0; j<Nthreads; j++){
+                             arr.set(values[j], startindex);
+                             // console.log(j, Nthreads, values[j]);
+                             startindex += bwRange[j].length;
+                        }
+
+                        var endtime = new Date();
+                        //console.log("HOM dip Elapsed time: ", endtime - starttime);
+                        // console.log("data from bw", arr);
+
+                        return arr; // this value is passed on to the next "then()"
+
+                    }).then(function( HOM ){
+
+                        for ( var i = 0, l = HOM.length; i < l; i ++){
+                            dataBW.push({
+                                x: BW[i]*1e9,
+                                y: HOM[i]
+                            })
+                        }
+                        self.dataBW = dataBW;
+                        self.draw();
+                        // //console.log("results," + self.data1d[3].y)
+                        self.plotBW.plotData( self.dataBW );
+
+                        // Calculate visibility
+                        var vis = (0.5 -  Math.min.apply(null, HOM))/0.5;
+                        // self.plot1d.setTitle("Idler angle = " + Math.round(1000*vis)/1000);//("Hong-Ou-Mandel Dip, Visbibility = ");
+                        self.plotBW.setYRange([Math.min.apply(null, HOM)*.98 , 1]);
+
+
+                         var endtime = new Date();
+
+                        return true;
+                });
             },
 
             draw: function(){
@@ -488,7 +547,9 @@ define(
 
                 // other plot
                 var data1d = self.data1d;
+                var dataBW = self.dataBW;
                 self.plot1d.plotData( data1d );
+                self.plotBW.plotData( dataBW );
 
                 if (!data1d){
                     //console.log("failed to plot");
@@ -498,12 +559,14 @@ define(
                 setTimeout(function(){
                      //console.log("setTimeout");
                     self.plot1d.plotData( data1d );
+                    self.plotBW.plotData( dataBW );
                     dfd.resolve();
                 }, 50);
 
                 return dfd.promise;
 
                 self.plot1d.plotData( data1d );
+                self.plotBW.plotData( dataBW );
             }
         });
 
