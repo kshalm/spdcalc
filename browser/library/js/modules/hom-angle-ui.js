@@ -182,6 +182,7 @@ define(
 
                 self.addPlot( self.plot );
                 self.addPlot( self.plot1d );
+                self.addPlot( self.plotBW );
                 self.initEvents();
             },
 
