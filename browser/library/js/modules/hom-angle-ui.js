@@ -246,7 +246,7 @@ define(
                 self.set_slider_values(tsi[0], tsi[1], tsi[2]);
 
                 self.plotOpts.set({
-                    'grid_size': 100,
+                    'grid_size': 50,
                     'T_2HOM': 20,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
@@ -481,8 +481,8 @@ define(
                         props.get()
                         ,bwRange[j]
                         ,0
-                        // po.get('grid_size'),
-                        ,50
+                        ,po.get('grid_size')
+                        // ,50
                         ,true
                         ,angle
 
