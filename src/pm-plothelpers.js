@@ -5,14 +5,16 @@
 
 PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
 
-    props.update_all_angles();
+    // props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
     var P = props.clone();
     // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
-    // P.theta_i = 0.6*Math.PI/180;
+    P.theta_i_e = 0.505*Math.PI/180;;
+    P.theta_i = PhaseMatch.find_internal_angle (P, 'idler');
+    // P.theta_i = 0.3*Math.PI/180;
     P.phi_i = P.phi_s + Math.PI;
-    P.update_all_angles();
-    P.optimum_idler(P);
+    // P.update_all_angles();
+    // P.optimum_idler(P);
 
     // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
     // P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
@@ -69,7 +71,7 @@ PhaseMatch.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_s
  */
 
 
-PhaseMatch.calc_JSA_diff_idler_angles = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
+PhaseMatch.calc_JSA_diff_idler_angles = function calc_JSA_diff_idler_angles(props, ls_start, ls_stop, li_start, li_stop, dim){
 
     // props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
@@ -153,7 +155,7 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
     var P = props.clone();
     // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
-    // P.theta_i = 0.6*Math.PI/180;
+    P.theta_i = 0.6*Math.PI/180;
     P.phi_i = P.phi_s + Math.PI;
     P.update_all_angles();
     // P.optimum_idler(P);

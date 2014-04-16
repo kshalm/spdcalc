@@ -874,6 +874,16 @@ PhaseMatch.calc_HOM_scan_p = function calc_HOM_scan(P, delT, ls_start, ls_stop, 
  * delT is the time delay between signal and idler
  */
 PhaseMatch.calc_HOM_JSA = function calc_HOM_JSA(P, ls_start, ls_stop, li_start, li_stop, delT, dim, dip){
+
+    //*************************
+    // Set the angle up for the idler
+    P.phi_i = P.phi_s + Math.PI;
+    P.update_all_angles();
+    P.theta_i_e = 0.505*Math.PI/180;
+    P.theta_i = PhaseMatch.find_internal_angle (P, 'idler');
+    console.log("angle is: ",(P.theta_i*180/Math.PI).toString());
+    //*************************
+
     var PM_JSA1 = PhaseMatch.calc_JSA(P, ls_start, ls_stop, li_start, li_stop, dim);
     var PM_JSA2 = PhaseMatch.calc_JSA(P, li_start, li_stop, ls_start, ls_stop, dim);
 

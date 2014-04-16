@@ -251,7 +251,7 @@ define(
                     trange.push(delT.subarray(i*divisions,i*divisions + divisions));
                 }
                 trange.push( delT.subarray((Nthreads-1)*divisions, delT.length));
-                
+
 
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
@@ -272,12 +272,12 @@ define(
                         var arr = new Float64Array( dim );
 
                         var startindex = 0;
-                        
+
                         for (j = 0; j<Nthreads; j++){
                              arr.set(values[j], startindex);
-                             
+
                              startindex += trange[j].length;
-                        }   
+                        }
 
                         var endtime = new Date();
                         console.log("HOM dip Elapsed time: ", endtime - starttime);
@@ -301,11 +301,11 @@ define(
                         self.plot1d.setYRange([0, Math.max.apply(null,HOM)*1.2]);
 
                         self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
-                        
+
                          var endtime = new Date();
 
                         return true;
-                });  
+                });
             },
 
             set_slider_values: function(zero_delay, t_start, t_stop){
@@ -326,8 +326,9 @@ define(
                     ,po = self.plotOpts;
 
                 var st = new Date();
-                
-                // Can only run in one thread. This graph is not easily parallizable. Need 
+
+
+                // Can only run in one thread. This graph is not easily parallizable. Need
                 // the entire grid to do the computation.
                 return  self.workers[self.nWorkers-1].exec('jsaHelper.doCalcHOMJSA', [
                             props.get(),
@@ -349,8 +350,8 @@ define(
                         // console.log("time jsa", sp -st);
                 });
 
-                
-                
+
+
                 // var PM = PhaseMatch.calc_HOM_JSA(
                 //     props,
                 //     po.get('ls_start'),
@@ -363,7 +364,7 @@ define(
                 // )
                 // ;
 
-                
+
                 // self.data = PM;
 
                 // // var S= PhaseMatch.calc_Schmidt(PM);
@@ -398,8 +399,8 @@ define(
                     self.plot1d.plotData( data1d );
                     dfd.resolve();
                 }, 50);
-                   
-                return dfd.promise; 
+
+                return dfd.promise;
 
                 // self.plot1d.plotData( data1d );
             }
