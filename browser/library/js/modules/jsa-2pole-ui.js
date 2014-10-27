@@ -41,7 +41,8 @@ define(
             showPlotOpts: [
                 'grid_size',
                 'signal-wavelength',
-                'idler-wavelength'
+                'idler-wavelength',
+                '2pole'
             ],
 
             initEvents : function(){
@@ -112,7 +113,8 @@ define(
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
-                    'li_stop': lim.lambda_i.max
+                    'li_stop': lim.lambda_i.max,
+                    'pole2': props.poling_period*1.02
                 });
             },
 
@@ -161,14 +163,18 @@ define(
                 var promises = [];
                 for (var j = 0; j < Nthreads; j++){
 
-                    promises[j] = self.workers[j].exec('jsaHelper.doJSACalc', [
+                    promises[j] = self.workers[j].exec('jsaHelper.doJSA2PoleCalc', [
                         propsJSON,
                         lambda_s,
                         lambda_i_range[j],
                         grid_size,
-                        norm
+                        norm,
+                        P.poling_period,
+                        self.plotOpts.get('pole2')
                     ]);
                 }
+
+                console.log(PhaseMatch.linspace(0,10,10));
 
 
                 return when.all( promises ).then(function( values ){

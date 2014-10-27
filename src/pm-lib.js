@@ -541,8 +541,10 @@
             BI = terms[3],
             CR = terms[4],
             CI = terms[5],
-            coeffR = terms[6],
-            coeffI = terms[7];
+            // coeffR = terms[6],
+            // coeffI = terms[7];
+            coeffR = 1,
+            coeffI = 1;
 
         var pmzcoeff = Math.exp(- 1/2*sq(z/bw)); // apodization
         var pmzcoeff = pmzcoeff * Math.exp(-sq(z)*CR -z*BI - AR);

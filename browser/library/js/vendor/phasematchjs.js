@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-03-19
+ * phasematchjs v0.0.1a - 2014-10-27
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -3703,8 +3703,10 @@ PhaseMatch.sign = function sign(x) {
             BI = terms[3],
             CR = terms[4],
             CI = terms[5],
-            coeffR = terms[6],
-            coeffI = terms[7];
+            // coeffR = terms[6],
+            // coeffI = terms[7];
+            coeffR = 1,
+            coeffI = 1;
 
         var pmzcoeff = Math.exp(- 1/2*sq(z/bw)); // apodization
         var pmzcoeff = pmzcoeff * Math.exp(-sq(z)*CR -z*BI - AR);
@@ -5684,6 +5686,30 @@ PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm
     return JSI;
 
 };
+
+PhaseMatch.calc_JSI_2pole = function calc_JSI_2pole(props, lambda_s, lambda_i, dim, norm, pole1, pole2){
+    var N = lambda_s.length * (lambda_i.length);
+    var JSI = new Float64Array( N );
+    norm = 1;
+    // calculate with the first poling period
+    props.poling_period = pole1;
+    var JSA1 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
+    // Calculate with the second poling period
+    props.L = props.L/2;
+    props.poling_period = pole2;
+    console.log(pole2);
+    var JSA2 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
+
+    for (var i=0; i<N; i++){
+
+        JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(JSA1[1][i] + JSA2[1][i]);
+    }
+    // JSI = PhaseMatch.normalize(JSI);
+
+    return JSI;
+
+};
+
 
 /* This plots the phasematching curve for the signal/idler vs the pump wavelength. It is simialar to the JSA calcualtion.
 *

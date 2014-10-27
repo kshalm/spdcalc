@@ -308,4 +308,17 @@
         </div>
 
     </div>
+
+    <!-- Second Poling Period.  -->
+    <div id="plot-opt-2pole">
+        <div class="control-group">
+            <label class="control-label">
+                Second Poling Period (microns)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="pole2" value="{{= this.converter.to('micro', parseFloat( it.pole2 )) }}" />
+            </div>
+        </div>
+
+    <!-- </div> -->
 </section>

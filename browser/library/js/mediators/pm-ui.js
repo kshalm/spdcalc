@@ -29,7 +29,8 @@ define(
         'modules/pm-curves-ui',
         'modules/jsa-2hom-ui',
         'modules/jsa-hom-bunching-ui',
-        'modules/couplingefficiency-ui'
+        'modules/couplingefficiency-ui',
+        'modules/jsa-2pole-ui'
     ],
     function(
         $,
@@ -61,7 +62,8 @@ define(
         curvesUI,
         jsa2homUI,
         jsahomBunchUI,
-        efficiencyUI
+        efficiencyUI,
+        jsa2pole
     ) {
 
         'use strict';
@@ -406,6 +408,8 @@ define(
                 self.set('jsa-hom-bunch', jsahomBunchUI());
                 // Coupling effiency map
                 self.set('efficiency', efficiencyUI());
+                // Two poling periods option
+                self.set('2pole', jsa2pole());
             },
 
             /**
