@@ -42,7 +42,7 @@ define(
                 'grid_size',
                 'signal-wavelength',
                 'idler-wavelength',
-                '2pole'
+                '2pump'
             ],
 
             initEvents : function(){
@@ -114,7 +114,7 @@ define(
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
                     'li_stop': lim.lambda_i.max,
-                    'pole2': props.poling_period - 500*1E-9
+                    'pump2': props.lambda_p - 3.5*1E-9
                 });
             },
 
@@ -163,14 +163,13 @@ define(
                 var promises = [];
                 for (var j = 0; j < Nthreads; j++){
 
-                    promises[j] = self.workers[j].exec('jsaHelper.doJSA2PoleCalc', [
+                    promises[j] = self.workers[j].exec('jsaHelper.doJSA2PumpCalc', [
                         propsJSON,
                         lambda_s,
                         lambda_i_range[j],
                         grid_size,
                         norm,
-                        P.poling_period,
-                        self.plotOpts.get('pole2')
+                        self.plotOpts.get('pump2')
                     ]);
                 }
 

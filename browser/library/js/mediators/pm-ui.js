@@ -30,7 +30,8 @@ define(
         'modules/jsa-2hom-ui',
         'modules/jsa-hom-bunching-ui',
         'modules/couplingefficiency-ui',
-        'modules/jsa-2pole-ui'
+        'modules/jsa-2pole-ui',
+        'modules/jsa-2pump-ui'
     ],
     function(
         $,
@@ -63,7 +64,8 @@ define(
         jsa2homUI,
         jsahomBunchUI,
         efficiencyUI,
-        jsa2pole
+        jsa2pole,
+        jsa2pump
     ) {
 
         'use strict';
@@ -410,6 +412,8 @@ define(
                 self.set('efficiency', efficiencyUI());
                 // Two poling periods option
                 self.set('2pole', jsa2pole());
+                // Two pump wavelengths option
+                self.set('2pump', jsa2pump());
             },
 
             /**

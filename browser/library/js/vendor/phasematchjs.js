@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-10-27
+ * phasematchjs v0.0.1a - 2014-10-28
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -3605,76 +3605,77 @@ PhaseMatch.sign = function sign(x) {
         // var coeffR = PhaseMatch.cdivideR(Math.sqrt(Wp_SQ*Ws_SQ*Wi_SQ), 0, coeffinvR, coeffinvI);
         // var coeffI = PhaseMatch.cdivideI(Math.sqrt(Wp_SQ*Ws_SQ*Wi_SQ), 0, coeffinvR, coeffinvI);
 
-        // gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
-        var gN = sq(1/Math.sqrt(Math.PI*2))*1/Math.sqrt(Math.PI*2),
-            gaussR = PhaseMatch.cdivideR(gN * Math.sqrt(Ws_SQ * Wi_SQ *Wp_SQ), 0 , Q_ispR,Q_ispI),
-            gaussI = PhaseMatch.cdivideI(gN * Math.sqrt(Ws_SQ * Wi_SQ *Wp_SQ), 0 , Q_ispR,Q_ispI);
+        // // gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
+        // var gN = sq(1/Math.sqrt(Math.PI*2))*1/Math.sqrt(Math.PI*2),
+        //     gaussR = PhaseMatch.cdivideR(gN * Math.sqrt(Ws_SQ * Wi_SQ *Wp_SQ), 0 , Q_ispR,Q_ispI),
+        //     gaussI = PhaseMatch.cdivideI(gN * Math.sqrt(Ws_SQ * Wi_SQ *Wp_SQ), 0 , Q_ispR,Q_ispI);
 
-        // xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
-        var xconst1R = PhaseMatch.cdivideR((sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs)), 0, Q_iR, Q_iI),
-            xconst1I = PhaseMatch.cdivideI((sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs)), 0, Q_iR, Q_iI),
-            // xconst1 += 1/Wp_SQ;
-            xconst2R = PhaseMatch.cdivideR(1, 0, Q_pR, Q_pI),
-            xconst2I = PhaseMatch.cdivideI(1, 0, Q_pR, Q_pI),
-            xconst3R = PhaseMatch.caddR(xconst1R,xconst1I,xconst2R,xconst2I),
-            xconst3I = PhaseMatch.caddI(xconst1R,xconst1I,xconst2R,xconst2I),
-            // xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
-            xconst4R = PhaseMatch.cdivideR(sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs), 0, Q_sR, Q_sI),
-            xconst4I = PhaseMatch.cdivideI(sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs), 0, Q_sR, Q_sI),
-            xconst5R = PhaseMatch.caddR(xconst3R,xconst3I,xconst4R,xconst4I),
-            xconst5I = PhaseMatch.caddI(xconst3R,xconst3I,xconst4R,xconst4I),
-            // Math.sqrt(xconst1);
-            xconst6R = PhaseMatch.csqrtR(xconst5R, xconst5I),
-            xconst6I = PhaseMatch.csqrtI(xconst5R, xconst5I),
-            // xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
-            xconstR = PhaseMatch.cdivideR(Math.sqrt(2*Math.PI),0,xconst6R, xconst6I),
-            xconstI = PhaseMatch.cdivideI(Math.sqrt(2*Math.PI),0,xconst6R, xconst6I);
+        // // xconst1 = (sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs))/Wi_SQ;
+        // var xconst1R = PhaseMatch.cdivideR((sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs)), 0, Q_iR, Q_iI),
+        //     xconst1I = PhaseMatch.cdivideI((sq(COS_PHIs) + sq(COS_THETAi)*sq(SIN_PHIs)), 0, Q_iR, Q_iI),
+        //     // xconst1 += 1/Wp_SQ;
+        //     xconst2R = PhaseMatch.cdivideR(1, 0, Q_pR, Q_pI),
+        //     xconst2I = PhaseMatch.cdivideI(1, 0, Q_pR, Q_pI),
+        //     xconst3R = PhaseMatch.caddR(xconst1R,xconst1I,xconst2R,xconst2I),
+        //     xconst3I = PhaseMatch.caddI(xconst1R,xconst1I,xconst2R,xconst2I),
+        //     // xconst1 += (sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs))/Ws_SQ;
+        //     xconst4R = PhaseMatch.cdivideR(sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs), 0, Q_sR, Q_sI),
+        //     xconst4I = PhaseMatch.cdivideI(sq(COS_PHIs) + sq(COS_THETAs)*sq(SIN_PHIs), 0, Q_sR, Q_sI),
+        //     xconst5R = PhaseMatch.caddR(xconst3R,xconst3I,xconst4R,xconst4I),
+        //     xconst5I = PhaseMatch.caddI(xconst3R,xconst3I,xconst4R,xconst4I),
+        //     // Math.sqrt(xconst1);
+        //     xconst6R = PhaseMatch.csqrtR(xconst5R, xconst5I),
+        //     xconst6I = PhaseMatch.csqrtI(xconst5R, xconst5I),
+        //     // xconst = Math.sqrt(2*Math.PI)/Math.sqrt(xconst1);
+        //     xconstR = PhaseMatch.cdivideR(Math.sqrt(2*Math.PI),0,xconst6R, xconst6I),
+        //     xconstI = PhaseMatch.cdivideI(Math.sqrt(2*Math.PI),0,xconst6R, xconst6I);
 
-        // yconst numerator
-        // yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ ));
-        //
-        // (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))
-        //
-        var ynum1R = PhaseMatch.caddR(Q_spR,Q_spI,Q_ipR,Q_ipI),
-            ynum1I = PhaseMatch.caddI(Q_spR,Q_spI,Q_ipR,Q_ipI),
-            ynum2R = PhaseMatch.caddR(ynum1R,ynum1I,Q_isR,Q_isI),
-            ynum2I = PhaseMatch.caddI(ynum1R,ynum1I,Q_isR,Q_isI),
-            // (sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ )
-            ynum3R = PhaseMatch.caddR(sq(COS_THETAs)*Q_ipR, sq(COS_THETAs)*Q_ipI, Q_isR, Q_isI),
-            ynum3I = PhaseMatch.caddI(sq(COS_THETAs)*Q_ipR, sq(COS_THETAs)*Q_ipI, Q_isR, Q_isI),
-            ynum4R = PhaseMatch.caddR(ynum3R, ynum3I, sq(COS_THETAi)*Q_spR, sq(COS_THETAi)*Q_spI),
-            ynum4I = PhaseMatch.caddI(ynum3R, ynum3I, sq(COS_THETAi)*Q_spR, sq(COS_THETAi)*Q_spI),
-            // (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ ));
-            ynumR = PhaseMatch.cmultiplyR(ynum2R,ynum2I,ynum4R,ynum4I),
-            ynumI = PhaseMatch.cmultiplyI(ynum2R,ynum2I,ynum4R,ynum4I);
-
-
-        // // yconst denominator
-        // // yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
-        var c1 = (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)),
-            yden1R = PhaseMatch.caddR(c1*Q_ipR, c1*Q_ipI, Q_isR, Q_isI),
-            yden1I = PhaseMatch.caddI(c1*Q_ipR, c1*Q_ipI, Q_isR, Q_isI),
-            c2 = (sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs)),
-            yden2R = PhaseMatch.caddR(c2*Q_spR, c2*Q_spI, yden1R, yden1I),
-            yden2I = PhaseMatch.caddI(c2*Q_spR, c2*Q_spI, yden1R, yden1I),
-            ydenR = PhaseMatch.cmultiplyR(Q_ispR,Q_ispI, yden2R, yden2I),
-            ydenI = PhaseMatch.cmultiplyI(Q_ispR,Q_ispI, yden2R, yden2I);
-
-        // yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
-        var yconstd1R = PhaseMatch.cdivideR(ynumR, ynumI, ydenR, ydenI),
-            yconstd1I = PhaseMatch.cdivideI(ynumR, ynumI, ydenR, ydenI),
-            yconstd2R = PhaseMatch.csqrtR(yconstd1R, yconstd1I),
-            yconstd2I = PhaseMatch.csqrtI(yconstd1R, yconstd1I),
-            yconstR = PhaseMatch.cdivideR(Math.sqrt(2*Math.PI), 0, yconstd2R, yconstd2I),
-            yconstI = PhaseMatch.cdivideI(Math.sqrt(2*Math.PI), 0, yconstd2R, yconstd2I);
+        // // yconst numerator
+        // // yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ ));
+        // //
+        // // (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))
+        // //
+        // var ynum1R = PhaseMatch.caddR(Q_spR,Q_spI,Q_ipR,Q_ipI),
+        //     ynum1I = PhaseMatch.caddI(Q_spR,Q_spI,Q_ipR,Q_ipI),
+        //     ynum2R = PhaseMatch.caddR(ynum1R,ynum1I,Q_isR,Q_isI),
+        //     ynum2I = PhaseMatch.caddI(ynum1R,ynum1I,Q_isR,Q_isI),
+        //     // (sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ )
+        //     ynum3R = PhaseMatch.caddR(sq(COS_THETAs)*Q_ipR, sq(COS_THETAs)*Q_ipI, Q_isR, Q_isI),
+        //     ynum3I = PhaseMatch.caddI(sq(COS_THETAs)*Q_ipR, sq(COS_THETAs)*Q_ipI, Q_isR, Q_isI),
+        //     ynum4R = PhaseMatch.caddR(ynum3R, ynum3I, sq(COS_THETAi)*Q_spR, sq(COS_THETAi)*Q_spI),
+        //     ynum4I = PhaseMatch.caddI(ynum3R, ynum3I, sq(COS_THETAi)*Q_spR, sq(COS_THETAi)*Q_spI),
+        //     // (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi)*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ ));
+        //     ynumR = PhaseMatch.cmultiplyR(ynum2R,ynum2I,ynum4R,ynum4I),
+        //     ynumI = PhaseMatch.cmultiplyI(ynum2R,ynum2I,ynum4R,ynum4I);
 
 
-        var coeffaR = PhaseMatch.cmultiplyR(gaussR, gaussI, xconstR, xconstI),
-            coeffaI = PhaseMatch.cmultiplyI(gaussR, gaussI, xconstR, xconstI),
-            coeffR = PhaseMatch.cmultiplyR(coeffaR, coeffaI, yconstR, yconstI),
-            coeffI = PhaseMatch.cmultiplyI(coeffaR, coeffaI, yconstR, yconstI);
+        // // // yconst denominator
+        // // // yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
+        // var c1 = (sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)),
+        //     yden1R = PhaseMatch.caddR(c1*Q_ipR, c1*Q_ipI, Q_isR, Q_isI),
+        //     yden1I = PhaseMatch.caddI(c1*Q_ipR, c1*Q_ipI, Q_isR, Q_isI),
+        //     c2 = (sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs)),
+        //     yden2R = PhaseMatch.caddR(c2*Q_spR, c2*Q_spI, yden1R, yden1I),
+        //     yden2I = PhaseMatch.caddI(c2*Q_spR, c2*Q_spI, yden1R, yden1I),
+        //     ydenR = PhaseMatch.cmultiplyR(Q_ispR,Q_ispI, yden2R, yden2I),
+        //     ydenI = PhaseMatch.cmultiplyI(Q_ispR,Q_ispI, yden2R, yden2I);
+
+        // // yconst = Math.sqrt(2*Math.PI)/Math.sqrt(yconst1/yconst2);
+        // var yconstd1R = PhaseMatch.cdivideR(ynumR, ynumI, ydenR, ydenI),
+        //     yconstd1I = PhaseMatch.cdivideI(ynumR, ynumI, ydenR, ydenI),
+        //     yconstd2R = PhaseMatch.csqrtR(yconstd1R, yconstd1I),
+        //     yconstd2I = PhaseMatch.csqrtI(yconstd1R, yconstd1I),
+        //     yconstR = PhaseMatch.cdivideR(Math.sqrt(2*Math.PI), 0, yconstd2R, yconstd2I),
+        //     yconstI = PhaseMatch.cdivideI(Math.sqrt(2*Math.PI), 0, yconstd2R, yconstd2I);
 
 
+        // var coeffaR = PhaseMatch.cmultiplyR(gaussR, gaussI, xconstR, xconstI),
+        //     coeffaI = PhaseMatch.cmultiplyI(gaussR, gaussI, xconstR, xconstI),
+        //     coeffR = PhaseMatch.cmultiplyR(coeffaR, coeffaI, yconstR, yconstI),
+        //     coeffI = PhaseMatch.cmultiplyI(coeffaR, coeffaI, yconstR, yconstI);
+
+        coeffR = Math.sqrt(0.5);
+        coeffI = Math.sqrt(0.5);
         // // Next the constant that remains after analytically integrating over y
         // yconst1 = (Wp_SQ*Ws_SQ + Wi_SQ*(Wp_SQ+Ws_SQ))*(sq(COS_THETAi))*Wp_SQ*Ws_SQ + Wi_SQ*(sq(COS_THETAs)*Wp_SQ+Ws_SQ );
         // yconst2 = Wi_SQ*Wp_SQ*Ws_SQ*((sq(COS_PHIs)+sq(COS_THETAi)*sq(SIN_PHIs))*Wp_SQ*Ws_SQ + Wi_SQ* (( sq(COS_PHIs) + sq(COS_THETAs) * sq(SIN_PHIs)) *Wp_SQ +Ws_SQ));
@@ -3703,10 +3704,10 @@ PhaseMatch.sign = function sign(x) {
             BI = terms[3],
             CR = terms[4],
             CI = terms[5],
-            // coeffR = terms[6],
-            // coeffI = terms[7];
-            coeffR = 1,
-            coeffI = 1;
+            coeffR = terms[6],
+            coeffI = terms[7];
+            // coeffR = 1,
+            // coeffI = 1;
 
         var pmzcoeff = Math.exp(- 1/2*sq(z/bw)); // apodization
         var pmzcoeff = pmzcoeff * Math.exp(-sq(z)*CR -z*BI - AR);
@@ -4975,9 +4976,9 @@ PhaseMatch.Crystals('KDP-1', {
 
     var con = PhaseMatch.constants;
     var spdcDefaults = {
-        lambda_p: 785 * con.nm,
-        lambda_s: 1570 * con.nm,
-        lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
+        lambda_p: 777 * con.nm,
+        lambda_s: 1554 * con.nm,
+        lambda_i: 1554 * 777 * con.nm / ( 1554 -  770 ),
         type: "Type 2:   e -> e + o",
         theta: 90 *Math.PI / 180,
         phi: 0,
@@ -4987,9 +4988,9 @@ PhaseMatch.Crystals('KDP-1', {
         theta_i_e: 0,
         phi_s: 0,
         phi_i: Math.PI ,
-        L: 2000 * con.um,
+        L: 10000 * con.um,
         W: 100 * con.um,
-        p_bw: 5.35 * con.nm,
+        p_bw: 1.5 * con.nm,
         walkoff_p: 0,
         // W_sx: .2 * Math.PI/180,
         W_sx: 100 * con.um,
@@ -5631,7 +5632,7 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
     // console.log(sq(centerpm[0]) + sq(centerpm[1]));
 
 
-    var i;
+    var i, j;
     // var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
     // var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
 
@@ -5670,8 +5671,6 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
 
 };
 
-
-
 PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm){
     var N = lambda_s.length * (lambda_i.length);
     var JSI = new Float64Array( N );
@@ -5687,22 +5686,58 @@ PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm
 
 };
 
+PhaseMatch.calc_amp_phase = function calc_amp_phase(real, imag){
+    console.log("length real:" + real.length.toString());
+    var N = real.length;
+
+    var amp = new Float64Array( N ),
+        phase = new Float64Array( N );
+    console.log("starting loop");
+    for (var i=0; i<N; i++){
+        amp[i] = Math.sqrt(real[i]*real[i] + imag[i]*imag[i]);
+        phase[i] = Math.atan2(imag[i], real[i]);
+    }
+    return [amp,phase];
+
+};
+
 PhaseMatch.calc_JSI_2pole = function calc_JSI_2pole(props, lambda_s, lambda_i, dim, norm, pole1, pole2){
     var N = lambda_s.length * (lambda_i.length);
     var JSI = new Float64Array( N );
-    norm = 1;
+    // norm = 1;
+    // props.L = props.L/3.36;
+    props.L = props.L;
+
     // calculate with the first poling period
     props.poling_period = pole1;
     var JSA1 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
     // Calculate with the second poling period
-    props.L = props.L/2;
     props.poling_period = pole2;
-    console.log(pole2);
+    // props.L = 2.36*props.L/3.36;
     var JSA2 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
 
-    for (var i=0; i<N; i++){
+    var JSA1_ap = PhaseMatch.calc_amp_phase(JSA1[0], JSA1[1]);
+    var JSA2_ap = PhaseMatch.calc_amp_phase(JSA2[0], JSA2[1]);
+    // console.log('test');
+    // console.log("amplitude" + JSA1_ap.toString());
 
-        JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(JSA1[1][i] + JSA2[1][i]);
+
+    for (var i=0; i<N; i++){
+        // var amp = JSA1_ap[0][i] + JSA2_ap[0][i];
+        // var phase = JSA1_ap[1][i] + JSA2_ap[1][i];
+        // var JSA_real = amp*Math.cos(0);
+        // var JSA_imag = amp*Math.sin(0);
+        // // JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(2*JSA1[1][i] + JSA2[1][i]);
+        // JSI[i] = sq(JSA_real) + sq(JSA_imag);
+        // var amp = JSA1_ap[0][i] + JSA2_ap[0][i];
+        // var phase = JSA1_ap[1][i] + JSA2_ap[1][i];
+        var JSA1_real = JSA1_ap[0][i]*Math.cos(JSA1_ap[1][i]);
+        var JSA1_imag = JSA1_ap[0][i]*Math.sin(JSA1_ap[1][i]);
+
+        var JSA2_real = JSA2_ap[0][i]*Math.cos(JSA2_ap[1][i]);
+        var JSA2_imag = JSA2_ap[0][i]*Math.sin(JSA2_ap[1][i]);
+        // JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(2*JSA1[1][i] + JSA2[1][i]);
+        JSI[i] = (sq(JSA1_real) + sq(JSA1_imag)) + (sq(JSA2_real) + sq(JSA2_imag));
     }
     // JSI = PhaseMatch.normalize(JSI);
 
@@ -5710,6 +5745,45 @@ PhaseMatch.calc_JSI_2pole = function calc_JSI_2pole(props, lambda_s, lambda_i, d
 
 };
 
+PhaseMatch.calc_JSI_2pump = function calc_JSI_2pump(props, lambda_s, lambda_i, dim, norm, pump2){
+    var N = lambda_s.length * (lambda_i.length);
+    var JSI = new Float64Array( N );
+    // norm = 1;
+
+    // calculate with the original pump
+    var JSA1 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
+    // Calculate with the second pump
+    props.lambda_p = pump2;
+    var JSA2 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
+
+    var JSA1_ap = PhaseMatch.calc_amp_phase(JSA1[0], JSA1[1]);
+    var JSA2_ap = PhaseMatch.calc_amp_phase(JSA2[0], JSA2[1]);
+    // console.log('test');
+    // console.log("amplitude" + JSA1_ap.toString());
+
+
+    for (var i=0; i<N; i++){
+        // var amp = JSA1_ap[0][i] + JSA2_ap[0][i];
+        // var phase = JSA1_ap[1][i] + JSA2_ap[1][i];
+        // var JSA_real = amp*Math.cos(0);
+        // var JSA_imag = amp*Math.sin(0);
+        // // JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(2*JSA1[1][i] + JSA2[1][i]);
+        // JSI[i] = sq(JSA_real) + sq(JSA_imag);
+        // var amp = JSA1_ap[0][i] + JSA2_ap[0][i];
+        // var phase = JSA1_ap[1][i] + JSA2_ap[1][i];
+        var JSA1_real = JSA1_ap[0][i]*Math.cos(JSA1_ap[1][i]);
+        var JSA1_imag = JSA1_ap[0][i]*Math.sin(JSA1_ap[1][i]);
+
+        var JSA2_real = JSA2_ap[0][i]*Math.cos(JSA2_ap[1][i]);
+        var JSA2_imag = JSA2_ap[0][i]*Math.sin(JSA2_ap[1][i]);
+        // JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(2*JSA1[1][i] + JSA2[1][i]);
+        JSI[i] = (sq(JSA1_real) + sq(JSA1_imag)) + (sq(JSA2_real) + sq(JSA2_imag));
+    }
+    // JSI = PhaseMatch.normalize(JSI);
+
+    return JSI;
+
+};
 
 /* This plots the phasematching curve for the signal/idler vs the pump wavelength. It is simialar to the JSA calcualtion.
 *

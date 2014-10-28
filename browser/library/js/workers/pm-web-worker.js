@@ -52,6 +52,27 @@ W('jsaHelper', {
         );
     },
 
+    doJSA2PumpCalc: function( args ){
+
+        this.props.set( args[0] );
+
+        var lambda_s = args[1],
+            lambda_i = args[2],
+            grid_size = args[3],
+            norm = args[4],
+            pump2 = args[5]
+            ;
+
+        return PhaseMatch.calc_JSI_2pump(
+            this.props,
+            lambda_s,
+            lambda_i,
+            grid_size,
+            norm,
+            pump2
+        );
+    },
+
     doCalcSchmidt: function( args ){
     	// console.log("working");
     	var PM = args[0];

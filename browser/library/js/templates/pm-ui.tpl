@@ -20,6 +20,7 @@
 <!--                     <option value="efficiency">Efficiency map</option>
  -->                <option value="schmidt-2d">Spectral Purity</option>
                     <option value="2pole">Two Poling Periods</option>
+                    <option value="2pump">Two Pump Wavelengths</option>
                     <!-- <option value="kitchen_sink">Kitchen Sink</option> -->
                 </select>
             </div>

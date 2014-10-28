@@ -20,9 +20,9 @@
 
     var con = PhaseMatch.constants;
     var spdcDefaults = {
-        lambda_p: 785 * con.nm,
-        lambda_s: 1570 * con.nm,
-        lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
+        lambda_p: 777 * con.nm,
+        lambda_s: 1554 * con.nm,
+        lambda_i: 1554 * 777 * con.nm / ( 1554 -  770 ),
         type: "Type 2:   e -> e + o",
         theta: 90 *Math.PI / 180,
         phi: 0,
@@ -32,9 +32,9 @@
         theta_i_e: 0,
         phi_s: 0,
         phi_i: Math.PI ,
-        L: 2000 * con.um,
+        L: 10000 * con.um,
         W: 100 * con.um,
-        p_bw: 5.35 * con.nm,
+        p_bw: 1.5 * con.nm,
         walkoff_p: 0,
         // W_sx: .2 * Math.PI/180,
         W_sx: 100 * con.um,

@@ -102,7 +102,7 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
     // console.log(sq(centerpm[0]) + sq(centerpm[1]));
 
 
-    var i;
+    var i, j;
     // var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
     // var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
 
@@ -141,8 +141,6 @@ PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
 
 };
 
-
-
 PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm){
     var N = lambda_s.length * (lambda_i.length);
     var JSI = new Float64Array( N );
@@ -158,22 +156,58 @@ PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm
 
 };
 
+PhaseMatch.calc_amp_phase = function calc_amp_phase(real, imag){
+    console.log("length real:" + real.length.toString());
+    var N = real.length;
+
+    var amp = new Float64Array( N ),
+        phase = new Float64Array( N );
+    console.log("starting loop");
+    for (var i=0; i<N; i++){
+        amp[i] = Math.sqrt(real[i]*real[i] + imag[i]*imag[i]);
+        phase[i] = Math.atan2(imag[i], real[i]);
+    }
+    return [amp,phase];
+
+};
+
 PhaseMatch.calc_JSI_2pole = function calc_JSI_2pole(props, lambda_s, lambda_i, dim, norm, pole1, pole2){
     var N = lambda_s.length * (lambda_i.length);
     var JSI = new Float64Array( N );
-    norm = 1;
+    // norm = 1;
+    // props.L = props.L/3.36;
+    props.L = props.L;
+
     // calculate with the first poling period
     props.poling_period = pole1;
     var JSA1 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
     // Calculate with the second poling period
-    props.L = props.L/2;
     props.poling_period = pole2;
-    console.log(pole2);
+    // props.L = 2.36*props.L/3.36;
     var JSA2 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
 
-    for (var i=0; i<N; i++){
+    var JSA1_ap = PhaseMatch.calc_amp_phase(JSA1[0], JSA1[1]);
+    var JSA2_ap = PhaseMatch.calc_amp_phase(JSA2[0], JSA2[1]);
+    // console.log('test');
+    // console.log("amplitude" + JSA1_ap.toString());
 
-        JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(JSA1[1][i] + JSA2[1][i]);
+
+    for (var i=0; i<N; i++){
+        // var amp = JSA1_ap[0][i] + JSA2_ap[0][i];
+        // var phase = JSA1_ap[1][i] + JSA2_ap[1][i];
+        // var JSA_real = amp*Math.cos(0);
+        // var JSA_imag = amp*Math.sin(0);
+        // // JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(2*JSA1[1][i] + JSA2[1][i]);
+        // JSI[i] = sq(JSA_real) + sq(JSA_imag);
+        // var amp = JSA1_ap[0][i] + JSA2_ap[0][i];
+        // var phase = JSA1_ap[1][i] + JSA2_ap[1][i];
+        var JSA1_real = JSA1_ap[0][i]*Math.cos(JSA1_ap[1][i]);
+        var JSA1_imag = JSA1_ap[0][i]*Math.sin(JSA1_ap[1][i]);
+
+        var JSA2_real = JSA2_ap[0][i]*Math.cos(JSA2_ap[1][i]);
+        var JSA2_imag = JSA2_ap[0][i]*Math.sin(JSA2_ap[1][i]);
+        // JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(2*JSA1[1][i] + JSA2[1][i]);
+        JSI[i] = (sq(JSA1_real) + sq(JSA1_imag)) + (sq(JSA2_real) + sq(JSA2_imag));
     }
     // JSI = PhaseMatch.normalize(JSI);
 
@@ -181,6 +215,45 @@ PhaseMatch.calc_JSI_2pole = function calc_JSI_2pole(props, lambda_s, lambda_i, d
 
 };
 
+PhaseMatch.calc_JSI_2pump = function calc_JSI_2pump(props, lambda_s, lambda_i, dim, norm, pump2){
+    var N = lambda_s.length * (lambda_i.length);
+    var JSI = new Float64Array( N );
+    // norm = 1;
+
+    // calculate with the original pump
+    var JSA1 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
+    // Calculate with the second pump
+    props.lambda_p = pump2;
+    var JSA2 = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, norm);
+
+    var JSA1_ap = PhaseMatch.calc_amp_phase(JSA1[0], JSA1[1]);
+    var JSA2_ap = PhaseMatch.calc_amp_phase(JSA2[0], JSA2[1]);
+    // console.log('test');
+    // console.log("amplitude" + JSA1_ap.toString());
+
+
+    for (var i=0; i<N; i++){
+        // var amp = JSA1_ap[0][i] + JSA2_ap[0][i];
+        // var phase = JSA1_ap[1][i] + JSA2_ap[1][i];
+        // var JSA_real = amp*Math.cos(0);
+        // var JSA_imag = amp*Math.sin(0);
+        // // JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(2*JSA1[1][i] + JSA2[1][i]);
+        // JSI[i] = sq(JSA_real) + sq(JSA_imag);
+        // var amp = JSA1_ap[0][i] + JSA2_ap[0][i];
+        // var phase = JSA1_ap[1][i] + JSA2_ap[1][i];
+        var JSA1_real = JSA1_ap[0][i]*Math.cos(JSA1_ap[1][i]);
+        var JSA1_imag = JSA1_ap[0][i]*Math.sin(JSA1_ap[1][i]);
+
+        var JSA2_real = JSA2_ap[0][i]*Math.cos(JSA2_ap[1][i]);
+        var JSA2_imag = JSA2_ap[0][i]*Math.sin(JSA2_ap[1][i]);
+        // JSI[i] = sq(JSA1[0][i] + JSA2[0][i]) + sq(2*JSA1[1][i] + JSA2[1][i]);
+        JSI[i] = (sq(JSA1_real) + sq(JSA1_imag)) + (sq(JSA2_real) + sq(JSA2_imag));
+    }
+    // JSI = PhaseMatch.normalize(JSI);
+
+    return JSI;
+
+};
 
 /* This plots the phasematching curve for the signal/idler vs the pump wavelength. It is simialar to the JSA calcualtion.
 *

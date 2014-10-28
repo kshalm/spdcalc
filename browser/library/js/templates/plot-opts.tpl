@@ -319,6 +319,18 @@
                 <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="pole2" value="{{= this.converter.to('micro', parseFloat( it.pole2 )) }}" />
             </div>
         </div>
+    </div>
 
-    <!-- </div> -->
+    <!-- Second Pump Wavelength.  -->
+    <div id="plot-opt-2pump">
+        <div class="control-group">
+            <label class="control-label">
+                Second Pump Wavelength (nm)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="nano" class="inputbox" name="pump2" value="{{= this.converter.to('nano', parseFloat( it.pump2 )) }}" />
+            </div>
+        </div>
+    </div>
+
 </section>
