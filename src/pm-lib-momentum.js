@@ -869,12 +869,20 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             // Now calculate the full term in the integral.
             // pmzcoeff = Math.exp(- 1/2*sq(z/bw)), // apodization
             pmzcoeff = 1,
-            // Exponential
-            EReal = pmzcoeff*Math.cos(EXPR),
-            EImag = pmzcoeff*Math.sin(EXPI),
+            // Exponential using Euler's formula
+            coeffR = Math.exp(-EXPR),
+            // coeffR = 1,
+            EReal = coeffR * pmzcoeff*Math.cos(EXPI),
+            EImag = coeffR * pmzcoeff*Math.sin(EXPI),
+
+            // real = coeffR,
+            // imag = 0;
 
             real = 0.5 * PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
             imag = 0.5 * PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
+
+            // real = DENI,
+            // imag = 0
             ;
 
         // console.log("1: " + A1R.toString() + "   2: " + A2R.toString() + "   3: " + A3R.toString() + "   4: " + A7R.toString() + "   5: " + A8R.toString() + "   6: " + A9R.toString() );
@@ -882,7 +890,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // console.log("real: " + A10R.toString() + "   Imag: " + A10I.toString());
 
         // real = 1;
-        imag = 0;
+        // real = 0;
         return [real, imag];
     };
 
