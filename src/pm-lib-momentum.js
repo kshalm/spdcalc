@@ -604,28 +604,35 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
+
     var twoPI = 2*Math.PI,
         twoPIc = twoPI*con.c
         ;
 
     var z0 = 0; //put pump in middle of the crystal
-    var RHOpx = P.walkoff_p; //pump walkoff angle.
-
-    var omega_s = twoPIc / P.lambda_s,
-        omega_i = twoPIc / P.lambda_i,
-        omega_p = omega_s + omega_i
-        ;
+    // var RHOpx = P.walkoff_p; //pump walkoff angle.
+    var RHOpx = 0;
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
+    var omega_s = twoPIc / P.lambda_s,
+        omega_i = twoPIc / P.lambda_i,
+        omega_p = omega_s + omega_i
+        // omega_p = twoPIc / P.lambda_p
+        ;
+
+    // console.log("frequencies2:" + (P.lambda_p*1E9).toString() + ", " + (omega_p/twoPI*1E-9).toString() + ", " + (omega_s*1E-9).toString() + ", " + (omega_i*1E-9).toString() + ", ")
+
     var delK = PhaseMatch.calc_delK(P);
     var delKx = delK[0],
         delKy = delK[1],
         delKz = delK[2]
         ;
+
+    // console.log("deltaK:" + delKx.toString() + ", " + delKy.toString() + ", " + delKz.toString() + ", ")
 
     var arg = P.L/2*(delKz);
 
@@ -647,12 +654,15 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     var Wp_SQ = sq(P.W * convfromFWHM), // convert from FWHM to sigma
         Ws_SQ = sq(P.W_sx * convfromFWHM), // convert from FWHM to sigma
         Wi_SQ = sq(P.W_ix * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
+        // Ws_SQ = sq(W_s * convfromFWHM), // convert from FWHM to sigma
+        // Wi_SQ = sq(W_i * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
         ;
 
-    var k_p = twoPI/(P.n_p * P.lambda_p),
-        k_s = twoPI/(P.n_s * P.lambda_s),
-        k_i = twoPI/(P.n_i * P.lambda_i)
+    var k_p = twoPI*P.n_p / P.lambda_p,
+        k_s = twoPI*P.n_s / P.lambda_s,
+        k_i = twoPI*P.n_i / P.lambda_i
         ;
+
 
     // console.log("haha: " + 1/Math.cos(0).toString());
     var PHI_s = sq(1/Math.cos(P.theta_s)), // External angle for the signal????
@@ -661,8 +671,11 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         PSI_i = k_i * Math.sin(P.theta_i)
         ;
 
-    P.lambda_p = lambda_p; //set back to the original lambda_p
-    P.n_p = n_p;
+    // var PHI_s = 1, // External angle for the signal????
+    //     PHI_i = 1, // External angle for the idler????
+    //     PSI_s = 0, 
+    //     PSI_i = 0
+    //     ;    
 
     var bw;  // Apodization 1/e^2
 
@@ -680,27 +693,27 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     var As = -0.25 * (Wp_SQ + Ws_SQ * PHI_s),
         Ai = -0.25 * (Wp_SQ + Wi_SQ * PHI_i),
         Bs = -0.25 * (Ws_SQ + Wp_SQ),
-        Bi = -0.25 * (Ws_SQ + Wp_SQ),
-        Cs = -0.25 * (k_p * P.L -2*k_s*z0)/(k_s*k_p),
-        Ci = -0.25 * (k_p * P.L -2*k_i*z0)/(k_i*k_p),
+        Bi = -0.25 * (Wi_SQ + Wp_SQ),
+        Cs = -0.25 * (P.L / k_s - 2*z0/k_p),
+        Ci = -0.25 * (P.L / k_i - 2*z0/k_p),
         Ds =  0.25 * P.L * (1/k_s - 1/k_p),
         Di =  0.25 * P.L * (1/k_i - 1/k_p),
-        Es =  0.50 * (Ws_SQ*PHI_s *PSI_s),
-        Ei =  0.50 * (Wi_SQ*PHI_i *PSI_i),
+        Es =  0.50 * (Ws_SQ*PHI_s * PSI_s),
+        Ei =  0.50 * (Wi_SQ*PHI_i * PSI_i),
         mx_real = -0.50 * Wp_SQ,
-        mx_imag = -0.50 * z0/k_p,
+        mx_imag = z0/k_p,
         my_real = mx_real, // Pump waist is symmetric
         my_imag = mx_imag,
         m  = P.L / (2*k_p),
         n  = 0.5 * P.L * RHOpx,
         ee = 0.5 * P.L * (k_p + k_s + k_i - twoPI / (P.poling_period * P.poling_sign)),
-        ff = 0.5 * P.L * (k_p - k_s + k_i + twoPI / (P.poling_period * P.poling_sign)),
+        ff = 0.5 * P.L * (k_p - k_s - k_i + twoPI / (P.poling_period * P.poling_sign)),
         hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
         ;
 
     // ///////////////////////////////////////
     // console.log("starting Test");
-    // console.log(As.toString(), Ai.toString(), Bs.toString(), Cs.toString(), Ci.toString(), Ds.toString(), Di.toString(), Es.toString(), Ei.toString(), m.toString(), n.toString(),ee.toString(), ff.toString(), hh.toString());
+    // console.log(ee.toString(), ff.toString(), hh.toString());//, Cs.toString(), Ci.toString(), Ds.toString(), Di.toString(), Es.toString(), Ei.toString(), m.toString(), n.toString(),ee.toString(), ff.toString(), hh.toString());
     // var test_terms = calczterms(0);
     // console.log("ending test");
     // console.log("hello:" + test_terms[0][0].toString());
@@ -860,14 +873,16 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             EReal = pmzcoeff*Math.cos(EXPR),
             EImag = pmzcoeff*Math.sin(EXPI),
 
-            real = PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
-            imag = PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
+            real = 0.5 * PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
+            imag = 0.5 * PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
             ;
 
-        // console.log("real: " + real.toString() + "   Imag: " + imag.toString());
+        // console.log("1: " + A1R.toString() + "   2: " + A2R.toString() + "   3: " + A3R.toString() + "   4: " + A7R.toString() + "   5: " + A8R.toString() + "   6: " + A9R.toString() );
+
+        // console.log("real: " + A10R.toString() + "   Imag: " + A10I.toString());
 
         // real = 1;
-        // imag = 0;
+        imag = 0;
         return [real, imag];
     };
 
@@ -909,6 +924,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // var PMt = 1;
     // var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
     var coeff = Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i);
+
+    P.lambda_p = lambda_p; //set back to the original lambda_p
+    P.n_p = n_p;
 
     return [coeff*PMz_real, coeff*PMz_imag, PMt];
 
