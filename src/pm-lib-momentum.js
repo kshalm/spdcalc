@@ -598,19 +598,21 @@
  * Get the constants and terms used in the calculation of the momentum
  * space joint spectrum for the coincidences.
  */
-PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
+PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
+    // console.log("hi");
+    // console.log("\n");
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
-    var twopi = 2*Math.PI,
-        twopic = twopi*con.c
+    var twoPI = 2*Math.PI,
+        twoPIc = twoPI*con.c
         ;
 
     var z0 = 0; //put pump in middle of the crystal
     var RHOpx = P.walkoff_p; //pump walkoff angle.
 
-    var omega_s = twopic / P.lambda_s,
-        omega_i = twopic / P.lambda_i,
+    var omega_s = twoPIc / P.lambda_s,
+        omega_i = twoPIc / P.lambda_i,
         omega_p = omega_s + omega_i
         ;
 
@@ -622,11 +624,14 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
     var delK = PhaseMatch.calc_delK(P);
     var delKx = delK[0],
         delKy = delK[1],
-        delKz = delK[2],
-        Kp = 
+        delKz = delK[2]
         ;
 
     var arg = P.L/2*(delKz);
+
+    // Height of the collected spots from the axis.
+    var hs = 0,
+        hi = 0;
 
     var PMz_real = 0;
     var PMz_imag = 0;
@@ -640,18 +645,21 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
 
     // Setup constants
     var Wp_SQ = sq(P.W * convfromFWHM), // convert from FWHM to sigma
-        Ws_SQ = sq(W_s * convfromFWHM), // convert from FWHM to sigma
-        Wi_SQ = sq(W_i * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
+        Ws_SQ = sq(P.W_sx * convfromFWHM), // convert from FWHM to sigma
+        Wi_SQ = sq(P.W_ix * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
         ;
 
-    var k_p = twopi/(P.n_p *lambda_p),
-        k_s = twopi/(P.n_s *lambda_s),
-        k_i = twopi/(P.n_i *lambda_i),
+    var k_p = twoPI/(P.n_p * P.lambda_p),
+        k_s = twoPI/(P.n_s * P.lambda_s),
+        k_i = twoPI/(P.n_i * P.lambda_i)
+        ;
 
-    var PHI_s = sq(Math.sec(P.theta_s_e)), // External angle for the signal
-        PHI_i = sq(Math.sec(P.theta_i_e)), // External angle for the idler
-        PSI_s = ks * Math.sin(P.theta_s_e), 
-        PSI_i = ki * Math.sin(P.theta_i_e);
+    // console.log("haha: " + 1/Math.cos(0).toString());
+    var PHI_s = sq(1/Math.cos(P.theta_s)), // External angle for the signal????
+        PHI_i = sq(1/Math.cos(P.theta_i)), // External angle for the idler????
+        PSI_s = k_s * Math.sin(P.theta_s), 
+        PSI_i = k_i * Math.sin(P.theta_i)
+        ;
 
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
@@ -673,8 +681,8 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
         Ai = -0.25 * (Wp_SQ + Wi_SQ * PHI_i),
         Bs = -0.25 * (Ws_SQ + Wp_SQ),
         Bi = -0.25 * (Ws_SQ + Wp_SQ),
-        Cs = -0.25 * (k_p * P.L -2*k_s*z0)/(k_s*kp),
-        Ci = -0.25 * (k_p * P.L -2*k_i*z0)/(k_i*kp),
+        Cs = -0.25 * (k_p * P.L -2*k_s*z0)/(k_s*k_p),
+        Ci = -0.25 * (k_p * P.L -2*k_i*z0)/(k_i*k_p),
         Ds =  0.25 * P.L * (1/k_s - 1/k_p),
         Di =  0.25 * P.L * (1/k_i - 1/k_p),
         Es =  0.50 * (Ws_SQ*PHI_s *PSI_s),
@@ -690,9 +698,20 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
         hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
         ;
 
+    // ///////////////////////////////////////
+    // console.log("starting Test");
+    // console.log(As.toString(), Ai.toString(), Bs.toString(), Cs.toString(), Ci.toString(), Ds.toString(), Di.toString(), Es.toString(), Ei.toString(), m.toString(), n.toString(),ee.toString(), ff.toString(), hh.toString());
+    // var test_terms = calczterms(0);
+    // console.log("ending test");
+    // console.log("hello:" + test_terms[0][0].toString());
+
+    // Math.sec(0);
+     ///////////////////////////////////////
+
 
     // As a function of z along the crystal, calculate the z-dependent coefficients
     var calczterms = function(z){
+        // console.log("inside calczterms");
         // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
         var A1 = [ As, Cs + Ds * z],
             A3 = [ Ai, Ci + Di * z],
@@ -705,7 +724,7 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
             A9 = A8, //Pump waist is symmetric
             A10 = [hh, ee + ff * z]
             ;
-        return [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]
+        return [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10];
     };
 
     var zintfunc = function(z){
@@ -729,9 +748,10 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
             A9R = terms[8][0], 
             A9I = terms[8][1], 
             A10R = terms[9][0], 
-            A10I = terms[9][1], 
+            A10I = terms[9][1] 
             ;
-
+        // console.log("hello");
+        // console.log("A1R: " + A1R.toString() + "   Imag: " + A1I.toString());
         // First calculate terms in the exponential of the integral
         //   E^(1/4 (4 A10 - A5^2/A1 - A6^2/A2 - (-2 A1 A7 + A5 A8)^2/(
         //  A1 (4 A1 A3 - A8^2)) - (A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2)))
@@ -758,8 +778,11 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
             EXP4Ia_num = -2 * PhaseMatch.cmultiplyI( A1R, A1I, A7R, A7I),
             EXP4Rb_num = PhaseMatch.cmultiplyR( A5R, A5I, A8R, A8I),
             EXP4Ib_num = PhaseMatch.cmultiplyI( A5R, A5I, A8R, A8I),
-            EXP4R_num  = PhaseMatch.caddR(EXP4Ra_num, EXP4Ia_num, EXP4Rb_num, EXP4Ib_num)
-            EXP4I_num  = PhaseMatch.caddI(EXP4Ra_num, EXP4Ia_num, EXP4Rb_num, EXP4Ib_num)
+            EXP4Rc_num  = PhaseMatch.caddR(EXP4Ra_num, EXP4Ia_num, EXP4Rb_num, EXP4Ib_num),
+            EXP4Ic_num  = PhaseMatch.caddI(EXP4Ra_num, EXP4Ia_num, EXP4Rb_num, EXP4Ib_num),
+            EXP4R_num   = PhaseMatch.cmultiplyR(EXP4Rc_num, EXP4Ic_num, EXP4Rc_num, EXP4Ic_num),
+            EXP4I_num   = PhaseMatch.cmultiplyI(EXP4Rc_num, EXP4Ic_num, EXP4Rc_num, EXP4Ic_num),
+            // Denominator
             EXP4Ra_den = -1 * PhaseMatch.cmultiplyR(A8R, A8I, A8R, A8I),
             EXP4Ia_den = -1 * PhaseMatch.cmultiplyI(A8R, A8I, A8R, A8I),
             EXP4Rb_den =  4 * PhaseMatch.cmultiplyR( A1R, A1I, A3R, A3I),
@@ -768,8 +791,8 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
             EXP4Ic_den =  PhaseMatch.caddI( EXP4Ra_den, EXP4Ia_den, EXP4Rb_den, EXP4Ib_den ),
             EXP4R_den = PhaseMatch.cmultiplyR(A1R, A1I, EXP4Rc_den, EXP4Ic_den),
             EXP4I_den = PhaseMatch.cmultiplyI(A1R, A1I, EXP4Rc_den, EXP4Ic_den),
-            Exp4R     = PhaseMatch.cdivideR(EXP4R_num, EXP4I_num, EXP4R_den, EXP4I_den),
-            Exp4I     = PhaseMatch.cdivideI(EXP4R_num, EXP4I_num, EXP4R_den, EXP4I_den),
+            EXP4R     = PhaseMatch.cdivideR(EXP4R_num, EXP4I_num, EXP4R_den, EXP4I_den),
+            EXP4I     = PhaseMatch.cdivideI(EXP4R_num, EXP4I_num, EXP4R_den, EXP4I_den),
 
             // A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2)))
             EXP5Rb_num = PhaseMatch.caddR( -2*A2R, -2*A2I, A9R, A9I),
@@ -778,6 +801,8 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
             EXP5Ic_num = PhaseMatch.cmultiplyI( EXP5Rb_num, EXP5Ib_num,EXP5Rb_num, EXP5Ib_num),
             EXP5R_num  = PhaseMatch.cmultiplyR( EXP3R, EXP3I ,EXP5Rc_num, EXP5Ic_num),
             EXP5I_num  = PhaseMatch.cmultiplyI( EXP3R, EXP3I ,EXP5Rc_num, EXP5Ic_num),
+            // EXP5R_num  = PhaseMatch.cmultiplyR( EXP5Rd_num, EXP5Id_num, EXP5Rd_num, EXP5Id_num),
+            // EXP5I_num  = PhaseMatch.cmultiplyI( EXP5Rd_num, EXP5Id_num, EXP5Rd_num, EXP5Id_num),
             // Denominator
             EXP5Ra_den = -1 * PhaseMatch.cmultiplyR(A9R, A9I, A9R, A9I),
             EXP5Ia_den = -1 * PhaseMatch.cmultiplyI(A9R, A9I, A9R, A9I),
@@ -790,14 +815,14 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
             EXP5I     = PhaseMatch.cdivideI(EXP5R_num, EXP5I_num, EXP5R_den, EXP5I_den),
 
             // Full expression for term in the exponential
-            EXP6R_a = PhaseMatch.caddR(EXP1R, EXP1I, -1*EXP2R, -EXP2I),
-            EXP6I_a = PhaseMatch.caddI(EXP1R, EXP1I, -1*EXP2R, -EXP2I),
-            EXP6R_b = PhaseMatch.caddR(EXP6R_a, EXP6I_a, -1*EXP3R, -EXP3I),
-            EXP6I_b = PhaseMatch.caddI(EXP6R_a, EXP6I_a, -1*EXP3R, -EXP3I),
-            EXP6R_c = PhaseMatch.caddR(EXP6R_b, EXP6I_b, -1*EXP4R, -EXP4I),
-            EXP6I_c = PhaseMatch.caddI(EXP6R_b, EXP6I_b, -1*EXP4R, -EXP4I),
-            EXPR = 0.25 * PhaseMatch.caddR(EXP6R_c, EXP6I_c, -1*EXP5R, -EXP5I),
-            EXPI = 0.25 * PhaseMatch.caddI(EXP6R_c, EXP6I_c, -1*EXP5R, -EXP5I),
+            EXP6R_a = PhaseMatch.caddR(EXP1R, EXP1I, -1*EXP2R, -1*EXP2I),
+            EXP6I_a = PhaseMatch.caddI(EXP1R, EXP1I, -1*EXP2R, -1*EXP2I),
+            EXP6R_b = PhaseMatch.caddR(EXP6R_a, EXP6I_a, -1*EXP3R, -1*EXP3I),
+            EXP6I_b = PhaseMatch.caddI(EXP6R_a, EXP6I_a, -1*EXP3R, -1*EXP3I),
+            EXP6R_c = PhaseMatch.caddR(EXP6R_b, EXP6I_b, -1*EXP4R, -1*EXP4I),
+            EXP6I_c = PhaseMatch.caddI(EXP6R_b, EXP6I_b, -1*EXP4R, -1*EXP4I),
+            EXPR = 0.25 * PhaseMatch.caddR(EXP6R_c, EXP6I_c, -1*EXP5R, -1*EXP5I),
+            EXPI = 0.25 * PhaseMatch.caddI(EXP6R_c, EXP6I_c, -1*EXP5R, -1*EXP5I),
 
 
             //////////////////////////////////////////////////////////////////////////////
@@ -829,15 +854,20 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
             DENI     = PhaseMatch.csqrtI(DEN4R_b, DEN4I_b),
 
             // Now calculate the full term in the integral.
-            pmzcoeff = Math.exp(- 1/2*sq(z/bw)), // apodization
+            // pmzcoeff = Math.exp(- 1/2*sq(z/bw)), // apodization
+            pmzcoeff = 1,
             // Exponential
             EReal = pmzcoeff*Math.cos(EXPR),
             EImag = pmzcoeff*Math.sin(EXPI),
 
-            real = PhaseMatch.cdivideR(EReal, EImag, DENR,DENI),
-            imag = PhaseMatch.cdivideI(EReal, EImag, DENR,DENI)
+            real = PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
+            imag = PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
             ;
 
+        // console.log("real: " + real.toString() + "   Imag: " + imag.toString());
+
+        // real = 1;
+        // imag = 0;
         return [real, imag];
     };
 
@@ -878,7 +908,9 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
     // var PMt = Math.exp(-A);
     // var PMt = 1;
     // var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
-    return [PMz_real, PMz_imag, PMt];
+    var coeff = Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i);
+
+    return [coeff*PMz_real, coeff*PMz_imag, PMt];
 
 };
 
@@ -895,4 +927,4 @@ PhaseMatch.get_constants_k_coinc = function get_constants_k_coinc (P){
 //     p_bw = p_bw /(2 * Math.sqrt(Math.log(2))); //convert from FWHM
 //     var alpha = Math.exp(-1/2*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(p_bw)));
 //     return alpha;
-};
+// };
