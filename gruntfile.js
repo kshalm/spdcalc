@@ -25,6 +25,7 @@ module.exports = function(grunt) {
             'src/scratchpad.js',
             'src/math-helpers.js',
             'src/pm-lib.js',
+            'src/pm-lib-momentum.js',
             'src/pm-crystals.js',
             'src/pm-properties.js',
             'src/pm-plothelpers.js',
