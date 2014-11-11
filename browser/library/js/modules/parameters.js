@@ -181,6 +181,7 @@ define(
 
                 if (self.props.autocalcpp){
                     self.props.calc_poling_period( self.props );
+                    // console.log("poling period: ", self.props.poling_period);
                 }
 
             },

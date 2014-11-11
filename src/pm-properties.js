@@ -289,7 +289,7 @@
                 var startTime = new Date();
                 PhaseMatch.nelderMead(find_pp, guess, 100);
                 var endTime = new Date();
-                // console.log("calculation time for periodic poling calc", endTime - startTime);
+                console.log("calculation time for periodic poling calc", endTime - startTime, props.poling_period);
 
                 props.poling_period = P.poling_period;
                 props.poling_sign = P.poling_sign;

@@ -3777,8 +3777,8 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
  */
 PhaseMatch.phasematch = function phasematch (P){
 
-    // var pm = PhaseMatch.calc_PM_tz(P);
-    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    var pm = PhaseMatch.calc_PM_tz(P);
+    // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
     var PMz_imag = pm[1];
@@ -6218,7 +6218,7 @@ PhaseMatch.Crystals('KDP-1', {
                 var startTime = new Date();
                 PhaseMatch.nelderMead(find_pp, guess, 100);
                 var endTime = new Date();
-                // console.log("calculation time for periodic poling calc", endTime - startTime);
+                console.log("calculation time for periodic poling calc", endTime - startTime, props.poling_period);
 
                 props.poling_period = P.poling_period;
                 props.poling_sign = P.poling_sign;
