@@ -643,8 +643,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // console.log("deltaK:" + delKx.toString() + ", " + delKy.toString() + ", " + delKz.toString() + ", ")
 
     // Height of the collected spots from the axis.
-    var hs = 0,
-        hi = 0;
+    var hs = Math.tan(P.theta_s)*P.L*0.5,
+        hi = Math.tan(P.theta_i)*P.L*0.5;
 
     var PMz_real = 0;
     var PMz_imag = 0;
@@ -900,8 +900,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             real = 0.5 * PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
             imag = 0.5 * PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
 
-            // real = EReal,
-            // imag = EImag
+            // real = 1 * EReal,
+            // imag = 1 * EImag
             ;
 
         // console.log("aa: " + EXP1I.toString() + " : " + Math.cos(EXP1I).toString() + " i*" +   Math.sin(EXP1I).toString());
@@ -953,7 +953,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // var PMt = Math.exp(-A);
     // var PMt = 1;
     // var PMt = Math.exp(-A) * xconst * yconst *gaussnorm;
-    var coeff = Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i);
+    // var coeff = Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i);
+    var coeff = 1;
 
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;

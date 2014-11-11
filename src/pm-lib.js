@@ -615,8 +615,8 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
  */
 PhaseMatch.phasematch = function phasematch (P){
 
-    var pm = PhaseMatch.calc_PM_tz(P);
-    // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    // var pm = PhaseMatch.calc_PM_tz(P);
+    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
     var PMz_imag = pm[1];

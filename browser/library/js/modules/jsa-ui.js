@@ -155,8 +155,8 @@ define(
                 P.optimum_idler(P);
                 console.log("External angle of the idler is:", PhaseMatch.find_external_angle(P,"idler")*180/Math.PI );
                 var PMN =  PhaseMatch.phasematch(props);
-                var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
-
+                // var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
+                var norm = 1;
                 // The calculation is split up and reutrned as a series of promises
                 var promises = [];
                 for (var j = 0; j < Nthreads; j++){

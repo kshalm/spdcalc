@@ -322,7 +322,7 @@
             // return theta_i;
 
             // P.theta_i = theta_i;
-            var offset = 0.3/180*Math.PI;
+            var offset = 0;
             P.theta_i = theta_i + offset;
             //Update the index of refraction for the idler
             P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
