@@ -629,8 +629,8 @@ PhaseMatch.phasematch = function phasematch (P){
     //     console.log("approx not valid," C_check);
     // }
     // Pump spectrum
-    // var alpha = PhaseMatch.pump_spectrum(P);
-    var alpha = 1;
+    var alpha = PhaseMatch.pump_spectrum(P);
+    // var alpha = 1;
 
     //return the real and imaginary parts of Phase matching function
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag, C_check];

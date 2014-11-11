@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-11-10
+ * phasematchjs v0.0.1a - 2014-11-11
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -3791,8 +3791,8 @@ PhaseMatch.phasematch = function phasematch (P){
     //     console.log("approx not valid," C_check);
     // }
     // Pump spectrum
-    // var alpha = PhaseMatch.pump_spectrum(P);
-    var alpha = 1;
+    var alpha = PhaseMatch.pump_spectrum(P);
+    // var alpha = 1;
 
     //return the real and imaginary parts of Phase matching function
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag, C_check];
@@ -5164,12 +5164,20 @@ PhaseMatch.find_external_angle = function find_external_angle (props, photon){
 PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // console.log("hi");
     // console.log("\n");
+    var toMicrons = 1;
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
 
+    // // For testing purposes
+    // P.lambda_s = 2 * lambda_p;
+    // P.lambda_i = 2 * lambda_p;
+    // P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+    // P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+
     var twoPI = 2*Math.PI,
-        twoPIc = twoPI*con.c
+        twoPIc = twoPI*con.c*toMicrons
         ;
 
     var z0 = 0; //put pump in middle of the crystal
@@ -5181,8 +5189,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
-    var omega_s = twoPIc / P.lambda_s,
-        omega_i = twoPIc / P.lambda_i,
+    var omega_s = twoPIc / (P.lambda_s  * toMicrons),
+        omega_i = twoPIc / (P.lambda_i * toMicrons),
         omega_p = omega_s + omega_i
         // omega_p = twoPIc / P.lambda_p
         ;
@@ -5196,8 +5204,6 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ;
 
     // console.log("deltaK:" + delKx.toString() + ", " + delKy.toString() + ", " + delKz.toString() + ", ")
-
-    var arg = P.L/2*(delKz);
 
     // Height of the collected spots from the axis.
     var hs = 0,
@@ -5214,24 +5220,24 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
 
     // Setup constants
-    var Wp_SQ = sq(P.W * convfromFWHM), // convert from FWHM to sigma
-        Ws_SQ = sq(P.W_sx * convfromFWHM), // convert from FWHM to sigma
-        Wi_SQ = sq(P.W_ix * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
+    var Wp_SQ = sq(P.W *toMicrons * convfromFWHM), // convert from FWHM to sigma
+        Ws_SQ = sq(P.W_sx * toMicrons * convfromFWHM), // convert from FWHM to sigma
+        Wi_SQ = sq(P.W_sx * toMicrons * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
         // Ws_SQ = sq(W_s * convfromFWHM), // convert from FWHM to sigma
         // Wi_SQ = sq(W_i * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
         ;
 
-    var k_p = twoPI*P.n_p / P.lambda_p,
-        k_s = twoPI*P.n_s / P.lambda_s,
-        k_i = twoPI*P.n_i / P.lambda_i
+    // Is this the k vector along the direction of propagation?
+    var k_p = twoPI*P.n_p / P.lambda_p / toMicrons,
+        k_s = twoPI*P.n_s / P.lambda_s / toMicrons,
+        k_i = twoPI*P.n_i / P.lambda_i / toMicrons
         ;
 
-
-    // console.log("haha: " + 1/Math.cos(0).toString());
-    var PHI_s = sq(1/Math.cos(P.theta_s)), // External angle for the signal????
+    //     var Ss = [ sinThetaS * Math.cos(P.phi_s),  sinThetaS * Math.sin(P.phi_s), Math.cos(P.theta_s)];
+    var PHI_s = sq(1/Math.cos(P.theta_s)), // External angle for the signal???? Is PHI_s z component?
         PHI_i = sq(1/Math.cos(P.theta_i)), // External angle for the idler????
-        PSI_s = k_s * Math.sin(P.theta_s), 
-        PSI_i = k_i * Math.sin(P.theta_i)
+        PSI_s = k_s * Math.sin(P.theta_s) * Math.sin(P.phi_s), // Looks to be the y component of the ks,i
+        PSI_i = k_i * Math.sin(P.theta_i) * Math.sin(P.phi_i)
         ;
 
     // var PHI_s = 1, // External angle for the signal????
@@ -5257,31 +5263,26 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         Ai = -0.25 * (Wp_SQ + Wi_SQ * PHI_i),
         Bs = -0.25 * (Ws_SQ + Wp_SQ),
         Bi = -0.25 * (Wi_SQ + Wp_SQ),
-        Cs = -0.25 * (P.L / k_s - 2*z0/k_p),
-        Ci = -0.25 * (P.L / k_i - 2*z0/k_p),
-        Ds =  0.25 * P.L * (1/k_s - 1/k_p),
-        Di =  0.25 * P.L * (1/k_i - 1/k_p),
+        Cs = -0.25 * (P.L *toMicrons / k_s - 2*z0/k_p),
+        Ci = -0.25 * (P.L *toMicrons / k_i - 2*z0/k_p),
+        Ds =  0.25 * P.L *toMicrons * (1/k_s - 1/k_p),
+        Di =  0.25 * P.L *toMicrons * (1/k_i - 1/k_p),
         Es =  0.50 * (Ws_SQ*PHI_s * PSI_s),
         Ei =  0.50 * (Wi_SQ*PHI_i * PSI_i),
         mx_real = -0.50 * Wp_SQ,
         mx_imag = z0/k_p,
         my_real = mx_real, // Pump waist is symmetric
         my_imag = mx_imag,
-        m  = P.L / (2*k_p),
-        n  = 0.5 * P.L * RHOpx,
-        ee = 0.5 * P.L * (k_p + k_s + k_i - twoPI / (P.poling_period * P.poling_sign)),
-        ff = 0.5 * P.L * (k_p - k_s - k_i + twoPI / (P.poling_period * P.poling_sign)),
+        m  = P.L *toMicrons / (2*k_p),
+        n  = 0.5 * P.L *toMicrons * RHOpx,
+        // @TODO: Need to figure out if it is better/correct to use delKz vs the explicit formula.
+        // ee = 0.5 * P.L *toMicrons * (k_p + k_s + k_i + twoPI / (P.poling_period *toMicrons * P.poling_sign)),
+        // ff = 0.5 * P.L *toMicrons * (k_p - k_s - k_i - twoPI / (P.poling_period * toMicrons * P.poling_sign)),
+        ee = 0.5 * P.L *toMicrons * (2*k_p - delKz),
+        ff = 0.5 * P.L *toMicrons * (delKz),
         hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
         ;
 
-    // ///////////////////////////////////////
-    // console.log("starting Test");
-    // console.log(ee.toString(), ff.toString(), hh.toString());//, Cs.toString(), Ci.toString(), Ds.toString(), Di.toString(), Es.toString(), Ei.toString(), m.toString(), n.toString(),ee.toString(), ff.toString(), hh.toString());
-    // var test_terms = calczterms(0);
-    // console.log("ending test");
-    // console.log("hello:" + test_terms[0][0].toString());
-
-    // Math.sec(0);
      ///////////////////////////////////////
 
 
@@ -5302,6 +5303,24 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             ;
         return [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10];
     };
+
+    // // // ///////////////////////////////////////
+    // // console.log("starting Test");
+    // // console.log(ee.toString(), ff.toString(), hh.toString());//, Cs.toString(), Ci.toString(), Ds.toString(), Di.toString(), Es.toString(), Ei.toString(), m.toString(), n.toString(),ee.toString(), ff.toString(), hh.toString());
+    // var tt = calczterms(0);
+    // console.log("ending test");
+    // // console.log("hello:" + test_terms[0][0].toString());
+    // console.log(tt[0][0].toString() + " + i" + tt[0][1].toString() + '\n' +
+    //             tt[1][0].toString() + " + i" + tt[1][1].toString() + '\n' +
+    //             tt[2][0].toString() + " + i" + tt[2][1].toString() + '\n' +
+    //             tt[3][0].toString() + " + i" + tt[3][1].toString() + '\n' +
+    //             tt[4][0].toString() + " + i" + tt[4][1].toString() + '\n' +
+    //             tt[5][0].toString() + " + i" + tt[5][1].toString() + '\n' +
+    //             tt[6][0].toString() + " + i" + tt[6][1].toString() + '\n' +
+    //             tt[7][0].toString() + " + i" + tt[7][1].toString() + '\n' +
+    //             tt[8][0].toString() + " + i" + tt[8][1].toString() + '\n' +
+    //             tt[9][0].toString() + " + i" + tt[9][1].toString() + '\n' 
+    // );
 
     var zintfunc = function(z){
         var terms = calczterms(z);
@@ -5430,10 +5449,10 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             DENI     = PhaseMatch.csqrtI(DEN4R_b, DEN4I_b),
 
             // Now calculate the full term in the integral.
-            // pmzcoeff = Math.exp(- 1/2*sq(z/bw)), // apodization
-            pmzcoeff = 1,
+            pmzcoeff = Math.exp(- 1/2*sq(z/bw)), // apodization
+            // pmzcoeff = 1,
             // Exponential using Euler's formula
-            coeffR = Math.exp(-EXPR),
+            coeffR = Math.exp(EXPR),
             // coeffR = 1,
             EReal = coeffR * pmzcoeff*Math.cos(EXPI),
             EImag = coeffR * pmzcoeff*Math.sin(EXPI),
@@ -5444,10 +5463,11 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             real = 0.5 * PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
             imag = 0.5 * PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
 
-            // real = DENI,
-            // imag = 0
+            // real = EReal,
+            // imag = EImag
             ;
 
+        // console.log("aa: " + EXP1I.toString() + " : " + Math.cos(EXP1I).toString() + " i*" +   Math.sin(EXP1I).toString());
         // console.log("1: " + A1R.toString() + "   2: " + A2R.toString() + "   3: " + A3R.toString() + "   4: " + A7R.toString() + "   5: " + A8R.toString() + "   6: " + A9R.toString() );
 
         // console.log("real: " + A10R.toString() + "   Imag: " + A10I.toString());
@@ -5460,8 +5480,10 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     var dz = 2/P.numzint;
     var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
-    // PMz_real = pmintz[0]/P.L;
-    // PMz_imag = pmintz[1]/P.L;
+    // var dz = 1;
+    // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
+    // PMz_real = pmintz[0]/P.L *toMicrons;
+    // PMz_imag = pmintz[1]/P.L *toMicrons;
     PMz_real = pmintz[0]/2;
     PMz_imag = pmintz[1]/2;
     var PMt = 1;
