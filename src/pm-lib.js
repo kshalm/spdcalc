@@ -1108,7 +1108,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     P.use_guassian_approx = true;
 
     var PMmax = PhaseMatch.phasematch_Int_Phase(P);
-    // console.log(P,PMmax['phasematch']);
+    console.log("PMax : ",Math.sqrt(PMmax['phasematch']));
     // threshold = PMmax*threshold*20;
     // threshold = threshold;
     //

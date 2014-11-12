@@ -4270,7 +4270,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     P.use_guassian_approx = true;
 
     var PMmax = PhaseMatch.phasematch_Int_Phase(P);
-    // console.log(P,PMmax['phasematch']);
+    console.log("PMax : ",Math.sqrt(PMmax['phasematch']));
     // threshold = PMmax*threshold*20;
     // threshold = threshold;
     //
@@ -4830,6 +4830,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         return [real, imag];
     };
 
+    var arg = P.L/2*(delKz);
+    
     if (P.calcfibercoupling){
         var dz = 2/P.numzint;
         var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
@@ -4845,7 +4847,6 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         PMz_imag = PMz_imag * coeff;
     }
     else{
-        var arg = P.L/2*(delKz);
         var PMzNorm1 = Math.sin(arg)/arg;
         // var PMz_real =  PMzNorm1 * Math.cos(arg);
         // var PMz_imag = PMzNorm1 * Math.sin(arg);
