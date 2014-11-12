@@ -3712,8 +3712,8 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
  */
 PhaseMatch.phasematch = function phasematch (P){
 
-    var pm = PhaseMatch.calc_PM_tz(P);
-    // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    // var pm = PhaseMatch.calc_PM_tz(P);
+    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
     var PMz_imag = pm[1];
@@ -4840,6 +4840,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         PMz_real = pmintz[0]/2;
         PMz_imag = pmintz[1]/2;
         var PMt = 1;
+        var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
+        PMz_real = PMz_real * coeff;
+        PMz_imag = PMz_imag * coeff;
     }
     else{
         var arg = P.L/2*(delKz);
@@ -4859,12 +4862,10 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     }
 
 
-    var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
-
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
 
-    return [coeff*PMz_real, coeff*PMz_imag, PMt];
+    return [PMz_real, PMz_imag, PMt];
 
 };
 
