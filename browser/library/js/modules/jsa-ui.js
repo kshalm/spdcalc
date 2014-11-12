@@ -128,7 +128,6 @@ define(
             calc: function( props ){
 
                 var self = this;
-                var starttime = new Date();
 
                 var propsJSON = props.get()
                     ,grid_size = self.plotOpts.get('grid_size')
@@ -154,10 +153,14 @@ define(
                 P.update_all_angles();
                 P.optimum_idler(P);
                 console.log("External angle of the idler is:", PhaseMatch.find_external_angle(P,"idler")*180/Math.PI );
-                var PMN =  PhaseMatch.phasematch(props);
+                // var PMN =  PhaseMatch.phasematch(props);
                 // var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
-                var norm = 1;
+                // var norm = 1;
+                var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
+                console.log("Normalization: ",norm);
+                
                 // The calculation is split up and reutrned as a series of promises
+                var starttime = new Date();
                 var promises = [];
                 for (var j = 0; j < Nthreads; j++){
 
@@ -170,7 +173,7 @@ define(
                     ]);
                 }
 
-                console.log(PhaseMatch.linspace(0,10,10));
+                // console.log(PhaseMatch.linspace(0,10,10));
 
 
                 return when.all( promises ).then(function( values ){
@@ -193,6 +196,7 @@ define(
 
                         var p = self.updateTitle( PM );
                         self.data = PM;
+                        // console.log("data", PM);
                         self.plot.setZRange([0,Math.max.apply(null,PM)]);
                         self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);

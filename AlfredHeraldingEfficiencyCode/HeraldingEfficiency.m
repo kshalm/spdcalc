@@ -31,10 +31,10 @@ L=10000;    % crystal lenght (microns)
 
 % 1550 nm
 % wavelength range % 
-lams_min=1.5499;
-lams_max=1.55;
-lami_min=1.5499;
-lami_max=1.55;
+lams_min=1.54;
+lams_max=1.56;
+lami_min=1.54;
+lami_max=1.56;
 
 %%% pump parameters %%%
 lamp=0.775;        % pump central wavelength
@@ -46,8 +46,8 @@ lams=2*lamp;          % signal central wavelength
 lami=2*lamp;          % idler central wavelength
 FWHM_waist_fcm=120; % collection mode waist
 
-NN=2;    % points in frequency vectors
-xipunt=1; % points in xi-vectors
+NN=1;    % points in frequency vectors
+xipunt=1 % points in xi-vectors
 
 %************************************************
 LAM =-polingPer(lamp,lams,-46)   % poling period
@@ -88,17 +88,17 @@ ell=(oms./IndxRefr_y((2*pi*c)./oms).^2).*(omi./IndxRefr_z((2*pi*c)./omi).^2);
 alpha=exp(-(omp-omgp0).^2./sigma^2);  % pump spectral amplitude 
 
 %%%%%%%%%  joint spectrum (coincidences) %%%%%%%%
-phi_Rc=Int_Rc_prx(L,ks,ki,kp,Wx,Wy,Wfs,Wfi,1,1,0,0,0,0,0,0,xipunt,LAM); % phase-matching function
-
-
 % phi_Rc=Int_Rc_prx(L,ks,ki,kp,Wx,Wy,Wfs,Wfi,1,1,0,0,0,0,0,0,xipunt,LAM); % phase-matching function
-% % jsa=alpha.*phi_Rc;  % JSA
+
+
+phi_Rc=Int_Rc_prx(L,ks,ki,kp,Wx,Wy,Wfs,Wfi,1,1,0,0,0,0,0,0,xipunt,LAM); % phase-matching function
+jsa=alpha.*phi_Rc;  % JSA
 % jsa=phi_Rc;  % JSA
-% K=SchmidtK(jsa);  % Schmidt number
+K=SchmidtK(jsa)  % Schmidt number
 
 % %%%%%%%% emission rate Rc %%%%%%%
 
-% etaN=(4/pi^2)*(sec(0)*sec(0)/(2^3*pi^6*sqrt(2*pi)*c^3*eps0))*deff^2*L^2*Wx*Wy*Wfs^2*Wfi^2*Pav/sigma;
+etaN=(4/pi^2)*(sec(0)*sec(0)/(2^3*pi^6*sqrt(2*pi)*c^3*eps0))*deff^2*L^2*Wx*Wy*Wfs^2*Wfi^2*Pav/sigma;
 
 % Rc=(2*pi)^4*etaN*sum(sum(ell.*abs(jsa).^2))*dws*dwi;
 

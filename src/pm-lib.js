@@ -137,18 +137,6 @@
     var ks = P.n_s * 2 * Math.PI/P.lambda_s;
     var kp = P.n_p * 2 * Math.PI/P.lambda_p;
 
-    // var z = 0;
-
-
-
-
-
-    // console.log(Anum, AnumR, Aden, AdenR);
-    // var Aden = AdenR;
-
-    // var A = Anum / Aden;
-    // var A = AR;
-
 
      // Deal with the z term coefficient. It is imaginary. Version with W_s and W_i independent
     var Bnum1 = 4*(SIN_2THETAi*SIN_PHIs*delK[0] + COS_PHIs*SIN_2THETAi*delK[1] +2*sq(COS_THETAi)*delK[2]);
@@ -199,20 +187,6 @@
     // var Cnum = sq(SIN_THETAi_plus_THETAs)*Wp_SQ + Ws_SQ*(sq(SIN_THETAi) - SIN_2THETAi*SIN_PHIs*RHOpx)+Wi_SQ*(sq(SIN_THETAs)+SIN_2THETAs*SIN_PHIs*RHOpx);
 
 
-    // var C = CR;
-
-
-
-
-
-    // console.log(Cs,C);
-
-    // // Check to see if the approximation is valid that will let us use the Sinc function.
-    // var C_check = Math.sqrt(Math.abs(C)*2)*P.L;
-    // var C_check = C*P.L/B;
-    // C_check = 0;
-
-
     // // Now calculate the normalization coefficients.
     // // First the constant that remains after analytically integrating over x
     var xconst1,
@@ -252,56 +226,17 @@
         gaussnorm = (1/Math.sqrt(pi2 * Ws_SQ)) * (1/Math.sqrt(pi2 * Wi_SQ)) * (1/Math.sqrt(pi2 * Wp_SQ));
     }
 
-    // var gaussnorm =1;
-
-    // var arg = B*P.L/2;
-
-    // var numz =P.apodization;
-    // var numz = 40;
-    // var z = PhaseMatch.linspace(0,P.L, numz);
     var pmzcoeff = 0,
         bw;
-    // var pmzcoeffMax = 0;
 
     if (P.calc_apodization && P.enable_pp){
         // var apodization_coeff = P.apodization_coeff;
         bw = P.apodization_FWHM  / 2.3548;
     }
     else {
-        // var apodization_coeff = new Array(numz);
-        // for (var j=0; j<numz; j++){
-        //     apodization_coeff[j] = 1;
-        // }
         bw = Math.pow(2,20);
     }
 
-
-    // for (var k=0; k<numz; k++){
-    //     pmzcoeff = Math.exp(-sq(z[k])*C)*apodization_coeff[k];
-    //     PMz_real += pmzcoeff*Math.cos(B*z[k]);
-    //     PMz_imag += pmzcoeff*Math.sin(B*z[k]);
-
-    //     // var pmzcoeffabs += sq(PMz_real)+sq(PMz_imag);
-    //     // if (pmzcoeffabs>pmzcoeffMax){
-    //     //     pmzcoeffMax = pmzcoeffabs;
-    //     // }
-    // }
-
-    // PMz_real = PMz_real/numz;
-    // PMz_imag = PMz_imag/numz;
-
-
-
-    // var zintReal = function(z){
-    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    //     return pmzcoeff*Math.cos(B*z);
-    //     // return  Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    // }
-
-    // var zintImag = function(z){
-    //     var pmzcoeff = Math.exp(-sq(z)*C - 1/2*sq(z/bw));
-    //     return  pmzcoeff*Math.sin(B*z);
-    // }
 
     ///////////////////////////////////////////
     var calczterms = function(z){
@@ -615,8 +550,8 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
  */
 PhaseMatch.phasematch = function phasematch (P){
 
-    // var pm = PhaseMatch.calc_PM_tz(P);
-    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    var pm = PhaseMatch.calc_PM_tz(P);
+    // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
     var PMz_imag = pm[1];
