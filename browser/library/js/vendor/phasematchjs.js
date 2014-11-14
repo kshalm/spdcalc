@@ -4711,8 +4711,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             // A6^2/A2
             EXP3R_a = PhaseMatch.cmultiplyR(A6R, A6I, A6R, A6I ),
             EXP3I_a = PhaseMatch.cmultiplyI(A6R, A6I, A6R, A6I ),
-            EXP3R = PhaseMatch.cdivideR(EXP2R_a, EXP2I_a, A2R, A2I),
-            EXP3I = PhaseMatch.cdivideI(EXP2R_a, EXP2I_a, A2R, A2I),
+            EXP3R = PhaseMatch.cdivideR(EXP3R_a, EXP3I_a, A2R, A2I),
+            EXP3I = PhaseMatch.cdivideI(EXP3R_a, EXP3I_a, A2R, A2I),
 
             // (-2 A1 A7 + A5 A8)^2/ (A1 (4 A1 A3 - A8^2))
             EXP4Ra_num = -2 * PhaseMatch.cmultiplyR( A1R, A1I, A7R, A7I),
@@ -4798,8 +4798,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             pmzcoeff = Math.exp(- 1/2*sq(z/bw)), // apodization
             // pmzcoeff = 1,
             // Exponential using Euler's formula
-            // coeffR = Math.exp(EXPR),
-            coeffR = 1,
+            coeffR = Math.exp(EXPR),
+            // coeffR = 1,
             EReal = coeffR * pmzcoeff*Math.cos(EXPI),
             EImag = coeffR * pmzcoeff*Math.sin(EXPI),
 
@@ -4818,11 +4818,16 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             //             DEN2R.toString() + " 1i* " + DEN2I.toString() + '\n' + 
             //             DEN3R.toString() + " 1i* " + DEN3I.toString() + '\n' 
             // );
-                        // DEN1R.toString() + " 1i* " + DEN1I.toString() + '\n' + 
-                        // DEN1R.toString() + " 1i* " + DEN1I.toString() + '\n' + 
-                        // DEN1R.toString() + " 1i* " + DEN1I.toString() + '\n' + 
+            
+            // console.log(EXPR.toString()  + " 1i* " + EXPI.toString()  + '\n' + 
+            //             EXP1R.toString() + " 1i* " + EXP1I.toString() + '\n' + 
+            //             EXP2R.toString() + " 1i* " + EXP2I.toString() + '\n' + 
+            //             EXP3R.toString() + " 1i* " + EXP3I.toString() + '\n' +
+            //             EXP4R.toString() + " 1i* " + EXP4I.toString() + '\n' +
+            //             EXP5R.toString() + " 1i* " + EXP5I.toString() + '\n' 
+            // );
 
-        // console.log("aa: " + EXP1I.toString() + " : " + Math.cos(EXP1I).toString() + " i*" +   Math.sin(EXP1I).toString());
+        // console.log("numerator: " + EReal.toString() + " , " + EImag.toString() +' , ' + coeffR.toString() + ' , ' + EXPI.toString());
         // console.log("1: " + A1R.toString() + "   2: " + A2R.toString() + "   3: " + A3R.toString() + "   4: " + A7R.toString() + "   5: " + A8R.toString() + "   6: " + A9R.toString() );
 
         // console.log("real: " + A10R.toString() + "   Imag: " + A10I.toString());
