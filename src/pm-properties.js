@@ -91,14 +91,21 @@
             this.theta_s = PhaseMatch.find_internal_angle(this, "signal");
             this.theta_i = PhaseMatch.find_internal_angle(this, "idler");
 
-            //Other functions that do not need to be included in the default init
-            this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
-            this.S_s = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_s, this.phi_s);
-            this.S_i = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_i, this.phi_i);
+            // //Other functions that do not need to be included in the default init
+            // this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
+            // this.S_s = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_s, this.phi_s);
+            // this.S_i = this.calc_Coordinate_Transform(this.theta, this.phi, this.theta_i, this.phi_i);
 
-            this.n_p = this.calc_Index_PMType(this.lambda_p, this.type, this.S_p, "pump");
-            this.n_s = this.calc_Index_PMType(this.lambda_s, this.type, this.S_s, "signal");
-            this.n_i = this.calc_Index_PMType(this.lambda_i, this.type, this.S_i, "idler");
+            // this.n_p = this.calc_Index_PMType(this.lambda_p, this.type, this.S_p, "pump");
+            // this.n_s = this.calc_Index_PMType(this.lambda_s, this.type, this.S_s, "signal");
+            // this.n_i = this.calc_Index_PMType(this.lambda_i, this.type, this.S_i, "idler");
+
+            // this.optimum_idler();
+            this.update_all_angles();
+
+            // set the external angle of the idler
+            // this.theta_i_e = PhaseMatch.find_external_angle(this, "idler");
+            // console.log("From init external angle is: ", this.theta_i_e *180/Math.PI, this.theta_s_e *180/Math.PI, this.theta_i *180/Math.PI, this.theta_s *180/Math.PI);
 
             //set the apodization length and Gaussian profile
             this.set_apodization_L();
@@ -207,6 +214,8 @@
             // console.log("new pump index", props.n_p);
 
             props.optimum_idler();
+            // set the external idler angle
+            props.theta_i_e = PhaseMatch.find_external_angle(props,"idler");
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
             // props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
             // console.log(props.n_s, props.n_s, props.n_i);
@@ -321,13 +330,12 @@
 
             // return theta_i;
 
-            // P.theta_i = theta_i;
-            var offset = 0;
-            P.theta_i = theta_i + offset;
+            P.theta_i = theta_i;
             //Update the index of refraction for the idler
             P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
             // console.log("External angle of the idler is:", PhaseMatch.find_external_angle(P,"idler")*180/Math.PI );
+            // P.theta_i_e = PhaseMatch.find_external_angle(P,"idler");
         },
 
         optimum_signal : function (){

@@ -108,7 +108,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 100,
+                    'grid_size': 2,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -152,6 +152,7 @@ define(
                 P.phi_i = P.phi_s + Math.PI;
                 P.update_all_angles();
                 P.optimum_idler(P);
+                P.theta_i_e = PhaseMatch.find_external_angle(P,"idler");
                 console.log("External angle of the idler is:", PhaseMatch.find_external_angle(P,"idler")*180/Math.PI );
                 // var PMN =  PhaseMatch.phasematch(props);
                 // var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
