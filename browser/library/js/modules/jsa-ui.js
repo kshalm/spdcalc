@@ -108,7 +108,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 50,
+                    'grid_size': 100,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -159,7 +159,7 @@ define(
                 // var norm = 1;
                 var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
                 console.log("Normalization: ",norm);
-                
+
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
                 var promises = [];

@@ -3712,8 +3712,8 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
  */
 PhaseMatch.phasematch = function phasematch (P){
 
-    // var pm = PhaseMatch.calc_PM_tz(P);
-    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    var pm = PhaseMatch.calc_PM_tz(P);
+    // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
     var PMz_imag = pm[1];
@@ -4557,7 +4557,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     var convfromFWHM = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
 
-    
+
     // var W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s))),
     //     W_i = 2*Math.asin( Math.cos(P.theta_i_e)*Math.sin(P.W_ix/2)/(P.n_i * Math.cos(P.theta_i)));
 
@@ -4587,9 +4587,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     // var PHI_s = 1, // External angle for the signal????
     //     PHI_i = 1, // External angle for the idler????
-    //     PSI_s = 0, 
+    //     PSI_s = 0,
     //     PSI_i = 0
-    //     ;    
+    //     ;
 
     var bw;  // Apodization 1/e^2
 
@@ -4664,32 +4664,32 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     //             tt[6][0].toString() + " + i" + tt[6][1].toString() + '\n' +
     //             tt[7][0].toString() + " + i" + tt[7][1].toString() + '\n' +
     //             tt[8][0].toString() + " + i" + tt[8][1].toString() + '\n' +
-    //             tt[9][0].toString() + " + i" + tt[9][1].toString() + '\n' 
+    //             tt[9][0].toString() + " + i" + tt[9][1].toString() + '\n'
     // );
 
     var zintfunc = function(z){
         // z = 0;
         var terms = calczterms(z);
-        var A1R = terms[0][0], 
-            A1I = terms[0][1], 
-            A2R = terms[1][0], 
-            A2I = terms[1][1], 
-            A3R = terms[2][0], 
-            A3I = terms[2][1], 
-            A4R = terms[3][0], 
+        var A1R = terms[0][0],
+            A1I = terms[0][1],
+            A2R = terms[1][0],
+            A2I = terms[1][1],
+            A3R = terms[2][0],
+            A3I = terms[2][1],
+            A4R = terms[3][0],
             A4I = terms[3][1],
-            A5R = terms[4][0], 
-            A5I = terms[4][1],  
-            A6R = terms[5][0], 
-            A6I = terms[5][1], 
-            A7R = terms[6][0], 
-            A7I = terms[6][1], 
-            A8R = terms[7][0], 
-            A8I = terms[7][1], 
-            A9R = terms[8][0], 
-            A9I = terms[8][1], 
-            A10R = terms[9][0], 
-            A10I = terms[9][1] 
+            A5R = terms[4][0],
+            A5I = terms[4][1],
+            A6R = terms[5][0],
+            A6I = terms[5][1],
+            A7R = terms[6][0],
+            A7I = terms[6][1],
+            A8R = terms[7][0],
+            A8I = terms[7][1],
+            A9R = terms[8][0],
+            A9I = terms[8][1],
+            A10R = terms[9][0],
+            A10I = terms[9][1]
             ;
         // console.log("hello");
         // console.log("A1R: " + A1R.toString() + "   Imag: " + A1I.toString());
@@ -4697,10 +4697,10 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         //   E^(1/4 (4 A10 - A5^2/A1 - A6^2/A2 - (-2 A1 A7 + A5 A8)^2/(
         //  A1 (4 A1 A3 - A8^2)) - (A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2)))
         // )
-            
+
             // 4 A10
         var EXP1R = A10R*4,
-            EXP1I = A10I*4, 
+            EXP1I = A10I*4,
 
             // A5^2/A1
             EXP2R_a = PhaseMatch.cmultiplyR(A5R, A5I, A5R, A5I ),
@@ -4813,18 +4813,18 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             // imag = 1 * EImag
             ;
 
-            // console.log(DENR.toString()  + " 1i* " + DENI.toString()  + '\n' + 
-            //             DEN1R.toString() + " 1i* " + DEN1I.toString() + '\n' + 
-            //             DEN2R.toString() + " 1i* " + DEN2I.toString() + '\n' + 
-            //             DEN3R.toString() + " 1i* " + DEN3I.toString() + '\n' 
+            // console.log(DENR.toString()  + " 1i* " + DENI.toString()  + '\n' +
+            //             DEN1R.toString() + " 1i* " + DEN1I.toString() + '\n' +
+            //             DEN2R.toString() + " 1i* " + DEN2I.toString() + '\n' +
+            //             DEN3R.toString() + " 1i* " + DEN3I.toString() + '\n'
             // );
-            
-            // console.log(EXPR.toString()  + " 1i* " + EXPI.toString()  + '\n' + 
-            //             EXP1R.toString() + " 1i* " + EXP1I.toString() + '\n' + 
-            //             EXP2R.toString() + " 1i* " + EXP2I.toString() + '\n' + 
+
+            // console.log(EXPR.toString()  + " 1i* " + EXPI.toString()  + '\n' +
+            //             EXP1R.toString() + " 1i* " + EXP1I.toString() + '\n' +
+            //             EXP2R.toString() + " 1i* " + EXP2I.toString() + '\n' +
             //             EXP3R.toString() + " 1i* " + EXP3I.toString() + '\n' +
             //             EXP4R.toString() + " 1i* " + EXP4I.toString() + '\n' +
-            //             EXP5R.toString() + " 1i* " + EXP5I.toString() + '\n' 
+            //             EXP5R.toString() + " 1i* " + EXP5I.toString() + '\n'
             // );
 
         // console.log("numerator: " + EReal.toString() + " , " + EImag.toString() +' , ' + coeffR.toString() + ' , ' + EXPI.toString());
@@ -4862,7 +4862,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         PMz_imag = 0;
         var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     }
-    
+
 
     if (P.use_guassian_approx){
         // console.log('approx');
@@ -4884,14 +4884,14 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
  * Normalization function for the joint spectrums
  */
 PhaseMatch.normalize_joint_spectrum = function normalize_joint_spectrum (props){
-    // Find the optimum phase matching condition. This will be when delK = 0 and everything is collinear. 
+    // Find the optimum phase matching condition. This will be when delK = 0 and everything is collinear.
     // Need to calculate optimum poling period and crystal angle.
     var P = props.clone();
     P.theta_s = 0;
-    P.theta_i = 0; 
+    P.theta_i = 0;
     P.theta_s_e = 0;
     P.theta_i_e = 0;
-        P.update_all_angles();
+    P.update_all_angles();
 
     if (props.enable_pp){
         P.calc_poling_period();
