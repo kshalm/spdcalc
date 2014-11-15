@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-11-14
+ * phasematchjs v0.0.1a - 2014-11-15
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -5534,6 +5534,12 @@ PhaseMatch.Crystals('KDP-1', {
         auto_calc_Theta : function (){
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             var props = this;
+            // Don't use the fiber coupling option to find the optimum phasematching angle.
+            // This is faster.
+            var fiber = props.calcfibercoupling;
+            props.update_all_angles(props);
+            // props.calcfibercoupling = false;
+
             var min_delK = function(x){
                 if (x>Math.PI/2 || x<0){return 1e12;}
                 props.theta = x;
@@ -5554,6 +5560,7 @@ PhaseMatch.Crystals('KDP-1', {
             var timeDiff = (endTime - startTime)/1000;
             // console.log("Theta autocalc = ", timeDiff, ans);
             props.theta = ans;
+            // props.calcfibercoupling = fiber;
             // calculate the walkoff angle
             // this.calc_walkoff_angles();
         },
