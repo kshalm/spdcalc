@@ -1291,6 +1291,7 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
 
         //Initial guess
         guess = props.theta_s;
+        // guess = 16*Math.PI/180;
     }
     if (photon === 'idler'){
         // var offset = 0.45/180*Math.PI;
@@ -1310,8 +1311,9 @@ PhaseMatch.find_internal_angle = function find_internal_angle (props, photon){
 
         //Initial guess
         guess = props.theta_i;
+        // guess = 45*Math.PI/180;
     }
-    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 30);
+    var ans = PhaseMatch.nelderMead(min_snells_law, guess, 20);
     // console.log("Internal angle is: ", ans*180/Math.PI, props.theta_s*180/Math.PI );
     return ans;
 };

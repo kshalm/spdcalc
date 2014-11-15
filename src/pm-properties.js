@@ -90,6 +90,7 @@
             // Find internal angles for signal and idler
             this.theta_s = PhaseMatch.find_internal_angle(this, "signal");
             this.theta_i = PhaseMatch.find_internal_angle(this, "idler");
+            // this.theta_s = 0;
 
             // //Other functions that do not need to be included in the default init
             // this.S_p = this.calc_Coordinate_Transform(this.theta, this.phi, 0, 0);
@@ -115,6 +116,12 @@
             // this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
 
             this.set_zint();
+
+            // this.auto_calc_Theta();
+            // this.theta_s = 8.624324930009333* Math.PI/180;
+            if (this.autocalctheta){
+                this.auto_calc_Theta();
+            }
 
             // console.log(this.zweights);
 
@@ -240,15 +247,11 @@
         auto_calc_Theta : function (){
             this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
             var props = this;
-            // Don't use the fiber coupling option to find the optimum phasematching angle.
-            // This is faster.
-            var fiber = props.calcfibercoupling;
-            props.update_all_angles(props);
-            // props.calcfibercoupling = false;
 
             var min_delK = function(x){
                 if (x>Math.PI/2 || x<0){return 1e12;}
                 props.theta = x;
+                props.theta_s = PhaseMatch.find_internal_angle(props, "signal");
                 props.update_all_angles(props);
                 var delK =  PhaseMatch.calc_delK(props);
                 // Returning all 3 delK components can lead to errors in the search
@@ -258,14 +261,27 @@
 
             var guess = Math.PI/6;
             var startTime = new Date();
-
-            var ans = PhaseMatch.nelderMead(min_delK, guess, 20);
+            // var theta_s = props.theta_s;
+            // var theta_s_e = props.theta_s_e;
+            // props.theta_s_e = theta_s_e +0.01;
+            // PhaseMatch.find_internal_angle(props, "signal");
+            // props.theta_s = theta_s + 0.01;
+            var ans = PhaseMatch.nelderMead(min_delK, guess, 30);
+            // props.theta = ans;
+            // props.theta_s_e = theta_s_e;
+            // PhaseMatch.find_internal_angle(props, "signal");
+            // props.theta_s = theta_s;
+            // Run again wiht better initial conditions based on previous optimization
+            ans = PhaseMatch.nelderMead(min_delK, ans, 30);
             var endTime = new Date();
 
 
             var timeDiff = (endTime - startTime)/1000;
             // console.log("Theta autocalc = ", timeDiff, ans);
-            props.theta = ans;
+            // props.theta = ans;
+            // console.log("After autocalc: ", props.theta_i * 180/Math.PI);
+            props.update_all_angles(props);
+            
             // props.calcfibercoupling = fiber;
             // calculate the walkoff angle
             // this.calc_walkoff_angles();

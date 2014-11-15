@@ -95,11 +95,18 @@ define(
                             var theta_s = PhaseMatch.find_internal_angle(self.props, "signal");
                             // console.log("theta_s int", theta_s*180/Math.PI);
                             self.props.set("theta_s", theta_s);
+                            // self.props.update_all_angles();
                             // set the internal idler angle
+                            console.log("setting intnerna signal:", theta_s *180/Math.PI);
+                            self.props.optimum_idler();
+                            console.log("setting internal idler 1:", self.props.theta_i *180/Math.PI);
                             // self.props.optimum_idler();
+                            // console.log("setting internal idler 2:", self.props.theta_i *180/Math.PI);
                             // // set the external idler angle
                             // var theta_i_e = PhaseMatch.find_external_angle(self.props,"idler");
-                            // // console.log("setting external idler:", theta_s_e *180/Math.PI);
+                            // console.log("setting intnerna signal:", theta_s *180/Math.PI);
+                            // console.log("setting internal idler:", self.props.theta_i *180/Math.PI);
+
                             // self.props.set("theta_i_e", theta_i_e);
                         }
                         if (key === 'theta_i_e'){
