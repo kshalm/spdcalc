@@ -351,7 +351,6 @@ PhaseMatch.calc_PM_Pump_Theta_Poling = function calc_PM_Pump_Theta_Poling(props,
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
     // console.log('inside calc_xy',props.phi*180/Math.PI);
-    console.log('xstart: ' + (x_start*180/Math.PI).toString() + ', ' + (x_stop*180/Math.PI).toString());
     props.update_all_angles();
     var P = props.clone();
     P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
@@ -372,7 +371,6 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     var theta_y_e = PhaseMatch.linspace(y_stop, y_start, dim);
     var X = theta_x_e;
     var Y = theta_y_e;
-    xinternal = new Float64Array( dim);
 
     for (var k = 0; k<dim; k++){
         if (theta_x_e[k] < 0){
@@ -385,13 +383,8 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             X[k] = PhaseMatch.find_internal_angle(P,"signal");
             Y[dim - k -1] = X[k];
         }
-        xinternal[k] = X[k] * 180 / Math.PI;
-
     }
 
-
-
-    console.log("internal angles: " + xinternal[0].toString() + ", " + xinternal[dim-1].toString() + ", " + x_start.toString()*180/Math.PI);
 
     var N = dim * dim;
     var PM = new Float64Array( N );
@@ -505,46 +498,53 @@ PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start,
 
     }
 
-    // Find Idler distribution
-    if (P.type === 0 || P.type === 1){
-        //swap signal and idler frequencies.
-        var lambda_s = P.lambda_s;
-        P.lambda_s = P.lambda_i;
-        P.lambda_i = lambda_s;
-    }
-    if (P.type === 2){
-        // console.log("switching");
-        P.type = 3;
-    }
-    else if (P.type === 3){
-        // console.log("other way");
-        P.type = 2;
-    }
+    //  // "Type 0:   o -> o + o",
+    //  //    "Type 0:   e -> e + e",
+    //  //    "Type 1:   e -> o + o",
+    //  //    "Type 2:   e -> e + o",
+    //  //    "Type 2:   e -> o + e"
 
-    for (i=0; i<N; i++){
-        index_x = i % dim;
-        index_y = Math.floor(i / dim);
+    // // Find Idler distribution
+    // if (P.type === "Type 0:   o -> o + o" || P.type === "Type 1:   e -> o + o" || P.type === "Type 0:   e -> e + e"){
+    //     //swap signal and idler frequencies.
+    //     var lambda_s = P.lambda_s;
+    //     P.lambda_s = P.lambda_i;
+    //     P.lambda_i = lambda_s;
+    // }
+    // if (P.type ===  "Type 2:   e -> e + o"){
+    //     // console.log("switching");
+    //     P.type =  "Type 2:   e -> o + e";
+    // }
+    // else if (P.type ===  "Type 2:   e -> o + e"){
+    //     // console.log("other way");
+    //     P.type = "Type 2:   e -> e + o";
+    // }
 
-        P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
-        P.phi_s = Math.atan2(Y[index_y],X[index_x]);
-        P.phi_i = (P.phi_s + Math.PI);
+    // for (i=0; i<N; i++){
+    //     index_x = i % dim;
+    //     index_y = Math.floor(i / dim);
 
-        P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+    //     P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
+    //     P.phi_s = Math.atan2(Y[index_y],X[index_x]);
+    //     P.phi_i = (P.phi_s + Math.PI);
 
-        if (P.brute_force) {
-           P.brute_force_theta_i(P); //use a search. could be time consuming.
-        }
-        else {
-            //calculate the correct idler angle analytically.
-            P.optimum_idler(P);
-        }
+    //     P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+    //     P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
-        PM[i] += PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+    //     if (P.brute_force) {
+    //        P.brute_force_theta_i(P); //use a search. could be time consuming.
+    //     }
+    //     else {
+    //         //calculate the correct idler angle analytically.
+    //         P.optimum_idler(P);
+    //     }
 
-    }
+    //     PM[i] += PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
 
-    return PM;
+    // }
+
+    // return PM;
+    return [1,0];
 
 };
 

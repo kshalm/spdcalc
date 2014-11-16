@@ -111,6 +111,10 @@ define(
                     labels: {
                         x: 'X Emission Angle (deg)',
                         y: 'Y Emission Angle (deg)'
+                    },
+                    format: {
+                        x: '.0f',
+                        y: '.0f'
                     }
                 });
 
@@ -124,6 +128,10 @@ define(
                     labels: {
                         x: 'X Emission Angle (deg)',
                         y: 'Y Emission Angle (deg)'
+                    },
+                    format: {
+                        x: '.0f',
+                        y: '.0f'
                     }
                 });
 
@@ -220,7 +228,7 @@ define(
                     ,Nthreads = self.nWorkers
                     ,promises = []
                     ;
-                console.log("start, stop angles are:", x_start, x_stop, po.get('theta_stop'));
+                // console.log("start, stop angles are:", x_start, x_stop, po.get('theta_stop'));
                 var isfibercoupled = props.calcfibercoupling;
                 props.calcfibercoupling = false;
                 var propsJSON = props.get();
@@ -303,7 +311,7 @@ define(
                         self.plotPMXY.setXRange([ x_start, x_stop ]);
                         self.plotPMXY.setYRange([ x_start, x_stop ]);
 
-                        console.log("start, stop angles are:", x_start, x_stop, po.get('theta_stop'));
+                        // console.log("start, stop angles are:", x_start, x_stop, po.get('theta_stop'));
 
                         self.dataPMXYBoth = values[1];
                         self.plotPMXYBoth.setXRange([ 2 * x_start, 2 * x_stop ]);
