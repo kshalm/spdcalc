@@ -135,15 +135,15 @@ define(
 
             if (this.logplot){
                 this.scales = {
-                    x: d3.scale.linear().domain( options.xrange ).nice(),
-                    y: d3.scale.linear().domain( options.yrange ).nice(),
-                    z: options.colorScale(this.logplot, [0.001,1]).copy()
+                    x: d3.scale.linear().domain( options.xrange ),
+                    y: d3.scale.linear().domain( options.yrange ),
+                    z: options.colorScale(this.logplot, [0.0001,1]).copy()
                 };
             }
             else{
                 this.scales = {
-                    x: d3.scale.linear().domain( options.xrange ).nice(),
-                    y: d3.scale.linear().domain( options.yrange ).nice(),
+                    x: d3.scale.linear().domain( options.xrange ),
+                    y: d3.scale.linear().domain( options.yrange ),
                     z: options.colorScale(this.logplot, [0,1]).copy()
                 };
             }
@@ -273,8 +273,8 @@ define(
                 this.hiddenCanvas.width = w;
                 this.hiddenCanvas.height = h;
 
-                this.scales.x.range([0, w]).nice();
-                this.scales.y.range([h, 0]).nice();
+                this.scales.x.range([0, w]);
+                this.scales.y.range([h, 0]);
 
                 this.refreshAxes();
             },
@@ -282,14 +282,14 @@ define(
             // these only make cosmetic changes...
             setXRange: function( xrangeArr ){
 
-                this.scales.x.domain( xrangeArr ).nice();
+                this.scales.x.domain( xrangeArr );
                 this.refreshAxes();
             },
 
             setYRange: function( yrangeArr ){
 
                 // yes, it should be domain here. not range
-                this.scales.y.domain( yrangeArr ).nice();
+                this.scales.y.domain( yrangeArr );
                 this.refreshAxes();
             },
 
@@ -316,8 +316,8 @@ define(
 
                 var self = this
                     ,svg = this.svgAxis
-                    ,x = this.scales.x.nice()
-                    ,y = this.scales.y.nice()
+                    ,x = this.scales.x
+                    ,y = this.scales.y
                     // ,z = this.scales.z
                     ,z = defaults.colorScale(this.logplot, this.scales.z.domain()).copy()
                     ,labels = this.labels
@@ -420,7 +420,7 @@ define(
                     vals.splice(1, 0, dom[0]+dom[1]/10);
                     var zAxis = d3.svg.axis()
                     // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
-                    .scale( d3.scale.log().domain( dom ).nice().range([0, colorBarWidth]) )
+                    .scale( d3.scale.log().domain( dom ).range([0, colorBarWidth]) )
                     .tickValues( vals )
                     .tickFormat( d3.format( '.2f' ) )
                     .orient("top")
@@ -439,7 +439,7 @@ define(
 
                 // var zAxis = d3.svg.axis()
                 //     // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
-                //     .scale( d3.scale.log().domain( dom ).nice().range([0, colorBarWidth]) )
+                //     .scale( d3.scale.log().domain( dom ).range([0, colorBarWidth]) )
                 //     .tickValues( vals )
                 //     .tickFormat( d3.format( '.1f' ) )
                 //     .orient("top")

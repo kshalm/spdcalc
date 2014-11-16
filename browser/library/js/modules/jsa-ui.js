@@ -154,11 +154,11 @@ define(
                 // P.optimum_idler(P);
                 // P.theta_i_e = PhaseMatch.find_external_angle(P,"idler");
                 // console.log("External angle of the idler is:", P.theta_i_e*180/Math.PI );
-                console.log("angles: ", P.theta_s * 180/Math.PI,  P.theta_i * 180/Math.PI,  P.theta_s_e * 180/Math.PI,  P.theta_i_e * 180/Math.PI);
+                // console.log("angles: ", P.theta_s * 180/Math.PI,  P.theta_i * 180/Math.PI,  P.theta_s_e * 180/Math.PI,  P.theta_i_e * 180/Math.PI);
                 // var PMN =  PhaseMatch.phasematch(props);
                 // var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
-                var norm = 1;
-                // var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
+                // var norm = 1;
+                var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
                 // console.log("Normalization: ",norm);
 
                 // The calculation is split up and reutrned as a series of promises

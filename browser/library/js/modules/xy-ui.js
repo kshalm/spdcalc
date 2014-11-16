@@ -220,7 +220,7 @@ define(
                     ,Nthreads = self.nWorkers
                     ,promises = []
                     ;
-
+                console.log("start, stop angles are:", x_start, x_stop, po.get('theta_stop'));
                 var isfibercoupled = props.calcfibercoupling;
                 props.calcfibercoupling = false;
                 var propsJSON = props.get();
@@ -234,6 +234,12 @@ define(
                         -1 * po.get('theta_stop'),
                         po.get('theta_stop'),
                         po.get('grid_size')
+                        // propsJSON,
+                        // x_start*Math.PI/80,
+                        // x_stop*Math.PI/80,
+                        // x_start*Math.PI/80,
+                        // x_stop*Math.PI/80,
+                        // po.get('grid_size')
 
                 ]);
 
@@ -296,6 +302,8 @@ define(
                         self.dataPMXY = values[0];
                         self.plotPMXY.setXRange([ x_start, x_stop ]);
                         self.plotPMXY.setYRange([ x_start, x_stop ]);
+
+                        console.log("start, stop angles are:", x_start, x_stop, po.get('theta_stop'));
 
                         self.dataPMXYBoth = values[1];
                         self.plotPMXYBoth.setXRange([ 2 * x_start, 2 * x_stop ]);

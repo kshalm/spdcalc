@@ -333,6 +333,8 @@
 
             var delKpp = P.lambda_s/(P.poling_period*P.poling_sign);
 
+            P.phi_i = P.phi_s + Math.PI;
+
             var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);
             arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
             arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);

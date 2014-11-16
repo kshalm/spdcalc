@@ -5629,6 +5629,8 @@ PhaseMatch.Crystals('KDP-1', {
 
             var delKpp = P.lambda_s/(P.poling_period*P.poling_sign);
 
+            P.phi_i = P.phi_s + Math.PI;
+
             var arg = sq(P.n_s) + sq(P.n_p*P.lambda_s/P.lambda_p);
             arg += -2*P.n_s*P.n_p*(P.lambda_s/P.lambda_p)*Math.cos(P.theta_s) - 2*P.n_p*P.lambda_s/P.lambda_p*delKpp;
             arg += 2*P.n_s*Math.cos(P.theta_s)*delKpp + sq(delKpp);
@@ -6251,7 +6253,7 @@ PhaseMatch.calc_PM_Pump_Theta_Poling = function calc_PM_Pump_Theta_Poling(props,
 
 PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, dim){
     // console.log('inside calc_xy',props.phi*180/Math.PI);
-
+    console.log('xstart: ' + (x_start*180/Math.PI).toString() + ', ' + (x_stop*180/Math.PI).toString());
     props.update_all_angles();
     var P = props.clone();
     P.lambda_i = 1/(1/P.lambda_p - 1/P.lambda_s);
@@ -6272,6 +6274,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     var theta_y_e = PhaseMatch.linspace(y_stop, y_start, dim);
     var X = theta_x_e;
     var Y = theta_y_e;
+    xinternal = new Float64Array( dim);
 
     for (var k = 0; k<dim; k++){
         if (theta_x_e[k] < 0){
@@ -6284,10 +6287,13 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             X[k] = PhaseMatch.find_internal_angle(P,"signal");
             Y[dim - k -1] = X[k];
         }
+        xinternal[k] = X[k] * 180 / Math.PI;
 
     }
 
-    // console.log(theta_x_e);
+
+
+    console.log("internal angles: " + xinternal[0].toString() + ", " + xinternal[dim-1].toString() + ", " + x_start.toString()*180/Math.PI);
 
     var N = dim * dim;
     var PM = new Float64Array( N );
