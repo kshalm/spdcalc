@@ -362,24 +362,40 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     P.phi_i = (P.phi_s + Math.PI);
     P.brute_force = true;
     if (P.brute_force){
+        // Check to see if the Rayleigh range is shorter than the crystal.
+        // If so, set the lenght of the crystal to be equal to 2* Rayleigh rang
+        z0 = Math.PI * P.W *P.W / P.lambda_p;
+        console.log("Rayleigh Range: " + (z0*1e6).toString());
+        if (5*z0 < P.L){
+            P.L = 5*z0;
+        }
         // dim = P.brute_dim;
         // dim = 5;
     }
 
 
     // Find the stopping angle to integrate over
+    int_angles = PhaseMatch.autorange_theta(P);
+    var tstart = int_angles[0];
+    var tstop  = int_angles[1];
+    if (tstop < x_stop){
+        tstop = x_stop;
+    };
+    // int_angles[1] = (P.theta_s_e - int_angles[0]) + P.theta_s_e;
+    var num_pts_per_deg = 10;
+    var numint = Math.round((tstop - tstart)*180/Math.PI*num_pts_per_deg);
+    console.log("number of integration points: " + numint.toString());
+
     P.theta_s_e = x_stop;
     var theta_stop  = PhaseMatch.find_internal_angle(P,"signal");
-
-    var numint = 100,
-        int_weights = PhaseMatch.NintegrateWeights(numint),
+    var int_weights = PhaseMatch.NintegrateWeights(numint),
         tstart = 0,
         tstop  = theta_stop,
         diff   = (tstop - tstart),
         dtheta = (diff/numint)
     ;
 
-    int_angles = PhaseMatch.autorange_theta(P);
+    
     // console.log("theta_stop: " + (theta_stop*180/Math.PI).toString() +', ' + numint.toString() +', ' + diff.toString() +', ' +dtheta.toString() );
     var i;
 
@@ -464,8 +480,8 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             // // }
             // // var tstop = del + P.theta_s;
             // // var tstop  = theta_stop, //P.theta_s + del,
-            var tstart = int_angles[0];
-            var tstop  = int_angles[1];
+            // var tstart = int_angles[0];
+            // var tstop  = int_angles[1];
             var diff   = (tstop - tstart),
                 dtheta = (diff/numint)
                 ;

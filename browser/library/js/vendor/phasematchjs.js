@@ -3226,24 +3226,35 @@ PhaseMatch.sign = function sign(x) {
 
     // var convfromFWHM = 1/(2 * Math.sqrt(2*Math.log(2))); //convert from FWHM
     // var convfromFWHM = 1/(2 * Math.sqrt(Math.log(2)));
-    var convfromFWHM = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
+    // Need to convert my 1/e^2 definition. I am using the definition
+    // E = exp(-x^2/(sqrt(2)*W)) vs the standard E = exp(-x^2/W)).
+    // Therefore W -> sqrt(2)*W
+    var convtoproppergaussian = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
+    // var convtoFWHM = 2*(Math.sqrt(Math.log(2)/2));
 
     var W_s,
         W_i;
 
     if (P.calcfibercoupling){
-        W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
-        W_i = 2*Math.asin( Math.cos(P.theta_i_e)*Math.sin(P.W_ix/2)/(P.n_i * Math.cos(P.theta_i)));
+        W_s = P.W_sx;
+        W_i = P.W_ix;
+        // W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
+        // W_i = 2*Math.asin( Math.cos(P.theta_i_e)*Math.sin(P.W_ix/2)/(P.n_i * Math.cos(P.theta_i)));
     }
     else {
        W_s = Math.pow(2,20); //Arbitrary large number
        W_i = Math.pow(2,20); //Arbitrary large number
     }
 
-    // Setup constants
-    var Wp_SQ = sq(P.W * convfromFWHM); // convert from FWHM to sigma
-    var Ws_SQ = sq(W_s * convfromFWHM); // convert from FWHM to sigma
-    var Wi_SQ = sq(W_i * convfromFWHM); // convert from FWHM to sigma @TODO: Change to P.W_i
+    // // Setup constants
+    var Wp_SQ = sq(P.W * convtoproppergaussian); // convert from FWHM to sigma
+    var Ws_SQ = sq(W_s * convtoproppergaussian); // convert from FWHM to sigma
+    var Wi_SQ = sq(W_i * convtoproppergaussian); // convert from FWHM to sigma @TODO: Change to P.W_i
+
+    // // Setup constants
+    // var Wp_SQ = sq(P.W * convtoFWHM); // convert from sigma to FWHM
+    // var Ws_SQ = sq(W_s * convtoFWHM); // convert from sigma to FWHM
+    // var Wi_SQ = sq(W_i * convtoFWHM); // convert from sigma to FWHM @TODO: Change to P.W_i
 
     var COS_2THETAs = Math.cos(2*P.theta_s);
     var COS_2THETAi = Math.cos(2*P.theta_i);
@@ -3258,7 +3269,6 @@ PhaseMatch.sign = function sign(x) {
     var SIN_THETAs = Math.sin(P.theta_s);
     var SIN_THETAi = Math.sin(P.theta_i);
     var SIN_PHIs = Math.sin(P.phi_s);
-
     var COS_2THETAi_minus_PHIs = Math.cos(2*(P.theta_i-P.phi_s));
     var COS_2THETAs_minus_PHIs = Math.cos(2*(P.theta_s-P.phi_s));
     var COS_2THETAs_plus_PHIs = Math.cos(2*(P.theta_s+P.phi_s));
@@ -4396,10 +4406,11 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     var P = props.clone();
     P.update_all_angles();
     var offset = 2* Math.PI/180;
-    var dif = (P.theta_s - P.theta_s*0.4);
-    var theta_start =dif*(1-(1e-6/P.W))*(1-(1e-6/P.L));
+    var dif = (P.theta_s - P.theta_s*0.3);
+    var theta_start =dif*(1-(1e-6/P.W));
     theta_start = Math.max(0, theta_start);
-    var theta_end = P.theta_s + P.theta_s*0.4;//*(1-(1e-6/P.W))*(1-(1e6*P.L));
+    // var theta_end = P.theta_s + P.theta_s*0.4;
+    var theta_end = P.theta_s + (P.theta_s - theta_start)
     theta_end = Math.max(2*Math.PI/180, theta_end);
     // console.log("Before", theta_start*180/Math.PI, theta_end*180/Math.PI);
     P.theta_s = theta_start;
@@ -6264,24 +6275,40 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     P.phi_i = (P.phi_s + Math.PI);
     P.brute_force = true;
     if (P.brute_force){
+        // Check to see if the Rayleigh range is shorter than the crystal.
+        // If so, set the lenght of the crystal to be equal to 2* Rayleigh rang
+        z0 = Math.PI * P.W *P.W / P.lambda_p;
+        console.log("Rayleigh Range: " + (z0*1e6).toString());
+        if (5*z0 < P.L){
+            P.L = 5*z0;
+        }
         // dim = P.brute_dim;
         // dim = 5;
     }
 
 
     // Find the stopping angle to integrate over
+    int_angles = PhaseMatch.autorange_theta(P);
+    var tstart = int_angles[0];
+    var tstop  = int_angles[1];
+    if (tstop < x_stop){
+        tstop = x_stop;
+    };
+    // int_angles[1] = (P.theta_s_e - int_angles[0]) + P.theta_s_e;
+    var num_pts_per_deg = 10;
+    var numint = Math.round((tstop - tstart)*180/Math.PI*num_pts_per_deg);
+    console.log("number of integration points: " + numint.toString());
+
     P.theta_s_e = x_stop;
     var theta_stop  = PhaseMatch.find_internal_angle(P,"signal");
-
-    var numint = 100,
-        int_weights = PhaseMatch.NintegrateWeights(numint),
+    var int_weights = PhaseMatch.NintegrateWeights(numint),
         tstart = 0,
         tstop  = theta_stop,
         diff   = (tstop - tstart),
         dtheta = (diff/numint)
     ;
 
-    int_angles = PhaseMatch.autorange_theta(P);
+    
     // console.log("theta_stop: " + (theta_stop*180/Math.PI).toString() +', ' + numint.toString() +', ' + diff.toString() +', ' +dtheta.toString() );
     var i;
 
@@ -6366,8 +6393,8 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             // // }
             // // var tstop = del + P.theta_s;
             // // var tstop  = theta_stop, //P.theta_s + del,
-            var tstart = int_angles[0];
-            var tstop  = int_angles[1];
+            // var tstart = int_angles[0];
+            // var tstop  = int_angles[1];
             var diff   = (tstop - tstart),
                 dtheta = (diff/numint)
                 ;
