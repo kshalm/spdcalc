@@ -498,53 +498,52 @@ PhaseMatch.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start,
 
     }
 
-    //  // "Type 0:   o -> o + o",
-    //  //    "Type 0:   e -> e + e",
-    //  //    "Type 1:   e -> o + o",
-    //  //    "Type 2:   e -> e + o",
-    //  //    "Type 2:   e -> o + e"
+     // "Type 0:   o -> o + o",
+     //    "Type 0:   e -> e + e",
+     //    "Type 1:   e -> o + o",
+     //    "Type 2:   e -> e + o",
+     //    "Type 2:   e -> o + e"
 
-    // // Find Idler distribution
-    // if (P.type === "Type 0:   o -> o + o" || P.type === "Type 1:   e -> o + o" || P.type === "Type 0:   e -> e + e"){
-    //     //swap signal and idler frequencies.
-    //     var lambda_s = P.lambda_s;
-    //     P.lambda_s = P.lambda_i;
-    //     P.lambda_i = lambda_s;
-    // }
-    // if (P.type ===  "Type 2:   e -> e + o"){
-    //     // console.log("switching");
-    //     P.type =  "Type 2:   e -> o + e";
-    // }
-    // else if (P.type ===  "Type 2:   e -> o + e"){
-    //     // console.log("other way");
-    //     P.type = "Type 2:   e -> e + o";
-    // }
+    // Find Idler distribution
+    if (P.type === "Type 0:   o -> o + o" || P.type === "Type 1:   e -> o + o" || P.type === "Type 0:   e -> e + e"){
+        //swap signal and idler frequencies.
+        var lambda_s = P.lambda_s;
+        P.lambda_s = P.lambda_i;
+        P.lambda_i = lambda_s;
+    }
+    if (P.type ===  "Type 2:   e -> e + o"){
+        // console.log("switching");
+        P.type =  "Type 2:   e -> o + e";
+    }
+    else if (P.type ===  "Type 2:   e -> o + e"){
+        // console.log("other way");
+        P.type = "Type 2:   e -> e + o";
+    }
 
-    // for (i=0; i<N; i++){
-    //     index_x = i % dim;
-    //     index_y = Math.floor(i / dim);
+    for (i=0; i<N; i++){
+        index_x = i % dim;
+        index_y = Math.floor(i / dim);
 
-    //     P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
-    //     P.phi_s = Math.atan2(Y[index_y],X[index_x]);
-    //     P.phi_i = (P.phi_s + Math.PI);
+        P.theta_s = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
+        P.phi_s = Math.atan2(Y[index_y],X[index_x]);
+        P.phi_i = (P.phi_s + Math.PI);
 
-    //     P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
-    //     P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+        P.S_s = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_s, P.phi_s);
+        P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
 
-    //     if (P.brute_force) {
-    //        P.brute_force_theta_i(P); //use a search. could be time consuming.
-    //     }
-    //     else {
-    //         //calculate the correct idler angle analytically.
-    //         P.optimum_idler(P);
-    //     }
+        if (P.brute_force) {
+           P.brute_force_theta_i(P); //use a search. could be time consuming.
+        }
+        else {
+            //calculate the correct idler angle analytically.
+            P.optimum_idler(P);
+        }
 
-    //     PM[i] += PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        PM[i] += PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
 
-    // }
+    }
 
-    // return PM;
-    return [1,0];
+    return PM;
 
 };
 
