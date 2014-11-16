@@ -381,9 +381,15 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     if (tstop < x_stop){
         tstop = x_stop;
     };
+    // if (tstop < P.theta_s_e){
+    //     tstop = 
+    // }
     // int_angles[1] = (P.theta_s_e - int_angles[0]) + P.theta_s_e;
-    var num_pts_per_deg = 10;
+    var num_pts_per_deg = 20;
     var numint = Math.round((tstop - tstart)*180/Math.PI*num_pts_per_deg);
+    if (numint < 100){
+        numint = 100;
+    };
     console.log("number of integration points: " + numint.toString());
 
     P.theta_s_e = x_stop;
