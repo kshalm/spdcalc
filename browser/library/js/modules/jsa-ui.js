@@ -126,7 +126,8 @@ define(
             },
 
             calc: function( props ){
-
+                // var testlinspace = PhaseMatch.linspace(0,25.3, 10);
+                // console.log("linspace test: ", testlinspace);
                 var self = this;
 
                 var propsJSON = props.get()

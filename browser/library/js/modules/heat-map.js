@@ -281,9 +281,10 @@ define(
 
             // these only make cosmetic changes...
             setXRange: function( xrangeArr ){
-
+                console.log("xrange: ", xrangeArr);
                 this.scales.x.domain( xrangeArr );
                 this.refreshAxes();
+                console.log("xscales", this.scales.x);
             },
 
             setYRange: function( yrangeArr ){
@@ -498,19 +499,23 @@ define(
                     ,l = data.length
                     ,cols = this.width
                     ,rows = this.height
-                    ,scale = Math.sqrt( l / (cols * rows) )
+                    ,scale = (Math.sqrt(l)) / Math.sqrt((cols) * (rows) )
                     ,i
                     ,xvals = []
                     ,yvals = []
                     ,x = this.scales.x
                     ,y = this.scales.y
                     ;
-
+                // console.log("in export:", x);
+                // console.log("ncols:", l, cols, rows, scale);
                 cols *= scale;
                 rows *= scale;
 
                 cols = Math.floor(cols);
                 rows = Math.floor(rows);
+
+                scale = Math.sqrt((cols -1 )*(rows-1)) / Math.sqrt((this.width) * (this.height) );
+                // console.log("ncols:", l, cols, rows, scale, (cols -1)/scale);
 
                 for ( var i = 0; i < cols; ++i ){
 
@@ -521,6 +526,7 @@ define(
 
                     yvals.push( y.invert( i / scale ) );
                 }
+                // console.log("inside heat map export", this.labels.x, xvals, cols);
 
                 return {
                     title: this.elTitle.text(),
