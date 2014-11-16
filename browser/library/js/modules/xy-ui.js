@@ -310,6 +310,7 @@ define(
                         self.dataPMXY = values[0];
                         self.plotPMXY.setXRange([ x_start, x_stop ]);
                         self.plotPMXY.setYRange([ x_start, x_stop ]);
+                        self.plotPMXY.setZRange([ 0, Math.max.apply(null,values[0]) ]);
 
                         // console.log("start, stop angles are:", x_start, x_stop, po.get('theta_stop'));
 

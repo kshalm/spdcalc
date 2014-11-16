@@ -4397,9 +4397,9 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     P.update_all_angles();
     var offset = 2* Math.PI/180;
     var dif = (P.theta_s - P.theta_s*0.4);
-    var theta_start =dif*(1-(1e-6/P.W));
+    var theta_start =dif*(1-(1e-6/P.W))*(1-(1e-6/P.L));
     theta_start = Math.max(0, theta_start);
-    var theta_end = P.theta_s + P.theta_s*0.4;
+    var theta_end = P.theta_s + P.theta_s*0.4;//*(1-(1e-6/P.W))*(1-(1e6*P.L));
     theta_end = Math.max(2*Math.PI/180, theta_end);
     // console.log("Before", theta_start*180/Math.PI, theta_end*180/Math.PI);
     P.theta_s = theta_start;
@@ -6262,11 +6262,27 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     // console.log('After clone',props.phi*180/Math.PI);
 
     P.phi_i = (P.phi_s + Math.PI);
-
+    P.brute_force = true;
     if (P.brute_force){
-        dim = P.brute_dim;
+        // dim = P.brute_dim;
+        // dim = 5;
     }
 
+
+    // Find the stopping angle to integrate over
+    P.theta_s_e = x_stop;
+    var theta_stop  = PhaseMatch.find_internal_angle(P,"signal");
+
+    var numint = 100,
+        int_weights = PhaseMatch.NintegrateWeights(numint),
+        tstart = 0,
+        tstop  = theta_stop,
+        diff   = (tstop - tstart),
+        dtheta = (diff/numint)
+    ;
+
+    int_angles = PhaseMatch.autorange_theta(P);
+    // console.log("theta_stop: " + (theta_stop*180/Math.PI).toString() +', ' + numint.toString() +', ' + diff.toString() +', ' +dtheta.toString() );
     var i;
 
     var theta_x_e = PhaseMatch.linspace(x_start, x_stop, dim);
@@ -6313,21 +6329,69 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 
 
         if (P.brute_force) {
-           P.brute_force_theta_i(P); //use a search. could be time consuming.
+            // P.brute_force_theta_i(P); //use a search. could be time consuming.
+            var angintfunct = function(theta_i){
+                // Set theta_i to the input theta, then update the coordinates + the index
+                P.theta_i = theta_i;
+                P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
+                P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+                // Now calculate the PM function
+                var pm_result = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+                return [pm_result,0];
+
+                // var pm_result = PhaseMatch.phasematch(P);
+                // return pm_result;
+
+                // console.log(pm_result.toString());
+                            }
+
+            // // Figure out range to integrate over. Go from (theta_stop - 0)
+            // // var del = 10 * Math.PI/180;
+            // // var del = P.theta_s * 1;
+            // // var tstart = P.theta_s - del;
+            // // if (tstart < 0){
+            // //     tstart = 0;
+            // // };
+            // var tstart = 0;
+            // var tstop = theta_stop;
+            // // var tstop = P.theta_s + del;
+            // // if (theta_stop < P.theta_s + del){ 
+            // //     tstop = P.theta_s + del;
+            // // };
+            // if (theta_stop < 2*P.theta_s){ 
+            //     tstop = 2*P.theta_s;
+            // };
+            // // else {
+            // //     tstop = P.theta_stop;
+            // // }
+            // // var tstop = del + P.theta_s;
+            // // var tstop  = theta_stop, //P.theta_s + del,
+            var tstart = int_angles[0];
+            var tstop  = int_angles[1];
+            var diff   = (tstop - tstart),
+                dtheta = (diff/numint)
+                ;
+            var pm_int_ang = PhaseMatch.Nintegrate2arg(angintfunct,tstart, tstop, dtheta,numint,int_weights);
+            // console.log("int result: " + pm_int_ang[0].toString());
+            PM[i] = Math.sqrt(pm_int_ang[0]*pm_int_ang[0] + pm_int_ang[1]*pm_int_ang[1])/diff;
         }
         else {
             //calculate the correct idler angle analytically.
+            // console.log('hello');
             P.optimum_idler(P);
+            PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
         }
 
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        
 
         // console.log('inside !',props.phi*180/Math.PI);
 
     }
+    P.brute_force = false;
     // var endTime = new Date();
     // var timeDiff = (endTime - startTime);
+    // console.log("return" + PM[0].toString());
     return PM;
 
 };

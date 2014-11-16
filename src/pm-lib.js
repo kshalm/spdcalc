@@ -1235,9 +1235,9 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     P.update_all_angles();
     var offset = 2* Math.PI/180;
     var dif = (P.theta_s - P.theta_s*0.4);
-    var theta_start =dif*(1-(1e-6/P.W));
+    var theta_start =dif*(1-(1e-6/P.W))*(1-(1e-6/P.L));
     theta_start = Math.max(0, theta_start);
-    var theta_end = P.theta_s + P.theta_s*0.4;
+    var theta_end = P.theta_s + P.theta_s*0.4;//*(1-(1e-6/P.W))*(1-(1e6*P.L));
     theta_end = Math.max(2*Math.PI/180, theta_end);
     // console.log("Before", theta_start*180/Math.PI, theta_end*180/Math.PI);
     P.theta_s = theta_start;

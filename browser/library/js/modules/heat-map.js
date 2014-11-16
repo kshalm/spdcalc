@@ -281,10 +281,10 @@ define(
 
             // these only make cosmetic changes...
             setXRange: function( xrangeArr ){
-                console.log("xrange: ", xrangeArr);
+                // console.log("xrange: ", xrangeArr);
                 this.scales.x.domain( xrangeArr );
                 this.refreshAxes();
-                console.log("xscales", this.scales.x);
+                // console.log("xscales", this.scales.x);
             },
 
             setYRange: function( yrangeArr ){
