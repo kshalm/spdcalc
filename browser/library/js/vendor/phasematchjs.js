@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-11-16
+ * phasematchjs v0.0.1a - 2014-11-17
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -6291,11 +6291,15 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     int_angles = PhaseMatch.autorange_theta(P);
     var tstart = int_angles[0];
     var tstop  = int_angles[1];
+    if (P.theta_s*180/Math.PI < 4){
+        tstart = 0;
+    };
+
     if (tstop < x_stop){
         tstop = x_stop;
     };
     // if (tstop < P.theta_s_e){
-    //     tstop = 
+    //     tstop =
     // }
     // int_angles[1] = (P.theta_s_e - int_angles[0]) + P.theta_s_e;
     var num_pts_per_deg = 20;
@@ -6314,7 +6318,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         dtheta = (diff/numint)
     ;
 
-    
+
     // console.log("theta_stop: " + (theta_stop*180/Math.PI).toString() +', ' + numint.toString() +', ' + diff.toString() +', ' +dtheta.toString() );
     var i;
 
@@ -6388,10 +6392,10 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             // var tstart = 0;
             // var tstop = theta_stop;
             // // var tstop = P.theta_s + del;
-            // // if (theta_stop < P.theta_s + del){ 
+            // // if (theta_stop < P.theta_s + del){
             // //     tstop = P.theta_s + del;
             // // };
-            // if (theta_stop < 2*P.theta_s){ 
+            // if (theta_stop < 2*P.theta_s){
             //     tstop = 2*P.theta_s;
             // };
             // // else {
@@ -6416,7 +6420,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         }
 
 
-        
+
 
         // console.log('inside !',props.phi*180/Math.PI);
 
