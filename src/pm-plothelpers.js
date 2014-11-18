@@ -366,8 +366,8 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
         // If so, set the lenght of the crystal to be equal to 2* Rayleigh rang
         z0 = Math.PI * P.W *P.W / P.lambda_p;
         console.log("Rayleigh Range: " + (z0*1e6).toString());
-        if (5*z0 < P.L){
-            P.L = 5*z0;
+        if (10*z0 < P.L){
+            P.L = 10 *z0;
         }
         // dim = P.brute_dim;
         // dim = 5;
@@ -391,9 +391,9 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     // int_angles[1] = (P.theta_s_e - int_angles[0]) + P.theta_s_e;
     var num_pts_per_deg = 20;
     var numint = Math.round((tstop - tstart)*180/Math.PI*num_pts_per_deg);
-    if (numint < 100){
-        numint = 100;
-    };
+    // if (numint < 100){
+    //     numint = 100;
+    // };
     console.log("number of integration points: " + numint.toString());
 
     P.theta_s_e = x_stop;
@@ -430,6 +430,7 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 
     var N = dim * dim;
     var PM = new Float64Array( N );
+    var PM_int_results = new Float64Array( numint );
 
     var startTime = new Date();
     for (i=0; i<N; i++){
@@ -461,10 +462,10 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
                 P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
                 // Now calculate the PM function
                 var pm_result = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
-                return [pm_result,0];
+                // return [pm_result,0];
 
                 // var pm_result = PhaseMatch.phasematch(P);
-                // return pm_result;
+                return pm_result;
 
                 // console.log(pm_result.toString());
                             }
@@ -495,9 +496,16 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             var diff   = (tstop - tstart),
                 dtheta = (diff/numint)
                 ;
-            var pm_int_ang = PhaseMatch.Nintegrate2arg(angintfunct,tstart, tstop, dtheta,numint,int_weights);
+
+            for (var j=0; j<numint; j++){
+                PM_int_results[j] = angintfunct(tstart + dtheta*j);
+            }
+
+            // PM[i] = Math.max.apply(Math, PM_int_results);
+            PM[i] = PhaseMatch.max(PM_int_results);
+            // var pm_int_ang = PhaseMatch.Nintegrate2arg(angintfunct,tstart, tstop, dtheta,numint,int_weights);
             // console.log("int result: " + pm_int_ang[0].toString());
-            PM[i] = Math.sqrt(pm_int_ang[0]*pm_int_ang[0] + pm_int_ang[1]*pm_int_ang[1])/diff;
+            // PM[i] = Math.sqrt(pm_int_ang[0]*pm_int_ang[0] + pm_int_ang[1]*pm_int_ang[1])/diff;
         }
         else {
             //calculate the correct idler angle analytically.
@@ -513,9 +521,9 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
 
     }
     P.brute_force = false;
-    // var endTime = new Date();
-    // var timeDiff = (endTime - startTime);
-    // console.log("return" + PM[0].toString());
+    var endTime = new Date();
+    var timeDiff = (endTime - startTime);
+    console.log("return" + timeDiff.toString());
     return PM;
 
 };

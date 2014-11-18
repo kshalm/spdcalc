@@ -134,6 +134,24 @@ PhaseMatch.normalize = function normalize(data){
 };
 
 /*
+* Faster method for finding the max from an array
+*/
+PhaseMatch.max = function max(data){
+    var counter = data.length,
+        max = -1*Infinity,
+        member
+        ;
+
+    while (counter--) {
+        member = data[counter];
+        if (max < member) {
+            max = member;
+        };
+    }
+    return max;
+};
+
+/*
 * Create a special purpose, high speed version of Simpson's rule to
 * integrate the z direction in the phasematching function. The function
 * returns two arguments corresponding to the real and imag components of
