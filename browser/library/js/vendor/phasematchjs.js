@@ -6316,6 +6316,10 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
     if (tstop < x_stop){
         tstop = x_stop;
     };
+
+    if (tstop < P.theta_i){
+        tstop = P.theta_i;
+    };
     // if (tstop < P.theta_s_e){
     //     tstop =
     // }
@@ -6423,10 +6427,10 @@ PhaseMatch.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, d
             // // var tstop = del + P.theta_s;
             // // var tstop  = theta_stop, //P.theta_s + del,
             // var tstart = int_angles[0];
-            // var tstop  = int_angles[1];
-            var diff   = (tstop - tstart),
-                dtheta = (diff/numint)
-                ;
+            // // var tstop  = int_angles[1];
+            // var diff   = (tstop - tstart),
+            //     dtheta = (diff/numint)
+            //     ;
 
             for (var j=0; j<numint; j++){
                 PM_int_results[j] = angintfunct(tstart + dtheta*j);
