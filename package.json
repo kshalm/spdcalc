@@ -21,19 +21,19 @@
   "keywords": [],
   "dependencies": {},
   "devDependencies": {
-    "http-server": "*",
     "grunt": "latest",
-    "grunt-contrib-concat": "latest",
-    "grunt-contrib-uglify": "latest",
-    "grunt-contrib-jasmine": "latest",
+    "grunt-bg-shell": "*",
     "grunt-contrib-clean": "latest",
+    "grunt-contrib-compass": "^1.0.1",
+    "grunt-contrib-concat": "latest",
     "grunt-contrib-copy": "latest",
+    "grunt-contrib-jasmine": "latest",
     "grunt-contrib-jshint": "latest",
     "grunt-contrib-requirejs": "*",
-    "grunt-contrib-compass": "*",
-    "grunt-bg-shell": "*",
+    "grunt-contrib-uglify": "latest",
     "grunt-contrib-watch": "~0.3.1",
-    "grunt-lodash": "~0.3.0"
+    "grunt-lodash": "~0.3.0",
+    "http-server": "*"
   },
   "bundledDependencies": [],
   "license": "GPLv3"
