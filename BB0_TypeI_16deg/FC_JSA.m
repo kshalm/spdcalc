@@ -67,9 +67,9 @@ gwswi_N = Int_Rc_prx(L,ks,ki,kp,W0x,W0y,Wfs,Wfi,sec(thetas_f)^2,sec(thetai_f)^2,
 
 % dws=abs(oms(1,2)-oms(1,1));
 % dwi=abs(omi(2,1)-omi(1,1));
-% ell=(oms./indxOr_BBO(oms).^2).*(omi./indxOr_BBO(omi).^2);
+ell=(oms./indxOr_BBO(oms).^2).*(omi./indxOr_BBO(omi).^2);
 
-% etaN=(sec(thetas_f)*sec(thetai_f)/(2^3*pi^6*sqrt(2*pi)*c^3*eps0))*deff^2*L^2*W0x*W0y*Wfs^2*Wfi^2*Pav/sigma;
+etaN=(sec(thetas_f)*sec(thetai_f)/(2^3*pi^6*sqrt(2*pi)*c^3*eps0))*deff^2*L^2*W0x*W0y*Wfs^2*Wfi^2*Pav/sigma;
 
 
 joint_amplitude=gwswi_N.*PUMP;

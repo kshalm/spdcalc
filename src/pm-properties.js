@@ -281,7 +281,7 @@
             // props.theta = ans;
             // console.log("After autocalc: ", props.theta_i * 180/Math.PI);
             props.update_all_angles(props);
-            
+
             // props.calcfibercoupling = fiber;
             // calculate the walkoff angle
             // this.calc_walkoff_angles();
@@ -468,6 +468,11 @@
             // this.numzint = 10;
 
             this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+            var n = this.numzint;
+            // var n = 3;
+            n = n+(3- n%3); //guarantee that n is divisible by 3
+            this.z2Dweights = PhaseMatch.Nintegrate2DWeights_3_8(n);
+            this.numz2Dint = n;
             // console.log(nslices);
         },
 

@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2014-12-30
+ * phasematchjs v0.0.1a - 2014-12-31
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
@@ -2388,17 +2388,17 @@ PhaseMatch.normalize = function normalize(data){
 */
 PhaseMatch.max = function max(data){
     var counter = data.length,
-        max = -1*Infinity,
+        maxd = -1*Infinity,
         member
         ;
 
     while (counter--) {
         member = data[counter];
-        if (max < member) {
-            max = member;
-        };
+        if (maxd < member) {
+            maxd = member;
+        }
     }
-    return max;
+    return maxd;
 };
 
 /*
@@ -2623,7 +2623,6 @@ PhaseMatch.Nintegrate2DModeSolver = function Nintegrate2DModeSolver(f,a,b,c,d,n,
 Calculate the array of weights for Simpson's 3/8 rule.
  */
 PhaseMatch.Nintegrate2DWeights_3_8 = function Nintegrate2DWeights_3_8(n){
-
     // if (n%3 !== 0){
     //     n = n+n%3; //guarantee that n is divisible by 3
     // }
@@ -2643,7 +2642,6 @@ PhaseMatch.Nintegrate2DWeights_3_8 = function Nintegrate2DWeights_3_8(n){
             weights[i] = 3;
         }
     }
-
     return weights;
 };
 
@@ -2688,6 +2686,41 @@ PhaseMatch.Nintegrate2D_3_8 = function Nintegrate2D_3_8(f,a,b,c,d,n,w){
     }
 
     return result*dx*dy*9/64;
+
+};
+
+/*
+A modification of Simpson's 2-Dimensional 3/8th's rule for the double integral
+over length that must be done in the singles caluclation. A custom function is
+being written to greatly speed up the calculation. The return is the real and
+imaginary parts. Make sure N is divisible by 3.
+*/
+PhaseMatch.Nintegrate2D_3_8_singles = function Nintegrate2D_3_8_singles(f, fz1 ,a,b,c,d,n,w){
+    var weights = w;
+    // n = n+(3- n%3); //guarantee that n is divisible by 3
+
+    var  dx = (b-a)/n
+        ,dy = (d-c)/n
+        ,result1 = 0
+        ,result2 = 0
+        ;
+
+    for (var j=0; j<n+2; j++){
+        var  x = a +j*dx
+            ,Cz1 = fz1(x)
+            ;
+
+        for (var k=0; k<n+2; k++){
+            var  y = c+k*dy
+                ,result =f(x, y, Cz1)
+                ,weight = weights[j]*weights[k]
+                ;
+                result1 += result[0] * weight;
+                result2 += result[1] * weight;
+        }
+    }
+
+    return [result1*dx*dy*9/64, result2*dx*dy*9/64];
 
 };
 
@@ -3740,7 +3773,8 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
  */
 PhaseMatch.phasematch = function phasematch (P){
 
-    var pm = PhaseMatch.calc_PM_tz(P);
+    // var pm = PhaseMatch.calc_PM_tz(P);
+    var pm = PhaseMatch.calc_PM_tz_k_singles(P);
     // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
@@ -4543,13 +4577,6 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
 
-    // // For testing purposes
-    // P.lambda_s = 2 * lambda_p;
-    // P.lambda_i = 2 * lambda_p;
-    // P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-    // P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-
-
     var twoPI = 2*Math.PI,
         twoPIc = twoPI*con.c
         ;
@@ -4614,14 +4641,6 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         PSI_i = (k_i/P.n_i) * Math.sin(P.theta_i_e) * Math.cos(P.phi_i)
         ;
 
-    // console.log("angular dependence: " + PHI_s.toString() +", "+ PHI_i.toString() +", "+ PSI_s.toString() +", "+ PSI_i.toString() +", External Angle Idler: " + (180/Math.PI * P.theta_i_e).toString());
-
-    // var PHI_s = 1, // External angle for the signal????
-    //     PHI_i = 1, // External angle for the idler????
-    //     PSI_s = 0,
-    //     PSI_i = 0
-    //     ;
-
     var bw;  // Apodization 1/e^2
 
     // Take into account apodized crystals
@@ -4679,24 +4698,6 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             ;
         return [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10];
     };
-
-    // // ///////////////////////////////////////
-    // console.log("starting Test");
-    // console.log(ee.toString(), ff.toString(), hh.toString());//, Cs.toString(), Ci.toString(), Ds.toString(), Di.toString(), Es.toString(), Ei.toString(), m.toString(), n.toString(),ee.toString(), ff.toString(), hh.toString());
-    // var tt = calczterms(0);
-    // console.log("ending test");
-    // // console.log("hello:" + test_terms[0][0].toString());
-    // console.log(tt[0][0].toString() + " + i" + tt[0][1].toString() + '\n' +
-    //             tt[1][0].toString() + " + i" + tt[1][1].toString() + '\n' +
-    //             tt[2][0].toString() + " + i" + tt[2][1].toString() + '\n' +
-    //             tt[3][0].toString() + " + i" + tt[3][1].toString() + '\n' +
-    //             tt[4][0].toString() + " + i" + tt[4][1].toString() + '\n' +
-    //             tt[5][0].toString() + " + i" + tt[5][1].toString() + '\n' +
-    //             tt[6][0].toString() + " + i" + tt[6][1].toString() + '\n' +
-    //             tt[7][0].toString() + " + i" + tt[7][1].toString() + '\n' +
-    //             tt[8][0].toString() + " + i" + tt[8][1].toString() + '\n' +
-    //             tt[9][0].toString() + " + i" + tt[9][1].toString() + '\n'
-    // );
 
     var zintfunc = function(z){
         // z = 0;
@@ -4833,42 +4834,15 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             // coeffR = 1,
             EReal = coeffR * pmzcoeff*Math.cos(EXPI),
             EImag = coeffR * pmzcoeff*Math.sin(EXPI),
-
-            // real = coeffR,
-            // imag = 0;
-
             real = 0.5 * PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
             imag = 0.5 * PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
-
-            // real = 1 * EReal,
-            // imag = 1 * EImag
             ;
 
-            // console.log(DENR.toString()  + " 1i* " + DENI.toString()  + '\n' +
-            //             DEN1R.toString() + " 1i* " + DEN1I.toString() + '\n' +
-            //             DEN2R.toString() + " 1i* " + DEN2I.toString() + '\n' +
-            //             DEN3R.toString() + " 1i* " + DEN3I.toString() + '\n'
-            // );
-
-            // console.log(EXPR.toString()  + " 1i* " + EXPI.toString()  + '\n' +
-            //             EXP1R.toString() + " 1i* " + EXP1I.toString() + '\n' +
-            //             EXP2R.toString() + " 1i* " + EXP2I.toString() + '\n' +
-            //             EXP3R.toString() + " 1i* " + EXP3I.toString() + '\n' +
-            //             EXP4R.toString() + " 1i* " + EXP4I.toString() + '\n' +
-            //             EXP5R.toString() + " 1i* " + EXP5I.toString() + '\n'
-            // );
-
-        // console.log("numerator: " + EReal.toString() + " , " + EImag.toString() +' , ' + coeffR.toString() + ' , ' + EXPI.toString());
-        // console.log("1: " + A1R.toString() + "   2: " + A2R.toString() + "   3: " + A3R.toString() + "   4: " + A7R.toString() + "   5: " + A8R.toString() + "   6: " + A9R.toString() );
-
-        // console.log("real: " + A10R.toString() + "   Imag: " + A10I.toString());
-
-        // real = 1;
-        // real = 0;
         return [real, imag];
     };
 
     var arg = P.L/2*(delKz);
+    var PMt = 1;
 
     if (P.calcfibercoupling){
         var dz = 2/P.numzint;
@@ -4879,7 +4853,6 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // PMz_imag = pmintz[1]/P.L ;
         PMz_real = pmintz[0]/2;
         PMz_imag = pmintz[1]/2;
-        var PMt = 1;
         // var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
         var coeff = 1;
         PMz_real = PMz_real * coeff;
@@ -4891,7 +4864,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // var PMz_imag = PMzNorm1 * Math.sin(arg);
         PMz_real =  PMzNorm1 ;
         PMz_imag = 0;
-        var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
+        PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     }
 
 
@@ -4909,6 +4882,416 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
 };
 
+
+/*
+ * Get the constants and terms used in the calculation of the momentum
+ * space joint spectrum for the singles counts from the Idler.
+ */
+PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
+    // console.log("hi");
+    // console.log("\n");
+    var toMicrons= 1;
+    var con = PhaseMatch.constants;
+    var lambda_p = P.lambda_p; //store the original lambda_p
+    var n_p = P.n_p;
+
+    // // For testing purposes
+    // P.lambda_s = 2 * lambda_p;
+    // P.lambda_i = 2 * lambda_p;
+    // P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+    // P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+
+    var twoPI = 2*Math.PI,
+        twoPIc = twoPI*con.c
+        ;
+
+    var z0 = 0; //put pump in middle of the crystal
+    // var RHOpx = P.walkoff_p; //pump walkoff angle.
+    var RHOpx = 0;
+
+    // Get the pump index corresponding to the crystal phasematching function
+    // to calculate the K vector mismatch
+    P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
+    P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+
+    var omega_s = twoPIc / (P.lambda_s ),
+        omega_i = twoPIc / (P.lambda_i),
+        omega_p = omega_s + omega_i
+        // omega_p = twoPIc / P.lambda_p
+        ;
+
+    // Height of the collected spots from the axis.
+    var hs = Math.tan(P.theta_s)*P.L*0.5,
+        hi = Math.tan(P.theta_i)*P.L*0.5;
+
+    var PMz_real = 0;
+    var PMz_imag = 0;
+
+    var convfromFWHM = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
+
+
+    // var W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s))),
+    //     W_i = 2*Math.asin( Math.cos(P.theta_i_e)*Math.sin(P.W_ix/2)/(P.n_i * Math.cos(P.theta_i)));
+
+
+    // Setup constants
+    var Wp_SQ = sq(P.W * convfromFWHM), // convert from FWHM to sigma
+        Ws_SQ = sq(P.W_sx  * convfromFWHM), // convert from FWHM to sigma
+        Wi_SQ = sq(P.W_sx  * convfromFWHM), // convert from FWHM to sigma @TODO: Change to P.W_i
+        // Ws_SQ = sq(W_s * convfromFWHM), // convert from FWHM to sigma
+        // Wi_SQ = sq(W_i * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
+        // Set Wx = Wy for the pump.
+        Wx_SQ = Wp_SQ,
+        Wy_SQ = Wp_SQ
+        ;
+
+    // Is this the k vector along the direction of propagation?
+    var k_p = twoPI*P.n_p / P.lambda_p,
+        k_s = twoPI*P.n_s / P.lambda_s, //  * Math.cos(P.theta_s),
+        k_i = twoPI*P.n_i / P.lambda_i  // * Math.cos(P.theta_i)
+        ;
+
+    //     var Ss = [ sinThetaS * Math.cos(P.phi_s),  sinThetaS * Math.sin(P.phi_s), Math.cos(P.theta_s)];
+    var PHI_s = sq(1/Math.cos(P.theta_s_e)), // External angle for the signal???? Is PHI_s z component?
+        PSI_s = (k_s/P.n_s) * Math.sin(P.theta_s_e) * Math.cos(P.phi_s) // Looks to be the y component of the ks,i
+        ;
+
+    // console.log("angular dependence: " + PHI_s.toString() +", "+ PHI_i.toString() +", "+ PSI_s.toString() +", "+ PSI_i.toString() +", External Angle Idler: " + (180/Math.PI * P.theta_i_e).toString());
+
+    // var PHI_s = 1, // External angle for the signal????
+    //     PHI_i = 1, // External angle for the idler????
+    //     PSI_s = 0,
+    //     PSI_i = 0
+    //     ;
+
+    var bw;  // Apodization 1/e^2
+
+    // Take into account apodized crystals
+    if (P.calc_apodization && P.enable_pp){
+        bw = P.apodization_FWHM  / 2.3548;
+        bw = 2* bw / P.L; // convert from 0->L to -1 -> 1 for the integral over z
+    }
+    else {
+        bw = Math.pow(2,20);
+    }
+
+    // Now calculate the the coeficients that get repeatedly used. This is from
+    // Karina's code. Do not assume a symmetric pump waist (Wx = Wy) here. This is inserted in the code above.
+
+    // Real terms
+    var  KpKs = k_p * k_s
+        ,L  = P.L
+        ,C0 = Ws_SQ * PHI_s
+        ,C1 = KpKs * (Wx_SQ + C0)
+        ,C2 = C0 * PSI_s
+        // @TODO: May be an error in C3 & C7. Not sure if it is +/- poling period
+        ,C7 = (k_p - k_s - k_i - twoPI / (P.poling_period  * P.poling_sign))
+        ,C3 = P.L * C7
+        ,C4 = P.L * (1/k_i - 1/k_p)
+        ,C5 = k_s/k_p
+        ,C6 = KpKs * (Ws_SQ + Wy_SQ)
+        ,C9 = k_p * Wx_SQ
+        ,C10 = k_p * Wy_SQ
+        ;
+    // Imaginary Terms
+    var  M1R = 2*hs
+        ,M1I = -C2
+        ,M2R = M1R
+        ,M2I = -M1I
+        ,M1_SQR = PhaseMatch.cmultiplyR( M1R, M1I, M1R, M1I)
+        ,M1_SQI = PhaseMatch.cmultiplyI( M1R, M1I, M1R, M1I)
+        ,M2_SQR = PhaseMatch.cmultiplyR( M2R, M2I, M2R, M2I)
+        ,M2_SQI = PhaseMatch.cmultiplyI( M2R, M2I, M2R, M2I)
+        ;
+
+    // As a function of z1 along the crystal, calculate the z1-dependent coefficients
+    var calcz1terms = function(z1){
+        // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
+        var  A1 = 2 * z0 - L*z1
+            ,B1 = L * (1 - z1)
+            ,B3 = L * (1 + z1)
+            // Imaginary terms
+            ,D1R = C9
+            ,D1I = -A1
+            ,D3R = C10
+            ,D3I = -A1
+            ,G1R = C1
+            ,G1I = B1 * k_p
+            ,G3R = C6
+            ,G3I = G1I
+            ,H1R = G1R
+            ,H1I = G1I - k_s * A1
+            ,H3R = G3R
+            ,H3I = G3I - k_s * A1
+            ,P1R = PhaseMatch.cdivideR(D1R, D1I, H1R, H1I)
+            ,P1I = PhaseMatch.cdivideI(D1R, D1I, H1R, H1I)
+            ,P3R = PhaseMatch.cdivideR(D3R, D3I, H3R, H3I)
+            ,P3I = PhaseMatch.cdivideI(D3R, D3I, H3R, H3I)
+            ,Q1R = PhaseMatch.cdivideR(M1_SQR, M1_SQI, H1R, H1I)
+            ,Q1I = PhaseMatch.cdivideI(M1_SQR, M1_SQI, H1R, H1I)
+            ,Q3R = PhaseMatch.cdivideR(B3*B3, 0, H3R, H3I)
+            ,Q3I = PhaseMatch.cdivideI(B3*B3, 0, H3R, H3I)
+        ;
+
+        return [D1R, D1I, D3R, D3I, H1R, H1I, H3R, H3I, P1R, P1I, P3R, P3I, Q1R, Q1I, Q3R, Q3I, A1, B1, B3];
+    };
+
+    // As a function of z2 along the crystal, calculate the z2-dependent coefficients
+    var calcz2terms = function(z2){
+        // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
+        var  A2 = 2 * z0 - L*z2
+            ,B2 = L * (1 - z2)
+            ,B4 = L * (1 + z2)
+            ,D2R = C9
+            ,D2I = A2
+            ,D4R = C10
+            ,D4I = A2
+            ,G2R = C1
+            ,G2I = -B2 * k_p
+            ,G4R = C6
+            ,G4I = G2I
+            ,H2R = G2R
+            ,H2I = G2I + k_s * A2
+            ,H4R = G4R
+            ,H4I = G4I + k_s * A2
+            ,P2R = PhaseMatch.cdivideR(D2R, D2I, H2R, H2I)
+            ,P2I = PhaseMatch.cdivideI(D2R, D2I, H2R, H2I)
+            ,P4R = PhaseMatch.cdivideR(D4R, D4I, H4R, H4I)
+            ,P4I = PhaseMatch.cdivideI(D4R, D4I, H4R, H4I)
+            ,Q2R = PhaseMatch.cdivideR(M2_SQR, M2_SQI, H2R, H2I)
+            ,Q2I = PhaseMatch.cdivideI(M2_SQR, M2_SQI, H2R, H2I)
+            ,Q4R = PhaseMatch.cdivideR(B4*B4, 0, H4R, H4I)
+            ,Q4I = PhaseMatch.cdivideI(B4*B4, 0, H4R, H4I)
+        ;
+
+        return [D2R, D2I, D4R, D4I, H2R, H2I, H4R, H4I, P2R, P2I, P4R, P4I, Q2R, Q2I, Q4R, Q4I, A2, B2, B4];
+    };
+
+    var zintfunc = function(z1, z2, Cz1){
+        // Get the terms that depend only on z2. We already have the terms depending only on z1 in Cz1
+        var  Cz2 = calcz2terms(z2)
+            // From Cz1
+            ,D1R = Cz1[0]
+            ,D1I = Cz1[1]
+            ,D3R = Cz1[2]
+            ,D3I = Cz1[3]
+            ,H1R = Cz1[4]
+            ,H1I = Cz1[5]
+            ,H3R = Cz1[6]
+            ,H3I = Cz1[7]
+            ,P1R = Cz1[8]
+            ,P1I = Cz1[9]
+            ,P3R = Cz1[10]
+            ,P3I = Cz1[11]
+            ,Q1R = Cz1[12]
+            ,Q1I = Cz1[13]
+            ,Q3R = Cz1[14]
+            ,Q3I = Cz1[15]
+            ,A1 = Cz1[16]
+            ,B1 = Cz1[17]
+            ,B3 = Cz1[18]
+            // From Cz2
+            ,D2R = Cz2[0]
+            ,D2I = Cz2[1]
+            ,D4R = Cz2[2]
+            ,D4I = Cz2[3]
+            ,H2R = Cz2[4]
+            ,H2I = Cz2[5]
+            ,H4R = Cz2[6]
+            ,H4I = Cz2[7]
+            ,P2R = Cz2[8]
+            ,P2I = Cz2[9]
+            ,P4R = Cz2[10]
+            ,P4I = Cz2[11]
+            ,Q2R = Cz2[12]
+            ,Q2I = Cz2[13]
+            ,Q4R = Cz2[14]
+            ,Q4I = Cz2[15]
+            ,A2 = Cz2[16]
+            ,B2 = Cz2[17]
+            ,B4 = Cz2[18]
+            // Now terms that depend on both z1 and z2
+            ,B6 = B2 - B1
+            ,B6a = C4 * (z1 - z2)
+            ,B7R = -2*Wx_SQ
+            ,B7I = B6a
+            ,B8R = -2*Wy_SQ
+            ,B8I = B6a
+            ,AA1R = -H1R/(4*KpKs)
+            ,AA1I = -H1I/(4*KpKs)
+            ,AA2R = -H2R/(4*KpKs)
+            ,AA2I = -H2I/(4*KpKs)
+            ,BB1R = -H3R/(4*KpKs)
+            ,BB1I = -H3I/(4*KpKs)
+            ,BB2R = -H4R/(4*KpKs)
+            ,BB2I = -H4I/(4*KpKs)
+
+            // Now calculate terms that Karina uses. EE, GG, GG, HH, and II
+            // EE = 0.25 * (B7 + C5 (P1 D1 + P2 D2));
+            ,EE1R = PhaseMatch.cmultiplyR(P2R, P2I, D2R, D2I)
+            ,EE1I = PhaseMatch.cmultiplyI(P2R, P2I, D2R, D2I)
+            ,EE2R = PhaseMatch.cmultiplyR(P1R, P1I, D1R, D1I)
+            ,EE2I = PhaseMatch.cmultiplyI(P1R, P1I, D1R, D1I)
+            ,EE3R = PhaseMatch.caddR(EE1R, EE1I, EE2R, EE2I)
+            ,EE3I = PhaseMatch.caddI(EE1R, EE1I, EE2R, EE2I)
+            ,EE4R = C5 * EE3R
+            ,EE4I = C5 * EE3I
+            ,EER = 0.25 * PhaseMatch.caddR(EE4R, EE4I, B7R, B7I)
+            ,EEI = 0.25 * PhaseMatch.caddI(EE4R, EE4I, B7R, B7I)
+
+            // FF = 0.25 * (B8 + C5 (P3 D3 + P4 D4));
+            ,FF1R = PhaseMatch.cmultiplyR(P4R, P4I, D4R, D4I)
+            ,FF1I = PhaseMatch.cmultiplyI(P4R, P4I, D4R, D4I)
+            ,FF2R = PhaseMatch.cmultiplyR(P3R, P3I, D3R, D3I)
+            ,FF2I = PhaseMatch.cmultiplyI(P3R, P3I, D3R, D3I)
+            ,FF3R = PhaseMatch.caddR(FF1R, FF1I, FF2R, FF2I)
+            ,FF3I = PhaseMatch.caddI(FF1R, FF1I, FF2R, FF2I)
+            ,FF4R = C5 * FF3R
+            ,FF4I = C5 * FF3I
+            ,FFR = 0.25 * PhaseMatch.caddR(FF4R, FF4I, B8R, B8I)
+            ,FFI = 0.25 * PhaseMatch.caddI(FF4R, FF4I, B8R, B8I)
+
+            // GG = 0.5*I*ks * (-P1 M1 + P2 M2);
+            ,GG1R = -1*PhaseMatch.cmultiplyR(P1R, P1I, M1R, M1I)
+            ,GG1I = -1*PhaseMatch.cmultiplyI(P1R, P1I, M1R, M1I)
+            ,GG2R = PhaseMatch.cmultiplyR(P2R, P2I, M2R, M2I)
+            ,GG2I = PhaseMatch.cmultiplyI(P2R, P2I, M2R, M2I)
+            ,GG3R = PhaseMatch.caddR(GG1R, GG1I, GG2R, GG2I)
+            ,GG3I = PhaseMatch.caddI(GG1R, GG1I, GG2R, GG2I)
+            ,GGR = 0.5 * PhaseMatch.cmultiplyR(GG3R, GG3I, 0, k_s)
+            ,GGI = 0.5 * PhaseMatch.cmultiplyI(GG3R, GG3I, 0, k_s)
+
+            // HH = 0.5 * I * rho_x * (  B6 -  ks (P3 B3 - P4 B4) );
+            //
+            HHR = -0.5 * RHOpx * (B6 - k_s*(P3I * B3 - P4I*B4))
+            HHI =  0.5 * RHOpx * (B6 - k_s*(P3R * B3 - P4R*B4))
+
+            // ,HH1R = -1* PhaseMatch.cmultiplyR(P4R, P4I, B4,0)
+            // ,HH1I = -1* PhaseMatch.cmultiplyI(P4R, P4I, B4,0)
+            // ,HH2R = PhaseMatch.cmultiplyR(P3R, P3I, B3, 0)
+            // ,HH2I = PhaseMatch.cmultiplyI(P3R, P3I, B3, 0)
+            // ,HH3R = PhaseMatch.caddR(HH1R, HH1I, HH2R, HH2I)
+            // ,HH3I = PhaseMatch.caddI(HH1R, HH1I, HH2R, HH2I)
+            // ,HH4R = k_s * HH3R
+            // ,HH4I = k_s * HH3I
+            // ,HH5R = PhaseMatch.caddR(HH4R, HH4I, B6, 0)
+            // ,HH5I = PhaseMatch.caddI(HH4R, HH4I, B6, 0)
+            // ,HHR = 0.5 * PhaseMatch.cmultiplyR(HH5R, HH5I, 0, RHOpx)
+            // ,HHI = 0.5 * PhaseMatch.cmultiplyI(HH5R, HH5I, 0, RHOpx)
+
+            // sII = 0.25 * (2*I*C7*B6 - 2 C2 PSI_s - kpks (RHOpx^2 (Q3 + Q4) + Q1 + Q2));
+            ,IIR = 0.25 * (-2*C2*PSI_s - KpKs*(RHOpx*RHOpx*(Q3R + Q4R) + Q1R + Q2R))
+            ,III = 0.25 * (2*C7*B6 - KpKs*(RHOpx*RHOpx*(Q3I + Q4I) + Q1I + Q2I))
+            // ,II2R = PhaseMatch.cmultiplyR(B6, 0, 0, 2*C7)
+            // ,II2I = PhaseMatch.cmultiplyI(B6, 0, 0, 2*C7)
+            // ,IIR = 0.25 * PhaseMatch.caddR(II1R, II1I, II2R, II2I)
+            // ,III = 0.25 * PhaseMatch.caddI(II1R, II1I, II2R, II2I)
+
+            // Now calculate terms in the numerator
+            // Exp(-(GG^2/(4 EE)) - HH^2/(4 FF) + II)
+            ,EXP1R = PhaseMatch.cmultiplyR(GGR, GGI, GGR, GGI)
+            ,EXP1I = PhaseMatch.cmultiplyI(GGR, GGI, GGR, GGI)
+            ,EXP2R = PhaseMatch.cdivideR(EXP1R, EXP1I, -4*EER, -4*EEI)
+            ,EXP2I = PhaseMatch.cdivideI(EXP1R, EXP1I, -4*EER, -4*EEI)
+            ,EXP3R = PhaseMatch.cmultiplyR(HHR, HHI, HHR, HHI)
+            ,EXP3I = PhaseMatch.cmultiplyI(HHR, HHI, HHR, HHI)
+            ,EXP4R = PhaseMatch.cdivideR(EXP3R, EXP3I, -4*FFR, -4*FFI)
+            ,EXP4I = PhaseMatch.cdivideI(EXP3R, EXP3I, -4*FFR, -4*FFI)
+            ,EXPR  = EXP2R + EXP4R + IIR
+            ,EXPI  = EXP2I + EXP4I + III
+
+            // Now calculate terms in the Denominator
+            // 8 * Sqrt[AA1 BB1 AA2 BB2 EE FF]
+            ,Den1R = PhaseMatch.cmultiplyR(AA1R, AA1I, BB1R, BB1I)
+            ,Den1I = PhaseMatch.cmultiplyI(AA1R, AA1I, BB1R, BB1I)
+            ,Den2R = PhaseMatch.cmultiplyR(AA2R, AA2I, BB2R, BB2I)
+            ,Den2I = PhaseMatch.cmultiplyI(AA2R, AA2I, BB2R, BB2I)
+            ,Den3R = PhaseMatch.cmultiplyR(EER, EEI, FFR, FFI)
+            ,Den3I = PhaseMatch.cmultiplyI(EER, EEI, FFR, FFI)
+            ,Den4R = PhaseMatch.cmultiplyR(Den1R, Den1I, Den2R, Den2I)
+            ,Den4I = PhaseMatch.cmultiplyI(Den1R, Den1I, Den2R, Den2I)
+            ,Den5R = PhaseMatch.cmultiplyR(Den4R, Den4I, Den3R, Den3I)
+            ,Den5I = PhaseMatch.cmultiplyI(Den4R, Den4I, Den3R, Den3I)
+            ,DenR  = 8 * PhaseMatch.csqrtR(Den5R, Den5I)
+            ,DenI  = 8 * PhaseMatch.csqrtI(Den5R, Den5I)
+
+            // Now calculate the full term in the integral.
+            // @TODO: Not sure how to correctly handle the apodization in the double length integral
+            ,pmzcoeff = Math.exp(- 1/2*sq(z1/bw)) * Math.exp(- 1/2*sq(z2/bw))// apodization
+            // ,pmzcoeff = 1
+            // Exponential using Euler's formula
+            ,coeffR = Math.exp(EXPR)
+            // ,coeffR = 1
+            ,EReal = coeffR * pmzcoeff*Math.cos(EXPI)
+            ,EImag = coeffR * pmzcoeff*Math.sin(EXPI)
+
+            // ,real = coeffR
+            // ,imag = 0
+
+            ,real = 0.5 * PhaseMatch.cdivideR(EReal, EImag, DenR, DenI)
+            ,imag = 0.5 * PhaseMatch.cdivideI(EReal, EImag, DenR, DenI)
+
+            // console.log("Int: " + IIR.toString() + ", " + III.toString() + ", " + EReal.toString() + ", " + EImag.toString());
+
+            // ,real = 1 * EReal
+            // ,imag = 1 * EImag
+            ;
+
+        // console.log("numerator: " + EReal.toString() + " , " + EImag.toString() +' , ' + coeffR.toString() + ' , ' + EXPI.toString());
+        // console.log("1: " + A1R.toString() + "   2: " + A2R.toString() + "   3: " + A3R.toString() + "   4: " + A7R.toString() + "   5: " + A8R.toString() + "   6: " + A9R.toString() );
+
+        // real = 1;
+        // real = 0;
+        return [real, imag];
+    };
+
+    var delK = PhaseMatch.calc_delK(P);
+    var delKx = delK[0],
+        delKy = delK[1],
+        delKz = delK[2]
+        ;
+    var arg = P.L/2*(delKz);
+
+    var PMt = 1;
+    if (P.calcfibercoupling){
+        var dz = 2/P.numz2Dint;
+        // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
+        var pmintz = PhaseMatch.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
+        // console.log("Int: " + pmintz[0].toString() + ", " + pmintz[1].toString() + ", " + P.z2Dweights.length.toString());
+        // var dz = 1;
+        // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
+        // PMz_real = pmintz[0]/P.L ;
+        // PMz_imag = pmintz[1]/P.L ;
+        PMz_real = pmintz[0]/2;
+        PMz_imag = pmintz[1]/2;
+        // var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
+        var coeff = 1;
+        PMz_real = PMz_real * coeff;
+        PMz_imag = PMz_imag * coeff;
+    }
+    else{
+        var PMzNorm1 = Math.sin(arg)/arg;
+        // var PMz_real =  PMzNorm1 * Math.cos(arg);
+        // var PMz_imag = PMzNorm1 * Math.sin(arg);
+        PMz_real =  PMzNorm1 ;
+        PMz_imag = 0;
+        PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
+    }
+    // console.log("Inside calculation");
+    // console.log("Int: " + PMz_real.toString() + ", " + PMz_imag.toString());
+
+    if (P.use_guassian_approx){
+        PMz_real = Math.exp(-0.193*sq(arg));
+        PMz_imag = 0;
+    }
+
+    P.lambda_p = lambda_p; //set back to the original lambda_p
+    P.n_p = n_p;
+
+    return [PMz_real, PMz_imag, PMt];
+
+};
 
 
 /*
@@ -4931,7 +5314,7 @@ PhaseMatch.normalize_joint_spectrum = function normalize_joint_spectrum (props){
         P.auto_calc_Theta();
     }
 
-    norm = PhaseMatch.phasematch_Int_Phase(P)['phasematch'];
+    var norm = PhaseMatch.phasematch_Int_Phase(P)['phasematch'];
     return norm;
 
 };
@@ -5606,7 +5989,7 @@ PhaseMatch.Crystals('KDP-1', {
             // props.theta = ans;
             // console.log("After autocalc: ", props.theta_i * 180/Math.PI);
             props.update_all_angles(props);
-            
+
             // props.calcfibercoupling = fiber;
             // calculate the walkoff angle
             // this.calc_walkoff_angles();
@@ -5793,6 +6176,11 @@ PhaseMatch.Crystals('KDP-1', {
             // this.numzint = 10;
 
             this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+            var n = this.numzint;
+            // var n = 3;
+            n = n+(3- n%3); //guarantee that n is divisible by 3
+            this.z2Dweights = PhaseMatch.Nintegrate2DWeights_3_8(n);
+            this.numz2Dint = n;
             // console.log(nslices);
         },
 

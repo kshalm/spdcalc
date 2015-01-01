@@ -138,17 +138,17 @@ PhaseMatch.normalize = function normalize(data){
 */
 PhaseMatch.max = function max(data){
     var counter = data.length,
-        max = -1*Infinity,
+        maxd = -1*Infinity,
         member
         ;
 
     while (counter--) {
         member = data[counter];
-        if (max < member) {
-            max = member;
-        };
+        if (maxd < member) {
+            maxd = member;
+        }
     }
-    return max;
+    return maxd;
 };
 
 /*
@@ -373,7 +373,6 @@ PhaseMatch.Nintegrate2DModeSolver = function Nintegrate2DModeSolver(f,a,b,c,d,n,
 Calculate the array of weights for Simpson's 3/8 rule.
  */
 PhaseMatch.Nintegrate2DWeights_3_8 = function Nintegrate2DWeights_3_8(n){
-
     // if (n%3 !== 0){
     //     n = n+n%3; //guarantee that n is divisible by 3
     // }
@@ -393,7 +392,6 @@ PhaseMatch.Nintegrate2DWeights_3_8 = function Nintegrate2DWeights_3_8(n){
             weights[i] = 3;
         }
     }
-
     return weights;
 };
 
@@ -438,6 +436,41 @@ PhaseMatch.Nintegrate2D_3_8 = function Nintegrate2D_3_8(f,a,b,c,d,n,w){
     }
 
     return result*dx*dy*9/64;
+
+};
+
+/*
+A modification of Simpson's 2-Dimensional 3/8th's rule for the double integral
+over length that must be done in the singles caluclation. A custom function is
+being written to greatly speed up the calculation. The return is the real and
+imaginary parts. Make sure N is divisible by 3.
+*/
+PhaseMatch.Nintegrate2D_3_8_singles = function Nintegrate2D_3_8_singles(f, fz1 ,a,b,c,d,n,w){
+    var weights = w;
+    // n = n+(3- n%3); //guarantee that n is divisible by 3
+
+    var  dx = (b-a)/n
+        ,dy = (d-c)/n
+        ,result1 = 0
+        ,result2 = 0
+        ;
+
+    for (var j=0; j<n+2; j++){
+        var  x = a +j*dx
+            ,Cz1 = fz1(x)
+            ;
+
+        for (var k=0; k<n+2; k++){
+            var  y = c+k*dy
+                ,result =f(x, y, Cz1)
+                ,weight = weights[j]*weights[k]
+                ;
+                result1 += result[0] * weight;
+                result2 += result[1] * weight;
+        }
+    }
+
+    return [result1*dx*dy*9/64, result2*dx*dy*9/64];
 
 };
 

@@ -19,7 +19,7 @@ zs=100;  % collection waist location (idler)
 zi=50;     % collection waist location (idler)
 
 %%% range and resolution of vectors and matrices %%%
-NN=100; % points in vectors
+NN=40; % points in vectors
 Nz=40;
 
 % omegas-omegai % 
@@ -54,9 +54,9 @@ ang_extg=16;  % external emission angle (degrees)
                                        ang_extg,deff,Pav,L,z0,zi,Nz,oms,omi);
 
 %%%% purity and efficiencies  %%%%% 
-purity=1/K;    % purity
-etas=Rc/Rs;    % heralding efficiency
-etai=Rc/Ri;    % heralding efficiency
+purity=1/K    % purity
+etas=Rc/Rs    % heralding efficiency
+etai=Rc/Ri    % heralding efficiency
 
 
 colormap gray
