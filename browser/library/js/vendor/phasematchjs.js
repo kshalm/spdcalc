@@ -1,8 +1,8 @@
 /**
- * phasematchjs v0.0.1a - 2014-12-31
+ * phasematchjs v0.0.1a - 2015-01-05
  *  ENTER_DESCRIPTION 
  *
- * Copyright (c) 2014 Krister Shalm <kshalm@gmail.com>
+ * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
  * Licensed GPLv3
  */
 (function (root, factory) {
@@ -3774,8 +3774,8 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
 PhaseMatch.phasematch = function phasematch (P){
 
     // var pm = PhaseMatch.calc_PM_tz(P);
-    var pm = PhaseMatch.calc_PM_tz_k_singles(P);
-    // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    // var pm = PhaseMatch.calc_PM_tz_k_singles(P);
+    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
     var PMz_imag = pm[1];
@@ -3795,9 +3795,37 @@ PhaseMatch.phasematch = function phasematch (P){
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag, C_check];
 };
 
+/*
+ * phasematch_singles()
+ * Gets the index of refraction depending on phasematching type for the singles
+ * Rate for the signal photon.
+ * P is SPDC Properties object
+ */
+PhaseMatch.phasematch_singles = function phasematch_singles(P){
+
+    var pm = PhaseMatch.calc_PM_tz_k_singles(P);
+    // Longitundinal components of PM.
+    var PMz_real = pm[0];
+    var PMz_imag = pm[1];
+    // Transverse component of PM
+    var PMt = pm[2];
+
+    var C_check = pm[3];
+    // console.log(C_check);
+    // if (C_check>0.5){
+    //     console.log("approx not valid," C_check);
+    // }
+    // Pump spectrum
+    var alpha = PhaseMatch.pump_spectrum(P);
+    alpha = sq(alpha);
+    // var alpha = 1;
+
+    //return the real and imaginary parts of Phase matching function
+    return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag, C_check];
+};
 
 /*
- * phasematch()
+ * phasematch_Int_Phase()
  * Gets the index of refraction depending on phasematching type
  * P is SPDC Properties object
  */
@@ -3805,6 +3833,39 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
 
     // PM is a complex array. First element is real part, second element is imaginary.
     var PM = PhaseMatch.phasematch(P);
+
+    var C_check = PM[2];
+
+    // var PMInt = sq(PM[0]) + sq(PM[1])
+
+    if (P.phase){
+        var PMang = Math.atan2(PM[1],PM[0]) + Math.PI;
+        // need to figure out an elegant way to apodize the phase. Leave out for now
+        // var x = PMInt<0.01
+        // var AP = PMInt
+        // var AP[x] = 0.
+        // var x = PMInt >0
+        // var AP[x] = 1.
+
+        // PM = PMang * AP;
+        PM= PMang*180/Math.PI;
+    } else {
+        // console.log  ("calculating Intensity")
+        PM = sq(PM[0]) + sq(PM[1]);
+    }
+    // console.log(PM)
+    return {"phasematch":PM};
+};
+
+/*
+ * phasematch_Int_Phase()
+ * Gets the index of refraction depending on phasematching type
+ * P is SPDC Properties object
+ */
+PhaseMatch.phasematch_Int_Phase_Singles = function phasematch_Int_Phase_Singles(P){
+
+    // PM is a complex array. First element is real part, second element is imaginary.
+    var PM = PhaseMatch.phasematch_singles(P);
 
     var C_check = PM[2];
 
@@ -4853,8 +4914,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // PMz_imag = pmintz[1]/P.L ;
         PMz_real = pmintz[0]/2;
         PMz_imag = pmintz[1]/2;
-        // var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
-        var coeff = 1;
+        var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
+        // var coeff = 1;
         PMz_real = PMz_real * coeff;
         PMz_imag = PMz_imag * coeff;
     }
@@ -5265,8 +5326,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         // PMz_imag = pmintz[1]/P.L ;
         PMz_real = pmintz[0]/2;
         PMz_imag = pmintz[1]/2;
-        // var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
-        var coeff = 1;
+        var coeff = ((omega_s * omega_i)/ (P.n_s * P.n_i));
+        // var coeff = 1;
         PMz_real = PMz_real * coeff;
         PMz_imag = PMz_imag * coeff;
     }
@@ -5315,6 +5376,38 @@ PhaseMatch.normalize_joint_spectrum = function normalize_joint_spectrum (props){
     }
 
     var norm = PhaseMatch.phasematch_Int_Phase(P)['phasematch'];
+    return norm;
+
+};
+
+/*
+ * Normalization function for the joint spectrum of the Singles rate
+ */
+PhaseMatch.normalize_joint_spectrum_singles = function normalize_joint_spectrum_singles (props){
+    // Find the optimum phase matching condition. This will be when delK = 0 and everything is collinear.
+    // Need to calculate optimum poling period and crystal angle.
+    var P = props.clone();
+    P.theta_s = 0;
+    P.theta_i = 0;
+    P.theta_s_e = 0;
+    P.theta_i_e = 0;
+    P.update_all_angles();
+
+    if (props.enable_pp){
+        P.calc_poling_period();
+    }
+    else{
+        P.auto_calc_Theta();
+    }
+
+    var convfromFWHM = Math.sqrt(2) // Use 1/e^2 in intensity.
+        ,Wi_SQ = Math.pow(P.W_sx  * convfromFWHM,2) // convert from FWHM to sigma @TODO: Change to P.W_i
+        ,PHI_s = 1/Math.cos(P.theta_s_e)
+        ;
+
+    console.log("Wi squared: ", Wi_SQ*PHI_s);
+
+    var norm = PhaseMatch.phasematch_Int_Phase_Singles(P)['phasematch'];//*(Wi_SQ*PHI_s);
     return norm;
 
 };
@@ -6400,7 +6493,7 @@ PhaseMatch.calc_JSI = function calc_JSI(props, ls_start, ls_stop, li_start, li_s
 
 };
 
-PhaseMatch.calc_JSA_p = function calc_JSA(props, lambda_s,lambda_i, dim, norm){
+PhaseMatch.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm){
 
     props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
@@ -6475,6 +6568,73 @@ PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm
     // JSI = PhaseMatch.normalize(JSI);
 
     return JSI;
+
+};
+
+PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lambda_i, dim, norm){
+
+    props.update_all_angles();
+    // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
+    var P = props.clone();
+    // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
+    // P.theta_i = 0.6*Math.PI/180;
+    P.phi_i = P.phi_s + Math.PI;
+    P.update_all_angles();
+    P.optimum_idler(P);
+
+    // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
+    // P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+
+
+    var todeg = 180/Math.PI;
+    // console.log(P.phi_i*todeg, P.phi_s*todeg);
+    // P.theta_i = P.theta_s;
+    // var centerpm = PhaseMatch.phasematch(P);
+    // console.log(sq(centerpm[0]) + sq(centerpm[1]));
+
+
+    var i;
+    // var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
+    // var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
+
+    var N = lambda_s.length * (lambda_i.length);
+    var PMreal = new Float64Array( N );
+    var PMimag = new Float64Array( N );
+    var PMmag = new Float64Array( N );
+
+    var maxpm = 0;
+
+    var  convfromFWHM = Math.sqrt(2) // Use 1/e^2 in intensity.
+        ,Wi_SQ = Math.pow(P.W_sx  * convfromFWHM,2) // convert from FWHM to sigma @TODO: Change to P.W_i
+        ,PHI_s = 1/Math.cos(P.theta_s_e)
+        ;
+
+    // calculate normalization
+    // var PMN = PhaseMatch.phasematch(P);
+    // var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
+
+
+    for (j=0; j<lambda_i.length; j++){
+        for (i=0; i<lambda_s.length; i++){
+            var index_s = i;
+            var index_i = j;
+
+            P.lambda_s = lambda_s[index_s];
+            P.lambda_i = lambda_i[index_i];
+
+            P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
+            P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+            var PM = PhaseMatch.phasematch_singles(P);
+            PMreal[i + lambda_s.length*j] = ( PM[0]/norm );//*(Wi_SQ * PHI_s);
+            PMimag[i + lambda_s.length*j] = ( PM[1]/norm );//*(Wi_SQ * PHI_s);
+            PMmag[i + lambda_s.length*j] = Math.sqrt(sq(PMreal[i + lambda_s.length*j]) + sq(PMimag[i + lambda_s.length*j]));
+        }
+    }
+
+    // console.log("Approx Check, ", C_check);
+    // return [PMreal, PMimag];
+    return PMmag;
 
 };
 

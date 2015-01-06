@@ -292,8 +292,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // PMz_imag = pmintz[1]/P.L ;
         PMz_real = pmintz[0]/2;
         PMz_imag = pmintz[1]/2;
-        // var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
-        var coeff = 1;
+        var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
+        // var coeff = 1;
         PMz_real = PMz_real * coeff;
         PMz_imag = PMz_imag * coeff;
     }
@@ -704,8 +704,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         // PMz_imag = pmintz[1]/P.L ;
         PMz_real = pmintz[0]/2;
         PMz_imag = pmintz[1]/2;
-        // var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
-        var coeff = 1;
+        var coeff = ((omega_s * omega_i)/ (P.n_s * P.n_i));
+        // var coeff = 1;
         PMz_real = PMz_real * coeff;
         PMz_imag = PMz_imag * coeff;
     }
@@ -754,6 +754,38 @@ PhaseMatch.normalize_joint_spectrum = function normalize_joint_spectrum (props){
     }
 
     var norm = PhaseMatch.phasematch_Int_Phase(P)['phasematch'];
+    return norm;
+
+};
+
+/*
+ * Normalization function for the joint spectrum of the Singles rate
+ */
+PhaseMatch.normalize_joint_spectrum_singles = function normalize_joint_spectrum_singles (props){
+    // Find the optimum phase matching condition. This will be when delK = 0 and everything is collinear.
+    // Need to calculate optimum poling period and crystal angle.
+    var P = props.clone();
+    P.theta_s = 0;
+    P.theta_i = 0;
+    P.theta_s_e = 0;
+    P.theta_i_e = 0;
+    P.update_all_angles();
+
+    if (props.enable_pp){
+        P.calc_poling_period();
+    }
+    else{
+        P.auto_calc_Theta();
+    }
+
+    var convfromFWHM = Math.sqrt(2) // Use 1/e^2 in intensity.
+        ,Wi_SQ = Math.pow(P.W_sx  * convfromFWHM,2) // convert from FWHM to sigma @TODO: Change to P.W_i
+        ,PHI_s = 1/Math.cos(P.theta_s_e)
+        ;
+
+    console.log("Wi squared: ", Wi_SQ*PHI_s);
+
+    var norm = PhaseMatch.phasematch_Int_Phase_Singles(P)['phasematch'];//*(Wi_SQ*PHI_s);
     return norm;
 
 };

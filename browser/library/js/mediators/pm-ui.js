@@ -29,7 +29,8 @@ define(
         'modules/pm-curves-ui',
         'modules/jsa-2hom-ui',
         'modules/jsa-hom-bunching-ui',
-        'modules/couplingefficiency-ui'
+        'modules/couplingefficiency-ui',
+        'modules/heralding-ui'
     ],
     function(
         $,
@@ -61,7 +62,8 @@ define(
         curvesUI,
         jsa2homUI,
         jsahomBunchUI,
-        efficiencyUI
+        efficiencyUI,
+        heraldingUI
     ) {
 
         'use strict';
@@ -406,6 +408,8 @@ define(
                 self.set('jsa-hom-bunch', jsahomBunchUI());
                 // Coupling effiency map
                 self.set('efficiency', efficiencyUI());
+                // Heralding Efficeny for a given set of parameters
+                self.set('heralding', heraldingUI());
             },
 
             /**

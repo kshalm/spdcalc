@@ -561,8 +561,8 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
 PhaseMatch.phasematch = function phasematch (P){
 
     // var pm = PhaseMatch.calc_PM_tz(P);
-    var pm = PhaseMatch.calc_PM_tz_k_singles(P);
-    // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    // var pm = PhaseMatch.calc_PM_tz_k_singles(P);
+    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
     var PMz_imag = pm[1];
@@ -582,9 +582,37 @@ PhaseMatch.phasematch = function phasematch (P){
     return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag, C_check];
 };
 
+/*
+ * phasematch_singles()
+ * Gets the index of refraction depending on phasematching type for the singles
+ * Rate for the signal photon.
+ * P is SPDC Properties object
+ */
+PhaseMatch.phasematch_singles = function phasematch_singles(P){
+
+    var pm = PhaseMatch.calc_PM_tz_k_singles(P);
+    // Longitundinal components of PM.
+    var PMz_real = pm[0];
+    var PMz_imag = pm[1];
+    // Transverse component of PM
+    var PMt = pm[2];
+
+    var C_check = pm[3];
+    // console.log(C_check);
+    // if (C_check>0.5){
+    //     console.log("approx not valid," C_check);
+    // }
+    // Pump spectrum
+    var alpha = PhaseMatch.pump_spectrum(P);
+    alpha = sq(alpha);
+    // var alpha = 1;
+
+    //return the real and imaginary parts of Phase matching function
+    return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag, C_check];
+};
 
 /*
- * phasematch()
+ * phasematch_Int_Phase()
  * Gets the index of refraction depending on phasematching type
  * P is SPDC Properties object
  */
@@ -592,6 +620,39 @@ PhaseMatch.phasematch_Int_Phase = function phasematch_Int_Phase(P){
 
     // PM is a complex array. First element is real part, second element is imaginary.
     var PM = PhaseMatch.phasematch(P);
+
+    var C_check = PM[2];
+
+    // var PMInt = sq(PM[0]) + sq(PM[1])
+
+    if (P.phase){
+        var PMang = Math.atan2(PM[1],PM[0]) + Math.PI;
+        // need to figure out an elegant way to apodize the phase. Leave out for now
+        // var x = PMInt<0.01
+        // var AP = PMInt
+        // var AP[x] = 0.
+        // var x = PMInt >0
+        // var AP[x] = 1.
+
+        // PM = PMang * AP;
+        PM= PMang*180/Math.PI;
+    } else {
+        // console.log  ("calculating Intensity")
+        PM = sq(PM[0]) + sq(PM[1]);
+    }
+    // console.log(PM)
+    return {"phasematch":PM};
+};
+
+/*
+ * phasematch_Int_Phase()
+ * Gets the index of refraction depending on phasematching type
+ * P is SPDC Properties object
+ */
+PhaseMatch.phasematch_Int_Phase_Singles = function phasematch_Int_Phase_Singles(P){
+
+    // PM is a complex array. First element is real part, second element is imaginary.
+    var PM = PhaseMatch.phasematch_singles(P);
 
     var C_check = PM[2];
 

@@ -55,4 +55,6 @@ etaNs=(sec(thetas_f)/(2^2*pi^5*sqrt(2*pi)*c^3*eps0))*deff^2*L^2*W0x*W0y*Wfs^2*Pa
 gwswi_Ns = intkPM_Ns(L,ks,ki,kp,W0x,W0y,WWfs,z0,tan(rho),sec(thetas_f)^2,ksf.*sin(thetas_f),hs,Nz);         
     
 jsa_Ns=real(gwswi_Ns).*abs(PUMP).^2;
+MaxjsaSingles = max(max(jsa_Ns))
 Rs=(2*pi)^3*etaNs*sum(sum(ell.*jsa_Ns))*dws*dwi;
+MaxRs = max(max((2*pi)^3*etaNs*((ell.*jsa_Ns))*dws*dwi))
