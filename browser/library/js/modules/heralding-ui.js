@@ -125,11 +125,15 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 40,
-                    'ls_start': lim.lambda_s.min,
-                    'ls_stop': lim.lambda_s.max,
-                    'li_start': lim.lambda_i.min,
-                    'li_stop': lim.lambda_i.max
+                    'grid_size': 4,
+                    // 'ls_start': lim.lambda_s.min,
+                    // 'ls_stop': lim.lambda_s.max,
+                    // 'li_start': lim.lambda_i.min,
+                    // 'li_stop': lim.lambda_i.max
+                    'ls_start': 0.81E-6,
+                    'ls_stop': 0.81E-6,
+                    'li_start': 0.81E-6,
+                    'li_stop': 0.81E-6
                 });
             },
 
@@ -245,8 +249,8 @@ define(
 
             calcRSingles: function(props, propsJSON,lambda_s,lambda_i_range,grid_size, norm, Nthreads){
                 // @TODO: Not sure I need the sqrt here.
-                var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum_singles(props));
-                // var norm = 1;
+                // var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum_singles(props));
+                var norm = 1;
 
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
@@ -299,9 +303,9 @@ define(
 
             calcRCoinc: function(props, propsJSON,lambda_s,lambda_i_range,grid_size, Nthreads){
 
-                var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
+                // var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
                 console.log("norm differences:", norm,  Math.sqrt(PhaseMatch.normalize_joint_spectrum(props)));
-                // var norm = 1;
+                var norm = 1;
 
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
@@ -364,15 +368,16 @@ define(
                 }
 
                 var  convfromFWHM = Math.sqrt(2) // Use 1/e^2 in intensity.
+                    ,convfromFWHM = 1
                     ,Wi_SQ = Math.pow(P.W_sx  * convfromFWHM,2) // convert from FWHM to sigma @TODO: Change to P.W_i
                     ,PHI_s = 1/Math.cos(P.theta_s_e)
                     ,Rc = PhaseMatch.Sum(self.dataCoinc)
                     ,Rs = PhaseMatch.Sum(self.data)
-                    ,eff = Rc/Rs //* (Wi_SQ * PHI_s)
+                    ,eff = Rc/Rs * (Wi_SQ * PHI_s)
                     ,Rmax = PhaseMatch.max(self.dataCoinc) / PhaseMatch.max(self.data) * (Wi_SQ * PHI_s)
                     ;
-
-                console.log("Eff", eff, Rmax);
+                console.log("Singles Max:", PhaseMatch.max(self.data), "Coinc Max:", PhaseMatch.max(self.dataCoinc), "waist:", P.W_sx, "hs:", Math.tan(P.theta_s)*P.L*0.5);
+                // console.log("Eff", eff, Rmax);
                 return eff;
             },
 

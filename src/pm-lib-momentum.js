@@ -52,7 +52,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     var PMz_real = 0;
     var PMz_imag = 0;
 
-    var convfromFWHM = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
+    // var convfromFWHM = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
+    var convfromFWHM = 1; // Use 1/e^2 in intensity.
 
 
     // var W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s))),
@@ -116,6 +117,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // ff = 0.5 * P.L  * (delKz),
         hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
         ;
+        console.log("hh: " + hh.toString() + ", Wi: " + Math.sqrt(Wi_SQ).toString() + ", PHI_i:" + PHI_i.toString() + ",  PSI_i" + PSI_i.toString());
 
      ///////////////////////////////////////
 
@@ -139,7 +141,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     };
 
     var zintfunc = function(z){
-        // z = 0;
+        z = 0;
         var terms = calczterms(z);
         var A1R = terms[0][0],
             A1I = terms[0][1],
@@ -163,7 +165,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             A10I = terms[9][1]
             ;
         // console.log("hello");
-        // console.log("A1R: " + A1R.toString() + "   Imag: " + A1I.toString());
+        // console.log("A1R: " + A1R.toString() + "   A2R: " + A2R.toString()+"A3R: " + A3R.toString() + "   A4R: " + A4R.toString()+"A5R: " + A5R.toString() + "   A6R: " + A6R.toString()+"A7R: " + A7R.toString() + "   A8R: " + A8R.toString()+"A9R: " + A9R.toString() + "   A10R: " + A10R.toString());
         // First calculate terms in the exponential of the integral
         //   E^(1/4 (4 A10 - A5^2/A1 - A6^2/A2 - (-2 A1 A7 + A5 A8)^2/(
         //  A1 (4 A1 A3 - A8^2)) - (A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2)))
@@ -273,10 +275,12 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             // coeffR = 1,
             EReal = coeffR * pmzcoeff*Math.cos(EXPI),
             EImag = coeffR * pmzcoeff*Math.sin(EXPI),
-            real = 0.5 * PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
-            imag = 0.5 * PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
+            real = PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
+            imag = PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
             ;
-
+            var EXPRadd = (EXP1R -EXP2R -EXP3R -EXP4R -EXP5R)/4;
+            // console.log("real: " + EXPR.toString() + "   EXPRadd: " + EXPRadd.toString() + "   ks: " + k_s.toString() + "   ki: " + k_i.toString() + "real: " + DENR.toString() + "   imag: " + DENI.toString());
+            // console.log("EXP1R: " + EXP1R.toString() + ", EXP2R: " + EXP2R.toString()+ ", EXP3R: " + EXP3R.toString()+ ", EXP4R: " + EXP4R.toString()+ ", EXP5R: " + EXP5R.toString());
         return [real, imag];
     };
 
@@ -292,8 +296,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // PMz_imag = pmintz[1]/P.L ;
         PMz_real = pmintz[0]/2;
         PMz_imag = pmintz[1]/2;
-        var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
-        // var coeff = 1;
+        // var coeff = (Math.sqrt(omega_s * omega_i)/ (P.n_s * P.n_i));
+        var coeff = 1;
         PMz_real = PMz_real * coeff;
         PMz_imag = PMz_imag * coeff;
     }
@@ -367,7 +371,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     var PMz_real = 0;
     var PMz_imag = 0;
 
-    var convfromFWHM = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
+    // var convfromFWHM = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
+    var convfromFWHM = 1; // Use 1/e^2 in intensity.
 
 
     // var W_s = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s))),
@@ -704,8 +709,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         // PMz_imag = pmintz[1]/P.L ;
         PMz_real = pmintz[0]/2;
         PMz_imag = pmintz[1]/2;
-        var coeff = ((omega_s * omega_i)/ (P.n_s * P.n_i));
-        // var coeff = 1;
+        // var coeff = ((omega_s * omega_i)/ (P.n_s * P.n_i));
+        var coeff = 1;
         PMz_real = PMz_real * coeff;
         PMz_imag = PMz_imag * coeff;
     }

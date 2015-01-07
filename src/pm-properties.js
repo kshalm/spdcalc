@@ -460,7 +460,7 @@
             // if (nslices>30){
             //     nslices = 30;
             // }
-
+            nslices =nslices*1;
             if (nslices%2 !== 0){
                 nslices +=1;
             }

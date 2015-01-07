@@ -31,3 +31,8 @@ A10 = -(kp.*Wy.^2 - 2.*1i.*z0 + 1i.*L.*Xi)./(2.*kp);
 
 A11=  (2.*1i.*L.*(ki + kp + ks - (ki - kp + ks).*Xi) - ...
        Wfi.^2.*Phii.*Psii.^2 - Wfs.^2.*Phis.*Psis.^2)./4;
+Wfi
+Phii
+Psii
+hh = A11
+   

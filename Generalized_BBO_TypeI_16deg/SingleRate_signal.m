@@ -1,7 +1,8 @@
 function [jsa_Ns,Rs]=SingleRate_signal(lamp,lams,lami,FWHM_spec,FWHM_waist,FWHM_waist_fcm,...
                                        ang_extg,deff,Pav,L,z0,zs,Nz,oms,omi)
-c=3e14;
-eps0=8.8542e-18;  % F/micrometros 
+mu = 1e-6;
+c=3e14 * mu;
+eps0=8.8542e-18 * mu;  % F/micrometros 
 
 %/////////////////////////////////////////////////////
 

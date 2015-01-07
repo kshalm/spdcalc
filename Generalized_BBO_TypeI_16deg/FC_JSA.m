@@ -1,7 +1,7 @@
 function [joint_amplitude,Rc,K]=FC_JSA(lamp,lams,lami,FWHM_spec,FWHM_waist,FWHM_waist_fcm,...
                                        ang_extg,deff,Pav,L,z0,zs,zi,Nz,oms,omi)
-
-c=3e14; 
+mu = 1e-6
+c=3e14 *mu;
 
 %/////////////////////////////////////////////////////
 
@@ -34,8 +34,8 @@ ang=angd.*pi./180; % radians
 thetas=ang_int;  %%%% angulo interno
 thetai=-ang_int;  %%%% angulo interno
 
-c=3e14; 
-eps0=8.8542e-18;  % F/micrometros 
+c=3e14 *mu;
+eps0=8.8542e-18 *mu;  % F/micrometros
 
 
 %%%%%%%%%%%%%%%%%%%% walk off angle %%%%%%%%%%%%
@@ -58,6 +58,9 @@ kif= omi./c;  %%% magnitud de k en el espacio libre
 ks=indxOr_BBO(oms).*ksf; %%% magnitud de k en el cristal
 ki=indxOr_BBO(omi).*kif; %%% magnitud de k en el cristal
 
+zs =0;
+zi=0;
+rho = 0;
 WWfs=Wfs.*sqrt( 1 + 2.*1i.*(zs+hs.*sin(thetas_f))./(ksf.*Wfs^2));
 WWfi=Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
 
@@ -72,7 +75,7 @@ etaN=(sec(thetas_f)*sec(thetai_f)/(2^3*pi^6*sqrt(2*pi)*c^3*eps0))*deff^2*L^2*W0x
 gwswi_N = Int_Rc_prx(L,ks,ki,kp,W0x,W0y,WWfs,WWfi,sec(thetas_f)^2,sec(thetai_f)^2,ksf.*sin(thetas_f),kif.*sin(thetai_f),tan(rho),hs,hi,z0,Nz);
 
 joint_amplitude=gwswi_N.*PUMP;
-MaxjsaCoinc = max(max(abs(joint_amplitude).^2)) 
+MaxjsaCoinc = max(max(abs(joint_amplitude).^2))
 Rc=(2*pi)^4*etaN*sum(sum(ell.*abs(joint_amplitude).^2))*dws*dwi;
 MaxRc = max(max((2*pi)^4*etaN*((ell.*abs(joint_amplitude).^2))*dws*dwi))
 K=SchmidtK(joint_amplitude);
