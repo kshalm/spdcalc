@@ -17,7 +17,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     var n_p = P.n_p;
 
     var twoPI = 2*Math.PI,
-        twoPIc = twoPI*con.c
+        twoPIc = twoPI*con.c*toMicrons
         ;
 
     var z0 = 0; //put pump in middle of the crystal
@@ -43,6 +43,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         delKz = delK[2]
         ;
 
+    PhaseMatch.convertToMicrons(P);
     // console.log("deltaK:" + delKx.toString() + ", " + delKy.toString() + ", " + delKz.toString() + ", ")
 
     // Height of the collected spots from the axis.
@@ -117,7 +118,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // ff = 0.5 * P.L  * (delKz),
         hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
         ;
-        console.log("hh: " + hh.toString() + ", Wi: " + Math.sqrt(Wi_SQ).toString() + ", PHI_i:" + PHI_i.toString() + ",  PSI_i" + PSI_i.toString());
+        // console.log("hh: " + hh.toString() + ", Wi: " + (Wi_SQ).toString() + ", PHI_i:" + PHI_i.toString() + ",  PSI_i: " + PSI_i.toString() + ",  ks: " + k_s.toString() + ",  n_s: " + P.n_s.toString() + ",  k/n: " + (k_s/P.n_s).toString() );
 
      ///////////////////////////////////////
 
@@ -141,7 +142,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     };
 
     var zintfunc = function(z){
-        z = 0;
+        // z = 0;
         var terms = calczterms(z);
         var A1R = terms[0][0],
             A1I = terms[0][1],
@@ -792,5 +793,37 @@ PhaseMatch.normalize_joint_spectrum_singles = function normalize_joint_spectrum_
 
     var norm = PhaseMatch.phasematch_Int_Phase_Singles(P)['phasematch'];//*(Wi_SQ*PHI_s);
     return norm;
+
+};
+
+/*
+ * To deal with possible floating point errors, convert from meters to microns before performing the calculations.
+ */
+PhaseMatch.convertToMicrons = function convertToMicrons (props){
+    var  P = props
+        ,mu = 1E6
+        ;
+
+    // // P.L = P.L*mu;
+    // console.log("Length: " + (P.L * mu).toString());
+    P.lambda_p = P.lambda_p * mu;
+    P.lambda_s = P.lambda_s * mu;
+    P.lambda_i = P.lambda_i * mu;
+    P.W = P.W * mu;
+    P.p_bw = P.p_bw * mu;
+    P.W_sx = P.W_sx * mu;
+    P.W_ix = P.W_ix * mu;
+    // console.log("P.L about to set");
+    P.L = P.L * mu;
+    // // console.log("set P.L");
+    // P.poling_period = P.poling_period * mu;
+    // P.apodization_FWHM = P.apodization_FWHM * mu;
+
+    // P.update_all_angles();
+    // P.set_apodization_L();
+    // P.set_apodization_coeff();
+    // P.set_zint();
+
+    return P;
 
 };

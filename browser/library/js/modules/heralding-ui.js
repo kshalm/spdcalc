@@ -126,14 +126,14 @@ define(
 
                 self.plotOpts.set({
                     'grid_size': 4,
-                    // 'ls_start': lim.lambda_s.min,
-                    // 'ls_stop': lim.lambda_s.max,
-                    // 'li_start': lim.lambda_i.min,
-                    // 'li_stop': lim.lambda_i.max
-                    'ls_start': 0.81E-6,
-                    'ls_stop': 0.81E-6,
-                    'li_start': 0.81E-6,
-                    'li_stop': 0.81E-6
+                    'ls_start': lim.lambda_s.min,
+                    'ls_stop': lim.lambda_s.max,
+                    'li_start': lim.lambda_i.min,
+                    'li_stop': lim.lambda_i.max
+                    // 'ls_start': 0.81E-6,
+                    // 'ls_stop': 0.81E-6,
+                    // 'li_start': 0.81E-6,
+                    // 'li_stop': 0.81E-6
                 });
             },
 
@@ -150,7 +150,8 @@ define(
                 // var testlinspace = PhaseMatch.linspace(0,25.3, 10);
                 // console.log("linspace test: ", testlinspace);
                 var self = this;
-
+                // var props = PhaseMatch.convertToMicrons(P);
+                // console.log("FINISHED CONVERSION");
                 var propsJSON = props.get()
                     ,grid_size = self.plotOpts.get('grid_size')
                     ;
@@ -170,10 +171,10 @@ define(
                 lambda_i_range.push( lambda_i.subarray((Nthreads-1)*divisions, lambda_i.length)); //make up the slack with the last one
 
                 // Get the normalization
-                var P = props.clone();
-                P.phi_i = P.phi_s + Math.PI;
-                P.update_all_angles();
-                // P.optimum_idler(P);
+                var Pn = props.clone();
+                Pn.phi_i = Pn.phi_s + Math.PI;
+                Pn.update_all_angles();
+                // Pn.optimum_idler(P);
                 // P.theta_i_e = PhaseMatch.find_external_angle(P,"idler");
                 // console.log("External angle of the idler is:", P.theta_i_e*180/Math.PI );
                 // console.log("angles: ", P.theta_s * 180/Math.PI,  P.theta_i * 180/Math.PI,  P.theta_s_e * 180/Math.PI,  P.theta_i_e * 180/Math.PI);
@@ -183,6 +184,7 @@ define(
                 var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
                 // console.log("Normalization: ",norm);
                 self.calcRSingles(props, propsJSON,lambda_s,lambda_i_range,grid_size, norm, Nthreads);
+
                 // self.calcRCoinc(props, propsJSON,lambda_s,lambda_i_range,grid_size, norm, Nthreads);
 
                 // var norm = 1;
@@ -356,6 +358,7 @@ define(
                         var eff = self.calcEfficiency(props);
                         console.log("efficiency: ", eff);
                         self.draw();
+                        console.log("FINISHED PLOTTING");
                         return true;
 
                     });

@@ -457,9 +457,9 @@
                 nslices = 4;
             }
 
-            // if (nslices>30){
-            //     nslices = 30;
-            // }
+            if (nslices>30){
+                nslices = 30;
+            }
             nslices =nslices*1;
             if (nslices%2 !== 0){
                 nslices +=1;
@@ -473,7 +473,7 @@
             n = n+(3- n%3); //guarantee that n is divisible by 3
             this.z2Dweights = PhaseMatch.Nintegrate2DWeights_3_8(n);
             this.numz2Dint = n;
-            // console.log(nslices);
+            console.log(nslices);
         },
 
 
@@ -557,9 +557,9 @@
                         this.set_apodization_coeff();
                     }
 
-                    if (name === "L"){
-                        this.set_zint();
-                    }
+                    // if (name === "L"){
+                    //     this.set_zint();
+                    // }
 
 
 

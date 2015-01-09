@@ -82,7 +82,7 @@ PhaseMatch.calc_JSI = function calc_JSI(props, ls_start, ls_stop, li_start, li_s
 };
 
 PhaseMatch.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm){
-
+    // norm = 1;
     props.update_all_angles();
     // console.log(props.lambda_i/1e-9, props.lambda_s/1e-9, props.theta_s*180/Math.PI, props.theta_i*180/Math.PI);
     var P = props.clone();
@@ -91,6 +91,8 @@ PhaseMatch.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm)
     P.phi_i = P.phi_s + Math.PI;
     P.update_all_angles();
     P.optimum_idler(P);
+
+    // P = PhaseMatch.convertToMicrons(P);
 
     // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
     // P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
@@ -128,6 +130,9 @@ PhaseMatch.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm)
 
             P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
+
+            // P.lambda_s = P.lambda_s *1E6;
+            // P.lambda_i = P.lambda_i *1E6;
 
             var PM = PhaseMatch.phasematch(P);
             PMreal[i + lambda_s.length*j] = PM[0]/norm;
