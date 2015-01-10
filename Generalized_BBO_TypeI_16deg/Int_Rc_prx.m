@@ -22,14 +22,15 @@ for jj=1:Npuntos
 ze = (4.*A11 - A2.^2./A1 - A4.^2./A3 - (A10.*A4 - 2.*A3.*A8).^2./(A3.*(-A10.^2 + 4.*A3.*A7)) - (-2.*A1.*A6 + A2.*A9).^2./(A1.*(4.*A1.*A5 - A9.^2)))./4.
 % diff = EXPtot/4 - ze
 zd = (sqrt(-A1).*sqrt(-A3).*sqrt(A10.^2./A3 - 4.*A7).*sqrt(-4.*A5 + A9.^2./A1));
-den1 = A1*A3
+den1 = A1.*A3
 den2 = A10.^2./A3 - 4.*A7
 den3 = -4.*A5 + A9.^2./A1
 zz = (exp(ze)./zd);
-Aone = A1
-Atwo = A3
-A1 * A3
-ab = Aone * Atwo
+
+Aten = A10
+Athree = A3
+Aseven = A7
+
 z = z + 0.5.*dXi.*zz;
      
 end
