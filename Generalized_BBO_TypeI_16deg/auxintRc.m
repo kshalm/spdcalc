@@ -1,7 +1,7 @@
 function [A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11]=auxintRc(Xi,L,ks,ki,kp,Wx,Wy,Wfs,Wfi,Phis,Phii,Psis,Psii,Rho,hs,hi,z0);
 
-Wfi = 50.95E-6;
-Wfs = Wfi;
+% Wfi = 50.95E-6;
+% Wfs = Wfi;
 A1 = (0.25.*1i.*(ks.*(2.*z0 - L.*Xi) + ...
       kp.*(L.*(-1 + Xi) + ...
       1i.*ks.*(Wx.^2 + Wfs.^2.*Phis))))./(kp.*ks);
@@ -32,10 +32,10 @@ A10 = -(kp.*Wy.^2 - 2.*1i.*z0 + 1i.*L.*Xi)./(2.*kp);
 
 A11=  (2.*1i.*L.*(ki + kp + ks - (ki - kp + ks).*Xi) - ...
        Wfi.^2.*Phii.*Psii.^2 - Wfs.^2.*Phis.*Psis.^2)./4;
-Wfi
-Wfi.^2
-Phii
-Psii
-ks
-hh = A11
+% Wfi
+% Wfi.^2
+% Phii
+% Psii
+% ks
+% hh = A11
    

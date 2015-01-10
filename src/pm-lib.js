@@ -545,10 +545,14 @@
  */
 PhaseMatch.pump_spectrum = function pump_spectrum (P){
     var con = PhaseMatch.constants;
+    // PhaseMatch.convertToMicrons(P);
+    var mu = 1;
+    con.c = con.c * mu;
     // @TODO: Need to move the pump bandwidth to someplace that is cached.
     var p_bw = 2*Math.PI*con.c/sq(P.lambda_p) *P.p_bw; //* n_p; //convert from wavelength to w
     p_bw = p_bw /(2 * Math.sqrt(Math.log(2))); //convert from FWHM
     var alpha = Math.exp(-1/2*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(p_bw)));
+    // PhaseMatch.convertToMeters(P);
     return alpha;
 };
 

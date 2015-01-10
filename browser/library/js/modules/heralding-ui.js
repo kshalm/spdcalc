@@ -126,14 +126,14 @@ define(
 
                 self.plotOpts.set({
                     'grid_size': 4,
-                    'ls_start': lim.lambda_s.min,
-                    'ls_stop': lim.lambda_s.max,
-                    'li_start': lim.lambda_i.min,
-                    'li_stop': lim.lambda_i.max
-                    // 'ls_start': 0.81E-6,
-                    // 'ls_stop': 0.81E-6,
-                    // 'li_start': 0.81E-6,
-                    // 'li_stop': 0.81E-6
+                    // 'ls_start': lim.lambda_s.min,
+                    // 'ls_stop': lim.lambda_s.max,
+                    // 'li_start': lim.lambda_i.min,
+                    // 'li_stop': lim.lambda_i.max
+                    'ls_start': 0.81E-6,
+                    'ls_stop': 0.81E-6,
+                    'li_start': 0.81E-6,
+                    'li_stop': 0.81E-6
                 });
             },
 
@@ -180,8 +180,8 @@ define(
                 // console.log("angles: ", P.theta_s * 180/Math.PI,  P.theta_i * 180/Math.PI,  P.theta_s_e * 180/Math.PI,  P.theta_i_e * 180/Math.PI);
                 // var PMN =  PhaseMatch.phasematch(props);
                 // var norm = Math.sqrt(PMN[0]*PMN[0] + PMN[1]*PMN[1]);
-                // var norm = 1;
-                var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
+                var norm = 1;
+                // var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
                 // console.log("Normalization: ",norm);
                 self.calcRSingles(props, propsJSON,lambda_s,lambda_i_range,grid_size, norm, Nthreads);
 

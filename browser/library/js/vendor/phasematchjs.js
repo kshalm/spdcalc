@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-01-08
+ * phasematchjs v0.0.1a - 2015-01-09
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -3758,10 +3758,14 @@ PhaseMatch.sign = function sign(x) {
  */
 PhaseMatch.pump_spectrum = function pump_spectrum (P){
     var con = PhaseMatch.constants;
+    // PhaseMatch.convertToMicrons(P);
+    var mu = 1;
+    con.c = con.c * mu;
     // @TODO: Need to move the pump bandwidth to someplace that is cached.
     var p_bw = 2*Math.PI*con.c/sq(P.lambda_p) *P.p_bw; //* n_p; //convert from wavelength to w
     p_bw = p_bw /(2 * Math.sqrt(Math.log(2))); //convert from FWHM
     var alpha = Math.exp(-1/2*sq(2*Math.PI*con.c*( ( 1/P.lambda_s + 1/P.lambda_i - 1/P.lambda_p) )/(p_bw)));
+    // PhaseMatch.convertToMeters(P);
     return alpha;
 };
 
@@ -4634,6 +4638,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // console.log("hi");
     // console.log("\n");
     var toMicrons= 1;
+    // var toMicrons= 1;
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
@@ -4651,6 +4656,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
+    PhaseMatch.convertToMicrons(P);
+
     var omega_s = twoPIc / (P.lambda_s ),
         omega_i = twoPIc / (P.lambda_i),
         omega_p = omega_s + omega_i
@@ -4658,6 +4665,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ;
 
     // console.log("frequencies2:" + (P.lambda_p*1E9).toString() + ", " + (omega_p/twoPI*1E-9).toString() + ", " + (omega_s*1E-9).toString() + ", " + (omega_i*1E-9).toString() + ", ")
+    // PhaseMatch.convertToMicrons(P);
 
     var delK = PhaseMatch.calc_delK(P);
     var delKx = delK[0],
@@ -4665,7 +4673,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         delKz = delK[2]
         ;
 
-    PhaseMatch.convertToMicrons(P);
+
     // console.log("deltaK:" + delKx.toString() + ", " + delKy.toString() + ", " + delKz.toString() + ", ")
 
     // Height of the collected spots from the axis.
@@ -4741,7 +4749,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
         ;
         // console.log("hh: " + hh.toString() + ", Wi: " + (Wi_SQ).toString() + ", PHI_i:" + PHI_i.toString() + ",  PSI_i: " + PSI_i.toString() + ",  ks: " + k_s.toString() + ",  n_s: " + P.n_s.toString() + ",  k/n: " + (k_s/P.n_s).toString() );
-
+        // console.log("As: " + As.toString() + " Bs: " + Bs. toString() + " Cs: " + Cs.toString() + " Ds: " + Ds.toString() + " Es: " + Es.toString() + " m: " + m.toString() + " n:" + n.toString() + " ee: " + ee.toString() + " ff:" + ff.toString());
      ///////////////////////////////////////
 
 
@@ -4764,7 +4772,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     };
 
     var zintfunc = function(z){
-        // z = 0;
+        z = 0;
         var terms = calczterms(z);
         var A1R = terms[0][0],
             A1I = terms[0][1],
@@ -4902,8 +4910,10 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             imag = PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
             ;
             var EXPRadd = (EXP1R -EXP2R -EXP3R -EXP4R -EXP5R)/4;
-            // console.log("real: " + EXPR.toString() + "   EXPRadd: " + EXPRadd.toString() + "   ks: " + k_s.toString() + "   ki: " + k_i.toString() + "real: " + DENR.toString() + "   imag: " + DENI.toString());
+            console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "   DenR: " + DENR.toString() + "   imag: " + DENI.toString() + " Den1R: " +DEN1R.toString() + " DEN2R: " + DEN2R.toString() + " DEN3R: " + DEN3R.toString() + " A1R: " + A1R.toString() + " A2R: " + A2R.toString());
             // console.log("EXP1R: " + EXP1R.toString() + ", EXP2R: " + EXP2R.toString()+ ", EXP3R: " + EXP3R.toString()+ ", EXP4R: " + EXP4R.toString()+ ", EXP5R: " + EXP5R.toString());
+            // console.log("real: " + real.toString() + " Imag: " + imag.toString());
+
         return [real, imag];
     };
 
@@ -4940,10 +4950,10 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         PMz_imag = 0;
     }
 
-
+    PhaseMatch.convertToMeters(P);
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
-
+    // console.log(PMz_real.toString());
     return [PMz_real, PMz_imag, PMt];
 
 };
@@ -4969,7 +4979,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
 
     var twoPI = 2*Math.PI,
-        twoPIc = twoPI*con.c
+        twoPIc = twoPI*con.c*toMicrons
         ;
 
     var z0 = 0; //put pump in middle of the crystal
@@ -4981,6 +4991,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
+    PhaseMatch.convertToMicrons(P);
     var omega_s = twoPIc / (P.lambda_s ),
         omega_i = twoPIc / (P.lambda_i),
         omega_p = omega_s + omega_i
@@ -5268,7 +5279,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             ,EXPR  = EXP2R + EXP4R + IIR
             ,EXPI  = EXP2I + EXP4I + III
 
-            // Now calculate terms in the Denominator
+            // Now calculate terms in the DENominator
             // 8 * Sqrt[AA1 BB1 AA2 BB2 EE FF]
             ,Den1R = PhaseMatch.cmultiplyR(AA1R, AA1I, BB1R, BB1I)
             ,Den1I = PhaseMatch.cmultiplyI(AA1R, AA1I, BB1R, BB1I)
@@ -5352,7 +5363,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         PMz_real = Math.exp(-0.193*sq(arg));
         PMz_imag = 0;
     }
-
+    PhaseMatch.convertToMeters(P);
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
 
@@ -5423,7 +5434,38 @@ PhaseMatch.normalize_joint_spectrum_singles = function normalize_joint_spectrum_
  */
 PhaseMatch.convertToMicrons = function convertToMicrons (props){
     var  P = props
-        ,mu = 1E6
+        // ,mu = 1E6
+        ,mu = 1
+        ;
+
+    // // P.L = P.L*mu;
+    // console.log("Length: " + (P.L * mu).toString());
+    P.lambda_p = P.lambda_p * mu;
+    P.lambda_s = P.lambda_s * mu;
+    P.lambda_i = P.lambda_i * mu;
+    P.W = P.W * mu;
+    P.p_bw = P.p_bw * mu;
+    P.W_sx = P.W_sx * mu;
+    P.W_ix = P.W_ix * mu;
+    // console.log("P.L about to set");
+    P.L = P.L * mu;
+    // // console.log("set P.L");
+    // P.poling_period = P.poling_period * mu;
+    // P.apodization_FWHM = P.apodization_FWHM * mu;
+
+    // P.update_all_angles();
+    // P.set_apodization_L();
+    // P.set_apodization_coeff();
+    // P.set_zint();
+
+    return P;
+
+};
+
+PhaseMatch.convertToMeters = function convertToMeters (props){
+    var  P = props
+        // ,mu = 1E-6
+        ,mu = 1
         ;
 
     // // P.L = P.L*mu;
