@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-01-09
+ * phasematchjs v0.0.1a - 2015-01-13
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -4749,7 +4749,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
         ;
         // console.log("hh: " + hh.toString() + ", Wi: " + (Wi_SQ).toString() + ", PHI_i:" + PHI_i.toString() + ",  PSI_i: " + PSI_i.toString() + ",  ks: " + k_s.toString() + ",  n_s: " + P.n_s.toString() + ",  k/n: " + (k_s/P.n_s).toString() );
-        // console.log("As: " + As.toString() + " Bs: " + Bs. toString() + " Cs: " + Cs.toString() + " Ds: " + Ds.toString() + " Es: " + Es.toString() + " m: " + m.toString() + " n:" + n.toString() + " ee: " + ee.toString() + " ff:" + ff.toString());
+        // console.log("ks: " + k_s.toString() + " kp: " + k_p. toString() + " Ws_sq: " + Ws_SQ.toString() + " Wp_SQ: " + Wp_SQ.toString() + " PHI_s: " + PHI_s.toString());// + " m: " + m.toString() + " n:" + n.toString() + " ee: " + ee.toString() + " ff:" + ff.toString());
      ///////////////////////////////////////
 
 
@@ -4879,15 +4879,15 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             DEN1R = PhaseMatch.cmultiplyR(A1R, A1I, A2R, A2I),
             DEN1I = PhaseMatch.cmultiplyI(A1R, A1I, A2R, A2I),
 
-            // (-4 A3 + A8^2/A1)
-            DEN2R_a = PhaseMatch.cdivideR(EXP4Ra_den, EXP4Ia_den, A1R, A1I),
-            DEN2I_a = PhaseMatch.cdivideI(EXP4Ra_den, EXP4Ia_den, A1R, A1I),
+            // (-4 A3 + A8^2/A1) //Matlab (-4 A7 + A10^2/A3)
+            DEN2R_a = PhaseMatch.cdivideR(-1*EXP4Ra_den, -1*EXP4Ia_den, A1R, A1I),
+            DEN2I_a = PhaseMatch.cdivideI(-1*EXP4Ra_den, -1*EXP4Ia_den, A1R, A1I),
             DEN2R = PhaseMatch.caddR(-4*A3R, -4*A3I, DEN2R_a, DEN2I_a),
             DEN2I = PhaseMatch.caddI(-4*A3R, -4*A3I, DEN2R_a, DEN2I_a),
 
             // (-4 A4 + A9^2/A2)
-            DEN3R_a = PhaseMatch.cdivideR(EXP5Ra_den, EXP5Ia_den, A2R, A2I),
-            DEN3I_a = PhaseMatch.cdivideI(EXP5Ra_den, EXP5Ia_den, A2R, A2I),
+            DEN3R_a = PhaseMatch.cdivideR(-1*EXP5Ra_den, -1*EXP5Ia_den, A2R, A2I),
+            DEN3I_a = PhaseMatch.cdivideI(-1*EXP5Ra_den, -1*EXP5Ia_den, A2R, A2I),
             DEN3R = PhaseMatch.caddR(-4*A4R, -4*A4I, DEN3R_a, DEN3I_a),
             DEN3I = PhaseMatch.caddI(-4*A4R, -4*A4I, DEN3R_a, DEN3I_a),
 
@@ -4911,8 +4911,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             imag = PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
             ;
             var EXPRadd = (EXP1R -EXP2R -EXP3R -EXP4R -EXP5R)/4;
-            console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "   DenR: " + DENR.toString() + "   imag: " + DENI.toString() + " Den1R: " +DEN1R.toString() + " DEN2R: " + DEN2R.toString() + " DEN3R: " + DEN3R.toString() + " A1R: " + A1R.toString() + " A2R: " + A2R.toString() + " A8R: " + A8R.toString() + " A1R: " + A1R.toString() + " A3R: " + A3R.toString());
-            // console.log("EXP1R: " + EXP1R.toString() + ", EXP2R: " + EXP2R.toString()+ ", EXP3R: " + EXP3R.toString()+ ", EXP4R: " + EXP4R.toString()+ ", EXP5R: " + EXP5R.toString());
+            // console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "   DenR: " + DENR.toString() + "   imag: " + DENI.toString() + " Den1R: " +DEN1R.toString() + " DEN2R: " + DEN2R.toString() + " DEN3R: " + DEN3R.toString() + " A1R: " + A1R.toString() + " A2R: " + A2R.toString() + " A8R: " + A8R.toString() + " A1R: " + A1R.toString() + " A3R: " + A3R.toString());
+            console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "EXP1R: " + EXP1R.toString() + ", EXP2R: " + EXP2R.toString()+ ", EXP3R: " + EXP3R.toString()+ ", EXP4R: " + EXP4R.toString()+ ", EXP5R: " + EXP5R.toString());
             // console.log("real: " + real.toString() + " Imag: " + imag.toString());
 
         return [real, imag];
@@ -4960,7 +4960,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 };
 
 
-/*
+/**********************************************************************
  * Get the constants and terms used in the calculation of the momentum
  * space joint spectrum for the singles counts from the Idler.
  */

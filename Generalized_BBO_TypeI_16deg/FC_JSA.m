@@ -71,10 +71,11 @@ dwi=abs(omi(2,1)-omi(1,1));
 ell=(oms./indxOr_BBO(oms).^2).*(omi./indxOr_BBO(omi).^2);
 
 etaN=(sec(thetas_f)*sec(thetai_f)/(2^3*pi^6*sqrt(2*pi)*c^3*eps0))*deff^2*L^2*W0x*W0y*Wfs^2*Wfi^2*Pav/sigma;
-
+theta_se = thetas_f
 gwswi_N = Int_Rc_prx(L,ks,ki,kp,W0x,W0y,WWfs,WWfi,sec(thetas_f)^2,sec(thetai_f)^2,ksf.*sin(thetas_f),kif.*sin(thetai_f),tan(rho),hs,hi,z0,Nz);
 
 maxGws = gwswi_N * sqrt(ell)
+PUMP
 joint_amplitude=gwswi_N.*PUMP;
 MaxjsaCoinc = max(max(abs(joint_amplitude).^2))
 Rc=(2*pi)^4*etaN*sum(sum(ell.*abs(joint_amplitude).^2))*dws*dwi;

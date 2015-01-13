@@ -5,6 +5,12 @@ function [A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11]=auxintRc(Xi,L,ks,ki,kp,Wx,Wy,Wfs,W
 A1 = (0.25.*1i.*(ks.*(2.*z0 - L.*Xi) + ...
       kp.*(L.*(-1 + Xi) + ...
       1i.*ks.*(Wx.^2 + Wfs.^2.*Phis))))./(kp.*ks);
+  
+% kss = ks
+% kpp = kp
+% Ws_sq = Wfs.^2 
+% Wp_sq = Wx.^2
+% PHI_s = Phis
 
 A2 = 1i.*hs + (Wfs.^2.*Phis.*Psis)./2;
 
