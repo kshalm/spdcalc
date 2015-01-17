@@ -72,7 +72,7 @@ FWHM_waist=59.99822837* mu;  % waist
 lams=0.810* mu;    % central wavelength
 lami=0.810* mu;    % central wavelength
 FWHM_waist_fcm=59.99822837* mu; % collection mode waist
-ang_extg=0;  % external emission angle (degrees)
+ang_extg=16;  % external emission angle (degrees)
 
 [oms,omi]=meshgrid(linspace((2*pi*c)/lams_max,(2*pi*c)/lams_min,NN),linspace((2*pi*c)/lami_max,(2*pi*c)/lami_min,NN));
 
