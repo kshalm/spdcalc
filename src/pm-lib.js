@@ -566,6 +566,8 @@ PhaseMatch.phasematch = function phasematch (P){
 
     // var pm = PhaseMatch.calc_PM_tz(P);
     // var pm = PhaseMatch.calc_PM_tz_k_singles(P);
+    // var todeg = 180/Math.PI;
+    // console.log("Inside phasematch:  Theta_s: " + (P.theta_s*todeg).toString() + ", Theta_i: " + (P.theta_i*todeg).toString() );
     var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
@@ -1184,7 +1186,7 @@ PhaseMatch.autorange_lambda = function autorange_lambda(props, threshold){
     P.use_guassian_approx = true;
 
     var PMmax = PhaseMatch.phasematch_Int_Phase(P);
-    console.log("PMax : ",Math.sqrt(PMmax['phasematch']));
+    // console.log("PMax : ",Math.sqrt(PMmax['phasematch']));
     // threshold = PMmax*threshold*20;
     // threshold = threshold;
     //

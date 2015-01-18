@@ -82,10 +82,10 @@ ang_extg=16;  % external emission angle (degrees)
 [jsa,Rc,K]=FC_JSA(lamp,lams,lami,FWHM_spec,FWHM_waist,FWHM_waist_fcm,...
                               ang_extg,deff,Pav,L,z0,zs,zi,Nz,oms,omi);
 
-% %%%%%  single detection rates %%%%%%
-%                           
-% [jsa_Ns,Rs]=SingleRate_signal(lamp,lams,lami,FWHM_spec,FWHM_waist,FWHM_waist_fcm,...
-%                                        ang_extg,deff,Pav,L,z0,zs,Nz,oms,omi);
+%%%%%  single detection rates %%%%%%
+                          
+[jsa_Ns,Rs]=SingleRate_signal(lamp,lams,lami,FWHM_spec,FWHM_waist,FWHM_waist_fcm,...
+                                       ang_extg,deff,Pav,L,z0,zs,Nz,oms,omi);
 % 
 % [jsa_Ni,Ri]=SingleRate_idler(lamp,lams,lami,FWHM_spec,FWHM_waist,FWHM_waist_fcm,...
 %                                        ang_extg,deff,Pav,L,z0,zi,Nz,oms,omi);

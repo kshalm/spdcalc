@@ -11,6 +11,8 @@
 PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // console.log("hi");
     // console.log("\n");
+    // var todeg = 180/Math.PI;
+    // console.log("Inside calc_PM_tz_k_coinc:  Theta_s: " + (P.theta_s*todeg).toString() + ", Theta_i: " + (P.theta_i*todeg).toString() );
     var toMicrons= 1;
     // var toMicrons= 1;
     var con = PhaseMatch.constants;
@@ -51,8 +53,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // console.log("deltaK:" + delKx.toString() + ", " + delKy.toString() + ", " + delKz.toString() + ", ")
 
     // Height of the collected spots from the axis.
-    var hs = Math.tan(P.theta_s)*P.L*0.5,
-        hi = Math.tan(P.theta_i)*P.L*0.5;
+    var hs = Math.tan(P.theta_s)*P.L*0.5 *Math.cos(P.phi_s),
+        hi = Math.tan(P.theta_i)*P.L*0.5 * Math.cos(P.phi_i);
 
     var PMz_real = 0;
     var PMz_imag = 0;
@@ -96,7 +98,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     else {
         bw = Math.pow(2,20);
     }
-
+    // console.log("Theta_s: " + (P.theta_s * 180 / Math.PI).toString() + ", Theta_i: " + (P.theta_i * 180 / Math.PI).toString(), ", PHI_I: " + PHI_i.toString() + ", Psi_I: " + PSI_i.toString() + ", PHI_s: " + PHI_s.toString() + ", Psi_s: " + PSI_s.toString());
     // console.log("Ks: " + k_s.toString() + "Ki: " + k_i.toString() + "Kp: " + k_p.toString() + "PHI_s: " + PHI_s.toString() + "PSIs: " + PSI_s.toString() );
     // Now calculate the the coeficients that get repeatedly used. This is from
     // Karina's code. Assume a symmetric pump waist (Wx = Wy)
@@ -124,7 +126,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
         ;
         // console.log("hh: " + hh.toString() + ", Wi: " + (Wi_SQ).toString() + ", PHI_i:" + PHI_i.toString() + ",  PSI_i: " + PSI_i.toString() + ",  ks: " + k_s.toString() + ",  n_s: " + P.n_s.toString() + ",  k/n: " + (k_s/P.n_s).toString() );
-        console.log("ks: " + k_s.toString() + " kp: " + k_p. toString() + " Ws_sq: " + Ws_SQ.toString() + " Wp_SQ: " + Wp_SQ.toString() + " PHI_s: " + PHI_s.toString() + " Cs:"+ Cs.toString() + " Ds:" + Ds.toString() + " As:" + As.toString());// + " m: " + m.toString() + " n:" + n.toString() + " ee: " + ee.toString() + " ff:" + ff.toString());
+        // console.log("ks: " + k_s.toString() + " kp: " + k_p. toString() + " Ws_sq: " + Ws_SQ.toString() + " Wp_SQ: " + Wp_SQ.toString() + " PHI_s: " + PHI_s.toString() + " Cs:"+ Cs.toString() + " Ds:" + Ds.toString() + " As:" + As.toString());// + " m: " + m.toString() + " n:" + n.toString() + " ee: " + ee.toString() + " ff:" + ff.toString());
      ///////////////////////////////////////
 
 
@@ -147,7 +149,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     };
 
     var zintfunc = function(z){
-        z = 0;
+        // z = 0;
         var terms = calczterms(z);
         var A1R = terms[0][0],
             A1I = terms[0][1],
@@ -289,7 +291,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             /////////////////////////////////////////////////////////////////
             // console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "   DenR: " + DENR.toString() + "   DENI: " + DENI.toString() + " Den1I: " +DEN1I.toString() + " DEN2I: " + DEN2I.toString() + " DEN3I: " + DEN3I.toString() + " A1I: " + A1I.toString() + " A2I: " + A2I.toString() + " A8I: " + A8I.toString() + " A1I: " + A1I.toString() + " A3I: " + A3I.toString());
             // console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "   DenR: " + DENR.toString() + "   DENI: " + DENI.toString() + " Den1R: " +DEN1R.toString() + " DEN2R: " + DEN2R.toString() + " DEN3R: " + DEN3R.toString() + " A1R: " + A1R.toString() + " A2R: " + A2R.toString() + " A8R: " + A8R.toString() + " A1R: " + A1R.toString() + " A3R: " + A3R.toString());
-            // console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "EXP1R: " + EXP1R.toString() + ", EXP2R: " + EXP2R.toString()+ ", EXP3R: " + EXP3R.toString()+ ", EXP4R: " + EXP4R.toString()+ ", EXP5R: " + EXP5R.toString());
+            // console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + " EXP1R: " + EXP1R.toString() + ", EXP2R: " + EXP2R.toString()+ ", EXP3R: " + EXP3R.toString()+ ", EXP4R: " + EXP4R.toString()+ ", EXP5R: " + EXP5R.toString() + " A1R: " + A1R.toString() + " A3R: " + A3R.toString() + "    A5I: " + A5I.toString() + ",    A7I: " + A7I.toString() + " A8R: " + A8R.toString() + ", Exp4R_num: " + EXP4R_num.toString() + ", Exp4I_num: " + EXP4I_num.toString() + ", Exp4R_den: " + EXP4R_den.toString() + ", Exp4I_den: " + EXP4I_den.toString() );
             // console.log("real: " + real.toString() + " Imag: " + imag.toString());
 
         return [real, imag];
@@ -377,8 +379,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ;
 
     // Height of the collected spots from the axis.
-    var hs = Math.tan(P.theta_s)*P.L*0.5,
-        hi = Math.tan(P.theta_i)*P.L*0.5;
+    var hs = Math.tan(P.theta_s)*P.L*0.5 *Math.cos(P.phi_s),
+        hi = Math.tan(P.theta_i)*P.L*0.5 * Math.cos(P.phi_i);
 
     var PMz_real = 0;
     var PMz_imag = 0;

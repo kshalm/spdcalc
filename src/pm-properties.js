@@ -90,6 +90,7 @@
             // Find internal angles for signal and idler
             this.theta_s = PhaseMatch.find_internal_angle(this, "signal");
             this.theta_i = PhaseMatch.find_internal_angle(this, "idler");
+            // console.log("Angle diff at beginning: ", (this.theta_s - this.theta_i)*180/Math.PI);
             // this.theta_s = 0;
 
             // //Other functions that do not need to be included in the default init
@@ -473,7 +474,7 @@
             n = n+(3- n%3); //guarantee that n is divisible by 3
             this.z2Dweights = PhaseMatch.Nintegrate2DWeights_3_8(n);
             this.numz2Dint = n;
-            console.log(nslices);
+            // console.log(nslices);
         },
 
 

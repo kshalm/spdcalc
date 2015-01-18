@@ -3,13 +3,16 @@ function [joint_amplitude,Rc,K]=FC_JSA(lamp,lams,lami,FWHM_spec,FWHM_waist,FWHM_
 mu = 1e-6
 c=3e14 *mu;
 
+W0 = 50.96*mu;
+
 %/////////////////////////////////////////////////////
 
 sigma = (2*pi*c/(lamp-FWHM_spec/2) - 2*pi*c/(lamp+FWHM_spec/2))*sqrt(2)/(2*sqrt(log(2)));
-W0 = FWHM_waist*sqrt(2)/(2*sqrt(log(2)));
+% W0 = FWHM_waist*sqrt(2)/(2*sqrt(log(2)));;
 W0x = W0; % beamwaist x
 W0y = W0; % beamwaist y
-Wf = FWHM_waist_fcm*sqrt(2)/(2*sqrt(log(2)));
+% Wf = FWHM_waist_fcm*sqrt(2)/(2*sqrt(log(2)));
+Wf = W0
 Wfs=Wf;
 Wfi=Wf;
 

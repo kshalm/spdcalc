@@ -125,15 +125,15 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size': 4,
-                    // 'ls_start': lim.lambda_s.min,
-                    // 'ls_stop': lim.lambda_s.max,
-                    // 'li_start': lim.lambda_i.min,
-                    // 'li_stop': lim.lambda_i.max
-                    'ls_start': 0.81E-6,
-                    'ls_stop': 0.81E-6,
-                    'li_start': 0.81E-6,
-                    'li_stop': 0.81E-6
+                    'grid_size': 40,
+                    'ls_start': lim.lambda_s.min,
+                    'ls_stop': lim.lambda_s.max,
+                    'li_start': lim.lambda_i.min,
+                    'li_stop': lim.lambda_i.max
+                    // 'ls_start': 0.81E-6,
+                    // 'ls_stop': 0.81E-6,
+                    // 'li_start': 0.81E-6,
+                    // 'li_stop': 0.81E-6
                 });
             },
 
@@ -174,6 +174,8 @@ define(
                 var Pn = props.clone();
                 Pn.phi_i = Pn.phi_s + Math.PI;
                 Pn.update_all_angles();
+                props.optimum_idler()
+                // console.log("Theta_s - Theta_i: ",(props.theta_s)*180/Math.PI, (props.theta_i)*180/Math.PI,  (props.theta_s - props.theta_i)*180/Math.PI);
                 // Pn.optimum_idler(P);
                 // P.theta_i_e = PhaseMatch.find_external_angle(P,"idler");
                 // console.log("External angle of the idler is:", P.theta_i_e*180/Math.PI );
@@ -291,7 +293,7 @@ define(
                      }).then(function( PM ){
                         // var p = self.updateTitle( PM );
                         self.data = PM;
-                        console.log("Max singles", PhaseMatch.max(PM));
+                        // console.log("Max singles", PhaseMatch.max(PM));
                         self.plotSingles.setZRange([0,Math.max.apply(null,PM)]);
                         self.plotSingles.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plotSingles.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
@@ -306,7 +308,7 @@ define(
             calcRCoinc: function(props, propsJSON,lambda_s,lambda_i_range,grid_size, Nthreads){
 
                 // var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum(props));
-                console.log("norm differences:", norm,  Math.sqrt(PhaseMatch.normalize_joint_spectrum(props)));
+                // console.log("norm differences:", norm,  Math.sqrt(PhaseMatch.normalize_joint_spectrum(props)));
                 var norm = 1;
 
                 // The calculation is split up and reutrned as a series of promises
@@ -358,7 +360,7 @@ define(
                         var eff = self.calcEfficiency(props);
                         console.log("efficiency: ", eff);
                         self.draw();
-                        console.log("FINISHED PLOTTING");
+                        // console.log("FINISHED PLOTTING");
                         return true;
 
                     });
@@ -379,7 +381,7 @@ define(
                     ,eff = Rc/Rs * (Wi_SQ * PHI_s)
                     ,Rmax = PhaseMatch.max(self.dataCoinc) / PhaseMatch.max(self.data) * (Wi_SQ * PHI_s)
                     ;
-                console.log("Singles Max:", PhaseMatch.max(self.data), "Coinc Max:", PhaseMatch.max(self.dataCoinc), "waist:", P.W_sx, "hs:", Math.tan(P.theta_s)*P.L*0.5);
+                // console.log("Singles Max:", PhaseMatch.max(self.data), "Coinc Max:", PhaseMatch.max(self.dataCoinc), "waist:", P.W_sx, "hs:", Math.tan(P.theta_s)*P.L*0.5);
                 // console.log("Eff", eff, Rmax);
                 return eff;
             },

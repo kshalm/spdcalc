@@ -99,6 +99,8 @@ PhaseMatch.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm)
 
 
     var todeg = 180/Math.PI;
+
+    // console.log("Inside JSA_p:  Theta_s: " + (P.theta_s*todeg).toString() + ", Theta_i: " + (P.theta_i*todeg).toString() );
     // console.log(P.phi_i*todeg, P.phi_s*todeg);
     // P.theta_i = P.theta_s;
     // var centerpm = PhaseMatch.phasematch(P);
@@ -141,7 +143,7 @@ PhaseMatch.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm)
     }
 
 
-    console.log("JSA coinc Max: " + PhaseMatch.max(PMreal).toString());
+    // console.log("JSA coinc Max: " + PhaseMatch.max(PMreal).toString());
     // console.log("Approx Check, ", C_check);
     return [PMreal, PMimag];
 
