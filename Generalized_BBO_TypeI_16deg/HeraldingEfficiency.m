@@ -46,8 +46,8 @@ deff=1.64e-6 * mu; % microns/Volts
 Pav=1e-3 ; % pump power
 L=300 * mu;    %crystal length
 z0=0 * mu;     % pump beamwaist position
-zs=100 * mu;  % collection waist location (idler)
-zi=50 * mu;     % collection waist location (idler)
+zs=0 * mu;  % collection waist location (idler)
+zi=0 * mu;     % collection waist location (idler)
 
 %%% range and resolution of vectors and matrices %%%
 NN=2; % points in vectors
@@ -67,6 +67,8 @@ lami_max=0.81 * mu;
 lamp=0.405* mu;  % central wavelength
 FWHM_spec=9e-3* mu; % bandwidth
 FWHM_waist=59.99822837* mu;  % waist
+% waist = FWHM_waist *sqrt(2)/(2*sqrt(log(2)))
+% waist
 
 % signal / idler parameters %
 lams=0.810* mu;    % central wavelength

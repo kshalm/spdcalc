@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-01-13
+ * phasematchjs v0.0.1a - 2015-01-17
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -4723,6 +4723,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         bw = Math.pow(2,20);
     }
 
+    // console.log("Ks: " + k_s.toString() + "Ki: " + k_i.toString() + "Kp: " + k_p.toString() + "PHI_s: " + PHI_s.toString() + "PSIs: " + PSI_s.toString() );
     // Now calculate the the coeficients that get repeatedly used. This is from
     // Karina's code. Assume a symmetric pump waist (Wx = Wy)
     var As = -0.25 * (Wp_SQ + Ws_SQ * PHI_s),
@@ -4749,7 +4750,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
         ;
         // console.log("hh: " + hh.toString() + ", Wi: " + (Wi_SQ).toString() + ", PHI_i:" + PHI_i.toString() + ",  PSI_i: " + PSI_i.toString() + ",  ks: " + k_s.toString() + ",  n_s: " + P.n_s.toString() + ",  k/n: " + (k_s/P.n_s).toString() );
-        // console.log("ks: " + k_s.toString() + " kp: " + k_p. toString() + " Ws_sq: " + Ws_SQ.toString() + " Wp_SQ: " + Wp_SQ.toString() + " PHI_s: " + PHI_s.toString());// + " m: " + m.toString() + " n:" + n.toString() + " ee: " + ee.toString() + " ff:" + ff.toString());
+        console.log("ks: " + k_s.toString() + " kp: " + k_p. toString() + " Ws_sq: " + Ws_SQ.toString() + " Wp_SQ: " + Wp_SQ.toString() + " PHI_s: " + PHI_s.toString() + " Cs:"+ Cs.toString() + " Ds:" + Ds.toString() + " As:" + As.toString());// + " m: " + m.toString() + " n:" + n.toString() + " ee: " + ee.toString() + " ff:" + ff.toString());
      ///////////////////////////////////////
 
 
@@ -4911,7 +4912,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             imag = PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
             ;
             var EXPRadd = (EXP1R -EXP2R -EXP3R -EXP4R -EXP5R)/4;
-            console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "   DenR: " + DENR.toString() + "   imag: " + DENI.toString() + " Den1R: " +DEN1R.toString() + " DEN2R: " + DEN2R.toString() + " DEN3R: " + DEN3R.toString() + " A1R: " + A1R.toString() + " A2R: " + A2R.toString() + " A8R: " + A8R.toString() + " A1R: " + A1R.toString() + " A3R: " + A3R.toString());
+            /////////////////////////////////////////////////////////////////
+            // console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "   DenR: " + DENR.toString() + "   DENI: " + DENI.toString() + " Den1I: " +DEN1I.toString() + " DEN2I: " + DEN2I.toString() + " DEN3I: " + DEN3I.toString() + " A1I: " + A1I.toString() + " A2I: " + A2I.toString() + " A8I: " + A8I.toString() + " A1I: " + A1I.toString() + " A3I: " + A3I.toString());
+            // console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "   DenR: " + DENR.toString() + "   DENI: " + DENI.toString() + " Den1R: " +DEN1R.toString() + " DEN2R: " + DEN2R.toString() + " DEN3R: " + DEN3R.toString() + " A1R: " + A1R.toString() + " A2R: " + A2R.toString() + " A8R: " + A8R.toString() + " A1R: " + A1R.toString() + " A3R: " + A3R.toString());
             // console.log("real: " + EXPR.toString() + "   ExpImag: " + EXPI.toString() + "EXP1R: " + EXP1R.toString() + ", EXP2R: " + EXP2R.toString()+ ", EXP3R: " + EXP3R.toString()+ ", EXP4R: " + EXP4R.toString()+ ", EXP5R: " + EXP5R.toString());
             // console.log("real: " + real.toString() + " Imag: " + imag.toString());
 

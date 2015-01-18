@@ -61,8 +61,11 @@ ki=indxOr_BBO(omi).*kif; %%% magnitud de k en el cristal
 zs =0;
 zi=0;
 rho = 0;
-WWfs=Wfs.*sqrt( 1 + 2.*1i.*(zs+hs.*sin(thetas_f))./(ksf.*Wfs^2));
-WWfi=Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
+% WWfs=Wfs.*sqrt( 1 + 2.*1i.*(zs+hs.*sin(thetas_f))./(ksf.*Wfs^2));
+% WWfi=Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
+
+WWfs=Wfs;
+WWfi=Wfi;
 
 
 PUMP=exp(-(oms+ omi-omp0).^2./sigma^2);
