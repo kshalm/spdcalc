@@ -564,11 +564,11 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
  */
 PhaseMatch.phasematch = function phasematch (P){
 
-    // var pm = PhaseMatch.calc_PM_tz(P);
+    var pm = PhaseMatch.calc_PM_tz(P);
     // var pm = PhaseMatch.calc_PM_tz_k_singles(P);
     // var todeg = 180/Math.PI;
     // console.log("Inside phasematch:  Theta_s: " + (P.theta_s*todeg).toString() + ", Theta_i: " + (P.theta_i*todeg).toString() );
-    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
     var PMz_imag = pm[1];
@@ -580,6 +580,30 @@ PhaseMatch.phasematch = function phasematch (P){
     // if (C_check>0.5){
     //     console.log("approx not valid," C_check);
     // }
+    // Pump spectrum
+    var alpha = PhaseMatch.pump_spectrum(P);
+    // var alpha = 1;
+
+    //return the real and imaginary parts of Phase matching function
+    return [alpha*PMt* PMz_real, alpha*PMt* PMz_imag, C_check];
+};
+
+/*
+ * phasematch()
+ * Gets the index of refraction depending on phasematching type
+ * P is SPDC Properties object
+ */
+PhaseMatch.phasematch_coinc = function phasematch_coinc (P){
+
+    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    // Longitundinal components of PM.
+    var PMz_real = pm[0];
+    var PMz_imag = pm[1];
+    // Transverse component of PM
+    var PMt = pm[2];
+
+    var C_check = pm[3];
+
     // Pump spectrum
     var alpha = PhaseMatch.pump_spectrum(P);
     // var alpha = 1;

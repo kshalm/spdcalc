@@ -411,7 +411,7 @@ In 2D we now get an array of weights that is given by:
  */
 PhaseMatch.Nintegrate2D_3_8 = function Nintegrate2D_3_8(f,a,b,c,d,n,w){
     var weights;
-    n = n+(3- n%3); //guarantee that n is divisible by 3
+    // n = n+(3- n%3); //guarantee that n is divisible by 3
 
     if (w === null || w === undefined){
       weights = PhaseMatch.Nintegrate2DWeights_3_8(n);
@@ -431,6 +431,7 @@ PhaseMatch.Nintegrate2D_3_8 = function Nintegrate2D_3_8(f,a,b,c,d,n,w){
 
     for (var j=0; j<n+2; j++){
         for (var k=0; k<n+2; k++){
+            // console.log("inside Simpsons. J: " +j.toString() + ", k:" + k.toString() + ", result:" +result.toString());
             result +=f(a +j*dx, c+k*dy)*weights[j]*weights[k];
         }
     }

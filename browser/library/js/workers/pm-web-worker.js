@@ -88,6 +88,30 @@ W('jsaHelper', {
                     params);
    	},
 
+    doCalcHeraldingEff: function( args ){
+      this.props.set( args[0] );
+
+      var xrange = args[1],
+          yrange = args[2],
+          ls_start = args[3],
+          ls_stop = args[4],
+          li_start = args[5],
+          li_stop = args[6],
+          grid_size_heralding = args[7]
+          ;
+
+      return  PhaseMatch.calc_heralding_plot_p(
+                    this.props,
+                    xrange,
+                    yrange,
+                    ls_start,
+                    ls_stop,
+                    li_start,
+                    li_stop,
+                    grid_size_heralding
+                    );
+    },
+
     do2HOM: function( args ){
       this.props.set( args[0] );
 
