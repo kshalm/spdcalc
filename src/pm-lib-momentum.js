@@ -24,8 +24,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ;
 
     var z0 = 0; //put pump in middle of the crystal
-    // var RHOpx = P.walkoff_p; //pump walkoff angle.
-    var RHOpx = 0;
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx  = 0;
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch
@@ -363,8 +363,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ;
 
     var z0 = 0; //put pump in middle of the crystal
-    // var RHOpx = P.walkoff_p; //pump walkoff angle.
-    var RHOpx = 0;
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx = 0;
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch

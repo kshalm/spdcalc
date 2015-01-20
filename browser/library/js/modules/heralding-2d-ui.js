@@ -116,7 +116,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size_heralding': 2,
+                    'grid_size_heralding': 10,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -125,10 +125,10 @@ define(
                     'xtal_l_stop': props.L*3,
                     'bw_start' : props.p_bw/3,
                     'bw_stop': props.p_bw*3,
-                    'Ws_start': 30E-6,
-                    'Ws_stop': 300E-6,
-                    'Wp_start': 30E-6,
-                    'Wp_stop': 300E-6
+                    'Ws_start': 30e-6,
+                    'Ws_stop': 300e-6,
+                    'Wp_start': 30e-6,
+                    'Wp_stop': 300e-6
 
                 });
             },
@@ -170,6 +170,7 @@ define(
                 }
                 yrange.push( Ws.subarray((Nthreads-1)*divisions, Ws.length));
                
+                var starttime = new Date();
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
                     promises[j] = self.workers[j].exec('jsaHelper.doCalcHeraldingEff', [
@@ -199,9 +200,13 @@ define(
 
                     }).then(function( PM ){
                         self.data = PM;
-                        self.plot.setZRange([1,Math.max.apply(null,PM)*1]);
-                        self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('xtal_l_start')), converter.to('micro',self.plotOpts.get('xtal_l_stop'))]);
-                        self.plot.setYRange( [ converter.to('nano',self.plotOpts.get('bw_start')), converter.to('nano',self.plotOpts.get('bw_stop'))]);
+                        // self.plot.setZRange([0,Math.max.apply(null,PM)*1]);
+                        self.plot.setZRange([0,1]);
+                        self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
+                        self.plot.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
+                        var endtime = new Date();
+                        console.log(" Elapsed time: ", endtime - starttime);
+                        
                         return true;
                 });  
 

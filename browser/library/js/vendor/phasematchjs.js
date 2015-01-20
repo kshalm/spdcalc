@@ -3778,11 +3778,11 @@ PhaseMatch.pump_spectrum = function pump_spectrum (P){
  */
 PhaseMatch.phasematch = function phasematch (P){
 
-    var pm = PhaseMatch.calc_PM_tz(P);
+    // var pm = PhaseMatch.calc_PM_tz(P);
     // var pm = PhaseMatch.calc_PM_tz_k_singles(P);
     // var todeg = 180/Math.PI;
     // console.log("Inside phasematch:  Theta_s: " + (P.theta_s*todeg).toString() + ", Theta_i: " + (P.theta_i*todeg).toString() );
-    // var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
+    var pm = PhaseMatch.calc_PM_tz_k_coinc(P);
     // Longitundinal components of PM.
     var PMz_real = pm[0];
     var PMz_imag = pm[1];
@@ -4677,8 +4677,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ;
 
     var z0 = 0; //put pump in middle of the crystal
-    // var RHOpx = P.walkoff_p; //pump walkoff angle.
-    var RHOpx = 0;
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx  = 0;
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch
@@ -5016,8 +5016,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ;
 
     var z0 = 0; //put pump in middle of the crystal
-    // var RHOpx = P.walkoff_p; //pump walkoff angle.
-    var RHOpx = 0;
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx = 0;
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch
@@ -7662,6 +7662,71 @@ PhaseMatch.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yrang
 
 };
 
+// /*
+// * calc_heralding_plot_p
+// */
+// PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, WsRange, ls_start, ls_stop, li_start, li_stop, n){
+//     props.update_all_angles();
+//     var P = props.clone()
+//         ,i
+//         ,N = WpRange.length*WsRange.length
+//         ,eff = new Float64Array( N )
+//         ,dim = 12 //make sure this is even
+//         ,maxeEff = 0
+//         ,Ws_ideal = 0
+//         ,Wp_ideal = 0
+//         ,Wi_SQ = Math.pow(P.W_sx,2)
+//         ,PHI_s = 1/Math.cos(P.theta_s_e)
+//         // ,dim = dim+(3- dim%3) //guarantee that n is divisible by 3
+//         ,lambdaWeights = PhaseMatch.Nintegrate2DWeights_3_8(n)
+//         ,lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim)
+//         ,lambda_i = PhaseMatch.linspace(li_stop, li_start, dim)
+//         ;
+
+//     P.phi_i = P.phi_s + Math.PI;
+//     P.update_all_angles();
+//     P.optimum_idler(P);
+
+//     function calc_singles_rate( ){
+//         var JSI_singles = PhaseMatch.calc_JSI_Singles_p(P, lambda_s,lambda_i, dim, 1);
+//         return PhaseMatch.Sum(JSI_singles);
+//     };
+
+//     function calc_coinc_rate( ){
+
+//         var JSI_coinc = PhaseMatch.calc_JSI_p(P, lambda_s,lambda_i, dim, 1);
+//         return PhaseMatch.Sum(JSI_coinc);
+//     };
+
+//     for (i=0; i<N; i++){
+//         var index_x = i % WpRange.length;
+//         var index_y = Math.floor(i / WpRange.length);
+//         P.W_sx = WsRange[index_y];
+//         P.W_sy = P.W_sx;
+//         P.W_ix = WsRange[index_y];
+//         P.W_iy = P.W_ix;
+//         P.W = WpRange[index_x];
+
+      
+//         var  singlesRate = calc_singles_rate()
+//             ,coincRate = calc_coinc_rate()
+//             ;
+
+//         // console.log("singles: " + singlesRate.toString() + ", coinc:" + coincRate.toString());
+//         eff[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
+//         console.log("Effi:" + (eff[i]).toString() + ', ' + (singlesRate).toString() + ', ' + (coincRate).toString() + ', ' + PHI_s.toString() );
+//         // if (S[i]<maxschmidt){
+//         //     maxschmidt = S[i];
+//         //     x_ideal = xrange[index_x];
+//         //     y_ideal = yrange[index_y];
+//         // }
+
+
+//     }
+//     return eff;
+
+// };
+
 /*
 * calc_heralding_plot_p
 */
@@ -7671,19 +7736,25 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         ,i
         ,N = WpRange.length*WsRange.length
         ,eff = new Float64Array( N )
-        ,dimInt = 9 //make sure this is even
+        ,n = 12 //make sure this is even
         ,maxeEff = 0
         ,Ws_ideal = 0
         ,Wp_ideal = 0
         ,Wi_SQ = Math.pow(P.W_sx,2)
         ,PHI_s = 1/Math.cos(P.theta_s_e)
-        ,n = n+(3- n%3) //guarantee that n is divisible by 3
+        // ,n = n+(3- n%3) //guarantee that n is divisible by 3
         ,lambdaWeights = PhaseMatch.Nintegrate2DWeights_3_8(n)
         ;
 
+    // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
+    // P.theta_i = 0.6*Math.PI/180;
+    P.phi_i = P.phi_s + Math.PI;
+    P.update_all_angles();
+    P.optimum_idler(P);
+
     function calc_singles_rate(lambda_s, lambda_i ){
 
-        // props.update_all_angles();
+        // P.update_all_angles();
         // var P = props;
         P.lambda_s = lambda_s;
         P.lambda_i = lambda_i;
@@ -7692,13 +7763,13 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         var PM = PhaseMatch.phasematch_singles(P);
-        console.log("inside singles: " + PM[0].toString() + ", i*" + PM[1].toString() + " P.n_p: " +P.n_p.toString() + ", Weights:" + lambdaWeights[0].toString());
+        // console.log("inside singles: " + PM[0].toString() + ", i*" + PM[1].toString() + " P.n_p: " +P.n_p.toString() + ", Weights:" + lambdaWeights[0].toString());
         return Math.sqrt(sq(PM[0]) + sq(PM[1]));
     };
 
     function calc_coinc_rate(lambda_s, lambda_i ){
 
-        // props.update_all_angles();
+        // P.update_all_angles();
         // var P = props;
         P.lambda_s = lambda_s;
         P.lambda_i = lambda_i;
@@ -7706,12 +7777,12 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-        var PM = PhaseMatch.phasematch_coinc(P);
-        return Math.sqrt(sq(PM[0]) + sq(PM[1]));
+        var PM = PhaseMatch.phasematch(P);
+        return (sq(PM[0]) + sq(PM[1]));
     };
 
     function calc_rates(lambda_s, lambda_i ){
-        console.log("blah");
+        // console.log("blah");
         // props.update_all_angles();
         // var P = props;
         P.lambda_s = lambda_s;
@@ -7720,13 +7791,13 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-        var PMcoinc = PhaseMatch.phasematch_coinc(P)
+        var  PMcoinc = PhaseMatch.phasematch(P)
             ,PMsingles = PhaseMatch.phasematch_singles(P)
             ,CoincRate = (sq(PMcoinc[0]) + sq(PMcoinc[1]))
             ,SinglesRate = Math.sqrt(sq(PMsingles[0]) + sq(PMsingles[1]))
-            ,Eff = CoincRate/SinglesRate
+            ,Eff = CoincRate/SinglesRate * (PHI_s * sq(P.W_sx))
             ;
-        // console.log("Eff in:" + Eff.toString());
+        // console.log("Eff in:" + CoincRate.toString() +", " +  SinglesRate.toString() +", " +  Eff.toString());
         return Eff;
     };
     // console.log("n: " + n.toString() + ", ls_start: " + n.toString() + ", Weights:" + lambdaWeights[4].toString());
@@ -7742,15 +7813,17 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
 
         // console.log( P.W_sx.toString() + ", " + P.W.toString());
 
-        // var singlesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
-        //     ,coincRate = PhaseMatch.Nintegrate2D_3_8(calc_coinc_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
-        //     ;
+        var singlesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
+            ,coincRate = PhaseMatch.Nintegrate2D_3_8(calc_coinc_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
+            ;
 
         // console.log("singles: " + singlesRate.toString() + ", coinc:" + coincRate.toString());
-        // eff[i] = singlesRate / coincRate *( Wi_SQ * PHI_s);
-        var test = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
-        eff[i] = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights) *( sq(WsRange[index_y]) * PHI_s);
-        console.log("Effi:" + (eff[i]).toString());
+        eff[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
+        // var test = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
+        // eff[i] = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);// *( sq(WsRange[index_y]) * PHI_s);
+
+        // console.log("Effi:" + (eff[i]).toString() );
+        
         // if (S[i]<maxschmidt){
         //     maxschmidt = S[i];
         //     x_ideal = xrange[index_x];
@@ -7759,11 +7832,6 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
 
 
     }
-
-    // console.log("max pm value = ", maxpm);
-    // console.log("Lowest Schmidt = ", maxschmidt, " , X = ", x_ideal, ", Y = ", y_ideal);
-    // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
-    // console.log(S[0]);
     return eff;
 
 };
