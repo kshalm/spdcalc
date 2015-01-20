@@ -42,11 +42,13 @@ define(
             nWorkers: 6,
             tplPlots: tplHeraldingLayout,
             showPlotOpts: [
-                'grid_size_schmidt',
+                'grid_size_heralding',
                 'signal-wavelength',
                 'idler-wavelength',
-                'xtal_length_range',
-                'pump_bw_range'
+                'pump-waist',
+                'signal-waist'
+
+
             ],
 
             initEvents : function(){
@@ -116,15 +118,11 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size_heralding': 10,
+                    'grid_size_heralding': 2,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
                     'li_stop': lim.lambda_i.max,
-                    'xtal_l_start': props.L/3,
-                    'xtal_l_stop': props.L*3,
-                    'bw_start' : props.p_bw/3,
-                    'bw_stop': props.p_bw*3,
                     'Ws_start': 30e-6,
                     'Ws_stop': 300e-6,
                     'Wp_start': 30e-6,
@@ -139,7 +137,7 @@ define(
                     Nthreads = self.nWorkers,
                     grid_size = self.plotOpts.get('grid_size_heralding'),
                     divisions = Math.floor(grid_size / Nthreads),
-                    xrange = [], 
+                    xrange = [],
                     yrange = [],
                     promises = [];
 
@@ -152,7 +150,7 @@ define(
                             self.plotOpts.get('Ws_stop'),
                             self.plotOpts.get('Ws_start'),
                             grid_size
-                        ); 
+                        );
 
                 // be sure to reverse the order of this array so the graph makes sense.
                 // Effectively, this moves the origin to the bottom right corner.
@@ -160,7 +158,7 @@ define(
                             self.plotOpts.get('Wp_start'),
                             self.plotOpts.get('Wp_stop'),
                             grid_size
-                        ); 
+                        );
 
                 var xrange = Wp;
 
@@ -169,7 +167,7 @@ define(
                     yrange.push(Ws.subarray(i*divisions,i*divisions + divisions));
                 }
                 yrange.push( Ws.subarray((Nthreads-1)*divisions, Ws.length));
-               
+
                 var starttime = new Date();
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
@@ -190,12 +188,12 @@ define(
                         // put the results back together
                         var arr = new Float64Array( grid_size *  grid_size );
                         var startindex = 0;
-                        
+
                         for (j = 0; j<Nthreads; j++){
                              arr.set(values[j], startindex);
                             // console.log("arr val set");
                              startindex += xrange.length*yrange[j].length;
-                        }                        
+                        }
                         return arr; // this value is passed on to the next "then()"
 
                     }).then(function( PM ){
@@ -206,11 +204,11 @@ define(
                         self.plot.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
                         var endtime = new Date();
                         console.log(" Elapsed time: ", endtime - starttime);
-                        
-                        return true;
-                });  
 
-                
+                        return true;
+                });
+
+
             },
 
             draw: function(){
@@ -230,8 +228,8 @@ define(
                     self.plot.plotData( data );
                     dfd.resolve();
                 }, 10);
-                   
-                return dfd.promise; 
+
+                return dfd.promise;
             }
         });
 

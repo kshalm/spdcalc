@@ -21,6 +21,18 @@
         </div>
     </div>
 
+    <!-- Grid size for 2D heralding plot. -->
+    <div id="plot-opt-grid_size_heralding">
+        <div class="control-group">
+            <label class="control-label grid_size">
+                Grid size
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="" class="inputbox" name="grid_size_heralding" value="{{= parseFloat( it.grid_size_heralding ) }}" />
+            </div>
+        </div>
+    </div>
+
     <div id="plot-opt-T_2HOM">
         <div class="control-group">
             <label class="control-label T_2HOM">
@@ -308,4 +320,53 @@
         </div>
 
     </div>
+
+
+
+    <!-- Pump Waist Range for the Heralding 2D calculations -->
+    <div id="plot-opt-pump-waist">
+        <label class="plot_wp">Pump Waist (1/e^2)</label>
+        <div class="control-group">
+            <label class="control-label">
+                Start (um)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="Wp_start" value="{{= this.converter.to('micro', parseFloat( it.Wp_start )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Stop (um)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="Wp_stop" value="{{= this.converter.to('micro', parseFloat( it.Wp_stop )) }}" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Signal Waist Range for the Heralding 2D calculations -->
+    <div id="plot-opt-signal-waist">
+        <label class="plot_ws">Signal Waist (1/e^2)</label>
+        <div class="control-group">
+            <label class="control-label">
+                Start (um)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="Ws_start" value="{{= this.converter.to('micro', parseFloat( it.Ws_start )) }}" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Stop (um)
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="Ws_stop" value="{{= this.converter.to('micro', parseFloat( it.Ws_stop )) }}" />
+            </div>
+        </div>
+    </div>
+
+
+
 </section>
