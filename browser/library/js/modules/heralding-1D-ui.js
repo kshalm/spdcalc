@@ -47,7 +47,7 @@ define(
             tplPlots: tplJSALayout,
             showPlotOpts: [
                 'npts-heralding-waist',
-                'grid_size_heralding',
+                'grid_size_heralding_JSI',
                 'signal-wavelength',
                 'idler-wavelength',
                 'signal-waist'
@@ -80,9 +80,10 @@ define(
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     labels: {
                         x: 'Collection Waist (um)',
-                        y: 'Heralding Efficiency'
+                        y: 'Efficiency'
                     },
-                    format: {x: '.0f'},
+                    format: {x: '1f'
+                            ,y: '.1f'},
                     width: 400,
                     height: 200,
                     yrange: [0,1]
@@ -96,9 +97,9 @@ define(
                 self.eldelT = $(tplWaistCtrl.render()).appendTo( self.el.find('.heat-map-wrapper') );
 
                 self.eldelT.slider({
-                    min: 30,
-                    max: 300,
-                    value: 150,
+                    min: 50,
+                    max: 200,
+                    value: 100,
                     orientation: "horizontal",
                     range: "min",
                     change: function(){
@@ -235,19 +236,19 @@ define(
                 tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max);
 
                 self.plotOpts.set({
-                    'grid_size_heralding': 40,
-                    'n_pts_eff_1d': 10,
+                    'grid_size_heralding_JSI': 40,
+                    'n_pts_eff_1d': 50,
                     'n_int': 14,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
                     'li_stop': lim.lambda_i.max,
 
-                    'delT_start': tsi[1],
-                    'delT_stop': tsi[2],
+                    // 'delT_start': tsi[1],
+                    // 'delT_stop': tsi[2],
 
-                    'Ws_start': 30e-6,
-                    'Ws_stop': 300e-6
+                    'Ws_start': 50e-6,
+                    'Ws_stop': 200e-6
                 });
 
                 self.set_slider_values(50e-6, self.plotOpts.get['Ws_start'], self.plotOpts.get['Ws_stop']);
@@ -352,7 +353,8 @@ define(
                         if (effMax * 1.1 > 1){
                             effMax = 1;
                         }
-                        effMin = effMin/1.1;
+                        effMin = Math.floor(effMin*10/1.2)/10;
+                        // console.log("Min value:", effMin);
                         // self.plot1dEff.setYRange([0, Math.max.apply(null,HOM)*1.2]);
                         self.plot1dEff.setYRange([effMin, effMax]);
 
@@ -384,7 +386,7 @@ define(
             calcRSingles: function(P){
                 var  self = this
                     ,props = P.clone()
-                    ,grid_size = self.plotOpts.get('grid_size_heralding')
+                    ,grid_size = self.plotOpts.get('grid_size_heralding_JSI')
                     ,Nthreads = self.nWorkers-1
                     ,lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), grid_size)
                     ,lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), grid_size)
@@ -461,7 +463,7 @@ define(
 
                 var  self = this
                     ,props = P.clone()
-                    ,grid_size = self.plotOpts.get('grid_size_heralding')
+                    ,grid_size = self.plotOpts.get('grid_size_heralding_JSI')
                     ,Nthreads = self.nWorkers-1
                     ,lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), grid_size)
                     ,lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), grid_size)

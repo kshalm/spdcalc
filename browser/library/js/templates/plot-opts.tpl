@@ -33,6 +33,18 @@
         </div>
     </div>
 
+    <!-- Grid size for 2D heralding plot. -->
+    <div id="plot-opt-grid_size_heralding_JSI">
+        <div class="control-group">
+            <label class="control-label grid_size">
+                Grid size
+            </label>
+            <div class="controls">
+                <input type="text" data-parse="float" data-unit="" class="inputbox" name="grid_size_heralding_JSI" value="{{= parseFloat( it.grid_size_heralding_JSI ) }}" />
+            </div>
+        </div>
+    </div>
+
     <div id="plot-opt-T_2HOM">
         <div class="control-group">
             <label class="control-label T_2HOM">

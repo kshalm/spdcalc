@@ -32,7 +32,10 @@ define(
             legend: false,
 
             // string value. See https://github.com/mbostock/d3/wiki/Formatting#wiki-d3_format
-            format: null
+            format: {
+                x: '.02f',
+                y: '.02f'
+            },
 
         };
 
@@ -72,6 +75,7 @@ define(
             this.svgPlot = this.svg.append("g");
 
             this.margin = defaults.margins;
+            this.setFormat(options.format);
             this.resize( options.width, options.height );
             this.setMargins( options.margins );
 
@@ -80,6 +84,24 @@ define(
         }
 
         LinePlot.prototype = {
+
+            setFormat: function( fmt ){
+
+                this.format = {};
+
+                if (typeof fmt === 'object'){
+
+                    this.format = $.extend( this.format, fmt );
+
+                } else {
+
+                    this.format.x = fmt;
+                    this.format.y = fmt;
+                    this.format.z = fmt;
+                }
+
+                this.refreshAxes();
+            },
 
             setTitle: function( title ){
 
@@ -154,14 +176,14 @@ define(
                 // init axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
-                    .tickFormat( d3.format( this.format ) )
+                    .tickFormat( d3.format( this.format.x ) )
                     .orient("bottom")
                     .ticks( (width / 50)|0 )
                     ;
 
                 var yAxis = d3.svg.axis()
                     .scale(y)
-                    .tickFormat( d3.format( this.format ) )
+                    .tickFormat( d3.format( this.format.y ) )
                     .orient("left")
                     .ticks( (height / 40)|0 )
                     ;

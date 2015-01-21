@@ -11,7 +11,7 @@ define(
 
         'worker!workers/pm-web-worker.js',
 
-        'tpl!templates/schmidt-2d-layout.tpl'
+        'tpl!templates/heralding-2d-layout.tpl'
     ],
     function(
         $,
@@ -55,7 +55,29 @@ define(
                 var self = this;
                 // self.el = $(tplPlots.render());
                 // collapse button for JSA module plot
-                self.el.on('click', '#collapse-schmidt', function(e){
+                self.el.on('click', '#collapse-efficiency', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-singles', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-coinc', function(e){
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = $(this).parent().parent().parent()
@@ -85,7 +107,7 @@ define(
                 // init plot
                 self.plot = new HeatMap({
                     title: 'Heralding Efficiency of Signal',
-                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    el: self.el.find('.efficiency-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
                         x: 'Pump Spot Size (1/e^2) (um)',
@@ -103,7 +125,7 @@ define(
                 // Singles plot
                 self.plotSingles = new HeatMap({
                     title: 'Singles Rate (normalized to max singles value)',
-                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    el: self.el.find('.singles-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
                         x: 'Pump Spot Size (1/e^2) (um)',
@@ -121,7 +143,7 @@ define(
                 // Singles plot
                 self.plotCoinc = new HeatMap({
                     title: 'Coinc Rate (normalized to max singles value)',
-                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    el: self.el.find('.coinc-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
                         x: 'Pump Spot Size (1/e^2) (um)',
@@ -136,7 +158,9 @@ define(
                     }
                 });
 
-                self.addPlot( self.plot, self.plotSingles, self.plotCoinc );
+                self.addPlot( self.plot);
+                self.addPlot( self.plotSingles);
+                self.addPlot( self.plotCoinc);
                 self.initEvents();
 
             },
@@ -154,15 +178,15 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size_heralding': 2,
+                    'grid_size_heralding': 8,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
                     'li_stop': lim.lambda_i.max,
-                    'Ws_start': 30e-6,
-                    'Ws_stop': 300e-6,
-                    'Wp_start': 30e-6,
-                    'Wp_stop': 300e-6
+                    'Ws_start': 50e-6,
+                    'Ws_stop': 200e-6,
+                    'Wp_start': 50e-6,
+                    'Wp_stop': 200e-6
 
                 });
             },
