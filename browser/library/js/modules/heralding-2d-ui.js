@@ -128,7 +128,7 @@ define(
                     el: self.el.find('.singles-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
-                        x: 'Pump Waist (1/e^2) (um)',
+                        x: 'Pump Waist (1/e^2) (um) ',
                         y: 'Signal/Idler Waist (1/e^2) (um)'
                     },
                     xrange: [ 0, 200 ],
