@@ -372,8 +372,7 @@ define(
                     return 0;
                 }
 
-                var  convfromFWHM = Math.sqrt(2) // Use 1/e^2 in intensity.
-                    ,convfromFWHM = 1
+                var  convfromFWHM = 1
                     ,Wi_SQ = Math.pow(P.W_sx  * convfromFWHM,2) // convert from FWHM to sigma @TODO: Change to P.W_i
                     ,PHI_s = 1/Math.cos(P.theta_s_e)
                     ,Rc = PhaseMatch.Sum(self.dataCoinc)
@@ -381,8 +380,9 @@ define(
                     ,eff = Rc/Rs * (Wi_SQ * PHI_s)
                     ,Rmax = PhaseMatch.max(self.dataCoinc) / PhaseMatch.max(self.data) * (Wi_SQ * PHI_s)
                     ;
-                // console.log("Singles Max:", PhaseMatch.max(self.data), "Coinc Max:", PhaseMatch.max(self.dataCoinc), "waist:", P.W_sx, "hs:", Math.tan(P.theta_s)*P.L*0.5);
-                // console.log("Eff", eff, Rmax);
+
+                    console.log("From calc:", Rc, Rs, eff);
+                
                 return eff;
             },
 
