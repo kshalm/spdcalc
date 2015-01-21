@@ -84,7 +84,7 @@ define(
 
                 // init plot
                 self.plot = new HeatMap({
-                    title: 'Heralding Efficiency',
+                    title: 'Heralding Efficiency of Signal',
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
@@ -100,7 +100,43 @@ define(
                     }
                 });
 
-                self.addPlot( self.plot );
+                // Singles plot
+                self.plotSingles = new HeatMap({
+                    title: 'Singles Rate (normalized to max singles value)',
+                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    margins: margins,
+                    labels: {
+                        x: 'Pump Spot Size (1/e^2) (um)',
+                        y: 'Signal/Idler Spot Size (1/e^2) (um)'
+                    },
+                    xrange: [ 0, 200 ],
+                    yrange: [ 0, 100 ],
+                    antialias: false,
+                    format: {
+                        x: '.01f',
+                        y: '.01f'
+                    }
+                });
+
+                // Singles plot
+                self.plotCoinc = new HeatMap({
+                    title: 'Coinc Rate (normalized to max singles value)',
+                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    margins: margins,
+                    labels: {
+                        x: 'Pump Spot Size (1/e^2) (um)',
+                        y: 'Signal/Idler Spot Size (1/e^2) (um)'
+                    },
+                    xrange: [ 0, 200 ],
+                    yrange: [ 0, 100 ],
+                    antialias: false,
+                    format: {
+                        x: '.01f',
+                        y: '.01f'
+                    }
+                });
+
+                self.addPlot( self.plot, self.plotSingles, self.plotCoinc );
                 self.initEvents();
 
             },
@@ -186,22 +222,41 @@ define(
                 var startindex =0;
                 return when.all( promises ).then(function( values ){
                         // put the results back together
-                        var arr = new Float64Array( grid_size *  grid_size );
+                        var eff = new Float64Array( grid_size *  grid_size );
+                        var singles = new Float64Array( grid_size *  grid_size );
+                        var coinc = new Float64Array( grid_size *  grid_size );
                         var startindex = 0;
-
+                        console.log(values);
                         for (j = 0; j<Nthreads; j++){
-                             arr.set(values[j], startindex);
-                            // console.log("arr val set");
+                             eff.set(values[j][0], startindex);
+                             singles.set(values[j][1], startindex);
+                             coinc.set(values[j][2], startindex);
+                            // console.log("eff val set");
                              startindex += xrange.length*yrange[j].length;
                         }
-                        return arr; // this value is passed on to the next "then()"
+                        return [eff, singles, coinc]; // this value is passed on to the next "then()"
 
                     }).then(function( PM ){
-                        self.data = PM;
+                        self.data = PM[0];
+                        self.singles = PM[1];
+                        self.coinc = PM[2];
                         // self.plot.setZRange([0,Math.max.apply(null,PM)*1]);
                         self.plot.setZRange([0,1]);
                         self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
                         self.plot.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
+
+                        var norm = Math.max.apply(null,PM[1])
+                        self.singles = PhaseMatch.normalizeToVal(self.singles, norm);
+                        // self.plotSingles.setZRange([0,Math.max.apply(null,PM[1])]);
+                        self.plotSingles.setZRange([0,1]);
+                        self.plotSingles.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
+                        self.plotSingles.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
+
+                        // self.plotCoinc.setZRange([0,Math.max.apply(null,PM[1])]);
+                        self.coinc = PhaseMatch.normalizeToVal(self.coinc, norm);
+                        self.plotSingles.setZRange([0,1]);
+                        self.plotCoinc.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
+                        self.plotCoinc.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
                         var endtime = new Date();
                         console.log(" Elapsed time: ", endtime - starttime);
 
@@ -215,10 +270,12 @@ define(
 
                 var self = this
                     ,data = self.data
+                    ,singles = self.singles
+                    ,coinc = self.coinc
                     ,dfd = when.defer()
                     ;
 
-                if (!data){
+                if (!data && !singles && !coinc){
                     return this;
                 }
 
@@ -226,6 +283,8 @@ define(
                  // async... but not inside webworker
                 setTimeout(function(){
                     self.plot.plotData( data );
+                    self.plotSingles.plotData( singles );
+                    self.plotCoinc.plotData( coinc );
                     dfd.resolve();
                 }, 10);
 

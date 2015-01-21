@@ -134,6 +134,19 @@ PhaseMatch.normalize = function normalize(data){
 };
 
 /*
+* Takes an array and normalizes it to a given value.
+*/
+PhaseMatch.normalizeToVal = function normalizeToVal(data,maxval){
+    // var maxval = Math.max.apply(null,data);
+    var n = data.length;
+
+    for (var i = 0; i<n; i++){
+      data[i] = data[i]/maxval;
+    }
+    return data;
+};
+
+/*
 * Faster method for finding the max from an array
 */
 PhaseMatch.max = function max(data){

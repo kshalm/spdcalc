@@ -31,7 +31,8 @@ define(
         'modules/jsa-hom-bunching-ui',
         'modules/couplingefficiency-ui',
         'modules/heralding-ui',
-        'modules/heralding-2d-ui'
+        'modules/heralding-2d-ui',
+        'modules/heralding-1D-ui'
     ],
     function(
         $,
@@ -65,7 +66,8 @@ define(
         jsahomBunchUI,
         efficiencyUI,
         heraldingUI,
-        heralding2dUI
+        heralding2dUI,
+        heralding1dUI
     ) {
 
         'use strict';
@@ -414,6 +416,8 @@ define(
                 self.set('heralding', heraldingUI());
                 // 2D Heralding Efficeny for a given set of parameters
                 self.set('heralding2d', heralding2dUI());
+                // 1D Heralding Efficeny for a given set of parameters
+                self.set('heralding1d', heralding1dUI());
             },
 
             /**
