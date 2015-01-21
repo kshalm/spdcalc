@@ -46,11 +46,11 @@ define(
             nWorkers: 5,
             tplPlots: tplJSALayout,
             showPlotOpts: [
-                'n_pts_eff_1d',
-                'grid_size_eff_1d',
+                'npts-heralding-waist',
+                'grid_size_heralding',
                 'signal-wavelength',
                 'idler-wavelength',
-                'time-delay'
+                'signal-waist'
             ],
 
             initEvents : function(){
@@ -146,6 +146,8 @@ define(
                     height: 400
                 });
 
+                self.dataCoinc = PhaseMatch.zeros(40,40);
+
 
                 // internal events
                 var to;
@@ -195,7 +197,7 @@ define(
                     ,dom = y.domain()
                     ;
 
-                console.log("dom", dom)
+                // console.log("dom", dom)
 
                 // create
                 line.enter()
@@ -233,7 +235,7 @@ define(
                 tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max);
 
                 self.plotOpts.set({
-                    'grid_size_eff_1d': 40,
+                    'grid_size_heralding': 40,
                     'n_pts_eff_1d': 10,
                     'n_int': 14,
                     'ls_start': lim.lambda_s.min,
@@ -285,7 +287,7 @@ define(
 
                 // // First calc the joint spectrum.
                 // // self.calc_HOM_JSA( props );
-                // self.calcRSingles( P );
+                self.calcRSingles( P );
                 // self.calcRCoinc( props );
 
                 // Next we begin the calculation of the HOM dip
@@ -359,7 +361,7 @@ define(
                          var endtime = new Date();
                          // First calc the joint spectrum.
                     // self.calc_HOM_JSA( props );
-                    self.calcRSingles( P );
+                    // self.calcRSingles( P );
 
                         return true;
                 });
@@ -382,7 +384,7 @@ define(
             calcRSingles: function(P){
                 var  self = this
                     ,props = P.clone()
-                    ,grid_size = self.plotOpts.get('grid_size_eff_1d')
+                    ,grid_size = self.plotOpts.get('grid_size_heralding')
                     ,Nthreads = self.nWorkers-1
                     ,lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), grid_size)
                     ,lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), grid_size)
@@ -459,7 +461,7 @@ define(
 
                 var  self = this
                     ,props = P.clone()
-                    ,grid_size = self.plotOpts.get('grid_size_eff_1d')
+                    ,grid_size = self.plotOpts.get('grid_size_heralding')
                     ,Nthreads = self.nWorkers-1
                     ,lambda_s = PhaseMatch.linspace(self.plotOpts.get('ls_start'), self.plotOpts.get('ls_stop'), grid_size)
                     ,lambda_i = PhaseMatch.linspace(self.plotOpts.get('li_stop'), self.plotOpts.get('li_start'), grid_size)
@@ -554,7 +556,7 @@ define(
                     ,dfd = when.defer()
                     ;
 
-                if (!data || !dataCoinc){
+                if (!data ){
                     return this;
                 }
 
