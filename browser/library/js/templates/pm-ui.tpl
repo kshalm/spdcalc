@@ -11,14 +11,14 @@
             <div class="ui-module-wrap pull-left">
                 <select tabindex="1" class="span3" id="ui-modules">
                     <option value="jsa">Joint Spectral Intensity</option>
-                    <option value="heralding2d">Heralding 2D Efficency</option>
-                    <option value="heralding1d">Heralding 1D Efficency</option>
                     <option value="curves">Phasematching Curves</option>
-                    <option value="xy">Emission Angle</option>
+                    <!-- <option value="xy">Emission Angle</option> -->
+                    <option value="heralding1d">Idler Heralding Joint Spectrum</option>
+                    <option value="heralding2d">Idler Collection Optimization</option>
                     <option value="jsa-hom">Hong-Ou-Mandel dip</option>
                     <option value="jsa-hom-bunch">Hong-Ou-Mandel bunching</option>
                     <option value="jsa-2hom">Two Source Hong-Ou-Mandel</option>
-                    <option value="heralding">Heralding Efficency</option>
+                    <!-- <option value="heralding">Heralding Efficency</option> -->
                     <!-- <option value="modesolver">Mode Solver</option> -->
 <!--                     <option value="efficiency">Efficiency map</option>
  -->                    <option value="schmidt-2d">Spectral Purity</option>

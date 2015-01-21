@@ -43,7 +43,7 @@ define(
         var jsahomUI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
-            nWorkers: 5,
+            nWorkers: 6,
             tplPlots: tplJSALayout,
             showPlotOpts: [
                 'npts-heralding-waist',
@@ -79,7 +79,7 @@ define(
                     title: 'Heralding Efficiency',
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     labels: {
-                        x: 'Collection Waist (um)',
+                        x: 'Signal and Idler Collection Waist (um)',
                         y: 'Efficiency'
                     },
                     format: {x: '1f'
@@ -117,7 +117,7 @@ define(
 
                 // init plot
                 self.plot = new HeatMap({
-                    title: 'Signal',
+                    title: 'Joint Spectrum with the Signal fiber coupled',
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     labels: {
                         x: 'Signal Wavelength(nm)',
@@ -133,7 +133,7 @@ define(
 
                 // init plot Coinc
                 self.plotCoinc = new HeatMap({
-                    title: 'Coincidences',
+                    title: 'Joint spectrum with Signal & Idler fiber coupled',
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     labels: {
                         x: 'Signal Wavelength(nm)',
@@ -333,13 +333,13 @@ define(
                         // return [eff, singles, coinc]; // this value is passed on to the next "then()"
                         return eff;
 
-                    }).then(function( HOM ){
+                    }).then(function( eff ){
 
-                        for ( var i = 0, l = HOM.length; i < l; i ++){
-                            // console.log(HOM[i]);
+                        for ( var i = 0, l = eff.length; i < l; i ++){
+                            // console.log(eff[i]);
                             data1d.push({
                                 x: Ws[i]/1e-6,
-                                y: HOM[i]
+                                y: eff[i]
                             })
                         }
                         self.data1d = data1d;
@@ -347,27 +347,27 @@ define(
 
                         // Calculate visibility
                         self.plot1dEff.setTitle("Efficiency" );//("Hong-Ou-Mandel Dip, Visbibility = ");
-                        var  effMax = Math.max.apply(null,HOM)
-                            ,effMin = Math.min.apply(null,HOM)
+                        var  effMax = Math.max.apply(null,eff)
+                            ,effMin = Math.min.apply(null,eff)
                             ;
                         if (effMax * 1.1 > 1){
                             effMax = 1;
                         }
                         effMin = Math.floor(effMin*10/1.2)/10;
                         // console.log("Min value:", effMin);
-                        // self.plot1dEff.setYRange([0, Math.max.apply(null,HOM)*1.2]);
+                        // self.plot1dEff.setYRange([0, Math.max.apply(null,eff)*1.2]);
                         self.plot1dEff.setYRange([effMin, effMax]);
 
                         self.set_slider_values(props.W_sx, po.get('Ws_start'), po.get('Ws_stop'));
 
                          var endtime = new Date();
                          // First calc the joint spectrum.
-                    // self.calc_HOM_JSA( props );
+                    // self.calc_eff_JSA( props );
                     // self.calcRSingles( P );
 
                         return true;
                 });
-                
+
 
             },
 
@@ -405,7 +405,7 @@ define(
 
                 var propsJSON = props.get();
 
-                
+
 
                 for (var i= 0; i<Nthreads-1; i++){
                     lambda_i_range.push(lambda_i.subarray(i*divisions,i*divisions + divisions));
@@ -528,9 +528,9 @@ define(
 
                         PM = PhaseMatch.normalizeToVal(PM, self.norm /prefactor );
                         self.dataCoinc = PM;
-                        var  Rs = PhaseMatch.Sum(self.data) 
+                        var  Rs = PhaseMatch.Sum(self.data)
                             ,Rc = PhaseMatch.Sum(self.dataCoinc)
-                            ,eff = Rc/Rs 
+                            ,eff = Rc/Rs
                             ;
                         // console.log("Efficiency from sum: ", Rc, Rs, eff); /// PhaseMatch.sum(self.data));
                         // console.log("Efficiency from sum: ", Ws, eff); /// PhaseMatch.sum(self.data));
@@ -540,7 +540,7 @@ define(
                         self.plotCoinc.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
                         var endtime = new Date();
-                        
+
                         self.draw();
                         // console.log("FINISHED PLOTTING");
                         return true;
@@ -548,7 +548,7 @@ define(
                     });
             },
 
-    
+
 
             draw: function(){
 

@@ -3,7 +3,7 @@
 <h2>SPDCalc: a fast design tool for spontaneous parametric downconversion sources</h2>
 <!-- <p style="font-style: italic">, L. K. Shalm, J. Palfree, Z. H. Levine, A. Migdall, T. Gerrits, S. W. Nam, and R. P. Mirin </p>
  -->
-<p>The process of spontaneous parametric downconversion is an important source of single-photons and quantum states of light. Much recent theoretical and experimental work focuses on engineering the properties of the photons emitted from downconversion. For multi-photon experiments generating photon pairs that are spectrally pure, meaning the signal and idler photons are uncorrelated, has been an active area of investigation. For fundamental tests of quantum mechanics, such as loop-hole-free Bell tests, optimizing the coupling of photons to single-mode fiber is an important consideration. 
+<p>The process of spontaneous parametric downconversion is an important source of single-photons and quantum states of light. Much recent theoretical and experimental work focuses on engineering the properties of the photons emitted from downconversion. For multi-photon experiments generating photon pairs that are spectrally pure, meaning the signal and idler photons are uncorrelated, has been an active area of investigation. For fundamental tests of quantum mechanics, such as loop-hole-free Bell tests, optimizing the coupling of photons to single-mode fiber is an important consideration.
 <p>
 
 <p>

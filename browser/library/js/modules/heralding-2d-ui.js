@@ -106,12 +106,12 @@ define(
 
                 // init plot
                 self.plot = new HeatMap({
-                    title: 'Heralding Efficiency of Signal',
+                    title: 'Idler heralding efficiency',
                     el: self.el.find('.efficiency-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
-                        x: 'Pump Spot Size (1/e^2) (um)',
-                        y: 'Signal/Idler Spot Size (1/e^2) (um)'
+                        x: 'Pump Waist (1/e^2) (um)',
+                        y: 'Signal & Idler Waist (1/e^2) (um)'
                     },
                     xrange: [ 0, 200 ],
                     yrange: [ 0, 100 ],
@@ -124,12 +124,12 @@ define(
 
                 // Singles plot
                 self.plotSingles = new HeatMap({
-                    title: 'Singles Rate (normalized to max singles value)',
+                    title: 'Singles rate (normalized to max singles value)',
                     el: self.el.find('.singles-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
-                        x: 'Pump Spot Size (1/e^2) (um)',
-                        y: 'Signal/Idler Spot Size (1/e^2) (um)'
+                        x: 'Pump Waist (1/e^2) (um)',
+                        y: 'Signal/Idler Waist (1/e^2) (um)'
                     },
                     xrange: [ 0, 200 ],
                     yrange: [ 0, 100 ],
@@ -142,12 +142,12 @@ define(
 
                 // Singles plot
                 self.plotCoinc = new HeatMap({
-                    title: 'Coinc Rate (normalized to max singles value)',
+                    title: 'Coinc rate (normalized to max singles value)',
                     el: self.el.find('.coinc-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
-                        x: 'Pump Spot Size (1/e^2) (um)',
-                        y: 'Signal/Idler Spot Size (1/e^2) (um)'
+                        x: 'Pump Waist (1/e^2) (um)',
+                        y: 'Signal/Idler Waist (1/e^2) (um)'
                     },
                     xrange: [ 0, 200 ],
                     yrange: [ 0, 100 ],
