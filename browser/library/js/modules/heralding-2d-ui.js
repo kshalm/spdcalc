@@ -184,9 +184,9 @@ define(
                     'li_start': lim.lambda_i.min,
                     'li_stop': lim.lambda_i.max,
                     'Ws_start': 50e-6,
-                    'Ws_stop': 200e-6,
+                    'Ws_stop': 150e-6,
                     'Wp_start': 50e-6,
-                    'Wp_stop': 200e-6
+                    'Wp_stop': 300e-6
 
                 });
             },
@@ -264,8 +264,8 @@ define(
                         self.data = PM[0];
                         self.singles = PM[1];
                         self.coinc = PM[2];
-                        // self.plot.setZRange([0,Math.max.apply(null,PM)*1]);
-                        self.plot.setZRange([0,1]);
+                        self.plot.setZRange([Math.min.apply(null,PM[0]),Math.max.apply(null,PM[0])]);
+                        // self.plot.setZRange([0,1]);
                         self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
                         self.plot.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
 

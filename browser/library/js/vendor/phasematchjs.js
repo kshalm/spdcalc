@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-01-20
+ * phasematchjs v0.0.1a - 2015-01-22
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -7751,7 +7751,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         ,eff = new Float64Array( N )
         ,singles = new Float64Array( N )
         ,coinc = new Float64Array( N )
-        ,n = 12 //make sure this is even
+        ,n = 21 //make sure this is even
         ,maxeEff = 0
         ,Ws_ideal = 0
         ,Wp_ideal = 0
