@@ -4668,6 +4668,42 @@ PhaseMatch.find_external_angle = function find_external_angle (props, photon){
 
 };
 
+PhaseMatch.swap_signal_idler = function swap_signal_idler(P){
+            // Swap role of signal and idler. Useful for calculating Idler properties
+            var  tempLambda = P.lambda_s
+                ,tempTheta = P.theta_s
+                ,tempPhis = P.phi_s
+                ,tempNs = P.n_s
+                ,tempSs = P.S_s
+                ,tempW_sx = P.W_sx
+                ,tempW_sy = P.W_sy
+                ,tempTheta_se = P.theta_s_e
+                ;
+
+            // Swap signal with Idler
+            P.lambda_s = P.lambda_i;
+            P.theta_s = P.theta_i;
+            P.phi_s = P.phi_i;
+            P.n_s = P.n_i;
+            P.S_s = P.S_i;
+            P.W_sx = P.W_ix;
+            P.W_sy = P.W_iy;
+            P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
+
+            // Now replace Idler values with Signal values
+            P.lambda_i = tempLambda;
+            P.theta_i = tempTheta;
+            P.phi_i = tempPhis;
+            P.n_i = tempNs;
+            P.S_i = tempSs;
+            P.W_ix = tempW_sx;
+            P.W_iy = tempW_sy;
+            // P.theta_i_e = tempTheta_se;
+
+            P.update_all_angles();
+            return P;
+};
+
 
 
 /*
@@ -6439,7 +6475,6 @@ PhaseMatch.Crystals('KDP-1', {
                 ,tempSs = P.S_s
                 ,tempW_sx = P.W_sx
                 ,tempW_sy = P.W_sy
-                ,tempTheta_se = P.theta_s_e
                 ;
 
                 // Swap signal with Idler
@@ -6450,7 +6485,7 @@ PhaseMatch.Crystals('KDP-1', {
                 P.S_s = P.S_i;
                 P.W_sx = P.W_ix;
                 P.W_sy = P.W_iy;
-                P.theta_s_e = P.theta_s_i;
+                P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
 
                 // Now replace Idler values with Signal values
                 P.lambda_i = tempLambda;
@@ -6460,7 +6495,7 @@ PhaseMatch.Crystals('KDP-1', {
                 P.S_i = tempSs;
                 P.W_ix = tempW_sx;
                 P.W_iy = tempW_sy;
-                P.theta_i_e = tempTheta_se;
+                // P.theta_i_e = tempTheta_se;
 
                 P.update_all_angles();
          },
@@ -7720,7 +7755,10 @@ PhaseMatch.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yrang
 //         ,i
 //         ,N = WpRange.length*WsRange.length
 //         ,eff = new Float64Array( N )
-//         ,dim = 12 //make sure this is even
+//         ,singles = new Float64Array( N )
+//         ,idlerSingles = new Float64Array( N )
+//         ,coinc = new Float64Array( N )
+//         ,dim = 15 
 //         ,maxeEff = 0
 //         ,Ws_ideal = 0
 //         ,Wp_ideal = 0
@@ -7760,19 +7798,17 @@ PhaseMatch.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yrang
 //         var  singlesRate = calc_singles_rate()
 //             ,coincRate = calc_coinc_rate()
 //             ;
+//         P.swap_signal_idler();
+//         var idlerSinglesRate = calc_singles_rate();
 
 //         // console.log("singles: " + singlesRate.toString() + ", coinc:" + coincRate.toString());
 //         eff[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
-//         console.log("Effi:" + (eff[i]).toString() + ', ' + (singlesRate).toString() + ', ' + (coincRate).toString() + ', ' + PHI_s.toString() );
-//         // if (S[i]<maxschmidt){
-//         //     maxschmidt = S[i];
-//         //     x_ideal = xrange[index_x];
-//         //     y_ideal = yrange[index_y];
-//         // }
-
+//         singles[i] = singlesRate;
+//         idlerSingles[i] = idlerSinglesRate;
+//         coinc[i] = coincRate *( sq(P.W_sx) * PHI_s);
 
 //     }
-//     return eff;
+//     return [eff, singles, coinc];
 
 // };
 
@@ -7784,11 +7820,12 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
     var P = props.clone()
         ,i
         ,N = WpRange.length*WsRange.length
-        ,eff = new Float64Array( N )
-        ,singles = new Float64Array( N )
-        ,idlerSingles = new Float64Array( N )
+        ,eff_s = new Float64Array( N )
+        ,eff_i = new Float64Array( N )
+        ,singles_s = new Float64Array( N )
+        ,singles_i = new Float64Array( N )
         ,coinc = new Float64Array( N )
-        ,n = 21 //make sure this is even
+        ,n = 15 //make sure this is even
         ,maxeEff = 0
         ,Ws_ideal = 0
         ,Wp_ideal = 0
@@ -7868,15 +7905,18 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         var singlesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
             ,coincRate = PhaseMatch.Nintegrate2D_3_8(calc_coinc_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
             ;
-        // P.swap_signal_idler();
 
-        // var idlerSinglesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
+        coincRate = coincRate *( sq(P.W_sx) * PHI_s);
+        P.swap_signal_idler();
+        var idlerSinglesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
+        P.swap_signal_idler();
         // P.swap_signal_idler();
         // console.log("singles: " + singlesRate.toString() + ", coinc:" + coincRate.toString());
-        eff[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
-        singles[i] = singlesRate;
-        // idlerSingles[i] = idlerSinglesRate;
-        coinc[i] = coincRate *( sq(P.W_sx) * PHI_s);
+        singles_s[i] = singlesRate;
+        singles_i[i] = idlerSinglesRate;
+        coinc[i] = coincRate;
+        eff_i[i] = coincRate / singlesRate;
+        eff_s[i] = coincRate / idlerSinglesRate;
         // var test = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
         // eff[i] = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);// *( sq(WsRange[index_y]) * PHI_s);
 
@@ -7890,7 +7930,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
 
 
     }
-    return [eff, singles, coinc];
+    return [eff_i, eff_s, singles_s, singles_i, coinc];
     // return eff;
 
 };

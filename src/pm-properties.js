@@ -512,7 +512,6 @@
                 ,tempSs = P.S_s
                 ,tempW_sx = P.W_sx
                 ,tempW_sy = P.W_sy
-                ,tempTheta_se = P.theta_s_e
                 ;
 
                 // Swap signal with Idler
@@ -523,7 +522,7 @@
                 P.S_s = P.S_i;
                 P.W_sx = P.W_ix;
                 P.W_sy = P.W_iy;
-                P.theta_s_e = P.theta_s_i;
+                P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
 
                 // Now replace Idler values with Signal values
                 P.lambda_i = tempLambda;
@@ -533,7 +532,7 @@
                 P.S_i = tempSs;
                 P.W_ix = tempW_sx;
                 P.W_iy = tempW_sy;
-                P.theta_i_e = tempTheta_se;
+                // P.theta_i_e = tempTheta_se;
 
                 P.update_all_angles();
          },
