@@ -1211,6 +1211,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         ,N = WpRange.length*WsRange.length
         ,eff = new Float64Array( N )
         ,singles = new Float64Array( N )
+        ,idlerSingles = new Float64Array( N )
         ,coinc = new Float64Array( N )
         ,n = 21 //make sure this is even
         ,maxeEff = 0
@@ -1292,10 +1293,14 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         var singlesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
             ,coincRate = PhaseMatch.Nintegrate2D_3_8(calc_coinc_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
             ;
+        // P.swap_signal_idler();
 
+        // var idlerSinglesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
+        // P.swap_signal_idler();
         // console.log("singles: " + singlesRate.toString() + ", coinc:" + coincRate.toString());
         eff[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
         singles[i] = singlesRate;
+        // idlerSingles[i] = idlerSinglesRate;
         coinc[i] = coincRate *( sq(P.W_sx) * PHI_s);
         // var test = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
         // eff[i] = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);// *( sq(WsRange[index_y]) * PHI_s);

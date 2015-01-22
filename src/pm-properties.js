@@ -502,6 +502,42 @@
             this.walkoff_p = -1/ne_p *(ne1_p - ne2_p)/deltheta;
          },
 
+          swap_signal_idler: function(){
+            // Swap role of signal and idler. Useful for calculating Idler properties
+            var P = this
+                ,tempLambda = P.lambda_s
+                ,tempTheta = P.theta_s
+                ,tempPhis = P.phi_s
+                ,tempNs = P.n_s
+                ,tempSs = P.S_s
+                ,tempW_sx = P.W_sx
+                ,tempW_sy = P.W_sy
+                ,tempTheta_se = P.theta_s_e
+                ;
+
+                // Swap signal with Idler
+                P.lambda_s = P.lambda_i;
+                P.theta_s = P.theta_i;
+                P.phi_s = P.phi_i;
+                P.n_s = P.n_i;
+                P.S_s = P.S_i;
+                P.W_sx = P.W_ix;
+                P.W_sy = P.W_iy;
+                P.theta_s_e = P.theta_s_i;
+
+                // Now replace Idler values with Signal values
+                P.lambda_i = tempLambda;
+                P.theta_i = tempTheta;
+                P.phi_i = tempPhis;
+                P.n_i = tempNs;
+                P.S_i = tempSs;
+                P.W_ix = tempW_sx;
+                P.W_iy = tempW_sy;
+                P.theta_i_e = tempTheta_se;
+
+                P.update_all_angles();
+         },
+
         /**
          * Set config value or many values that are allowed (ie: defined in spdcDefaults )
          * @param {String|Object} name The key name to set, or a config object with key: value pairs
