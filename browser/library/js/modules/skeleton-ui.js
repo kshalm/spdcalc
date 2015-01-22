@@ -179,7 +179,7 @@ define(
                 if ( self.workers.length > n ){
                     leftovers = self.workers.splice(0, (self.workers.length - n));
                     for ( var i = 0, l = leftovers.length; i < l; ++i ){
-                        
+
                         leftovers[ i ].destroy();
                     }
                 } else {

@@ -1,4 +1,4 @@
-<div>
+
 	<div class="plot-wrapper  span7 offset1">
 	    <div class="row-fluid">
 	    	<h2 class="title">Idler heralding efficiency ( \( \eta_i = \frac{R_s}{R_c} \)) </h2>
@@ -37,5 +37,3 @@
 		        <!-- heat map goes here -->
 		</div>
 	</div>
-
-</div>
