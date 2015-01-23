@@ -522,8 +522,12 @@
                 P.S_s = P.S_i;
                 P.W_sx = P.W_ix;
                 P.W_sy = P.W_iy;
+                console.log("Theta external before swap: ", P.theta_s_e * 180/Math.PI);
                 P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
-
+                console.log("Theta external after swap: ", P.theta_s_e * 180/Math.PI);
+                console.log("");
+                
+            
                 // Now replace Idler values with Signal values
                 P.lambda_i = tempLambda;
                 P.theta_i = tempTheta;

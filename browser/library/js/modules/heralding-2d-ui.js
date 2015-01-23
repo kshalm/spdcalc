@@ -122,7 +122,25 @@ define(
                     }
                 });
 
-                // Singles plot
+                // Signal Heralding Efficiency plot
+                self.plotSignalEff = new HeatMap({
+                    title: 'Signal heralding efficiency',
+                    el: self.el.find('.efficiency-wrapper').get( 0 ),
+                    margins: margins,
+                    labels: {
+                        x: 'Pump Waist (1/e^2) (um)',
+                        y: 'Signal & Idler Waist (1/e^2) (um)'
+                    },
+                    xrange: [ 0, 200 ],
+                    yrange: [ 0, 100 ],
+                    antialias: false,
+                    format: {
+                        x: '.01f',
+                        y: '.01f'
+                    }
+                });
+
+                // Signal singles plot
                 self.plotSingles = new HeatMap({
                     title: 'Singles rate (normalized to max singles value)',
                     el: self.el.find('.singles-wrapper').get( 0 ),
@@ -140,7 +158,25 @@ define(
                     }
                 });
 
-                // Singles plot
+                // Idler singles plot
+                self.plotIdlerSingles = new HeatMap({
+                    title: 'Singles rate',
+                    el: self.el.find('.singles-wrapper').get( 0 ),
+                    margins: margins,
+                    labels: {
+                        x: 'Pump Waist (1/e^2) (um) ',
+                        y: 'Signal/Idler Waist (1/e^2) (um)'
+                    },
+                    xrange: [ 0, 200 ],
+                    yrange: [ 0, 100 ],
+                    antialias: false,
+                    format: {
+                        x: '.01f',
+                        y: '.01f'
+                    }
+                });
+
+                // Coinc plot
                 self.plotCoinc = new HeatMap({
                     title: 'Coinc rate (normalized to max singles value)',
                     el: self.el.find('.coinc-wrapper').get( 0 ),
@@ -159,7 +195,9 @@ define(
                 });
 
                 self.addPlot( self.plot);
+                self.addPlot( self.plotSignalEff);
                 self.addPlot( self.plotSingles);
+                self.addPlot( self.plotIdlerSingles);
                 self.addPlot( self.plotCoinc);
                 self.initEvents();
 

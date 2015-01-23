@@ -1221,6 +1221,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         ,Wp_ideal = 0
         ,Wi_SQ = Math.pow(P.W_sx,2)
         ,PHI_s = 1/Math.cos(P.theta_s_e)
+        // ,PHI_i = 1/Math.cos(P.theta_s_i)
         // ,n = n+(3- n%3) //guarantee that n is divisible by 3
         ,lambdaWeights = PhaseMatch.Nintegrate2DWeights_3_8(n)
         ;
@@ -1230,6 +1231,10 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
     P.phi_i = P.phi_s + Math.PI;
     P.update_all_angles();
     P.optimum_idler(P);
+
+    P_i = P.clone();
+    P_i.swap_signal_idler();
+    var PHI_i = 1/Math.cos(P_i.theta_s_e);
 
     function calc_singles_rate(lambda_s, lambda_i ){
 
@@ -1243,6 +1248,21 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
 
         var PM = PhaseMatch.phasematch_singles(P);
         // console.log("inside singles: " + PM[0].toString() + ", i*" + PM[1].toString() + " P.n_p: " +P.n_p.toString() + ", Weights:" + lambdaWeights[0].toString());
+        return Math.sqrt(sq(PM[0]) + sq(PM[1]));
+    };
+
+    function calc_singles_rate_i(lambda_s, lambda_i ){
+
+        // P.update_all_angles();
+        // var P = props;
+        P_i.lambda_s = lambda_s;
+        P_i.lambda_i = lambda_i;
+
+        P_i.n_s = P_i.calc_Index_PMType(P_i.lambda_s, P_i.type, P_i.S_s, "signal");
+        P_i.n_i = P_i.calc_Index_PMType(P_i.lambda_i, P_i.type, P_i.S_i, "idler");
+
+        var PM = PhaseMatch.phasematch_singles(P_i);
+        // console.log("inside singles: " + PM[0].toString() + ", i*" + PM[1].toString() + " P_i.n_p: " +P.n_p.toString() + ", Weights:" + lambdaWeights[0].toString());
         return Math.sqrt(sq(PM[0]) + sq(PM[1]));
     };
 
@@ -1290,23 +1310,29 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         P.W_iy = P.W_ix;
         P.W = WpRange[index_x];
 
+        P_i.W_sx = WsRange[index_y];
+        P_i.W_sy = P_i.W_sx;
+        P_i.W_ix = WsRange[index_y];
+        P_i.W_iy = P_i.W_ix;
+
         // console.log( P.W_sx.toString() + ", " + P.W.toString());
 
         var singlesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
             ,coincRate = PhaseMatch.Nintegrate2D_3_8(calc_coinc_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
             ;
 
-        coincRate = coincRate *( sq(P.W_sx) * PHI_s);
-        P.swap_signal_idler();
-        var idlerSinglesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
-        P.swap_signal_idler();
+        // coincRate = coincRate ;
+        // P.swap_signal_idler();
+        // var PHI_i = 1/Math.cos(P_i.theta_s_e);
+        var idlerSinglesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate_i, li_start, li_stop, ls_start, ls_stop, n, lambdaWeights);
+        // P.swap_signal_idler();
         // P.swap_signal_idler();
         // console.log("singles: " + singlesRate.toString() + ", coinc:" + coincRate.toString());
         singles_s[i] = singlesRate;
         singles_i[i] = idlerSinglesRate;
         coinc[i] = coincRate;
-        eff_i[i] = coincRate / singlesRate;
-        eff_s[i] = coincRate / idlerSinglesRate;
+        eff_i[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
+        eff_s[i] = coincRate / idlerSinglesRate *( sq(P.W_sx) * PHI_i);
         // var test = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
         // eff[i] = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);// *( sq(WsRange[index_y]) * PHI_s);
 
