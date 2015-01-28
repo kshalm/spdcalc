@@ -504,6 +504,8 @@
 
           swap_signal_idler: function(){
             // Swap role of signal and idler. Useful for calculating Idler properties
+            // this.update_all_angles();
+
             var P = this
                 ,tempLambda = P.lambda_s
                 ,tempTheta = P.theta_s
@@ -512,6 +514,7 @@
                 ,tempSs = P.S_s
                 ,tempW_sx = P.W_sx
                 ,tempW_sy = P.W_sy
+                ,tempTheta_se = P.theta_s_e
                 ;
 
                 // Swap signal with Idler
@@ -522,12 +525,13 @@
                 P.S_s = P.S_i;
                 P.W_sx = P.W_ix;
                 P.W_sy = P.W_iy;
-                console.log("Theta external before swap: ", P.theta_s_e * 180/Math.PI);
-                P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
-                console.log("Theta external after swap: ", P.theta_s_e * 180/Math.PI);
-                console.log("");
-                
-            
+                // console.log("Theta external before swap: ", P.theta_s_e * 180/Math.PI);
+                // P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
+                P.theta_s_e = P.theta_i_e;
+                // console.log("Theta external after swap: ", P.theta_s_e * 180/Math.PI);
+                // console.log("");
+
+
                 // Now replace Idler values with Signal values
                 P.lambda_i = tempLambda;
                 P.theta_i = tempTheta;
@@ -536,9 +540,20 @@
                 P.S_i = tempSs;
                 P.W_ix = tempW_sx;
                 P.W_iy = tempW_sy;
-                // P.theta_i_e = tempTheta_se;
+                P.theta_i_e = tempTheta_se;
 
-                P.update_all_angles();
+                // Is this the right thing to do? Do I need to do this?
+                // Change the phasematching type if it is type II
+                if (P.type ===  "Type 2:   e -> e + o"){
+                    // console.log("switching");
+                    P.type =  "Type 2:   e -> o + e";
+                }
+                 else if (P.type ===  "Type 2:   e -> o + e"){
+                    // console.log("other way");
+                    P.type = "Type 2:   e -> e + o";
+                }
+
+                // P.update_all_angles();
          },
 
         /**

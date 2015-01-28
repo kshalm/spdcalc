@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-01-22
+ * phasematchjs v0.0.1a - 2015-01-27
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -6467,6 +6467,8 @@ PhaseMatch.Crystals('KDP-1', {
 
           swap_signal_idler: function(){
             // Swap role of signal and idler. Useful for calculating Idler properties
+            // this.update_all_angles();
+
             var P = this
                 ,tempLambda = P.lambda_s
                 ,tempTheta = P.theta_s
@@ -6475,6 +6477,7 @@ PhaseMatch.Crystals('KDP-1', {
                 ,tempSs = P.S_s
                 ,tempW_sx = P.W_sx
                 ,tempW_sy = P.W_sy
+                ,tempTheta_se = P.theta_s_e
                 ;
 
                 // Swap signal with Idler
@@ -6485,12 +6488,13 @@ PhaseMatch.Crystals('KDP-1', {
                 P.S_s = P.S_i;
                 P.W_sx = P.W_ix;
                 P.W_sy = P.W_iy;
-                console.log("Theta external before swap: ", P.theta_s_e * 180/Math.PI);
-                P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
-                console.log("Theta external after swap: ", P.theta_s_e * 180/Math.PI);
-                console.log("");
-                
-            
+                // console.log("Theta external before swap: ", P.theta_s_e * 180/Math.PI);
+                // P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
+                P.theta_s_e = P.theta_i_e;
+                // console.log("Theta external after swap: ", P.theta_s_e * 180/Math.PI);
+                // console.log("");
+
+
                 // Now replace Idler values with Signal values
                 P.lambda_i = tempLambda;
                 P.theta_i = tempTheta;
@@ -6499,9 +6503,20 @@ PhaseMatch.Crystals('KDP-1', {
                 P.S_i = tempSs;
                 P.W_ix = tempW_sx;
                 P.W_iy = tempW_sy;
-                // P.theta_i_e = tempTheta_se;
+                P.theta_i_e = tempTheta_se;
 
-                P.update_all_angles();
+                // Is this the right thing to do? Do I need to do this?
+                // Change the phasematching type if it is type II
+                if (P.type ===  "Type 2:   e -> e + o"){
+                    // console.log("switching");
+                    P.type =  "Type 2:   e -> o + e";
+                }
+                 else if (P.type ===  "Type 2:   e -> o + e"){
+                    // console.log("other way");
+                    P.type = "Type 2:   e -> e + o";
+                }
+
+                // P.update_all_angles();
          },
 
         /**
@@ -7762,7 +7777,7 @@ PhaseMatch.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yrang
 //         ,singles = new Float64Array( N )
 //         ,idlerSingles = new Float64Array( N )
 //         ,coinc = new Float64Array( N )
-//         ,dim = 15 
+//         ,dim = 15
 //         ,maxeEff = 0
 //         ,Ws_ideal = 0
 //         ,Wp_ideal = 0
@@ -7848,12 +7863,15 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
 
     P_i = P.clone();
     P_i.swap_signal_idler();
+    // console.log(" ----------------------------------");
     var PHI_i = 1/Math.cos(P_i.theta_s_e);
 
     function calc_singles_rate(lambda_s, lambda_i ){
 
         // P.update_all_angles();
         // var P = props;
+        // P.swap_signal_idler();
+        // P.swap_signal_idler();
         P.lambda_s = lambda_s;
         P.lambda_i = lambda_i;
 
@@ -7861,6 +7879,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         var PM = PhaseMatch.phasematch_singles(P);
+        // P.swap_signal_idler();
         // console.log("inside singles: " + PM[0].toString() + ", i*" + PM[1].toString() + " P.n_p: " +P.n_p.toString() + ", Weights:" + lambdaWeights[0].toString());
         return Math.sqrt(sq(PM[0]) + sq(PM[1]));
     };
@@ -7936,17 +7955,17 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
             ;
 
         // coincRate = coincRate ;
-        // P.swap_signal_idler();
+        P.swap_signal_idler();
         // var PHI_i = 1/Math.cos(P_i.theta_s_e);
-        var idlerSinglesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate_i, li_start, li_stop, ls_start, ls_stop, n, lambdaWeights);
-        // P.swap_signal_idler();
+        var idlerSinglesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, li_start, li_stop, ls_start, ls_stop, n, lambdaWeights);
+        P.swap_signal_idler();
         // P.swap_signal_idler();
         // console.log("singles: " + singlesRate.toString() + ", coinc:" + coincRate.toString());
-        singles_s[i] = singlesRate;
-        singles_i[i] = idlerSinglesRate;
+        singles_s[i] = singlesRate / ( sq(P.W_sx) * PHI_s);
+        singles_i[i] = idlerSinglesRate / ( sq(P.W_sx) * PHI_i);
         coinc[i] = coincRate;
         eff_i[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
-        eff_s[i] = coincRate / idlerSinglesRate *( sq(P.W_sx) * PHI_i);
+        eff_s[i] = coincRate / idlerSinglesRate  *( sq(P.W_sx) * PHI_i);
         // var test = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
         // eff[i] = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);// *( sq(WsRange[index_y]) * PHI_s);
 

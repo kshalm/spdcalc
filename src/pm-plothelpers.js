@@ -1148,7 +1148,7 @@ PhaseMatch.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yrang
 //         ,singles = new Float64Array( N )
 //         ,idlerSingles = new Float64Array( N )
 //         ,coinc = new Float64Array( N )
-//         ,dim = 15 
+//         ,dim = 15
 //         ,maxeEff = 0
 //         ,Ws_ideal = 0
 //         ,Wp_ideal = 0
@@ -1234,12 +1234,15 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
 
     P_i = P.clone();
     P_i.swap_signal_idler();
+    // console.log(" ----------------------------------");
     var PHI_i = 1/Math.cos(P_i.theta_s_e);
 
     function calc_singles_rate(lambda_s, lambda_i ){
 
         // P.update_all_angles();
         // var P = props;
+        // P.swap_signal_idler();
+        // P.swap_signal_idler();
         P.lambda_s = lambda_s;
         P.lambda_i = lambda_i;
 
@@ -1247,6 +1250,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
         var PM = PhaseMatch.phasematch_singles(P);
+        // P.swap_signal_idler();
         // console.log("inside singles: " + PM[0].toString() + ", i*" + PM[1].toString() + " P.n_p: " +P.n_p.toString() + ", Weights:" + lambdaWeights[0].toString());
         return Math.sqrt(sq(PM[0]) + sq(PM[1]));
     };
@@ -1322,17 +1326,17 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
             ;
 
         // coincRate = coincRate ;
-        // P.swap_signal_idler();
+        P.swap_signal_idler();
         // var PHI_i = 1/Math.cos(P_i.theta_s_e);
-        var idlerSinglesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate_i, li_start, li_stop, ls_start, ls_stop, n, lambdaWeights);
-        // P.swap_signal_idler();
+        var idlerSinglesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, li_start, li_stop, ls_start, ls_stop, n, lambdaWeights);
+        P.swap_signal_idler();
         // P.swap_signal_idler();
         // console.log("singles: " + singlesRate.toString() + ", coinc:" + coincRate.toString());
-        singles_s[i] = singlesRate;
-        singles_i[i] = idlerSinglesRate;
+        singles_s[i] = singlesRate / ( sq(P.W_sx) * PHI_s);
+        singles_i[i] = idlerSinglesRate / ( sq(P.W_sx) * PHI_i);
         coinc[i] = coincRate;
         eff_i[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
-        eff_s[i] = coincRate / idlerSinglesRate *( sq(P.W_sx) * PHI_i);
+        eff_s[i] = coincRate / idlerSinglesRate  *( sq(P.W_sx) * PHI_i);
         // var test = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
         // eff[i] = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);// *( sq(WsRange[index_y]) * PHI_s);
 

@@ -284,39 +284,61 @@ define(
                 var startindex =0;
                 return when.all( promises ).then(function( values ){
                         // put the results back together
-                        var eff = new Float64Array( grid_size *  grid_size );
-                        var singles = new Float64Array( grid_size *  grid_size );
+                        var eff_i = new Float64Array( grid_size *  grid_size );
+                        var eff_s = new Float64Array( grid_size *  grid_size );
+                        var singles_s = new Float64Array( grid_size *  grid_size );
+                        var singles_i = new Float64Array( grid_size *  grid_size );
                         var coinc = new Float64Array( grid_size *  grid_size );
                         var startindex = 0;
                         console.log(values);
                         for (j = 0; j<Nthreads; j++){
-                             eff.set(values[j][0], startindex);
-                             singles.set(values[j][1], startindex);
-                             coinc.set(values[j][2], startindex);
-                            // console.log("eff val set");
+                             eff_i.set(values[j][0], startindex);
+                             eff_s.set(values[j][1], startindex);
+                             singles_s.set(values[j][2], startindex);
+                             singles_i.set(values[j][3], startindex);
+                             coinc.set(values[j][4], startindex);
+                            // console.log("eff_i val set");
                              startindex += xrange.length*yrange[j].length;
                         }
-                        return [eff, singles, coinc]; // this value is passed on to the next "then()"
+                        return [eff_i, eff_s, singles_s, singles_i, coinc]; // this value is passed on to the next "then()"
 
                     }).then(function( PM ){
-                        self.data = PM[0];
-                        self.singles = PM[1];
-                        self.coinc = PM[2];
-                        self.plot.setZRange([Math.min.apply(null,PM[0]),Math.max.apply(null,PM[0])]);
+                        self.eff_i = PM[0];
+                        self.eff_s = PM[1];
+                        self.singles_s = PM[2];
+                        self.singles_i = PM[3];
+                        self.coinc = PM[4];
+
+                        self.plot.setZRange([Math.min.apply(null,PM[0]),Math.max.apply(null,self.eff_i)]);
                         // self.plot.setZRange([0,1]);
                         self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
                         self.plot.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
 
-                        var norm = Math.max.apply(null,PM[1])
-                        self.singles = PhaseMatch.normalizeToVal(self.singles, norm);
-                        // self.plotSingles.setZRange([0,Math.max.apply(null,PM[1])]);
+                        self.plotSignalEff.setZRange([Math.min.apply(null,PM[0]),Math.max.apply(null,self.eff_s)]);
+                        // self.plotSignalEff.setZRange([0,1]);
+                        self.plotSignalEff.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
+                        self.plotSignalEff.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
+
+                        var norm = Math.max.apply(null, self.singles_s);
+                        var norm_i = Math.max.apply(null, self.singles_i);
+                        // var norm = Math.max(norm_s, norm_i);
+                        // var norm = 1;
+
+                        self.singles_s = PhaseMatch.normalizeToVal(self.singles_s, norm);
+                        self.singles_i = PhaseMatch.normalizeToVal(self.singles_i, norm);
+
                         self.plotSingles.setZRange([0,1]);
                         self.plotSingles.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
                         self.plotSingles.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
 
+                        self.plotIdlerSingles.setZRange([0,1]);
+                        self.plotIdlerSingles.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
+                        self.plotIdlerSingles.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
+
+
                         // self.plotCoinc.setZRange([0,Math.max.apply(null,PM[1])]);
                         self.coinc = PhaseMatch.normalizeToVal(self.coinc, norm);
-                        self.plotSingles.setZRange([0,1]);
+                        // self.plotCoinc.setZRange([0,1]);
                         self.plotCoinc.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
                         self.plotCoinc.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
                         var endtime = new Date();
@@ -331,21 +353,25 @@ define(
             draw: function(){
 
                 var self = this
-                    ,data = self.data
-                    ,singles = self.singles
+                    ,eff_i = self.eff_i
+                    ,eff_s = self.eff_s
+                    ,singles_s = self.singles_s
+                    ,singles_i = self.singles_i
                     ,coinc = self.coinc
                     ,dfd = when.defer()
                     ;
 
-                if (!data && !singles && !coinc){
+                if (!eff_i && !singles_s && !coinc  && !eff_s && !singles_i){
                     return this;
                 }
 
-                // self.plot.plotData( data );
+                // self.plot.plotData( eff_i );
                  // async... but not inside webworker
                 setTimeout(function(){
-                    self.plot.plotData( data );
-                    self.plotSingles.plotData( singles );
+                    self.plot.plotData( eff_i );
+                    self.plotSignalEff.plotData( eff_s );
+                    self.plotSingles.plotData( singles_s );
+                    self.plotIdlerSingles.plotData( singles_i );
                     self.plotCoinc.plotData( coinc );
                     dfd.resolve();
                 }, 10);
