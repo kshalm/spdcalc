@@ -90,6 +90,7 @@ define(
                 });
 
                 self.plot1dEff.resize(400,150);
+                self.plot1dEff.displayLegend(true);
                 // self.plot1dEff.setTitle("boo");
 
                 self.elPlot1d = $(self.plot1dEff.el);
@@ -131,6 +132,20 @@ define(
                     height: 400
                 });
 
+                self.plotIdler = new HeatMap({
+                    title: 'Joint Spectrum with the Idler fiber coupled',
+                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    labels: {
+                        x: 'Signal Wavelength(nm)',
+                        y: 'Idler Wavelength(nm)'
+                    },
+                    format: {
+                        x: '.0f',
+                        y: '.0f'
+                    },
+                    width: 400,
+                    height: 400
+                });
                 // init plot Coinc
                 self.plotCoinc = new HeatMap({
                     title: 'Joint spectrum with Signal & Idler fiber coupled',
@@ -170,6 +185,7 @@ define(
                 });
 
                 self.addPlot( self.plot );
+                self.addPlot( self.plotIdler );
                 self.addPlot( self.plotCoinc );
                 self.addPlot( self.plot1dEff );
                 self.initEvents();
@@ -237,7 +253,7 @@ define(
 
                 self.plotOpts.set({
                     'grid_size_heralding_JSI': 40,
-                    'n_pts_eff_1d': 50,
+                    'n_pts_eff_1d': 30,
                     'n_int': 14,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
@@ -318,37 +334,75 @@ define(
                 var startindex =0;
                 return when.all( promises ).then(function( values ){
                         // put the results back together
-                        var eff = new Float64Array( npts  );
-                        var singles = new Float64Array( npts  );
-                        var coinc = new Float64Array( npts  );
+                        var eff_i = new Float64Array( npts );
+                        var eff_s = new Float64Array( npts );
+                        var singles_s = new Float64Array( npts );
+                        var singles_i = new Float64Array( npts );
+                        var coinc = new Float64Array( npts );
                         var startindex = 0;
                         // console.log(values);
                         for (j = 0; j<Nthreads; j++){
-                             eff.set(values[j][0], startindex);
-                             // singles.set(values[j][1], startindex);
-                             // coinc.set(values[j][2], startindex);
-                            // console.log("eff val set");
+                             eff_i.set(values[j][0], startindex);
+                             eff_s.set(values[j][1], startindex);
+                             singles_s.set(values[j][2], startindex);
+                             singles_i.set(values[j][3], startindex);
+                             coinc.set(values[j][4], startindex);
+                            // console.log("eff_i val set");
                              startindex += yrange[j].length;
                         }
-                        // return [eff, singles, coinc]; // this value is passed on to the next "then()"
-                        return eff;
+                        // return eff_i;
+                        return [eff_i, eff_s, singles_s, singles_i, coinc]; // this value is passed on to the next "then()"
 
-                    }).then(function( eff ){
+                // return when.all( promises ).then(function( values ){
+                //         // put the results back together
+                //         var eff = new Float64Array( npts  );
+                //         var singles = new Float64Array( npts  );
+                //         var coinc = new Float64Array( npts  );
+                //         var startindex = 0;
+                //         // console.log(values);
+                //         for (j = 0; j<Nthreads; j++){
+                //              eff.set(values[j][0], startindex);
+                //              // singles.set(values[j][1], startindex);
+                //              // coinc.set(values[j][2], startindex);
+                //             // console.log("eff val set");
+                //              startindex += yrange[j].length;
+                //         }
+                //         // return [eff, singles, coinc]; // this value is passed on to the next "then()"
+                //         return eff;
 
-                        for ( var i = 0, l = eff.length; i < l; i ++){
+                    }).then(function( data ){
+
+                        var  eff_i = data[0]
+                            ,eff_s = data[1]
+                            ,dataEff_i = []
+                            ,dataEff_s = []
+                            ;
+
+                        for ( var i = 0, l = eff_i.length; i < l; i ++){
                             // console.log(eff[i]);
-                            data1d.push({
+                            dataEff_i.push({
                                 x: Ws[i]/1e-6,
-                                y: eff[i]
+                                y: eff_i[i]
                             })
                         }
-                        self.data1d = data1d;
+                        self.dataEff_i = dataEff_i;
+
+                        for ( var i = 0, l = eff_s.length; i < l; i ++){
+                            // console.log(eff[i]);
+                            dataEff_s.push({
+                                x: Ws[i]/1e-6,
+                                y: eff_s[i]
+                            })
+                        }
+                        self.dataEff_s = dataEff_s;
+
+
                         self.draw();
 
                         // Calculate visibility
                         self.plot1dEff.setTitle("Efficiency" );//("Hong-Ou-Mandel Dip, Visbibility = ");
-                        var  effMax = Math.max.apply(null,eff)
-                            ,effMin = Math.min.apply(null,eff)
+                        var  effMax = Math.max.apply(null,eff_s)
+                            ,effMin = Math.min.apply(null,eff_s)
                             ;
                         if (effMax * 1.1 > 1){
                             effMax = 1;
@@ -356,7 +410,8 @@ define(
                         effMin = Math.floor(effMin*10/1.2)/10;
                         // console.log("Min value:", effMin);
                         // self.plot1dEff.setYRange([0, Math.max.apply(null,eff)*1.2]);
-                        self.plot1dEff.setYRange([effMin, effMax]);
+
+                        // self.plot1dEff.setYRange([effMin, effMax]);
 
                         self.set_slider_values(props.W_sx, po.get('Ws_start'), po.get('Ws_stop'));
 
@@ -431,26 +486,45 @@ define(
 
                 return when.all( promises ).then(function( values ){
                         // put the results back together
-                        var arr = new Float64Array( grid_size *  grid_size );
+                        var singles_s = new Float64Array( grid_size *  grid_size );
+                        var singles_i = new Float64Array( grid_size *  grid_size );
                         var startindex = 0;
 
                         for (j = 0; j<Nthreads; j++){
-                             arr.set(values[j], startindex);
+                             singles_s.set(values[j][0], startindex);
+                             singles_i.set(values[j][1], startindex);
                              startindex += lambda_s.length*lambda_i_range[j].length;
 
                         }
-                        return arr; // this value is passed on to the next "then()"
+                        return [singles_s, singles_i]; // this value is passed on to the next "then()"
 
                      }).then(function( PM ){
                         // var p = self.updateTitle( PM );
-                        self.norm = Math.max.apply(null,PM);
-                        PM = PhaseMatch.normalizeToVal(PM, self.norm);
-                        self.data = PM;
+                        var  singles_s = PM[0]
+                            ,singles_i = PM[1]
+                            ;
+
+                        var  norm_s = Math.max.apply(null,PM[0])
+                            ,norm_i = Math.max.apply(null,PM[1])
+                            ;
+
+                        // console.log(singles_i);
+                        console.log(norm_s, norm_i);
+                        self.norm = Math.max(norm_s,norm_i);
+                        singles_s = PhaseMatch.normalizeToVal(singles_s, self.norm);
+                        singles_i = PhaseMatch.normalizeToVal(singles_i, self.norm);
+
+                        self.data_s = singles_s;
+                        self.data_i = singles_i
                         // self.draw();
-                        // console.log("Max singles", PhaseMatch.max(PM));
-                        self.plot.setZRange([0,Math.max.apply(null,PM)]);
+                        // console.log("Max singles", PhaseMatch.max(singles_s));
+                        // self.plot.setZRange([0,Math.max.apply(null,PM[0])]);
                         self.plot.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
+
+                        // self.plotIdler.setZRange([0,Math.max.apply(null,PM[1])]);
+                        self.plotIdler.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
+                        self.plotIdler.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
                         var endtime = new Date();
                         self.calcRCoinc(props);
@@ -528,7 +602,7 @@ define(
 
                         PM = PhaseMatch.normalizeToVal(PM, self.norm /prefactor );
                         self.dataCoinc = PM;
-                        var  Rs = PhaseMatch.Sum(self.data)
+                        var  Rs = PhaseMatch.Sum(self.data_s)
                             ,Rc = PhaseMatch.Sum(self.dataCoinc)
                             ,eff = Rc/Rs
                             ;
@@ -553,27 +627,35 @@ define(
             draw: function(){
 
                 var self = this
-                    ,data = self.data
+                    ,data_s = self.data_s
+                    ,data_i = self.data_i
                     ,dataCoinc = self.dataCoinc
                     ,dfd = when.defer()
                     ;
 
-                if (!data ){
+                if (!data_s  ){
                     return this;
                 }
 
 
 
                 // other plot
-                var data1d = self.data1d;
+                var dataEff_i = self.dataEff_i;
+                var dataEff_s = self.dataEff_s;
 
-                if (!data1d){
+                if (!dataEff_i && !dataEff_s){
                     return this;
                 }
 
                 setTimeout(function(){
-                    self.plot1dEff.plotData( data1d );
-                    self.plot.plotData( data );
+                    self.plot1dEff.clear();
+                    self.plot1dEff.addSeries( dataEff_i , 'Idler');
+                    self.plot1dEff.addSeries( dataEff_s, 'Signal');
+                    self.plot1dEff.plotData( );
+
+                    // self.plot1dEff.plotData( dataEff_i );
+                    self.plot.plotData( data_s );
+                    self.plotIdler.plotData(data_i);
                     self.plotCoinc.plotData( dataCoinc );
                     dfd.resolve();
                 }, 10);

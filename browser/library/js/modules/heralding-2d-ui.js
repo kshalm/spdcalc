@@ -216,7 +216,7 @@ define(
                 lim = PhaseMatch.autorange_lambda(props, threshold);
 
                 self.plotOpts.set({
-                    'grid_size_heralding': 2,
+                    'grid_size_heralding': 5,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -309,19 +309,23 @@ define(
                         self.singles_i = PM[3];
                         self.coinc = PM[4];
 
-                        self.plot.setZRange([Math.min.apply(null,PM[0]),Math.max.apply(null,self.eff_i)]);
-                        // self.plot.setZRange([0,1]);
+                        var maxEff_s = Math.max.apply(null, self.eff_s);
+                        var maxEff_i = Math.max.apply(null, self.eff_i);
+                        var maxEff = Math.max(maxEff_s, maxEff_i);
+
+                        // self.plot.setZRange([Math.min.apply(null,PM[0]),Math.max.apply(null,self.eff_i)]);
+                        self.plot.setZRange([0,maxEff]);
                         self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
                         self.plot.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
 
-                        self.plotSignalEff.setZRange([Math.min.apply(null,PM[0]),Math.max.apply(null,self.eff_s)]);
-                        // self.plotSignalEff.setZRange([0,1]);
+                        // self.plotSignalEff.setZRange([Math.min.apply(null,PM[0]),Math.max.apply(null,self.eff_s)]);
+                        self.plotSignalEff.setZRange([0,maxEff]);
                         self.plotSignalEff.setXRange( [ converter.to('micro',self.plotOpts.get('Wp_start')), converter.to('micro',self.plotOpts.get('Wp_stop'))]);
                         self.plotSignalEff.setYRange( [ converter.to('micro',self.plotOpts.get('Ws_start')), converter.to('micro',self.plotOpts.get('Ws_stop'))]);
 
-                        var norm = Math.max.apply(null, self.singles_s);
+                        var norm_s = Math.max.apply(null, self.singles_s);
                         var norm_i = Math.max.apply(null, self.singles_i);
-                        // var norm = Math.max(norm_s, norm_i);
+                        var norm = Math.max(norm_s, norm_i);
                         // var norm = 1;
 
                         self.singles_s = PhaseMatch.normalizeToVal(self.singles_s, norm);

@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-01-27
+ * phasematchjs v0.0.1a - 2015-01-28
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -6822,9 +6822,14 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
     // var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
 
     var N = lambda_s.length * (lambda_i.length);
-    var PMreal = new Float64Array( N );
-    var PMimag = new Float64Array( N );
-    var PMmag = new Float64Array( N );
+    var PMreal_s = new Float64Array( N );
+    var PMimag_s = new Float64Array( N );
+    var PMmag_s = new Float64Array( N );
+
+    var PMreal_i = new Float64Array( N );
+    var PMimag_i = new Float64Array( N );
+    var PMmag_i = new Float64Array( N );
+
 
     var maxpm = 0;
 
@@ -6849,16 +6854,30 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
             P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
+            // var P_i = P.clone();
             var PM = PhaseMatch.phasematch_singles(P);
-            PMreal[i + lambda_s.length*j] = ( PM[0]/norm );//*(Wi_SQ * PHI_s);
-            PMimag[i + lambda_s.length*j] = ( PM[1]/norm );//*(Wi_SQ * PHI_s);
-            PMmag[i + lambda_s.length*j] = Math.sqrt(sq(PMreal[i + lambda_s.length*j]) + sq(PMimag[i + lambda_s.length*j]));
+            PMreal_s[i + lambda_s.length*j] = ( PM[0]/norm );//*(Wi_SQ * PHI_s);
+            PMimag_s[i + lambda_s.length*j] = ( PM[1]/norm );//*(Wi_SQ * PHI_s);
+            PMmag_s[i + lambda_s.length*j] = Math.sqrt(sq(PMreal_s[i + lambda_s.length*j]) + sq(PMimag_s[i + lambda_s.length*j]));
+
+            // Now calculate the Idler JSI
+            // The role of the signal and idler get swapped in the calculation
+            // but the signal and idler wavelengths and other properties stay the same
+            // so there is no need to transpose the PMmag_i array.
+            P.swap_signal_idler();
+            var PM_i = PhaseMatch.phasematch_singles(P);
+            PMreal_i[i + lambda_s.length*j] = ( PM_i[0]/norm );//*(Wi_SQ * PHI_s);
+            PMimag_i[i + lambda_s.length*j] = ( PM_i[1]/norm );//*(Wi_SQ * PHI_s);
+            PMmag_i[i + lambda_s.length*j] = Math.sqrt(sq(PMreal_i[i + lambda_s.length*j]) + sq(PMimag_i[i + lambda_s.length*j]));
+            P.swap_signal_idler();
+
         }
     }
 
     // console.log("Approx Check, ", C_check);
     // return [PMreal, PMimag];
-    return PMmag;
+    // console.log(PMmag_i.toString());
+    return [PMmag_s, PMmag_i];
 
 };
 
