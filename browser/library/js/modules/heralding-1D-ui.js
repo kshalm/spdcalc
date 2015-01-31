@@ -64,6 +64,36 @@ define(
                     $(this).text( text );
                     target.toggleClass('collapsed');
                 });
+
+                self.el.on('click', '#collapse-singles-s', function(e){
+                    e.preventDefault();
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-singles-i', function(e){
+                    e.preventDefault();
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-coinc', function(e){
+                    e.preventDefault();
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
             },
             /**
              * Initialize Plots
@@ -118,8 +148,8 @@ define(
 
                 // init plot
                 self.plot = new HeatMap({
-                    title: 'Joint Spectrum with the Signal fiber coupled',
-                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    title: 'Normailized to the max singles rate',
+                    el: self.el.find('.singles-s-wrapper').get( 0 ),
                     labels: {
                         x: 'Signal Wavelength(nm)',
                         y: 'Idler Wavelength(nm)'
@@ -133,8 +163,8 @@ define(
                 });
 
                 self.plotIdler = new HeatMap({
-                    title: 'Joint Spectrum with the Idler fiber coupled',
-                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    title: 'Normailized to the max singles rate',
+                    el: self.el.find('.singles-i-wrapper').get( 0 ),
                     labels: {
                         x: 'Signal Wavelength(nm)',
                         y: 'Idler Wavelength(nm)'
@@ -148,8 +178,8 @@ define(
                 });
                 // init plot Coinc
                 self.plotCoinc = new HeatMap({
-                    title: 'Joint spectrum with Signal & Idler fiber coupled',
-                    el: self.el.find('.heat-map-wrapper').get( 0 ),
+                    title: 'Normailized to the max singles rate',
+                    el: self.el.find('.coinc-wrapper').get( 0 ),
                     labels: {
                         x: 'Signal Wavelength(nm)',
                         y: ''
@@ -267,7 +297,7 @@ define(
                     'Ws_stop': 200e-6
                 });
 
-                self.set_slider_values(50e-6, self.plotOpts.get['Ws_start'], self.plotOpts.get['Ws_stop']);
+                self.set_slider_values(150e-6, self.plotOpts.get['Ws_start'], self.plotOpts.get['Ws_stop']);
 
 
             },
@@ -285,12 +315,6 @@ define(
                     ,dim = po.get('n_pts_eff_1d')
                     ,npts = po.get('n_pts_eff_1d')
                     ,trange = []
-                    // ,delT = PhaseMatch.linspace(
-                    //     po.get('delT_start'),
-                    //     po.get('delT_stop'),
-                    //     dim
-                    // )
-
                     ,Nthreads = self.nWorkers -1
                     ,divisions = Math.floor(npts / Nthreads)
                     ,promises = []
@@ -340,7 +364,6 @@ define(
                         var singles_i = new Float64Array( npts );
                         var coinc = new Float64Array( npts );
                         var startindex = 0;
-                        // console.log(values);
                         for (j = 0; j<Nthreads; j++){
                              eff_i.set(values[j][0], startindex);
                              eff_s.set(values[j][1], startindex);
@@ -353,22 +376,6 @@ define(
                         // return eff_i;
                         return [eff_i, eff_s, singles_s, singles_i, coinc]; // this value is passed on to the next "then()"
 
-                // return when.all( promises ).then(function( values ){
-                //         // put the results back together
-                //         var eff = new Float64Array( npts  );
-                //         var singles = new Float64Array( npts  );
-                //         var coinc = new Float64Array( npts  );
-                //         var startindex = 0;
-                //         // console.log(values);
-                //         for (j = 0; j<Nthreads; j++){
-                //              eff.set(values[j][0], startindex);
-                //              // singles.set(values[j][1], startindex);
-                //              // coinc.set(values[j][2], startindex);
-                //             // console.log("eff val set");
-                //              startindex += yrange[j].length;
-                //         }
-                //         // return [eff, singles, coinc]; // this value is passed on to the next "then()"
-                //         return eff;
 
                     }).then(function( data ){
 
@@ -401,25 +408,19 @@ define(
 
                         // Calculate visibility
                         self.plot1dEff.setTitle("Efficiency" );//("Hong-Ou-Mandel Dip, Visbibility = ");
-                        var  effMax = Math.max.apply(null,eff_s)
-                            ,effMin = Math.min.apply(null,eff_s)
+                        var  effMax = Math.max( Math.max.apply(null,eff_s), Math.max.apply(null,eff_i) )
+                            ,effMin = Math.min( Math.min.apply(null,eff_s), Math.min.apply(null,eff_i) )
                             ;
                         if (effMax * 1.1 > 1){
                             effMax = 1;
                         }
-                        effMin = Math.floor(effMin*10/1.2)/10;
-                        // console.log("Min value:", effMin);
-                        // self.plot1dEff.setYRange([0, Math.max.apply(null,eff)*1.2]);
+                        effMin = Math.floor(effMin*10/1.1)/10;
 
-                        // self.plot1dEff.setYRange([effMin, effMax]);
+                        self.plot1dEff.setYRange([effMin, effMax]);
 
                         self.set_slider_values(props.W_sx, po.get('Ws_start'), po.get('Ws_stop'));
 
                          var endtime = new Date();
-                         // First calc the joint spectrum.
-                    // self.calc_eff_JSA( props );
-                    // self.calcRSingles( P );
-
                         return true;
                 });
 
@@ -454,7 +455,9 @@ define(
                 // console.log("Ws: ", Ws*1e6);
 
                 props.W_sx = Ws;
-                // props.W_ix = Ws;
+                props.W_ix = Ws;
+                props.W_sy = Ws;
+                props.W_iy = Ws;
                 // props.update_all_angles();
                 // props.optimum_idler();
 
@@ -504,12 +507,12 @@ define(
                             ,singles_i = PM[1]
                             ;
 
-                        var  norm_s = Math.max.apply(null,PM[0])
-                            ,norm_i = Math.max.apply(null,PM[1])
+                        var  norm_s = Math.max.apply(null,singles_s)
+                            ,norm_i = Math.max.apply(null, singles_i)
                             ;
 
                         // console.log(singles_i);
-                        console.log(norm_s, norm_i);
+                        // console.log(norm_s, norm_i);
                         self.norm = Math.max(norm_s,norm_i);
                         singles_s = PhaseMatch.normalizeToVal(singles_s, self.norm);
                         singles_i = PhaseMatch.normalizeToVal(singles_i, self.norm);
@@ -545,14 +548,18 @@ define(
                     ,divisions = Math.floor(grid_size / Nthreads)
                     ,lambda_i_range = []
                     ,Ws = self.get('delT')
-                    ,Wi_SQ = Math.pow(Ws,2) // convert from FWHM to sigma @TODO: Change to props.W_i
-                    ,PHI_s = 1/Math.cos(props.theta_s_e)
-                    ,prefactor = ((Wi_SQ * PHI_s))
+                    // ,Wi_SQ = Math.pow(Ws,2) // convert from FWHM to sigma @TODO: Change to props.W_i
+                    // ,PHI_s = 1/Math.cos(props.theta_s_e)
+                    // ,PHI_i = 1/Math.cos(props.theta_i_e)
+                    // ,prefactor = ((Wi_SQ * PHI_s))
+                    // ,scale_s = ((Wi_SQ * PHI_s))
+                    // ,scale_i = ((Wi_SQ * PHI_i))
+                    // ,prefactor = 1
                     ;
 
 
                 props.W_sx = Ws;
-                // props.W_ix = Ws;
+                props.W_ix = Ws;
                 // props.update_all_angles();
                 // props.optimum_idler();
 
@@ -599,16 +606,18 @@ define(
 
                      }).then(function( PM ){
 
-
-                        PM = PhaseMatch.normalizeToVal(PM, self.norm /prefactor );
+                        var coinc_max = Math.max.apply(null,PM);
+                        PM = PhaseMatch.normalizeToVal(PM, self.norm);
                         self.dataCoinc = PM;
                         var  Rs = PhaseMatch.Sum(self.data_s)
+                            ,Ri = PhaseMatch.Sum(self.data_i)
                             ,Rc = PhaseMatch.Sum(self.dataCoinc)
-                            ,eff = Rc/Rs
+                            ,eff_i = Rc/Rs
+                            ,eff_s = Rc/Ri
                             ;
                         // console.log("Efficiency from sum: ", Rc, Rs, eff); /// PhaseMatch.sum(self.data));
                         // console.log("Efficiency from sum: ", Ws, eff); /// PhaseMatch.sum(self.data));
-                        self.plot1dEff.setTitle("Collection Waist (um): " + (Ws*1e6).toFixed(0) + ", Efficiency: " + eff.toFixed(2));
+                        self.plot1dEff.setTitle("Waist: " + (Ws*1e6).toFixed(0) + "um  |  Signal: " + eff_s.toFixed(2) + "  |  Idler: "+  eff_i.toFixed(2) );
 
                         self.plotCoinc.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plotCoinc.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);

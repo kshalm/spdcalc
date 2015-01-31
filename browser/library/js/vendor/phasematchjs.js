@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-01-28
+ * phasematchjs v0.0.1a - 2015-01-30
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -4726,13 +4726,16 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ;
 
     var z0 = 0; //put pump in middle of the crystal
-    var RHOpx = P.walkoff_p; //pump walkoff angle.
-    // var RHOpx  = 0;
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+
+    // P.calc_walkoff_angles();
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx  = 0;
+
 
     PhaseMatch.convertToMicrons(P);
 
@@ -5065,13 +5068,15 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ;
 
     var z0 = 0; //put pump in middle of the crystal
-    var RHOpx = P.walkoff_p; //pump walkoff angle.
-    // var RHOpx = 0;
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+
+    // P.calc_walkoff_angles();
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx = 0;
 
     PhaseMatch.convertToMicrons(P);
     var omega_s = twoPIc / (P.lambda_s ),
@@ -6001,7 +6006,8 @@ PhaseMatch.Crystals('KDP-1', {
         walkoff_p: 0,
         // W_sx: .2 * Math.PI/180,
         W_sx: 100 * con.um,
-        W_sy: 0.2 * Math.PI/180,
+        W_sy: 100 * con.um,
+        W_ix: 100 * con.um,
         W_ix: 100 * con.um,
         phase: false,
         brute_force: false,
@@ -6190,6 +6196,7 @@ PhaseMatch.Crystals('KDP-1', {
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
             // props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
             // console.log(props.n_s, props.n_s, props.n_i);
+            // props.calc_walkoff_angles();
         },
 
         get_group_velocity : function(lambda, Type, S, photon){
@@ -6248,7 +6255,8 @@ PhaseMatch.Crystals('KDP-1', {
 
             // props.calcfibercoupling = fiber;
             // calculate the walkoff angle
-            // this.calc_walkoff_angles();
+            this.calc_walkoff_angles();
+            // console.log("Walkoff:", this.walkoff_p*180/Math.PI);
         },
 
 
@@ -6289,6 +6297,7 @@ PhaseMatch.Crystals('KDP-1', {
 
                 props.poling_period = P.poling_period;
                 props.poling_sign = P.poling_sign;
+                props.calc_walkoff_angles();
             }
         },
 
@@ -6463,20 +6472,26 @@ PhaseMatch.Crystals('KDP-1', {
             this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
 
             this.walkoff_p = -1/ne_p *(ne1_p - ne2_p)/deltheta;
+            console.log("Walkoff:", this.walkoff_p*180/Math.PI);
+            // this.walkoff_p = 0;
          },
 
           swap_signal_idler: function(){
             // Swap role of signal and idler. Useful for calculating Idler properties
             // this.update_all_angles();
-
+            // @ToDO: Do not swap the role of the signal/idler waists. In the code the idler waist
+            // is always set to be 100 um and is never updated to be equal to the signal waist until
+            // the actual phasematching function is called. Therefore switching the waists will yield
+            // the wrong result here. Need to fix this if we ever decide to handle asymmetric coupling
+            // geometries where the signal and idler can have different waists.
             var P = this
                 ,tempLambda = P.lambda_s
                 ,tempTheta = P.theta_s
                 ,tempPhis = P.phi_s
                 ,tempNs = P.n_s
                 ,tempSs = P.S_s
-                ,tempW_sx = P.W_sx
-                ,tempW_sy = P.W_sy
+                // ,tempW_sx = P.W_sx
+                // ,tempW_sy = P.W_sy
                 ,tempTheta_se = P.theta_s_e
                 ;
 
@@ -6486,8 +6501,8 @@ PhaseMatch.Crystals('KDP-1', {
                 P.phi_s = P.phi_i;
                 P.n_s = P.n_i;
                 P.S_s = P.S_i;
-                P.W_sx = P.W_ix;
-                P.W_sy = P.W_iy;
+                // P.W_sx = P.W_ix;
+                // P.W_sy = P.W_iy;
                 // console.log("Theta external before swap: ", P.theta_s_e * 180/Math.PI);
                 // P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
                 P.theta_s_e = P.theta_i_e;
@@ -6501,8 +6516,8 @@ PhaseMatch.Crystals('KDP-1', {
                 P.phi_i = tempPhis;
                 P.n_i = tempNs;
                 P.S_i = tempSs;
-                P.W_ix = tempW_sx;
-                P.W_iy = tempW_sy;
+                // P.W_ix = tempW_sx;
+                // P.W_iy = tempW_sy;
                 P.theta_i_e = tempTheta_se;
 
                 // Is this the right thing to do? Do I need to do this?
@@ -6543,6 +6558,7 @@ PhaseMatch.Crystals('KDP-1', {
                     } else if ( name === 'crystal' && typeof val !== 'object' ){
 
                         val = PhaseMatch.Crystals( val );
+                        // this.calc_walkoff_angles();
                     }
 
                     if (name === 'poling_period'){
@@ -6806,21 +6822,11 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
     P.update_all_angles();
     P.optimum_idler(P);
 
-    // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
-    // P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
-
 
     var todeg = 180/Math.PI;
-    // console.log(P.phi_i*todeg, P.phi_s*todeg);
-    // P.theta_i = P.theta_s;
-    // var centerpm = PhaseMatch.phasematch(P);
-    // console.log(sq(centerpm[0]) + sq(centerpm[1]));
 
 
     var i;
-    // var lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim);
-    // var lambda_i = PhaseMatch.linspace(li_stop, li_start, dim);
-
     var N = lambda_s.length * (lambda_i.length);
     var PMreal_s = new Float64Array( N );
     var PMimag_s = new Float64Array( N );
@@ -6833,9 +6839,11 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
 
     var maxpm = 0;
 
-    var  convfromFWHM = Math.sqrt(2) // Use 1/e^2 in intensity.
-        ,Wi_SQ = Math.pow(P.W_sx  * convfromFWHM,2) // convert from FWHM to sigma @TODO: Change to P.W_i
+    var  Ws_SQ = Math.pow(P.W_sx,2) // convert from FWHM to sigma @TODO: Change to P.W_i
         ,PHI_s = 1/Math.cos(P.theta_s_e)
+        ,PHI_i = 1/Math.cos(P.theta_i_e)
+        ,scale_s = (Ws_SQ * PHI_s)
+        ,scale_i =(Ws_SQ * PHI_i) //assume symmetric coupling geometry
         ;
 
     // calculate normalization
@@ -6856,9 +6864,9 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
 
             // var P_i = P.clone();
             var PM = PhaseMatch.phasematch_singles(P);
-            PMreal_s[i + lambda_s.length*j] = ( PM[0]/norm );//*(Wi_SQ * PHI_s);
-            PMimag_s[i + lambda_s.length*j] = ( PM[1]/norm );//*(Wi_SQ * PHI_s);
-            PMmag_s[i + lambda_s.length*j] = Math.sqrt(sq(PMreal_s[i + lambda_s.length*j]) + sq(PMimag_s[i + lambda_s.length*j]));
+            PMreal_s[i + lambda_s.length*j] = ( PM[0]/norm ) ;
+            PMimag_s[i + lambda_s.length*j] = ( PM[1]/norm ) ;
+            PMmag_s[i + lambda_s.length*j] = (Math.sqrt(sq(PMreal_s[i + lambda_s.length*j]) + sq(PMimag_s[i + lambda_s.length*j]))) /scale_s;
 
             // Now calculate the Idler JSI
             // The role of the signal and idler get swapped in the calculation
@@ -6866,10 +6874,11 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
             // so there is no need to transpose the PMmag_i array.
             P.swap_signal_idler();
             var PM_i = PhaseMatch.phasematch_singles(P);
-            PMreal_i[i + lambda_s.length*j] = ( PM_i[0]/norm );//*(Wi_SQ * PHI_s);
-            PMimag_i[i + lambda_s.length*j] = ( PM_i[1]/norm );//*(Wi_SQ * PHI_s);
-            PMmag_i[i + lambda_s.length*j] = Math.sqrt(sq(PMreal_i[i + lambda_s.length*j]) + sq(PMimag_i[i + lambda_s.length*j]));
             P.swap_signal_idler();
+            PMreal_i[i + lambda_s.length*j] = ( PM_i[0]/norm );
+            PMimag_i[i + lambda_s.length*j] = ( PM_i[1]/norm );
+            PMmag_i[i + lambda_s.length*j] = (Math.sqrt(sq(PMreal_i[i + lambda_s.length*j]) + sq(PMimag_i[i + lambda_s.length*j]))) /scale_i;
+
 
         }
     }
@@ -7874,15 +7883,12 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         ,lambdaWeights = PhaseMatch.Nintegrate2DWeights_3_8(n)
         ;
 
-    // console.log(P.theta_i*180/Math.PI, P.phi_i*180/Math.PI);
-    // P.theta_i = 0.6*Math.PI/180;
     P.phi_i = P.phi_s + Math.PI;
     P.update_all_angles();
     P.optimum_idler(P);
 
     P_i = P.clone();
     P_i.swap_signal_idler();
-    // console.log(" ----------------------------------");
     var PHI_i = 1/Math.cos(P_i.theta_s_e);
 
     function calc_singles_rate(lambda_s, lambda_i ){
@@ -7932,27 +7938,6 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         return (sq(PM[0]) + sq(PM[1]));
     };
 
-    // function calc_rates(lambda_s, lambda_i ){
-    //     // console.log("blah");
-    //     // props.update_all_angles();
-    //     // var P = props;
-    //     P.lambda_s = lambda_s;
-    //     P.lambda_i = lambda_i;
-
-    //     P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-    //     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-
-    //     var  PMcoinc = PhaseMatch.phasematch(P)
-    //         ,PMsingles = PhaseMatch.phasematch_singles(P)
-    //         ,CoincRate = (sq(PMcoinc[0]) + sq(PMcoinc[1]))
-    //         ,SinglesRate = Math.sqrt(sq(PMsingles[0]) + sq(PMsingles[1]))
-    //         ,Eff = CoincRate/SinglesRate * (PHI_s * sq(P.W_sx))
-    //         ;
-    //     // console.log("Eff in:" + CoincRate.toString() +", " +  SinglesRate.toString() +", " +  Eff.toString());
-    //     return Eff;
-    // };
-    // console.log("n: " + n.toString() + ", ls_start: " + n.toString() + ", Weights:" + lambdaWeights[4].toString());
-
     for (i=0; i<N; i++){
         var index_x = i % WpRange.length;
         var index_y = Math.floor(i / WpRange.length);
@@ -7966,8 +7951,6 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         P_i.W_sy = P_i.W_sx;
         P_i.W_ix = WsRange[index_y];
         P_i.W_iy = P_i.W_ix;
-
-        // console.log( P.W_sx.toString() + ", " + P.W.toString());
 
         var singlesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
             ,coincRate = PhaseMatch.Nintegrate2D_3_8(calc_coinc_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
@@ -7985,16 +7968,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         coinc[i] = coincRate;
         eff_i[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
         eff_s[i] = coincRate / idlerSinglesRate  *( sq(P.W_sx) * PHI_i);
-        // var test = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);
-        // eff[i] = PhaseMatch.Nintegrate2D_3_8(calc_rates, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights);// *( sq(WsRange[index_y]) * PHI_s);
 
-        // console.log("Effi:" + (eff[i]).toString() );
-
-        // if (S[i]<maxschmidt){
-        //     maxschmidt = S[i];
-        //     x_ideal = xrange[index_x];
-        //     y_ideal = yrange[index_y];
-        // }
 
 
     }
@@ -8003,178 +7977,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
 
 };
 
-// PhaseMatch.calc_singles_rate = function calc_singles_rate(props, lambda_p, lambda_s ){
 
-//     // props.update_all_angles();
-//     var P = props;
-//     P.lambda_s = lambda_s;
-//     P.lambda_p = lambda_p;
-
-//     P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-//     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-
-//     var PM = PhaseMatch.phasematch_singles(P);
-//     return Math.sqrt(sq(PM[0]) + sq(PM[1]));
-// };
-
-// PhaseMatch.calc_coinc_rate = function calc_coinc_rate(props, lambda_p, lambda_s ){
-
-//     // props.update_all_angles();
-//     var P = props;
-//     P.lambda_s = lambda_s;
-//     P.lambda_p = lambda_p;
-
-//     P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-//     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-
-//     var PM = PhaseMatch.phasematch_coinc(P);
-//     return Math.sqrt(sq(PM[0]) + sq(PM[1]));
-// };
-
-
-// PhaseMatch.calc_XY_mode_solver2 = function calc_XY_mode_solver2(props, x_start, x_stop, y_start, y_stop, BW, dim){
-
-//     props.update_all_angles();
-//     var P = props.clone();
-
-//     var dim_lambda = dim;
-
-//     if (P.brute_force){
-//         dim = P.brute_dim;
-//         dim_lambda = Math.round(dim_lambda/5)+1;
-//     }
-
-//     //convert the angular FWHM outside the xtal to sigma inside.
-//     // var W_sx = P.W_sx / P.n_s;
-//     // var W_sy = P.W_sy / P.n_s;
-
-//     var W_sx = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sx/2)/(P.n_s * Math.cos(P.theta_s)));
-//     var W_sy = 2*Math.asin( Math.cos(P.theta_s_e)*Math.sin(P.W_sy/2)/(P.n_s * Math.cos(P.theta_s)));
-//     //convert from FWHM to sigma
-//     W_sx = W_sx /(2 * Math.sqrt(2*Math.log(2)));
-//     W_sy = W_sx;
-//     // W_sy = W_sy /(2 * Math.sqrt(2*Math.log(2)));
-
-//     // console.log("Angluar FWHM =", W_sx *180/Math.PI, W_sy * 180/Math.PI, P.theta_s_e*180/Math.PI);
-
-//     P.optimum_idler(P);
-//     P.phi_i = P.phi_s + Math.PI;
-//     var X_0_s = Math.sin(P.theta_s)* Math.cos(P.phi_s);
-//     var Y_0_s = Math.sin(P.theta_s)* Math.sin(P.phi_s);
-
-//     var X_0_i = Math.sin(P.theta_i)* Math.cos(P.phi_i);
-//     var Y_0_i = Math.sin(P.theta_i)* Math.sin(P.phi_i);
-
-//     var theta_x_e = PhaseMatch.linspace(x_start, x_stop, dim);
-//     var theta_y_e = PhaseMatch.linspace(y_start, y_stop, dim);
-//     var X = theta_x_e;
-//     var Y = theta_y_e;
-
-//     for (var k = 0; k<dim; k++){
-//         if (theta_x_e[k] < 0){
-//             P.theta_i_e = -1*theta_x_e[k];
-//             X[k] = -1*PhaseMatch.find_internal_angle(P,"idler");
-//         }
-//         else {
-//             P.theta_i_e = theta_x_e[k];
-//             X[k] = PhaseMatch.find_internal_angle(P,"idler");
-//         }
-//          if (theta_y_e[k] < 0){
-//             P.theta_i_e = -1*theta_y_e[k];
-//             Y[k] = -1*PhaseMatch.find_internal_angle(P,"idler");
-//         }
-//         else {
-//             P.theta_i_e = theta_y_e[k];
-//             Y[k] = PhaseMatch.find_internal_angle(P,"idler");
-//         }
-
-//     }
-
-//     // var X = PhaseMatch.linspace(x_start, x_stop, dim);
-//     // var Y = PhaseMatch.linspace(y_start, y_stop, dim);
-
-//     var lambda_s = PhaseMatch.linspace(P.lambda_s - BW/2, P.lambda_s + BW/2, dim_lambda);
-//     var lambda_i = PhaseMatch.linspace(P.lambda_i - BW/2, P.lambda_i + BW/2, dim_lambda);
-
-
-//     var N = dim * dim;
-//     var PM = new Float64Array( N );
-//     var singles = 0;
-//     var coinc =0;
-//     var maxalpha = 0;
-
-//     // for every point on the idler spatial grid, loop through and calculate the maximum phasematching probability.
-//     for (var i=0; i<N; i++){
-//         var index_x = i % dim;
-//         var index_y = Math.floor(i / dim);
-
-//         // First set up the known quantities
-//         P.theta_i = Math.asin(Math.sqrt(sq(X[index_x]) + sq(Y[index_y])));
-//         P.phi_i = Math.atan2(Y[index_y],X[index_x]);
-//         P.phi_s = P.phi_i + Math.PI;
-//         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
-
-//         var x_i = Math.sin(P.theta_i)*Math.cos(P.phi_i);
-//         var y_i = Math.sin(P.theta_i)*Math.sin(P.phi_i);
-//         // var norm = Math.sqrt(1/((2*Math.PI)*sq(W_sx)));
-//         var norm = 1;
-//         var alpha_i = norm*Math.exp(-1*sq((X_0_i - x_i )/(2*W_sx)) - sq((Y_0_i - y_i)/(2*W_sy)));
-
-//         if (alpha_i>maxalpha){maxalpha = alpha_i;}
-
-//         var maxval =0;
-
-//         // Loop through the wavelengths.
-//          for (var j=0; j<dim_lambda; j++){
-//             P.lambda_i = lambda_i[j];
-//             P.lambda_s = 1/(1/P.lambda_p - 1/P.lambda_i);
-//             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-
-//             // Find the optimum theta_s corresponding to this theta_i and lambda_i
-//             if (P.brute_force) {
-//                 P.brute_force_theta_s(); //use a search. time consuming.
-//                 // var thetabrute = P.theta_s;
-//                 // console.log("brute",P.theta_s*180/Math.PI);
-//                 // P.optimum_signal();
-//                 // console.log("analytic",(P.theta_s-thetabrute)*180/Math.PI);
-//             }
-//             else {
-//                 //calculate the correct signal angle analytically.
-//                 P.optimum_signal();
-//             }
-//             // P.optimum_signal(P);
-
-//             var x = Math.sin(P.theta_s)*Math.cos(P.phi_s);
-//             var y = Math.sin(P.theta_s)*Math.sin(P.phi_s);
-//             var alpha_s = norm*Math.exp(-1*sq((X_0_s - x )/(2*W_sx)) - sq((Y_0_s - y)/(2*W_sy)));
-
-
-//             // P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
-
-//             var PM_tmp_complex = PhaseMatch.phasematch(P); //complex
-
-//             var PM_tmp = sq(PM_tmp_complex[0]*alpha_s) + sq(PM_tmp_complex[1]*alpha_s);
-//             // maxval += PM_tmp/dim_lambda;
-//             if (PM_tmp>maxval){
-//                 maxval = PM_tmp;
-//                 // singles += maxval;
-//                 // singles +=sq(PM_tmp_complex[0]*alpha_i) + sq(PM_tmp_complex[1]*alpha_i);
-//                 // coinc += sq(PM_tmp_complex[0]*alpha_s*alpha_i) + sq(PM_tmp_complex[1]*alpha_s*alpha_i)
-//                 // coinc += sq(PM_tmp_complex[0]*alpha_s-alpha_i) + sq(PM_tmp_complex[1]*alpha_s-alpha_i);
-//                 // coinc += singles - sq(alpha_i);
-//             }
-//         }
-
-//         PM[i] = maxval;
-//         singles += maxval;
-//         // coinc += Math.sqrt(sq(sq(alpha_i)-maxval));
-//         coinc += maxval*(1- Math.abs(sq(alpha_i) - maxval));
-
-//     }
-//     console.log("singles", singles, "coinc: ", coinc, "eff:", coinc/singles);
-
-//     return PM;
-// };
 
 
 

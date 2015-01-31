@@ -38,7 +38,8 @@
         walkoff_p: 0,
         // W_sx: .2 * Math.PI/180,
         W_sx: 100 * con.um,
-        W_sy: 0.2 * Math.PI/180,
+        W_sy: 100 * con.um,
+        W_ix: 100 * con.um,
         W_ix: 100 * con.um,
         phase: false,
         brute_force: false,
@@ -227,6 +228,7 @@
             // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
             // props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
             // console.log(props.n_s, props.n_s, props.n_i);
+            // props.calc_walkoff_angles();
         },
 
         get_group_velocity : function(lambda, Type, S, photon){
@@ -285,7 +287,8 @@
 
             // props.calcfibercoupling = fiber;
             // calculate the walkoff angle
-            // this.calc_walkoff_angles();
+            this.calc_walkoff_angles();
+            // console.log("Walkoff:", this.walkoff_p*180/Math.PI);
         },
 
 
@@ -326,6 +329,7 @@
 
                 props.poling_period = P.poling_period;
                 props.poling_sign = P.poling_sign;
+                props.calc_walkoff_angles();
             }
         },
 
@@ -500,20 +504,26 @@
             this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
 
             this.walkoff_p = -1/ne_p *(ne1_p - ne2_p)/deltheta;
+            console.log("Walkoff:", this.walkoff_p*180/Math.PI);
+            // this.walkoff_p = 0;
          },
 
           swap_signal_idler: function(){
             // Swap role of signal and idler. Useful for calculating Idler properties
             // this.update_all_angles();
-
+            // @ToDO: Do not swap the role of the signal/idler waists. In the code the idler waist
+            // is always set to be 100 um and is never updated to be equal to the signal waist until
+            // the actual phasematching function is called. Therefore switching the waists will yield
+            // the wrong result here. Need to fix this if we ever decide to handle asymmetric coupling
+            // geometries where the signal and idler can have different waists.
             var P = this
                 ,tempLambda = P.lambda_s
                 ,tempTheta = P.theta_s
                 ,tempPhis = P.phi_s
                 ,tempNs = P.n_s
                 ,tempSs = P.S_s
-                ,tempW_sx = P.W_sx
-                ,tempW_sy = P.W_sy
+                // ,tempW_sx = P.W_sx
+                // ,tempW_sy = P.W_sy
                 ,tempTheta_se = P.theta_s_e
                 ;
 
@@ -523,8 +533,8 @@
                 P.phi_s = P.phi_i;
                 P.n_s = P.n_i;
                 P.S_s = P.S_i;
-                P.W_sx = P.W_ix;
-                P.W_sy = P.W_iy;
+                // P.W_sx = P.W_ix;
+                // P.W_sy = P.W_iy;
                 // console.log("Theta external before swap: ", P.theta_s_e * 180/Math.PI);
                 // P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
                 P.theta_s_e = P.theta_i_e;
@@ -538,8 +548,8 @@
                 P.phi_i = tempPhis;
                 P.n_i = tempNs;
                 P.S_i = tempSs;
-                P.W_ix = tempW_sx;
-                P.W_iy = tempW_sy;
+                // P.W_ix = tempW_sx;
+                // P.W_iy = tempW_sy;
                 P.theta_i_e = tempTheta_se;
 
                 // Is this the right thing to do? Do I need to do this?
@@ -580,6 +590,7 @@
                     } else if ( name === 'crystal' && typeof val !== 'object' ){
 
                         val = PhaseMatch.Crystals( val );
+                        // this.calc_walkoff_angles();
                     }
 
                     if (name === 'poling_period'){

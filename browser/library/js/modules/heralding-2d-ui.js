@@ -55,7 +55,7 @@ define(
                 var self = this;
                 // self.el = $(tplPlots.render());
                 // collapse button for JSA module plot
-                self.el.on('click', '#collapse-efficiency', function(e){
+                self.el.on('click', '#collapse-efficiency-s', function(e){
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = $(this).parent().parent().parent()
@@ -66,7 +66,29 @@ define(
                     target.toggleClass('collapsed');
                 });
 
-                self.el.on('click', '#collapse-singles', function(e){
+                self.el.on('click', '#collapse-efficiency-i', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-singles-s', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-singles-i', function(e){
                     e.preventDefault();
                     // var target = self.elParameters.parent()
                     var target = $(this).parent().parent().parent()
@@ -107,7 +129,7 @@ define(
                 // init plot
                 self.plot = new HeatMap({
                     title: 'Idler heralding efficiency',
-                    el: self.el.find('.efficiency-wrapper').get( 0 ),
+                    el: self.el.find('.efficiency_i-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
                         x: 'Pump Waist (1/e^2) (um)',
@@ -125,7 +147,7 @@ define(
                 // Signal Heralding Efficiency plot
                 self.plotSignalEff = new HeatMap({
                     title: 'Signal heralding efficiency',
-                    el: self.el.find('.efficiency-wrapper').get( 0 ),
+                    el: self.el.find('.efficiency_s-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
                         x: 'Pump Waist (1/e^2) (um)',
@@ -142,8 +164,8 @@ define(
 
                 // Signal singles plot
                 self.plotSingles = new HeatMap({
-                    title: 'Singles rate (normalized to max singles value)',
-                    el: self.el.find('.singles-wrapper').get( 0 ),
+                    title: 'Signal singles rate',
+                    el: self.el.find('.singles_s-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
                         x: 'Pump Waist (1/e^2) (um) ',
@@ -160,8 +182,8 @@ define(
 
                 // Idler singles plot
                 self.plotIdlerSingles = new HeatMap({
-                    title: 'Singles rate',
-                    el: self.el.find('.singles-wrapper').get( 0 ),
+                    title: 'Idler Singles rate',
+                    el: self.el.find('.singles_i-wrapper').get( 0 ),
                     margins: margins,
                     labels: {
                         x: 'Pump Waist (1/e^2) (um) ',
@@ -290,7 +312,6 @@ define(
                         var singles_i = new Float64Array( grid_size *  grid_size );
                         var coinc = new Float64Array( grid_size *  grid_size );
                         var startindex = 0;
-                        console.log(values);
                         for (j = 0; j<Nthreads; j++){
                              eff_i.set(values[j][0], startindex);
                              eff_s.set(values[j][1], startindex);
