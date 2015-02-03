@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-01-30
+ * phasematchjs v0.0.1a - 2015-02-03
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -5908,7 +5908,7 @@ PhaseMatch.Crystals('LiNB-MgO', {
             ;
         var l2 = lambda*lambda;
         var nz = Math.sqrt( a1 + b1*F + (a2 + b2*F)/(l2 - sq(a3+b3*F)) + (a4+b4*F)/(l2 -sq(a5)) - a6*l2 );
-        
+
          // Coefficients for the oridnary index
         var  a1 = 5.653
             ,a2 = 0.1185
@@ -5969,7 +5969,68 @@ PhaseMatch.Crystals('KDP-1', {
 });
 
 
+/**
+ * AGGaSe2
+ */
+PhaseMatch.Crystals('AgGaSe2-1', {
+    name: 'AgGaSe2 Ref 1',
+    info: 'H. Kildal, J. Mikkelsen, Opt. Commun. 9, 315 (1973)',
+    type: '',
+    cls: '',
+    lambda_min: 1000*1e-9,
+    lambda_max: 13500*1e-9,
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
 
+        var  nx = Math.sqrt(3.9362 + 2.9113/(1-sq(0.38821/lambda)) + 1.7954/ (1-sq(40/lambda)) )
+            ,ny = nx
+            ,nz = Math.sqrt(3.3132 + 3.3616/(1-sq(0.38201/lambda)) + 1.7677/ (1-sq(40/lambda)) )
+            ;
+
+
+        // http://www.redoptronics.com/AgGaS2-AgGaSe2.html
+        var  dnx = 15.4e-5
+            ,dny = dnx
+            ,dnz = 15.4e-5;
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+        return [nx, ny, nz];
+    }
+});
+
+
+/**
+ * AGGaSe2
+ */
+PhaseMatch.Crystals('AgGaSe2-2', {
+    name: 'AgGaSe2 Ref 2',
+    info: 'G. C. Bhar, Appl. Opt., 15, 305 (1976)',
+    type: '',
+    cls: '',
+    lambda_min: 1000*1e-9,
+    lambda_max: 13500*1e-9,
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+
+        var  nx = Math.sqrt(4.6453 + 2.2057/(1-sq(0.43347/lambda)) + 1.8377/ (1-sq(40/lambda)) )
+            ,ny = nx
+            ,nz = Math.sqrt(5.2912 + 1.3970/(1-sq(0.53339/lambda)) + 1.9282/ (1-sq(40/lambda)) )
+            ;
+
+
+        // http://www.redoptronics.com/AgGaS2-AgGaSe2.html
+        var  dnx = 15.4e-5
+            ,dny = dnx
+            ,dnz = 15.4e-5;
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+        return [nx, ny, nz];
+    }
+});
 (function(){
 
     // These are the names associated with the types
