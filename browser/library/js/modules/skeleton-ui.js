@@ -154,6 +154,9 @@ define(
                 }
 
                 // auto draw
+
+                self.autocalcPlotOpts();
+                
                 self.refresh();
 
             },

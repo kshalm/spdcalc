@@ -240,17 +240,21 @@ define(
                         // keeps the plot options from incorrectly refreshing if
                         // autocalc plot options is checked.
                         if (self.elPlotOpts.find('[name="'+key+'"]').length>0){
+                            console.log(self.elPlotOpts.find('[name="'+key+'"]'));
 
                             if ( !self.plotOpts.get('autocalc_plotopts') ){
                                 el.val( val );
+
                             }
                         }
                         else {
                             el.val( val );
                         }
 
-                        //
+                                            
                     });
+
+                    
 
                 });
 
