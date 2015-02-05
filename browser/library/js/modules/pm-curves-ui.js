@@ -42,13 +42,14 @@ define(
             tplPlots: tplCurvesLayout,
             showPlotOpts: [
                 'grid_size',
-                // 'signal-wavelength',
-                'pm-signal-wavelength',
+                'signal-wavelength',
+                // 'pm-signal-wavelength',
                 // 'idler-wavelength',
                 'pump-wavelength',
                 'pump-theta',
                 'pump-phi',
-                'poling-period'
+                'poling-period',
+                'theta'
             ],
 
             initEvents : function(){
@@ -88,6 +89,40 @@ define(
                     target.toggleClass('collapsed');
                 });
 
+                /////////////////////////////
+                self.el.on('click', '#collapse-theta-phi', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-thetas-thetai', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
+                self.el.on('click', '#collapse-lambda-theta', function(e){
+                    e.preventDefault();
+                    // var target = self.elParameters.parent()
+                    var target = $(this).parent().parent().parent()
+                        ,text = target.is('.collapsed') ? String.fromCharCode(0x2296) : String.fromCharCode(0x2295)
+                        ;
+
+                    $(this).text( text );
+                    target.toggleClass('collapsed');
+                });
+
             },
 
             /**
@@ -113,21 +148,6 @@ define(
                 });
 
                 self.elplotSignal = $(self.plotSignal.el);
-
-                // // Phasematching angle vs signal wavelength
-                // self.plotTheta = new HeatMap({
-                //     title: 'Phasematching',
-                //     el: self.el.find('.curve-crystal-wrapper').get( 0 ),
-                //     labels: {
-                //         y: 'Signal Wavelength (nm)',
-                //         x: 'Angle of optic axis with respect to pump direction (deg)'
-                //     },
-                //     format: {
-                //         y: '.0f'
-                //     }
-                // });
-
-                // self.elplotTheta = $(self.plotTheta.el);
 
                 // Phasematching poling period vs theta
                 self.plotPolingTheta = new HeatMap({
@@ -156,11 +176,52 @@ define(
 
                 self.elplotThetaPhi = $(self.plotThetaPhi.el);
 
+                //////////////////////////////
+                // Lambda_s vs theta_s plot
+                self.plotLambdasThetas = new HeatMap({
+                    title: 'Wavelength vs emission angle',
+                    el: self.el.find('.lambda_s-theta_s-wrapper').get( 0 ),
+                    labels: {
+                        x: 'Signal Wavelength (nm)',
+                        y: 'Theta Signal (deg)'
+                    },
+                    format: {z: '.0f'}
+                });
+
+                self.elplotLambdasThetas = $(self.plotLambdasThetas.el);
+
+                // Theta/Phi in the crystal
+                self.plotThetaPhiSignal = new HeatMap({
+                    title: 'Signal Theta vs Phi',
+                    el: self.el.find('.pm-theta-phi-wrapper').get( 0 ),
+                    labels: {
+                        x: 'Theta Signal (deg)',
+                        y: 'Phi Signal (deg)'
+                    }
+                });
+
+                self.elplotThetaPhiSignal = $(self.plotThetaPhiSignal.el);
+
+                // Theta/Phi in the crystal
+                self.plotThetaTheta = new HeatMap({
+                    title: 'Signal vs Idler',
+                    el: self.el.find('.pm-theta-theta-wrapper').get( 0 ),
+                    labels: {
+                        x: 'Theta Signal (deg)',
+                        y: 'Theta Idler (deg)'
+                    }
+                });
+
+                self.elplotThetaTheta = $(self.plotThetaTheta.el);
+
 
                 self.addPlot( self.plotSignal );
                 // self.addPlot( self.plotTheta );
                 self.addPlot( self.plotPolingTheta );
                 self.addPlot( self.plotThetaPhi );
+                self.addPlot( self.plotLambdasThetas );
+                self.addPlot( self.plotThetaPhiSignal );
+                self.addPlot( self.plotThetaTheta );
                 self.initEvents();
             },
 
@@ -195,6 +256,8 @@ define(
                     'pump_phi_stop': Math.PI/2,
                     'poling_period_start': poling_limits[0],
                     'poling_period_stop': poling_limits[1],
+                    'theta_start': lim_theta[0],
+                    'theta_stop': lim_theta[1]
 
                 });
             },
@@ -209,7 +272,9 @@ define(
                     // ,dataBoth = []
                     ,l_start = converter.to('nano', po.get('ls_start'))
                     ,l_stop =  converter.to('nano', po.get('ls_stop'))
-                    ,Nthreads = self.nWorkers
+                    ,t_start = converter.to('deg', po.get('theta_start'))
+                    ,t_stop = converter.to('deg', po.get('theta_stop'))
+                    ,Nthreads = 6
                     ,promises = []
                     ;
 
@@ -221,8 +286,10 @@ define(
 
             promises[0] = self.workers[0].exec('jsaHelper.doPMSignal', [
                     propsJSON,
-                    po.get('pm_signal_wavelength_start'),
-                    po.get('pm_signal_wavelength_stop'),
+                    // po.get('pm_signal_wavelength_start'),
+                    // po.get('pm_signal_wavelength_stop'),
+                    po.get('ls_start'),
+                    po.get('ls_stop'),
                     po.get('lp_start'),
                     po.get('lp_stop'),
                     "signal",
@@ -250,6 +317,40 @@ define(
 
             ]);
 
+            ////////////////////////////////////
+            // Lambda signal vs theta signal
+                promises[3] = self.workers[0].exec('jsaHelper.doXYLambdasThetas', [
+                        propsJSON,
+                        po.get('ls_start'),
+                        po.get('ls_stop'),
+                        po.get('theta_start'),
+                        po.get('theta_stop'),
+                        po.get('grid_size')
+
+                ]);
+
+                 // Theta vs Phi in crystal
+                promises[4] = self.workers[0].exec('jsaHelper.doXYThetavsPhi', [
+                        propsJSON,
+                        po.get('theta_start'),
+                        po.get('theta_stop'),
+                        0,
+                        0.5 * Math.PI,
+                        po.get('grid_size')
+
+                ]);
+
+
+                promises[5] = self.workers[0].exec('jsaHelper.doXYThetaTheta', [
+                        propsJSON,
+                        po.get('theta_start'),
+                        po.get('theta_stop'),
+                        po.get('theta_start'),
+                        po.get('theta_stop'),
+                        po.get('grid_size')
+
+                ]);
+
             return when.all( promises ).then(function( values ){
                 self.dataSignal = values[0];
                 self.plotSignal.setXRange([ converter.to('nano', po.get('lp_start')),converter.to('nano', po.get('lp_stop')) ]);
@@ -263,58 +364,25 @@ define(
                 self.plotPolingTheta.setXRange([ converter.to('micro',  po.get('poling_period_start')),converter.to('micro', po.get('poling_period_stop')) ]);
                 self.plotPolingTheta.setYRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
 
+                ///////////////////////////
+                self.dataLambdasThetas = values[3].data;
+                self.plotLambdasThetas.setXRange([ l_start, l_stop ]);
+                self.plotLambdasThetas.setYRange([ t_start, t_stop ]);
+
+                self.dataThetaPhiSignal = values[4];
+                self.plotThetaPhiSignal.setXRange([ t_start, t_stop ]);
+                self.plotThetaPhiSignal.setYRange([0 ,90]);
+
+                self.dataThetaTheta = values[5];
+                self.plotThetaTheta.setXRange([ t_start, t_stop ]);
+                self.plotThetaTheta.setYRange([ t_start, t_stop ]);
+
 
                 return true; // this value is passed on to the next "then()"
 
             });
 
-            // var PMSignal = PhaseMatch.calc_PM_Curves(
-            //         props,
-            //         po.get('pm_signal_wavelength_start'),
-            //         po.get('pm_signal_wavelength_stop'),
-            //         po.get('lp_start'),
-            //         po.get('lp_stop'),
-            //         "signal",
-            //         po.get('grid_size')
-            //     );
-            // // console.log(props.calcfibercoupling);
-            // self.dataSignal = PMSignal;
-            // self.plotSignal.setXRange([ converter.to('nano', po.get('lp_start')),converter.to('nano', po.get('lp_stop')) ]);
-            // self.plotSignal.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
 
-
-
-            // var PMThetaPhi = PhaseMatch.calc_PM_Pump_Theta_Phi(
-            //         props,
-
-            //         po.get('pump_theta_start'),
-            //         po.get('pump_theta_stop'),
-            //         po.get('pump_phi_start'),
-            //         po.get('pump_phi_stop'),
-            //         // 0,
-            //         // Math.PI/2,
-            //         // 0,
-            //         // Math.PI,
-
-            //         po.get('grid_size')
-            //     );
-            // console.log("finished", PMThetaPhi);
-            // self.dataThetaPhi = PMThetaPhi;
-            // self.plotThetaPhi.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
-            // self.plotThetaPhi.setYRange([ converter.to('deg',  po.get('pump_phi_start')),converter.to('deg', po.get('pump_phi_stop')) ]);
-
-
-            // var PMPolingTheta = PhaseMatch.calc_PM_Pump_Theta_Poling(
-            //         props,
-            //         po.get('poling_period_start'),
-            //         po.get('poling_period_stop'),
-            //         po.get('pump_theta_start'),
-            //         po.get('pump_theta_stop'),
-            //         po.get('grid_size')
-            //     );
-            // self.dataPolingTheta = PMPolingTheta;
-            // self.plotPolingTheta.setXRange([ converter.to('micro',  po.get('poling_period_start')),converter.to('micro', po.get('poling_period_stop')) ]);
-            // self.plotPolingTheta.setYRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
 
             },
 
@@ -331,6 +399,17 @@ define(
                     self.plotSignal.plotData( self.dataSignal );
                     self.plotPolingTheta.plotData( self.dataPolingTheta );
                     self.plotThetaPhi.plotData( self.dataThetaPhi);
+
+                    ////////////////
+
+                    // lambda signal vs theta signal plot
+                    self.plotLambdasThetas.plotData( self.dataLambdasThetas );
+
+                    // Theta vs Phi in the crystal
+                    self.plotThetaPhiSignal.plotData( self.dataThetaPhiSignal );
+
+                    // Theta vs Phi in the crystal
+                    self.plotThetaTheta.plotData( self.dataThetaTheta )
                     dfd.resolve();
                 }, 10);
                 return dfd.promise;
