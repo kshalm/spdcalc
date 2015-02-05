@@ -5639,9 +5639,10 @@ PhaseMatch.Crystals('BBO-1', {
     // info: '',
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        lambda_sq = sq(lambda);
         // http://www.newlightphotonics.com/bbo-properties.html & Alan Migdall
-        var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-        var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
+        var no = Math.sqrt(2.7359 + 0.01878/ (lambda_sq - 0.01822) - 0.01354*lambda_sq);
+        var ne = Math.sqrt(2.3753 + 0.01224 / (lambda_sq - 0.01667) - 0.01516*lambda_sq);
 
         //from Newlight Photonics
         var dno= -9.3e-6;
@@ -5654,90 +5655,6 @@ PhaseMatch.Crystals('BBO-1', {
     }
 });
 
-// /**
-//  * KTP indicies.
-//  */
-// PhaseMatch.Crystals('KTP-1', {
-//     name: 'KTP ref 1',
-//     // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
-//     info: 'http://www.redoptronics.com/KTP-crystal.html',
-//     indicies: function(lambda, temp){
-//         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-
-//         // http://www.redoptronics.com/KTP-crystal.html
-//         var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
-//         var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
-//         var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
-
-
-//         // H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)
-//         // var nx = Math.sqrt( 2.1146 + 0.89188/(1 - (0.20861/sq(lambda))) - (0.01320* sq(lambda)) );
-//         // var ny = Math.sqrt( 2.1518 + 0.87862/(1 - (0.21801/sq(lambda))) - (0.01327* sq(lambda)) );
-//         // var nz = Math.sqrt( 2.3136 + 1.00012/(1 - (0.23831/sq(lambda))) - (0.01679* sq(lambda)) );
-
-//         // http://www.castech-us.com/casktp.htm & Newlight Photonics
-//         // var nx= Math.sqrt(3.0065+0.03901/(sq(lambda)-0.04251)-0.01327*sq(lambda));
-//         // var ny= Math.sqrt(3.0333+0.04154/(sq(lambda)-0.04547)-0.01408*sq(lambda));
-//         // var nz= Math.sqrt(3.0065+0.05694/(sq(lambda)-0.05658)-0.01682*sq(lambda));
-
-
-//         var dnx= 1.1e-5;
-//         var dny= 1.3e-5;
-//         var dnz= 1.6e-5;
-
-//         nx = nx + (temp -20.0)*dnx;
-//         ny = ny + (temp -20.0)*dny;
-//         nz = nz + (temp -20.0)*dnz;
-
-//         // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-//         // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
-
-//         return [nx, ny, nz];
-//     }
-// });
-
-// *
-//  * KTP Ref 2 indicies.
-
-// PhaseMatch.Crystals('KTP-2', {
-//     name: 'KTP ref 2',
-//     // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
-//     info: 'http://www.castech-us.com/casktp.htm & Newlight Photonics',
-//     indicies: function(lambda, temp){
-//         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-
-//         // http://www.redoptronics.com/KTP-crystal.html
-//         // var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
-//         // var ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
-//         // var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
-
-
-//         // H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)
-//         // var nx = Math.sqrt( 2.1146 + 0.89188/(1 - (0.20861/sq(lambda))) - (0.01320* sq(lambda)) );
-//         // var ny = Math.sqrt( 2.1518 + 0.87862/(1 - (0.21801/sq(lambda))) - (0.01327* sq(lambda)) );
-//         // var nz = Math.sqrt( 2.3136 + 1.00012/(1 - (0.23831/sq(lambda))) - (0.01679* sq(lambda)) );
-
-//         // http://www.castech-us.com/casktp.htm & Newlight Photonics
-//         var nx= Math.sqrt(3.0065+0.03901/(sq(lambda)-0.04251)-0.01327*sq(lambda));
-//         var ny= Math.sqrt(3.0333+0.04154/(sq(lambda)-0.04547)-0.01408*sq(lambda));
-//         var nz= Math.sqrt(3.0065+0.05694/(sq(lambda)-0.05658)-0.01682*sq(lambda));
-
-
-//         var dnx= 1.1e-5;
-//         var dny= 1.3e-5;
-//         var dnz= 1.6e-5;
-
-//         nx = nx + (temp -20.0)*dnx;
-//         ny = ny + (temp -20.0)*dny;
-//         nz = nz + (temp -20.0)*dnz;
-
-//         // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-//         // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
-
-//         return [nx, ny, nz];
-//     }
-// });
-
 /**
  * KTP indicies.
  */
@@ -5747,19 +5664,20 @@ PhaseMatch.Crystals('KTP-3', {
     info: 'Includes Franco Wong"s modificatin.  http://dx.doi.org/10.1063/1.1668320, http://www.redoptronics.com/KTP-crystal.html',
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        lambda_sq = sq(lambda);
 
         // http://www.redoptronics.com/KTP-crystal.html
-        var nx= Math.sqrt(2.10468 + 0.89342*sq(lambda)/(sq(lambda)-0.04438)-0.01036*sq(lambda));
+        var nx= Math.sqrt(2.10468 + 0.89342*lambda_sq/(lambda_sq-0.04438)-0.01036*lambda_sq);
         var ny;
 
         if (lambda< 1.2){
-            ny= Math.sqrt(2.14559 + 0.87629*sq(lambda)/(sq(lambda)-0.0485)-0.01173*sq(lambda));
+            ny= Math.sqrt(2.14559 + 0.87629*lambda_sq/(lambda_sq-0.0485)-0.01173*lambda_sq);
         }
         else {
-            ny= Math.sqrt(2.0993 + 0.922683*sq(lambda)/(sq(lambda)-0.0467695)-0.0138408*sq(lambda));
+            ny= Math.sqrt(2.0993 + 0.922683*lambda_sq/(lambda_sq-0.0467695)-0.0138408*lambda_sq);
         }
 
-        var nz= Math.sqrt(1.9446 + 1.3617*sq(lambda)/(sq(lambda)-0.047)-0.01491* sq(lambda));
+        var nz= Math.sqrt(1.9446 + 1.3617*lambda_sq/(lambda_sq-0.047)-0.01491* lambda_sq);
 
         var dnx= 1.1e-5;
         var dny= 1.3e-5;
@@ -5776,38 +5694,6 @@ PhaseMatch.Crystals('KTP-3', {
     }
 });
 
-// /**
-//  * KTP indicies. From ADvR. Kiyoshi Kato and Eiko Takaoka, Applied Optics, Vo. 41, No. 24 5040. 2002
-//  */
-// PhaseMatch.Crystals('KTP-ADvR', {
-//     name: 'KTP ref ADvR',
-//     // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
-//     info: 'Kiyoshi Kato and Eiko Takaoka, Applied Optics, Vo. 41, No. 24 5040. 2002. Used by ADvR for Flux grown KTP.',
-//     indicies: function(lambda, temp){
-//         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-
-//         var nx= Math.sqrt(3.29100 + 0.0414/(sq(lambda)-0.03978)+ 9.35522/(sq(lambda) -31.45571));
-//         var ny= Math.sqrt(3.45018  + 0.04341/(sq(lambda)-0.04597)+ 16.98825/(sq(lambda) -39.43799));
-//         var nz= Math.sqrt(4.59423  + 0.06206/(sq(lambda)-0.04763)+ 110.80672/(sq(lambda) -86.12171));
-
-//         // TODO: These temperature coefficients need to be modified.
-//         var dnx= 1.1e-5;
-//         var dny= 1.3e-5;
-//         var dnz= 1.6e-5;
-
-//         nx = nx + (temp -20.0)*dnx;
-//         ny = ny + (temp -20.0)*dny;
-//         nz = nz + (temp -20.0)*dnz;
-
-//         // var no = Math.sqrt(2.7359 + 0.01878/ (sq(lambda) - 0.01822) - 0.01354*sq(lambda));
-//         // var ne = Math.sqrt(2.3753 + 0.01224 / (sq(lambda) - 0.01667) - 0.01516*sq(lambda));
-
-//         return [nx, ny, nz];
-//     }
-// });
-
-
-
 
 /**
  * BiBO indicies.
@@ -5817,6 +5703,7 @@ PhaseMatch.Crystals('BiBO-1', {
     info: 'http://www.newlightphotonics.com/bibo-properties.html',
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        lambda_sq = sq(lambda);
         //Alan Migdal's program
         // var nx = Math.sqrt(3.0740 + 0.0323/(sq(lambda)-0.0316) - 0.01337*sq(lambda) );
         // var ny = Math.sqrt(3.1685 + 0.0373/(sq(lambda)-0.0346) - 0.01750*sq(lambda) );
@@ -5828,9 +5715,9 @@ PhaseMatch.Crystals('BiBO-1', {
         // var nz = Math.sqrt(3.6545+0.0511/(sq(lambda)-0.0371)-0.0226*sq(lambda));
 
         // http://www.newlightphotonics.com/bibo-properties.html
-        var nx = Math.sqrt(3.0740 + 0.0323/(sq(lambda)-0.0316)-0.01337*sq(lambda));
-        var ny = Math.sqrt(3.1685 + 0.0373/(sq(lambda)-0.0346)-0.01750*sq(lambda));
-        var nz = Math.sqrt(3.6545 + 0.0511/(sq(lambda)-0.0371)-0.0226*sq(lambda));
+        var nx = Math.sqrt(3.0740 + 0.0323/(lambda_sq-0.0316)-0.01337*lambda_sq);
+        var ny = Math.sqrt(3.1685 + 0.0373/(lambda_sq-0.0346)-0.01750*lambda_sq);
+        var nz = Math.sqrt(3.6545 + 0.0511/(lambda_sq-0.0371)-0.0226*lambda_sq);
 
         // var dnx = 4.8e-5;
         // var dny = 4.4e-6;
@@ -5855,10 +5742,11 @@ PhaseMatch.Crystals('LiNbO3-1', {
     lambda_max: 3.4*1e-9,
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        lambda_sq = sq(lambda);
         //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
-        var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
+        var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - lambda_sq) - 0.027169*lambda_sq );
         var ny = nx;
-        var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
+        var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - lambda_sq) -  0.021950*lambda_sq );
 
         // http://www.redoptronics.com/linbo3-crystals.html
         // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));
@@ -5941,12 +5829,14 @@ PhaseMatch.Crystals('KDP-1', {
     lambda_max: 1500*1e-9,
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        lambda_sq = sq(lambda);
+
         //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
         // var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
-        var nx = Math.sqrt(2.259276 + 13.005522 * sq(lambda)/(sq(lambda) - 400)+0.01008956/(sq(lambda) - 0.012942625));
+        var nx = Math.sqrt(2.259276 + 13.005522 * lambda_sq/(lambda_sq - 400)+0.01008956/(lambda_sq - 0.012942625));
         var ny = nx;
-        // var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - sq(lambda)) -  0.021950*sq(lambda) );
-        var nz = Math.sqrt(2.132668 +3.2279924 * sq(lambda)/(sq(lambda) - 400) + 0.008637494/(sq(lambda)- 0.012281043));
+        // var nz = Math.sqrt( 4.5820 - 0.099169/(0.044432 - lambda_sq) -  0.021950*lambda_sq );
+        var nz = Math.sqrt(2.132668 +3.2279924 * lambda_sq/(lambda_sq - 400) + 0.008637494/(lambda_sq- 0.012281043));
 
         // http://www.redoptronics.com/linbo3-crystals.html
         // var nx = Math.sqrt(4.9048+0.11768/(sq(lambda) - 0.04750) - 0.027169 * sq(lambda));
@@ -5989,9 +5879,10 @@ PhaseMatch.Crystals('AgGaSe2-1', {
 
 
         // http://www.redoptronics.com/AgGaS2-AgGaSe2.html
-        var  dnx = 15.4e-5
+        var  dnx = 15e-5
             ,dny = dnx
-            ,dnz = 15.4e-5;
+            ,dnz = 15e-5
+            ;
 
         nx = nx + (temp -20.0)*dnx;
         ny = ny + (temp -20.0)*dny;
@@ -6020,10 +5911,12 @@ PhaseMatch.Crystals('AgGaSe2-2', {
             ;
 
 
+        // Got temperature coefficients fro:
         // http://www.redoptronics.com/AgGaS2-AgGaSe2.html
-        var  dnx = 15.4e-5
+        var  dnx = 15e-5
             ,dny = dnx
-            ,dnz = 15.4e-5;
+            ,dnz = 15e-5
+            ;
 
         nx = nx + (temp -20.0)*dnx;
         ny = ny + (temp -20.0)*dny;
@@ -6031,6 +5924,89 @@ PhaseMatch.Crystals('AgGaSe2-2', {
         return [nx, ny, nz];
     }
 });
+
+/**
+ * AgGaS2
+ */
+PhaseMatch.Crystals('AgGaS2-1', {
+    name: 'AgGaS2 Ref 1',
+    info: 'G. C. Bhar, Appl. Opt., 15, 305 (1976)',
+    type: '',
+    cls: '',
+    lambda_min: 500*1e-9,
+    lambda_max: 13000*1e-9,
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        lambda_sq = sq(lambda);
+
+        var  nx = Math.sqrt(3.628 + 2.1686*lambda_sq/(lambda_sq-0.1003) + 2.1753*lambda_sq/ (lambda_sq-950) )
+            ,ny = nx
+            ,nz =Math.sqrt(4.0172 + 1.5274*lambda_sq/(lambda_sq-0.131) + 2.1699*lambda_sq/ (lambda_sq-950) )
+            ;
+
+
+        // Got temperature coefficients fro:
+        // http://www.redoptronics.com/AgGaS2-AgGaSe2.html
+        var  dnx = 15.4e-5
+            ,dny = dnx
+            ,dnz = 15.5e-5;
+
+        nx = nx + (temp -20.0)*dnx;
+        ny = ny + (temp -20.0)*dny;
+        nz = nz + (temp -20.0)*dnz;
+        return [nx, ny, nz];
+    }
+});
+
+/**
+ * LiIO3 ref 1
+ */
+PhaseMatch.Crystals('LiIO3-1', {
+    name: 'LiIO3 Ref 1',
+    info: 'B. F. Levine, C. G. Bethea: Appl. Phys. Lett. 20, 272 (1972)',
+    type: 'Negative Uniaxial',
+    cls: 'Class 6',
+    lambda_min: 300*1e-9,
+    lambda_max: 5000*1e-9,
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        lambda_sq = sq(lambda);
+
+        var  nx = Math.sqrt(2.03132 + 1.37623/(1 - (0.0350832/lambda_sq)) + 1.06745/ (1 - (169/lambda_sq)) )
+            ,ny = nx
+            ,nz =Math.sqrt( 1.83086 + 1.08807/(1.0 - (0.031381 / lambda_sq)) + 0.554582/(1.0 - (158.76/lambda_sq)) )
+            ;
+        return [nx, ny, nz];
+    }
+});
+
+/**
+ * LiIO3 ref 2
+ */
+PhaseMatch.Crystals('LiIO3-2', {
+    name: 'LiIO3 Ref 2',
+    info: 'K. Takizawa, M. Okada, S. Leiri, Opt. Commun., 23, 279 (1977)',
+    type: 'Negative Uniaxial',
+    cls: 'Class 6',
+    lambda_min: 300*1e-9,
+    lambda_max: 5000*1e-9,
+    indicies: function(lambda, temp){
+        lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
+        lambda_sq = sq(lambda);
+
+        var  nx = Math.sqrt(3.4095 + 0.047664/(lambda_sq - 0.033991) )
+            ,ny = nx
+            ,nz = Math.sqrt(2.9163 + 0.034514/(lambda_sq - 0.031034) )
+            ;
+        return [nx, ny, nz];
+    }
+});
+
+
+
+
+
+
 (function(){
 
     // These are the names associated with the types
