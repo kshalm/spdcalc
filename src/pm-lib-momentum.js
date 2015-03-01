@@ -24,8 +24,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ;
 
     var  z0 = 0 //put pump in middle of the crystal
-        ,z0s = z0
-        ,z0i = z0
+        ,z0s = -50E-6 //-P.L/(2*Math.cos(P.theta_s_e))
+        ,z0i = -50E-6 //-P.L/(2*Math.cos(P.theta_s_e))
         ;
 
     // Get the pump index corresponding to the crystal phasematching function
@@ -379,7 +379,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ;
 
     var z0 = 0 //put pump in middle of the crystal
-        ,z0s = z0
+        ,z0s = -50E-6 //-P.L/(2*Math.cos(P.theta_s_e))
         ;
 
     // Get the pump index corresponding to the crystal phasematching function
@@ -442,7 +442,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     // Now put the waist of the signal & idler at the center fo the crystal.
     // W = Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
     var  Ws_r = Ws_SQ
-        ,Ws_i = 2/(omega_s/con.c) * (z0s + hs * Math.sin(P.theta_s_e) )
+        ,Ws_i = -2/(omega_s/con.c) * (z0s + hs * Math.sin(P.theta_s_e) )
         ;
 
     var bw;  // Apodization 1/e^2

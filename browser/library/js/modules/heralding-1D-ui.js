@@ -113,7 +113,7 @@ define(
                         y: 'Efficiency'
                     },
                     format: {x: '1f'
-                            ,y: '.1f'},
+                            ,y: '.2f'},
                     width: 400,
                     height: 200,
                     yrange: [0,1]
@@ -617,7 +617,7 @@ define(
                             ;
                         // console.log("Efficiency from sum: ", Rc, Rs, eff); /// PhaseMatch.sum(self.data));
                         // console.log("Efficiency from sum: ", Ws, eff); /// PhaseMatch.sum(self.data));
-                        self.plot1dEff.setTitle("Waist: " + (Ws*1e6).toFixed(0) + "um  |  Signal: " + eff_s.toFixed(2) + "  |  Idler: "+  eff_i.toFixed(2) );
+                        self.plot1dEff.setTitle("Waist: " + (Ws*1e6).toFixed(0) + "um  |  Signal: " + eff_s.toFixed(3) + "  |  Idler: "+  eff_i.toFixed(3) );
 
                         self.plotCoinc.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plotCoinc.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);

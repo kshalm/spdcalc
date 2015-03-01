@@ -81,7 +81,7 @@ define(
                         x: 'Time delay (fs)',
                         y: 'Coincidence probability'
                     },
-                    format: {x: '.0f'},
+                    format: {x: '.00f'},
                     width: 400,
                     height: 200,
                     yrange: [0,.65]
