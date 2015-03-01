@@ -23,7 +23,10 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         twoPIc = twoPI*con.c*toMicrons
         ;
 
-    var z0 = 0; //put pump in middle of the crystal
+    var  z0 = 0 //put pump in middle of the crystal
+        ,z0s = z0
+        ,z0i = z0
+        ;
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch
@@ -58,6 +61,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // Height of the collected spots from the axis.
     var hs = Math.tan(P.theta_s)*P.L*0.5 *Math.cos(P.phi_s),
         hi = Math.tan(P.theta_i)*P.L*0.5 * Math.cos(P.phi_i);
+
 
     var PMz_real = 0;
     var PMz_imag = 0;
@@ -101,52 +105,61 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     else {
         bw = Math.pow(2,20);
     }
+
+    // Now put the waist of the signal & idler at the center fo the crystal.
+    // W = Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
+    var  Ws_r = Ws_SQ
+        ,Ws_i = -2/(omega_s/con.c) * (z0s + hs * Math.sin(P.theta_s_e) )
+        ,Wi_r = Wi_SQ
+        ,Wi_i = -2/(omega_i/con.c) * (z0i + hi * Math.sin(P.theta_i_e) )
+        ;
+
     // console.log("Theta_s: " + (P.theta_s * 180 / Math.PI).toString() + ", Theta_i: " + (P.theta_i * 180 / Math.PI).toString(), ", PHI_I: " + PHI_i.toString() + ", Psi_I: " + PSI_i.toString() + ", PHI_s: " + PHI_s.toString() + ", Psi_s: " + PSI_s.toString());
     // console.log("Ks: " + k_s.toString() + "Ki: " + k_i.toString() + "Kp: " + k_p.toString() + "PHI_s: " + PHI_s.toString() + "PSIs: " + PSI_s.toString() );
     // Now calculate the the coeficients that get repeatedly used. This is from
     // Karina's code. Assume a symmetric pump waist (Wx = Wy)
-    var As = -0.25 * (Wp_SQ + Ws_SQ * PHI_s),
-        Ai = -0.25 * (Wp_SQ + Wi_SQ * PHI_i),
-        Bs = -0.25 * (Ws_SQ + Wp_SQ),
-        Bi = -0.25 * (Wi_SQ + Wp_SQ),
+    var As_r = -0.25 * (Wp_SQ + Ws_r * PHI_s),
+        As_i = -0.25 * PHI_s * Ws_i,
+        Ai_r = -0.25 * (Wp_SQ + Wi_r * PHI_i),
+        Ai_i = -0.25 * PHI_i * Wi_i,
+        Bs_r = -0.25 * (Ws_r + Wp_SQ),
+        Bs_i = -0.25 * Ws_i,
+        Bi_r = -0.25 * (Wi_r + Wp_SQ),
+        Bi_i = -0.25 * Wi_i,
         Cs = -0.25 * (P.L  / k_s - 2*z0/k_p),
         Ci = -0.25 * (P.L  / k_i - 2*z0/k_p),
         Ds =  0.25 * P.L  * (1/k_s - 1/k_p),
         Di =  0.25 * P.L  * (1/k_i - 1/k_p),
-        Es =  0.50 * (Ws_SQ*PHI_s * PSI_s),
-        Ei =  0.50 * (Wi_SQ*PHI_i * PSI_i),
+        Es_r =  0.50 * (Ws_r*PHI_s * PSI_s),
+        Es_i =  0.50 * (Ws_i*PHI_i * PSI_i),
+        Ei_r =  0.50 * (Wi_r*PHI_i * PSI_i),
+        Ei_i =  0.50 * (Wi_i*PHI_i * PSI_i),
         mx_real = -0.50 * Wp_SQ,
         mx_imag = z0/k_p,
         my_real = mx_real, // Pump waist is symmetric
         my_imag = mx_imag,
         m  = P.L  / (2*k_p),
         n  = 0.5 * P.L  * RHOpx,
-        // @TODO: Need to figure out if it is better/correct to use delKz vs the explicit formula.
         ee = 0.5 * P.L  * (k_p + k_s + k_i + twoPI / (P.poling_period  * P.poling_sign)),
         ff = 0.5 * P.L  * (k_p - k_s - k_i - twoPI / (P.poling_period  * P.poling_sign)),
-        // ee = 0.5 * P.L  * (2*k_p - delKz),
-        // ff = 0.5 * P.L  * (delKz),
-        hh = -0.25 * (Wi_SQ * PHI_i * sq(PSI_i) + Ws_SQ * PHI_s * sq(PSI_s))
+        hh_r = -0.25 * (Wi_r * PHI_i * sq(PSI_i) + Ws_r * PHI_s * sq(PSI_s)),
+        hh_i = -0.25 * (Wi_i * PHI_i * sq(PSI_i) + Ws_i * PHI_s * sq(PSI_s))
         ;
-        // console.log("hh: " + hh.toString() + ", Wi: " + (Wi_SQ).toString() + ", PHI_i:" + PHI_i.toString() + ",  PSI_i: " + PSI_i.toString() + ",  ks: " + k_s.toString() + ",  n_s: " + P.n_s.toString() + ",  k/n: " + (k_s/P.n_s).toString() );
-        // console.log("ks: " + k_s.toString() + " kp: " + k_p. toString() + " Ws_sq: " + Ws_SQ.toString() + " Wp_SQ: " + Wp_SQ.toString() + " PHI_s: " + PHI_s.toString() + " Cs:"+ Cs.toString() + " Ds:" + Ds.toString() + " As:" + As.toString());// + " m: " + m.toString() + " n:" + n.toString() + " ee: " + ee.toString() + " ff:" + ff.toString());
-     ///////////////////////////////////////
-
 
     // As a function of z along the crystal, calculate the z-dependent coefficients
     var calczterms = function(z){
         // console.log("inside calczterms");
         // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
-        var A1 = [ As, Cs + Ds * z],
-            A3 = [ Ai, Ci + Di * z],
-            A2 = [ Bs, Cs + Ds * z],
-            A4 = [ Bi, Ci + Di * z],
-            A5 = [ Es, hs],
-            A7 = [ Ei, hi],
+        var A1 = [ As_r, As_i + Cs + Ds * z],
+            A3 = [ Ai_r, Ai_i + Ci + Di * z],
+            A2 = [ Bs_r, Bs_i + Cs + Ds * z],
+            A4 = [ Bi_r, Bi_i + Ci + Di * z],
+            A5 = [ Es_r, Es_i + hs],
+            A7 = [ Ei_r, Ei_i + hi],
             A6 = [ 0, n*(1+z)],
             A8 = [ mx_real, mx_imag - m * z],
             A9 = A8, //Pump waist is symmetric
-            A10 = [hh, ee + ff * z]
+            A10 = [hh_r, hh_i + ee + ff * z]
             ;
         return [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10];
     };
@@ -365,7 +378,9 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         twoPIc = twoPI*con.c*toMicrons
         ;
 
-    var z0 = 0; //put pump in middle of the crystal
+    var z0 = 0 //put pump in middle of the crystal
+        ,z0s = z0
+        ;
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch
@@ -389,6 +404,10 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
     var PMz_real = 0;
     var PMz_imag = 0;
+
+    // // Location of the waist for the signal and idler
+    // var z0s = P.L/2;
+    // var z0s = 0;
 
     // var convfromFWHM = 1*Math.sqrt(2); // Use 1/e^2 in intensity.
     var convfromFWHM = 1; // Use 1/e^2 in intensity.
@@ -420,13 +439,11 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         PSI_s = (k_s/P.n_s) * Math.sin(P.theta_s_e) * Math.cos(P.phi_s) // Looks to be the y component of the ks,i
         ;
 
-    // console.log("angular dependence: " + PHI_s.toString() +", "+ PHI_i.toString() +", "+ PSI_s.toString() +", "+ PSI_i.toString() +", External Angle Idler: " + (180/Math.PI * P.theta_i_e).toString());
-
-    // var PHI_s = 1, // External angle for the signal????
-    //     PHI_i = 1, // External angle for the idler????
-    //     PSI_s = 0,
-    //     PSI_i = 0
-    //     ;
+    // Now put the waist of the signal & idler at the center fo the crystal.
+    // W = Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
+    var  Ws_r = Ws_SQ
+        ,Ws_i = 2/(omega_s/con.c) * (z0s + hs * Math.sin(P.theta_s_e) )
+        ;
 
     var bw;  // Apodization 1/e^2
 
@@ -442,26 +459,29 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     // Now calculate the the coeficients that get repeatedly used. This is from
     // Karina's code. Do not assume a symmetric pump waist (Wx = Wy) here. This is inserted in the code above.
 
-    // Real terms
     var  KpKs = k_p * k_s
         ,L  = P.L
-        ,C0 = Ws_SQ * PHI_s
-        ,C1 = KpKs * (Wx_SQ + C0)
-        ,C2 = C0 * PSI_s
-        // @TODO: May be an error in C3 & C7. Not sure if it is +/- poling period
+        // ,C0 = Ws_SQ * PHI_s
+        ,C0_r = Ws_r * PHI_s
+        ,C0_i = Ws_i * PHI_s
+        ,C1_r = KpKs * (Wx_SQ + C0_r)
+        ,C1_i = KpKs * (C0_i)
+        ,C2_r = C0_r * PSI_s
+        ,C2_i = C0_i * PSI_s
         ,C7 = (k_p - k_s - k_i - twoPI / (P.poling_period  * P.poling_sign))
         ,C3 = P.L * C7
         ,C4 = P.L * (1/k_i - 1/k_p)
         ,C5 = k_s/k_p
-        ,C6 = KpKs * (Ws_SQ + Wy_SQ)
+        ,C6_r = KpKs * (Ws_r + Wy_SQ)
+        ,C6_i = KpKs * Ws_i 
         ,C9 = k_p * Wx_SQ
         ,C10 = k_p * Wy_SQ
         ;
     // Imaginary Terms
-    var  M1R = 2*hs
-        ,M1I = -C2
-        ,M2R = M1R
-        ,M2I = -M1I
+    var  M1R = 2*hs + C2_i
+        ,M1I = -C2_r
+        ,M2R = 2*hs - C2_i
+        ,M2I = C2_r
         ,M1_SQR = PhaseMatch.cmultiplyR( M1R, M1I, M1R, M1I)
         ,M1_SQI = PhaseMatch.cmultiplyI( M1R, M1I, M1R, M1I)
         ,M2_SQR = PhaseMatch.cmultiplyR( M2R, M2I, M2R, M2I)
@@ -479,10 +499,10 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             ,D1I = -A1
             ,D3R = C10
             ,D3I = -A1
-            ,G1R = C1
-            ,G1I = B1 * k_p
-            ,G3R = C6
-            ,G3I = G1I
+            ,G1R = C1_r
+            ,G1I = C1_i + B1 * k_p
+            ,G3R = C6_r
+            ,G3I = C6_i + G1I
             ,H1R = G1R
             ,H1I = G1I - k_s * A1
             ,H3R = G3R
@@ -510,10 +530,10 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             ,D2I = A2
             ,D4R = C10
             ,D4I = A2
-            ,G2R = C1
-            ,G2I = -B2 * k_p
-            ,G4R = C6
-            ,G4I = G2I
+            ,G2R = C1_r
+            ,G2I = C1_i -B2 * k_p
+            ,G4R = C6_r
+            ,G4I = C6_i + G2I
             ,H2R = G2R
             ,H2I = G2I + k_s * A2
             ,H4R = G4R
@@ -644,8 +664,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // ,HHI = 0.5 * PhaseMatch.cmultiplyI(HH5R, HH5I, 0, RHOpx)
 
             // sII = 0.25 * (2*I*C7*B6 - 2 C2 PSI_s - kpks (RHOpx^2 (Q3 + Q4) + Q1 + Q2));
-            ,IIR = 0.25 * (-2*C2*PSI_s - KpKs*(RHOpx*RHOpx*(Q3R + Q4R) + Q1R + Q2R))
-            ,III = 0.25 * (2*C7*B6 - KpKs*(RHOpx*RHOpx*(Q3I + Q4I) + Q1I + Q2I))
+            ,IIR = 0.25 * (-2*C2_r*PSI_s - KpKs*(RHOpx*RHOpx*(Q3R + Q4R) + Q1R + Q2R))
+            ,III = 0.25 * (-2*C2_i*PSI_s + 2*C7*B6 - KpKs*(RHOpx*RHOpx*(Q3I + Q4I) + Q1I + Q2I))
             // ,II2R = PhaseMatch.cmultiplyR(B6, 0, 0, 2*C7)
             // ,II2I = PhaseMatch.cmultiplyI(B6, 0, 0, 2*C7)
             // ,IIR = 0.25 * PhaseMatch.caddR(II1R, II1I, II2R, II2I)
