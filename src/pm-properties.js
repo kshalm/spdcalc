@@ -56,7 +56,7 @@
         temp: 20,
         enable_pp: true,
         calcfibercoupling: true,
-        singles: false
+        singles: false,
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
@@ -124,6 +124,11 @@
             if (this.autocalctheta){
                 this.auto_calc_Theta();
             }
+
+            // Set the positions of the signal, idler, pump waists
+            this.z0p = 0;
+            this.z0s = -0*this.L/2;
+            this.z0i = -0*this.L/2;
 
             // console.log(this.zweights);
 

@@ -3,7 +3,6 @@
  */
 
 
-
 /*
  * Get the constants and terms used in the calculation of the momentum
  * space joint spectrum for the coincidences.
@@ -23,9 +22,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         twoPIc = twoPI*con.c*toMicrons
         ;
 
-    var  z0 = 0 //put pump in middle of the crystal
-        ,z0s = -50E-6 //-P.L/(2*Math.cos(P.theta_s_e))
-        ,z0i = -50E-6 //-P.L/(2*Math.cos(P.theta_s_e))
+    var  z0 = P.z0p //put pump in middle of the crystal
+        ,z0s = P.z0s //-P.L/(2*Math.cos(P.theta_s_e))
+        ,z0i = P.z0i //-P.L/(2*Math.cos(P.theta_i_e))
         ;
 
     // Get the pump index corresponding to the crystal phasematching function
@@ -131,7 +130,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         Ds =  0.25 * P.L  * (1/k_s - 1/k_p),
         Di =  0.25 * P.L  * (1/k_i - 1/k_p),
         Es_r =  0.50 * (Ws_r*PHI_s * PSI_s),
-        Es_i =  0.50 * (Ws_i*PHI_i * PSI_i),
+        Es_i =  0.50 * (Ws_i*PHI_i * PSI_s),
         Ei_r =  0.50 * (Wi_r*PHI_i * PSI_i),
         Ei_i =  0.50 * (Wi_i*PHI_i * PSI_i),
         mx_real = -0.50 * Wp_SQ,
@@ -378,8 +377,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         twoPIc = twoPI*con.c*toMicrons
         ;
 
-    var z0 = 0 //put pump in middle of the crystal
-        ,z0s = -50E-6 //-P.L/(2*Math.cos(P.theta_s_e))
+    var z0 = P.z0p //put pump in middle of the crystal
+        ,z0s = P.z0s// -P.L/(2*Math.cos(P.theta_s_e))
         ;
 
     // Get the pump index corresponding to the crystal phasematching function

@@ -197,8 +197,20 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
     var  Ws_SQ = Math.pow(P.W_sx,2) // convert from FWHM to sigma @TODO: Change to P.W_i
         ,PHI_s = 1/Math.cos(P.theta_s_e)
         ,PHI_i = 1/Math.cos(P.theta_i_e)
-        ,scale_s = (Ws_SQ * PHI_s)
-        ,scale_i =(Ws_SQ * PHI_i) //assume symmetric coupling geometry
+        ,con = PhaseMatch.constants
+        ,twoPIc = 2*Math.PI*con.c
+        ,omega_s = twoPIc / (P.lambda_s )
+        ,omega_i = twoPIc / (P.lambda_i )
+        ,hs = Math.tan(P.theta_s)*P.L*0.5 *Math.cos(P.phi_s)
+        ,hi = Math.tan(P.theta_i)*P.L*0.5 * Math.cos(P.phi_i)
+        ,Ws_r = Ws_SQ
+        ,Ws_i = -2/(omega_s/con.c) * (P.z0s + hs * Math.sin(P.theta_s_e) )
+        ,absWs_sq = Math.sqrt(Ws_r*Ws_r + Ws_i*Ws_i)
+        ,Wi_r = Ws_SQ
+        ,Wi_i = -2/(omega_i/con.c) * (P.z0i + hi * Math.sin(P.theta_i_e) )
+        ,absWi_sq = Math.sqrt(Wi_r*Wi_r + Wi_i*Wi_i)
+        ,scale_s = (absWs_sq * PHI_s)
+        ,scale_i =(absWi_sq * PHI_i) //assume symmetric coupling geometry
         ;
 
     // calculate normalization

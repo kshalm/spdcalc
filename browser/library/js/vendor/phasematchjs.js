@@ -4725,9 +4725,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         twoPIc = twoPI*con.c*toMicrons
         ;
 
-    var  z0 = 0 //put pump in middle of the crystal
-        ,z0s = -50E-6 //-P.L/(2*Math.cos(P.theta_s_e))
-        ,z0i = -50E-6 //-P.L/(2*Math.cos(P.theta_s_e))
+    var  z0 = P.z0p //put pump in middle of the crystal
+        ,z0s = P.z0s //-P.L/(2*Math.cos(P.theta_s_e))
+        ,z0i = P.z0i //-P.L/(2*Math.cos(P.theta_i_e))
         ;
 
     // Get the pump index corresponding to the crystal phasematching function
@@ -4833,7 +4833,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         Ds =  0.25 * P.L  * (1/k_s - 1/k_p),
         Di =  0.25 * P.L  * (1/k_i - 1/k_p),
         Es_r =  0.50 * (Ws_r*PHI_s * PSI_s),
-        Es_i =  0.50 * (Ws_i*PHI_i * PSI_i),
+        Es_i =  0.50 * (Ws_i*PHI_i * PSI_s),
         Ei_r =  0.50 * (Wi_r*PHI_i * PSI_i),
         Ei_i =  0.50 * (Wi_i*PHI_i * PSI_i),
         mx_real = -0.50 * Wp_SQ,
@@ -5080,8 +5080,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         twoPIc = twoPI*con.c*toMicrons
         ;
 
-    var z0 = 0 //put pump in middle of the crystal
-        ,z0s = -50E-6 //-P.L/(2*Math.cos(P.theta_s_e))
+    var z0 = P.z0p //put pump in middle of the crystal
+        ,z0s = P.z0s// -P.L/(2*Math.cos(P.theta_s_e))
         ;
 
     // Get the pump index corresponding to the crystal phasematching function
@@ -6081,7 +6081,7 @@ PhaseMatch.Crystals('LiIO3-2', {
         temp: 20,
         enable_pp: true,
         calcfibercoupling: true,
-        singles: false
+        singles: false,
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
@@ -6149,6 +6149,11 @@ PhaseMatch.Crystals('LiIO3-2', {
             if (this.autocalctheta){
                 this.auto_calc_Theta();
             }
+
+            // Set the positions of the signal, idler, pump waists
+            this.z0p = 0;
+            this.z0s = -0*this.L/2;
+            this.z0i = -0*this.L/2;
 
             // console.log(this.zweights);
 
@@ -6899,8 +6904,20 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
     var  Ws_SQ = Math.pow(P.W_sx,2) // convert from FWHM to sigma @TODO: Change to P.W_i
         ,PHI_s = 1/Math.cos(P.theta_s_e)
         ,PHI_i = 1/Math.cos(P.theta_i_e)
-        ,scale_s = (Ws_SQ * PHI_s)
-        ,scale_i =(Ws_SQ * PHI_i) //assume symmetric coupling geometry
+        ,con = PhaseMatch.constants
+        ,twoPIc = 2*Math.PI*con.c
+        ,omega_s = twoPIc / (P.lambda_s )
+        ,omega_i = twoPIc / (P.lambda_i )
+        ,hs = Math.tan(P.theta_s)*P.L*0.5 *Math.cos(P.phi_s)
+        ,hi = Math.tan(P.theta_i)*P.L*0.5 * Math.cos(P.phi_i)
+        ,Ws_r = Ws_SQ
+        ,Ws_i = -2/(omega_s/con.c) * (P.z0s + hs * Math.sin(P.theta_s_e) )
+        ,absWs_sq = Math.sqrt(Ws_r*Ws_r + Ws_i*Ws_i)
+        ,Wi_r = Ws_SQ
+        ,Wi_i = -2/(omega_i/con.c) * (P.z0i + hi * Math.sin(P.theta_i_e) )
+        ,absWi_sq = Math.sqrt(Wi_r*Wi_r + Wi_i*Wi_i)
+        ,scale_s = (absWs_sq * PHI_s)
+        ,scale_i =(absWi_sq * PHI_i) //assume symmetric coupling geometry
         ;
 
     // calculate normalization
