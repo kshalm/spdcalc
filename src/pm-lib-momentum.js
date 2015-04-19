@@ -164,7 +164,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     };
 
     var zintfunc = function(z){
-        // z = 0;
+        z = 0;
         var terms = calczterms(z);
         var A1R = terms[0][0],
             A1I = terms[0][1],
@@ -317,7 +317,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     if (P.calcfibercoupling){
         var dz = 2/P.numzint;
-        var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
+        // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
+        var pmintz = zintfunc(0);
+
         // var dz = 1;
         // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
         // PMz_real = pmintz[0]/P.L ;
@@ -365,6 +367,10 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
+
+    // console.log("");
+    // console.log("Inside Singles");
+    // console.log(P.lambda_s.toString());
 
     // // For testing purposes
     // P.lambda_s = 2 * lambda_p;
@@ -489,6 +495,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
     // As a function of z1 along the crystal, calculate the z1-dependent coefficients
     var calcz1terms = function(z1){
+        z1=0;
         // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
         var  A1 = 2 * z0 - L*z1
             ,B1 = L * (1 - z1)
@@ -521,6 +528,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
     // As a function of z2 along the crystal, calculate the z2-dependent coefficients
     var calcz2terms = function(z2){
+        z2 = 0;
         // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
         var  A2 = 2 * z0 - L*z2
             ,B2 = L * (1 - z2)
@@ -551,6 +559,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     };
 
     var zintfunc = function(z1, z2, Cz1){
+        z1 = 0;
+        z2 =0;
         // Get the terms that depend only on z2. We already have the terms depending only on z1 in Cz1
         var  Cz2 = calcz2terms(z2)
             // From Cz1
@@ -719,7 +729,6 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // ,real = 1 * EReal
             // ,imag = 1 * EImag
             ;
-
         // console.log("numerator: " + EReal.toString() + " , " + EImag.toString() +' , ' + coeffR.toString() + ' , ' + EXPI.toString());
         // console.log("1: " + A1R.toString() + "   2: " + A2R.toString() + "   3: " + A3R.toString() + "   4: " + A7R.toString() + "   5: " + A8R.toString() + "   6: " + A9R.toString() );
 
@@ -738,8 +747,9 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     var PMt = 1;
     if (P.calcfibercoupling){
         var dz = 2/P.numz2Dint;
-        // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
-        var pmintz = PhaseMatch.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
+        // var pmintz = PhaseMatch.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
+        var pmintz = zintfunc(0,0, calcz1terms(0));
+
         // console.log("Int: " + pmintz[0].toString() + ", " + pmintz[1].toString() + ", " + P.z2Dweights.length.toString());
         // var dz = 1;
         // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
@@ -770,6 +780,9 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     PhaseMatch.convertToMeters(P);
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
+
+    // console.log("real: " + PMz_real.toString() + " imag: " + PMz_imag.toString());
+
 
     return [PMz_real, PMz_imag, PMt];
 

@@ -57,6 +57,7 @@
         enable_pp: true,
         calcfibercoupling: true,
         singles: false,
+        z0s: 2000/2 * con.um,
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
@@ -127,8 +128,8 @@
 
             // Set the positions of the signal, idler, pump waists
             this.z0p = 0;
-            this.z0s = -0*this.L/2;
-            this.z0i = -0*this.L/2;
+            this.z0s = -1*this.L/2;
+            this.z0i = -1*this.L/2;
 
             // console.log(this.zweights);
 
@@ -600,7 +601,7 @@
 
                     if (name === 'poling_period'){
                         if (val===0 || isNaN(val)){
-                            val = Math.pow(2,20);
+                            val = Math.pow(2,30);
                         }
                     }
 
@@ -611,10 +612,15 @@
                         // val = 25;
                     }
 
-                    if (name === 'poling_period'){
-                        if (isNaN(val)){
-                            val = Math.pow(2,30);
-                        }
+                    // if (name === 'poling_period'){
+                    //     if (isNaN(val)){
+                    //         val = Math.pow(2,30);
+                    //     }
+                    // }
+
+                    if (name === 'z0s'){
+                        // Match the idler waist position to that of the signal
+                        this.z0i = val;                   
                     }
 
                     this[ name ] = val;

@@ -285,6 +285,9 @@ define(
                     'grid_size_heralding_JSI': 40,
                     'n_pts_eff_1d': 30,
                     'n_int': 14,
+                    // 'grid_size_heralding_JSI': 2,
+                    // 'n_pts_eff_1d': 2,
+                    // 'n_int': 2,
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
@@ -324,6 +327,11 @@ define(
                             self.plotOpts.get('Ws_stop'),
                             npts
                         );
+                    // ,Ws = PhaseMatch.linspace(
+                    //         P.W_sx,
+                    //         1.001*P.W_sx,
+                    //         npts
+                    //     );
                     ;
 
                 // // First calc the joint spectrum.

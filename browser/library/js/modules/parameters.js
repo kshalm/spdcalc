@@ -97,7 +97,7 @@ define(
                             self.props.set("theta_s", theta_s);
                             // self.props.update_all_angles();
                             // set the internal idler angle
-                            console.log("setting intnerna signal:", theta_s *180/Math.PI);
+                            console.log("setting internal signal:", theta_s *180/Math.PI);
                             self.props.optimum_idler();
                             console.log("setting internal idler 1:", self.props.theta_i *180/Math.PI);
                             // self.props.optimum_idler();
@@ -114,6 +114,7 @@ define(
                             // console.log("theta_s int", val);
                             self.props.set("theta_i", theta_i);
                         }
+
 
                         self.checkautocalc();
                         self.refresh();

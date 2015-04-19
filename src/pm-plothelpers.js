@@ -1249,8 +1249,11 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         // ,PHI_i = 1/Math.cos(P.theta_s_i)
         // ,n = n+(3- n%3) //guarantee that n is divisible by 3
         ,lambdaWeights = PhaseMatch.Nintegrate2DWeights_3_8(n)
+        // @@@@@@ For testing purposes
         ,lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim)
         ,lambda_i = PhaseMatch.linspace(li_stop, li_start, dim)
+        // ,lambda_s = PhaseMatch.linspace(P.lambda_p *2, P.lambda_p *2, dim)
+        // ,lambda_i = PhaseMatch.linspace(P.lambda_p *2, P.lambda_p *2, dim)
         ;
 
     P.phi_i = P.phi_s + Math.PI;
@@ -1332,6 +1335,18 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         P_i.W_sy = P_i.W_sx;
         P_i.W_ix = WsRange[index_y];
         P_i.W_iy = P_i.W_ix;
+
+        // // Testing out values
+        // P.W_sx = WsRange[index_y];
+        // P.W_sy = P.W_sx;
+        // P.W_ix = WsRange[index_y];
+        // P.W_iy = P.W_ix;
+        // P.W = WpRange[index_x];
+
+        // P_i.W_sx = WsRange[index_y];
+        // P_i.W_sy = P_i.W_sx;
+        // P_i.W_ix = WsRange[index_y];
+        // P_i.W_iy = P_i.W_ix;
 
         // var singlesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
         //     ,coincRate = PhaseMatch.Nintegrate2D_3_8(calc_coinc_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)

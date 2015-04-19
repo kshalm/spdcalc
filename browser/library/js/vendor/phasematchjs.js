@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-03-01
+ * phasematchjs v0.0.1a - 2015-04-19
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -4867,7 +4867,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     };
 
     var zintfunc = function(z){
-        // z = 0;
+        z = 0;
         var terms = calczterms(z);
         var A1R = terms[0][0],
             A1I = terms[0][1],
@@ -5020,7 +5020,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     if (P.calcfibercoupling){
         var dz = 2/P.numzint;
-        var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
+        // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
+        var pmintz = zintfunc(0);
+
         // var dz = 1;
         // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
         // PMz_real = pmintz[0]/P.L ;
@@ -5068,6 +5070,10 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
+
+    // console.log("");
+    // console.log("Inside Singles");
+    // console.log(P.lambda_s.toString());
 
     // // For testing purposes
     // P.lambda_s = 2 * lambda_p;
@@ -5192,6 +5198,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
     // As a function of z1 along the crystal, calculate the z1-dependent coefficients
     var calcz1terms = function(z1){
+        z1=0;
         // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
         var  A1 = 2 * z0 - L*z1
             ,B1 = L * (1 - z1)
@@ -5224,6 +5231,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
     // As a function of z2 along the crystal, calculate the z2-dependent coefficients
     var calcz2terms = function(z2){
+        z2 = 0;
         // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
         var  A2 = 2 * z0 - L*z2
             ,B2 = L * (1 - z2)
@@ -5254,6 +5262,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     };
 
     var zintfunc = function(z1, z2, Cz1){
+        z1 = 0;
+        z2 =0;
         // Get the terms that depend only on z2. We already have the terms depending only on z1 in Cz1
         var  Cz2 = calcz2terms(z2)
             // From Cz1
@@ -5422,7 +5432,6 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // ,real = 1 * EReal
             // ,imag = 1 * EImag
             ;
-
         // console.log("numerator: " + EReal.toString() + " , " + EImag.toString() +' , ' + coeffR.toString() + ' , ' + EXPI.toString());
         // console.log("1: " + A1R.toString() + "   2: " + A2R.toString() + "   3: " + A3R.toString() + "   4: " + A7R.toString() + "   5: " + A8R.toString() + "   6: " + A9R.toString() );
 
@@ -5441,8 +5450,9 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     var PMt = 1;
     if (P.calcfibercoupling){
         var dz = 2/P.numz2Dint;
-        // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
-        var pmintz = PhaseMatch.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
+        // var pmintz = PhaseMatch.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
+        var pmintz = zintfunc(0,0, calcz1terms(0));
+
         // console.log("Int: " + pmintz[0].toString() + ", " + pmintz[1].toString() + ", " + P.z2Dweights.length.toString());
         // var dz = 1;
         // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
@@ -5473,6 +5483,9 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     PhaseMatch.convertToMeters(P);
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
+
+    // console.log("real: " + PMz_real.toString() + " imag: " + PMz_imag.toString());
+
 
     return [PMz_real, PMz_imag, PMt];
 
@@ -6082,6 +6095,7 @@ PhaseMatch.Crystals('LiIO3-2', {
         enable_pp: true,
         calcfibercoupling: true,
         singles: false,
+        z0s: 2000/2 * con.um,
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
@@ -6152,8 +6166,8 @@ PhaseMatch.Crystals('LiIO3-2', {
 
             // Set the positions of the signal, idler, pump waists
             this.z0p = 0;
-            this.z0s = -0*this.L/2;
-            this.z0i = -0*this.L/2;
+            this.z0s = -1*this.L/2;
+            this.z0i = -1*this.L/2;
 
             // console.log(this.zweights);
 
@@ -6625,7 +6639,7 @@ PhaseMatch.Crystals('LiIO3-2', {
 
                     if (name === 'poling_period'){
                         if (val===0 || isNaN(val)){
-                            val = Math.pow(2,20);
+                            val = Math.pow(2,30);
                         }
                     }
 
@@ -6636,10 +6650,15 @@ PhaseMatch.Crystals('LiIO3-2', {
                         // val = 25;
                     }
 
-                    if (name === 'poling_period'){
-                        if (isNaN(val)){
-                            val = Math.pow(2,30);
-                        }
+                    // if (name === 'poling_period'){
+                    //     if (isNaN(val)){
+                    //         val = Math.pow(2,30);
+                    //     }
+                    // }
+
+                    if (name === 'z0s'){
+                        // Match the idler waist position to that of the signal
+                        this.z0i = val;                   
                     }
 
                     this[ name ] = val;
@@ -7956,8 +7975,11 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         // ,PHI_i = 1/Math.cos(P.theta_s_i)
         // ,n = n+(3- n%3) //guarantee that n is divisible by 3
         ,lambdaWeights = PhaseMatch.Nintegrate2DWeights_3_8(n)
+        // @@@@@@ For testing purposes
         ,lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim)
         ,lambda_i = PhaseMatch.linspace(li_stop, li_start, dim)
+        // ,lambda_s = PhaseMatch.linspace(P.lambda_p *2, P.lambda_p *2, dim)
+        // ,lambda_i = PhaseMatch.linspace(P.lambda_p *2, P.lambda_p *2, dim)
         ;
 
     P.phi_i = P.phi_s + Math.PI;
@@ -8039,6 +8061,18 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
         P_i.W_sy = P_i.W_sx;
         P_i.W_ix = WsRange[index_y];
         P_i.W_iy = P_i.W_ix;
+
+        // // Testing out values
+        // P.W_sx = WsRange[index_y];
+        // P.W_sy = P.W_sx;
+        // P.W_ix = WsRange[index_y];
+        // P.W_iy = P.W_ix;
+        // P.W = WpRange[index_x];
+
+        // P_i.W_sx = WsRange[index_y];
+        // P_i.W_sy = P_i.W_sx;
+        // P_i.W_ix = WsRange[index_y];
+        // P_i.W_iy = P_i.W_ix;
 
         // var singlesRate = PhaseMatch.Nintegrate2D_3_8(calc_singles_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)
         //     ,coincRate = PhaseMatch.Nintegrate2D_3_8(calc_coinc_rate, ls_start, ls_stop, li_start, li_stop, n, lambdaWeights)

@@ -32,7 +32,8 @@ define(
         'modules/couplingefficiency-ui',
         'modules/heralding-ui',
         'modules/heralding-2d-ui',
-        'modules/heralding-1D-ui'
+        'modules/heralding-1D-ui',
+        'modules/testingui'
     ],
     function(
         $,
@@ -67,7 +68,8 @@ define(
         efficiencyUI,
         heraldingUI,
         heralding2dUI,
-        heralding1dUI
+        heralding1dUI,
+        testingUI
     ) {
 
         'use strict';
@@ -122,7 +124,7 @@ define(
                     'ready': function(){
 
                         // default
-                        self.load('jsa');
+                        self.load('testing');
 
                         self.emit('info', 'Application Loaded');
                     },
@@ -422,6 +424,8 @@ define(
                 self.set('heralding2d', heralding2dUI());
                 // 1D Heralding Efficeny for a given set of parameters
                 self.set('heralding1d', heralding1dUI());
+                // Testing Module
+                self.set('testing', testingUI());
             },
 
             /**
