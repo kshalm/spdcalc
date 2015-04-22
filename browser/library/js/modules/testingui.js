@@ -81,23 +81,22 @@ define(
                 var P = props.clone();
                 P.lambda_s = P.lambda_p *2;
                 P.lambda_i = P.lambda_s;
-                P.W = 100E-6;
+                // P.W = 100E-6;
                 P.phi_i = P.phi_s + Math.PI;
                 P.update_all_angles();
-
-
-                props.optimum_idler(props);
+                P.optimum_idler(P);
+                
                 var pm_singles = PhaseMatch.calc_PM_tz_k_singles(P);
-                console.log("Singles");
+                // console.log("Singles");
                 // console.log("REAL: ", pm_singles[0], "IMAG: ", pm_singles[1]);
-                var abs_singles = pm_singles[0] * pm_singles[0] + pm_singles[1] * pm_singles[1];
-                console.log("ABS: ", abs_singles);
-                console.log("");
+                // var abs_singles = pm_singles[0] * pm_singles[0] + pm_singles[1] * pm_singles[1];
+                // // console.log("ABS: ", abs_singles);
+                // console.log("");
                 var pm_coinc = PhaseMatch.calc_PM_tz_k_coinc(P);
-                console.log("Coinc");
+                // console.log("Coinc");
                 // console.log("REAL: ", pm_coinc[0].toExponential(), "IMAG: ", pm_coinc[1].toExponential());
-                var abs_coinc = pm_coinc[0] * pm_coinc[0] + pm_coinc[1] * pm_coinc[1];
-                console.log("ABS: ", abs_coinc);
+                // var abs_coinc = pm_coinc[0] * pm_coinc[0] + pm_coinc[1] * pm_coinc[1];
+                // console.log("ABS: ", abs_coinc);
                 console.log("");
                 console.log("");
 

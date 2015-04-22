@@ -33,8 +33,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
     // P.calc_walkoff_angles();
-    var RHOpx = P.walkoff_p; //pump walkoff angle.
-    // var RHOpx  = 0;
+    // var RHOpx = P.walkoff_p; //pump walkoff angle.
+    var RHOpx  = 0;
 
 
     PhaseMatch.convertToMicrons(P);
@@ -56,7 +56,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
 
     // console.log("deltaK:" + delKx.toString() + ", " + delKy.toString() + ", " + delKz.toString() + ", ")
-
+    var toDeg = 180/Math.PI;
+    // console.log("angles in calc:", P.theta_s*toDeg, P.theta_s_e*toDeg, P.phi_s*toDeg);
     // Height of the collected spots from the axis.
     var hs = Math.tan(P.theta_s)*P.L*0.5 *Math.cos(P.phi_s),
         hi = Math.tan(P.theta_i)*P.L*0.5 * Math.cos(P.phi_i);
@@ -108,19 +109,24 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // Now put the waist of the signal & idler at the center fo the crystal.
     // W = Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
     var  Ws_r = Ws_SQ
-        ,Ws_i = -2/(omega_s/con.c) * (z0s + hs * Math.sin(P.theta_s_e) )
+        ,Ws_i = 2/(k_s/P.n_s) * (z0s + hs * Math.sin(P.theta_s_e)*Math.cos(P.phi_s) )
         ,Wi_r = Wi_SQ
-        ,Wi_i = -2/(omega_i/con.c) * (z0i + hi * Math.sin(P.theta_i_e) )
+        ,Wi_i = 2/(k_i/P.n_i) * (z0i + hi * Math.sin(P.theta_i_e)*Math.cos(P.phi_i) )
         ;
+
+    // console.log("Signal WAIST:",Ws_r,Ws_i);
+    // console.log('SIGNAL CALCULATIONS:', hs * Math.sin(P.theta_s_e)*Math.cos(P.phi_s), hi * Math.sin(P.theta_i_e)*Math.cos(P.phi_i) );
+    // console.log("EXTERNAL ANGLES:", P.theta_s_e * toDeg, P.theta_i_e * toDeg);
 
     // console.log("Theta_s: " + (P.theta_s * 180 / Math.PI).toString() + ", Theta_i: " + (P.theta_i * 180 / Math.PI).toString(), ", PHI_I: " + PHI_i.toString() + ", Psi_I: " + PSI_i.toString() + ", PHI_s: " + PHI_s.toString() + ", Psi_s: " + PSI_s.toString());
     // console.log("Ks: " + k_s.toString() + "Ki: " + k_i.toString() + "Kp: " + k_p.toString() + "PHI_s: " + PHI_s.toString() + "PSIs: " + PSI_s.toString() );
     // Now calculate the the coeficients that get repeatedly used. This is from
     // Karina's code. Assume a symmetric pump waist (Wx = Wy)
+
     var As_r = -0.25 * (Wp_SQ + Ws_r * PHI_s),
         As_i = -0.25 * PHI_s * Ws_i,
         Ai_r = -0.25 * (Wp_SQ + Wi_r * PHI_i),
-        Ai_i = -0.25 * PHI_i * Wi_i,
+        Ai_i = -0.25 * PHI_i * Wi_i ,
         Bs_r = -0.25 * (Ws_r + Wp_SQ),
         Bs_i = -0.25 * Ws_i,
         Bi_r = -0.25 * (Wi_r + Wp_SQ),
@@ -160,11 +166,26 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             A9 = A8, //Pump waist is symmetric
             A10 = [hh_r, hh_i + ee + ff * z]
             ;
+        // console.log("AS_i",As_i);
+        // console.log("Terms in Karina's order going from A1-A11");
+        // console.log(A1);
+        // console.log(A5);
+        // console.log(A2);
+        // console.log(A6);
+        // console.log(A3);
+        // console.log(A7);
+        // console.log(A4);
+        // console.log(A6);
+        // console.log(A8);
+        // console.log(A9);
+        // console.log(A10);
+
+        // OK A
         return [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10];
     };
 
     var zintfunc = function(z){
-        z = 0;
+        // z = 0;
         var terms = calczterms(z);
         var A1R = terms[0][0],
             A1I = terms[0][1],
@@ -191,9 +212,37 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // console.log("hello");
         // console.log("A1R: " + A1R.toString() + "   A2R: " + A2R.toString()+"A3R: " + A3R.toString() + "   A4R: " + A4R.toString()+"A5R: " + A5R.toString() + "   A6R: " + A6R.toString()+"A7R: " + A7R.toString() + "   A8R: " + A8R.toString()+"A9R: " + A9R.toString() + "   A10R: " + A10R.toString());
         // First calculate terms in the exponential of the integral
-        //   E^(1/4 (4 A10 - A5^2/A1 - A6^2/A2 - (-2 A1 A7 + A5 A8)^2/(
-        //  A1 (4 A1 A3 - A8^2)) - (A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2)))
+        //   E^(1/4 (4 A10 - A5^2/A1 - A6^2/A2 - (-2 A1 A7 + A5 A8)^2/(A1 (4 A1 A3 - A8^2)) - (A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2)))
         // )
+
+        // From Karina's code
+//         % z = (exp((4.*A11 - A2.^2./A1 - A4.^2./A3 - (A10.*A4 - 2.*A3.*A8).^2./(A3.*(-A10.^2 + 4.*A3.*A7)) - (-2.*A1.*A6 + A2.*A9).^2./(A1.*(4.*A1.*A5 - A9.^2)))./4.)./...
+// %      
+        // Kr -> Ka
+        // A1 -> A1
+        // A2 -> A3
+        // A3 -> A5
+        // A4 -> A7
+        // A5 -> A2
+        // A6 -> A4
+        // A6 -> A8
+        // A7 -> A6 
+        // A8 -> A9
+        // A9 -> A10
+        // A10 -> A11
+
+        // Ka -> Kr
+        // A1 -> A1
+        // A2 -> A5
+        // A3 -> A2
+        // A4 -> A6
+        // A5 -> A3
+        // A6 -> A7
+        // A7 -> A4 
+        // A8 -> A6
+        // A9 -> A8
+        // A10 -> A9
+        // A11 -> A10    
 
             // 4 A10
         var EXP1R = A10R*4,
@@ -317,8 +366,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     if (P.calcfibercoupling){
         var dz = 2/P.numzint;
-        // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
-        var pmintz = zintfunc(0);
+        var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
+        // var pmintz = zintfunc(0);
 
         // var dz = 1;
         // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
@@ -393,8 +442,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
     // P.calc_walkoff_angles();
-    var RHOpx = P.walkoff_p; //pump walkoff angle.
-    // var RHOpx = 0;
+    // var RHOpx = P.walkoff_p; //pump walkoff angle.
+    var RHOpx = 0;
 
     PhaseMatch.convertToMicrons(P);
     var omega_s = twoPIc / (P.lambda_s ),
@@ -446,9 +495,15 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
     // Now put the waist of the signal & idler at the center fo the crystal.
     // W = Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
+    // var  Ws_r = Ws_SQ
+    //     ,Ws_i = -2/(omega_s/con.c) * (z0s + hs * Math.sin(P.theta_s_e) )
+    //     ;
+
     var  Ws_r = Ws_SQ
-        ,Ws_i = -2/(omega_s/con.c) * (z0s + hs * Math.sin(P.theta_s_e) )
+        ,Ws_i = 2/(k_s/P.n_s) * (z0s + hs * Math.sin(P.theta_s_e)*Math.cos(P.phi_s) )
         ;
+
+    // console.log("WAIST Imag:", Ws_i);
 
     var bw;  // Apodization 1/e^2
 
@@ -495,7 +550,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
     // As a function of z1 along the crystal, calculate the z1-dependent coefficients
     var calcz1terms = function(z1){
-        z1=0;
+        // z1=0;
         // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
         var  A1 = 2 * z0 - L*z1
             ,B1 = L * (1 - z1)
@@ -508,7 +563,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             ,G1R = C1_r
             ,G1I = C1_i + B1 * k_p
             ,G3R = C6_r
-            ,G3I = C6_i + G1I
+            ,G3I = C6_i + B1 * k_p
             ,H1R = G1R
             ,H1I = G1I - k_s * A1
             ,H3R = G3R
@@ -528,7 +583,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
     // As a function of z2 along the crystal, calculate the z2-dependent coefficients
     var calcz2terms = function(z2){
-        z2 = 0;
+        // z2 = 0;
         // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
         var  A2 = 2 * z0 - L*z2
             ,B2 = L * (1 - z2)
@@ -538,9 +593,9 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             ,D4R = C10
             ,D4I = A2
             ,G2R = C1_r
-            ,G2I = C1_i -B2 * k_p
+            ,G2I = -C1_i -B2 * k_p
             ,G4R = C6_r
-            ,G4I = C6_i + G2I
+            ,G4I = -C6_i -B2 * k_p
             ,H2R = G2R
             ,H2I = G2I + k_s * A2
             ,H4R = G4R
@@ -559,8 +614,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     };
 
     var zintfunc = function(z1, z2, Cz1){
-        z1 = 0;
-        z2 =0;
+        // z1 = 0;
+        // z2 =0;
         // Get the terms that depend only on z2. We already have the terms depending only on z1 in Cz1
         var  Cz2 = calcz2terms(z2)
             // From Cz1
@@ -656,8 +711,10 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
             // HH = 0.5 * I * rho_x * (  B6 -  ks (P3 B3 - P4 B4) );
             //
-            HHR = -0.5 * RHOpx * (B6 - k_s*(P3I * B3 - P4I*B4))
-            HHI =  0.5 * RHOpx * (B6 - k_s*(P3R * B3 - P4R*B4))
+            // HHR = -0.5 * RHOpx * (B6 - k_s*(P3I * B3 - P4I*B4))
+            // HHI =  0.5 * RHOpx * (B6 - k_s*(P3R * B3 - P4R*B4))
+            HHR = -0.5 * RHOpx * k_s*(+P3I * B3 - P4I*B4)
+            HHI =  0.5 * RHOpx * (B6 + k_s*(P3R * B3 - P4R*B4))
 
             // ,HH1R = -1* PhaseMatch.cmultiplyR(P4R, P4I, B4,0)
             // ,HH1I = -1* PhaseMatch.cmultiplyI(P4R, P4I, B4,0)
@@ -729,7 +786,35 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // ,real = 1 * EReal
             // ,imag = 1 * EImag
             ;
+
+        // console.log("AA1:", AA1R, AA1I);
+        // console.log("BB1:",BB1R, BB1I);
+        // console.log("AA2:", AA2R, AA2I);
+        // console.log("BB2:",BB2R, BB2I);
+        // console.log("EE: ", EER, EEI);
+        // console.log("FF: ", FFR, FFI);
+        // console.log("GG: ", GGR, GGI);
+        // console.log("HH: ", HHR, HHI);
+        // console.log("II: ", IIR, III);
+        // console.log("Denominator: ", DenR, DenI);
+        // console.log("Exponent: ", EXPR, EXPI);
+        // console.log("RESULT: ", real*0.5, imag*0.5);
+        // // ,IIR = 0.25 * (-2*C2_r*PSI_s - KpKs*(RHOpx*RHOpx*(Q3R + Q4R) + Q1R + Q2R))
+        // //  III = 0.25 * (-2*C2_i*PSI_s + 2*C7*B6 - KpKs*(RHOpx*RHOpx*(Q3I + Q4I) + Q1I + Q2I))
+        // console.log("C2_i:", C2_i);
+        // console.log("C7:", C7);
+        // console.log("B6:", B6);
+        // // console.log("Q1I:", Q1I);
+        // // console.log("Q2I:", Q2I);
+        // // console.log("Q3I:", Q3I);
+        // // console.log("Q4I:", Q4I);
+        // // console.log("B3,B4:", B3, B4, B1, B2);
+        // // console.log("H3:", H3R, H3I);
+        // // console.log("H1:", H1R, H1I);
+        // console.log(P.theta*180/Math.PI);
+
         // console.log("numerator: " + EReal.toString() + " , " + EImag.toString() +' , ' + coeffR.toString() + ' , ' + EXPI.toString());
+        // console.log("denominator: " + DenR.toString() + " , " + DenI.toString() );
         // console.log("1: " + A1R.toString() + "   2: " + A2R.toString() + "   3: " + A3R.toString() + "   4: " + A7R.toString() + "   5: " + A8R.toString() + "   6: " + A9R.toString() );
 
         // real = 1;
@@ -742,13 +827,17 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         delKy = delK[1],
         delKz = delK[2]
         ;
+
     var arg = P.L/2*(delKz);
 
     var PMt = 1;
     if (P.calcfibercoupling){
         var dz = 2/P.numz2Dint;
-        // var pmintz = PhaseMatch.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
-        var pmintz = zintfunc(0,0, calcz1terms(0));
+        var pmintz = PhaseMatch.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
+        var  z1 = -.8
+            ,z2 = .1
+            ;
+        // var pmintz = zintfunc(z1,z2, calcz1terms(z1));
 
         // console.log("Int: " + pmintz[0].toString() + ", " + pmintz[1].toString() + ", " + P.z2Dweights.length.toString());
         // var dz = 1;

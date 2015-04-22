@@ -128,8 +128,8 @@
 
             // Set the positions of the signal, idler, pump waists
             this.z0p = 0;
-            this.z0s = -1*this.L/2;
-            this.z0i = -1*this.L/2;
+            // this.z0s = -1*this.L/2;
+            this.z0i = this.z0s;
 
             // console.log(this.zweights);
 
