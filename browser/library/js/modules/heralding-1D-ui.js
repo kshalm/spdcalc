@@ -282,8 +282,8 @@ define(
                 tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max);
 
                 self.plotOpts.set({
-                    'grid_size_heralding_JSI': 40,
-                    'n_pts_eff_1d': 30,
+                    'grid_size_heralding_JSI': 30,
+                    'n_pts_eff_1d': 5,
                     'n_int': 14,
                     // 'grid_size_heralding_JSI': 2,
                     // 'n_pts_eff_1d': 2,
@@ -296,8 +296,8 @@ define(
                     // 'delT_start': tsi[1],
                     // 'delT_stop': tsi[2],
 
-                    'Ws_start': 50e-6,
-                    'Ws_stop': 200e-6
+                    'Ws_start': 10e-6,
+                    'Ws_stop': 100e-6
                 });
 
                 self.set_slider_values(150e-6, self.plotOpts.get['Ws_start'], self.plotOpts.get['Ws_stop']);
