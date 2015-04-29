@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2015-04-24
+ * phasematchjs v0.0.1a - 2015-04-28
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
@@ -5115,11 +5115,15 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
 
             // console.log("Exponent: ", EXPR, EXPI);
-            // console.log("4A10: ", EXP1R, EXP1I);
-            // console.log("A5^2/A1: ", EXP2R, EXP2I);
-            // console.log("A6^2/A2: ", EXP3R, EXP3I);
-            // console.log("(-2 A1 A7 + A5 A8)^2:", EXP4R, EXP4I);
-            // console.log("A6^2 (-2 A2 + A9)^2):", EXP5R, EXP5I);
+            // // console.log("4A10: ", EXP1R, EXP1I);
+            // // console.log("A5^2/A1: ", EXP2R, EXP2I);
+            // // console.log("A6^2/A2: ", EXP3R, EXP3I);
+            // // console.log("(-2 A1 A7 + A5 A8)^2:", EXP4R, EXP4I);
+            // // console.log("A6^2 (-2 A2 + A9)^2):", EXP5R, EXP5I);
+            // console.log("Den1: ", DEN1R, DEN1I);
+            // console.log("DEN2: ", DEN2R, DEN2I);
+            // console.log("DEN3: ", DEN3R, DEN3I);
+            // console.log("C9squaredA2:", DEN3R_a, DEN3I_a);
             // console.log("Denominator: ", DENR, DENI);
             // console.log("RESULT: ", (0.5*real).toExponential(), (0.5*imag).toExponential());
             /////////////////////////////////////////////////////////////////
@@ -5137,7 +5141,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     if (P.calcfibercoupling){
         var dz = 2/P.numzint;
         var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
-        // var pmintz = zintfunc(0);
+        // var pmintz = zintfunc(0.5);
 
         // var dz = 1;
         // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
@@ -5420,7 +5424,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             
 
             ,gamma1I = -k_p*L*B1 + k_s * A1
-            ,gamma2I = -k_p*L*B2 + k_s * A2
+            ,gamma2I = (-k_p*L*B2 + k_s * A2)
             ,HaR = alpha1R
             ,HaI = alpha1I + gamma1I
             ,HbR = alpha2R
@@ -5441,7 +5445,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
             // Now for the denominators that show up in EE, FF, GG, HH, and II
             ,X11R = (C9*k_s - HaR)
-            ,X11I = -HaI
+            ,X11I = -HaI 
             ,X12R = -HcI
             ,X12I = HcR - C9*k_s
             ,Y21R = (C10*k_s - HbR)
@@ -5451,18 +5455,32 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
             //Now to calculate the term EE
             // EE = 1/4*(-  2*Wx^2 + I B6a + C5/X11*(C9 - I A1)^2 - I C5/X12*(C9 + I A2)^2  )
-            ,EE1R = PhaseMatch.cmultiplyR(C9, -A1, C9, -A1)
-            ,EE1I = PhaseMatch.cmultiplyI(C9, -A1, C9, -A1)
-            ,EE2R = PhaseMatch.cmultiplyR(C9, A2, C9, A2)
-            ,EE2I = PhaseMatch.cmultiplyI(C9, A2, C9, A2)
+            // ,EE1R = PhaseMatch.cmultiplyR(C9, -A1, C9, -A1)
+            // ,EE1I = PhaseMatch.cmultiplyI(C9, -A1, C9, -A1)
+            // ,EE2R = PhaseMatch.cmultiplyR(C9, A2, C9, A2)
+            // ,EE2I = PhaseMatch.cmultiplyI(C9, A2, C9, A2)
+            // ,EE3R = C5 * PhaseMatch.cdivideR(EE1R, EE1I, X11R, X11I)
+            // ,EE3I = C5 * PhaseMatch.cdivideI(EE1R, EE1I, X11R, X11I)
+            // ,EE4R = C5 * PhaseMatch.cdivideR(EE2R, EE2I, X12R, X12I)
+            // ,EE4I = C5 * PhaseMatch.cdivideI(EE2R, EE2I, X12R, X12I)
+            // ,EE5R = PhaseMatch.cmultiplyR(0, 1, EE4R, EE4I)
+            // ,EE5I = PhaseMatch.cmultiplyI(0, 1, EE4R, EE4I)
+            // ,EER = 0.25 * (-2*Wx_SQ + EE3R - EE5R)
+            // ,EEI = 0.25 * (B6a + EE3I - EE5I)
+
+            ,EE1R = PhaseMatch.cmultiplyR(A1, C9, A1, C9)
+            ,EE1I = PhaseMatch.cmultiplyI(A1, C9, A1, C9)
+            ,EE2R = PhaseMatch.cmultiplyR(A2, -C9, A2, -C9)
+            ,EE2I = PhaseMatch.cmultiplyI(A2, -C9, A2, -C9)
             ,EE3R = C5 * PhaseMatch.cdivideR(EE1R, EE1I, X11R, X11I)
             ,EE3I = C5 * PhaseMatch.cdivideI(EE1R, EE1I, X11R, X11I)
             ,EE4R = C5 * PhaseMatch.cdivideR(EE2R, EE2I, X12R, X12I)
             ,EE4I = C5 * PhaseMatch.cdivideI(EE2R, EE2I, X12R, X12I)
             ,EE5R = PhaseMatch.cmultiplyR(0, 1, EE4R, EE4I)
             ,EE5I = PhaseMatch.cmultiplyI(0, 1, EE4R, EE4I)
-            ,EER = 0.25 * (-2*Wx_SQ + EE3R - EE5R)
-            ,EEI = 0.25 * (B6a + EE3I - EE5I)
+            ,EER = 0.25 * (-2*Wx_SQ - EE3R + EE5R)
+            ,EEI = 0.25 * (B6a - EE3I + EE5I)
+
 
             //Now to calculate the term FF
             // FF = 1/4*(-2*Wy^2 + I B6a - C5/Y21 *(I C10 + A1)^2 + I C5/Y22 *(-I C10 + A2)^2)
@@ -5579,15 +5597,19 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // ,real = coeffR
             // ,imag = 0
 
-            ,real = 0.5 * PhaseMatch.cdivideR(EReal, EImag, DenR, DenI)
-            ,imag = 0.5 * PhaseMatch.cdivideI(EReal, EImag, DenR, DenI)
+            ,real = 0.5* PhaseMatch.cdivideR(EReal, EImag, DenR, DenI)
+            ,imag = 0.5* PhaseMatch.cdivideI(EReal, EImag, DenR, DenI)
 
             // console.log("Int: " + IIR.toString() + ", " + III.toString() + ", " + EReal.toString() + ", " + EImag.toString());
 
             // ,real = 1 * EReal
             // ,imag = 1 * EImag
             ;
-        // console.log("X12:", X12R, X12I)
+
+        // console.log("X11:", X11R, X11I);
+        // console.log("X12:", X12R, X12I);
+        // console.log("Y21:", Y21R, Y21I);
+        // console.log("Y22:", Y22R, Y22I);
         // console.log("Gamma1 ", gamma1I);
         // console.log("Gamma2 ", gamma2I);
         // console.log("AA1:", AA1R, AA1I);
@@ -5602,6 +5624,26 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         // console.log("Exponent: ", EXPR, EXPI);
         // console.log("Denominator: ", DenR, DenI);
         // console.log("RESULT: ", real*0.5, imag*0.5);
+        // console.log("Den4 ", Den4R, Den4I);
+        // console.log("Den3 ", Den3R, Den3I);
+        // console.log("Den5 ", Den5R, Den5I);
+        // console.log("Wx_2 ", Wx_SQ, Wy_SQ);
+        // console.log("A1, A2", A1, A2);
+        // console.log("C9", C9, C9*k_s);
+        // console.log("C5", C5);
+        // console.log("FF4:", FF4R, FF4I);
+        // console.log("FF5:", FF5R, FF5I);
+        // console.log("FF3:", FF3R, FF3I);
+        // console.log("Y21:", Y21R, Y21I);
+        // console.log("Y21+Y22:", -2*Wy_SQ - FF3R + FF5R, B6a - FF3I + FF5I);
+        // console.log("FFother:", -2*Wy_SQ, B6a);
+
+        
+
+
+        // console.log("B1, B2: ", B1, B2);
+        // console.log("A1, A2: ", A1, A2);
+
         // console.log("GG^2/4EE", -EXP2R, -EXP2I);
         // console.log("HH^2/4FF", -EXP4R, -EXP4I);
         // // console.log("Rho: ", RHOpx);
@@ -5643,8 +5685,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         var pmintz = PhaseMatch.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
         // var  z1 = 0
         //     ,z2 = 0.5
-        // var z1 = 0
-        //     ,z2 = 0
+        // var z1 = 0.5
+        //     ,z2 = -.7
         //     ;
         // var pmintz = zintfunc(z1,z2, calcz1terms(z1));
 
@@ -7125,10 +7167,12 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
         ,hs = Math.tan(P.theta_s)*P.L*0.5 *Math.cos(P.phi_s)
         ,hi = Math.tan(P.theta_i)*P.L*0.5 * Math.cos(P.phi_i)
         ,Ws_r = Ws_SQ
-        ,Ws_i = -2/(omega_s/con.c) * (P.z0s + hs * Math.sin(P.theta_s_e) )
+        // ,Ws_i = -2/(omega_s/con.c) * (P.z0s + hs * Math.sin(P.theta_s_e) )
+        ,Ws_i = 0
         ,absWs_sq = Math.sqrt(Ws_r*Ws_r + Ws_i*Ws_i)
         ,Wi_r = Ws_SQ
-        ,Wi_i = -2/(omega_i/con.c) * (P.z0i + hi * Math.sin(P.theta_i_e) )
+        // ,Wi_i = -2/(omega_i/con.c) * (P.z0i + hi * Math.sin(P.theta_i_e) )
+        ,Wi_i = 0
         ,absWi_sq = Math.sqrt(Wi_r*Wi_r + Wi_i*Wi_i)
         ,scale_s = (absWs_sq * PHI_s)
         ,scale_i =(absWi_sq * PHI_i) //assume symmetric coupling geometry
