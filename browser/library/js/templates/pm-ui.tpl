@@ -10,7 +10,7 @@
 
             <div class="ui-module-wrap pull-left">
                 <select tabindex="1" class="span3" id="ui-modules">
-                    <option value="testing">Testing</option>
+                    <!-- <option value="testing">Testing</option> -->
                     <option value="jsa">Joint Spectral Intensity</option>
                     <option value="curves">Phasematching Curves</option>
                     <!-- <option value="xy">Emission Angle</option> -->

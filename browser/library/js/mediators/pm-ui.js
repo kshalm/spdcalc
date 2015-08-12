@@ -124,7 +124,8 @@ define(
                     'ready': function(){
 
                         // default
-                        self.load('testing');
+                        // self.load('testing');
+                        self.load('jsa');
 
                         self.emit('info', 'Application Loaded');
                     },

@@ -33,8 +33,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
     // P.calc_walkoff_angles();
-    // var RHOpx = P.walkoff_p; //pump walkoff angle.
-    var RHOpx  = 0;
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx  = 0;
 
 
     PhaseMatch.convertToMicrons(P);
@@ -513,8 +513,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
 
     // P.calc_walkoff_angles();
-    // var RHOpx = P.walkoff_p; //pump walkoff angle.
-    var RHOpx = 0
+    var RHOpx = P.walkoff_p; //pump walkoff angle.
+    // var RHOpx = 0
 
     PhaseMatch.convertToMicrons(P);
     var omega_s = twoPIc / (P.lambda_s ),

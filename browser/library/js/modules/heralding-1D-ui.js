@@ -283,7 +283,7 @@ define(
 
                 self.plotOpts.set({
                     'grid_size_heralding_JSI': 30,
-                    'n_pts_eff_1d': 5,
+                    'n_pts_eff_1d': 15,
                     'n_int': 14,
                     // 'grid_size_heralding_JSI': 2,
                     // 'n_pts_eff_1d': 2,
@@ -296,8 +296,8 @@ define(
                     // 'delT_start': tsi[1],
                     // 'delT_stop': tsi[2],
 
-                    'Ws_start': 10e-6,
-                    'Ws_stop': 100e-6
+                    'Ws_start': 60e-6,
+                    'Ws_stop': 160e-6
                 });
 
                 self.set_slider_values(150e-6, self.plotOpts.get['Ws_start'], self.plotOpts.get['Ws_stop']);
