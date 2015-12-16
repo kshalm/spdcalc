@@ -14,9 +14,9 @@
                     <option value="jsa">Joint Spectral Intensity</option>
                     <option value="curves">Phasematching Curves</option>
                     <!-- <option value="xy">Emission Angle</option> -->
-                    <option value="heralding1d">Heralding Joint Spectrum</option>
-                    <option value="heralding1dAdv">Heralding, Rates, and Joint Spectrum</option>
-                    <option value="heraldingPumpFocusPosition">Heralding pump focus position</option>
+                    <!-- <option values="heralding1d">Heralding Joint Spectrum</option> -->
+                    <option value="heralding1dAdv">Heralding vs collection waist</option>
+                    <option value="heraldingPumpFocusPosition">Heralding vs focus position</option>
                     <option value="heralding2d">Heralding Optimization</option>
                     <option value="jsa-hom">Hong-Ou-Mandel dip</option>
                     <option value="jsa-hom-bunch">Hong-Ou-Mandel bunching</option>

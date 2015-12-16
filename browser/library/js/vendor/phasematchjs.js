@@ -8317,7 +8317,7 @@ PhaseMatch.calc_heralding_plot_focus_position_p = function calc_heralding_plot_f
         // ,lambda_s = PhaseMatch.linspace(P.lambda_p *2, P.lambda_p *2, dim)
         // ,lambda_i = PhaseMatch.linspace(P.lambda_p *2, P.lambda_p *2, dim)
         ;
-    console.log("NNNNNNNN: " + WsRange.toString());
+    // console.log("NNNNNNNN: " + WsRange.toString());
     P.phi_i = P.phi_s + Math.PI;
     P.update_all_angles();
     P.optimum_idler(P);

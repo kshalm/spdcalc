@@ -104,7 +104,6 @@ define(
 
                 var self = this;
 
-
                 // init plot
                 self.plot1dEff = new LinePlot({
                     title: 'Heralding Efficiency',
@@ -144,8 +143,9 @@ define(
                         self.set( 'delT', (parseFloat(self.eldelT.slider( 'value' )) * delTConversion ));
                     }
                 });
+                // var props = this.parameters.getProps();
 
-                self.set('delT', 100e-6);
+                self.set('delT', 0);
 
                 // init plot
                 self.plot1dRates = new LinePlot({
@@ -544,15 +544,17 @@ define(
                     ,norm = 1
                     ,divisions = Math.floor(grid_size / Nthreads)
                     ,lambda_i_range = []
-                    ,Ws = self.get('delT')
+                    ,z0 = self.get('delT')
                     ;
 
-                // console.log("Ws: ", Ws*1e6);
+                props.z0s = z0;
+                props.z0i = z0;
+                console.log("Z0: ", z0*1e6);
 
-                props.W_sx = Ws;
-                props.W_ix = Ws;
-                props.W_sy = Ws;
-                props.W_iy = Ws;
+                // props.W_sx = Ws;
+                // props.W_ix = Ws;
+                // props.W_sy = Ws;
+                // props.W_iy = Ws;
                 // props.update_all_angles();
                 // props.optimum_idler();
 
@@ -642,7 +644,11 @@ define(
                     // ,norm = 1
                     ,divisions = Math.floor(grid_size / Nthreads)
                     ,lambda_i_range = []
-                    ,Ws = self.get('delT')
+                    ,z0 = self.get('delT')
+                    ;
+
+                    props.z0s = z0;
+                    props.z0i = z0;
                     // ,Wi_SQ = Math.pow(Ws,2) // convert from FWHM to sigma @TODO: Change to props.W_i
                     // ,PHI_s = 1/Math.cos(props.theta_s_e)
                     // ,PHI_i = 1/Math.cos(props.theta_i_e)
@@ -650,11 +656,11 @@ define(
                     // ,scale_s = ((Wi_SQ * PHI_s))
                     // ,scale_i = ((Wi_SQ * PHI_i))
                     // ,prefactor = 1
-                    ;
+                    // ;
 
 
-                props.W_sx = Ws;
-                props.W_ix = Ws;
+                // props.W_sx = Ws;
+                // props.W_ix = Ws;
                 // props.update_all_angles();
                 // props.optimum_idler();
 
@@ -710,9 +716,10 @@ define(
                             ,eff_i = Rc/Rs
                             ,eff_s = Rc/Ri
                             ;
+                        console.log("in coinc calc");
                         // console.log("Efficiency from sum: ", Rc, Rs, eff); /// PhaseMatch.sum(self.data));
                         // console.log("Efficiency from sum: ", Ws, eff); /// PhaseMatch.sum(self.data));
-                        self.plot1dEff.setTitle("Waist: " + (Ws*1e6).toFixed(0) + "um  |  Signal: " + eff_s.toFixed(3) + "  |  Idler: "+  eff_i.toFixed(3) );
+                        self.plot1dEff.setTitle("Waist position: " + (z0*1e6).toFixed(0) + "um  |  Signal: " + eff_s.toFixed(3) + "  |  Idler: "+  eff_i.toFixed(3) );
 
                         self.plotCoinc.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plotCoinc.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
@@ -720,7 +727,7 @@ define(
                         var endtime = new Date();
 
                         self.draw();
-                        // console.log("FINISHED PLOTTING");
+                        console.log("FINISHED PLOTTING");
                         return true;
 
                     });
@@ -766,7 +773,7 @@ define(
                     self.plot1dRates.addSeries( dataR_s, 'Signal');
                     self.plot1dRates.addSeries( dataR_coin, 'Coincidences');
                     self.plot1dRates.plotData( );
-                    console.log("Rates_i", dataR_i, dataR_coin);
+                    // console.log("Rates_i", dataR_i, dataR_coin, eff_s);
 
                     // self.plot1dEff.plotData( dataEff_i );
                     self.plot.plotData( data_s );

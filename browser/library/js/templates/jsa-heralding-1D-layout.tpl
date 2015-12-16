@@ -1,6 +1,6 @@
 <div class="plot-wrapper span7 offset1">
     <div class="row-fluid">
-    	<h2 class="title">Idler heralding efficiency for a fixed pump waist.</h2>
+    	<h2 class="title">Heralding efficiency for a fixed pump waist.</h2>
 
             <div class="btn-wrap ">
                 <button class="btn collapse-ctrl-plot" id="collapse-homjsa">&#x2296;</button>
