@@ -1162,76 +1162,12 @@ PhaseMatch.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yrang
 
 };
 
-// /*
-// * calc_heralding_plot_p
-// */
-// PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, WsRange, ls_start, ls_stop, li_start, li_stop, n){
-//     props.update_all_angles();
-//     var P = props.clone()
-//         ,i
-//         ,N = WpRange.length*WsRange.length
-//         ,eff = new Float64Array( N )
-//         ,singles = new Float64Array( N )
-//         ,idlerSingles = new Float64Array( N )
-//         ,coinc = new Float64Array( N )
-//         ,dim = 15
-//         ,maxeEff = 0
-//         ,Ws_ideal = 0
-//         ,Wp_ideal = 0
-//         ,Wi_SQ = Math.pow(P.W_sx,2)
-//         ,PHI_s = 1/Math.cos(P.theta_s_e)
-//         // ,dim = dim+(3- dim%3) //guarantee that n is divisible by 3
-//         ,lambdaWeights = PhaseMatch.Nintegrate2DWeights_3_8(n)
-//         ,lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim)
-//         ,lambda_i = PhaseMatch.linspace(li_stop, li_start, dim)
-//         ;
 
-//     P.phi_i = P.phi_s + Math.PI;
-//     P.update_all_angles();
-//     P.optimum_idler(P);
-
-//     function calc_singles_rate( ){
-//         var JSI_singles = PhaseMatch.calc_JSI_Singles_p(P, lambda_s,lambda_i, dim, 1);
-//         return PhaseMatch.Sum(JSI_singles);
-//     };
-
-//     function calc_coinc_rate( ){
-
-//         var JSI_coinc = PhaseMatch.calc_JSI_p(P, lambda_s,lambda_i, dim, 1);
-//         return PhaseMatch.Sum(JSI_coinc);
-//     };
-
-//     for (i=0; i<N; i++){
-//         var index_x = i % WpRange.length;
-//         var index_y = Math.floor(i / WpRange.length);
-//         P.W_sx = WsRange[index_y];
-//         P.W_sy = P.W_sx;
-//         P.W_ix = WsRange[index_y];
-//         P.W_iy = P.W_ix;
-//         P.W = WpRange[index_x];
-
-
-//         var  singlesRate = calc_singles_rate()
-//             ,coincRate = calc_coinc_rate()
-//             ;
-//         P.swap_signal_idler();
-//         var idlerSinglesRate = calc_singles_rate();
-
-//         // console.log("singles: " + singlesRate.toString() + ", coinc:" + coincRate.toString());
-//         eff[i] = coincRate / singlesRate *( sq(P.W_sx) * PHI_s);
-//         singles[i] = singlesRate;
-//         idlerSingles[i] = idlerSinglesRate;
-//         coinc[i] = coincRate *( sq(P.W_sx) * PHI_s);
-
-//     }
-//     return [eff, singles, coinc];
-
-// };
 
 /*
 * calc_heralding_plot_p
 */
-PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, WsRange, ls_start, ls_stop, li_start, li_stop, n){
+PhaseMatch.calc_heralding_plot_p = function calc_heralding_plot_p(props, WpRange, WsRange, ls_start, ls_stop, li_start, li_stop, n){
     props.update_all_angles();
     var P = props.clone()
         ,i
@@ -1266,6 +1202,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
     P_i.swap_signal_idler();
     var PHI_i = 1/Math.cos(P_i.theta_s_e);
 
+    ///////////////////////////////////////////////////
     // function calc_singles_rate(lambda_s, lambda_i ){
 
     //     // P.update_all_angles();
@@ -1312,6 +1249,7 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
     //     var PM = PhaseMatch.phasematch(P);
     //     return (sq(PM[0]) + sq(PM[1]));
     // };
+
 
     function calc_singles_rate( ){
         var JSI_singles = PhaseMatch.calc_JSI_Singles_p(P, lambda_s,lambda_i, dim, 1);
@@ -1385,4 +1323,95 @@ PhaseMatch.calc_heralding_plot_p = function calc_schmidt_plot(props, WpRange, Ws
 
 
 
+/*
+* calc_heralding_plot_focus_position_p
+*/
+PhaseMatch.calc_heralding_plot_focus_position_p = function calc_heralding_plot_focus_position_p(props, WsRange, ls_start, ls_stop, li_start, li_stop, n){
+    props.update_all_angles();
+    var WpRange = [props.W];
+    var P = props.clone()
+        // ,WpRange = [props.W]
+        ,i
+        ,N = WpRange.length*WsRange.length
+        ,eff_s = new Float64Array( N )
+        ,eff_i = new Float64Array( N )
+        ,singles_s = new Float64Array( N )
+        ,singles_i = new Float64Array( N )
+        ,coinc = new Float64Array( N )
+        ,n = 16 //make sure this is even
+        ,dim = 15
+        ,maxeEff = 0
+        ,Ws_ideal = 0
+        ,Wp_ideal = 0
+        ,Wi_SQ = Math.pow(P.W_sx,2)
+        ,PHI_s = 1/Math.cos(P.theta_s_e)
+        // ,PHI_i = 1/Math.cos(P.theta_s_i)
+        // ,n = n+(3- n%3) //guarantee that n is divisible by 3
+        ,lambdaWeights = PhaseMatch.Nintegrate2DWeights_3_8(n)
+        // @@@@@@ For testing purposes
+        ,lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim)
+        ,lambda_i = PhaseMatch.linspace(li_stop, li_start, dim)
+        // ,lambda_s = PhaseMatch.linspace(P.lambda_p *2, P.lambda_p *2, dim)
+        // ,lambda_i = PhaseMatch.linspace(P.lambda_p *2, P.lambda_p *2, dim)
+        ;
+    console.log("NNNNNNNN: " + WsRange.toString());
+    P.phi_i = P.phi_s + Math.PI;
+    P.update_all_angles();
+    P.optimum_idler(P);
 
+    P_i = P.clone();
+    P_i.swap_signal_idler();
+    var PHI_i = 1/Math.cos(P_i.theta_s_e);
+
+    function calc_singles_rate( ){
+        var JSI_singles = PhaseMatch.calc_JSI_Singles_p(P, lambda_s,lambda_i, dim, 1);
+        // console.log(PhaseMatch.Sum(JSI_singles[0]).toString());
+        return [PhaseMatch.Sum(JSI_singles[0]), PhaseMatch.Sum(JSI_singles[1])];
+    };
+
+    function calc_coinc_rate( ){
+        var JSI_coinc = PhaseMatch.calc_JSI_p(P, lambda_s,lambda_i, dim, 1);
+        return PhaseMatch.Sum(JSI_coinc);
+    };
+
+    for (i=0; i<N; i++){
+        // var index_x = i % WpRange.length;
+        // var index_y = Math.floor(i / WpRange.length);
+        // P.W_sx = WsRange[index_y];
+        // P.W_sy = P.W_sx;
+        // P.W_ix = WsRange[index_y];
+        // P.W_iy = P.W_ix;
+        // P.W = WpRange[index_x];
+
+        // P_i.W_sx = WsRange[index_y];
+        // P_i.W_sy = P_i.W_sx;
+        // P_i.W_ix = WsRange[index_y];
+        // P_i.W_iy = P_i.W_ix;
+
+        P.z0s = WsRange[i];
+        P.z0i = WsRange[i];
+
+        P_i.z0s = WsRange[i];
+        P_i.z0i = WsRange[i];
+
+
+        var  singRate = calc_singles_rate()
+            ,coincRate = calc_coinc_rate()
+            ,singlesRate = singRate[0]
+            ,idlerSinglesRate = singRate[1]
+            ;
+
+        singles_s[i] = singlesRate // / ( sq(P.W_sx) * PHI_s);
+        singles_i[i] = idlerSinglesRate // / ( sq(P.W_sx) * PHI_i);
+        coinc[i] = coincRate;
+        eff_i[i] = coincRate / singlesRate //*( sq(P.W_sx) * PHI_s);
+        eff_s[i] = coincRate / idlerSinglesRate//  *( sq(P.W_sx) * PHI_i);
+        // console.log(coincRate.toString() + ', ' + singlesRate.toString());
+
+
+
+    }
+    return [eff_i, eff_s, singles_s, singles_i, coinc];
+    // return eff;
+
+};

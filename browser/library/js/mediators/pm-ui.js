@@ -33,6 +33,8 @@ define(
         'modules/heralding-ui',
         'modules/heralding-2d-ui',
         'modules/heralding-1D-ui',
+        'modules/heralding-1D-advanced-ui',
+        'modules/heralding-pump-focus-position-ui',
         'modules/testingui'
     ],
     function(
@@ -69,6 +71,8 @@ define(
         heraldingUI,
         heralding2dUI,
         heralding1dUI,
+        heralding1dUIAdv,
+        heraldingPumpFocusPosition,
         testingUI
     ) {
 
@@ -425,6 +429,10 @@ define(
                 self.set('heralding2d', heralding2dUI());
                 // 1D Heralding Efficeny for a given set of parameters
                 self.set('heralding1d', heralding1dUI());
+                // 1D Heralding Efficeny for a given set of parameters. Includes Rates
+                self.set('heralding1dAdv', heralding1dUIAdv());
+                // Heralding efficiency as a function of crytal focus position
+                self.set('heraldingPumpFocusPosition', heraldingPumpFocusPosition());
                 // Testing Module
                 self.set('testing', testingUI());
             },

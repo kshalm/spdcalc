@@ -105,7 +105,17 @@ define(
 
             setTitle: function( title ){
 
-                this.elTitle.text( title );
+                this.elTitle.text( title);
+            },
+
+            setYLabel: function( title ){
+
+                this.labels.y( title );
+            },
+
+            setXLabel: function( title ){
+
+                this.labels.x.text( title );
             },
 
             setMargins: function( cfg ){
