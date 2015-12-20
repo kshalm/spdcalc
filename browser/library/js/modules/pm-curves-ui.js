@@ -354,7 +354,7 @@ define(
             return when.all( promises ).then(function( values ){
                 self.dataSignal = values[0];
                 self.plotSignal.setXRange([ converter.to('nano', po.get('lp_start')),converter.to('nano', po.get('lp_stop')) ]);
-                self.plotSignal.setYRange([ converter.to('nano', po.get('pm_signal_wavelength_start')),converter.to('nano', po.get('pm_signal_wavelength_stop')) ]);
+                self.plotSignal.setYRange([ converter.to('nano', po.get('ls_start')),converter.to('nano', po.get('ls_stop')) ]);
 
                 self.dataThetaPhi = values[1];
                 self.plotThetaPhi.setXRange([ converter.to('deg',  po.get('pump_theta_start')),converter.to('deg', po.get('pump_theta_stop')) ]);
