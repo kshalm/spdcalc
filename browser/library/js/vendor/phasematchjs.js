@@ -1,8 +1,8 @@
 /**
- * phasematchjs v0.0.1a - 2015-12-20
+ * phasematchjs v0.0.1a - 2016-02-03
  *  ENTER_DESCRIPTION 
  *
- * Copyright (c) 2015 Krister Shalm <kshalm@gmail.com>
+ * Copyright (c) 2016 Krister Shalm <kshalm@gmail.com>
  * Licensed GPLv3
  */
 (function (root, factory) {
