@@ -36,10 +36,10 @@
 
             function setup(obj) {
 
-                self.onmessage = function (e) {
+                this.onmessage = function (e) {
 
-                    self.postMessage( obj.process( e.data.args ) );
-                    self.close();
+                    this.postMessage( obj.process( e.data.args ) );
+                    this.close();
                 };
             }
 
@@ -104,7 +104,7 @@
             } else {
 
                 while ( data.length ){
-                    
+
                     this.run( data.splice(0, chunksize) );
                 }
             }
@@ -131,7 +131,7 @@
     //         var results = new Float64Array( chunk.length );
 
     //         for ( var i = 0, l = chunk.length; i < l; ++i ){
-                
+
     //             results[i] = this.helper( chunk[ i ] ) * this.baz.n / this.bar[ 2 ];
     //         }
 
@@ -152,7 +152,7 @@
 
     //     for ( var i = 0, l = results.length; i < l; ++i ){
     //         for ( var j = 0, ll = results[ i ].length; j < ll; ++j ){
-                
+
     //             ans += results[ i ][ j ];
     //         }
     //     }

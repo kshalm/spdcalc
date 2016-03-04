@@ -490,7 +490,7 @@
             coeffI = terms[7];
 
         var pmzcoeff = Math.exp(- 1/2*sq(z/bw)); // apodization
-        var pmzcoeff = pmzcoeff * Math.exp(-sq(z)*CR -z*BI - AR);
+        pmzcoeff = pmzcoeff * Math.exp(-sq(z)*CR -z*BI - AR);
         var realE = pmzcoeff*Math.cos(-sq(z)*CI +z*BR - AI);
         var imagE = pmzcoeff*Math.sin(-sq(z)*CI +z*BR - AI);
 
@@ -501,12 +501,13 @@
         return [real,imag];
     };
 
+    var PMt;
     if (P.calcfibercoupling){
         var dz = P.L/P.numzint;
         var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-P.L/2, P.L/2,dz,P.numzint,P.zweights);
         PMz_real = pmintz[0]/P.L;
         PMz_imag = pmintz[1]/P.L;
-        var PMt = 1;
+        PMt = 1;
     }
     else{
         var PMzNorm1 = Math.sin(arg)/arg;
@@ -514,7 +515,7 @@
         // var PMz_imag = PMzNorm1 * Math.sin(arg);
         PMz_real =  PMzNorm1 ;
         PMz_imag = 0;
-        var PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
+        PMt = Math.exp(-0.5*(sq(delK[0]) + sq(delK[1]))*sq(P.W));
     }
     // var PMz_real = PhaseMatch.Nintegrate(zintReal,-P.L/2, P.L/2,numz)/P.L;
     // var PMz_imag = PhaseMatch.Nintegrate(zintImag,-P.L/2, P.L/2,numz)/P.L;
@@ -1340,7 +1341,7 @@ PhaseMatch.autorange_theta = function autorange_theta(props){
     var theta_start =dif*(1-(1e-6/P.W));
     theta_start = Math.max(0, theta_start);
     // var theta_end = P.theta_s + P.theta_s*0.4;
-    var theta_end = P.theta_s + (P.theta_s - theta_start)
+    var theta_end = P.theta_s + (P.theta_s - theta_start);
     theta_end = Math.max(2*Math.PI/180, theta_end);
     // console.log("Before", theta_start*180/Math.PI, theta_end*180/Math.PI);
     P.theta_s = theta_start;
@@ -1476,5 +1477,3 @@ PhaseMatch.swap_signal_idler = function swap_signal_idler(P){
             P.update_all_angles();
             return P;
 };
-
-

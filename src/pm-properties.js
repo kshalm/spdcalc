@@ -40,7 +40,7 @@
         W_sx: 100 * con.um,
         W_sy: 100 * con.um,
         W_ix: 100 * con.um,
-        W_ix: 100 * con.um,
+        // W_ix: 100 * con.um,
         phase: false,
         brute_force: false,
         brute_dim: 50,
@@ -57,7 +57,8 @@
         enable_pp: true,
         calcfibercoupling: true,
         singles: false,
-        z0s: 2000/2 * con.um,
+        z0s: -2000/2 * con.um,
+        z0: 2000/2 * con.um
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
@@ -88,6 +89,7 @@
 
             // set properties or fall back to defaults
             this.set( PhaseMatch.util.extend({}, spdcDefaults, cfg) );
+            this.update_all_angles();
 
             // Find internal angles for signal and idler
             this.theta_s = PhaseMatch.find_internal_angle(this, "signal");
@@ -331,7 +333,7 @@
                 var startTime = new Date();
                 PhaseMatch.nelderMead(find_pp, guess, 100);
                 var endTime = new Date();
-                console.log("calculation time for periodic poling calc", endTime - startTime, props.poling_period);
+                //console.log("calculation time for periodic poling calc", endTime - startTime, props.poling_period);
 
                 props.poling_period = P.poling_period;
                 props.poling_sign = P.poling_sign;
@@ -510,7 +512,7 @@
             this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
 
             this.walkoff_p = -1/ne_p *(ne1_p - ne2_p)/deltheta;
-            console.log("Walkoff:", this.walkoff_p*180/Math.PI);
+            // console.log("Walkoff:", this.walkoff_p*180/Math.PI);
             // this.walkoff_p = 0;
          },
 
@@ -618,9 +620,10 @@
                     //     }
                     // }
 
-                    if (name === 'z0s'){
+                    if (name === 'z0'){
                         // Match the idler waist position to that of the signal
-                        this.z0i = val;                   
+                        this.z0s = val - this.L;
+                        this.z0i = val - this.L;
                     }
 
                     this[ name ] = val;
@@ -689,4 +692,3 @@
     PhaseMatch.SPDCprop = SPDCprop;
 
 })();
-

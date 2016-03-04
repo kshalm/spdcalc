@@ -59,7 +59,7 @@ PhaseMatch.Crystals('BBO-1', {
     // info: '',
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        lambda_sq = sq(lambda);
+        var lambda_sq = sq(lambda);
         // http://www.newlightphotonics.com/bbo-properties.html & Alan Migdall
         var no = Math.sqrt(2.7359 + 0.01878/ (lambda_sq - 0.01822) - 0.01354*lambda_sq);
         var ne = Math.sqrt(2.3753 + 0.01224 / (lambda_sq - 0.01667) - 0.01516*lambda_sq);
@@ -84,7 +84,7 @@ PhaseMatch.Crystals('KTP-3', {
     info: 'Includes Franco Wong"s modificatin.  http://dx.doi.org/10.1063/1.1668320, http://www.redoptronics.com/KTP-crystal.html',
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        lambda_sq = sq(lambda);
+        var lambda_sq = sq(lambda);
 
         // http://www.redoptronics.com/KTP-crystal.html
         var nx= Math.sqrt(2.10468 + 0.89342*lambda_sq/(lambda_sq-0.04438)-0.01036*lambda_sq);
@@ -123,7 +123,7 @@ PhaseMatch.Crystals('BiBO-1', {
     info: 'http://www.newlightphotonics.com/bibo-properties.html',
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        lambda_sq = sq(lambda);
+        var lambda_sq = sq(lambda);
         //Alan Migdal's program
         // var nx = Math.sqrt(3.0740 + 0.0323/(sq(lambda)-0.0316) - 0.01337*sq(lambda) );
         // var ny = Math.sqrt(3.1685 + 0.0373/(sq(lambda)-0.0346) - 0.01750*sq(lambda) );
@@ -162,7 +162,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
     lambda_max: 3.4*1e-9,
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        lambda_sq = sq(lambda);
+        var lambda_sq = sq(lambda);
         //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
         var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - lambda_sq) - 0.027169*lambda_sq );
         var ny = nx;
@@ -218,17 +218,16 @@ PhaseMatch.Crystals('LiNB-MgO', {
         var nz = Math.sqrt( a1 + b1*F + (a2 + b2*F)/(l2 - sq(a3+b3*F)) + (a4+b4*F)/(l2 -sq(a5)) - a6*l2 );
 
          // Coefficients for the oridnary index
-        var  a1 = 5.653
-            ,a2 = 0.1185
-            ,a3 = 0.2091
-            ,a4 = 89.61
-            ,a5 = 10.85
-            ,a6 = 1.97e-2
-            ,b1 = 7.941e-7
-            ,b2 = 3.134e-8
-            ,b3 = -4.641e-9
-            ,b4 = -2.188e-6
-            ;
+        a1 = 5.653;
+        a2 = 0.1185;
+        a3 = 0.2091;
+        a4 = 89.61;
+        a5 = 10.85;
+        a6 = 1.97e-2;
+        b1 = 7.941e-7;
+        b2 = 3.134e-8;
+        b3 = -4.641e-9;
+        b4 = -2.188e-6;
 
         var nx = Math.sqrt( a1 + b1*F + (a2 + b2*F)/(l2 - sq(a3+b3*F)) + (a4+b4*F)/(l2 -sq(a5)) - a6*l2 );
         var ny = nx;
@@ -249,7 +248,7 @@ PhaseMatch.Crystals('KDP-1', {
     lambda_max: 1500*1e-9,
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        lambda_sq = sq(lambda);
+        var lambda_sq = sq(lambda);
 
         //Alan Migdal's program & http://www.redoptronics.com/linbo3-crystals.html
         // var nx = Math.sqrt( 4.9048 - 0.11768/(0.04750 - sq(lambda)) - 0.027169*sq(lambda) );
@@ -357,7 +356,7 @@ PhaseMatch.Crystals('AgGaS2-1', {
     lambda_max: 13000*1e-9,
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        lambda_sq = sq(lambda);
+        var lambda_sq = sq(lambda);
 
         var  nx = Math.sqrt(3.628 + 2.1686*lambda_sq/(lambda_sq-0.1003) + 2.1753*lambda_sq/ (lambda_sq-950) )
             ,ny = nx
@@ -390,7 +389,7 @@ PhaseMatch.Crystals('LiIO3-1', {
     lambda_max: 5000*1e-9,
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        lambda_sq = sq(lambda);
+        var lambda_sq = sq(lambda);
 
         var  nx = Math.sqrt(2.03132 + 1.37623/(1 - (0.0350832/lambda_sq)) + 1.06745/ (1 - (169/lambda_sq)) )
             ,ny = nx
@@ -412,7 +411,7 @@ PhaseMatch.Crystals('LiIO3-2', {
     lambda_max: 5000*1e-9,
     indicies: function(lambda, temp){
         lambda = lambda * 1e6; //Convert for Sellmeir Coefficients
-        lambda_sq = sq(lambda);
+        var lambda_sq = sq(lambda);
 
         var  nx = Math.sqrt(3.4095 + 0.047664/(lambda_sq - 0.033991) )
             ,ny = nx
@@ -421,8 +420,3 @@ PhaseMatch.Crystals('LiIO3-2', {
         return [nx, ny, nz];
     }
 });
-
-
-
-
-

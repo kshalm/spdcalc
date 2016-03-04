@@ -1,7 +1,7 @@
 PhaseMatch.Complex = (function () {
 
 'use strict';
-    
+
 /*
 Localize global props for better performance
  */
@@ -35,8 +35,8 @@ Object definition
 
 function Complex(re, im){
     // allow instantiation by simply: Complex(args);
-    if (!(this instanceof Complex)) return new Complex(re, im);
-    
+    if (!(this instanceof Complex)){ return new Complex(re, im);}
+
     // private properties... don't modify directly
     this._ = new ArrDef(2);
 
@@ -160,7 +160,7 @@ var prototype = Complex.prototype = {
     },
 
     log: function(k){
-        if (!k) k = 0;
+        if (!k){ k = 0;}
         return this.fromRect(
             log(this.magnitude()),
             this.angle() + k * 2 * PI
@@ -241,17 +241,17 @@ var prototype = Complex.prototype = {
     },
 
     toString: function( polar ){
-        if (polar) return this.magnitude() + ' ' + this.angle();
+        if (polar){ return this.magnitude() + ' ' + this.angle();}
 
         var ret = ''
             ,re = this._[0]
             ,im = this._[1]
             ;
-        if (re) ret += re;
-        if (re && im || im < 0) ret += im < 0 ? '-' : '+';
+        if (re) {ret += re;}
+        if (re && im || im < 0) {ret += im < 0 ? '-' : '+';}
         if (im){
             var absIm = abs(im);
-            if (absIm !== 1) ret += absIm;
+            if (absIm !== 1) {ret += absIm;}
             ret += 'i';
         }
         return ret || '0';
@@ -279,10 +279,10 @@ var prototype = Complex.prototype = {
 var extend = {
 
     from: function( real, im ){
-        if (real instanceof Complex) return real.clone();
+        if (real instanceof Complex) {return real.clone();}
         var type = typeof real;
         if (type === 'string'){
-            if (real === 'i') real = '0+1i';
+            if (real === 'i') {real = '0+1i';}
             var match = real.match(/(\d+)?([\+\-]\d*)[ij]/);
             if (match){
                 real = match[1];
@@ -304,7 +304,7 @@ var extend = {
 
 };
 
-for (var e in extend) Complex[e] = extend[e];
+for (var e in extend) {Complex[e] = extend[e];}
 
 return Complex;
 

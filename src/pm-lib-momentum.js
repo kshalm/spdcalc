@@ -139,8 +139,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ,GAM1i = GAM2i *PHI_i
         ,GAM3s = -2 * ks_f * GAM1s * SIN_THETA_s_e * COS_PHI_s
         ,GAM3i = -2 * ki_f * GAM1i * SIN_THETA_i_e * COS_PHI_i
-        ,GAM4s = -.5 * ks_f * SIN_THETA_s_e * COS_PHI_s * GAM3s
-        ,GAM4i = -.5 * ki_f * SIN_THETA_i_e * COS_PHI_i * GAM3i
+        ,GAM4s = -0.5 * ks_f * SIN_THETA_s_e * COS_PHI_s * GAM3s
+        ,GAM4i = -0.5 * ki_f * SIN_THETA_i_e * COS_PHI_i * GAM3i
         ,zhs = z0s + hs * SIN_THETA_s_e * COS_PHI_s
         ,zhi = z0i + hi * SIN_THETA_i_e * COS_PHI_i
         ,DEL2s = 0.5 / ks_f * zhs
@@ -156,7 +156,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ,As_r = -0.25 * Wp_SQ + GAM1s
         ,As_i = -DEL1s
         ,Ai_r = -0.25 * Wp_SQ + GAM1i
-        ,Ai_i = -DEL1i 
+        ,Ai_i = -DEL1i
         ,Bs_r = -0.25 * Wp_SQ + GAM2s
         ,Bs_i = -DEL2s
         ,Bi_r = -0.25 * Wp_SQ + GAM2i
@@ -223,9 +223,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             A9 = A8, //Pump waist is symmetric
             A10 = [hh_r, hh_i + ee + ff * z]
             ;
-    
+
         // console.log("Terms in Karina's order going from A1-A11");
-       
+
         // console.log("A1:", A1);
         // console.log("A2:", A2);
         // console.log("A3:", A3);
@@ -274,7 +274,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
         // From Karina's code
 //         % z = (exp((4.*A11 - A2.^2./A1 - A4.^2./A3 - (A10.*A4 - 2.*A3.*A8).^2./(A3.*(-A10.^2 + 4.*A3.*A7)) - (-2.*A1.*A6 + A2.*A9).^2./(A1.*(4.*A1.*A5 - A9.^2)))./4.)./...
-// %      
+// %
         // Kr -> Ka
         // A1 -> A1
         // A2 -> A3
@@ -283,7 +283,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // A5 -> A2
         // A6 -> A4
         // A6 -> A8
-        // A7 -> A6 
+        // A7 -> A6
         // A8 -> A9
         // A9 -> A10
         // A10 -> A11
@@ -295,11 +295,11 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // A4 -> A6
         // A5 -> A3
         // A6 -> A7
-        // A7 -> A4 
+        // A7 -> A4
         // A8 -> A6
         // A9 -> A8
         // A10 -> A9
-        // A11 -> A10    
+        // A11 -> A10
 
             // 4 A10
         var EXP1R = A10R*4,
@@ -549,7 +549,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         // Ws_SQ = sq(W_s * convfromFWHM), // convert from FWHM to sigma
         // Wi_SQ = sq(W_i * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
         // Set Wx = Wy for the pump.
-        Wx_SQ = Wp_SQ,
+        Wx_SQ = Wp_SQ ,
         Wy_SQ = Wp_SQ
         ;
 
@@ -601,13 +601,13 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     //     ,GAM2s = -0.25 * Ws_SQ
     //     ,GAM1s = GAM2s *PHI_s
     //     ,GAM3s = -2 * ks_f * GAM1s * SIN_THETA_s_e
-    //     ,GAM4s = -.5 * ks_f * SIN_THETA_s_e
+    //     ,GAM4s = -0.5 * ks_f * SIN_THETA_s_e
     //     ,zhs = z0s + hs * SIN_THETA_s_e
     //     ,DEL2s = 0.5 / ks_f * zhs
     //     ,DEL1s = DEL2s * PHI_s
     //     ,DEL3s = hs - zhs * PHI_s * SIN_THETA_s_e
     //     ,DEL4s = 0.5*ks_f * zhs * SIN_THETA_s_e * sq(TAN_THETA_s_e) - ks_f * z0s
-        
+
 
     var  ks_f = (k_s/P.n_s)
         ,SIN_THETA_s_e = Math.sin(P.theta_s_e)
@@ -617,7 +617,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ,GAM2s = -0.25 * Ws_SQ
         ,GAM1s = GAM2s *PHI_s
         ,GAM3s = -2 * ks_f * GAM1s * SIN_THETA_s_e * COS_PHI_s
-        ,GAM4s = -.5 * ks_f * SIN_THETA_s_e * COS_PHI_s * GAM3s
+        ,GAM4s = -0.5 * ks_f * SIN_THETA_s_e * COS_PHI_s * GAM3s
         ,zhs = z0s + hs * SIN_THETA_s_e * COS_PHI_s
         ,DEL2s = 0.5 / ks_f * zhs
         ,DEL1s = DEL2s * PHI_s
@@ -638,7 +638,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ,C4 = P.L * (1/k_i - 1/k_p)
         ,C5 = k_s/k_p
         // ,C6_r = KpKs * (Ws_r + Wy_SQ)
-        // ,C6_i = KpKs * Ws_i 
+        // ,C6_i = KpKs * Ws_i
         // ,C6_r = KpKs * (Wy_SQ -4*GAM2s)
         // ,C6_i = 4*KpKs * GAM2s
         ,C9 = k_p * Wx_SQ
@@ -660,6 +660,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ,alpha2cI = - alpha2I
         ,alpha3cR = alpha3R
         ,alpha3cI = - alpha3I
+        ;
 
             // M1R = -2 * DEL3s
     //     ,M1I = -2 * GAM3s
@@ -683,7 +684,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             ,B1 = (1 - z1)
             ,B3 = (1 + z1)
         ;
-        return [A1, B1, B3]
+        return [A1, B1, B3];
 
         // return [D1R, D1I, D3R, D3I, H1R, H1I, H3R, H3I, P1R, P1I, P3R, P3I, Q1R, Q1I, Q3R, Q3I, A1, B1, B3];
     };
@@ -696,7 +697,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             ,B2 = (1 - z2)
             ,B4 = (1 + z2)
         ;
-        return [A2, B2, B4]
+        return [A2, B2, B4];
         // return [D2R, D2I, D4R, D4I, H2R, H2I, H4R, H4I, P2R, P2I, P4R, P4I, Q2R, Q2I, Q4R, Q4I, A2, B2, B4];
     };
 
@@ -710,15 +711,15 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             ,A1 = Cz1[0]
             ,B1 = Cz1[1]
             ,B3 = Cz1[2]
-        
+
             // From Cz2
             ,A2 = Cz2[0]
             ,B2 = Cz2[1]
             ,B4 = Cz2[2]
-            
+
             // Now terms that depend on both z1 and z2
             ,B6a = C4 * B0
-            
+
 
             ,gamma1I = -k_p*L*B1 + k_s * A1
             ,gamma2I = (-k_p*L*B2 + k_s * A2)
@@ -742,7 +743,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
             // Now for the denominators that show up in EE, FF, GG, HH, and II
             ,X11R = (C9*k_s - HaR)
-            ,X11I = -HaI 
+            ,X11I = -HaI
             ,X12R = -HcI
             ,X12I = HcR - C9*k_s
             ,Y21R = (C10*k_s - HbR)
@@ -935,7 +936,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         // console.log("Y21+Y22:", -2*Wy_SQ - FF3R + FF5R, B6a - FF3I + FF5I);
         // console.log("FFother:", -2*Wy_SQ, B6a);
 
-        
+
 
 
         // console.log("B1, B2: ", B1, B2);
@@ -983,7 +984,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         // var  z1 = 0
         //     ,z2 = 0.5
         // var z1 = 0.5
-        //     ,z2 = -.7
+        //     ,z2 = -0.7
         //     ;
         // var pmintz = zintfunc(z1,z2, calcz1terms(z1));
 
@@ -1076,7 +1077,7 @@ PhaseMatch.normalize_joint_spectrum_singles = function normalize_joint_spectrum_
         ,PHI_s = 1/Math.cos(P.theta_s_e)
         ;
 
-    console.log("Wi squared: ", Wi_SQ*PHI_s);
+    //console.log("Wi squared: ", Wi_SQ*PHI_s);
 
     var norm = PhaseMatch.phasematch_Int_Phase_Singles(P)['phasematch'];//*(Wi_SQ*PHI_s);
     return norm;
