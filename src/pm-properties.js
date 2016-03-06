@@ -581,9 +581,11 @@
          */
         set: function( name, val ){
 
+            var self = this;
+
             if ( typeof name === 'object' ){
 
-                PhaseMatch.util.each( name, function(val, name){this.set(name, val);}, this );
+                PhaseMatch.util.each( name, function(val, name){self.set(name, val);} );
                 return this;
 
             } else {

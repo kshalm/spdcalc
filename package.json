@@ -32,8 +32,8 @@
     "grunt-contrib-requirejs": "*",
     "grunt-contrib-uglify": "latest",
     "grunt-contrib-watch": "~0.3.1",
-    "grunt-lodash": "~0.3.0",
-    "http-server": "*"
+    "http-server": "*",
+    "lodash": "^4.6.1"
   },
   "bundledDependencies": [],
   "license": "GPL-3.0"
