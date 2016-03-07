@@ -150,7 +150,7 @@ module.exports = function(grunt) {
         // watch a directory for changes and execute tasks when they change
         watch: {
           files: 'src/**/*.js',
-          tasks: ['clean', 'concat:phasematch', 'copy:phasematch', 'jshint:phasematch', 'uglify']
+          tasks: [ 'concat:phasematch', 'copy:phasematch']
         },
         // minify the concatenated javascript
         uglify : {

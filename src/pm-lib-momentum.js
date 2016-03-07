@@ -1,7 +1,7 @@
 /**
  * Phasematching Library for momentum space calculations
  */
-
+var ellipticity = 1.0;
 
 /*
  * Get the constants and terms used in the calculation of the momentum
@@ -77,9 +77,11 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // Setup constants
     var Wp_SQ = sq(P.W * convfromFWHM), // convert from FWHM to sigma
         Ws_SQ = sq(P.W_sx  * convfromFWHM), // convert from FWHM to sigma
-        Wi_SQ = sq(P.W_sx  * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
+        Wi_SQ = sq(P.W_sx  * convfromFWHM), // convert from FWHM to sigma @TODO: Change to P.W_i
         // Ws_SQ = sq(W_s * convfromFWHM), // convert from FWHM to sigma
         // Wi_SQ = sq(W_i * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
+        Wx_SQ = Wp_SQ * sq(ellipticity),
+        Wy_SQ = Wp_SQ
         ;
 
     // Is this the k vector along the direction of propagation?
@@ -153,13 +155,13 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ,DEL4i = 0.5*ki_f * zhi * sq(TAN_THETA_i_e) - ki_f * z0i
 
 
-        ,As_r = -0.25 * Wp_SQ + GAM1s
+        ,As_r = -0.25 * Wx_SQ + GAM1s
         ,As_i = -DEL1s
-        ,Ai_r = -0.25 * Wp_SQ + GAM1i
+        ,Ai_r = -0.25 * Wx_SQ + GAM1i
         ,Ai_i = -DEL1i
-        ,Bs_r = -0.25 * Wp_SQ + GAM2s
+        ,Bs_r = -0.25 * Wy_SQ + GAM2s
         ,Bs_i = -DEL2s
-        ,Bi_r = -0.25 * Wp_SQ + GAM2i
+        ,Bi_r = -0.25 * Wy_SQ + GAM2i
         ,Bi_i = -DEL2i
         ,Cs = -0.25 * (P.L  / k_s - 2*z0/k_p)
         ,Ci = -0.25 * (P.L  / k_i - 2*z0/k_p)
@@ -169,9 +171,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // ,Es_i =  0.50 * (Ws_i*PHI_i * PSI_s)
         // ,Ei_r =  0.50 * (Wi_r*PHI_i * PSI_i)
         // ,Ei_i =  0.50 * (Wi_i*PHI_i * PSI_i)
-        ,mx_real = -0.50 * Wp_SQ
+        ,mx_real = -0.50 * Wx_SQ
         ,mx_imag = z0/k_p
-        ,my_real = mx_real // Pump waist is symmetric
+        ,my_real = -0.50 * Wy_SQ
         ,my_imag = mx_imag
         ,m  = P.L  / (2*k_p)
         ,n  = 0.5 * P.L  * Math.tan(RHOpx)
@@ -220,7 +222,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             //1i*0.5.*L.*(1 + Xi).*tan(Rho);
             A6 = [ 0, n*(1+z)],
             A8 = [ mx_real, mx_imag - m * z],
-            A9 = A8, //Pump waist is symmetric
+            A9 = [ my_real, my_imag - m * z],
+            // A9 = A8, //Pump waist is symmetric
             A10 = [hh_r, hh_i + ee + ff * z]
             ;
 
@@ -549,7 +552,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         // Ws_SQ = sq(W_s * convfromFWHM), // convert from FWHM to sigma
         // Wi_SQ = sq(W_i * convfromFWHM) // convert from FWHM to sigma @TODO: Change to P.W_i
         // Set Wx = Wy for the pump.
-        Wx_SQ = Wp_SQ ,
+        Wx_SQ = Wp_SQ * sq(ellipticity),
         Wy_SQ = Wp_SQ
         ;
 
