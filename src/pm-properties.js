@@ -40,7 +40,7 @@
         W_sx: 100 * con.um,
         W_sy: 100 * con.um,
         W_ix: 100 * con.um,
-        // W_ix: 100 * con.um,
+        W_iy: 100 * con.um,
         phase: false,
         brute_force: false,
         brute_dim: 50,
@@ -58,7 +58,7 @@
         calcfibercoupling: true,
         singles: false,
         z0s: -2000/2 * con.um,
-        z0: 2000/2 * con.um
+        // z0: 2000/2 * con.um
     };
 
     var spdcDefaultKeys = PhaseMatch.util.keys( spdcDefaults );
@@ -129,7 +129,7 @@
             }
 
             // Set the positions of the signal, idler, pump waists
-            this.z0p = 0;
+            this.z0p = 0 *con.um;
             // this.z0s = -1*this.L/2;
             this.z0i = this.z0s;
 
@@ -622,10 +622,10 @@
                     //     }
                     // }
 
-                    if (name === 'z0'){
+                    if (name === 'z0s'){
                         // Match the idler waist position to that of the signal
-                        this.z0s = val - this.L;
-                        this.z0i = val - this.L;
+                        // this.z0s = val - this.L;
+                        this.z0i = val;
                     }
 
                     this[ name ] = val;

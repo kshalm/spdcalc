@@ -150,7 +150,7 @@ module.exports = function(grunt) {
         // watch a directory for changes and execute tasks when they change
         watch: {
           files: 'src/**/*.js',
-          tasks: ['lodash', 'concat:phasematch', 'copy:phasematch']
+          tasks: ['clean', 'concat:phasematch', 'copy:phasematch', 'jshint:phasematch', 'uglify']
         },
         // minify the concatenated javascript
         uglify : {
@@ -197,7 +197,7 @@ module.exports = function(grunt) {
     grunt.registerTask('server-dist', [ 'bgShell:httpserverDist', 'watch' ]);
     grunt.registerTask('build-browser', ['cleanup', 'jshint:browser', 'compass', 'requirejs:browser']);
 
-    grunt.registerTask('build-phasematch', ['clean', 'concat:phasematch', 'copy:phasematch', 'jshint:phasematch', 'uglify', 'jasmine']);
+    grunt.registerTask('build-phasematch', ['clean', 'concat:phasematch', 'copy:phasematch', 'jshint:phasematch', 'uglify']);
 
     // Default task executes a build for phasematch library.
     grunt.registerTask('default', ['build-phasematch']);
