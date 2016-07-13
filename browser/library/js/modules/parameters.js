@@ -198,6 +198,12 @@ define(
                     // console.log("poling period: ", self.props.poling_period);
                 }
 
+                if (self.props.autocalfocus){
+                    self.props.auto_calc_collection_focus( self.props );
+                    // console.log("poling period: ", self.props.poling_period);
+                }
+                
+
             },
 
             // resync all values in the original self.props object

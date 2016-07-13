@@ -1,0 +1,477 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install' ]
+2 info using npm@2.1.14
+3 info using node@v0.10.34
+4 verbose node symlink /usr/local/bin/node
+5 warn package.json phasematchjs@0.0.1a No README data
+6 verbose install where, deps [ '/Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS',
+6 verbose install   [ 'grunt',
+6 verbose install     'grunt-bg-shell',
+6 verbose install     'grunt-contrib-clean',
+6 verbose install     'grunt-contrib-compass',
+6 verbose install     'grunt-contrib-concat',
+6 verbose install     'grunt-contrib-copy',
+6 verbose install     'grunt-contrib-jasmine',
+6 verbose install     'grunt-contrib-jshint',
+6 verbose install     'grunt-contrib-requirejs',
+6 verbose install     'grunt-contrib-uglify',
+6 verbose install     'grunt-contrib-watch',
+6 verbose install     'http-server',
+6 verbose install     'lodash' ] ]
+7 verbose install where, peers [ '/Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS',
+7 verbose install   [] ]
+8 info preinstall phasematchjs@0.0.1-a
+9 silly cache add args [ 'grunt-contrib-jshint@latest', null ]
+10 verbose cache add spec grunt-contrib-jshint@latest
+11 verbose already installed skipping grunt-contrib-requirejs@* /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS
+12 silly cache add args [ 'grunt-contrib-uglify@latest', null ]
+13 verbose cache add spec grunt-contrib-uglify@latest
+14 silly cache add parsed spec { raw: 'grunt-contrib-jshint@latest',
+14 silly cache add   scope: null,
+14 silly cache add   name: 'grunt-contrib-jshint',
+14 silly cache add   rawSpec: 'latest',
+14 silly cache add   spec: 'latest',
+14 silly cache add   type: 'tag' }
+15 verbose addNamed grunt-contrib-jshint@latest
+16 silly addNamed semver.valid null
+17 silly addNamed semver.validRange null
+18 info addNameTag [ 'grunt-contrib-jshint', 'latest' ]
+19 silly mapToRegistry name grunt-contrib-jshint
+20 silly mapToRegistry using default registry
+21 silly mapToRegistry registry https://registry.npmjs.org/
+22 silly mapToRegistry uri https://registry.npmjs.org/grunt-contrib-jshint
+23 verbose addNameTag registry:https://registry.npmjs.org/grunt-contrib-jshint not in flight; fetching
+24 verbose already installed skipping grunt-contrib-watch@~0.3.1 /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS
+25 verbose already installed skipping http-server@* /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS
+26 verbose already installed skipping lodash@^4.6.1 /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS
+27 silly cache add parsed spec { raw: 'grunt-contrib-uglify@latest',
+27 silly cache add   scope: null,
+27 silly cache add   name: 'grunt-contrib-uglify',
+27 silly cache add   rawSpec: 'latest',
+27 silly cache add   spec: 'latest',
+27 silly cache add   type: 'tag' }
+28 verbose addNamed grunt-contrib-uglify@latest
+29 silly addNamed semver.valid null
+30 silly addNamed semver.validRange null
+31 info addNameTag [ 'grunt-contrib-uglify', 'latest' ]
+32 silly mapToRegistry name grunt-contrib-uglify
+33 silly mapToRegistry using default registry
+34 silly mapToRegistry registry https://registry.npmjs.org/
+35 silly mapToRegistry uri https://registry.npmjs.org/grunt-contrib-uglify
+36 verbose addNameTag registry:https://registry.npmjs.org/grunt-contrib-uglify not in flight; fetching
+37 verbose request uri https://registry.npmjs.org/grunt-contrib-jshint
+38 verbose request no auth needed
+39 info attempt registry request try #1 at 13:38:52
+40 verbose request id 319a2ba7c0d38212
+41 verbose etag "DXBHNGG6B2ETMZHOCEMQHKK84"
+42 http request GET https://registry.npmjs.org/grunt-contrib-jshint
+43 silly cache add args [ 'grunt@latest', null ]
+44 verbose cache add spec grunt@latest
+45 verbose already installed skipping grunt-bg-shell@* /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS
+46 silly cache add args [ 'grunt-contrib-clean@latest', null ]
+47 verbose cache add spec grunt-contrib-clean@latest
+48 verbose already installed skipping grunt-contrib-compass@^1.0.4 /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS
+49 silly cache add args [ 'grunt-contrib-concat@latest', null ]
+50 verbose cache add spec grunt-contrib-concat@latest
+51 silly cache add args [ 'grunt-contrib-copy@latest', null ]
+52 verbose cache add spec grunt-contrib-copy@latest
+53 silly cache add args [ 'grunt-contrib-jasmine@latest', null ]
+54 verbose cache add spec grunt-contrib-jasmine@latest
+55 silly cache add parsed spec { raw: 'grunt@latest',
+55 silly cache add   scope: null,
+55 silly cache add   name: 'grunt',
+55 silly cache add   rawSpec: 'latest',
+55 silly cache add   spec: 'latest',
+55 silly cache add   type: 'tag' }
+56 verbose addNamed grunt@latest
+57 silly addNamed semver.valid null
+58 silly addNamed semver.validRange null
+59 info addNameTag [ 'grunt', 'latest' ]
+60 silly mapToRegistry name grunt
+61 silly mapToRegistry using default registry
+62 silly mapToRegistry registry https://registry.npmjs.org/
+63 silly mapToRegistry uri https://registry.npmjs.org/grunt
+64 verbose addNameTag registry:https://registry.npmjs.org/grunt not in flight; fetching
+65 silly cache add parsed spec { raw: 'grunt-contrib-clean@latest',
+65 silly cache add   scope: null,
+65 silly cache add   name: 'grunt-contrib-clean',
+65 silly cache add   rawSpec: 'latest',
+65 silly cache add   spec: 'latest',
+65 silly cache add   type: 'tag' }
+66 verbose addNamed grunt-contrib-clean@latest
+67 silly addNamed semver.valid null
+68 silly addNamed semver.validRange null
+69 info addNameTag [ 'grunt-contrib-clean', 'latest' ]
+70 silly mapToRegistry name grunt-contrib-clean
+71 silly mapToRegistry using default registry
+72 silly mapToRegistry registry https://registry.npmjs.org/
+73 silly mapToRegistry uri https://registry.npmjs.org/grunt-contrib-clean
+74 verbose addNameTag registry:https://registry.npmjs.org/grunt-contrib-clean not in flight; fetching
+75 silly cache add parsed spec { raw: 'grunt-contrib-concat@latest',
+75 silly cache add   scope: null,
+75 silly cache add   name: 'grunt-contrib-concat',
+75 silly cache add   rawSpec: 'latest',
+75 silly cache add   spec: 'latest',
+75 silly cache add   type: 'tag' }
+76 verbose addNamed grunt-contrib-concat@latest
+77 silly addNamed semver.valid null
+78 silly addNamed semver.validRange null
+79 info addNameTag [ 'grunt-contrib-concat', 'latest' ]
+80 silly mapToRegistry name grunt-contrib-concat
+81 silly mapToRegistry using default registry
+82 silly mapToRegistry registry https://registry.npmjs.org/
+83 silly mapToRegistry uri https://registry.npmjs.org/grunt-contrib-concat
+84 verbose addNameTag registry:https://registry.npmjs.org/grunt-contrib-concat not in flight; fetching
+85 silly cache add parsed spec { raw: 'grunt-contrib-copy@latest',
+85 silly cache add   scope: null,
+85 silly cache add   name: 'grunt-contrib-copy',
+85 silly cache add   rawSpec: 'latest',
+85 silly cache add   spec: 'latest',
+85 silly cache add   type: 'tag' }
+86 verbose addNamed grunt-contrib-copy@latest
+87 silly addNamed semver.valid null
+88 silly addNamed semver.validRange null
+89 info addNameTag [ 'grunt-contrib-copy', 'latest' ]
+90 silly mapToRegistry name grunt-contrib-copy
+91 silly mapToRegistry using default registry
+92 silly mapToRegistry registry https://registry.npmjs.org/
+93 silly mapToRegistry uri https://registry.npmjs.org/grunt-contrib-copy
+94 verbose addNameTag registry:https://registry.npmjs.org/grunt-contrib-copy not in flight; fetching
+95 silly cache add parsed spec { raw: 'grunt-contrib-jasmine@latest',
+95 silly cache add   scope: null,
+95 silly cache add   name: 'grunt-contrib-jasmine',
+95 silly cache add   rawSpec: 'latest',
+95 silly cache add   spec: 'latest',
+95 silly cache add   type: 'tag' }
+96 verbose addNamed grunt-contrib-jasmine@latest
+97 silly addNamed semver.valid null
+98 silly addNamed semver.validRange null
+99 info addNameTag [ 'grunt-contrib-jasmine', 'latest' ]
+100 silly mapToRegistry name grunt-contrib-jasmine
+101 silly mapToRegistry using default registry
+102 silly mapToRegistry registry https://registry.npmjs.org/
+103 silly mapToRegistry uri https://registry.npmjs.org/grunt-contrib-jasmine
+104 verbose addNameTag registry:https://registry.npmjs.org/grunt-contrib-jasmine not in flight; fetching
+105 verbose request uri https://registry.npmjs.org/grunt-contrib-uglify
+106 verbose request no auth needed
+107 info attempt registry request try #1 at 13:38:52
+108 verbose etag "ETGEAFNHWAIZJPO8Y3QAYZOR"
+109 http request GET https://registry.npmjs.org/grunt-contrib-uglify
+110 verbose request uri https://registry.npmjs.org/grunt-contrib-clean
+111 verbose request no auth needed
+112 info attempt registry request try #1 at 13:38:52
+113 verbose etag "C8JCH2LBRPNG2857NOJUZ8K5T"
+114 http request GET https://registry.npmjs.org/grunt-contrib-clean
+115 verbose request uri https://registry.npmjs.org/grunt
+116 verbose request no auth needed
+117 info attempt registry request try #1 at 13:38:52
+118 verbose etag "AH239V6LN78RSA83VN8M28UJ8"
+119 http request GET https://registry.npmjs.org/grunt
+120 verbose request uri https://registry.npmjs.org/grunt-contrib-concat
+121 verbose request no auth needed
+122 info attempt registry request try #1 at 13:38:52
+123 verbose etag "CHOBACI533HIKB0K0E15E5HSE"
+124 http request GET https://registry.npmjs.org/grunt-contrib-concat
+125 verbose request uri https://registry.npmjs.org/grunt-contrib-copy
+126 verbose request no auth needed
+127 info attempt registry request try #1 at 13:38:52
+128 verbose etag "CYQJUK2SMLZ0HLB499XP1R3QH"
+129 http request GET https://registry.npmjs.org/grunt-contrib-copy
+130 verbose request uri https://registry.npmjs.org/grunt-contrib-jasmine
+131 verbose request no auth needed
+132 info attempt registry request try #1 at 13:38:52
+133 verbose etag "523MOW7Y8MBO34AXYQ4XD80YZ"
+134 http request GET https://registry.npmjs.org/grunt-contrib-jasmine
+135 http 304 https://registry.npmjs.org/grunt
+136 silly get cb [ 304,
+136 silly get   { date: 'Wed, 13 Jul 2016 05:38:55 GMT',
+136 silly get     via: '1.1 varnish',
+136 silly get     'cache-control': 'max-age=300',
+136 silly get     etag: '"AH239V6LN78RSA83VN8M28UJ8"',
+136 silly get     age: '243',
+136 silly get     connection: 'keep-alive',
+136 silly get     'x-served-by': 'cache-lax1425-LAX',
+136 silly get     'x-cache': 'HIT',
+136 silly get     'x-cache-hits': '4',
+136 silly get     'x-timer': 'S1468388335.014659,VS0,VE0',
+136 silly get     vary: 'Accept-Encoding' } ]
+137 verbose etag https://registry.npmjs.org/grunt from cache
+138 silly addNameTag next cb for grunt with tag latest
+139 verbose addNamed grunt@1.0.1
+140 silly addNamed semver.valid 1.0.1
+141 silly addNamed semver.validRange 1.0.1
+142 silly cache afterAdd grunt@1.0.1
+143 verbose afterAdd /Users/kshalm/.npm/grunt/1.0.1/package/package.json not in flight; writing
+144 verbose afterAdd /Users/kshalm/.npm/grunt/1.0.1/package/package.json written
+145 info already installed grunt@1.0.1
+146 http 304 https://registry.npmjs.org/grunt-contrib-jshint
+147 silly get cb [ 304,
+147 silly get   { date: 'Wed, 13 Jul 2016 05:38:55 GMT',
+147 silly get     via: '1.1 varnish',
+147 silly get     'cache-control': 'max-age=300',
+147 silly get     etag: '"DXBHNGG6B2ETMZHOCEMQHKK84"',
+147 silly get     age: '101',
+147 silly get     connection: 'keep-alive',
+147 silly get     'x-served-by': 'cache-lax1435-LAX',
+147 silly get     'x-cache': 'HIT',
+147 silly get     'x-cache-hits': '1',
+147 silly get     'x-timer': 'S1468388335.036308,VS0,VE0',
+147 silly get     vary: 'Accept-Encoding' } ]
+148 verbose etag https://registry.npmjs.org/grunt-contrib-jshint from cache
+149 http 304 https://registry.npmjs.org/grunt-contrib-uglify
+150 silly get cb [ 304,
+150 silly get   { date: 'Wed, 13 Jul 2016 05:38:55 GMT',
+150 silly get     via: '1.1 varnish',
+150 silly get     'cache-control': 'max-age=300',
+150 silly get     etag: '"ETGEAFNHWAIZJPO8Y3QAYZOR"',
+150 silly get     age: '243',
+150 silly get     connection: 'keep-alive',
+150 silly get     'x-served-by': 'cache-lax1427-LAX',
+150 silly get     'x-cache': 'HIT',
+150 silly get     'x-cache-hits': '1',
+150 silly get     'x-timer': 'S1468388335.076428,VS0,VE0',
+150 silly get     vary: 'Accept-Encoding' } ]
+151 verbose etag https://registry.npmjs.org/grunt-contrib-uglify from cache
+152 silly addNameTag next cb for grunt-contrib-jshint with tag latest
+153 verbose addNamed grunt-contrib-jshint@1.0.0
+154 silly addNamed semver.valid 1.0.0
+155 silly addNamed semver.validRange 1.0.0
+156 silly addNameTag next cb for grunt-contrib-uglify with tag latest
+157 verbose addNamed grunt-contrib-uglify@1.0.1
+158 silly addNamed semver.valid 1.0.1
+159 silly addNamed semver.validRange 1.0.1
+160 silly cache afterAdd grunt-contrib-jshint@1.0.0
+161 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-jshint/1.0.0/package/package.json not in flight; writing
+162 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-jshint/1.0.0/package/package.json written
+163 info already installed grunt-contrib-jshint@1.0.0
+164 silly cache afterAdd grunt-contrib-uglify@1.0.1
+165 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-uglify/1.0.1/package/package.json not in flight; writing
+166 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-uglify/1.0.1/package/package.json written
+167 info already installed grunt-contrib-uglify@1.0.1
+168 http 304 https://registry.npmjs.org/grunt-contrib-clean
+169 silly get cb [ 304,
+169 silly get   { date: 'Wed, 13 Jul 2016 05:38:55 GMT',
+169 silly get     via: '1.1 varnish',
+169 silly get     'cache-control': 'max-age=300',
+169 silly get     etag: '"C8JCH2LBRPNG2857NOJUZ8K5T"',
+169 silly get     age: '101',
+169 silly get     connection: 'keep-alive',
+169 silly get     'x-served-by': 'cache-lax1431-LAX',
+169 silly get     'x-cache': 'HIT',
+169 silly get     'x-cache-hits': '1',
+169 silly get     'x-timer': 'S1468388335.114191,VS0,VE0',
+169 silly get     vary: 'Accept-Encoding' } ]
+170 verbose etag https://registry.npmjs.org/grunt-contrib-clean from cache
+171 silly addNameTag next cb for grunt-contrib-clean with tag latest
+172 verbose addNamed grunt-contrib-clean@1.0.0
+173 silly addNamed semver.valid 1.0.0
+174 silly addNamed semver.validRange 1.0.0
+175 silly cache afterAdd grunt-contrib-clean@1.0.0
+176 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-clean/1.0.0/package/package.json not in flight; writing
+177 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-clean/1.0.0/package/package.json written
+178 info already installed grunt-contrib-clean@1.0.0
+179 http 304 https://registry.npmjs.org/grunt-contrib-concat
+180 silly get cb [ 304,
+180 silly get   { date: 'Wed, 13 Jul 2016 05:38:55 GMT',
+180 silly get     via: '1.1 varnish',
+180 silly get     'cache-control': 'max-age=300',
+180 silly get     etag: '"CHOBACI533HIKB0K0E15E5HSE"',
+180 silly get     age: '53',
+180 silly get     connection: 'keep-alive',
+180 silly get     'x-served-by': 'cache-lax1424-LAX',
+180 silly get     'x-cache': 'HIT',
+180 silly get     'x-cache-hits': '2',
+180 silly get     'x-timer': 'S1468388335.150777,VS0,VE0',
+180 silly get     vary: 'Accept-Encoding' } ]
+181 verbose etag https://registry.npmjs.org/grunt-contrib-concat from cache
+182 silly addNameTag next cb for grunt-contrib-concat with tag latest
+183 verbose addNamed grunt-contrib-concat@1.0.1
+184 silly addNamed semver.valid 1.0.1
+185 silly addNamed semver.validRange 1.0.1
+186 silly cache afterAdd grunt-contrib-concat@1.0.1
+187 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-concat/1.0.1/package/package.json not in flight; writing
+188 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-concat/1.0.1/package/package.json written
+189 info already installed grunt-contrib-concat@1.0.1
+190 http 304 https://registry.npmjs.org/grunt-contrib-copy
+191 silly get cb [ 304,
+191 silly get   { date: 'Wed, 13 Jul 2016 05:38:55 GMT',
+191 silly get     via: '1.1 varnish',
+191 silly get     'cache-control': 'max-age=300',
+191 silly get     etag: '"CYQJUK2SMLZ0HLB499XP1R3QH"',
+191 silly get     age: '244',
+191 silly get     connection: 'keep-alive',
+191 silly get     'x-served-by': 'cache-lax1425-LAX',
+191 silly get     'x-cache': 'HIT',
+191 silly get     'x-cache-hits': '1',
+191 silly get     'x-timer': 'S1468388335.483657,VS0,VE0',
+191 silly get     vary: 'Accept-Encoding' } ]
+192 verbose etag https://registry.npmjs.org/grunt-contrib-copy from cache
+193 silly addNameTag next cb for grunt-contrib-copy with tag latest
+194 verbose addNamed grunt-contrib-copy@1.0.0
+195 silly addNamed semver.valid 1.0.0
+196 silly addNamed semver.validRange 1.0.0
+197 silly cache afterAdd grunt-contrib-copy@1.0.0
+198 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-copy/1.0.0/package/package.json not in flight; writing
+199 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-copy/1.0.0/package/package.json written
+200 info already installed grunt-contrib-copy@1.0.0
+201 http 304 https://registry.npmjs.org/grunt-contrib-jasmine
+202 silly get cb [ 304,
+202 silly get   { date: 'Wed, 13 Jul 2016 05:38:55 GMT',
+202 silly get     via: '1.1 varnish',
+202 silly get     'cache-control': 'max-age=300',
+202 silly get     etag: '"523MOW7Y8MBO34AXYQ4XD80YZ"',
+202 silly get     age: '87',
+202 silly get     connection: 'keep-alive',
+202 silly get     'x-served-by': 'cache-lax1435-LAX',
+202 silly get     'x-cache': 'HIT',
+202 silly get     'x-cache-hits': '1',
+202 silly get     'x-timer': 'S1468388335.512769,VS0,VE0',
+202 silly get     vary: 'Accept-Encoding' } ]
+203 verbose etag https://registry.npmjs.org/grunt-contrib-jasmine from cache
+204 silly addNameTag next cb for grunt-contrib-jasmine with tag latest
+205 verbose addNamed grunt-contrib-jasmine@1.0.3
+206 silly addNamed semver.valid 1.0.3
+207 silly addNamed semver.validRange 1.0.3
+208 silly cache afterAdd grunt-contrib-jasmine@1.0.3
+209 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-jasmine/1.0.3/package/package.json not in flight; writing
+210 verbose afterAdd /Users/kshalm/.npm/grunt-contrib-jasmine/1.0.3/package/package.json written
+211 info already installed grunt-contrib-jasmine@1.0.3
+212 silly install resolved []
+213 info build /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS
+214 verbose linkStuff [ false,
+214 verbose linkStuff   false,
+214 verbose linkStuff   false,
+214 verbose linkStuff   '/Users/kshalm/Dropbox/Physics/Code/Javascript' ]
+215 info linkStuff phasematchjs@0.0.1-a
+216 verbose linkBins phasematchjs@0.0.1-a
+217 verbose linkMans phasematchjs@0.0.1-a
+218 verbose rebuildBundles phasematchjs@0.0.1-a
+219 verbose rebuildBundles [ '.bin',
+219 verbose rebuildBundles   'grunt',
+219 verbose rebuildBundles   'grunt-bg-shell',
+219 verbose rebuildBundles   'grunt-cli',
+219 verbose rebuildBundles   'grunt-contrib-clean',
+219 verbose rebuildBundles   'grunt-contrib-compass',
+219 verbose rebuildBundles   'grunt-contrib-concat',
+219 verbose rebuildBundles   'grunt-contrib-copy',
+219 verbose rebuildBundles   'grunt-contrib-jasmine',
+219 verbose rebuildBundles   'grunt-contrib-jshint',
+219 verbose rebuildBundles   'grunt-contrib-requirejs',
+219 verbose rebuildBundles   'grunt-contrib-uglify',
+219 verbose rebuildBundles   'grunt-contrib-watch',
+219 verbose rebuildBundles   'grunt-lodash',
+219 verbose rebuildBundles   'grunt-lodashbuilder',
+219 verbose rebuildBundles   'http-server',
+219 verbose rebuildBundles   'lodash',
+219 verbose rebuildBundles   'lodash-cli' ]
+220 verbose rebuild bundle /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/grunt-cli
+221 info build /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/grunt-cli
+222 info preinstall grunt-cli@0.1.7
+223 verbose linkStuff [ false,
+223 verbose linkStuff   false,
+223 verbose linkStuff   false,
+223 verbose linkStuff   '/Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules' ]
+224 info linkStuff grunt-cli@0.1.7
+225 warn prefer global grunt-cli@0.1.7 should be installed with -g
+226 verbose linkBins grunt-cli@0.1.7
+227 verbose link bins [ { grunt: 'bin/grunt' },
+227 verbose link bins   '/Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/.bin',
+227 verbose link bins   false ]
+228 verbose linkMans grunt-cli@0.1.7
+229 verbose rebuildBundles grunt-cli@0.1.7
+230 verbose rebuildBundles [ '.bin', 'findup-sync', 'nopt', 'resolve' ]
+231 verbose gentlyRm vacuuming /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/.bin/grunt
+232 silly gentlyRm purging /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/.bin/grunt
+233 silly gentlyRm quitting because other entries in /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/.bin
+234 info install grunt-cli@0.1.7
+235 info postinstall grunt-cli@0.1.7
+236 verbose rebuild bundle /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/grunt-lodash
+237 info build /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/grunt-lodash
+238 info preinstall grunt-lodash@0.3.0
+239 verbose linkStuff [ false,
+239 verbose linkStuff   false,
+239 verbose linkStuff   false,
+239 verbose linkStuff   '/Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules' ]
+240 info linkStuff grunt-lodash@0.3.0
+241 verbose linkBins grunt-lodash@0.3.0
+242 verbose linkMans grunt-lodash@0.3.0
+243 verbose rebuildBundles grunt-lodash@0.3.0
+244 verbose rebuildBundles [ 'lodash' ]
+245 info install grunt-lodash@0.3.0
+246 info postinstall grunt-lodash@0.3.0
+247 verbose rebuild bundle /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/grunt-lodashbuilder
+248 info build /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/grunt-lodashbuilder
+249 info preinstall grunt-lodashbuilder@0.1.7
+250 verbose linkStuff [ false,
+250 verbose linkStuff   false,
+250 verbose linkStuff   false,
+250 verbose linkStuff   '/Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules' ]
+251 info linkStuff grunt-lodashbuilder@0.1.7
+252 verbose linkBins grunt-lodashbuilder@0.1.7
+253 verbose linkMans grunt-lodashbuilder@0.1.7
+254 verbose rebuildBundles grunt-lodashbuilder@0.1.7
+255 verbose rebuildBundles [ '.bin',
+255 verbose rebuildBundles   'grunt-contrib-jshint',
+255 verbose rebuildBundles   'grunt-contrib-nodeunit',
+255 verbose rebuildBundles   'grunt-contrib-watch',
+255 verbose rebuildBundles   'lodash',
+255 verbose rebuildBundles   'node-minify',
+255 verbose rebuildBundles   'semver',
+255 verbose rebuildBundles   'temp',
+255 verbose rebuildBundles   'uglify-js',
+255 verbose rebuildBundles   'wrench' ]
+256 info install grunt-lodashbuilder@0.1.7
+257 info postinstall grunt-lodashbuilder@0.1.7
+258 verbose unsafe-perm in lifecycle false
+259 verbose rebuild bundle /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/lodash-cli
+260 info build /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/lodash-cli
+261 info preinstall lodash-cli@2.2.1
+262 verbose linkStuff [ false,
+262 verbose linkStuff   false,
+262 verbose linkStuff   false,
+262 verbose linkStuff   '/Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules' ]
+263 info linkStuff lodash-cli@2.2.1
+264 verbose linkBins lodash-cli@2.2.1
+265 verbose link bins [ { lodash: 'bin/lodash' },
+265 verbose link bins   '/Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/.bin',
+265 verbose link bins   false ]
+266 verbose linkMans lodash-cli@2.2.1
+267 verbose rebuildBundles lodash-cli@2.2.1
+268 verbose rebuildBundles [ '.bin', 'closure-compiler', 'uglify-js' ]
+269 verbose gentlyRm vacuuming /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/.bin/lodash
+270 silly gentlyRm purging /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/.bin/lodash
+271 silly gentlyRm quitting because other entries in /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/.bin
+272 info install lodash-cli@2.2.1
+273 info postinstall lodash-cli@2.2.1
+274 info install phasematchjs@0.0.1-a
+275 info postinstall phasematchjs@0.0.1-a
+276 info prepublish phasematchjs@0.0.1-a
+277 warn unmet dependency /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/lodash-cli requires lodash@'2.2.1' but will load
+277 warn unmet dependency /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS/node_modules/lodash,
+277 warn unmet dependency which is version 4.13.1
+278 verbose stack Error: The package grunt does not satisfy its siblings' peerDependencies requirements!
+278 verbose stack     at /usr/local/lib/node_modules/npm/lib/install.js:103:32
+278 verbose stack     at /usr/local/lib/node_modules/npm/lib/install.js:225:5
+278 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/read-installed/read-installed.js:138:5
+278 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/read-installed/read-installed.js:251:14
+278 verbose stack     at cb (/usr/local/lib/node_modules/npm/node_modules/slide/lib/async-map.js:47:24)
+278 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/read-installed/read-installed.js:251:14
+278 verbose stack     at cb (/usr/local/lib/node_modules/npm/node_modules/slide/lib/async-map.js:47:24)
+278 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/read-installed/read-installed.js:251:14
+278 verbose stack     at cb (/usr/local/lib/node_modules/npm/node_modules/slide/lib/async-map.js:47:24)
+278 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/read-installed/read-installed.js:251:14
+279 verbose cwd /Users/kshalm/Dropbox/Physics/Code/Javascript/PhasematchJS
+280 error Darwin 15.3.0
+281 error argv "node" "/usr/local/bin/npm" "install"
+282 error node v0.10.34
+283 error npm  v2.1.14
+284 error code EPEERINVALID
+285 error peerinvalid The package grunt does not satisfy its siblings' peerDependencies requirements!
+285 error peerinvalid Peer grunt-bg-shell@2.0.1 wants grunt@~0.4.0
+285 error peerinvalid Peer grunt-contrib-clean@1.0.0 wants grunt@>= 0.4.5
+285 error peerinvalid Peer grunt-contrib-compass@1.0.4 wants grunt@>=0.4.0
+285 error peerinvalid Peer grunt-contrib-concat@1.0.1 wants grunt@>=0.4.0
+285 error peerinvalid Peer grunt-contrib-jshint@1.0.0 wants grunt@>=0.4.0
+285 error peerinvalid Peer grunt-contrib-requirejs@0.4.0 wants grunt@~0.4.0
+285 error peerinvalid Peer grunt-contrib-watch@0.3.1 wants grunt@~0.4.0
+286 verbose exit [ 1, true ]

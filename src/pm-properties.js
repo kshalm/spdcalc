@@ -57,7 +57,9 @@
         enable_pp: true,
         calcfibercoupling: true,
         singles: false,
+        autocalfocus: true,
         z0s: -2000/2 * con.um,
+        
         // z0: 2000/2 * con.um
     };
 
@@ -128,10 +130,12 @@
                 this.auto_calc_Theta();
             }
 
+            this.auto_calc_collection_focus();
+
             // Set the positions of the signal, idler, pump waists
             this.z0p = 0 *con.um;
             // this.z0s = -1*this.L/2;
-            this.z0i = this.z0s;
+            // this.z0i = this.z0s;
 
             // console.log(this.zweights);
 
@@ -341,6 +345,66 @@
             }
         },
 
+        auto_calc_collection_focus : function (){
+            this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
+            var props = this;
+            props.update_all_angles();
+
+            var bw = 0.01
+                    ,ls_start = this.lambda_s - this.lambda_s *bw
+                    ,ls_stop = this.lambda_s + this.lambda_s *bw
+                    ,li_start = this.lambda_i - this.lambda_i *bw
+                    ,li_stop = this.lambda_i + this.lambda_i *bw
+                    ,dim = 10
+                    ,lambda_s = PhaseMatch.linspace(ls_start, ls_stop, dim)
+                    ,lambda_i = PhaseMatch.linspace(li_start, li_stop, dim)
+                    ,n = 20
+                    ;
+
+            props.nslices = 10;
+
+            var max_coinc = function(focus){
+                if (focus >0 || focus< -1*this.L){return 1e12;}
+
+                props.z0s = focus;
+                props.z0i = focus;
+                    //PhaseMatch.calc_heralding_plot_focus_position_p = function calc_heralding_plot_focus_position_p(props, WsRange, ls_start, ls_stop, li_start, li_stop, n){
+                // var eff = [1];
+                // var eff = PhaseMatch.calc_heralding_plot_focus_position_p(props, [focus], ls_start, ls_stop, li_start, li_stop, n);
+                var JSI_coinc = PhaseMatch.calc_JSI_p(props, lambda_s, lambda_i, dim, 1);
+                var coinc = PhaseMatch.Sum(JSI_coinc);
+                // console.log(coinc, focus*1e6);
+                return (1/(coinc+1));
+            };
+
+            var guess = -this.L/2;
+            var startTime = new Date();
+            // props.z0s = guess;
+            // props.z0i = guess;
+            var ans = PhaseMatch.nelderMead(max_coinc, guess, 10);
+            
+            // Run again wiht better initial conditions based on previous optimization
+            ans = PhaseMatch.nelderMead(max_coinc, ans, 20);
+            var endTime = new Date();
+
+
+            var timeDiff = (endTime - startTime)/1000;
+
+            this.z0s = ans;
+            this.z0i = this.z0s;
+
+            // console.log("New focus Position:", ans*1e6, this.z0s * 1e6);
+            // // console.log("Theta autocalc = ", timeDiff, ans);
+            // // props.theta = ans;
+            // // console.log("After autocalc: ", props.theta_i * 180/Math.PI);
+            // props.update_all_angles(props);
+
+            // // props.calcfibercoupling = fiber;
+            // // calculate the walkoff angle
+            // this.calc_walkoff_angles();
+            // // console.log("Walkoff:", this.walkoff_p*180/Math.PI);
+        },
+
         optimum_idler : function (){
             var P = this;
 
@@ -464,16 +528,36 @@
         },
 
         set_zint : function (){
-            var zslice = 100e-6; //length of each crystal slice
+            var zslice = 100e-6 * Math.pow(this.L/2500e-6, 0.5);
+
+            if (zslice < 100e-6){
+                zslice = 100e-6;
+            }
+
+            if (zslice > 500e-6){
+                zslice = 500e-6;
+            }
+            // if (this.L < 5000e-6){
+            //     zslice = 100e-6;
+            // }
+            // if ((this.L > 5000e-6)&&(this.L < 15000e-6)){
+            //     zslice = 150e-6
+            // }
+            // else{
+            //     zslice = 300e-6
+            // }
+            // var zslice = 300e-6; //length of each crystal slice
             var nslices = Math.round(this.L/zslice);
             if (nslices < 4){
                 nslices = 4;
             }
 
-            if (nslices>30){
-                nslices = 30;
-            }
-            nslices =nslices*1;
+            // console.log(nslices);
+            //console.log("number slices");
+            // if (nslices>30){
+            //     nslices = 30;
+            // }
+            // nslices =nslices*1;
             if (nslices%2 !== 0){
                 nslices +=1;
             }
@@ -486,7 +570,7 @@
             n = n+(3- n%3); //guarantee that n is divisible by 3
             this.z2Dweights = PhaseMatch.Nintegrate2DWeights_3_8(n);
             this.numz2Dint = n;
-            // console.log(nslices);
+            //console.log(nslices);
         },
 
 
@@ -639,9 +723,9 @@
                         this.set_apodization_coeff();
                     }
 
-                    // if (name === "L"){
-                    //     this.set_zint();
-                    // }
+                    if (name === "L"){
+                        this.set_zint();
+                    }
 
 
 

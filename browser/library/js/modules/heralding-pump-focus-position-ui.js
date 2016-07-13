@@ -50,8 +50,7 @@ define(
                 'npts-heralding-waist',
                 'grid_size_heralding_JSI',
                 'signal-wavelength',
-                'idler-wavelength',
-                'signal-waist'
+                'idler-wavelength'
             ],
 
             initEvents : function(){
@@ -333,7 +332,7 @@ define(
 
                 self.plotOpts.set({
                     'grid_size_heralding_JSI': 30,
-                    'n_pts_eff_1d': 15,
+                    'n_pts_eff_1d': 10,
                     'n_int': 14,
                     // 'grid_size_heralding_JSI': 2,
                     // 'n_pts_eff_1d': 2,
@@ -341,13 +340,13 @@ define(
                     'ls_start': lim.lambda_s.min,
                     'ls_stop': lim.lambda_s.max,
                     'li_start': lim.lambda_i.min,
-                    'li_stop': lim.lambda_i.max,
+                    'li_stop': lim.lambda_i.max
 
                     // 'delT_start': tsi[1],
                     // 'delT_stop': tsi[2],
 
-                    'Ws_start': 60e-6,
-                    'Ws_stop': 160e-6
+                    // 'Ws_start': 30e-6,
+                    // 'Ws_stop': 130e-6
                 });
 
                 self.set_slider_values(150e-6, self.plotOpts.get['Ws_start'], self.plotOpts.get['Ws_stop']);

@@ -288,6 +288,15 @@ define(
                 });
 
                 //////////////////////////////////////////////////////////////////////////////////
+                // autocalc focus checkbox
+                // self.el.on('change', '#autocalfocus', function(){
+
+                //     var enabled = $(this).is(':checked');
+                //     $('#z0s').prop('disabled', !enabled);
+                //     self.autocalfocus = enabled;
+                // });
+
+                //////////////////////////////////////////////////////////////////////////////////
                 // Enable the periodic poling options
                 self.el.on('change', '#enable-calc-pp', function(){
 

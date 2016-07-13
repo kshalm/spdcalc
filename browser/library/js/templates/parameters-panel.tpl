@@ -165,6 +165,14 @@
                 <input type="text" data-parse="float" data-unit="micro" class="inputbox" name="W_sx" value="{{= this.converter.to('micro', parseFloat( it.W_sx )) }}" />
             </div>
         </div>
+
+        <div class="control-group">
+                <label class="checkbox control-label calc_focus">
+                    Automatically find optimal waist position
+                    <input id="autocalfocus" type="checkbox" class="inputbox" name="autocalfocus" {{? it.autocalfocus }} checked="checked" {{?}} />
+                </label>
+            </div>
+
         <div class="control-group">
             <label class="control-label z0s">
                 Waist Position (um)
