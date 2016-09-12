@@ -148,17 +148,17 @@ define(
 
                 // init plot
                 self.plot1dRates = new LinePlot({
-                    title: 'Rates',
+                    title: 'Brightness',
                     el: self.el.find('.heat-map-wrapper').get( 0 ),
                     labels: {
                         x: 'Signal and Idler Collection Waist (um)',
-                        y: 'Rates'
+                        y: 'Counts/s'
                     },
                     format: {x: '1f'
-                            ,y: '.2f'},
+                            ,y: '1f'},
                     width: 400,
                     height: 200,
-                    yrange: [0,1]
+                    // yrange: [0,1]
                 });
 
                 self.plot1dRates.resize(400,150);
@@ -383,6 +383,7 @@ define(
                     //     );
                     ;
 
+                self.Nrates = P.get_rates_constant();
                 self.calcRSingles( P );
                 // self.calcRCoinc( props );
 
@@ -465,7 +466,12 @@ define(
                         self.dataEff_s = dataEff_s;
 
                         var  RMax = Math.max( Math.max.apply(null,R_s), Math.max.apply(null,R_i) );
-                        self.RMax = RMax;
+                        // var  RCoincMax = Math.max.apply(null,R_coin)
+                        // console.log("RMAX: ", RMax, "Singles: ", RMax*self.Nrates, "Coinc: ", RCoincMax*self.Nrates, RCoincMax);
+                        // self.RMax = RMax;
+                        // var RMax = 1/self.Nrates;
+                        // self.RMax = 1/self.Nrates;
+                        var RMax = 1
 
                         for ( var i = 0, l = R_s.length; i < l; i ++){
                             // console.log(eff[i]);
@@ -499,7 +505,7 @@ define(
 
                         // Calculate max and min efficiencies
                         self.plot1dEff.setTitle("Efficiency" );
-                        self.plot1dRates.setTitle("Relative Rates (scale: " + (RMax).toPrecision(4)+ " a.u.)");
+                        self.plot1dRates.setTitle("Counts/s per mW of pump power");
                         // console.log("RMax: ",RMax.toPrecision(4));
 
                         var  effMax = Math.max( Math.max.apply(null,eff_s), Math.max.apply(null,eff_i) )
@@ -605,14 +611,16 @@ define(
                             ,norm_i = Math.max.apply(null, singles_i)
                             ;
 
+                        self.data_s = singles_s;
+                        self.data_i = singles_i;
                         // console.log(singles_i);
                         // console.log(norm_s, norm_i);
                         self.norm = Math.max(norm_s,norm_i);
-                        singles_s = PhaseMatch.normalizeToVal(singles_s, self.norm);
-                        singles_i = PhaseMatch.normalizeToVal(singles_i, self.norm);
+                        console.log("NORM: ", self.norm);
+                        // self.norm = 1
+                        // singles_s = PhaseMatch.normalizeToVal(singles_s, self.norm);
+                        // singles_i = PhaseMatch.normalizeToVal(singles_i, self.norm);
 
-                        self.data_s = singles_s;
-                        self.data_i = singles_i
                         // self.draw();
                         // console.log("Max singles", PhaseMatch.max(singles_s));
                         // self.plot.setZRange([0,Math.max.apply(null,PM[0])]);
@@ -671,7 +679,7 @@ define(
                 var promises = [];
                 for (var j = 0; j < Nthreads; j++){
 
-                    promises[j] = self.workers[j].exec('jsaHelper.doJSACalc', [
+                    promises[j] = self.workers[j].exec('jsaHelper.doJSACoincCalcRates', [
                         propsJSON,
                         lambda_s,
                         lambda_i_range[j],
@@ -700,23 +708,30 @@ define(
 
                      }).then(function( PM ){
 
-                        var coinc_max = Math.max.apply(null,PM);
-                        PM = PhaseMatch.normalizeToVal(PM, self.norm);
                         self.dataCoinc = PM;
-                        var  Rs = PhaseMatch.Sum(self.data_s)
-                            ,Ri = PhaseMatch.Sum(self.data_i)
-                            ,Rc = PhaseMatch.Sum(self.dataCoinc)
+                        var coinc_max = Math.max.apply(null,PM);
+                        // PM = PhaseMatch.normalizeToVal(PM, self.norm);
+                        
+
+                        var  Rs = PhaseMatch.Sum(self.data_s) //* self.Nrates
+                            ,Ri = PhaseMatch.Sum(self.data_i) //* self.Nrates
+                            ,Rc = PhaseMatch.Sum(self.dataCoinc) //* self.Nrates
                             ,eff_i = Rc/Rs
                             ,eff_s = Rc/Ri
                             ;
                         // console.log("Efficiency from sum: ", Rc, Rs, eff); /// PhaseMatch.sum(self.data));
                         // console.log("Efficiency from sum: ", Ws, eff); /// PhaseMatch.sum(self.data));
                         self.plot1dEff.setTitle("Waist: " + (Ws*1e6).toFixed(0) + "um  |  Signal: " + eff_s.toFixed(3) + "  |  Idler: "+  eff_i.toFixed(3) );
+                        self.plot1dRates.setTitle("Singles_signal: " + (Rs).toFixed(0) + "  |  Singles_idler: " + Ri.toFixed(0) + "  |  Coinc: "+  Rc.toFixed(0) );
 
                         self.plotCoinc.setXRange([ converter.to('nano', self.plotOpts.get('ls_start')), converter.to('nano', self.plotOpts.get('ls_stop')) ]);
                         self.plotCoinc.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
                         var endtime = new Date();
+                        console.log()
+                        self.data_s = PhaseMatch.normalizeToVal(self.data_s, self.norm);
+                        self.data_i = PhaseMatch.normalizeToVal(self.data_i, self.norm);
+                        self.dataCoinc = PhaseMatch.normalizeToVal(self.dataCoinc, self.norm);
 
                         self.draw();
                         // console.log("FINISHED PLOTTING");
@@ -736,6 +751,14 @@ define(
                     ,dfd = when.defer()
                     ;
 
+                // // Normalize the joint spectrum graphs
+                // var  norm_s = Math.max.apply(null, data_s)
+                //     ,norm_i = Math.max.apply(null, data_i)
+                //     ;
+                // var norm = Math.max(norm_s,norm_i);
+                // self.norm = 1
+
+
                 if (!data_s  ){
                     return this;
                 }
@@ -745,6 +768,11 @@ define(
                 // other plot
                 var dataEff_i = self.dataEff_i;
                 var dataEff_s = self.dataEff_s;
+
+                // data_s = PhaseMatch.normalizeToVal(data_s, self.norm);
+                // data_i = PhaseMatch.normalizeToVal(data_i, self.norm);
+                // dataCoinc = PhaseMatch.normalizeToVal(dataCoinc, self.norm);
+
                 var dataR_s = self.dataR_s;
                 var dataR_i = self.dataR_i;
                 var dataR_coin = self.dataR_coin;
@@ -766,6 +794,11 @@ define(
                     self.plot1dRates.addSeries( dataR_coin, 'Coincidences');
                     self.plot1dRates.plotData( );
                     console.log("Rates_i", dataR_i, dataR_coin);
+
+                    // data_s = PhaseMatch.normalizeToVal(data_s, self.norm);
+                    // data_i = PhaseMatch.normalizeToVal(data_i, self.norm);
+                    // dataCoinc = PhaseMatch.normalizeToVal(dataCoinc, self.norm);
+
 
                     // self.plot1dEff.plotData( dataEff_i );
                     self.plot.plotData( data_s );

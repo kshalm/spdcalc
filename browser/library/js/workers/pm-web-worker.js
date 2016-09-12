@@ -48,6 +48,25 @@ W('jsaHelper', {
         );
     },
 
+    doJSACoincCalcRates: function( args ){
+
+        this.props.set( args[0] );
+
+        var lambda_s = args[1],
+            lambda_i = args[2],
+            grid_size = args[3],
+            norm = args[4]
+            ;
+
+        return PhaseMatch.calc_JSI_rates_p(
+            this.props,
+            lambda_s,
+            lambda_i,
+            grid_size,
+            norm
+        );
+    },
+
     doCalcSchmidt: function( args ){
     	// console.log("working");
     	var PM = args[0];

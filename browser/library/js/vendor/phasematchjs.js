@@ -1,5 +1,5 @@
 /**
- * phasematchjs v0.0.1a - 2016-07-13
+ * phasematchjs v0.0.1a - 2016-09-12
  *  ENTER_DESCRIPTION 
  *
  * Copyright (c) 2016 Krister Shalm <kshalm@gmail.com>
@@ -16424,14 +16424,17 @@ _.noConflict();
 
 var nm = Math.pow(10, -9);
 var um = Math.pow(10, -6);
+var pm = Math.pow(10, -12);
 var lightspeed =  2.99792458 * Math.pow(10, 8);
 var twoPI = 2 * Math.PI;
-
+var e0 = 8.854 * Math.pow(10,-12)
 PhaseMatch.constants = {
     // user accessible constants
     um: um,
     nm: nm,
-    c: lightspeed
+    pm: pm,
+    c: lightspeed,
+    e0: e0
 };
 PhaseMatch.Complex = (function () {
 
@@ -20939,9 +20942,9 @@ PhaseMatch.Crystals('LiIO3-2', {
 
     var con = PhaseMatch.constants;
     var spdcDefaults = {
-        lambda_p: 785 * con.nm,
-        lambda_s: 1570 * con.nm,
-        lambda_i: 1570 * 785 * con.nm / ( 1570 -  785 ),
+        lambda_p: 775 * con.nm,
+        lambda_s: 1550 * con.nm,
+        lambda_i: 1550 * 775 * con.nm / ( 1550 -  775 ),
         type: "Type 2:   e -> e + o",
         theta: 90 *Math.PI / 180,
         phi: 0,
@@ -20955,7 +20958,6 @@ PhaseMatch.Crystals('LiIO3-2', {
         W: 100 * con.um,
         p_bw: 5.35 * con.nm,
         walkoff_p: 0,
-        // W_sx: .2 * Math.PI/180,
         W_sx: 100 * con.um,
         W_sy: 100 * con.um,
         W_ix: 100 * con.um,
@@ -20978,6 +20980,8 @@ PhaseMatch.Crystals('LiIO3-2', {
         singles: false,
         autocalfocus: true,
         z0s: -2000/2 * con.um,
+        deff: 1 * con.pm,
+        Pav: 1e-3 
         
         // z0: 2000/2 * con.um
     };
@@ -21446,6 +21450,15 @@ PhaseMatch.Crystals('LiIO3-2', {
 
         },
 
+        get_rates_constant : function (){
+            var bw_pump = 2*Math.PI*con.c*(1/(this.lambda_p-this.p_bw/2) - 1/(this.lambda_p+this.p_bw/2))*Math.sqrt(2)/(2*Math.sqrt(Math.log(2)));
+            var N_num = Math.pow(2, 1.5) * Math.pow(this.deff, 2) * Math.pow(this.L,2) * this.Pav;
+            var N_den = Math.pow(Math.PI, .5) * con.e0 * Math.pow(con.c,3) * bw_pump;
+            var N = N_num/N_den;
+            console.log(N, N_num, Math.pow(this.deff, 2) * Math.pow(this.L,2), this.L, this.Pav);
+            return (N);
+        },
+
         set_zint : function (){
             var zslice = 100e-6 * Math.pow(this.L/2500e-6, 0.5);
 
@@ -21861,6 +21874,64 @@ PhaseMatch.calc_JSI_p = function calc_JSI_p(props, lambda_s, lambda_i, dim, norm
 
 };
 
+// Calculate and return the coincidence rate 
+PhaseMatch.calc_JSI_rates_p = function calc_JSI_rates_p(props, lambda_s, lambda_i, dim, norm){
+    var N = lambda_s.length * (lambda_i.length);
+    var JSI = new Float64Array( N );
+    var JSA = PhaseMatch.calc_JSA_p(props, lambda_s,lambda_i, dim, 1);
+    var dw_s = (lambda_s[lambda_s.length-1] - lambda_s[0])/lambda_s.length;
+    var dw_i = (lambda_i[lambda_i.length-1] - lambda_i[0])/lambda_i.length;
+
+    var Ws_SQ = Math.pow(props.W_sx,2) 
+        ,PHI_s = 1/Math.cos(props.theta_s_e)
+        ,PHI_i = 1/Math.cos(props.theta_i_e)
+        ,con = PhaseMatch.constants
+        ,twoPIc = 2*Math.PI*con.c
+        ,omega_s = twoPIc / (props.lambda_s )
+        ,omega_i = twoPIc / (props.lambda_i )
+        // ,pumpScale = Math.pow(props.W,2) // May need to later include the ellipticity parameter
+        ,scale = (sq(props.W_sx) * PHI_s * sq(props.W_ix) * PHI_i * sq(props.W))
+        ,inv_lambda_s_sq = 0
+        ,inv_lambda_i_sq = 0
+        ,dlambda_s = Math.abs(lambda_s[lambda_s.length-1] - lambda_s[0])/lambda_s.length
+        ,dlambda_i = Math.abs(lambda_i[lambda_i.length-1] - lambda_i[0])/lambda_i.length
+        ,norm_sum_s = twoPIc * dlambda_s
+        ,norm_sum_i = twoPIc * dlambda_i
+        ,lomega = omega_s * omega_i /sq(props.n_s*props.n_i)
+        ,norm_const = props.get_rates_constant();
+        ;
+        ;
+
+    // for (var l = 0; l<lambda_s.length; l++){
+    //     inv_lambda_s_sq += 1/sq(lambda_s[l]);
+    // }
+
+    // for (var k = 0; k<lambda_i.length; k++){
+    //     inv_lambda_i_sq += 1/sq(lambda_i[k]);
+    // }
+
+    var d_omega_s = norm_sum_s /sq(props.lambda_s);
+    var d_omega_i = norm_sum_i /sq(props.lambda_i);
+
+    // var d_omega_s = 1;
+    // var d_omega_i = 1;
+
+    for (var i=0; i<N; i++){
+
+        JSI[i] = (sq(JSA[0][i]) + sq(JSA[1][i]))*norm_const*scale*(d_omega_s*d_omega_i)*lomega;
+    }
+
+    // And now we have the scaling.
+
+
+
+    return JSI;
+
+};
+
+
+////////////////////
+//CURRENT
 PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lambda_i, dim, norm){
 
     props.update_all_angles();
@@ -21886,34 +21957,41 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
     var PMimag_i = new Float64Array( N );
     var PMmag_i = new Float64Array( N );
 
+    // var dOmega_s = new Float64Array( lambda_s.length );
+    // var dOmega_i = new Float64Array( lambda_i.length );
+
 
     var maxpm = 0;
 
-    var  Ws_SQ = Math.pow(P.W_sx,2) // convert from FWHM to sigma @TODO: Change to P.W_i
+    var  Ws_SQ = Math.pow(P.W_sx,2)
+        ,Wi_SQ = Math.pow(P.W_ix,2) 
         ,PHI_s = 1/Math.cos(P.theta_s_e)
         ,PHI_i = 1/Math.cos(P.theta_i_e)
         ,con = PhaseMatch.constants
         ,twoPIc = 2*Math.PI*con.c
         ,omega_s = twoPIc / (P.lambda_s )
         ,omega_i = twoPIc / (P.lambda_i )
-        ,hs = Math.tan(P.theta_s)*P.L*0.5 *Math.cos(P.phi_s)
-        ,hi = Math.tan(P.theta_i)*P.L*0.5 * Math.cos(P.phi_i)
-        ,Ws_r = Ws_SQ
-        // ,Ws_i = -2/(omega_s/con.c) * (P.z0s + hs * Math.sin(P.theta_s_e) )
-        ,Ws_i = 0
-        ,absWs_sq = Math.sqrt(Ws_r*Ws_r + Ws_i*Ws_i)
-        ,Wi_r = Ws_SQ
-        // ,Wi_i = -2/(omega_i/con.c) * (P.z0i + hi * Math.sin(P.theta_i_e) )
-        ,Wi_i = 0
-        ,absWi_sq = Math.sqrt(Wi_r*Wi_r + Wi_i*Wi_i)
-        ,scale_s = (absWs_sq * PHI_s)
-        ,scale_i =(absWi_sq * PHI_i) //assume symmetric coupling geometry
+        ,pumpScale = Math.pow(P.W,2) // May need to later include the ellipticity parameter
+        ,scale_s = 1/(Ws_SQ * PHI_s *pumpScale)
+        ,scale_i =1/(Wi_SQ * PHI_i * pumpScale) //assume symmetric coupling geometry
+        ,dlambda_s = Math.abs(lambda_s[lambda_s.length-1] - lambda_s[0])/lambda_s.length
+        ,dlambda_i = Math.abs(lambda_i[lambda_i.length-1] - lambda_i[0])/lambda_i.length
+        ,norm_sum_s = twoPIc * dlambda_s
+        ,norm_sum_i = twoPIc * dlambda_i
+        ,lomega = omega_s * omega_i /sq(props.n_s*props.n_i)
+        ,norm_const = props.get_rates_constant();
         ;
 
     // calculate normalization
     // var PMN = PhaseMatch.phasematch(P);
     // var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
 
+
+    
+    // var lomega = omega_s * omega_i /sq(props.n_s*props.n_i);
+
+    // dOmega_s = lomega*(twoPIc*Math.abs(1/lambda_s[0] - 1/lambda_s[lambda_s.length-1])/lambda_s.length);
+    // dOmega_i = lomega* (twoPIc*Math.abs(1/lambda_i[0] - 1/lambda_i[lambda_i.length-1])/lambda_i.length);
 
     for (var j=0; j<lambda_i.length; j++){
         for (i=0; i<lambda_s.length; i++){
@@ -21923,14 +22001,21 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
             P.lambda_s = lambda_s[index_s];
             P.lambda_i = lambda_i[index_i];
 
+            dOmega_s = norm_sum_s / sq(lambda_s[index_s]);
+            dOmega_i = norm_sum_i / sq(lambda_i[index_i]);
+            // var dOmega_s = 1.;
+            // var dOmega_i = 1.;
+            // lomega = 1;
+
+
             P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
             // var P_i = P.clone();
             var PM = PhaseMatch.phasematch_singles(P);
-            PMreal_s[i + lambda_s.length*j] = ( PM[0]/norm ) ;
-            PMimag_s[i + lambda_s.length*j] = ( PM[1]/norm ) ;
-            PMmag_s[i + lambda_s.length*j] = (Math.sqrt(sq(PMreal_s[i + lambda_s.length*j]) + sq(PMimag_s[i + lambda_s.length*j]))) /scale_s;
+            PMreal_s[i + lambda_s.length*j] = ( PM[0]  /norm ) ;
+            PMimag_s[i + lambda_s.length*j] = ( PM[1]  /norm ) ;
+            PMmag_s[i + lambda_s.length*j] = (Math.sqrt(sq(PMreal_s[i + lambda_s.length*j]) + sq(PMimag_s[i + lambda_s.length*j])))* norm_const  *(dOmega_s * dOmega_i) *lomega /scale_s;
 
             // Now calculate the Idler JSI
             // The role of the signal and idler get swapped in the calculation
@@ -21939,9 +22024,9 @@ PhaseMatch.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lamb
             P.swap_signal_idler();
             var PM_i = PhaseMatch.phasematch_singles(P);
             P.swap_signal_idler();
-            PMreal_i[i + lambda_s.length*j] = ( PM_i[0]/norm );
-            PMimag_i[i + lambda_s.length*j] = ( PM_i[1]/norm );
-            PMmag_i[i + lambda_s.length*j] = (Math.sqrt(sq(PMreal_i[i + lambda_s.length*j]) + sq(PMimag_i[i + lambda_s.length*j]))) /scale_i;
+            PMreal_i[i + lambda_s.length*j] = ( PM_i[0] /norm );
+            PMimag_i[i + lambda_s.length*j] = ( PM_i[1] /norm );
+            PMmag_i[i + lambda_s.length*j] = (Math.sqrt(sq(PMreal_i[i + lambda_s.length*j]) + sq(PMimag_i[i + lambda_s.length*j]))) * norm_const * (dOmega_s * dOmega_i) *lomega /scale_i;
 
 
         }
@@ -22847,7 +22932,8 @@ PhaseMatch.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yrang
 };
 
 
-
+////////////
+//CURRENT
 /*
 * calc_heralding_plot_p
 */
@@ -22938,12 +23024,24 @@ PhaseMatch.calc_heralding_plot_p = function calc_heralding_plot_p(props, WpRange
 
     function calc_singles_rate( ){
         var JSI_singles = PhaseMatch.calc_JSI_Singles_p(P, lambda_s,lambda_i, dim, 1);
-        // // console.log(PhaseMatch.Sum(JSI_singles[0]).toString());
+
+        // Now, since the calculation is done in terms of omega_s, omega_i, need to figure out 
+        // step size of the Riemman sum.
+
+        // for (var i=0; i<lambda_s.length, i++){
+
+        // }
+        // var dw_s = (lambda_s[lambda_s.length-1] - lambda_s[0])/lambda_s.length;
+        // var dw_i = (lambda_i[lambda_i.length-1] - lambda_i[0])/lambda_i.length;
+        // console.log(PhaseMatch.Sum(JSI_singles[0]).toString());
         return [PhaseMatch.Sum(JSI_singles[0]), PhaseMatch.Sum(JSI_singles[1])];
     }
 
     function calc_coinc_rate( ){
-        var JSI_coinc = PhaseMatch.calc_JSI_p(P, lambda_s,lambda_i, dim, 1);
+        
+        // var JSI_coinc = PhaseMatch.calc_JSI_p(P, lambda_s,lambda_i, dim, 1);
+        var JSI_coinc = PhaseMatch.calc_JSI_rates_p(P, lambda_s,lambda_i, dim, 1);
+        
         return PhaseMatch.Sum(JSI_coinc);
     }
 
