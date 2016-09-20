@@ -111,7 +111,26 @@ define(
                 $(function(){
                     self.emit('domready');
                 });
-            },
+
+            // var delay = 1000;
+            // setTimeout(self.initParameters(), delay);
+            //
+            //
+            // setTimeout(self.initUI(),delay*2);
+            //
+            //
+            // setTimeout(self.initPlotOpts(), delay*3);
+            //
+            // setTimeout(self.initEvents(), delay*4);
+            //
+            // setTimeout(self.initModules(), delay*6);
+            //
+            //
+            // setTimeout($(function(){
+            //     self.emit('domready');
+            // }),delay*8);
+
+        },
 
             /**
              * Initialize events
@@ -210,7 +229,7 @@ define(
                                         plot: data
                                     });
 
-                                    // console.log(csv);
+
                                     // return;
 
                                     document.location = 'data:Application/octet-stream,' + window.encodeURIComponent(csv);
@@ -234,7 +253,7 @@ define(
                 self.parameters.on('refresh', function(){
 
                     this.each(function( val, key ){
-                        // console.log(val, key)
+
                         // refresh parameter values in the html
                         var el = self.elParameters.find('[name="'+key+'"]')
                             ,unit = el.data('unit')
@@ -247,7 +266,7 @@ define(
                         // keeps the plot options from incorrectly refreshing if
                         // autocalc plot options is checked.
                         if (self.elPlotOpts.find('[name="'+key+'"]').length>0){
-                            console.log(self.elPlotOpts.find('[name="'+key+'"]'));
+
 
                             if ( !self.plotOpts.get('autocalc_plotopts') ){
                                 el.val( val );
@@ -258,10 +277,10 @@ define(
                             el.val( val );
                         }
 
-                                            
+
                     });
 
-                    
+
 
                 });
 
@@ -330,9 +349,9 @@ define(
                     if (unit){
                         val  = converter.from( unit, val );
                     }
-                    // console.log("in PM-ui", key, val);
+
                     // update the corresponding property in the parameters object
-                    // console.log(key,val)
+
                     self.parameters.set( key, val );
                 });
 
@@ -576,7 +595,3 @@ define(
         return new Mediator();
     }
 );
-
-
-
-

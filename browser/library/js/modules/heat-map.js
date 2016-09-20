@@ -147,35 +147,39 @@ define(
                     z: options.colorScale(this.logplot, [0,1]).copy()
                 };
             }
-            // console.log("initalize",this.logplot);
+
+            
 
 
             this.margin = defaults.margins;
-            this.setFormat(options.format);
+
+            this.setFormat(options.format); // problem line
+
             this.resize( options.width, options.height );
             this.setMargins( options.margins );
 
             this.hiddenCtx = this.hiddenCanvas.getContext('2d');
             this.ctx = this.canvas.getContext('2d');
 
+
             var calcXindex = function(val){
                     var range = self.scales.x.domain();
                     var index = Math.floor(((val-range[0])/(range[1]- range[0]))*self.cols);
-                    // console.log(val, range, index, self.cols);
+                    
                     return index;
             };
 
             var calcYindex = function(val){
                     var range = self.scales.y.domain();
                     var index = Math.floor(((val-range[0])/(range[1]- range[0]))*self.rows);
-                    // console.log(val, range, index, self.cols);
+                    
                     return index;
             };
 
             var self = this;
             $(this.el).on('mousemove', function(e){
                 var offset = $(self.canvas).offset();
-                // console.log(( e.pageX - offset.left ), e.pageY - offset.top);
+                
                 var x = e.pageX - offset.left;
                 var y = e.pageY - offset.top;
                 self.el.css("cursor", "auto");
@@ -281,10 +285,10 @@ define(
 
             // these only make cosmetic changes...
             setXRange: function( xrangeArr ){
-                // console.log("xrange: ", xrangeArr);
+                
                 this.scales.x.domain( xrangeArr );
                 this.refreshAxes();
-                // console.log("xscales", this.scales.x);
+                
             },
 
             setYRange: function( yrangeArr ){
@@ -302,7 +306,7 @@ define(
 
             setLogPlot: function(bool){
                 this.logplot = bool;
-                // console.log('current domain: ', this.scales.z.domain());
+                
                 this.scales.z = defaults.colorScale(this.logplot, this.scales.z.domain()).copy();
                 // this.refreshAxes();
                 this.plotData(this.data);
@@ -314,6 +318,14 @@ define(
             },
 
             refreshAxes: function(){
+                // Check for edge initialization cases
+                if (this.width === undefined){
+                    this.width = 400;
+                }
+
+                if (this.height === undefined){
+                    this.height = 400;
+                }
 
                 var self = this
                     ,svg = this.svgAxis
@@ -426,7 +438,7 @@ define(
                     .tickFormat( d3.format( '.2f' ) )
                     .orient("top")
                     ;
-                    // console.log("Inside log plot");
+                    
                 }
                 else{
                     vals.splice(1, 0, (dom[1]-dom[0]) / 2 +dom[0]);
@@ -506,8 +518,8 @@ define(
                     ,x = this.scales.x
                     ,y = this.scales.y
                     ;
-                // console.log("in export:", x);
-                // console.log("ncols:", l, cols, rows, scale);
+                
+                
                 cols *= scale;
                 rows *= scale;
 
@@ -515,7 +527,7 @@ define(
                 rows = Math.floor(rows);
 
                 scale = Math.sqrt((cols -1 )*(rows-1)) / Math.sqrt((this.width) * (this.height) );
-                // console.log("ncols:", l, cols, rows, scale, (cols -1)/scale);
+                
 
                 for ( var i = 0; i < cols; ++i ){
 
@@ -526,7 +538,7 @@ define(
 
                     yvals.push( y.invert( i / scale ) );
                 }
-                // console.log("inside heat map export", this.labels.x, xvals, cols);
+                
 
                 return {
                     title: this.elTitle.text(),

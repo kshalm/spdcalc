@@ -40,7 +40,7 @@ define(
         };
 
         function LinePlot( options ){
-
+            
             options = $.extend({}, defaults, options);
 
             this.labels = options.labels;
@@ -81,6 +81,7 @@ define(
 
             this.showlegend = new Boolean();
             this.showlegend = options.legend;
+            
         }
 
         LinePlot.prototype = {
@@ -174,7 +175,14 @@ define(
             },
 
             refreshAxes: function(){
+                // Check for edge initialization cases
+                if (this.width === undefined){
+                    this.width = 400;
+                }
 
+                if (this.height === undefined){
+                    this.height = 400;
+                }
                 var svg = this.svgPlot
                     ,x = this.scales.x
                     ,y = this.scales.y

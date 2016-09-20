@@ -1,5 +1,4 @@
-require.config({ 
-      
+require.config({
     waitSeconds: 30,
 
     shim: {
@@ -21,9 +20,9 @@ require.config({
     },
 
     baseUrl: 'library/js',
-    
+
     paths: {
-        
+
         //
         //  This is where you can add paths to any plugins or vendor scripts.
         //
@@ -48,14 +47,14 @@ require.config({
 
         // MVC
         'stapes': 'vendor/stapes',
-        
+
         // jQuery
         'jquery': 'vendor/jquery',
         'jquery-ui': 'vendor/jquery-ui-1.10.0.custom.min',
         'jquery.dropkick': 'vendor/jquery.dropkick-1.0.0',
         'jquery.tagsinput': 'vendor/jquery.tagsinput'
-        
-        
+
+
     },
 
     packages: [

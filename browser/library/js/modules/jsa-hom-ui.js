@@ -70,9 +70,9 @@ define(
              * @return {void}
              */
             initPlots : function(){
-
+                
                 var self = this;
-
+                
                 // init plot
                 self.plot1d = new LinePlot({
                     title: 'Hong-Ou-Mandel Dip',
@@ -93,7 +93,7 @@ define(
                 self.elPlot1d = $(self.plot1d.el);
 
                 self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el.find('.heat-map-wrapper') );
-
+                
                 self.eldelT.slider({
                     min: -800,
                     max: 800,
@@ -113,7 +113,7 @@ define(
                 });
 
                 self.set('delT', 0);
-
+                
                 // init plot
                 self.plot = new HeatMap({
                     title: 'Joint spectral amplitude',
@@ -146,10 +146,12 @@ define(
                 self.on('refresh', function(){
                     self.refreshLine( self.get('delT') );
                 });
-
+                
                 self.addPlot( self.plot );
                 self.addPlot( self.plot1d );
+                
                 self.initEvents();
+                
             },
 
             refreshJSA: function(){
@@ -170,7 +172,7 @@ define(
                     ,dom = y.domain()
                     ;
 
-                // console.log("dom", dom)
+                // 
 
                 // create
                 line.enter()
@@ -251,7 +253,7 @@ define(
                     trange.push(delT.subarray(i*divisions,i*divisions + divisions));
                 }
                 trange.push( delT.subarray((Nthreads-1)*divisions, delT.length));
-                
+
 
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
@@ -272,15 +274,15 @@ define(
                         var arr = new Float64Array( dim );
 
                         var startindex = 0;
-                        
+
                         for (j = 0; j<Nthreads; j++){
                              arr.set(values[j], startindex);
-                             
+
                              startindex += trange[j].length;
-                        }   
+                        }
 
                         var endtime = new Date();
-                        console.log("HOM dip Elapsed time: ", endtime - starttime);
+                        
 
                         return arr; // this value is passed on to the next "then()"
 
@@ -301,16 +303,16 @@ define(
                         self.plot1d.setYRange([0, Math.max.apply(null,HOM)*1.2]);
 
                         self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
-                        
+
                          var endtime = new Date();
 
                         return true;
-                });  
+                });
             },
 
             set_slider_values: function(zero_delay, t_start, t_stop){
                 var self = this;
-                // console.log("set slider values", self.eldelT.slider);
+                // 
                 // @TODO Krister: Noticed a weird bug where using self.set to change "delT" causes the red line to
                 // disappear for any value other than 0.
                 self.eldelT.slider({
@@ -326,8 +328,8 @@ define(
                     ,po = self.plotOpts;
 
                 var st = new Date();
-                
-                // Can only run in one thread. This graph is not easily parallizable. Need 
+
+                // Can only run in one thread. This graph is not easily parallizable. Need
                 // the entire grid to do the computation.
                 return  self.workers[self.nWorkers-1].exec('jsaHelper.doCalcHOMJSA', [
                             props.get(),
@@ -346,11 +348,11 @@ define(
                         self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
                         var sp = new Date();
-                        // console.log("time jsa", sp -st);
+                        // 
                 });
 
-                
-                
+
+
                 // var PM = PhaseMatch.calc_HOM_JSA(
                 //     props,
                 //     po.get('ls_start'),
@@ -363,7 +365,7 @@ define(
                 // )
                 // ;
 
-                
+
                 // self.data = PM;
 
                 // // var S= PhaseMatch.calc_Schmidt(PM);
@@ -398,8 +400,8 @@ define(
                     self.plot1d.plotData( data1d );
                     dfd.resolve();
                 }, 50);
-                   
-                return dfd.promise; 
+
+                return dfd.promise;
 
                 // self.plot1d.plotData( data1d );
             }

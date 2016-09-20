@@ -59,8 +59,8 @@
         autocalfocus: true,
         z0s: -2000/2 * con.um,
         deff: 1 * con.pm,
-        Pav: 1e-3 
-        
+        Pav: 1e-3
+
         // z0: 2000/2 * con.um
     };
 
@@ -135,8 +135,8 @@
 
             // Set the positions of the signal, idler, pump waists
             this.z0p = 0 *con.um;
-            // this.z0s = -1*this.L/2;
-            // this.z0i = this.z0s;
+            this.z0s = -1*this.L/2;
+            this.z0i = this.z0s;
 
             // console.log(this.zweights);
 
@@ -383,7 +383,7 @@
             // props.z0s = guess;
             // props.z0i = guess;
             var ans = PhaseMatch.nelderMead(max_coinc, guess, 10);
-            
+
             // Run again wiht better initial conditions based on previous optimization
             ans = PhaseMatch.nelderMead(max_coinc, ans, 20);
             var endTime = new Date();
