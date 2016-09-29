@@ -1,49 +1,46 @@
-(function(){
+var crystals = {};
+var cloneDeep = require('lodash/cloneDeep');
 
-    var crystals = {};
+// defaults defined for every crystal
+var defaults = {
 
-    // defaults defined for every crystal
-    var defaults = {
+    name: 'Unnamed Crystal',
+    temp: 20,
+    info: '',
 
-        name: 'Unnamed Crystal',
-        temp: 20,
-        info: '',
+    indicies: function(){ return [1, 1, 1]; }
+};
 
-        indicies: function(){ return [1, 1, 1]; }
-    };
+// get and set crystal db entries
 
-    // get and set crystal db entries
+var Crystals = function( key, create ){
 
-    PhaseMatch.Crystals = function( key, create ){
+    // invalid args
+    if ( !key ) {return null;}
 
-        // invalid args
-        if ( !key ) {return null;}
+    if ( !create && !( key in crystals ) ){
 
-        if ( !create && !( key in crystals ) ){
+        throw 'Crystal type "' + key + ' not yet defined.';
+    }
 
-            throw 'Crystal type "' + key + ' not yet defined.';
+    if ( create ){
+
+        if ( key in crystals ){
+
+            throw 'Crystal type "' + key + ' already defined.';
         }
 
-        if ( create ){
+        crystals[ key ] = Object.assign({}, defaults, create, { id: key });
+    }
 
-            if ( key in crystals ){
+    return cloneDeep( crystals[ key ] );
+};
 
-                throw 'Crystal type "' + key + ' already defined.';
-            }
+// get all crystal keynames
+Crystals.keys = function(){
 
-            crystals[ key ] = PhaseMatch.util.extend({}, defaults, create, { id: key });
-        }
-
-        return PhaseMatch.util.clone( crystals[ key ], true );
-    };
-
-    // get all crystal keynames
-    PhaseMatch.Crystals.keys = function(){
-
-        return PhaseMatch.util.keys( crystals );
-    };
-
-})();
+    return Object.keys( crystals );
+};
 
 
 /**
@@ -54,7 +51,7 @@
 /**
  * BBO indicies.
  */
-PhaseMatch.Crystals('BBO-1', {
+Crystals('BBO-1', {
     name: 'BBO ref 1',
     // info: '',
     indicies: function(lambda, temp){
@@ -78,7 +75,7 @@ PhaseMatch.Crystals('BBO-1', {
 /**
  * KTP indicies.
  */
-PhaseMatch.Crystals('KTP-3', {
+Crystals('KTP-3', {
     name: 'KTP ref 1',
     // info: 'H. Vanherzeele, J. D. Bierlein, F. C. Zumsteg, Appl. Opt., 27, 3314 (1988)',
     info: 'Includes Franco Wong"s modificatin.  http://dx.doi.org/10.1063/1.1668320, http://www.redoptronics.com/KTP-crystal.html',
@@ -118,7 +115,7 @@ PhaseMatch.Crystals('KTP-3', {
 /**
  * BiBO indicies.
  */
-PhaseMatch.Crystals('BiBO-1', {
+Crystals('BiBO-1', {
     name: 'BiBO ref 1',
     info: 'http://www.newlightphotonics.com/bibo-properties.html',
     indicies: function(lambda, temp){
@@ -153,7 +150,7 @@ PhaseMatch.Crystals('BiBO-1', {
 /**
  * LiNbO3 indicies.
  */
-PhaseMatch.Crystals('LiNbO3-1', {
+Crystals('LiNbO3-1', {
     name: 'LiNbO3 ref 1',
     info: 'http://www.newlightphotonics.com/bibo-properties.html',
     type: 'Negative Uniaxial',
@@ -191,7 +188,7 @@ PhaseMatch.Crystals('LiNbO3-1', {
 /**
  * LiNbO3 MGO doped indicies.
  */
-PhaseMatch.Crystals('LiNB-MgO', {
+Crystals('LiNB-MgO', {
     name: 'LiNbO3 (5% MgO doped)',
     info: 'Applied Physics B May 2008,Volume 91,Issue 2,pp 343-348',
     type: '',
@@ -239,7 +236,7 @@ PhaseMatch.Crystals('LiNB-MgO', {
 /**
  * LiNbO3 indicies.
  */
-PhaseMatch.Crystals('KDP-1', {
+Crystals('KDP-1', {
     name: 'KDP ref 1',
     info: 'http://www.newlightphotonics.com/KDP-crystal.html',
     type: 'Negative Uniaxial',
@@ -281,7 +278,7 @@ PhaseMatch.Crystals('KDP-1', {
 /**
  * AGGaSe2
  */
-PhaseMatch.Crystals('AgGaSe2-1', {
+Crystals('AgGaSe2-1', {
     name: 'AgGaSe2 Ref 1',
     info: 'H. Kildal, J. Mikkelsen, Opt. Commun. 9, 315 (1973)',
     type: '',
@@ -314,7 +311,7 @@ PhaseMatch.Crystals('AgGaSe2-1', {
 /**
  * AGGaSe2
  */
-PhaseMatch.Crystals('AgGaSe2-2', {
+Crystals('AgGaSe2-2', {
     name: 'AgGaSe2 Ref 2',
     info: 'G. C. Bhar, Appl. Opt., 15, 305 (1976)',
     type: '',
@@ -347,7 +344,7 @@ PhaseMatch.Crystals('AgGaSe2-2', {
 /**
  * AgGaS2
  */
-PhaseMatch.Crystals('AgGaS2-1', {
+Crystals('AgGaS2-1', {
     name: 'AgGaS2 Ref 1',
     info: 'G. C. Bhar, Appl. Opt., 15, 305 (1976)',
     type: '',
@@ -380,7 +377,7 @@ PhaseMatch.Crystals('AgGaS2-1', {
 /**
  * LiIO3 ref 1
  */
-PhaseMatch.Crystals('LiIO3-1', {
+Crystals('LiIO3-1', {
     name: 'LiIO3 Ref 1',
     info: 'B. F. Levine, C. G. Bethea: Appl. Phys. Lett. 20, 272 (1972)',
     type: 'Negative Uniaxial',
@@ -402,7 +399,7 @@ PhaseMatch.Crystals('LiIO3-1', {
 /**
  * LiIO3 ref 2
  */
-PhaseMatch.Crystals('LiIO3-2', {
+Crystals('LiIO3-2', {
     name: 'LiIO3 Ref 2',
     info: 'K. Takizawa, M. Okada, S. Leiri, Opt. Commun., 23, 279 (1977)',
     type: 'Negative Uniaxial',
@@ -420,3 +417,5 @@ PhaseMatch.Crystals('LiIO3-2', {
         return [nx, ny, nz];
     }
 });
+
+module.export = Crystals;

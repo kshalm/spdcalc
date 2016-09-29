@@ -1,9 +1,5 @@
-PhaseMatch.Complex = (function () {
-
-'use strict';
-
 /*
-Localize global props for better performance
+ * Localize global props for better performance
  */
 var PI = Math.PI
     ,cos = Math.cos
@@ -19,7 +15,7 @@ var PI = Math.PI
 var ArrDef = window.Float64Array || window.Array;
 
 /*
-Utility functions
+ * Utility functions
  */
 function sinh(x){
     return (exp(x) - exp(-x)) * 0.5;
@@ -30,7 +26,7 @@ function cosh(x){
 }
 
 /*
-Object definition
+ * Object definition
  */
 
 function Complex(re, im){
@@ -306,6 +302,4 @@ var extend = {
 
 for (var e in extend) {Complex[e] = extend[e];}
 
-return Complex;
-
-})();
+module.exports = Complex;

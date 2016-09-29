@@ -2,19 +2,85 @@
  * Phasematching Library for momentum space calculations
  */
 var ellipticity = 1.0;
+var calc_delK = require('./pm-refraction').calc_delK;
+var con = require('./constants');
+var helpers = require('./math/helpers');
+
+
+/*
+ * To deal with possible floating point errors, convert from meters to microns before performing the calculations.
+ */
+var convertToMicrons = function convertToMicrons (props){
+    var  P = props
+        // ,mu = 1E6
+        ,mu = 1
+        ;
+
+    // // P.L = P.L*mu;
+    // console.log("Length: " + (P.L * mu).toString());
+    P.lambda_p = P.lambda_p * mu;
+    P.lambda_s = P.lambda_s * mu;
+    P.lambda_i = P.lambda_i * mu;
+    P.W = P.W * mu;
+    P.p_bw = P.p_bw * mu;
+    P.W_sx = P.W_sx * mu;
+    P.W_ix = P.W_ix * mu;
+    // console.log("P.L about to set");
+    P.L = P.L * mu;
+    // // console.log("set P.L");
+    // P.poling_period = P.poling_period * mu;
+    // P.apodization_FWHM = P.apodization_FWHM * mu;
+
+    // P.update_all_angles();
+    // P.set_apodization_L();
+    // P.set_apodization_coeff();
+    // P.set_zint();
+
+    return P;
+
+};
+
+var convertToMeters = function convertToMeters (props){
+    var  P = props
+        // ,mu = 1E-6
+        ,mu = 1
+        ;
+
+    // // P.L = P.L*mu;
+    // console.log("Length: " + (P.L * mu).toString());
+    P.lambda_p = P.lambda_p * mu;
+    P.lambda_s = P.lambda_s * mu;
+    P.lambda_i = P.lambda_i * mu;
+    P.W = P.W * mu;
+    P.p_bw = P.p_bw * mu;
+    P.W_sx = P.W_sx * mu;
+    P.W_ix = P.W_ix * mu;
+    // console.log("P.L about to set");
+    P.L = P.L * mu;
+    // // console.log("set P.L");
+    // P.poling_period = P.poling_period * mu;
+    // P.apodization_FWHM = P.apodization_FWHM * mu;
+
+    // P.update_all_angles();
+    // P.set_apodization_L();
+    // P.set_apodization_coeff();
+    // P.set_zint();
+
+    return P;
+
+};
 
 /*
  * Get the constants and terms used in the calculation of the momentum
  * space joint spectrum for the coincidences.
  */
-PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
+var calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // console.log("hi");
     // console.log("\n");
     // var todeg = 180/Math.PI;
     // console.log("Inside calc_PM_tz_k_coinc:  Theta_s: " + (P.theta_s*todeg).toString() + ", Theta_i: " + (P.theta_i*todeg).toString() );
     var toMicrons= 1;
     // var toMicrons= 1;
-    var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
 
@@ -37,7 +103,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // var RHOpx  = 0;
 
 
-    PhaseMatch.convertToMicrons(P);
+    convertToMicrons(P);
 
     var omega_s = twoPIc / (P.lambda_s ),
         omega_i = twoPIc / (P.lambda_i),
@@ -46,9 +112,9 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ;
 
     // console.log("frequencies2:" + (P.lambda_p*1E9).toString() + ", " + (omega_p/twoPI*1E-9).toString() + ", " + (omega_s*1E-9).toString() + ", " + (omega_i*1E-9).toString() + ", ")
-    // PhaseMatch.convertToMicrons(P);
+    // convertToMicrons(P);
 
-    var delK = PhaseMatch.calc_delK(P);
+    var delK = calc_delK(P);
     var delKx = delK[0],
         delKy = delK[1],
         delKz = delK[2]
@@ -309,67 +375,67 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             EXP1I = A10I*4,
 
             // A5^2/A1
-            EXP2R_a = PhaseMatch.cmultiplyR(A5R, A5I, A5R, A5I ),
-            EXP2I_a = PhaseMatch.cmultiplyI(A5R, A5I, A5R, A5I ),
-            EXP2R = PhaseMatch.cdivideR(EXP2R_a, EXP2I_a, A1R, A1I),
-            EXP2I = PhaseMatch.cdivideI(EXP2R_a, EXP2I_a, A1R, A1I),
+            EXP2R_a = helpers.cmultiplyR(A5R, A5I, A5R, A5I ),
+            EXP2I_a = helpers.cmultiplyI(A5R, A5I, A5R, A5I ),
+            EXP2R = helpers.cdivideR(EXP2R_a, EXP2I_a, A1R, A1I),
+            EXP2I = helpers.cdivideI(EXP2R_a, EXP2I_a, A1R, A1I),
 
             // A6^2/A2
-            EXP3R_a = PhaseMatch.cmultiplyR(A6R, A6I, A6R, A6I ),
-            EXP3I_a = PhaseMatch.cmultiplyI(A6R, A6I, A6R, A6I ),
-            EXP3R = PhaseMatch.cdivideR(EXP3R_a, EXP3I_a, A2R, A2I),
-            EXP3I = PhaseMatch.cdivideI(EXP3R_a, EXP3I_a, A2R, A2I),
+            EXP3R_a = helpers.cmultiplyR(A6R, A6I, A6R, A6I ),
+            EXP3I_a = helpers.cmultiplyI(A6R, A6I, A6R, A6I ),
+            EXP3R = helpers.cdivideR(EXP3R_a, EXP3I_a, A2R, A2I),
+            EXP3I = helpers.cdivideI(EXP3R_a, EXP3I_a, A2R, A2I),
 
             // (-2 A1 A7 + A5 A8)^2/ (A1 (4 A1 A3 - A8^2))
-            EXP4Ra_num = -2 * PhaseMatch.cmultiplyR( A1R, A1I, A7R, A7I),
-            EXP4Ia_num = -2 * PhaseMatch.cmultiplyI( A1R, A1I, A7R, A7I),
-            EXP4Rb_num = PhaseMatch.cmultiplyR( A5R, A5I, A8R, A8I),
-            EXP4Ib_num = PhaseMatch.cmultiplyI( A5R, A5I, A8R, A8I),
-            EXP4Rc_num  = PhaseMatch.caddR(EXP4Ra_num, EXP4Ia_num, EXP4Rb_num, EXP4Ib_num),
-            EXP4Ic_num  = PhaseMatch.caddI(EXP4Ra_num, EXP4Ia_num, EXP4Rb_num, EXP4Ib_num),
-            EXP4R_num   = PhaseMatch.cmultiplyR(EXP4Rc_num, EXP4Ic_num, EXP4Rc_num, EXP4Ic_num),
-            EXP4I_num   = PhaseMatch.cmultiplyI(EXP4Rc_num, EXP4Ic_num, EXP4Rc_num, EXP4Ic_num),
+            EXP4Ra_num = -2 * helpers.cmultiplyR( A1R, A1I, A7R, A7I),
+            EXP4Ia_num = -2 * helpers.cmultiplyI( A1R, A1I, A7R, A7I),
+            EXP4Rb_num = helpers.cmultiplyR( A5R, A5I, A8R, A8I),
+            EXP4Ib_num = helpers.cmultiplyI( A5R, A5I, A8R, A8I),
+            EXP4Rc_num  = helpers.caddR(EXP4Ra_num, EXP4Ia_num, EXP4Rb_num, EXP4Ib_num),
+            EXP4Ic_num  = helpers.caddI(EXP4Ra_num, EXP4Ia_num, EXP4Rb_num, EXP4Ib_num),
+            EXP4R_num   = helpers.cmultiplyR(EXP4Rc_num, EXP4Ic_num, EXP4Rc_num, EXP4Ic_num),
+            EXP4I_num   = helpers.cmultiplyI(EXP4Rc_num, EXP4Ic_num, EXP4Rc_num, EXP4Ic_num),
             // Denominator
-            EXP4Ra_den = -1 * PhaseMatch.cmultiplyR(A8R, A8I, A8R, A8I),
-            EXP4Ia_den = -1 * PhaseMatch.cmultiplyI(A8R, A8I, A8R, A8I),
-            EXP4Rb_den =  4 * PhaseMatch.cmultiplyR( A1R, A1I, A3R, A3I),
-            EXP4Ib_den =  4 * PhaseMatch.cmultiplyI( A1R, A1I, A3R, A3I),
-            EXP4Rc_den =  PhaseMatch.caddR( EXP4Ra_den, EXP4Ia_den, EXP4Rb_den, EXP4Ib_den ),
-            EXP4Ic_den =  PhaseMatch.caddI( EXP4Ra_den, EXP4Ia_den, EXP4Rb_den, EXP4Ib_den ),
-            EXP4R_den = PhaseMatch.cmultiplyR(A1R, A1I, EXP4Rc_den, EXP4Ic_den),
-            EXP4I_den = PhaseMatch.cmultiplyI(A1R, A1I, EXP4Rc_den, EXP4Ic_den),
-            EXP4R     = PhaseMatch.cdivideR(EXP4R_num, EXP4I_num, EXP4R_den, EXP4I_den),
-            EXP4I     = PhaseMatch.cdivideI(EXP4R_num, EXP4I_num, EXP4R_den, EXP4I_den),
+            EXP4Ra_den = -1 * helpers.cmultiplyR(A8R, A8I, A8R, A8I),
+            EXP4Ia_den = -1 * helpers.cmultiplyI(A8R, A8I, A8R, A8I),
+            EXP4Rb_den =  4 * helpers.cmultiplyR( A1R, A1I, A3R, A3I),
+            EXP4Ib_den =  4 * helpers.cmultiplyI( A1R, A1I, A3R, A3I),
+            EXP4Rc_den =  helpers.caddR( EXP4Ra_den, EXP4Ia_den, EXP4Rb_den, EXP4Ib_den ),
+            EXP4Ic_den =  helpers.caddI( EXP4Ra_den, EXP4Ia_den, EXP4Rb_den, EXP4Ib_den ),
+            EXP4R_den = helpers.cmultiplyR(A1R, A1I, EXP4Rc_den, EXP4Ic_den),
+            EXP4I_den = helpers.cmultiplyI(A1R, A1I, EXP4Rc_den, EXP4Ic_den),
+            EXP4R     = helpers.cdivideR(EXP4R_num, EXP4I_num, EXP4R_den, EXP4I_den),
+            EXP4I     = helpers.cdivideI(EXP4R_num, EXP4I_num, EXP4R_den, EXP4I_den),
 
             // A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2)))
-            EXP5Rb_num = PhaseMatch.caddR( -2*A2R, -2*A2I, A9R, A9I),
-            EXP5Ib_num = PhaseMatch.caddI( -2*A2R, -2*A2I, A9R, A9I),
-            EXP5Rc_num = PhaseMatch.cmultiplyR( EXP5Rb_num, EXP5Ib_num,EXP5Rb_num, EXP5Ib_num),
-            EXP5Ic_num = PhaseMatch.cmultiplyI( EXP5Rb_num, EXP5Ib_num,EXP5Rb_num, EXP5Ib_num),
-            EXP5R_num  = PhaseMatch.cmultiplyR( EXP3R, EXP3I ,EXP5Rc_num, EXP5Ic_num),
-            EXP5I_num  = PhaseMatch.cmultiplyI( EXP3R, EXP3I ,EXP5Rc_num, EXP5Ic_num),
-            // EXP5R_num  = PhaseMatch.cmultiplyR( EXP5Rd_num, EXP5Id_num, EXP5Rd_num, EXP5Id_num),
-            // EXP5I_num  = PhaseMatch.cmultiplyI( EXP5Rd_num, EXP5Id_num, EXP5Rd_num, EXP5Id_num),
+            EXP5Rb_num = helpers.caddR( -2*A2R, -2*A2I, A9R, A9I),
+            EXP5Ib_num = helpers.caddI( -2*A2R, -2*A2I, A9R, A9I),
+            EXP5Rc_num = helpers.cmultiplyR( EXP5Rb_num, EXP5Ib_num,EXP5Rb_num, EXP5Ib_num),
+            EXP5Ic_num = helpers.cmultiplyI( EXP5Rb_num, EXP5Ib_num,EXP5Rb_num, EXP5Ib_num),
+            EXP5R_num  = helpers.cmultiplyR( EXP3R, EXP3I ,EXP5Rc_num, EXP5Ic_num),
+            EXP5I_num  = helpers.cmultiplyI( EXP3R, EXP3I ,EXP5Rc_num, EXP5Ic_num),
+            // EXP5R_num  = helpers.cmultiplyR( EXP5Rd_num, EXP5Id_num, EXP5Rd_num, EXP5Id_num),
+            // EXP5I_num  = helpers.cmultiplyI( EXP5Rd_num, EXP5Id_num, EXP5Rd_num, EXP5Id_num),
             // Denominator
-            EXP5Ra_den = -1 * PhaseMatch.cmultiplyR(A9R, A9I, A9R, A9I),
-            EXP5Ia_den = -1 * PhaseMatch.cmultiplyI(A9R, A9I, A9R, A9I),
-            EXP5Rb_den =  4 * PhaseMatch.cmultiplyR( A2R, A2I, A4R, A4I),
-            EXP5Ib_den =  4 * PhaseMatch.cmultiplyI( A2R, A2I, A4R, A4I),
-            EXP5R_den =  PhaseMatch.caddR( EXP5Ra_den, EXP5Ia_den, EXP5Rb_den, EXP5Ib_den ),
-            EXP5I_den =  PhaseMatch.caddI( EXP5Ra_den, EXP5Ia_den, EXP5Rb_den, EXP5Ib_den ),
+            EXP5Ra_den = -1 * helpers.cmultiplyR(A9R, A9I, A9R, A9I),
+            EXP5Ia_den = -1 * helpers.cmultiplyI(A9R, A9I, A9R, A9I),
+            EXP5Rb_den =  4 * helpers.cmultiplyR( A2R, A2I, A4R, A4I),
+            EXP5Ib_den =  4 * helpers.cmultiplyI( A2R, A2I, A4R, A4I),
+            EXP5R_den =  helpers.caddR( EXP5Ra_den, EXP5Ia_den, EXP5Rb_den, EXP5Ib_den ),
+            EXP5I_den =  helpers.caddI( EXP5Ra_den, EXP5Ia_den, EXP5Rb_den, EXP5Ib_den ),
             // expression for fifth term
-            EXP5R     = PhaseMatch.cdivideR(EXP5R_num, EXP5I_num, EXP5R_den, EXP5I_den),
-            EXP5I     = PhaseMatch.cdivideI(EXP5R_num, EXP5I_num, EXP5R_den, EXP5I_den),
+            EXP5R     = helpers.cdivideR(EXP5R_num, EXP5I_num, EXP5R_den, EXP5I_den),
+            EXP5I     = helpers.cdivideI(EXP5R_num, EXP5I_num, EXP5R_den, EXP5I_den),
 
             // Full expression for term in the exponential
-            EXP6R_a = PhaseMatch.caddR(EXP1R, EXP1I, -1*EXP2R, -1*EXP2I),
-            EXP6I_a = PhaseMatch.caddI(EXP1R, EXP1I, -1*EXP2R, -1*EXP2I),
-            EXP6R_b = PhaseMatch.caddR(EXP6R_a, EXP6I_a, -1*EXP3R, -1*EXP3I),
-            EXP6I_b = PhaseMatch.caddI(EXP6R_a, EXP6I_a, -1*EXP3R, -1*EXP3I),
-            EXP6R_c = PhaseMatch.caddR(EXP6R_b, EXP6I_b, -1*EXP4R, -1*EXP4I),
-            EXP6I_c = PhaseMatch.caddI(EXP6R_b, EXP6I_b, -1*EXP4R, -1*EXP4I),
-            EXPR = 0.25 * PhaseMatch.caddR(EXP6R_c, EXP6I_c, -1*EXP5R, -1*EXP5I),
-            EXPI = 0.25 * PhaseMatch.caddI(EXP6R_c, EXP6I_c, -1*EXP5R, -1*EXP5I),
+            EXP6R_a = helpers.caddR(EXP1R, EXP1I, -1*EXP2R, -1*EXP2I),
+            EXP6I_a = helpers.caddI(EXP1R, EXP1I, -1*EXP2R, -1*EXP2I),
+            EXP6R_b = helpers.caddR(EXP6R_a, EXP6I_a, -1*EXP3R, -1*EXP3I),
+            EXP6I_b = helpers.caddI(EXP6R_a, EXP6I_a, -1*EXP3R, -1*EXP3I),
+            EXP6R_c = helpers.caddR(EXP6R_b, EXP6I_b, -1*EXP4R, -1*EXP4I),
+            EXP6I_c = helpers.caddI(EXP6R_b, EXP6I_b, -1*EXP4R, -1*EXP4I),
+            EXPR = 0.25 * helpers.caddR(EXP6R_c, EXP6I_c, -1*EXP5R, -1*EXP5I),
+            EXPI = 0.25 * helpers.caddI(EXP6R_c, EXP6I_c, -1*EXP5R, -1*EXP5I),
 
 
             //////////////////////////////////////////////////////////////////////////////
@@ -377,28 +443,28 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             // Sqrt[A1 A2 (-4 A3 + A8^2/A1) (-4 A4 + A9^2/A2)]
 
             // A1 A2
-            DEN1R = PhaseMatch.cmultiplyR(A1R, A1I, A2R, A2I),
-            DEN1I = PhaseMatch.cmultiplyI(A1R, A1I, A2R, A2I),
+            DEN1R = helpers.cmultiplyR(A1R, A1I, A2R, A2I),
+            DEN1I = helpers.cmultiplyI(A1R, A1I, A2R, A2I),
 
             // (-4 A3 + A8^2/A1) //Matlab (-4 A7 + A10^2/A3)
-            DEN2R_a = PhaseMatch.cdivideR(-1*EXP4Ra_den, -1*EXP4Ia_den, A1R, A1I),
-            DEN2I_a = PhaseMatch.cdivideI(-1*EXP4Ra_den, -1*EXP4Ia_den, A1R, A1I),
-            DEN2R = PhaseMatch.caddR(-4*A3R, -4*A3I, DEN2R_a, DEN2I_a),
-            DEN2I = PhaseMatch.caddI(-4*A3R, -4*A3I, DEN2R_a, DEN2I_a),
+            DEN2R_a = helpers.cdivideR(-1*EXP4Ra_den, -1*EXP4Ia_den, A1R, A1I),
+            DEN2I_a = helpers.cdivideI(-1*EXP4Ra_den, -1*EXP4Ia_den, A1R, A1I),
+            DEN2R = helpers.caddR(-4*A3R, -4*A3I, DEN2R_a, DEN2I_a),
+            DEN2I = helpers.caddI(-4*A3R, -4*A3I, DEN2R_a, DEN2I_a),
 
             // (-4 A4 + A9^2/A2)
-            DEN3R_a = PhaseMatch.cdivideR(-1*EXP5Ra_den, -1*EXP5Ia_den, A2R, A2I),
-            DEN3I_a = PhaseMatch.cdivideI(-1*EXP5Ra_den, -1*EXP5Ia_den, A2R, A2I),
-            DEN3R = PhaseMatch.caddR(-4*A4R, -4*A4I, DEN3R_a, DEN3I_a),
-            DEN3I = PhaseMatch.caddI(-4*A4R, -4*A4I, DEN3R_a, DEN3I_a),
+            DEN3R_a = helpers.cdivideR(-1*EXP5Ra_den, -1*EXP5Ia_den, A2R, A2I),
+            DEN3I_a = helpers.cdivideI(-1*EXP5Ra_den, -1*EXP5Ia_den, A2R, A2I),
+            DEN3R = helpers.caddR(-4*A4R, -4*A4I, DEN3R_a, DEN3I_a),
+            DEN3I = helpers.caddI(-4*A4R, -4*A4I, DEN3R_a, DEN3I_a),
 
             // full expression for denominator
-            DEN4R_a = PhaseMatch.cmultiplyR(DEN1R, DEN1I, DEN2R, DEN2I),
-            DEN4I_a = PhaseMatch.cmultiplyI(DEN1R, DEN1I, DEN2R, DEN2I),
-            DEN4R_b = PhaseMatch.cmultiplyR(DEN4R_a, DEN4I_a, DEN3R, DEN3I),
-            DEN4I_b = PhaseMatch.cmultiplyI(DEN4R_a, DEN4I_a, DEN3R, DEN3I),
-            DENR     = PhaseMatch.csqrtR(DEN4R_b, DEN4I_b),
-            DENI     = PhaseMatch.csqrtI(DEN4R_b, DEN4I_b),
+            DEN4R_a = helpers.cmultiplyR(DEN1R, DEN1I, DEN2R, DEN2I),
+            DEN4I_a = helpers.cmultiplyI(DEN1R, DEN1I, DEN2R, DEN2I),
+            DEN4R_b = helpers.cmultiplyR(DEN4R_a, DEN4I_a, DEN3R, DEN3I),
+            DEN4I_b = helpers.cmultiplyI(DEN4R_a, DEN4I_a, DEN3R, DEN3I),
+            DENR     = helpers.csqrtR(DEN4R_b, DEN4I_b),
+            DENI     = helpers.csqrtI(DEN4R_b, DEN4I_b),
 
             // Now calculate the full term in the integral.
             pmzcoeff = Math.exp(- 1/2*sq(z/bw)), // apodization
@@ -408,8 +474,8 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             // coeffR = 1,
             EReal = coeffR * pmzcoeff*Math.cos(EXPI),
             EImag = coeffR * pmzcoeff*Math.sin(EXPI),
-            real = PhaseMatch.cdivideR(EReal, EImag, DENR, DENI),
-            imag = PhaseMatch.cdivideI(EReal, EImag, DENR, DENI)
+            real = helpers.cdivideR(EReal, EImag, DENR, DENI),
+            imag = helpers.cdivideI(EReal, EImag, DENR, DENI)
             ;
             var EXPRadd = (EXP1R -EXP2R -EXP3R -EXP4R -EXP5R)/4;
 
@@ -440,11 +506,11 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     if (P.calcfibercoupling){
         var dz = 2/P.numzint;
-        var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
+        var pmintz = helpers.Nintegrate2arg(zintfunc,-1, 1,dz,P.numzint,P.zweights);
         // var pmintz = zintfunc(0.5);
 
         // var dz = 1;
-        // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
+        // var pmintz = helpers.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
         // PMz_real = pmintz[0]/P.L ;
         // PMz_imag = pmintz[1]/P.L ;
         PMz_real = pmintz[0]/2;
@@ -470,7 +536,7 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         PMz_imag = 0;
     }
 
-    PhaseMatch.convertToMeters(P);
+    convertToMeters(P);
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
     // console.log(PMz_real.toString());
@@ -483,11 +549,10 @@ PhaseMatch.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
  * Get the constants and terms used in the calculation of the momentum
  * space joint spectrum for the singles counts from the Idler.
  */
-PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
+var calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     // console.log("hi");
     // console.log("\n");
     var toMicrons= 1;
-    var con = PhaseMatch.constants;
     var lambda_p = P.lambda_p; //store the original lambda_p
     var n_p = P.n_p;
 
@@ -519,7 +584,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     var RHOpx = P.walkoff_p; //pump walkoff angle.
     // var RHOpx = 0
 
-    PhaseMatch.convertToMicrons(P);
+    convertToMicrons(P);
     var omega_s = twoPIc / (P.lambda_s ),
         omega_i = twoPIc / (P.lambda_i),
         omega_p = omega_s + omega_i
@@ -673,10 +738,10 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     // //     ,M1I = -C2_r
     // //     ,M2R = 2*hs - C2_i
     // //     ,M2I = C2_r
-    //     ,M1_SQR = PhaseMatch.cmultiplyR( M1R, M1I, M1R, M1I)
-    //     ,M1_SQI = PhaseMatch.cmultiplyI( M1R, M1I, M1R, M1I)
-    //     ,M2_SQR = PhaseMatch.cmultiplyR( M2R, M2I, M2R, M2I)
-    //     ,M2_SQI = PhaseMatch.cmultiplyI( M2R, M2I, M2R, M2I)
+    //     ,M1_SQR = helpers.cmultiplyR( M1R, M1I, M1R, M1I)
+    //     ,M1_SQI = helpers.cmultiplyI( M1R, M1I, M1R, M1I)
+    //     ,M2_SQR = helpers.cmultiplyR( M2R, M2I, M2R, M2I)
+    //     ,M2_SQI = helpers.cmultiplyI( M2R, M2I, M2R, M2I)
     //     ;
 
     // As a function of z1 along the crystal, calculate the z1-dependent coefficients
@@ -756,68 +821,68 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
             //Now to calculate the term EE
             // EE = 1/4*(-  2*Wx^2 + I B6a + C5/X11*(C9 - I A1)^2 - I C5/X12*(C9 + I A2)^2  )
-            // ,EE1R = PhaseMatch.cmultiplyR(C9, -A1, C9, -A1)
-            // ,EE1I = PhaseMatch.cmultiplyI(C9, -A1, C9, -A1)
-            // ,EE2R = PhaseMatch.cmultiplyR(C9, A2, C9, A2)
-            // ,EE2I = PhaseMatch.cmultiplyI(C9, A2, C9, A2)
-            // ,EE3R = C5 * PhaseMatch.cdivideR(EE1R, EE1I, X11R, X11I)
-            // ,EE3I = C5 * PhaseMatch.cdivideI(EE1R, EE1I, X11R, X11I)
-            // ,EE4R = C5 * PhaseMatch.cdivideR(EE2R, EE2I, X12R, X12I)
-            // ,EE4I = C5 * PhaseMatch.cdivideI(EE2R, EE2I, X12R, X12I)
-            // ,EE5R = PhaseMatch.cmultiplyR(0, 1, EE4R, EE4I)
-            // ,EE5I = PhaseMatch.cmultiplyI(0, 1, EE4R, EE4I)
+            // ,EE1R = helpers.cmultiplyR(C9, -A1, C9, -A1)
+            // ,EE1I = helpers.cmultiplyI(C9, -A1, C9, -A1)
+            // ,EE2R = helpers.cmultiplyR(C9, A2, C9, A2)
+            // ,EE2I = helpers.cmultiplyI(C9, A2, C9, A2)
+            // ,EE3R = C5 * helpers.cdivideR(EE1R, EE1I, X11R, X11I)
+            // ,EE3I = C5 * helpers.cdivideI(EE1R, EE1I, X11R, X11I)
+            // ,EE4R = C5 * helpers.cdivideR(EE2R, EE2I, X12R, X12I)
+            // ,EE4I = C5 * helpers.cdivideI(EE2R, EE2I, X12R, X12I)
+            // ,EE5R = helpers.cmultiplyR(0, 1, EE4R, EE4I)
+            // ,EE5I = helpers.cmultiplyI(0, 1, EE4R, EE4I)
             // ,EER = 0.25 * (-2*Wx_SQ + EE3R - EE5R)
             // ,EEI = 0.25 * (B6a + EE3I - EE5I)
 
-            ,EE1R = PhaseMatch.cmultiplyR(A1, C9, A1, C9)
-            ,EE1I = PhaseMatch.cmultiplyI(A1, C9, A1, C9)
-            ,EE2R = PhaseMatch.cmultiplyR(A2, -C9, A2, -C9)
-            ,EE2I = PhaseMatch.cmultiplyI(A2, -C9, A2, -C9)
-            ,EE3R = C5 * PhaseMatch.cdivideR(EE1R, EE1I, X11R, X11I)
-            ,EE3I = C5 * PhaseMatch.cdivideI(EE1R, EE1I, X11R, X11I)
-            ,EE4R = C5 * PhaseMatch.cdivideR(EE2R, EE2I, X12R, X12I)
-            ,EE4I = C5 * PhaseMatch.cdivideI(EE2R, EE2I, X12R, X12I)
-            ,EE5R = PhaseMatch.cmultiplyR(0, 1, EE4R, EE4I)
-            ,EE5I = PhaseMatch.cmultiplyI(0, 1, EE4R, EE4I)
+            ,EE1R = helpers.cmultiplyR(A1, C9, A1, C9)
+            ,EE1I = helpers.cmultiplyI(A1, C9, A1, C9)
+            ,EE2R = helpers.cmultiplyR(A2, -C9, A2, -C9)
+            ,EE2I = helpers.cmultiplyI(A2, -C9, A2, -C9)
+            ,EE3R = C5 * helpers.cdivideR(EE1R, EE1I, X11R, X11I)
+            ,EE3I = C5 * helpers.cdivideI(EE1R, EE1I, X11R, X11I)
+            ,EE4R = C5 * helpers.cdivideR(EE2R, EE2I, X12R, X12I)
+            ,EE4I = C5 * helpers.cdivideI(EE2R, EE2I, X12R, X12I)
+            ,EE5R = helpers.cmultiplyR(0, 1, EE4R, EE4I)
+            ,EE5I = helpers.cmultiplyI(0, 1, EE4R, EE4I)
             ,EER = 0.25 * (-2*Wx_SQ - EE3R + EE5R)
             ,EEI = 0.25 * (B6a - EE3I + EE5I)
 
 
             //Now to calculate the term FF
             // FF = 1/4*(-2*Wy^2 + I B6a - C5/Y21 *(I C10 + A1)^2 + I C5/Y22 *(-I C10 + A2)^2)
-            ,FF1R = PhaseMatch.cmultiplyR(A1, C10, A1, C10)
-            ,FF1I = PhaseMatch.cmultiplyI(A1, C10, A1, C10)
-            ,FF2R = PhaseMatch.cmultiplyR(A2, -C10, A2, -C10)
-            ,FF2I = PhaseMatch.cmultiplyI(A2, -C10, A2, -C10)
-            ,FF3R = C5 * PhaseMatch.cdivideR(FF1R, FF1I, Y21R, Y21I)
-            ,FF3I = C5 * PhaseMatch.cdivideI(FF1R, FF1I, Y21R, Y21I)
-            ,FF4R = C5 * PhaseMatch.cdivideR(FF2R, FF2I, Y22R, Y22I)
-            ,FF4I = C5 * PhaseMatch.cdivideI(FF2R, FF2I, Y22R, Y22I)
-            ,FF5R = PhaseMatch.cmultiplyR(0, 1, FF4R, FF4I)
-            ,FF5I = PhaseMatch.cmultiplyI(0, 1, FF4R, FF4I)
+            ,FF1R = helpers.cmultiplyR(A1, C10, A1, C10)
+            ,FF1I = helpers.cmultiplyI(A1, C10, A1, C10)
+            ,FF2R = helpers.cmultiplyR(A2, -C10, A2, -C10)
+            ,FF2I = helpers.cmultiplyI(A2, -C10, A2, -C10)
+            ,FF3R = C5 * helpers.cdivideR(FF1R, FF1I, Y21R, Y21I)
+            ,FF3I = C5 * helpers.cdivideI(FF1R, FF1I, Y21R, Y21I)
+            ,FF4R = C5 * helpers.cdivideR(FF2R, FF2I, Y22R, Y22I)
+            ,FF4I = C5 * helpers.cdivideI(FF2R, FF2I, Y22R, Y22I)
+            ,FF5R = helpers.cmultiplyR(0, 1, FF4R, FF4I)
+            ,FF5I = helpers.cmultiplyI(0, 1, FF4R, FF4I)
             ,FFR = 0.25 * (-2*Wy_SQ - FF3R + FF5R)
             ,FFI = 0.25 * (B6a - FF3I + FF5I)
 
             //Now to calculate the term GG
             // GG = ks*( \[Alpha]3c/X12 *(I C9 - A2)  +  \[Alpha]3/X11 *(-C9 + I A1));
-            ,GG1R = PhaseMatch.cmultiplyR(-C9, A1, alpha3R, alpha3I)
-            ,GG1I = PhaseMatch.cmultiplyI(-C9, A1, alpha3R, alpha3I)
-            ,GG2R = PhaseMatch.cdivideR(GG1R, GG1I, X11R, X11I)
-            ,GG2I = PhaseMatch.cdivideI(GG1R, GG1I, X11R, X11I)
-            ,GG3R = PhaseMatch.cmultiplyR(-A2, C9, alpha3cR, alpha3cI)
-            ,GG3I = PhaseMatch.cmultiplyI(-A2, C9, alpha3cR, alpha3cI)
-            ,GG4R = PhaseMatch.cdivideR(GG3R, GG3I, X12R, X12I)
-            ,GG4I = PhaseMatch.cdivideI(GG3R, GG3I, X12R, X12I)
+            ,GG1R = helpers.cmultiplyR(-C9, A1, alpha3R, alpha3I)
+            ,GG1I = helpers.cmultiplyI(-C9, A1, alpha3R, alpha3I)
+            ,GG2R = helpers.cdivideR(GG1R, GG1I, X11R, X11I)
+            ,GG2I = helpers.cdivideI(GG1R, GG1I, X11R, X11I)
+            ,GG3R = helpers.cmultiplyR(-A2, C9, alpha3cR, alpha3cI)
+            ,GG3I = helpers.cmultiplyI(-A2, C9, alpha3cR, alpha3cI)
+            ,GG4R = helpers.cdivideR(GG3R, GG3I, X12R, X12I)
+            ,GG4I = helpers.cdivideI(GG3R, GG3I, X12R, X12I)
             ,GGR = k_s * ( GG2R + GG4R)
             ,GGI = k_s * ( GG2I + GG4I)
 
             //Now to calculate the term HH
             // HH = L * \[Rho]/2 *(I B0 + ks*(B3/Y21 *(-I C10 - A1)  +  B4/Y22 *(C10 + I A2)));
             // HH = L * \[Rho]/2 *(I B0 + ks*(B3/Y21 *(-I C10 - A1)  +  B4/Y22 *(C10 + I A2)));
-            ,HH2R = B4 * PhaseMatch.cdivideR(C10, A2, Y22R, Y22I)
-            ,HH2I = B4 * PhaseMatch.cdivideI(C10, A2, Y22R, Y22I)
-            ,HH4R = B3 * PhaseMatch.cdivideR(-A1, -C10, Y21R, Y21I)
-            ,HH4I = B3 * PhaseMatch.cdivideI(-A1, -C10, Y21R, Y21I)
+            ,HH2R = B4 * helpers.cdivideR(C10, A2, Y22R, Y22I)
+            ,HH2I = B4 * helpers.cdivideI(C10, A2, Y22R, Y22I)
+            ,HH4R = B3 * helpers.cdivideR(-A1, -C10, Y21R, Y21I)
+            ,HH4I = B3 * helpers.cdivideI(-A1, -C10, Y21R, Y21I)
             ,HHR = 0.5 * LRho * (k_s * (HH2R + HH4R))
             ,HHI = 0.5 * LRho * (B0 + k_s * (HH2I + HH4I))
 
@@ -827,20 +892,20 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // IIgam = kp*ks*(\[Alpha]3^2/X11 - I \[Alpha]3c^2/X12)
             // IIdelk = 2 \[CapitalGamma]4s + 0.5 I (C3*B0)
 
-            ,IIrho1R = sq(B4) * PhaseMatch.cdivideR(0, 1, Y22R, Y22I)
-            ,IIrho1I = sq(B4) * PhaseMatch.cdivideI(0, 1, Y22R, Y22I)
-            ,IIrho2R = sq(B3) * PhaseMatch.cdivideR(1, 0, Y21R, Y21I)
-            ,IIrho2I = sq(B3) * PhaseMatch.cdivideI(1, 0, Y21R, Y21I)
+            ,IIrho1R = sq(B4) * helpers.cdivideR(0, 1, Y22R, Y22I)
+            ,IIrho1I = sq(B4) * helpers.cdivideI(0, 1, Y22R, Y22I)
+            ,IIrho2R = sq(B3) * helpers.cdivideR(1, 0, Y21R, Y21I)
+            ,IIrho2I = sq(B3) * helpers.cdivideI(1, 0, Y21R, Y21I)
             ,IIrhoR = 0.25 * LRho_sq * (IIrho1R - IIrho2R)
             ,IIrhoI = 0.25 * LRho_sq * (IIrho1I - IIrho2I)
-            ,IIgam1R = PhaseMatch.cmultiplyR(alpha3R, alpha3I, alpha3R, alpha3I)
-            ,IIgam1I = PhaseMatch.cmultiplyI(alpha3R, alpha3I, alpha3R, alpha3I)
-            ,IIgam2R = PhaseMatch.cdivideR(IIgam1R, IIgam1I, X11R, X11I)
-            ,IIgam2I = PhaseMatch.cdivideI(IIgam1R, IIgam1I, X11R, X11I)
-            ,IIgam3R = PhaseMatch.cmultiplyR(alpha3cR, alpha3cI, alpha3cR, alpha3cI)
-            ,IIgam3I = PhaseMatch.cmultiplyI(alpha3cR, alpha3cI, alpha3cR, alpha3cI)
-            ,IIgam4R = PhaseMatch.cdivideR(IIgam3R, IIgam3I, X12R, X12I)
-            ,IIgam4I = PhaseMatch.cdivideI(IIgam3R, IIgam3I, X12R, X12I)
+            ,IIgam1R = helpers.cmultiplyR(alpha3R, alpha3I, alpha3R, alpha3I)
+            ,IIgam1I = helpers.cmultiplyI(alpha3R, alpha3I, alpha3R, alpha3I)
+            ,IIgam2R = helpers.cdivideR(IIgam1R, IIgam1I, X11R, X11I)
+            ,IIgam2I = helpers.cdivideI(IIgam1R, IIgam1I, X11R, X11I)
+            ,IIgam3R = helpers.cmultiplyR(alpha3cR, alpha3cI, alpha3cR, alpha3cI)
+            ,IIgam3I = helpers.cmultiplyI(alpha3cR, alpha3cI, alpha3cR, alpha3cI)
+            ,IIgam4R = helpers.cdivideR(IIgam3R, IIgam3I, X12R, X12I)
+            ,IIgam4I = helpers.cdivideI(IIgam3R, IIgam3I, X12R, X12I)
             ,IIgamR = IIgam2R + IIgam4I
             ,IIgamI = IIgam2I - IIgam4R
             ,IIR = 2*GAM4s + KpKs * (IIrhoR + IIgamR)
@@ -852,38 +917,38 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // ,HHI = 0
             // ,GGR = 0
             // ,GGI = 0
-            // // ,II2R = PhaseMatch.cmultiplyR(B6, 0, 0, 2*C7)
-            // ,II2I = PhaseMatch.cmultiplyI(B6, 0, 0, 2*C7)
-            // ,IIR = 0.25 * PhaseMatch.caddR(II1R, II1I, II2R, II2I)
-            // ,III = 0.25 * PhaseMatch.caddI(II1R, II1I, II2R, II2I)
+            // // ,II2R = helpers.cmultiplyR(B6, 0, 0, 2*C7)
+            // ,II2I = helpers.cmultiplyI(B6, 0, 0, 2*C7)
+            // ,IIR = 0.25 * helpers.caddR(II1R, II1I, II2R, II2I)
+            // ,III = 0.25 * helpers.caddI(II1R, II1I, II2R, II2I)
 
             // Now calculate terms in the numerator
             // Exp(-(GG^2/(4 EE)) - HH^2/(4 FF) + II)
-            ,EXP1R = PhaseMatch.cmultiplyR(GGR, GGI, GGR, GGI)
-            ,EXP1I = PhaseMatch.cmultiplyI(GGR, GGI, GGR, GGI)
-            ,EXP2R = - PhaseMatch.cdivideR(EXP1R, EXP1I, EER, EEI) /4
-            ,EXP2I = - PhaseMatch.cdivideI(EXP1R, EXP1I, EER, EEI) /4
-            ,EXP3R = PhaseMatch.cmultiplyR(HHR, HHI, HHR, HHI)
-            ,EXP3I = PhaseMatch.cmultiplyI(HHR, HHI, HHR, HHI)
-            ,EXP4R = PhaseMatch.cdivideR(EXP3R, EXP3I, -4*FFR, -4*FFI)
-            ,EXP4I = PhaseMatch.cdivideI(EXP3R, EXP3I, -4*FFR, -4*FFI)
+            ,EXP1R = helpers.cmultiplyR(GGR, GGI, GGR, GGI)
+            ,EXP1I = helpers.cmultiplyI(GGR, GGI, GGR, GGI)
+            ,EXP2R = - helpers.cdivideR(EXP1R, EXP1I, EER, EEI) /4
+            ,EXP2I = - helpers.cdivideI(EXP1R, EXP1I, EER, EEI) /4
+            ,EXP3R = helpers.cmultiplyR(HHR, HHI, HHR, HHI)
+            ,EXP3I = helpers.cmultiplyI(HHR, HHI, HHR, HHI)
+            ,EXP4R = helpers.cdivideR(EXP3R, EXP3I, -4*FFR, -4*FFI)
+            ,EXP4I = helpers.cdivideI(EXP3R, EXP3I, -4*FFR, -4*FFI)
             ,EXPR  = EXP2R + EXP4R + IIR
             ,EXPI  = EXP2I + EXP4I + III
 
             // Now calculate terms in the DENominator
             // 8 * Sqrt[AA1 BB1 AA2 BB2 EE FF]
-            ,Den1R = PhaseMatch.cmultiplyR(AA1R, AA1I, BB1R, BB1I)
-            ,Den1I = PhaseMatch.cmultiplyI(AA1R, AA1I, BB1R, BB1I)
-            ,Den2R = PhaseMatch.cmultiplyR(AA2R, AA2I, BB2R, BB2I)
-            ,Den2I = PhaseMatch.cmultiplyI(AA2R, AA2I, BB2R, BB2I)
-            ,Den3R = PhaseMatch.cmultiplyR(EER, EEI, FFR, FFI)
-            ,Den3I = PhaseMatch.cmultiplyI(EER, EEI, FFR, FFI)
-            ,Den4R = PhaseMatch.cmultiplyR(Den1R, Den1I, Den2R, Den2I)
-            ,Den4I = PhaseMatch.cmultiplyI(Den1R, Den1I, Den2R, Den2I)
-            ,Den5R = PhaseMatch.cmultiplyR(Den4R, Den4I, Den3R, Den3I)
-            ,Den5I = PhaseMatch.cmultiplyI(Den4R, Den4I, Den3R, Den3I)
-            ,DenR  = 8 * PhaseMatch.csqrtR(Den5R, Den5I)
-            ,DenI  = 8 * PhaseMatch.csqrtI(Den5R, Den5I)
+            ,Den1R = helpers.cmultiplyR(AA1R, AA1I, BB1R, BB1I)
+            ,Den1I = helpers.cmultiplyI(AA1R, AA1I, BB1R, BB1I)
+            ,Den2R = helpers.cmultiplyR(AA2R, AA2I, BB2R, BB2I)
+            ,Den2I = helpers.cmultiplyI(AA2R, AA2I, BB2R, BB2I)
+            ,Den3R = helpers.cmultiplyR(EER, EEI, FFR, FFI)
+            ,Den3I = helpers.cmultiplyI(EER, EEI, FFR, FFI)
+            ,Den4R = helpers.cmultiplyR(Den1R, Den1I, Den2R, Den2I)
+            ,Den4I = helpers.cmultiplyI(Den1R, Den1I, Den2R, Den2I)
+            ,Den5R = helpers.cmultiplyR(Den4R, Den4I, Den3R, Den3I)
+            ,Den5I = helpers.cmultiplyI(Den4R, Den4I, Den3R, Den3I)
+            ,DenR  = 8 * helpers.csqrtR(Den5R, Den5I)
+            ,DenI  = 8 * helpers.csqrtI(Den5R, Den5I)
 
             // Now calculate the full term in the integral.
             // @TODO: Not sure how to correctly handle the apodization in the double length integral
@@ -898,8 +963,8 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // ,real = coeffR
             // ,imag = 0
 
-            ,real = 0.5* PhaseMatch.cdivideR(EReal, EImag, DenR, DenI)
-            ,imag = 0.5* PhaseMatch.cdivideI(EReal, EImag, DenR, DenI)
+            ,real = 0.5* helpers.cdivideR(EReal, EImag, DenR, DenI)
+            ,imag = 0.5* helpers.cdivideI(EReal, EImag, DenR, DenI)
 
             // console.log("Int: " + IIR.toString() + ", " + III.toString() + ", " + EReal.toString() + ", " + EImag.toString());
 
@@ -972,7 +1037,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         return [real, imag];
     };
 
-    var delK = PhaseMatch.calc_delK(P);
+    var delK = calc_delK(P);
     var delKx = delK[0],
         delKy = delK[1],
         delKz = delK[2]
@@ -983,7 +1048,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     var PMt = 1;
     if (P.calcfibercoupling){
         var dz = 2/P.numz2Dint;
-        var pmintz = PhaseMatch.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
+        var pmintz = helpers.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
         // var  z1 = 0
         //     ,z2 = 0.5
         // var z1 = 0.5
@@ -993,7 +1058,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
         // console.log("Int: " + pmintz[0].toString() + ", " + pmintz[1].toString() + ", " + P.z2Dweights.length.toString());
         // var dz = 1;
-        // var pmintz = PhaseMatch.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
+        // var pmintz = helpers.Nintegrate2arg(zintfunc,-1, 1,dz,1,P.zweights);
         // PMz_real = pmintz[0]/P.L ;
         // PMz_imag = pmintz[1]/P.L ;
         PMz_real = pmintz[0]/2;
@@ -1018,7 +1083,7 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         PMz_real = Math.exp(-0.193*sq(arg));
         PMz_imag = 0;
     }
-    PhaseMatch.convertToMeters(P);
+    convertToMeters(P);
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
 
@@ -1030,122 +1095,10 @@ PhaseMatch.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 };
 
 
-/*
- * Normalization function for the joint spectrums
- */
-PhaseMatch.normalize_joint_spectrum = function normalize_joint_spectrum (props){
-    // Find the optimum phase matching condition. This will be when delK = 0 and everything is collinear.
-    // Need to calculate optimum poling period and crystal angle.
-    var P = props.clone();
-    P.theta_s = 0;
-    P.theta_i = 0;
-    P.theta_s_e = 0;
-    P.theta_i_e = 0;
-    P.update_all_angles();
 
-    if (props.enable_pp){
-        P.calc_poling_period();
-    }
-    else{
-        P.auto_calc_Theta();
-    }
-
-    var norm = PhaseMatch.phasematch_Int_Phase(P)['phasematch'];
-    return norm;
-
-};
-
-/*
- * Normalization function for the joint spectrum of the Singles rate
- */
-PhaseMatch.normalize_joint_spectrum_singles = function normalize_joint_spectrum_singles (props){
-    // Find the optimum phase matching condition. This will be when delK = 0 and everything is collinear.
-    // Need to calculate optimum poling period and crystal angle.
-    var P = props.clone();
-    P.theta_s = 0;
-    P.theta_i = 0;
-    P.theta_s_e = 0;
-    P.theta_i_e = 0;
-    P.update_all_angles();
-
-    if (props.enable_pp){
-        P.calc_poling_period();
-    }
-    else{
-        P.auto_calc_Theta();
-    }
-
-    var convfromFWHM = Math.sqrt(2) // Use 1/e^2 in intensity.
-        ,Wi_SQ = Math.pow(P.W_sx  * convfromFWHM,2) // convert from FWHM to sigma @TODO: Change to P.W_i
-        ,PHI_s = 1/Math.cos(P.theta_s_e)
-        ;
-
-    //console.log("Wi squared: ", Wi_SQ*PHI_s);
-
-    var norm = PhaseMatch.phasematch_Int_Phase_Singles(P)['phasematch'];//*(Wi_SQ*PHI_s);
-    return norm;
-
-};
-
-/*
- * To deal with possible floating point errors, convert from meters to microns before performing the calculations.
- */
-PhaseMatch.convertToMicrons = function convertToMicrons (props){
-    var  P = props
-        // ,mu = 1E6
-        ,mu = 1
-        ;
-
-    // // P.L = P.L*mu;
-    // console.log("Length: " + (P.L * mu).toString());
-    P.lambda_p = P.lambda_p * mu;
-    P.lambda_s = P.lambda_s * mu;
-    P.lambda_i = P.lambda_i * mu;
-    P.W = P.W * mu;
-    P.p_bw = P.p_bw * mu;
-    P.W_sx = P.W_sx * mu;
-    P.W_ix = P.W_ix * mu;
-    // console.log("P.L about to set");
-    P.L = P.L * mu;
-    // // console.log("set P.L");
-    // P.poling_period = P.poling_period * mu;
-    // P.apodization_FWHM = P.apodization_FWHM * mu;
-
-    // P.update_all_angles();
-    // P.set_apodization_L();
-    // P.set_apodization_coeff();
-    // P.set_zint();
-
-    return P;
-
-};
-
-PhaseMatch.convertToMeters = function convertToMeters (props){
-    var  P = props
-        // ,mu = 1E-6
-        ,mu = 1
-        ;
-
-    // // P.L = P.L*mu;
-    // console.log("Length: " + (P.L * mu).toString());
-    P.lambda_p = P.lambda_p * mu;
-    P.lambda_s = P.lambda_s * mu;
-    P.lambda_i = P.lambda_i * mu;
-    P.W = P.W * mu;
-    P.p_bw = P.p_bw * mu;
-    P.W_sx = P.W_sx * mu;
-    P.W_ix = P.W_ix * mu;
-    // console.log("P.L about to set");
-    P.L = P.L * mu;
-    // // console.log("set P.L");
-    // P.poling_period = P.poling_period * mu;
-    // P.apodization_FWHM = P.apodization_FWHM * mu;
-
-    // P.update_all_angles();
-    // P.set_apodization_L();
-    // P.set_apodization_coeff();
-    // P.set_zint();
-
-    return P;
-
+module.exports = {
+    convertToMicrons: convertToMicrons
+    , convertToMeters: convertToMeters
+    , calc_PM_tz_k_coinc: calc_PM_tz_k_coinc
+    , calc_PM_tz_k_singles: calc_PM_tz_k_singles
 };
