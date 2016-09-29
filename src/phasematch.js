@@ -14,7 +14,7 @@ var sq = helpers.sq;
 Object.assign( PhaseMatch, helpers );
 
 // assign momentum functions
-var pm_momentum = require('./math/pm-lib-momentum');
+var pm_momentum = require('./pm-lib-momentum');
 Object.assign( PhaseMatch, pm_momentum );
 
 /**

@@ -2,10 +2,9 @@
  * Phasematching Library for momentum space calculations
  */
 var ellipticity = 1.0;
-var calc_delK = require('./pm-refraction').calc_delK;
 var con = require('./constants');
 var helpers = require('./math/helpers');
-
+var PhaseMatch = require('./phasematch');
 
 /*
  * To deal with possible floating point errors, convert from meters to microns before performing the calculations.
@@ -114,7 +113,7 @@ var calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // console.log("frequencies2:" + (P.lambda_p*1E9).toString() + ", " + (omega_p/twoPI*1E-9).toString() + ", " + (omega_s*1E-9).toString() + ", " + (omega_i*1E-9).toString() + ", ")
     // convertToMicrons(P);
 
-    var delK = calc_delK(P);
+    var delK = PhaseMatch.calc_delK(P);
     var delKx = delK[0],
         delKy = delK[1],
         delKz = delK[2]
@@ -1037,7 +1036,7 @@ var calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         return [real, imag];
     };
 
-    var delK = calc_delK(P);
+    var delK = PhaseMatch.calc_delK(P);
     var delKx = delK[0],
         delKy = delK[1],
         delKz = delK[2]
@@ -1096,9 +1095,9 @@ var calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
 
 
-module.exports = {
+Object.assign(module.exports, {
     convertToMicrons: convertToMicrons
     , convertToMeters: convertToMeters
     , calc_PM_tz_k_coinc: calc_PM_tz_k_coinc
     , calc_PM_tz_k_singles: calc_PM_tz_k_singles
-};
+});

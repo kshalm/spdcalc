@@ -38,15 +38,12 @@ module.exports = function(grunt) {
         browserDir: 'browser',
         browserDistDir: 'browser-dist',
 
-        pkg : pkg,
-        uglifyFiles : {}
+        pkg : pkg
     };
 
     // setup dynamic filenames
-    config.versioned = [config.pkg.name, config.pkg.version].join('-');
-    config.dist = ['dist/', '.js'].join(config.versioned);
-    config.uglifyFiles[['dist/', '.min.js'].join(config.versioned)] = config.dist;
-
+    config.dist = 'dist/phasematch.js';
+    
     // Project configuration.
     grunt.initConfig({
         pkg : config.pkg,
@@ -60,42 +57,8 @@ module.exports = function(grunt) {
             phasematch : ['dist/'],
             browser: ['<%= config.browserDistDir %>']
         },
-        // build a custom version of the lodash library for utility functions
-        // lodash: {
-        //     main: {
-        //         // modifiers for prepared builds
-        //         // backbone, csp, legacy, mobile, strict, underscore
-        //         modifier: 'modern',
-        //         // output location
-        //         dest: 'build/lodash.js',
-        //         options: {
-        //             // define a different Lo-Dash location
-        //             // useful if you wanna use a different Lo-Dash version (>= 0.7.0)
-        //             // by default, lodashbuilder uses always the latest version
-        //             // of Lo-Dash (that was in npm at the time of lodashbuilders installation)
-        //             // src: 'node_modules/lodash',
-        //             // More information can be found in the [Lo-Dash custom builds section](http://lodash.com/#custom-builds)
-        //             // category: ['collections', 'functions']
-        //             exports: ['none'],
-        //             iife: '(function(){%output%;lodash.extend(PhaseMatch.util, lodash);}());',
-        //             include: ['each', 'extend', 'bind', 'clone', 'keys', 'pick', 'memoize']
-        //             // minus: ['result', 'shuffle']
-        //             // plus: ['random', 'template'],
-        //             // template: './*.jst'
-        //             // settings: '{interpolate:/\\{\\{([\\s\\S]+?)\\}\\}/g}'
-        //         }
-        //     }
-        // },
-        // concatenate files into one file
-        concat : {
-            options : {
-                stripBanners : true,
-                banner : config.banner
-            },
-            phasematch : {
-                src : config.sources,
-                dest : config.dist
-            }
+        webpack: {
+            pm: require('./webpack.config')
         },
         copy: {
             phasematch: {
@@ -142,27 +105,15 @@ module.exports = function(grunt) {
         compass: {
             browser: {
                 options: {
-                    config: 'config.rb',
+                    config: 'config/compass.rb',
                     force: true
                 }
-            }
-        },
-        // watch a directory for changes and execute tasks when they change
-        watch: {
-          files: 'src/**/*.js',
-          tasks: [ 'concat:phasematch', 'copy:phasematch']
-        },
-        // minify the concatenated javascript
-        uglify : {
-            options : { mangle : true },
-            phasematch : {
-                files : config.uglifyFiles
             }
         },
         // unit tests on the concatenated javascript
         jasmine : {
             tests : {
-                src : ['dist/', '.js'].join(config.versioned),
+                src : config.dist,
                 options : {
                     specs : 'test/spec/*.spec.js',
                     template : 'test/grunt.tmpl'
@@ -172,7 +123,7 @@ module.exports = function(grunt) {
         // check coding conventions on src files
         jshint : {
             options : {
-                jshintrc : 'jshint.json'
+                jshintrc : 'config/jshint.json'
             },
             phasematch : ['src/*.js'],
             browser:  ['<%= config.browserDir %>/library/js/{.,modules,mediators}/*.js']
@@ -182,7 +133,6 @@ module.exports = function(grunt) {
     // register grunt plugins
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-copy');
@@ -190,14 +140,15 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-compass');
     grunt.loadNpmTasks('grunt-bg-shell');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
+    grunt.loadNpmTasks('grunt-webpack');
 
 
     grunt.registerTask('cleanup', ['clean', 'bgShell:cleanCompass']);
-    grunt.registerTask('dev', [ 'bgShell:watchCompass', 'bgShell:httpserver', 'watch']);
-    grunt.registerTask('server-dist', [ 'bgShell:httpserverDist', 'watch' ]);
+    grunt.registerTask('dev', [ 'bgShell:watchCompass', 'bgShell:httpserver']);
+    grunt.registerTask('server-dist', [ 'bgShell:httpserverDist' ]);
     grunt.registerTask('build-browser', ['cleanup', 'jshint:browser', 'compass', 'requirejs:browser']);
 
-    grunt.registerTask('build-phasematch', ['clean', 'concat:phasematch', 'copy:phasematch', 'jshint:phasematch', 'uglify']);
+    grunt.registerTask('build-phasematch', ['jshint:phasematch', 'clean', 'webpack:phasematch', 'copy:phasematch']);
 
     // Default task executes a build for phasematch library.
     grunt.registerTask('default', ['build-phasematch']);
