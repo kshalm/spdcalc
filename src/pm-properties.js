@@ -374,7 +374,7 @@ SPDCprop.prototype = {
         props.nslices = 10;
 
         var max_coinc = function(focus){
-            if (focus >0 || focus< -1*this.L){return 1e12;}
+            if (focus >0 || focus< -1*props.L){return 1e12;}
 
             props.z0s = focus;
             props.z0i = focus;
