@@ -4,6 +4,7 @@
 
 var PlotHelpers = module.exports = {};
 var helpers = require('./math/helpers');
+var sq = helpers.sq;
 var con = require('./constants');
 var PhaseMatch = require('./phasematch');
 
@@ -194,8 +195,6 @@ PlotHelpers.calc_JSI_rates_p = function calc_JSI_rates_p(props, lambda_s, lambda
         ,norm_sum_i = twoPIc * dlambda_i
         ,lomega = omega_s * omega_i /sq(props.n_s*props.n_i)
         ,norm_const = props.get_rates_constant();
-        ;
-        ;
 
     // for (var l = 0; l<lambda_s.length; l++){
     //     inv_lambda_s_sq += 1/sq(lambda_s[l]);
@@ -265,6 +264,8 @@ PlotHelpers.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lam
         ,twoPIc = 2*Math.PI*con.c
         ,omega_s = twoPIc / (P.lambda_s )
         ,omega_i = twoPIc / (P.lambda_i )
+        ,dOmega_s
+        ,dOmega_i
         ,pumpScale = Math.pow(P.W,2) // May need to later include the ellipticity parameter
         ,scale_s = 1/(Ws_SQ * PHI_s *pumpScale)
         ,scale_i =1/(Wi_SQ * PHI_i * pumpScale) //assume symmetric coupling geometry
@@ -274,7 +275,6 @@ PlotHelpers.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lam
         ,norm_sum_i = twoPIc * dlambda_i
         ,lomega = omega_s * omega_i /sq(props.n_s*props.n_i)
         ,norm_const = props.get_rates_constant();
-        ;
 
     // calculate normalization
     // var PMN = PhaseMatch.phasematch(P);
@@ -1252,10 +1252,10 @@ PlotHelpers.calc_heralding_plot_p = function calc_heralding_plot_p(props, WpRang
         ,lambdaWeights = helpers.Nintegrate2DWeights_3_8(n)
         // @@@@@@ For testing purposes
         ,lambda_s = helpers.linspace(ls_start, ls_stop, dim)
-        ,lambda_i = helpers.linspace(li_stop, li_start, dim)
+        ,lambda_i = helpers.linspace(li_stop, li_start, dim);
         // ,lambda_s = helpers.linspace(P.lambda_p *2, P.lambda_p *2, dim)
         // ,lambda_i = helpers.linspace(P.lambda_p *2, P.lambda_p *2, dim)
-        ;
+
     n = 15; //make sure this is even
 
 
@@ -1372,8 +1372,7 @@ PlotHelpers.calc_heralding_plot_p = function calc_heralding_plot_p(props, WpRang
         var  singRate = calc_singles_rate()
             ,coincRate = calc_coinc_rate()
             ,singlesRate = singRate[0]
-            ,idlerSinglesRate = singRate[1]
-            ;
+            ,idlerSinglesRate = singRate[1];
 
         // // coincRate = coincRate ;
         // P.swap_signal_idler();
@@ -1426,10 +1425,10 @@ PlotHelpers.calc_heralding_plot_focus_position_p = function calc_heralding_plot_
         ,lambdaWeights = helpers.Nintegrate2DWeights_3_8(n)
         // @@@@@@ For testing purposes
         ,lambda_s = helpers.linspace(ls_start, ls_stop, dim)
-        ,lambda_i = helpers.linspace(li_stop, li_start, dim)
+        ,lambda_i = helpers.linspace(li_stop, li_start, dim);
         // ,lambda_s = helpers.linspace(P.lambda_p *2, P.lambda_p *2, dim)
         // ,lambda_i = helpers.linspace(P.lambda_p *2, P.lambda_p *2, dim)
-        ;
+
     n = 16; //make sure this is even
     // // console.log("NNNNNNNN: " + WsRange.toString());
     P.phi_i = P.phi_s + Math.PI;

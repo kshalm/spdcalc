@@ -27,7 +27,7 @@ require.config({
         //  This is where you can add paths to any plugins or vendor scripts.
         //
 
-        'phasematch': 'vendor/phasematchjs',
+        'phasematch': 'vendor/phasematch',
 
         // third party
         'd3': 'vendor/d3.v3',

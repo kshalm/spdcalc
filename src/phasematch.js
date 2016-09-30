@@ -17,6 +17,14 @@ Object.assign( PhaseMatch, helpers );
 var pm_momentum = require('./pm-lib-momentum');
 Object.assign( PhaseMatch, pm_momentum );
 
+// assign properties tools
+var pm_props = require('./pm-properties');
+Object.assign( PhaseMatch, pm_props );
+
+// assign plot helpers
+var pm_plot = require('./pm-plothelpers');
+Object.assign( PhaseMatch, pm_plot );
+
 /**
  * Phasematching Library
  * This is the file that will evolve into the lambda_ibrary of functions to compute phasematching.
@@ -1552,3 +1560,10 @@ PhaseMatch.swap_signal_idler = function swap_signal_idler(P){
     P.update_all_angles();
     return P;
 };
+
+
+
+if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(function(){ return PhaseMatch; });
+}

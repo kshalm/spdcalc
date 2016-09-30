@@ -1,5 +1,5 @@
 importScripts('./worker-runner.js');
-importScripts('../vendor/phasematchjs.js');
+importScripts('../vendor/phasematch.js');
 
 
 // declare a worker helper for the JSA calculations
@@ -382,4 +382,3 @@ W('jsaHelper', {
     }
 
 });
-

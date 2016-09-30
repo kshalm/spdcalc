@@ -12,7 +12,7 @@ var PI = Math.PI
     ,atan2 = Math.atan2
     ;
 
-var ArrDef = window.Float64Array || window.Array;
+var ArrDef = Float64Array || Array;
 
 /*
  * Utility functions

@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 
     // setup dynamic filenames
     config.dist = 'dist/phasematch.js';
-    
+
     // Project configuration.
     grunt.initConfig({
         pkg : config.pkg,
@@ -58,13 +58,17 @@ module.exports = function(grunt) {
             browser: ['<%= config.browserDistDir %>']
         },
         webpack: {
-            pm: require('./webpack.config')
+            phasematch: require('./webpack.config')
         },
         copy: {
             phasematch: {
-                flatten: true,
-                src: config.dist,
-                dest: '<%= config.browserDir %>/library/js/vendor/<%= config.pkg.name %>.js'
+                files: [{
+                    // flatten: true,
+                    expand: true,
+                    cwd: 'dist',
+                    src: ['phasematch.js', 'phasematch.js.map'],
+                    dest: '<%= config.browserDir %>/library/js/vendor/'
+                }]
             }
         },
         bgShell: {
@@ -79,7 +83,7 @@ module.exports = function(grunt) {
 
             httpserver: {
                 cmd: 'node node_modules/http-server/bin/http-server -p 8080 <%= config.browserDir %>',
-                bg: true
+                bg: false
             },
 
             httpserverDist: {

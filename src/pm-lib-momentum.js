@@ -4,6 +4,7 @@
 var ellipticity = 1.0;
 var con = require('./constants');
 var helpers = require('./math/helpers');
+var sq = helpers.sq;
 var PhaseMatch = require('./phasematch');
 
 /*

@@ -1,5 +1,6 @@
 var crystals = {};
 var cloneDeep = require('lodash/cloneDeep');
+var sq = require('./math/helpers').sq;
 
 // defaults defined for every crystal
 var defaults = {
@@ -418,4 +419,4 @@ Crystals('LiIO3-2', {
     }
 });
 
-module.export = Crystals;
+module.exports = Crystals;

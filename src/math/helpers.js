@@ -3,7 +3,7 @@
  */
 var helpers = {};
 
-helpers.sq = function sq( x ){
+var sq = helpers.sq = function sq( x ){
     return x * x;
     // return Math.pow(x,2);
 };

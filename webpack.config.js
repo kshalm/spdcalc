@@ -6,6 +6,7 @@ module.exports = {
 	entry: {
 		phasematch: [
 			// 'webpack-hot-middleware/client',
+			'babel-polyfill',
 			'./src/phasematch.js'
 		]
 		// ,browser: [
@@ -13,6 +14,8 @@ module.exports = {
 		// ]
 	},
 	output: {
+		library: 'PhaseMatch',
+		libraryTarget: 'umd',
 		path: path.join(__dirname, 'dist'),
 		filename: '[name].js'
 	},
@@ -20,8 +23,8 @@ module.exports = {
 		new webpack.optimize.OccurenceOrderPlugin(),
 		// new webpack.HotModuleReplacementPlugin(),
 		new webpack.NoErrorsPlugin(),
-		new webpack.optimize.DedupePlugin(),
-		new webpack.optimize.UglifyJsPlugin()
+		new webpack.optimize.DedupePlugin()
+		// new webpack.optimize.UglifyJsPlugin()
 	],
 	resolve: {
 		// alias: {
@@ -32,7 +35,7 @@ module.exports = {
 		loaders: [
 			{
 				test: /\.js$/,
-				loader: 'babel',
+				loader: 'babel-loader',
 				exclude: /node_modules/,
 				include: path.join(__dirname, 'src')
 			}

@@ -10,6 +10,7 @@ var assignWith = require('lodash/assignWith');
 var pick = require('lodash/pick');
 var con = require('./constants');
 var helpers = require('./math/helpers');
+var sq = helpers.sq;
 var Crystals = require('./pm-crystals');
 var nelderMead = require('./math/nelder-mead');
 var PhaseMatch = require('./phasematch');
@@ -539,7 +540,7 @@ SPDCprop.prototype = {
     get_rates_constant : function (){
         var bw_pump = 2*Math.PI*con.c*(1/(this.lambda_p-this.p_bw/2) - 1/(this.lambda_p+this.p_bw/2))*Math.sqrt(2)/(2*Math.sqrt(Math.log(2)));
         var N_num = Math.pow(2, 1.5) * Math.pow(this.deff, 2) * Math.pow(this.L,2) * this.Pav;
-        var N_den = Math.pow(Math.PI, .5) * con.e0 * Math.pow(con.c,3) * bw_pump;
+        var N_den = Math.pow(Math.PI, 0.5) * con.e0 * Math.pow(con.c,3) * bw_pump;
         var N = N_num/N_den;
         console.log(N, N_num, Math.pow(this.deff, 2) * Math.pow(this.L,2), this.L, this.Pav);
         return (N);
