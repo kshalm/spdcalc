@@ -2,7 +2,9 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-	devtool: 'cheap-module-source-map',
+	devtool: 'eval',
+    resolve: { fallback: path.join(__dirname, "node_modules") },
+    resolveLoader: { fallback: path.join(__dirname, "node_modules") },
 	entry: {
 		phasematch: [
 			// 'webpack-hot-middleware/client',
@@ -20,11 +22,11 @@ module.exports = {
 		filename: '[name].js'
 	},
 	plugins: [
-		new webpack.optimize.OccurenceOrderPlugin(),
-		// new webpack.HotModuleReplacementPlugin(),
-		new webpack.NoErrorsPlugin(),
-		new webpack.optimize.DedupePlugin()
-		// new webpack.optimize.UglifyJsPlugin()
+		new webpack.optimize.OccurenceOrderPlugin()
+		// ,new webpack.HotModuleReplacementPlugin()
+		,new webpack.NoErrorsPlugin()
+		// ,new webpack.optimize.DedupePlugin()
+		// ,new webpack.optimize.UglifyJsPlugin()
 	],
 	resolve: {
 		// alias: {
@@ -35,8 +37,8 @@ module.exports = {
 		loaders: [
 			{
 				test: /\.js$/,
-				loader: 'babel-loader',
-				exclude: /node_modules/,
+				loader: 'babel',
+				// exclude: /node_modules/,
 				include: path.join(__dirname, 'src')
 			}
 			// ,{
