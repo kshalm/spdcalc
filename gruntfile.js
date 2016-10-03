@@ -58,7 +58,8 @@ module.exports = function(grunt) {
             browser: ['<%= config.browserDistDir %>']
         },
         webpack: {
-            phasematch: require('./webpack.config')
+            phasematchDev: require('./config/webpack-pm-dev.config')
+            ,browserDev: require('./config/webpack-ui-dev.config')
         },
         copy: {
             phasematch: {

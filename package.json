@@ -20,12 +20,14 @@
   },
   "keywords": [],
   "dependencies": {
-    "babel-polyfill": "^6.16.0"
+    "babel-polyfill": "^6.16.0",
+    "when": "^3.7.7"
   },
   "devDependencies": {
     "babel-core": "^6.11.4",
     "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.9.0",
+    "dot-loader": "^0.1.1",
     "grunt": "^1.0.0",
     "grunt-bg-shell": "*",
     "grunt-contrib-clean": "latest",
@@ -38,10 +40,13 @@
     "grunt-contrib-uglify": "latest",
     "grunt-webpack": "^1.0.14",
     "http-server": "*",
+    "imports-loader": "^0.6.5",
+    "json-loader": "^0.5.4",
+    "lodash": "^4.6.1",
+    "text-loader": "0.0.1",
     "webpack": "^1.13.1",
     "webpack-dev-middleware": "^1.6.1",
-    "webpack-dev-server": "^1.14.1",
-    "lodash": "^4.6.1"
+    "webpack-dev-server": "^1.16.1"
   },
   "bundledDependencies": [],
   "license": "GPL-3.0"

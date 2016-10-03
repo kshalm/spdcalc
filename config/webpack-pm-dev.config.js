@@ -3,9 +3,7 @@ var webpack = require('webpack');
 
 module.exports = {
 	devtool: 'eval',
-    resolve: { fallback: path.join(__dirname, "node_modules") },
-    resolveLoader: { fallback: path.join(__dirname, "node_modules") },
-	entry: {
+    entry: {
 		phasematch: [
 			// 'webpack-hot-middleware/client',
 			'babel-polyfill',
@@ -18,7 +16,7 @@ module.exports = {
 	output: {
 		library: 'PhaseMatch',
 		libraryTarget: 'umd',
-		path: path.join(__dirname, 'dist'),
+		path: path.join(__dirname, '../dist'),
 		filename: '[name].js'
 	},
 	plugins: [
@@ -29,9 +27,13 @@ module.exports = {
 		// ,new webpack.optimize.UglifyJsPlugin()
 	],
 	resolve: {
+		fallback: path.join(__dirname, "../node_modules")
 		// alias: {
 		// 	webworkify: 'webworkify-webpack'
 		// }
+	},
+	resolveLoader: {
+		fallback: path.join(__dirname, "../node_modules")
 	},
 	module: {
 		loaders: [
