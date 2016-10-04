@@ -9,7 +9,7 @@ define(
         'modules/skeleton-ui',
         'modules/converter',
 
-        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
 
         'tpl!templates/jsa-heralding-1d-layout.tpl',
         'tpl!templates/time-delay-ctrl.tpl'
@@ -24,13 +24,15 @@ define(
         SkeletonUI,
         converter,
 
-        pmWorker,
+        W,
 
         tplJSALayout,
         tplWaistCtrl
     ) {
 
         'use strict';
+
+        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
 
         var delTConversion = 1e-6;
 
@@ -711,7 +713,7 @@ define(
                         self.dataCoinc = PM;
                         var coinc_max = Math.max.apply(null,PM);
                         // PM = PhaseMatch.normalizeToVal(PM, self.norm);
-                        
+
 
                         var  Rs = PhaseMatch.Sum(self.data_s) //* self.Nrates
                             ,Ri = PhaseMatch.Sum(self.data_i) //* self.Nrates

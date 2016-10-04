@@ -8,7 +8,7 @@ define(
         'modules/ddmenu',
         'custom-checkbox',
 
-        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
 
         'tpl!templates/plot-menu.tpl'
     ],
@@ -21,12 +21,13 @@ define(
         ddmenu,
         customCheckbox,
 
-        pmWorker,
+        W,
 
         tplPlotMenu
     ) {
 
         'use strict';
+        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
 
         var to;
         var defaults = {
@@ -156,7 +157,7 @@ define(
                 // auto draw
 
                 self.autocalcPlotOpts();
-                
+
                 self.refresh();
 
             },

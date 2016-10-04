@@ -7,7 +7,7 @@ define(
         'modules/heat-map',
         'modules/line-plot',
         'modules/converter',
-        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
         'modules/skeleton-ui',
         'tpl!templates/pm-curves.tpl'
     ],
@@ -20,7 +20,7 @@ define(
         LinePlot,
         converter,
 
-        pmWorker,
+        W,
 
         SkeletonUI,
         tplCurvesLayout
@@ -28,7 +28,7 @@ define(
 
         'use strict';
 
-
+        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
         var con = PhaseMatch.constants;
 
         /**

@@ -9,7 +9,7 @@ define(
         'modules/skeleton-ui',
         'modules/converter',
 
-        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
 
         'tpl!templates/schmidt-2d-layout.tpl'
     ],
@@ -23,12 +23,14 @@ define(
         SkeletonUI,
         converter,
 
-        pmWorker,
+        W,
 
         tplSchmidtLayout
     ) {
 
         'use strict';
+
+        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
 
         var con = PhaseMatch.constants;
 
@@ -134,7 +136,7 @@ define(
                     Nthreads = self.nWorkers,
                     grid_size = self.plotOpts.get('grid_size_schmidt'),
                     divisions = Math.floor(grid_size / Nthreads),
-                    xrange = [], 
+                    xrange = [],
                     yrange = [],
                     promises = [];
 
@@ -147,7 +149,7 @@ define(
                             self.plotOpts.get('xtal_l_start'),
                             self.plotOpts.get('xtal_l_stop'),
                             grid_size
-                        ); 
+                        );
 
                 // be sure to reverse the order of this array so the graph makes sense.
                 // Effectively, this moves the origin to the bottom right corner.
@@ -155,7 +157,7 @@ define(
                             self.plotOpts.get('bw_stop'),
                             self.plotOpts.get('bw_start'),
                             grid_size
-                        ); 
+                        );
 
                 var xrange = xtalL;
 
@@ -164,7 +166,7 @@ define(
                     yrange.push(bw.subarray(i*divisions,i*divisions + divisions));
                 }
                 yrange.push( bw.subarray((Nthreads-1)*divisions, bw.length));
-               
+
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
                     promises[j] = self.workers[j].exec('jsaHelper.doCalcSchmidtPlot', [
@@ -185,12 +187,12 @@ define(
                         // put the results back together
                         var arr = new Float64Array( grid_size *  grid_size );
                         var startindex = 0;
-                        
+
                         for (j = 0; j<Nthreads; j++){
                              arr.set(values[j], startindex);
                             // console.log("arr val set");
                              startindex += xrange.length*yrange[j].length;
-                        }                        
+                        }
                         return arr; // this value is passed on to the next "then()"
 
                     }).then(function( PM ){
@@ -199,9 +201,9 @@ define(
                         self.plot.setXRange( [ converter.to('micro',self.plotOpts.get('xtal_l_start')), converter.to('micro',self.plotOpts.get('xtal_l_stop'))]);
                         self.plot.setYRange( [ converter.to('nano',self.plotOpts.get('bw_start')), converter.to('nano',self.plotOpts.get('bw_stop'))]);
                         return true;
-                });  
+                });
 
-                
+
             },
 
             draw: function(){
@@ -221,8 +223,8 @@ define(
                     self.plot.plotData( data );
                     dfd.resolve();
                 }, 10);
-                   
-                return dfd.promise; 
+
+                return dfd.promise;
             }
         });
 

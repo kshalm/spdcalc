@@ -439,7 +439,6 @@ define(
                 // XY
                 self.set('xy', xyUI());
                 // Schmidt Spectral Purity
-                // self.set('schmidt-2d', schmidtUI);
                 self.set('schmidt-2d', schmidtUI());
                 // Mode solver view
                 self.set('modesolver', msUI());

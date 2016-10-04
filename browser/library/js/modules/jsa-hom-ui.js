@@ -9,7 +9,7 @@ define(
         'modules/skeleton-ui',
         'modules/converter',
 
-        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
 
         'tpl!templates/jsa-hom-layout.tpl',
         'tpl!templates/time-delay-ctrl.tpl'
@@ -24,13 +24,15 @@ define(
         SkeletonUI,
         converter,
 
-        pmWorker,
+        W,
 
         tplJSALayout,
         tplTimeDelayCtrl
     ) {
 
         'use strict';
+
+        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
 
         var delTConversion = 1e-15;
 
@@ -70,9 +72,9 @@ define(
              * @return {void}
              */
             initPlots : function(){
-                
+
                 var self = this;
-                
+
                 // init plot
                 self.plot1d = new LinePlot({
                     title: 'Hong-Ou-Mandel Dip',
@@ -93,7 +95,7 @@ define(
                 self.elPlot1d = $(self.plot1d.el);
 
                 self.eldelT = $(tplTimeDelayCtrl.render()).appendTo( self.el.find('.heat-map-wrapper') );
-                
+
                 self.eldelT.slider({
                     min: -800,
                     max: 800,
@@ -113,7 +115,7 @@ define(
                 });
 
                 self.set('delT', 0);
-                
+
                 // init plot
                 self.plot = new HeatMap({
                     title: 'Joint spectral amplitude',
@@ -146,12 +148,12 @@ define(
                 self.on('refresh', function(){
                     self.refreshLine( self.get('delT') );
                 });
-                
+
                 self.addPlot( self.plot );
                 self.addPlot( self.plot1d );
-                
+
                 self.initEvents();
-                
+
             },
 
             refreshJSA: function(){
@@ -172,7 +174,7 @@ define(
                     ,dom = y.domain()
                     ;
 
-                // 
+                //
 
                 // create
                 line.enter()
@@ -282,7 +284,7 @@ define(
                         }
 
                         var endtime = new Date();
-                        
+
 
                         return arr; // this value is passed on to the next "then()"
 
@@ -312,7 +314,7 @@ define(
 
             set_slider_values: function(zero_delay, t_start, t_stop){
                 var self = this;
-                // 
+                //
                 // @TODO Krister: Noticed a weird bug where using self.set to change "delT" causes the red line to
                 // disappear for any value other than 0.
                 self.eldelT.slider({
@@ -348,7 +350,7 @@ define(
                         self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
                         var sp = new Date();
-                        // 
+                        //
                 });
 
 

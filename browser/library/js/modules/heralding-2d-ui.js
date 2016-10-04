@@ -9,7 +9,7 @@ define(
         'modules/skeleton-ui',
         'modules/converter',
 
-        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
 
         'tpl!templates/heralding-2d-layout.tpl'
     ],
@@ -23,12 +23,14 @@ define(
         SkeletonUI,
         converter,
 
-        pmWorker,
+        W,
 
         tplHeraldingLayout
     ) {
 
         'use strict';
+
+        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
 
         var con = PhaseMatch.constants;
 

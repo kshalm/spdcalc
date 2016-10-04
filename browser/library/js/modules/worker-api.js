@@ -6,7 +6,7 @@ define(
         when
     ){
         'use strict';
-        
+
         // log errors
         function onError(e) {
 
@@ -30,7 +30,7 @@ define(
             return {
 
                 exec: function( cmd, args ){
-                    
+
                     var dfd = when.defer();
                     var jobId = _nJobs++;
                     var send;
@@ -66,7 +66,7 @@ define(
                         cmd: cmd,
                         args: args
                     };
-                    
+
                     _worker.postMessage( send );
 
                     return dfd.promise;
@@ -88,7 +88,7 @@ define(
 
         Wrapper.prototype = {
             exec: function( what, args ){
-                
+
                 var self = this;
                 var send = {
                     args: args
@@ -136,10 +136,18 @@ define(
                 var self = this;
                 self.worker.destroy();
             },
-        };        
+        };
 
         // api
         var W = function W( obj ){
+
+            if ( typeof obj === 'string' ){
+                return {
+                    spawn: function(){
+                        return W( new Worker(obj) );
+                    }
+                };
+            }
 
             // connect to a worker
             return new Wrapper( obj );
@@ -157,16 +165,12 @@ define(
             var url = req.toUrl(name);
 
             if (window.Worker) {
-                onLoad({
-                    spawn: function(){
-                        return W( new Worker(url) );
-                    }
-                });
+                onLoad( W(url) );
             } else {
                 req(["plugins/worker-fake"], function () {
                     onLoad({
                         spawn: function( name ){
-                            return W( new Worker(url) );
+                            return W( W(url) );
                         }
                     });
                 });

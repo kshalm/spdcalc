@@ -36,7 +36,7 @@ module.exports = {
 	        'phasematch': 'vendor/phasematch',
 
 	        // third party
-	        'd3': 'vendor/d3.v3',
+	        // 'd3': 'vendor/d3.v3',
 
 	        'bootstrap-tooltip': 'vendor/bootstrap-tooltip',
 	        'custom-checkbox': 'vendor/flat-ui/custom_checkbox_and_radio',
@@ -79,10 +79,10 @@ module.exports = {
 				// , exclude: /node_modules/
 				, include: path.join(__dirname, 'src')
 			}
-			, {
-				test: /d3/
-				, loader: 'exports?d3'
-			}
+			// , {
+			// 	test: /d3/
+			// 	, loader: 'exports?d3'
+			// }
 			, {
 				test: /jquery-ui|bootstrap-tooltip|jquery\.dropkick|jquery\.tagsinput/
 				, loader: 'imports?jquery'

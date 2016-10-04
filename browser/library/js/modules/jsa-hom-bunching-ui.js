@@ -9,7 +9,7 @@ define(
         'modules/skeleton-ui',
         'modules/converter',
 
-        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
 
         'tpl!templates/jsa-hom-layout.tpl',
         'tpl!templates/time-delay-ctrl.tpl'
@@ -24,13 +24,15 @@ define(
         SkeletonUI,
         converter,
 
-        pwWorker,
+        W,
 
         tplJSALayout,
         tplTimeDelayCtrl
     ) {
 
         'use strict';
+
+        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
 
         var delTConversion = 1e-15;
 
@@ -269,7 +271,7 @@ define(
                     trange.push(delT.subarray(i*divisions,i*divisions + divisions));
                 }
                 trange.push( delT.subarray((Nthreads-1)*divisions, delT.length));
-                
+
 
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
@@ -290,12 +292,12 @@ define(
                         var arr = new Float64Array( dim );
 
                         var startindex = 0;
-                        
+
                         for (j = 0; j<Nthreads; j++){
                              arr.set(values[j], startindex);
-                             
+
                              startindex += trange[j].length;
-                        }   
+                        }
 
                         var endtime = new Date();
                         console.log("HOM bunching Elapsed time: ", endtime - starttime);
@@ -319,14 +321,14 @@ define(
                         // self.plot1d.setYRange([0, Math.max.apply(null,HOM)*1.2]);
                         self.plot1d.setYRange([0.4, Math.max.apply(null,HOM)*1.2]);
                         self.set_slider_values(tsi[0], po.get('delT_start'), po.get('delT_stop'));
-                        
+
                          var endtime = new Date();
 
                         return true;
-                });  
-                
+                });
 
-                
+
+
             },
 
             set_slider_values: function(zero_delay, t_start, t_stop){
@@ -356,8 +358,8 @@ define(
                     ,po = self.plotOpts;
 
                 var st = new Date();
-                
-                // Can only run in one thread. This graph is not easily parallizable. Need 
+
+                // Can only run in one thread. This graph is not easily parallizable. Need
                 // the entire grid to do the computation.
                 return  self.workers[self.nWorkers-2].exec('jsaHelper.doCalcHOMJSA', [
                             props.get(),
@@ -377,7 +379,7 @@ define(
                         self.plot.setXRange([ converter.to('nano', po.get('ls_start')), converter.to('nano', po.get('ls_stop')) ]);
                         self.plot.setYRange([ converter.to('nano', po.get('li_start')), converter.to('nano', po.get('li_stop')) ]);
                         var sp = new Date();
-                        
+
                         return p;
                         // console.log("time jsa", sp -st);
                 });

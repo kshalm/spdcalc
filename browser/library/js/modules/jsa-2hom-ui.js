@@ -9,7 +9,7 @@ define(
         'modules/skeleton-ui',
         'modules/converter',
 
-        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
 
         'tpl!templates/jsa-2hom-layout.tpl'
         // 'tpl!templates/time-delay-ctrl.tpl'
@@ -24,13 +24,15 @@ define(
         SkeletonUI,
         converter,
 
-        pmWorker,
+        W,
 
         tplJSALayout
         // tplTimeDelayCtrl
     ) {
 
         'use strict';
+
+        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
 
         var delTConversion = 1e-15;
 
@@ -92,7 +94,7 @@ define(
 
                 self.elPlot1d = $(self.plot1d.el);
 
-               
+
                 self.addPlot( self.plot1d );
 
                 self.initEvents();
@@ -105,7 +107,7 @@ define(
                 self.draw();
             },
 
-            
+
 
             autocalcPlotOpts: function(){
 
@@ -170,7 +172,7 @@ define(
                     trange.push(delT.subarray(i*divisions,i*divisions + divisions));
                 }
                 trange.push( delT.subarray((Nthreads-1)*divisions, delT.length));
-                
+
 
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
@@ -192,14 +194,14 @@ define(
                         var arr_si = new Float64Array( dim );
 
                         var startindex = 0;
-                        
+
                         for (j = 0; j<Nthreads; j++){
                              arr_ss.set(values[j][0], startindex);
                              arr_ii.set(values[j][1], startindex);
                              arr_si.set(values[j][2], startindex);
                             // console.log("arr val set");
                              startindex += trange[j].length;
-                        }   
+                        }
 
                         var endtime = new Date();
                         console.log("2HOM Elapsed time: ", endtime - starttime);
@@ -246,7 +248,7 @@ define(
                         self.plot1d.setYRange([0, Math.max.apply(null,HOM[0])*1.3]);
 
                         return true;
-                });  
+                });
 
                 // var HOM = PhaseMatch.calc_2HOM_scan_p(
                 //         props,

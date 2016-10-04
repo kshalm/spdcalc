@@ -9,7 +9,7 @@ define(
         'modules/skeleton-ui',
         'modules/converter',
 
-        'worker!workers/pm-web-worker.js',
+        'modules/worker-api',
 
         'tpl!templates/jsa-heralding-1D-layout.tpl',
         'tpl!templates/time-delay-ctrl.tpl'
@@ -24,13 +24,14 @@ define(
         SkeletonUI,
         converter,
 
-        pmWorker,
+        W,
 
         tplLayout,
         tplSignalWaistCtrl
     ) {
 
         'use strict';
+        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
 
         var waistConversion = 1e-6;
 
