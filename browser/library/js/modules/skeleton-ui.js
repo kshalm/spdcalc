@@ -27,7 +27,7 @@ define(
     ) {
 
         'use strict';
-        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
+        var pmWorker = W( require('worker!workers/pm-web-worker.js') );
 
         var to;
         var defaults = {
@@ -74,7 +74,7 @@ define(
 
                 self.tplPlots.converter = converter;
 
-                self.el = $( self.tplPlots.render() );
+                self.el = $( self.tplPlots() );
 
                 self.elPlotOpts = $('<div>');
                 self.plots = [];
@@ -101,7 +101,7 @@ define(
 
                 var self = this;
 
-                plot.el.prepend( tplPlotMenu.render({
+                plot.el.prepend( tplPlotMenu({
 
                 }));
 

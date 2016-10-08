@@ -82,11 +82,9 @@ define(
         var tplLinePlotAsCSV = doT.template(textLinePlotAsCSV, $.extend({}, doT.templateSettings, { strip: false }));
 
         // Note: conversions moved to converter module
-
-        tplParametersPanel.PhaseMatch = PhaseMatch;
-        tplParametersPanel.converter = converter;
-        tplPlotOpts.converter = converter;
-
+        tplParametersPanel = tplParametersPanel.bind({ PhaseMatch, converter });
+        tplPlotOpts = tplPlotOpts.bind({ PhaseMatch, converter });
+        
         /**
          * Page-level Mediator
          * @module PMUI
@@ -384,7 +382,7 @@ define(
             initUI: function(){
 
                 var self = this;
-                self.el = $(tplPMUI.render());
+                self.el = $(tplPMUI());
 
                 self.elMain = self.el.find('#main');
                 self.elParameters = self.el.find('#parameters');
@@ -393,7 +391,7 @@ define(
                 self.elDocs = self.el.find('#docs');
 
                 // init parameters panel
-                self.elParameters.append( $(tplParametersPanel.render( self.parameters.getAll() )) );
+                self.elParameters.append( $(tplParametersPanel( self.parameters.getAll() )) );
 
                 // self.elPlotOpts = self.el.find('#plot-opts');
                 self.elPlotOpts = self.elParameters.find('#plot-opts');
@@ -421,7 +419,7 @@ define(
                     }
                 });
 
-                self.elPlotOpts.html( tplPlotOpts.render( self.plotOpts.getAll() ) );
+                self.elPlotOpts.html( tplPlotOpts( self.plotOpts.getAll() ) );
                 customCheckbox( self.elPlotOpts );
                 self.plotOpts.attachView( self.elPlotOpts );
             },
@@ -496,7 +494,7 @@ define(
                 self.elDocs.empty();
 
                 if (mod.tplDoc){
-                    self.elDocs.html( mod.tplDoc.render() );
+                    self.elDocs.html( mod.tplDoc() );
                 }
 
                 if (window.MathJax){

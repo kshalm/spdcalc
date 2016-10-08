@@ -1,5 +1,5 @@
-importScripts('./worker-runner.js');
-importScripts('../vendor/phasematch.js');
+var W = require('./worker-runner');
+var PhaseMatch = require('phasematch');
 
 
 // declare a worker helper for the JSA calculations

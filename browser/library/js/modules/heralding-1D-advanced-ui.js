@@ -32,7 +32,7 @@ define(
 
         'use strict';
 
-        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
+        var pmWorker = W( require('worker!workers/pm-web-worker.js') );
 
         var delTConversion = 1e-6;
 
@@ -127,7 +127,7 @@ define(
 
                 self.elPlot1d = $(self.plot1dEff.el);
 
-                self.eldelT = $(tplWaistCtrl.render()).appendTo( self.el.find('.heat-map-wrapper') );
+                self.eldelT = $(tplWaistCtrl()).appendTo( self.el.find('.heat-map-wrapper') );
 
                 self.eldelT.slider({
                     min: 50,

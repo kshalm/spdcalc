@@ -32,7 +32,7 @@ define(
 
         'use strict';
 
-        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
+        var pmWorker = W( require('worker!workers/pm-web-worker.js') );
 
         var delTConversion = 1e-15;
 

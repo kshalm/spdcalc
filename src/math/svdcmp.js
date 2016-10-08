@@ -26,6 +26,8 @@ References:
   http://www.nr.com/
 */
 
+var helpers = require('./helpers');
+
 var pythag = function(a, b){
   var at = Math.abs(a), bt = Math.abs(b), ct;
 
@@ -46,7 +48,6 @@ var sign = function(a, b){
   return b >= 0.0? Math.abs(a): -Math.abs(a);
 };
 
-// PhaseMatch.svdcmp = function(a, m, n, w, v){
 var svdcmp = function(a){
   var flag, i, its, j, jj, k, l, nm,
       anorm = 0.0, c, f, g = 0.0, h, s, scale = 0.0, x, y, z, rv1 = [];
@@ -54,7 +55,7 @@ var svdcmp = function(a){
       var m = a.length;  //number of rows
       var n = a[0].length; // number of cols
 
-      var v = PhaseMatch.zeros(m,n);
+      var v = helpers.zeros(m,n);
       // var v = cloneDeep(a);
       var w = [];
 

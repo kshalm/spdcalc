@@ -139,19 +139,13 @@ define(
         };
 
         // api
-        var W = function W( obj ){
+        var W = function W( worker ){
 
-            if ( typeof obj === 'string' ){
-                return {
-                    spawn: function(){
-                        return W( new Worker(obj) );
-                    }
-                };
-            }
-
-            // connect to a worker
-            return new Wrapper( obj );
-
+            return {
+                spawn: function(){
+                    return new Wrapper( new worker );
+                }
+            };
         };
 
         // Allows us to use this as a requireJS plugin

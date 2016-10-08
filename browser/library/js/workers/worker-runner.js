@@ -12,7 +12,7 @@ function runner( name, schema ){
     if ( !schema ){
 
         cls = _registry[ name ];
-        
+
         if ( cls ){
 
             return new cls();
@@ -36,11 +36,11 @@ function runner( name, schema ){
 
 function execute( helper, args ){
     if ( args.method ){
-        
+
         return helper[ args.method ]( args.args );
 
     } else if ( args.fn ){
-        
+
         var fn = eval( '(' + args.fn + ')' );
         return fn();
     }
@@ -58,16 +58,16 @@ function map( helper, args ){
     if ( args.method ){
 
         for ( i = 0, l = arr.length; i < l; ++i ){
-            
+
             result[ i ] = helper[ args.method ]( arr[ i ] );
         }
         return result;
 
     } else if ( args.fn ){
-        
+
         var fn = eval( '(' + args.fn + ')' );
         for ( i = 0, l = arr.length; i < l; ++i ){
-            
+
             result[ i ] = fn( arr[ i ] );
         }
         return result;
@@ -78,7 +78,7 @@ var _runners = {};
 
 function run( cmd, args ){
     var helper;
-    
+
     if ( cmd === 'exec' ){
 
         if ( args.fn ){
@@ -86,11 +86,11 @@ function run( cmd, args ){
         } else {
             helper = _runners[ args.name ];
         }
-        
+
         if ( !helper ){
             helper = runner( args.name );
         }
-        
+
         if ( helper ){
 
             _runners[ args.name ] = helper;
@@ -134,8 +134,8 @@ self.addEventListener('message', function( e ){
     var cmd = e.data.cmd;
     var args = e.data.args;
     var result = run( cmd, args );
-    
+
     self.postMessage({ jobId: jobId, result: result }, !ffBug && result && result.buffer? [result.buffer] : undefined);
 }, false);
 
-
+module.exports = W;

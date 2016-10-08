@@ -353,7 +353,7 @@ body {
     background: #fff;
     padding: 2em 3em;
     overflow: auto;
-    @include border-radius( 0 0 10px 10px );
+    border-radius: 0 0 10px 10px;
 
     p {
         font-family: $monoFontFamily;
@@ -510,5 +510,3 @@ textarea,
 //     stroke: 'black';
 //     stroke-width: 4px;
 // }
-
-

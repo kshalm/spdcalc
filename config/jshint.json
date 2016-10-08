@@ -14,11 +14,8 @@
     "node": true,
     "esversion": 6,
     "globals" : {
-        "define": true,
         "require": true,
         "module" : true,
-        "exports" : true,
-        "PhaseMatch" : true,
-        "sq": true
+        "exports" : true
     }
 }

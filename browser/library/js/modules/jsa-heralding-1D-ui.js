@@ -31,7 +31,7 @@ define(
     ) {
 
         'use strict';
-        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
+        var pmWorker = W( require('worker!workers/pm-web-worker.js') );
 
         var waistConversion = 1e-6;
 
@@ -93,7 +93,7 @@ define(
 
                 self.elPlot1dEff = $(self.plot1DEff.el);
 
-                self.elWaistSig = $(tplSignalWaistCtrl.render()).appendTo( self.el.find('.heat-map-wrapper') );
+                self.elWaistSig = $(tplSignalWaistCtrl()).appendTo( self.el.find('.heat-map-wrapper') );
 
                 self.elWaistSig.slider({
                     min: -800,

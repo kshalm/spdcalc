@@ -40,7 +40,7 @@ define(
 
             initEvents : function(){
                 var self = this;
-                // self.el = $(tplPlots.render());
+                // self.el = $(tplPlots());
                 // collapse button for JSA module plot
                 self.el.on('click', '#collapse-modesolver', function(e){
                     e.preventDefault();

@@ -420,7 +420,7 @@ a:hover {
 /* line 622, vendor/compass_twitter_bootstrap/_mixins.scss */
 .row-fluid .offset10:first-child {
   margin-left: 85.10638%;
-  *margin-left: 85%;
+  *margin-left: 85.0%;
 }
 /* line 616, vendor/compass_twitter_bootstrap/_mixins.scss */
 .row-fluid .span9 {
@@ -2987,7 +2987,7 @@ table .span24 {
   text-decoration: none;
   color: #fff;
   background-color: #08c;
-  background-color: #0082c3;
+  background-color: #0081c2;
   background-image: -moz-linear-gradient(top, #08c, #0077b3);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#0077b3));
   background-image: -webkit-linear-gradient(top, #08c, #0077b3);
@@ -3004,7 +3004,7 @@ table .span24 {
   text-decoration: none;
   outline: 0;
   background-color: #08c;
-  background-color: #0082c3;
+  background-color: #0081c2;
   background-image: -moz-linear-gradient(top, #08c, #0077b3);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#0077b3));
   background-image: -webkit-linear-gradient(top, #08c, #0077b3);
@@ -3223,7 +3223,7 @@ button.close {
   cursor: pointer;
   color: #333;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
-  background-color: #f6f6f6;
+  background-color: whitesmoke;
   background-image: -moz-linear-gradient(top, #fff, #e6e6e6);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fff), to(#e6e6e6));
   background-image: -webkit-linear-gradient(top, #fff, #e6e6e6);
@@ -3372,7 +3372,7 @@ button.close {
 .btn-primary {
   color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #006fcc;
+  background-color: #006ecc;
   background-image: -moz-linear-gradient(top, #08c, #0044cc);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#0044cc));
   background-image: -webkit-linear-gradient(top, #08c, #0044cc);
@@ -3380,7 +3380,7 @@ button.close {
   background-image: linear-gradient(to bottom, #0088cc, #0044cc);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0085c7', endColorstr='#0042c7', GradientType=0);
-  border-color: #0044cc #0044cc #002b80;
+  border-color: #0044cc #0044cc #002a80;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #0044cc;
   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
@@ -3390,7 +3390,7 @@ button.close {
 .btn-primary:hover, .btn-primary:active, .btn-primary.active, .btn-primary.disabled, .btn-primary[disabled] {
   color: #fff;
   background-color: #0044cc;
-  *background-color: #003cb3;
+  *background-color: #003bb3;
 }
 /* line 496, vendor/compass_twitter_bootstrap/_mixins.scss */
 .btn-primary:active, .btn-primary.active {
@@ -3401,7 +3401,7 @@ button.close {
 .btn-warning {
   color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #faa834;
+  background-color: #f9a834;
   background-image: -moz-linear-gradient(top, #fbb450, #f89406);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fbb450), to(#f89406));
   background-image: -webkit-linear-gradient(top, #fbb450, #f89406);
@@ -3430,7 +3430,7 @@ button.close {
 .btn-danger {
   color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #dc504b;
+  background-color: #db4f4a;
   background-image: -moz-linear-gradient(top, #ee5f5b, #bd362f);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#bd362f));
   background-image: -webkit-linear-gradient(top, #ee5f5b, #bd362f);
@@ -3459,7 +3459,7 @@ button.close {
 .btn-success {
   color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #5cb85c;
+  background-color: #5bb75b;
   background-image: -moz-linear-gradient(top, #62c462, #51a351);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#62c462), to(#51a351));
   background-image: -webkit-linear-gradient(top, #62c462, #51a351);
@@ -3488,7 +3488,7 @@ button.close {
 .btn-info {
   color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #4bb0ce;
+  background-color: #4ab0ce;
   background-image: -moz-linear-gradient(top, #5bc0de, #2f96b4);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#2f96b4));
   background-image: -webkit-linear-gradient(top, #5bc0de, #2f96b4);
@@ -4834,7 +4834,7 @@ input[type="submit"].btn.btn-mini {
 }
 /* line 378, vendor/compass_twitter_bootstrap/_navbar.scss */
 .navbar-inverse .navbar-inner {
-  background-color: #1c1c1c;
+  background-color: #1b1b1b;
   background-image: -moz-linear-gradient(top, #222222, #111111);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#222222), to(#111111));
   background-image: -webkit-linear-gradient(top, #222222, #111111);
@@ -4941,7 +4941,7 @@ input[type="submit"].btn.btn-mini {
 .navbar-inverse .btn-navbar {
   color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #0f0f0f;
+  background-color: #0e0e0e;
   background-image: -moz-linear-gradient(top, #151515, #040404);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#151515), to(#040404));
   background-image: -webkit-linear-gradient(top, #151515, #040404);
@@ -5721,7 +5721,7 @@ a.label:hover, a.badge:hover {
   overflow: hidden;
   height: 20px;
   margin-bottom: 20px;
-  background-color: #f7f7f7;
+  background-color: #f6f6f6;
   background-image: -moz-linear-gradient(top, #f5f5f5, #f9f9f9);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f5f5f5), to(#f9f9f9));
   background-image: -webkit-linear-gradient(top, #f5f5f5, #f9f9f9);
@@ -5746,7 +5746,7 @@ a.label:hover, a.badge:hover {
   font-size: 12px;
   text-align: center;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #0e91d3;
+  background-color: #0e90d2;
   background-image: -moz-linear-gradient(top, #149bdf, #0480be);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#149bdf), to(#0480be));
   background-image: -webkit-linear-gradient(top, #149bdf, #0480be);
@@ -5798,7 +5798,7 @@ a.label:hover, a.badge:hover {
 
 /* line 93, vendor/compass_twitter_bootstrap/_progress-bars.scss */
 .progress-danger .bar, .progress .bar-danger, .ui-slider .bar-danger {
-  background-color: #de524d;
+  background-color: #de514c;
   background-image: -moz-linear-gradient(top, #ee5f5b, #c43c35);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#c43c35));
   background-image: -webkit-linear-gradient(top, #ee5f5b, #c43c35);
@@ -5820,7 +5820,7 @@ a.label:hover, a.badge:hover {
 
 /* line 101, vendor/compass_twitter_bootstrap/_progress-bars.scss */
 .progress-success .bar, .progress .bar-success, .ui-slider .bar-success {
-  background-color: #5eba5e;
+  background-color: #5db95d;
   background-image: -moz-linear-gradient(top, #62c462, #57a957);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#62c462), to(#57a957));
   background-image: -webkit-linear-gradient(top, #62c462, #57a957);
@@ -5864,7 +5864,7 @@ a.label:hover, a.badge:hover {
 
 /* line 117, vendor/compass_twitter_bootstrap/_progress-bars.scss */
 .progress-warning .bar, .progress .bar-warning, .ui-slider .bar-warning {
-  background-color: #faa834;
+  background-color: #f9a834;
   background-image: -moz-linear-gradient(top, #fbb450, #f89406);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fbb450), to(#f89406));
   background-image: -webkit-linear-gradient(top, #fbb450, #f89406);
@@ -6140,13 +6140,13 @@ a.label:hover, a.badge:hover {
 
 @font-face {
   font-family: "Flat-UI-Icons-16";
-  src: url('../fonts/Flat-UI-Icons-16.eot?1453939542');
-  src: url('../fonts/Flat-UI-Icons-16.eot?&1453939542#iefix') format("embedded-opentype"), url('../fonts/Flat-UI-Icons-16.woff?1453939542') format("woff"), url('../fonts/Flat-UI-Icons-16.ttf?1453939542') format("truetype"), url('../fonts/Flat-UI-Icons-16.svg?1453939542#Flat-UI-Icons-16') format("svg");
+  src: url('../fonts/Flat-UI-Icons-16.eot?1457221925');
+  src: url('../fonts/Flat-UI-Icons-16.eot?&1457221925#iefix') format("embedded-opentype"), url('../fonts/Flat-UI-Icons-16.woff?1457221925') format("woff"), url('../fonts/Flat-UI-Icons-16.ttf?1457221925') format("truetype"), url('../fonts/Flat-UI-Icons-16.svg?1457221925#Flat-UI-Icons-16') format("svg");
   font-weight: normal;
   font-style: normal;
 }
 /* Use the following CSS code if you want to use data attributes for inserting your icons */
-/* line 11, vendor/flat-ui/_icon-font.sass */
+/* line 11, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 [data-icon]:before {
   font-family: "Flat-UI-Icons-16";
   content: attr(data-icon);
@@ -6160,7 +6160,7 @@ a.label:hover, a.badge:hover {
 /*Instead of a list of all class selectors,
  *you can use the generic selector below, but it's slower:
  *[class*="fui-"]:before { */
-/* line 25, vendor/flat-ui/_icon-font.sass */
+/* line 25, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-volume-16:before, .fui-video-16:before, .fui-time-16:before, .fui-settings-16:before, .fui-plus-16:before, .fui-new-16:before, .fui-menu-16:before, .fui-man-16:before, .fui-mail-16:before, .fui-lock-16:before, .fui-location-16:before, .fui-heart-16:before, .fui-eye-16:before, .fui-cross-16:before, .fui-cmd-16:before, .fui-checkround-16:before, .fui-checkmark-16:before, .fui-camera-16:before, .fui-calendar-16:before, .fui-bubble-16:before {
   font-family: "Flat-UI-Icons-16";
   speak: none;
@@ -6170,115 +6170,115 @@ a.label:hover, a.badge:hover {
   -webkit-font-smoothing: antialiased;
 }
 
-/* line 33, vendor/flat-ui/_icon-font.sass */
+/* line 33, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-volume-16:before {
   content: "";
 }
 
-/* line 36, vendor/flat-ui/_icon-font.sass */
+/* line 36, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-video-16:before {
   content: "";
 }
 
-/* line 39, vendor/flat-ui/_icon-font.sass */
+/* line 39, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-time-16:before {
   content: "";
 }
 
-/* line 42, vendor/flat-ui/_icon-font.sass */
+/* line 42, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-settings-16:before {
   content: "";
 }
 
-/* line 45, vendor/flat-ui/_icon-font.sass */
+/* line 45, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-plus-16:before {
   content: "";
 }
 
-/* line 48, vendor/flat-ui/_icon-font.sass */
+/* line 48, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-new-16:before {
   content: "";
 }
 
-/* line 51, vendor/flat-ui/_icon-font.sass */
+/* line 51, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-menu-16:before {
   content: "";
 }
 
-/* line 54, vendor/flat-ui/_icon-font.sass */
+/* line 54, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-man-16:before {
   content: "";
 }
 
-/* line 57, vendor/flat-ui/_icon-font.sass */
+/* line 57, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-mail-16:before {
   content: "";
 }
 
-/* line 60, vendor/flat-ui/_icon-font.sass */
+/* line 60, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-lock-16:before {
   content: "";
 }
 
-/* line 63, vendor/flat-ui/_icon-font.sass */
+/* line 63, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-location-16:before {
   content: "";
 }
 
-/* line 66, vendor/flat-ui/_icon-font.sass */
+/* line 66, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-heart-16:before {
   content: "";
 }
 
-/* line 69, vendor/flat-ui/_icon-font.sass */
+/* line 69, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-eye-16:before {
   content: "";
 }
 
-/* line 72, vendor/flat-ui/_icon-font.sass */
+/* line 72, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-cross-16:before {
   content: "";
 }
 
-/* line 75, vendor/flat-ui/_icon-font.sass */
+/* line 75, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-cmd-16:before {
   content: "";
 }
 
-/* line 78, vendor/flat-ui/_icon-font.sass */
+/* line 78, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-checkround-16:before {
   content: "";
 }
 
-/* line 81, vendor/flat-ui/_icon-font.sass */
+/* line 81, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-checkmark-16:before {
   content: "";
 }
 
-/* line 84, vendor/flat-ui/_icon-font.sass */
+/* line 84, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-camera-16:before {
   content: "";
 }
 
-/* line 87, vendor/flat-ui/_icon-font.sass */
+/* line 87, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-calendar-16:before {
   content: "";
 }
 
-/* line 90, vendor/flat-ui/_icon-font.sass */
+/* line 90, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font.sass */
 .fui-bubble-16:before {
   content: "";
 }
 
 @font-face {
   font-family: "Flat-UI-Icons-24";
-  src: url('../fonts/Flat-UI-Icons-24.eot?1453939542');
-  src: url('../fonts/Flat-UI-Icons-24.eot?&1453939542#iefix') format("embedded-opentype"), url('../fonts/Flat-UI-Icons-24.woff?1453939542') format("woff"), url('../fonts/Flat-UI-Icons-24.ttf?1453939542') format("truetype"), url('../fonts/Flat-UI-Icons-24.svg?1453939542#Flat-UI-Icons-24') format("svg");
+  src: url('../fonts/Flat-UI-Icons-24.eot?1457221925');
+  src: url('../fonts/Flat-UI-Icons-24.eot?&1457221925#iefix') format("embedded-opentype"), url('../fonts/Flat-UI-Icons-24.woff?1457221925') format("woff"), url('../fonts/Flat-UI-Icons-24.ttf?1457221925') format("truetype"), url('../fonts/Flat-UI-Icons-24.svg?1457221925#Flat-UI-Icons-24') format("svg");
   font-weight: normal;
   font-style: normal;
 }
 /* Use the following CSS code if you want to use data attributes for inserting your icons */
-/* line 11, vendor/flat-ui/_icon-font-24.sass */
+/* line 11, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 [data-icon]:before {
   font-family: "Flat-UI-Icons-24";
   content: attr(data-icon);
@@ -6292,7 +6292,7 @@ a.label:hover, a.badge:hover {
 /*Instead of a list of all class selectors,
  *you can use the generic selector below, but it's slower:
  *[class*="fui-"]:before { */
-/* line 25, vendor/flat-ui/_icon-font-24.sass */
+/* line 25, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-video-24:before, .fui-time-24:before, .fui-settings-24:before, .fui-plus-24:before, .fui-new-24:before, .fui-menu-24:before, .fui-man-24:before, .fui-mail-24:before, .fui-lock-24:before, .fui-location-24:before, .fui-heart-24:before, .fui-eye-24:before, .fui-cross-24:before, .fui-cmd-24:before, .fui-checkround-24:before, .fui-checkmark-24:before, .fui-calendar-24:before, .fui-bubble-24:before, .fui-volume-24:before, .fui-camera-24:before {
   font-family: "Flat-UI-Icons-24";
   speak: none;
@@ -6302,113 +6302,113 @@ a.label:hover, a.badge:hover {
   -webkit-font-smoothing: antialiased;
 }
 
-/* line 33, vendor/flat-ui/_icon-font-24.sass */
+/* line 33, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-video-24:before {
   content: "";
 }
 
-/* line 36, vendor/flat-ui/_icon-font-24.sass */
+/* line 36, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-time-24:before {
   content: "";
 }
 
-/* line 39, vendor/flat-ui/_icon-font-24.sass */
+/* line 39, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-settings-24:before {
   content: "";
 }
 
-/* line 42, vendor/flat-ui/_icon-font-24.sass */
+/* line 42, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-plus-24:before {
   content: "";
 }
 
-/* line 45, vendor/flat-ui/_icon-font-24.sass */
+/* line 45, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-new-24:before {
   content: "";
 }
 
-/* line 48, vendor/flat-ui/_icon-font-24.sass */
+/* line 48, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-menu-24:before {
   content: "";
 }
 
-/* line 51, vendor/flat-ui/_icon-font-24.sass */
+/* line 51, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-man-24:before {
   content: "";
 }
 
-/* line 54, vendor/flat-ui/_icon-font-24.sass */
+/* line 54, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-mail-24:before {
   content: "";
 }
 
-/* line 57, vendor/flat-ui/_icon-font-24.sass */
+/* line 57, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-lock-24:before {
   content: "";
 }
 
-/* line 60, vendor/flat-ui/_icon-font-24.sass */
+/* line 60, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-location-24:before {
   content: "";
 }
 
-/* line 63, vendor/flat-ui/_icon-font-24.sass */
+/* line 63, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-heart-24:before {
   content: "";
 }
 
-/* line 66, vendor/flat-ui/_icon-font-24.sass */
+/* line 66, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-eye-24:before {
   content: "";
 }
 
-/* line 69, vendor/flat-ui/_icon-font-24.sass */
+/* line 69, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-cross-24:before {
   content: "";
 }
 
-/* line 72, vendor/flat-ui/_icon-font-24.sass */
+/* line 72, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-cmd-24:before {
   content: "";
 }
 
-/* line 75, vendor/flat-ui/_icon-font-24.sass */
+/* line 75, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-checkround-24:before {
   content: "";
 }
 
-/* line 78, vendor/flat-ui/_icon-font-24.sass */
+/* line 78, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-checkmark-24:before {
   content: "";
 }
 
-/* line 81, vendor/flat-ui/_icon-font-24.sass */
+/* line 81, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-calendar-24:before {
   content: "";
 }
 
-/* line 84, vendor/flat-ui/_icon-font-24.sass */
+/* line 84, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-bubble-24:before {
   content: "";
 }
 
-/* line 87, vendor/flat-ui/_icon-font-24.sass */
+/* line 87, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-volume-24:before {
   content: "";
 }
 
-/* line 90, vendor/flat-ui/_icon-font-24.sass */
+/* line 90, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_icon-font-24.sass */
 .fui-camera-24:before {
   content: "";
 }
 
-/* line 2, vendor/flat-ui/modules/_type.sass */
+/* line 2, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_type.sass */
 body {
   color: #34495e;
   font: 14px/1.231;
 }
 
-/* line 6, vendor/flat-ui/modules/_type.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_type.sass */
 a {
   color: #1abc9c;
   text-decoration: underline;
@@ -6418,26 +6418,26 @@ a {
   transition: 0.25s;
   -webkit-backface-visibility: hidden;
 }
-/* line 10, vendor/flat-ui/modules/_type.sass */
+/* line 10, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_type.sass */
 a:hover {
   color: #1abc9c;
   text-decoration: none;
 }
 
-/* line 14, vendor/flat-ui/modules/_type.sass */
+/* line 14, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_type.sass */
 h1 {
   font-size: 32px;
   font-weight: 900;
 }
 
-/* line 18, vendor/flat-ui/modules/_type.sass */
+/* line 18, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_type.sass */
 h2 {
   font-size: 26px;
   font-weight: 700;
   margin-bottom: 2px;
 }
 
-/* line 23, vendor/flat-ui/modules/_type.sass */
+/* line 23, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_type.sass */
 h3 {
   font-size: 24px;
   font-weight: 700;
@@ -6445,28 +6445,28 @@ h3 {
   margin-top: 2px;
 }
 
-/* line 29, vendor/flat-ui/modules/_type.sass */
+/* line 29, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_type.sass */
 h4 {
   font-size: 18px;
   font-weight: 500;
   margin-top: 4px;
 }
 
-/* line 34, vendor/flat-ui/modules/_type.sass */
+/* line 34, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_type.sass */
 h5 {
   font-size: 16px;
   font-weight: 500;
   text-transform: uppercase;
 }
 
-/* line 39, vendor/flat-ui/modules/_type.sass */
+/* line 39, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_type.sass */
 h6 {
   font-size: 13px;
   font-weight: 500;
   text-transform: uppercase;
 }
 
-/* line 11, vendor/flat-ui/modules/_btn.sass */
+/* line 11, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn {
   border: none;
   background: #1abc9c;
@@ -6483,7 +6483,7 @@ h6 {
   transition: 0.25s;
   -webkit-backface-visibility: hidden;
 }
-/* line 23, vendor/flat-ui/modules/_btn.sass */
+/* line 23, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn:hover, .btn:focus {
   background-color: #4e6d8d;
   color: #fff;
@@ -6493,7 +6493,7 @@ h6 {
   transition: 0.25s;
   -webkit-backface-visibility: hidden;
 }
-/* line 29, vendor/flat-ui/modules/_btn.sass */
+/* line 29, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn:active, .btn.active {
   background-color: #2c3e50;
   color: rgba(255, 255, 255, 0.75);
@@ -6501,104 +6501,104 @@ h6 {
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 35, vendor/flat-ui/modules/_btn.sass */
+/* line 35, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.disabled, .btn[disabled] {
   background-color: #95a5a6;
   color: #fff;
 }
-/* line 41, vendor/flat-ui/modules/_btn.sass */
+/* line 41, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-large {
   padding-bottom: 12px;
   padding-top: 13px;
 }
-/* line 46, vendor/flat-ui/modules/_btn.sass */
+/* line 46, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-primary {
   background-color: #1abc9c;
 }
-/* line 3, vendor/flat-ui/modules/_btn.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-primary:hover, .btn.btn-primary:focus {
   background-color: #2fe2bf;
 }
-/* line 6, vendor/flat-ui/modules/_btn.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-primary:active, .btn.btn-primary.active {
   background-color: #16a085;
 }
-/* line 49, vendor/flat-ui/modules/_btn.sass */
+/* line 49, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-info {
   background-color: #3498db;
 }
-/* line 3, vendor/flat-ui/modules/_btn.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-info:hover, .btn.btn-info:focus {
   background-color: #5dade2;
 }
-/* line 6, vendor/flat-ui/modules/_btn.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-info:active, .btn.btn-info.active {
   background-color: #2383c4;
 }
-/* line 52, vendor/flat-ui/modules/_btn.sass */
+/* line 52, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-danger {
   background-color: #e74c3c;
 }
-/* line 3, vendor/flat-ui/modules/_btn.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-danger:hover, .btn.btn-danger:focus {
   background-color: #ec7063;
 }
-/* line 6, vendor/flat-ui/modules/_btn.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-danger:active, .btn.btn-danger.active {
   background-color: #dc2d1b;
 }
-/* line 55, vendor/flat-ui/modules/_btn.sass */
+/* line 55, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-success {
   background-color: #1abc9c;
 }
-/* line 3, vendor/flat-ui/modules/_btn.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-success:hover, .btn.btn-success:focus {
   background-color: #2fe2bf;
 }
-/* line 6, vendor/flat-ui/modules/_btn.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-success:active, .btn.btn-success.active {
   background-color: #16a085;
 }
-/* line 58, vendor/flat-ui/modules/_btn.sass */
+/* line 58, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-warning {
   background-color: #f1c40f;
 }
-/* line 3, vendor/flat-ui/modules/_btn.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-warning:hover, .btn.btn-warning:focus {
   background-color: #f4d03f;
 }
-/* line 6, vendor/flat-ui/modules/_btn.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn.btn-warning:active, .btn.btn-warning.active {
   background-color: #cea70c;
 }
-/* line 62, vendor/flat-ui/modules/_btn.sass */
+/* line 62, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn-toolbar .btn {
   font-size: 18px;
   padding: 10px 14px 9px;
 }
-/* line 66, vendor/flat-ui/modules/_btn.sass */
+/* line 66, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn-toolbar .btn:first-child {
   -webkit-border-radius: 6px 0 0 6px;
   -moz-border-radius: 6px 0 0 6px;
   border-radius: 6px 0 0 6px;
 }
-/* line 69, vendor/flat-ui/modules/_btn.sass */
+/* line 69, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn-toolbar .btn:last-child {
   -webkit-border-radius: 0 6px 6px 0;
   -moz-border-radius: 0 6px 6px 0;
   border-radius: 0 6px 6px 0;
 }
 
-/* line 73, vendor/flat-ui/modules/_btn.sass */
+/* line 73, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_btn.sass */
 .btn-toolbar .btn.active {
   color: #fff;
 }
 
-/* line 2, vendor/flat-ui/modules/_navbar.sass */
+/* line 2, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar {
   font-size: 18px;
 }
-/* line 5, vendor/flat-ui/modules/_navbar.sass */
+/* line 5, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .brand {
   color: #34495e;
   font-size: inherit;
@@ -6606,17 +6606,17 @@ h6 {
   padding-bottom: 16px;
   padding-top: 15px;
 }
-/* line 16, vendor/flat-ui/modules/_navbar.sass */
+/* line 16, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav > li:hover > ul {
   top: 100%;
 }
-/* line 20, vendor/flat-ui/modules/_navbar.sass */
+/* line 20, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav > li > ul {
   padding-top: 13px;
   top: 80%;
   background-color: #fff\9;
 }
-/* line 81, vendor/flat-ui/_mixins.sass */
+/* line 81, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 .navbar .nav > li > ul:before {
   content: "";
   border-style: solid;
@@ -6629,30 +6629,30 @@ h6 {
   width: 0px;
   -webkit-transform: rotate(360deg);
 }
-/* line 31, vendor/flat-ui/modules/_navbar.sass */
+/* line 31, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav > li > ul li:hover ul {
   opacity: 1;
   -webkit-transform: scale(1, 1);
   visibility: visible;
   display: block\9;
 }
-/* line 36, vendor/flat-ui/modules/_navbar.sass */
+/* line 36, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav > li > ul li ul {
   left: 100%;
 }
-/* line 40, vendor/flat-ui/modules/_navbar.sass */
+/* line 40, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav > li > a {
   padding: 14px 15px 17px;
 }
-/* line 42, vendor/flat-ui/modules/_navbar.sass */
+/* line 42, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav > li > a:hover {
   color: #1abc9c;
 }
-/* line 45, vendor/flat-ui/modules/_navbar.sass */
+/* line 45, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav li {
   position: relative;
 }
-/* line 49, vendor/flat-ui/modules/_navbar.sass */
+/* line 49, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav li:hover > ul {
   opacity: 1;
   z-index: 100;
@@ -6660,7 +6660,7 @@ h6 {
   visibility: visible;
   display: block\9;
 }
-/* line 58, vendor/flat-ui/modules/_navbar.sass */
+/* line 58, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav ul {
   border-radius: 4px;
   left: 15px;
@@ -6681,31 +6681,31 @@ h6 {
   transition: 0.3s ease-out;
   -webkit-backface-visibility: hidden;
 }
-/* line 77, vendor/flat-ui/modules/_navbar.sass */
+/* line 77, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav ul ul {
   left: 95%;
   padding-left: 5px;
 }
-/* line 82, vendor/flat-ui/modules/_navbar.sass */
+/* line 82, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav ul li {
   background-color: #34495e;
   padding: 0 3px 3px;
 }
-/* line 86, vendor/flat-ui/modules/_navbar.sass */
+/* line 86, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav ul li:first-child {
   border-radius: 4px 4px 0 0;
   padding-top: 3px;
 }
-/* line 90, vendor/flat-ui/modules/_navbar.sass */
+/* line 90, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav ul li:last-child {
   border-radius: 0 0 4px 4px;
 }
-/* line 94, vendor/flat-ui/modules/_navbar.sass */
+/* line 94, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav ul li.active > a, .navbar .nav ul li.active > a:hover {
   background-color: #1abc9c;
   color: #fff;
 }
-/* line 99, vendor/flat-ui/modules/_navbar.sass */
+/* line 99, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav ul a {
   border-radius: 2px;
   color: #fff;
@@ -6714,12 +6714,12 @@ h6 {
   padding: 6px 9px;
   text-decoration: none;
 }
-/* line 106, vendor/flat-ui/modules/_navbar.sass */
+/* line 106, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar .nav ul a:hover {
   background-color: #1abc9c;
 }
 
-/* line 109, vendor/flat-ui/modules/_navbar.sass */
+/* line 109, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar-inner {
   border: none;
   padding-left: 4px;
@@ -6730,16 +6730,16 @@ h6 {
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
 
-/* line 122, vendor/flat-ui/modules/_navbar.sass */
+/* line 122, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar-inverse .navbar-inner {
   background: #ecf0f1;
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-/* line 127, vendor/flat-ui/modules/_navbar.sass */
+/* line 127, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar-inverse .nav > li > a {
   color: #34495e;
 }
-/* line 132, vendor/flat-ui/modules/_navbar.sass */
+/* line 132, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar-inverse .nav .active > a, .navbar-inverse .nav .active > a:hover, .navbar-inverse .nav .active > a:focus {
   background-color: transparent;
   color: #1abc9c;
@@ -6748,7 +6748,7 @@ h6 {
   box-shadow: none;
 }
 
-/* line 138, vendor/flat-ui/modules/_navbar.sass */
+/* line 138, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .navbar-unread {
   background-color: #e74c3c;
   border-radius: 30px;
@@ -6766,12 +6766,12 @@ h6 {
   top: 8px;
   z-index: 10;
 }
-/* line 155, vendor/flat-ui/modules/_navbar.sass */
+/* line 155, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_navbar.sass */
 .active .navbar-unread {
   display: block;
 }
 
-/* line 7, vendor/flat-ui/modules/_select.sass */
+/* line 7, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_container {
   cursor: pointer;
   font-size: 14px;
@@ -6779,7 +6779,7 @@ h6 {
   outline: none;
 }
 
-/* line 14, vendor/flat-ui/modules/_select.sass */
+/* line 14, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_toggle {
   background-color: #1abc9c;
   color: #fff;
@@ -6794,25 +6794,25 @@ h6 {
   transition: 0.15s;
   -webkit-backface-visibility: hidden;
 }
-/* line 24, vendor/flat-ui/modules/_select.sass */
+/* line 24, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_toggle:hover, .dk_toggle:focus, .dk_focus .dk_toggle {
   background-color: #2fe2bf;
   color: #fff;
   outline: none;
 }
-/* line 31, vendor/flat-ui/modules/_select.sass */
+/* line 31, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_toggle:active {
   background-color: #16a085;
   outline: none;
 }
-/* line 34, vendor/flat-ui/modules/_select.sass */
+/* line 34, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_toggle:active .select-icon {
   border-left-color: transparent;
 }
 
-/* line 38, vendor/flat-ui/modules/_select.sass */
+/* line 38, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .select-icon {
-  background: #1abc9c url('../images/select/toggle.png?1453939542') no-repeat right center;
+  background: #1abc9c url('../images/select/toggle.png?1457221925') no-repeat right center;
   border-left: 2px solid rgba(52, 73, 94, 0.15);
   border-radius: 0 6px 6px 0;
   height: 100%;
@@ -6827,25 +6827,25 @@ h6 {
   -webkit-backface-visibility: hidden;
 }
 
-/* line 50, vendor/flat-ui/modules/_select.sass */
+/* line 50, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_open {
   z-index: 10;
 }
-/* line 54, vendor/flat-ui/modules/_select.sass */
+/* line 54, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_open .dk_toggle {
   background-color: #1abc9c;
 }
-/* line 56, vendor/flat-ui/modules/_select.sass */
+/* line 56, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_open .dk_toggle .select-icon {
   background-color: #16a085;
   border-left-color: transparent;
 }
 
-/* line 61, vendor/flat-ui/modules/_select.sass */
+/* line 61, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_options {
   padding-top: 14px;
 }
-/* line 81, vendor/flat-ui/_mixins.sass */
+/* line 81, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 .dk_options:before {
   content: "";
   border-style: solid;
@@ -6858,16 +6858,16 @@ h6 {
   width: 0px;
   -webkit-transform: rotate(360deg);
 }
-/* line 65, vendor/flat-ui/modules/_select.sass */
+/* line 65, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_options:before {
   left: auto;
   right: 12px;
 }
-/* line 69, vendor/flat-ui/modules/_select.sass */
+/* line 69, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_options li {
   padding-bottom: 3px;
 }
-/* line 72, vendor/flat-ui/modules/_select.sass */
+/* line 72, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_options a {
   border-radius: 3px;
   color: #fff;
@@ -6875,17 +6875,17 @@ h6 {
   padding: 5px 9px;
   text-decoration: none;
 }
-/* line 78, vendor/flat-ui/modules/_select.sass */
+/* line 78, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_options a:hover {
   background-color: #1abc9c;
 }
 
-/* line 81, vendor/flat-ui/modules/_select.sass */
+/* line 81, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_option_current a {
   background-color: #1abc9c;
 }
 
-/* line 85, vendor/flat-ui/modules/_select.sass */
+/* line 85, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_options_inner {
   background-color: #34495e;
   border-radius: 5px;
@@ -6894,52 +6894,52 @@ h6 {
   padding: 3px 3px 0;
 }
 
-/* line 93, vendor/flat-ui/modules/_select.sass */
+/* line 93, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_touch .dk_options {
   max-height: 250px;
 }
 
-/* line 99, vendor/flat-ui/modules/_select.sass */
+/* line 99, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_container {
   display: none;
   position: relative;
   vertical-align: middle;
 }
-/* line 104, vendor/flat-ui/modules/_select.sass */
+/* line 104, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_container.dk_shown {
   display: inline-block;
   zoom: 1;
   *display: inline;
 }
-/* line 108, vendor/flat-ui/modules/_select.sass */
+/* line 108, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_container[class*="span"] {
   float: none;
   margin-left: 0;
 }
 
-/* line 113, vendor/flat-ui/modules/_select.sass */
+/* line 113, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_toggle {
   display: block;
   position: relative;
 }
 
-/* line 117, vendor/flat-ui/modules/_select.sass */
+/* line 117, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_open {
   position: relative;
 }
-/* line 119, vendor/flat-ui/modules/_select.sass */
+/* line 119, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_open .dk_options {
   margin-top: -1px;
   opacity: 1;
   z-index: 10;
   display: block;
 }
-/* line 125, vendor/flat-ui/modules/_select.sass */
+/* line 125, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_open .dk_label {
   color: inherit;
 }
 
-/* line 128, vendor/flat-ui/modules/_select.sass */
+/* line 128, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_options {
   margin-top: -21px;
   position: absolute;
@@ -6954,41 +6954,41 @@ h6 {
   transition: 0.1s ease-out;
   -webkit-backface-visibility: hidden;
 }
-/* line 140, vendor/flat-ui/modules/_select.sass */
+/* line 140, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .select-right .dk_options {
   left: auto;
   right: 0;
 }
-/* line 144, vendor/flat-ui/modules/_select.sass */
+/* line 144, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_options a {
   display: block;
 }
 
-/* line 147, vendor/flat-ui/modules/_select.sass */
+/* line 147, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_options_inner {
   overflow: auto;
   outline: none;
   position: relative;
 }
 
-/* line 153, vendor/flat-ui/modules/_select.sass */
+/* line 153, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_touch .dk_options {
   overflow: hidden;
 }
-/* line 155, vendor/flat-ui/modules/_select.sass */
+/* line 155, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_touch .dk_options_inner {
   max-height: none;
   overflow: visible;
 }
 
-/* line 159, vendor/flat-ui/modules/_select.sass */
+/* line 159, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_select.sass */
 .dk_fouc select {
   position: relative;
   top: -99999em;
   visibility: hidden;
 }
 
-/* line 9, vendor/flat-ui/modules/_input.sass */
+/* line 9, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 textarea,
 input[type="text"],
 input[type="password"],
@@ -7018,7 +7018,7 @@ input[type="color"],
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 35, vendor/flat-ui/_mixins.sass */
+/* line 35, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 textarea:-moz-placeholder,
 input[type="text"]:-moz-placeholder,
 input[type="password"]:-moz-placeholder,
@@ -7037,7 +7037,7 @@ input[type="color"]:-moz-placeholder,
 .uneditable-input:-moz-placeholder {
   color: #acb6c0;
 }
-/* line 37, vendor/flat-ui/_mixins.sass */
+/* line 37, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 textarea::-webkit-input-placeholder,
 input[type="text"]::-webkit-input-placeholder,
 input[type="password"]::-webkit-input-placeholder,
@@ -7056,7 +7056,7 @@ input[type="color"]::-webkit-input-placeholder,
 .uneditable-input::-webkit-input-placeholder {
   color: #acb6c0;
 }
-/* line 39, vendor/flat-ui/_mixins.sass */
+/* line 39, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 textarea.placeholder,
 input[type="text"].placeholder,
 input[type="password"].placeholder,
@@ -7075,7 +7075,7 @@ input[type="color"].placeholder,
 .uneditable-input.placeholder {
   color: #acb6c0;
 }
-/* line 35, vendor/flat-ui/modules/_input.sass */
+/* line 35, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 textarea:focus,
 input[type="text"]:focus,
 input[type="password"]:focus,
@@ -7097,7 +7097,7 @@ input[type="color"]:focus,
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 39, vendor/flat-ui/modules/_input.sass */
+/* line 39, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 .control-group.error textarea, .control-group.error
 input[type="text"], .control-group.error
 input[type="password"], .control-group.error
@@ -7120,7 +7120,7 @@ input[type="color"], .control-group.error
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 5, vendor/flat-ui/modules/_input.sass */
+/* line 5, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 .control-group.error textarea:focus, .control-group.error
 input[type="text"]:focus, .control-group.error
 input[type="password"]:focus, .control-group.error
@@ -7141,7 +7141,7 @@ input[type="color"]:focus, .control-group.error
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 42, vendor/flat-ui/modules/_input.sass */
+/* line 42, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 .control-group.success textarea, .control-group.success
 input[type="text"], .control-group.success
 input[type="password"], .control-group.success
@@ -7164,7 +7164,7 @@ input[type="color"], .control-group.success
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 5, vendor/flat-ui/modules/_input.sass */
+/* line 5, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 .control-group.success textarea:focus, .control-group.success
 input[type="text"]:focus, .control-group.success
 input[type="password"]:focus, .control-group.success
@@ -7185,7 +7185,7 @@ input[type="color"]:focus, .control-group.success
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 45, vendor/flat-ui/modules/_input.sass */
+/* line 45, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 .control-group.warning textarea, .control-group.warning
 input[type="text"], .control-group.warning
 input[type="password"], .control-group.warning
@@ -7208,7 +7208,7 @@ input[type="color"], .control-group.warning
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 5, vendor/flat-ui/modules/_input.sass */
+/* line 5, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 .control-group.warning textarea:focus, .control-group.warning
 input[type="text"]:focus, .control-group.warning
 input[type="password"]:focus, .control-group.warning
@@ -7229,7 +7229,7 @@ input[type="color"]:focus, .control-group.warning
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 48, vendor/flat-ui/modules/_input.sass */
+/* line 48, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 .control-group.info textarea, .control-group.info
 input[type="text"], .control-group.info
 input[type="password"], .control-group.info
@@ -7252,7 +7252,7 @@ input[type="color"], .control-group.info
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 5, vendor/flat-ui/modules/_input.sass */
+/* line 5, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 .control-group.info textarea:focus, .control-group.info
 input[type="text"]:focus, .control-group.info
 input[type="password"]:focus, .control-group.info
@@ -7274,7 +7274,7 @@ input[type="color"]:focus, .control-group.info
   box-shadow: none;
 }
 
-/* line 52, vendor/flat-ui/modules/_input.sass */
+/* line 52, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 input[disabled],
 input[readonly],
 textarea[disabled],
@@ -7285,14 +7285,14 @@ textarea[readonly] {
   cursor: default;
 }
 
-/* line 62, vendor/flat-ui/modules/_input.sass */
+/* line 62, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_input.sass */
 input,
 textarea,
 .uneditable-input {
   width: 100px;
 }
 
-/* line 2, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 2, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox,
 .radio {
   margin-bottom: 12px;
@@ -7304,12 +7304,12 @@ textarea,
   transition: 0.25s;
   -webkit-backface-visibility: hidden;
 }
-/* line 9, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 9, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox:hover,
 .radio:hover {
   color: #1abc9c;
 }
-/* line 12, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 12, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox input,
 .radio input {
   outline: none !important;
@@ -7317,57 +7317,57 @@ textarea,
   filter: alpha(opacity=0);
   zoom: 1;
 }
-/* line 17, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 17, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox.checked .icon,
 .radio.checked .icon {
   background-position: -60px -30px;
   opacity: 1;
   display: block\9;
 }
-/* line 22, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 22, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox.checked .icon-to-fade,
 .radio.checked .icon-to-fade {
   opacity: 0;
   display: none\9;
 }
-/* line 27, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 27, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox.disabled,
 .radio.disabled {
   color: #d7dddd;
   cursor: default;
 }
-/* line 31, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 31, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox.disabled .icon,
 .radio.disabled .icon {
   opacity: 0;
   display: none\9;
 }
-/* line 35, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 35, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox.disabled .icon-to-fade,
 .radio.disabled .icon-to-fade {
   background-position: -30px -60px;
   opacity: 1;
   display: block\9;
 }
-/* line 41, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 41, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox.disabled.checked .icon,
 .radio.disabled.checked .icon {
   background-position: 0 -90px;
   opacity: 1;
   display: block\9;
 }
-/* line 46, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 46, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox.disabled.checked .icon-to-fade,
 .radio.disabled.checked .icon-to-fade {
   opacity: 0;
   display: none\9;
 }
-/* line 51, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 51, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox .icon,
 .checkbox .icon-to-fade,
 .radio .icon,
 .radio .icon-to-fade {
-  background: url('../images/checkbox.png?1453939542') -90px 0 no-repeat;
+  background: url('../images/checkbox.png?1457221925') -90px 0 no-repeat;
   display: block;
   height: 20px;
   left: 0;
@@ -7381,7 +7381,7 @@ textarea,
   transition: opacity 0.1s linear;
   -webkit-backface-visibility: hidden;
 }
-/* line 63, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 63, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .checkbox .icon,
 .radio .icon {
   opacity: 0;
@@ -7390,26 +7390,26 @@ textarea,
   display: none\9;
 }
 
-/* line 71, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+/* line 71, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
 .radio .icon,
 .radio .icon-to-fade {
-  background-image: url('../images/radio.png?1453939542');
+  background-image: url('../images/radio.png?1457221925');
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-moz-min-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 3 / 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 2) {
-  /* line 78, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+  /* line 78, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
   .checkbox .icon {
-    background-image: url('../images/checkbox-2x.png?1453939542');
+    background-image: url('../images/checkbox-2x.png?1457221925');
     background-size: 110px 110px;
   }
 
-  /* line 83, vendor/flat-ui/modules/_checkbox-and-radio.sass */
+  /* line 83, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_checkbox-and-radio.sass */
   .radio .icon {
-    background-image: url('../images/radio-2x.png?1453939542');
+    background-image: url('../images/radio-2x.png?1457221925');
     background-size: 110px 110px;
   }
 }
-/* line 2, vendor/flat-ui/modules/_toggle.sass */
+/* line 2, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle {
   background-color: #34495e;
   border-radius: 60px;
@@ -7427,22 +7427,22 @@ textarea,
   transition: 0.25s;
   -webkit-backface-visibility: hidden;
 }
-/* line 73, vendor/flat-ui/_mixins.sass */
+/* line 73, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 .toggle:before, .toggle:after {
   display: table;
   content: "";
 }
-/* line 77, vendor/flat-ui/_mixins.sass */
+/* line 77, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 .toggle:after {
   clear: both;
 }
-/* line 14, vendor/flat-ui/modules/_toggle.sass */
+/* line 14, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle.toggle-off {
   background-color: #cbd2d8;
 }
-/* line 17, vendor/flat-ui/modules/_toggle.sass */
+/* line 17, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle.toggle-off .toggle-radio {
-  background-image: url('../images/toggle/icon-off.png?1453939542');
+  background-image: url('../images/toggle/icon-off.png?1457221925');
   background-position: 0 0;
   color: #fff;
   left: 0;
@@ -7450,13 +7450,13 @@ textarea,
   margin-right: -13px;
   z-index: 1;
 }
-/* line 25, vendor/flat-ui/modules/_toggle.sass */
+/* line 25, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle.toggle-off .toggle-radio:first-child {
   left: -120%;
 }
-/* line 28, vendor/flat-ui/modules/_toggle.sass */
+/* line 28, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle .toggle-radio {
-  background: url('../images/toggle/icon-on.png?1453939542') right top no-repeat;
+  background: url('../images/toggle/icon-on.png?1457221925') right top no-repeat;
   color: #1abc9c;
   display: block;
   font-weight: 700;
@@ -7473,12 +7473,12 @@ textarea,
   transition: 0.25s;
   -webkit-backface-visibility: hidden;
 }
-/* line 42, vendor/flat-ui/modules/_toggle.sass */
+/* line 42, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle .toggle-radio:first-child {
   margin-bottom: -29px;
   left: 0;
 }
-/* line 46, vendor/flat-ui/modules/_toggle.sass */
+/* line 46, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle input {
   display: none;
   position: absolute;
@@ -7488,45 +7488,45 @@ textarea,
   filter: alpha(opacity=1);
   zoom: 1;
 }
-/* line 55, vendor/flat-ui/modules/_toggle.sass */
+/* line 55, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle.toggle-icon {
   border-radius: 6px 7px 7px 6px;
 }
-/* line 58, vendor/flat-ui/modules/_toggle.sass */
+/* line 58, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle.toggle-icon.toggle-off {
   border-radius: 7px 6px 6px 7px;
 }
-/* line 60, vendor/flat-ui/modules/_toggle.sass */
+/* line 60, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle.toggle-icon.toggle-off .toggle-radio {
-  background-image: url('../images/toggle/block-off.png?1453939542');
+  background-image: url('../images/toggle/block-off.png?1457221925');
   background-position: 0 0;
 }
-/* line 64, vendor/flat-ui/modules/_toggle.sass */
+/* line 64, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle.toggle-icon .toggle-radio {
-  background-image: url('../images/toggle/block-on.png?1453939542');
+  background-image: url('../images/toggle/block-on.png?1457221925');
   background-position: 62px 0;
   border-radius: 6px;
   min-width: 27px;
   text-align: right;
 }
-/* line 71, vendor/flat-ui/modules/_toggle.sass */
+/* line 71, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
 .toggle.toggle-icon .toggle-radio:first-child {
   text-align: left;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-moz-min-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 3 / 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 2) {
-  /* line 78, vendor/flat-ui/modules/_toggle.sass */
+  /* line 78, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
   .toggle.toggle-off .toggle-radio {
-    background-image: url('../images/toggle/icon-off-2x.png?1453939542');
+    background-image: url('../images/toggle/icon-off-2x.png?1457221925');
     background-size: 30px 29px;
   }
-  /* line 82, vendor/flat-ui/modules/_toggle.sass */
+  /* line 82, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_toggle.sass */
   .toggle .toggle-radio {
-    background-image: url('../images/toggle/icon-on-2x.png?1453939542');
+    background-image: url('../images/toggle/icon-on-2x.png?1457221925');
     background-size: 30px 29px;
   }
 }
-/* line 2, vendor/flat-ui/modules/_progress.sass */
+/* line 2, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_progress.sass */
 .progress, .ui-slider {
   background: #e8edf2;
   border-radius: 32px;
@@ -7536,7 +7536,7 @@ textarea,
   box-shadow: none;
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-/* line 9, vendor/flat-ui/modules/_progress.sass */
+/* line 9, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_progress.sass */
 .progress .bar, .ui-slider .bar {
   background: #1abc9c;
   -webkit-box-shadow: none !important;
@@ -7544,35 +7544,35 @@ textarea,
   box-shadow: none !important;
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-/* line 14, vendor/flat-ui/modules/_progress.sass */
+/* line 14, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_progress.sass */
 .progress .bar-success, .ui-slider .bar-success {
   background-color: #1abc9c;
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-/* line 18, vendor/flat-ui/modules/_progress.sass */
+/* line 18, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_progress.sass */
 .progress .bar-warning, .ui-slider .bar-warning {
   background-color: #f1c40f;
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-/* line 22, vendor/flat-ui/modules/_progress.sass */
+/* line 22, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_progress.sass */
 .progress .bar-danger, .ui-slider .bar-danger {
   background-color: #e74c3c;
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-/* line 26, vendor/flat-ui/modules/_progress.sass */
+/* line 26, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_progress.sass */
 .progress .bar-info, .ui-slider .bar-info {
   background-color: #3498db;
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
 
-/* line 2, vendor/flat-ui/modules/_ui-slider.sass */
+/* line 2, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_ui-slider.sass */
 .ui-slider {
   margin-bottom: 20px;
   position: relative;
   width: 400px;
 }
 
-/* line 8, vendor/flat-ui/modules/_ui-slider.sass */
+/* line 8, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_ui-slider.sass */
 .ui-slider-handle {
   background-color: #16a085;
   border-radius: 50%;
@@ -7589,21 +7589,21 @@ textarea,
   transition: background 0.25s;
   -webkit-backface-visibility: hidden;
 }
-/* line 21, vendor/flat-ui/modules/_ui-slider.sass */
+/* line 21, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_ui-slider.sass */
 .ui-slider-handle[style*='100'] {
   margin-left: -15px;
 }
-/* line 25, vendor/flat-ui/modules/_ui-slider.sass */
+/* line 25, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_ui-slider.sass */
 .ui-slider-handle:hover, .ui-slider-handle:focus {
   background-color: #2fe2bf;
   outline: none;
 }
-/* line 29, vendor/flat-ui/modules/_ui-slider.sass */
+/* line 29, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_ui-slider.sass */
 .ui-slider-handle:active {
   background-color: #16a085;
 }
 
-/* line 32, vendor/flat-ui/modules/_ui-slider.sass */
+/* line 32, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_ui-slider.sass */
 .ui-slider-range {
   background-color: #1abc9c;
   border-radius: 30px 0 0 30px;
@@ -7613,7 +7613,7 @@ textarea,
   z-index: 1;
 }
 
-/* line 40, vendor/flat-ui/modules/_ui-slider.sass */
+/* line 40, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_ui-slider.sass */
 .ui-slider-segment {
   background-color: #d6dbe0;
   border-radius: 50%;
@@ -7623,7 +7623,7 @@ textarea,
   width: 6px;
 }
 
-/* line 4, vendor/flat-ui/modules/_pager.sass */
+/* line 4, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pager.sass */
 .pager {
   background-color: #34495e;
   border-radius: 6px;
@@ -7634,7 +7634,7 @@ textarea,
   zoom: 1;
   *display: inline;
 }
-/* line 14, vendor/flat-ui/modules/_pager.sass */
+/* line 14, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pager.sass */
 .pager li:first-child > a, .pager li:first-child > span {
   border-left: none;
   padding-left: 20px;
@@ -7642,14 +7642,14 @@ textarea,
   -moz-border-radius: 6px 0 0 6px;
   border-radius: 6px 0 0 6px;
 }
-/* line 19, vendor/flat-ui/modules/_pager.sass */
+/* line 19, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pager.sass */
 .pager li:first-child > a img, .pager li:first-child > span img {
   margin-left: 0;
   margin-right: 13px;
   margin-left: 0\9;
   margin-right: 9px\9;
 }
-/* line 25, vendor/flat-ui/modules/_pager.sass */
+/* line 25, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pager.sass */
 .pager li.pager-center {
   padding: 9px 18px 10px;
   padding-left: 0;
@@ -7658,14 +7658,14 @@ textarea,
   zoom: 1;
   *display: inline;
 }
-/* line 32, vendor/flat-ui/modules/_pager.sass */
+/* line 32, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pager.sass */
 .pager li.previous img, .pager li.next img {
   height: 14px;
   margin: -1px 0 0 13px;
   margin-left: 9px\9;
   vertical-align: middle;
 }
-/* line 40, vendor/flat-ui/modules/_pager.sass */
+/* line 40, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pager.sass */
 .pager li > a, .pager li > span {
   background: none;
   border: none;
@@ -7679,16 +7679,16 @@ textarea,
   -moz-border-radius: 0 6px 6px 0;
   border-radius: 0 6px 6px 0;
 }
-/* line 51, vendor/flat-ui/modules/_pager.sass */
+/* line 51, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pager.sass */
 .pager li > a:hover, .pager li > a:focus, .pager li > span:hover, .pager li > span:focus {
   background-color: #4e6d8d;
 }
-/* line 54, vendor/flat-ui/modules/_pager.sass */
+/* line 54, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pager.sass */
 .pager li > a:active, .pager li > span:active {
   background-color: #2c3e50;
 }
 
-/* line 5, vendor/flat-ui/modules/_pagination.sass */
+/* line 5, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul {
   background: #d7dce0;
   -webkit-border-radius: 6px;
@@ -7698,19 +7698,19 @@ textarea,
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 11, vendor/flat-ui/modules/_pagination.sass */
+/* line 11, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul > li:first-child {
   -webkit-border-radius: 6px 0 0 6px;
   -moz-border-radius: 6px 0 0 6px;
   border-radius: 6px 0 0 6px;
 }
-/* line 14, vendor/flat-ui/modules/_pagination.sass */
+/* line 14, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul > li:last-child {
   -webkit-border-radius: 0 6px 6px 0;
   -moz-border-radius: 0 6px 6px 0;
   border-radius: 0 6px 6px 0;
 }
-/* line 19, vendor/flat-ui/modules/_pagination.sass */
+/* line 19, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul > li.previous > a, .pagination ul > li.previous > span, .pagination ul > li.next > a, .pagination ul > li.next > span {
   background: transparent;
   border: none;
@@ -7724,7 +7724,7 @@ textarea,
   -moz-box-shadow: none !important;
   box-shadow: none !important;
 }
-/* line 29, vendor/flat-ui/modules/_pagination.sass */
+/* line 29, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul > li.next > a, .pagination ul > li.next > span {
   border-left: 2px solid #fff !important;
   margin-left: 9px;
@@ -7733,7 +7733,7 @@ textarea,
   -moz-border-radius: 0 6px 6px 0;
   border-radius: 0 6px 6px 0;
 }
-/* line 36, vendor/flat-ui/modules/_pagination.sass */
+/* line 36, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul > li.active > a, .pagination ul > li.active > span {
   background-color: #fff;
   border-color: #fff;
@@ -7741,7 +7741,7 @@ textarea,
   color: #d7dce0;
   margin: 10px 5px 9px;
 }
-/* line 43, vendor/flat-ui/modules/_pagination.sass */
+/* line 43, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul > li.active > a:hover, .pagination ul > li.active > a:focus, .pagination ul > li.active > span:hover, .pagination ul > li.active > span:focus {
   background-color: #fff;
   border-color: #fff;
@@ -7750,7 +7750,7 @@ textarea,
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 49, vendor/flat-ui/modules/_pagination.sass */
+/* line 49, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul > li > a, .pagination ul > li > span {
   background: #fff;
   border: 5px solid #d7dce0;
@@ -7765,7 +7765,7 @@ textarea,
   transition: background 0.2s ease-out, border-color 0s ease-out, color 0.2s ease-out;
   -webkit-backface-visibility: hidden;
 }
-/* line 59, vendor/flat-ui/modules/_pagination.sass */
+/* line 59, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul > li > a:hover, .pagination ul > li > a :focus, .pagination ul > li > span:hover, .pagination ul > li > span :focus {
   background-color: #1abc9c;
   border-color: #1abc9c;
@@ -7776,12 +7776,12 @@ textarea,
   transition: background 0.2s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
   -webkit-backface-visibility: hidden;
 }
-/* line 65, vendor/flat-ui/modules/_pagination.sass */
+/* line 65, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul > li > a:active, .pagination ul > li > span:active {
   background-color: #16a085;
   border-color: #16a085;
 }
-/* line 69, vendor/flat-ui/modules/_pagination.sass */
+/* line 69, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_pagination.sass */
 .pagination ul img {
   height: 14px;
   margin-top: -1px;
@@ -7789,13 +7789,13 @@ textarea,
   width: 13px;
 }
 
-/* line 5, vendor/flat-ui/modules/_share.sass */
+/* line 5, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_share.sass */
 .share {
   background-color: #ecf0f5;
   border-radius: 6px;
   position: relative;
 }
-/* line 81, vendor/flat-ui/_mixins.sass */
+/* line 81, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 .share:before {
   content: "";
   border-style: solid;
@@ -7808,43 +7808,43 @@ textarea,
   width: 0px;
   -webkit-transform: rotate(360deg);
 }
-/* line 11, vendor/flat-ui/modules/_share.sass */
+/* line 11, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_share.sass */
 .share ul {
   list-style-type: none;
   margin: 0;
   padding: 15px;
 }
-/* line 16, vendor/flat-ui/modules/_share.sass */
+/* line 16, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_share.sass */
 .share li {
   padding-top: 11px;
   *zoom: 1;
 }
-/* line 73, vendor/flat-ui/_mixins.sass */
+/* line 73, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 .share li:before, .share li:after {
   display: table;
   content: "";
 }
-/* line 77, vendor/flat-ui/_mixins.sass */
+/* line 77, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/_mixins.sass */
 .share li:after {
   clear: both;
 }
-/* line 19, vendor/flat-ui/modules/_share.sass */
+/* line 19, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_share.sass */
 .share li:first-child {
   padding-top: 0;
 }
-/* line 22, vendor/flat-ui/modules/_share.sass */
+/* line 22, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_share.sass */
 .share .toggle {
   float: right;
   margin: 0;
 }
-/* line 26, vendor/flat-ui/modules/_share.sass */
+/* line 26, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_share.sass */
 .share .btn {
   -webkit-border-radius: 0 0 6px 6px;
   -moz-border-radius: 0 0 6px 6px;
   border-radius: 0 0 6px 6px;
 }
 
-/* line 29, vendor/flat-ui/modules/_share.sass */
+/* line 29, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_share.sass */
 .share-label {
   float: left;
   font-size: 15px;
@@ -7852,45 +7852,45 @@ textarea,
   width: 50%;
 }
 
-/* line 2, vendor/flat-ui/modules/_tooltip.sass */
+/* line 2, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_tooltip.sass */
 .tooltip {
   font-size: 12px;
 }
-/* line 8, vendor/flat-ui/modules/_tooltip.sass */
+/* line 8, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_tooltip.sass */
 .tooltip.in {
   opacity: 1;
   filter: alpha(opacity=100);
   zoom: 1;
 }
-/* line 11, vendor/flat-ui/modules/_tooltip.sass */
+/* line 11, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_tooltip.sass */
 .tooltip.top {
   padding-bottom: 9px;
 }
-/* line 13, vendor/flat-ui/modules/_tooltip.sass */
+/* line 13, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_tooltip.sass */
 .tooltip.top .tooltip-arrow {
   border-top-color: #34495e;
   border-width: 9px 9px 0;
   bottom: 0;
 }
-/* line 20, vendor/flat-ui/modules/_tooltip.sass */
+/* line 20, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_tooltip.sass */
 .tooltip.right .tooltip-arrow {
   border-right-color: #34495e;
   border-width: 9px 9px 9px 0;
   margin-top: -9px;
   left: -3px;
 }
-/* line 26, vendor/flat-ui/modules/_tooltip.sass */
+/* line 26, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_tooltip.sass */
 .tooltip.bottom {
   padding-top: 8px;
 }
-/* line 28, vendor/flat-ui/modules/_tooltip.sass */
+/* line 28, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_tooltip.sass */
 .tooltip.bottom .tooltip-arrow {
   border-bottom-color: #34495e;
   border-width: 0 9px 9px;
   margin-left: -9px;
   top: -1px;
 }
-/* line 35, vendor/flat-ui/modules/_tooltip.sass */
+/* line 35, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_tooltip.sass */
 .tooltip.left .tooltip-arrow {
   border-right-color: #34495e;
   border-width: 9px 9px 9px 0;
@@ -7898,7 +7898,7 @@ textarea,
   top: -3px;
 }
 
-/* line 41, vendor/flat-ui/modules/_tooltip.sass */
+/* line 41, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_tooltip.sass */
 .tooltip-inner {
   background-color: #34495e;
   line-height: 18px;
@@ -7909,230 +7909,180 @@ textarea,
   border-radius: 6px;
 }
 
-/* line 9, vendor/flat-ui/modules/_palette.sass */
+/* line 9, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette {
   color: #fff;
   margin: 0;
   padding: 15px;
   text-transform: uppercase;
 }
-/* line 15, vendor/flat-ui/modules/_palette.sass */
+/* line 15, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette dt {
   display: block;
   font-weight: 500;
   opacity: 0.8;
 }
-/* line 20, vendor/flat-ui/modules/_palette.sass */
+/* line 20, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette dd {
   font-weight: 200;
   margin-left: 0;
   opacity: 0.8;
 }
 
-/* line 3, vendor/flat-ui/modules/_palette.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-firm {
   background-color: #1abc9c;
 }
 
-/* line 6, vendor/flat-ui/modules/_palette.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-firm-dark {
   background-color: #16a085;
 }
 
-/* line 3, vendor/flat-ui/modules/_palette.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-success {
   background-color: #1abc9c;
 }
 
-/* line 6, vendor/flat-ui/modules/_palette.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-success-dark {
   background-color: #16a085;
 }
 
-/* line 3, vendor/flat-ui/modules/_palette.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-info {
   background-color: #3498db;
 }
 
-/* line 6, vendor/flat-ui/modules/_palette.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-info-dark {
   background-color: #2383c4;
 }
 
-/* line 3, vendor/flat-ui/modules/_palette.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-warning {
   background-color: #f1c40f;
 }
 
-/* line 6, vendor/flat-ui/modules/_palette.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-warning-dark {
   background-color: #cea70c;
 }
 
-/* line 3, vendor/flat-ui/modules/_palette.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-danger {
   background-color: #e74c3c;
 }
 
-/* line 6, vendor/flat-ui/modules/_palette.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-danger-dark {
   background-color: #dc2d1b;
 }
 
-/* line 3, vendor/flat-ui/modules/_palette.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-night {
   background-color: #34495e;
 }
 
-/* line 6, vendor/flat-ui/modules/_palette.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-night-dark {
   background-color: #2c3e50;
 }
 
-/* line 3, vendor/flat-ui/modules/_palette.sass */
+/* line 3, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-bright {
   background-color: #f1c40f;
 }
 
-/* line 6, vendor/flat-ui/modules/_palette.sass */
+/* line 6, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-bright-dark {
   background-color: #cea70c;
 }
 
-/* line 34, vendor/flat-ui/modules/_palette.sass */
+/* line 34, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-success-dark {
   background-color: #27ae60;
 }
 
-/* line 37, vendor/flat-ui/modules/_palette.sass */
+/* line 37, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-info-dark {
   background-color: #2980b9;
 }
 
-/* line 40, vendor/flat-ui/modules/_palette.sass */
+/* line 40, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-bright-dark {
   background-color: #f39c12;
 }
 
-/* line 43, vendor/flat-ui/modules/_palette.sass */
+/* line 43, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-amethyst {
   background-color: #9b59b6;
 }
 
-/* line 46, vendor/flat-ui/modules/_palette.sass */
+/* line 46, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-wisteria {
   background-color: #8e44ad;
 }
 
-/* line 49, vendor/flat-ui/modules/_palette.sass */
+/* line 49, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-carrot {
   background-color: #e67e22;
 }
 
-/* line 52, vendor/flat-ui/modules/_palette.sass */
+/* line 52, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-pumpkin {
   background-color: #d35400;
 }
 
-/* line 55, vendor/flat-ui/modules/_palette.sass */
+/* line 55, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-alizarin {
   background-color: #e74c3c;
 }
 
-/* line 58, vendor/flat-ui/modules/_palette.sass */
+/* line 58, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-pomegranate {
   background-color: #c0392b;
 }
 
-/* line 61, vendor/flat-ui/modules/_palette.sass */
+/* line 61, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-clouds {
   background-color: #ecf0f1;
   color: #bdc3c7;
 }
 
-/* line 65, vendor/flat-ui/modules/_palette.sass */
+/* line 65, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-silver {
   background-color: #bdc3c7;
 }
 
-/* line 68, vendor/flat-ui/modules/_palette.sass */
+/* line 68, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-concrete {
   background-color: #95a5a6;
 }
 
-/* line 71, vendor/flat-ui/modules/_palette.sass */
+/* line 71, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-asbestos {
   background-color: #7f8c8d;
 }
 
-/* line 75, vendor/flat-ui/modules/_palette.sass */
+/* line 75, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-paragraph {
   color: #7f8c8d;
   font-size: 12px;
   line-height: 17px;
 }
-/* line 80, vendor/flat-ui/modules/_palette.sass */
+/* line 80, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-paragraph span {
   color: #bdc3c7;
 }
 
-/* line 84, vendor/flat-ui/modules/_palette.sass */
+/* line 84, /Users/wellcaffeinated/Documents/github/spdcalc/browser/library/styles/vendor/flat-ui/modules/_palette.sass */
 .palette-headline {
   color: #7f8c8d;
   font-weight: 700;
   margin-top: -5px;
 }
 
-/* line 2, vendor/flat-ui/modules/_tile.sass */
-.tile {
-  background-color: #ecf0f5;
-  border-radius: 6px;
-  padding: 14px;
-  position: relative;
-  text-align: center;
-}
-/* line 10, vendor/flat-ui/modules/_tile.sass */
-.tile.tile-hot:before {
-  background: url("../images/tile/ribbon.png") 0 0 no-repeat;
-  background-size: 82px 82px;
-  content: "";
-  height: 82px;
-  position: absolute;
-  right: -4px;
-  top: -4px;
-  width: 82px;
-}
-/* line 20, vendor/flat-ui/modules/_tile.sass */
-.tile p {
-  font-size: 15px;
-  margin-bottom: 33px;
-}
-
-/* line 24, vendor/flat-ui/modules/_tile.sass */
-.tile-image {
-  height: 100px;
-  margin: 31px 0 27px;
-  vertical-align: bottom;
-}
-/* line 28, vendor/flat-ui/modules/_tile.sass */
-.tile-image.big-illustration {
-  height: 111px;
-  margin-top: 20px;
-  width: 112px;
-}
-
-/* line 33, vendor/flat-ui/modules/_tile.sass */
-.tile-title {
-  font-size: 20px;
-  margin: 0;
-}
-
-@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-moz-min-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 3 / 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 2) {
-  /* line 40, vendor/flat-ui/modules/_tile.sass */
-  .tile.tile-hot:before {
-    background-image: url("../images/tile/ribbon-2x.png");
-  }
-}
 /* line 23, site.scss */
 body {
   padding: 0;
@@ -8420,7 +8370,7 @@ body {
 /* line 279, _pm-ui.scss */
 #pm-ui .plot-wrapper.spinner:after {
   content: '';
-  background: rgba(255, 255, 255, 0.8) url('../images/spinner.gif?1453939542') no-repeat center center;
+  background: rgba(255, 255, 255, 0.8) url('../images/spinner.gif?1457221925') no-repeat center center;
   position: absolute;
   top: 0;
   left: 0;
@@ -8476,8 +8426,6 @@ body {
   background: #fff;
   padding: 2em 3em;
   overflow: auto;
-  -moz-border-radius: 0 0 10px 10px;
-  -webkit-border-radius: 0;
   border-radius: 0 0 10px 10px;
 }
 /* line 358, _pm-ui.scss */

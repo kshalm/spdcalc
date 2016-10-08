@@ -1560,10 +1560,3 @@ PhaseMatch.swap_signal_idler = function swap_signal_idler(P){
     P.update_all_angles();
     return P;
 };
-
-
-
-if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define(function(){ return PhaseMatch; });
-}

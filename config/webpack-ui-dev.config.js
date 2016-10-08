@@ -1,21 +1,20 @@
 var path = require('path');
 var webpack = require('webpack');
+var compass = require('compass-importer');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
 	devtool: 'eval',
     entry: {
-		ui: [
+		spdcalc: [
 			// 'webpack-hot-middleware/client',
-			'babel-polyfill',
-			'page-pm-ui'
+			// 'babel-polyfill',
+			'spdcalc'
 		]
-		// ,browser: [
-		// 	'./browser/library/js/main.js'
-		// ]
 	},
 	output: {
 		library: 'PhaseMatchUI',
-		path: path.join(__dirname, '../dist/browser/library/js'),
+		path: path.join(__dirname, '../dist/'),
 		filename: '[name].js'
 	},
 	plugins: [
@@ -24,9 +23,12 @@ module.exports = {
 		,new webpack.NoErrorsPlugin()
 		// ,new webpack.optimize.DedupePlugin()
 		// ,new webpack.optimize.UglifyJsPlugin()
+		,new ExtractTextPlugin('site.css', {
+            allChunks: true
+        })
 	],
 	resolve: {
-	    modulesDirectories: ['browser/library/js', 'node_modules/']
+	    modulesDirectories: ['browser', 'browser/library/js', 'node_modules']
 		, alias: {
 
 	        //
@@ -61,7 +63,7 @@ module.exports = {
 	        'jquery.tagsinput': 'vendor/jquery.tagsinput',
 
 			'site-config': 'config/site-config.json'
-	    },
+	    }
 	},
 	resolveLoader: {
 		alias: {
@@ -76,13 +78,9 @@ module.exports = {
 			{
 				test: /\.js$/
 				, loader: 'babel'
-				// , exclude: /node_modules/
+				, exclude: /node_modules/
 				, include: path.join(__dirname, 'src')
 			}
-			// , {
-			// 	test: /d3/
-			// 	, loader: 'exports?d3'
-			// }
 			, {
 				test: /jquery-ui|bootstrap-tooltip|jquery\.dropkick|jquery\.tagsinput/
 				, loader: 'imports?jquery'
@@ -95,22 +93,24 @@ module.exports = {
 				test: /\.tpl$/
 				, loader: 'dot-loader'
 			}
-			// ,{
-			// 	test: /\.monk$/,
-			// 	exclude: /node_modules/,
-			// 	loader: 'monkberry-loader'
-			// }
-			// ,{
-			// 	test: /\.scss?$/,
-			// 	loader: ExtractTextPlugin.extract('style', 'css?sourceMap!sass?sourceMap'),
-			// 	exclude: /node_modules/,
-			// 	include: path.join(__dirname, 'public')
-			// }
+			,{
+				test: /\.scss$/
+				, loader: ExtractTextPlugin.extract('style', 'css?sourceMap!sass?sourceMap')
+				, exclude: /node_modules/
+				// , include: path.join(__dirname, '../browser/styles')
+			}
 			,{
 				test: /json!\.json$/
 				, loader: "json-loader"
 			}
+			,{
+                test: /\.(jpe?g|png|gif|svg)$/
+                , loader: 'file'
+            }
 		],
 		postLoaders: []
+	}
+	,sassLoader: {
+		importer: compass
 	}
 };

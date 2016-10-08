@@ -61,6 +61,24 @@ module.exports = function(grunt) {
             phasematchDev: require('./config/webpack-pm-dev.config')
             ,browserDev: require('./config/webpack-ui-dev.config')
         },
+        'webpack-dev-server': {
+            options: {
+                watch: true
+                , keepalive: true
+                , contentBase: __dirname + '/dist'
+                , stats: {
+                    // Configure the console output
+                    colors: true,
+                    modules: true,
+                    reasons: true
+                }
+            }
+            , browserDev: (() => {
+                var cfg = Object.create(require('./config/webpack-ui-dev.config'));
+                cfg.entry.spdcalc.unshift("webpack-dev-server/client?http://localhost:8080/");
+                return cfg;
+            })()
+        },
         copy: {
             phasematch: {
                 files: [{
@@ -149,11 +167,11 @@ module.exports = function(grunt) {
 
 
     grunt.registerTask('cleanup', ['clean', 'bgShell:cleanCompass']);
-    grunt.registerTask('dev', [ 'bgShell:watchCompass', 'bgShell:httpserver']);
+    grunt.registerTask('dev', [ 'webpack:browserDev', 'webpack-dev-server:browserDev']);
     grunt.registerTask('server-dist', [ 'bgShell:httpserverDist' ]);
     grunt.registerTask('build-browser', ['cleanup', 'jshint:browser', 'compass', 'requirejs:browser']);
 
-    grunt.registerTask('build-phasematch', ['jshint:phasematch', 'clean', 'webpack:phasematch', 'copy:phasematch']);
+    grunt.registerTask('build-phasematch', ['jshint:phasematch', 'clean', 'webpack:phasematchDev', 'copy:phasematch']);
 
     // Default task executes a build for phasematch library.
     grunt.registerTask('default', ['build-phasematch']);

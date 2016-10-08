@@ -30,7 +30,7 @@ define(
 
         'use strict';
 
-        var pmWorker = W( 'library/js/workers/pm-web-worker.js' );
+        var pmWorker = W( require('worker!workers/pm-web-worker.js') );
 
         var con = PhaseMatch.constants;
 
@@ -55,7 +55,7 @@ define(
 
             initEvents : function(){
                 var self = this;
-                // self.el = $(tplPlots.render());
+                // self.el = $(tplPlots());
                 // collapse button for JSA module plot
                 self.el.on('click', '#collapse-efficiency-s', function(e){
                     e.preventDefault();
