@@ -334,7 +334,7 @@ define(
                     //         1.001*P.W_sx,
                     //         npts
                     //     );
-                    ;
+                    // ;
 
                 // // First calc the joint spectrum.
                 // // self.calc_HOM_JSA( props );
@@ -349,7 +349,7 @@ define(
                 }
                 yrange.push( Ws.subarray((Nthreads-1)*divisions, Ws.length));
 
-                var starttime = new Date();
+                starttime = new Date();
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
                     promises[j] = self.workers[j].exec('jsaHelper.doCalcHeraldingEff', [
@@ -395,21 +395,21 @@ define(
                             ,dataEff_s = []
                             ;
 
-                        for ( var i = 0, l = eff_i.length; i < l; i ++){
+                        for ( let i = 0, l = eff_i.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataEff_i.push({
                                 x: Ws[i]/1e-6,
                                 y: eff_i[i]
-                            })
+                            });
                         }
                         self.dataEff_i = dataEff_i;
 
-                        for ( var i = 0, l = eff_s.length; i < l; i ++){
+                        for ( let i = 0, l = eff_s.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataEff_s.push({
                                 x: Ws[i]/1e-6,
                                 y: eff_s[i]
-                            })
+                            });
                         }
                         self.dataEff_s = dataEff_s;
 
@@ -430,7 +430,7 @@ define(
 
                         self.set_slider_values(props.W_sx, po.get('Ws_start'), po.get('Ws_stop'));
 
-                         var endtime = new Date();
+                        var endtime = new Date();
                         return true;
                 });
 
@@ -482,7 +482,6 @@ define(
 
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
-                var self = this;
                 var promises = [];
 
                 for (var j = 0; j < Nthreads; j++){
@@ -528,7 +527,7 @@ define(
                         singles_i = PhaseMatch.normalizeToVal(singles_i, self.norm);
 
                         self.data_s = singles_s;
-                        self.data_i = singles_i
+                        self.data_i = singles_i;
                         // self.draw();
                         // console.log("Max singles", PhaseMatch.max(singles_s));
                         // self.plot.setZRange([0,Math.max.apply(null,PM[0])]);
@@ -583,7 +582,6 @@ define(
 
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
-                var self = this;
                 var promises = [];
                 for (var j = 0; j < Nthreads; j++){
 

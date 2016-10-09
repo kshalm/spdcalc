@@ -40,7 +40,7 @@ define(
         };
 
         function LinePlot( options ){
-            
+
             options = $.extend({}, defaults, options);
 
             this.labels = options.labels;
@@ -79,9 +79,8 @@ define(
             this.resize( options.width, options.height );
             this.setMargins( options.margins );
 
-            this.showlegend = new Boolean();
-            this.showlegend = options.legend;
-            
+            this.showlegend = !!options.legend;
+
         }
 
         LinePlot.prototype = {
@@ -382,13 +381,16 @@ define(
 
                 svg.selectAll('.line').remove();
 
+                var scaleX = function(d) { return x(d.x); };
+                var scaleY = function(d) { return y(d.y); };
+
                 for ( var i = 0, l = this.series.length; i < l; ++i ){
 
                     series = this.series[ i ];
 
                     line = d3.svg.line( series.data )
-                        .x(function(d) { return x(d.x); })
-                        .y(function(d) { return y(d.y); })
+                        .x(scaleX)
+                        .y(scaleY)
                         ;
 
                     svg.append('path')

@@ -409,7 +409,7 @@ define(
                     self.plotThetaPhiSignal.plotData( self.dataThetaPhiSignal );
 
                     // Theta vs Phi in the crystal
-                    self.plotThetaTheta.plotData( self.dataThetaTheta )
+                    self.plotThetaTheta.plotData( self.dataThetaTheta );
                     dfd.resolve();
                 }, 10);
                 return dfd.promise;

@@ -256,6 +256,12 @@ define(
             // refresh the vertical line on the line-plot
             refreshLine: function( delT ){
 
+                this.refresh1dEffLine( delT );
+                this.refresh1dRatesLine( delT );
+            },
+
+            refresh1dEffLine: function( delT ){
+
                 var self = this
                     ,line = self.plot1dEff.svgPlot
                         .selectAll('.vline')
@@ -284,8 +290,9 @@ define(
                     ;
 
                 line.exit().remove();
+            },
 
-                ////////////////////////
+            refresh1dRatesLine: function( delT ){
 
                 var self = this
                     ,line = self.plot1dRates.svgPlot
@@ -315,7 +322,6 @@ define(
                     ;
 
                 line.exit().remove();
-
             },
 
             autocalcPlotOpts: function(){
@@ -383,7 +389,7 @@ define(
                     //         1.001*P.W_sx,
                     //         npts
                     //     );
-                    ;
+                    // ;
 
                 self.Nrates = P.get_rates_constant();
                 self.calcRSingles( P );
@@ -396,7 +402,7 @@ define(
                 }
                 yrange.push( Ws.subarray((Nthreads-1)*divisions, Ws.length));
 
-                var starttime = new Date();
+                starttime = new Date();
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
                     promises[j] = self.workers[j].exec('jsaHelper.doCalcHeraldingEff', [
@@ -449,56 +455,56 @@ define(
                             ,dataR_coin = []
                             ;
 
-                        for ( var i = 0, l = eff_i.length; i < l; i ++){
+                        for ( let i = 0, l = eff_i.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataEff_i.push({
                                 x: Ws[i]/1e-6,
                                 y: eff_i[i]
-                            })
+                            });
                         }
                         self.dataEff_i = dataEff_i;
 
-                        for ( var i = 0, l = eff_s.length; i < l; i ++){
+                        for ( let i = 0, l = eff_s.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataEff_s.push({
                                 x: Ws[i]/1e-6,
                                 y: eff_s[i]
-                            })
+                            });
                         }
                         self.dataEff_s = dataEff_s;
 
-                        var  RMax = Math.max( Math.max.apply(null,R_s), Math.max.apply(null,R_i) );
+                        var RMax = Math.max( Math.max.apply(null,R_s), Math.max.apply(null,R_i) );
                         // var  RCoincMax = Math.max.apply(null,R_coin)
                         // console.log("RMAX: ", RMax, "Singles: ", RMax*self.Nrates, "Coinc: ", RCoincMax*self.Nrates, RCoincMax);
                         // self.RMax = RMax;
                         // var RMax = 1/self.Nrates;
                         // self.RMax = 1/self.Nrates;
-                        var RMax = 1
+                        RMax = 1;
 
-                        for ( var i = 0, l = R_s.length; i < l; i ++){
+                        for ( let i = 0, l = R_s.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataR_s.push({
                                 x: Ws[i]/1e-6,
                                 y: R_s[i]/RMax
-                            })
+                            });
                         }
                         self.dataR_s = dataR_s;
 
-                        for ( var i = 0, l = R_i.length; i < l; i ++){
+                        for ( let i = 0, l = R_i.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataR_i.push({
                                 x: Ws[i]/1e-6,
                                 y: R_i[i]/RMax
-                            })
+                            });
                         }
                         self.dataR_i = dataR_i;
 
-                        for ( var i = 0, l = R_coin.length; i < l; i ++){
+                        for ( let i = 0, l = R_coin.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataR_coin.push({
                                 x: Ws[i]/1e-6,
                                 y: R_coin[i]/RMax
-                            })
+                            });
                         }
                         self.dataR_coin = dataR_coin;
 
@@ -522,7 +528,7 @@ define(
 
                         self.set_slider_values(props.W_sx, po.get('Ws_start'), po.get('Ws_stop'));
 
-                         var endtime = new Date();
+                        var endtime = new Date();
                         return true;
                 });
 
@@ -574,7 +580,6 @@ define(
 
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
-                var self = this;
                 var promises = [];
 
                 for (var j = 0; j < Nthreads; j++){
@@ -677,7 +682,6 @@ define(
 
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
-                var self = this;
                 var promises = [];
                 for (var j = 0; j < Nthreads; j++){
 
@@ -730,7 +734,7 @@ define(
                         self.plotCoinc.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
                         var endtime = new Date();
-                        console.log()
+
                         self.data_s = PhaseMatch.normalizeToVal(self.data_s, self.norm);
                         self.data_i = PhaseMatch.normalizeToVal(self.data_i, self.norm);
                         self.dataCoinc = PhaseMatch.normalizeToVal(self.dataCoinc, self.norm);

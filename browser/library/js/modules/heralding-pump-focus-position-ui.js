@@ -255,6 +255,11 @@ define(
 
             // refresh the vertical line on the line-plot
             refreshLine: function( delT ){
+                this.refresh1dEffLine( delT );
+                this.refresh1dRatesLine( delT );
+            },
+
+            refresh1dEffLine: function( delT ){
 
                 var self = this
                     ,line = self.plot1dEff.svgPlot
@@ -284,8 +289,9 @@ define(
                     ;
 
                 line.exit().remove();
+            },
 
-                ////////////////////////
+            refresh1dRatesLine: function( delT ){
 
                 var self = this
                     ,line = self.plot1dRates.svgPlot
@@ -396,7 +402,7 @@ define(
                 }
                 yrange.push( Ws.subarray((Nthreads-1)*divisions, Ws.length));
 
-                var starttime = new Date();
+                starttime = new Date();
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
                     promises[j] = self.workers[j].exec('jsaHelper.doCalcHeraldingEffFocus', [
@@ -448,51 +454,51 @@ define(
                             ,dataR_coin = []
                             ;
 
-                        for ( var i = 0, l = eff_i.length; i < l; i ++){
+                        for ( let i = 0, l = eff_i.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataEff_i.push({
                                 x: Ws[i]/1e-6,
                                 y: eff_i[i]
-                            })
+                            });
                         }
                         self.dataEff_i = dataEff_i;
 
-                        for ( var i = 0, l = eff_s.length; i < l; i ++){
+                        for ( let i = 0, l = eff_s.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataEff_s.push({
                                 x: Ws[i]/1e-6,
                                 y: eff_s[i]
-                            })
+                            });
                         }
                         self.dataEff_s = dataEff_s;
 
                         var  RMax = Math.max( Math.max.apply(null,R_s), Math.max.apply(null,R_i) );
                         self.RMax = RMax;
 
-                        for ( var i = 0, l = R_s.length; i < l; i ++){
+                        for ( let i = 0, l = R_s.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataR_s.push({
                                 x: Ws[i]/1e-6,
                                 y: R_s[i]/RMax
-                            })
+                            });
                         }
                         self.dataR_s = dataR_s;
 
-                        for ( var i = 0, l = R_i.length; i < l; i ++){
+                        for ( let i = 0, l = R_i.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataR_i.push({
                                 x: Ws[i]/1e-6,
                                 y: R_i[i]/RMax
-                            })
+                            });
                         }
                         self.dataR_i = dataR_i;
 
-                        for ( var i = 0, l = R_coin.length; i < l; i ++){
+                        for ( let i = 0, l = R_coin.length; i < l; i ++){
                             // console.log(eff[i]);
                             dataR_coin.push({
                                 x: Ws[i]/1e-6,
                                 y: R_coin[i]/RMax
-                            })
+                            });
                         }
                         self.dataR_coin = dataR_coin;
 
@@ -570,7 +576,6 @@ define(
 
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
-                var self = this;
                 var promises = [];
 
                 for (var j = 0; j < Nthreads; j++){
@@ -616,7 +621,7 @@ define(
                         singles_i = PhaseMatch.normalizeToVal(singles_i, self.norm);
 
                         self.data_s = singles_s;
-                        self.data_i = singles_i
+                        self.data_i = singles_i;
                         // self.draw();
                         // console.log("Max singles", PhaseMatch.max(singles_s));
                         // self.plot.setZRange([0,Math.max.apply(null,PM[0])]);
@@ -675,7 +680,6 @@ define(
 
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
-                var self = this;
                 var promises = [];
                 for (var j = 0; j < Nthreads; j++){
 

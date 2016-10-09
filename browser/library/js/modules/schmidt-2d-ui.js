@@ -159,7 +159,7 @@ define(
                             grid_size
                         );
 
-                var xrange = xtalL;
+                xrange = xtalL;
 
 
                 for (var i = 0; i<Nthreads-1; i++){

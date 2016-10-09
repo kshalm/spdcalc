@@ -34,8 +34,14 @@ define(
                     var dfd = when.defer();
                     var jobId = _nJobs++;
                     var send;
+                    var listeners = {};
 
-                    var callback = function( e ) {
+                    var unlisten = function(){
+                        _worker.removeEventListener('message', listeners.callback);
+                        _worker.removeEventListener('error', listeners.errback);
+                    };
+
+                    listeners.callback = function callback( e ) {
                         e.data.jobId = e.data.jobId|0; // int
                         if (e.data.jobId === jobId){
 
@@ -44,22 +50,20 @@ define(
                             } else {
                                 dfd.resolve( e.data.result );
                             }
-                            _worker.removeEventListener('message', callback);
-                            _worker.removeEventListener('error', errback);
+                            unlisten();
                         }
-                    }
-                    ,errback = function( e ){
+                    };
+
+                    listeners.errback = function errback( e ){
                         var msg = [
                             'Webworker ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
                         ].join('');
-                        _worker.removeEventListener('message', callback);
-                        _worker.removeEventListener('error', errback);
+                        unlisten();
                         dfd.reject( msg );
-                    }
-                    ;
+                    };
 
-                    _worker.addEventListener('error', errback, false);
-                    _worker.addEventListener('message', callback, false);
+                    _worker.addEventListener('error', listeners.errback, false);
+                    _worker.addEventListener('message', listeners.callback, false);
 
                     send = {
                         jobId: jobId,
@@ -97,7 +101,7 @@ define(
                 if (typeof what === 'string'){
 
                     what = what.split('.');
-                    send.name = what[ 0 ]
+                    send.name = what[ 0 ];
                     send.method = what[ 1 ];
 
                 } else {
@@ -120,7 +124,7 @@ define(
                 if (typeof what === 'string'){
 
                     what = what.split('.');
-                    send.name = what[ 0 ]
+                    send.name = what[ 0 ];
                     send.method = what[ 1 ];
 
                 } else {
@@ -143,7 +147,7 @@ define(
 
             return {
                 spawn: function(){
-                    return new Wrapper( new worker );
+                    return new Wrapper( new worker() );
                 }
             };
         };

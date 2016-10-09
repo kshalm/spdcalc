@@ -85,7 +85,7 @@ define(
                     format: {x: '.00f'},
                     width: 400,
                     height: 200,
-                    yrange: [0,.65]
+                    yrange: [0,0.65]
                 });
 
                 self.plot1DEff.resize(400,150);
@@ -224,9 +224,10 @@ define(
 
             calc: function( props ){
 
-                var self = this,
-                    threshold = 0.5
-                    ,props = self.parameters.getProps()
+                props = this.parameters.getProps();
+
+                var self = this
+                    ,threshold = 0.5
                     ,lim = PhaseMatch.autorange_lambda(props, threshold)
                     ,tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max)
                     ,data1d = []
@@ -291,7 +292,7 @@ define(
                             data1d.push({
                                 x: delT[i]/1e-15,
                                 y: HOM[i]
-                            })
+                            });
                         }
                         self.data1d = data1d;
                         self.draw();

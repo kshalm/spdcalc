@@ -173,13 +173,14 @@ define(
 
                 // If the filters are mismatched, we need to integrate over more points.
                 var lambdadiff = Math.abs(po.get("ls_stop") - po.get("ls_start")) - Math.abs(po.get("li_stop") - po.get("li_start"));
+                var dimlambda;
                 lambdadiff = lambdadiff / Math.abs(po.get("ls_stop") - po.get("ls_start")) + Math.abs(po.get("li_stop") - po.get("li_start")) /2;
                 console.log("lambda diff", lambdadiff);
                 if (Math.abs(lambdadiff) > 0.3){
-                    var dimlambda = 32;
+                    dimlambda = 32;
                 }
                 else if (Math.abs(lambdadiff) > 0.1){
-                    var dimlambda = 24;
+                    dimlambda = 24;
                 }
                 else {
                     dimlambda = 16;
@@ -249,7 +250,7 @@ define(
                 var data =[];
 
                 data = [
-                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: .9, title: 'Idler collection FWHM', labelX: (X0)*deg, labelY: (Y0+6*W/2)*deg},
+                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: 0.9, title: 'Idler collection FWHM', labelX: (X0)*deg, labelY: (Y0+6*W/2)*deg},
                     { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W * deg, opacity: 0.3, title: 'Idler collection 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+6*W/2)*deg },
                 ];
                 var xx = self.plot2dSignal.scales.x;
