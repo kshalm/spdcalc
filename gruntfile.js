@@ -202,7 +202,7 @@ module.exports = function(grunt) {
         , 'webpack:phasematch'
     ]);
     grunt.registerTask('build-spdcalc', [
-        // 'jshint:spdcalc',
+        'jshint:spdcalc',
         'webpack:spdcalc'
     ]);
 
