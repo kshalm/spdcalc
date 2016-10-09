@@ -12,9 +12,11 @@ module.exports = {
 			'babel-polyfill',
 			'spdcalc'
 		]
+		,mathjax: [
+			'mathjax'
+		]
 	},
 	output: {
-		library: 'spdcalc',
 		path: path.join(__dirname, '../dist/'),
 		filename: '[name].js'
 	},
