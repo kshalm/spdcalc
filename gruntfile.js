@@ -196,7 +196,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-prompt');
     grunt.loadNpmTasks('grunt-bump');
 
-    grunt.registerTask('dev', [ 'webpack-dev-server:spdcalc' ]);
+    grunt.registerTask('dev', [ 'clean', 'webpack-dev-server:spdcalc' ]);
     grunt.registerTask('build-phasematch', [
         'jshint:phasematch'
         , 'webpack:phasematch'
