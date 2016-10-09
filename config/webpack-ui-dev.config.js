@@ -31,6 +31,8 @@ module.exports = {
 		,new ExtractTextPlugin('site.css', {
             allChunks: true
         })
+		// one day mathjax will be commonjs compliant like everyone else
+		// one day...
 		,new CopyWebpackPlugin([
             { from: 'node_modules/mathjax/extensions', to: 'extensions' }
 			,{ from: 'node_modules/mathjax/jax', to: 'jax' }
@@ -44,31 +46,11 @@ module.exports = {
 	    modulesDirectories: ['browser', 'browser/library/js', 'node_modules']
 		, alias: {
 
-	        //
-	        //  This is where you can add paths to any plugins or vendor scripts.
-	        //
-
 	        // 'phasematch': 'vendor/phasematch',
 			'phasematch': path.join(__dirname, '../src/phasematch'),
 
-	        // third party
-	        // 'd3': 'vendor/d3.v3',
-
 	        'bootstrap-tooltip': 'vendor/bootstrap-tooltip',
 	        'custom-checkbox': 'vendor/flat-ui/custom_checkbox_and_radio',
-
-	        // Plugins
-	        'text': 'plugins/text',
-	        'json': 'plugins/json',
-	        'tpl' : 'plugins/tpl',
-	        'async' : 'plugins/async',
-	        'worker' : 'modules/worker-api',
-
-	        // Templating
-	        // 'dot' : 'vendor/doT',
-
-	        // MVC
-	        // 'stapes': 'vendor/stapes',
 
 	        // jQuery
 	        // 'jquery': 'vendor/jquery',
