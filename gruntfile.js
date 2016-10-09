@@ -3,7 +3,7 @@
 module.exports = function(grunt) {
     "use strict";
 
-    var spdcalcDevWebpack = require('./config/webpack-ui-dev.config');
+    var spdcalcDevWebpack = require('./config/webpack-spdcalc.config');
     var webpack = require('webpack');
     var merge = require('lodash/merge');
     var semver = require('semver');
