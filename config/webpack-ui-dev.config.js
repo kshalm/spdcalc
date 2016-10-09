@@ -35,6 +35,7 @@ module.exports = {
             { from: 'node_modules/mathjax/extensions', to: 'extensions' }
 			,{ from: 'node_modules/mathjax/jax', to: 'jax' }
 			,{ from: 'node_modules/mathjax/fonts', to: 'fonts' }
+			,{ from: 'browser/CNAME' }
 		], {
 			copyUnmodified: true
 		})
@@ -67,10 +68,10 @@ module.exports = {
 	        // 'dot' : 'vendor/doT',
 
 	        // MVC
-	        'stapes': 'vendor/stapes',
+	        // 'stapes': 'vendor/stapes',
 
 	        // jQuery
-	        'jquery': 'vendor/jquery',
+	        // 'jquery': 'vendor/jquery',
 	        'jquery-ui': 'vendor/jquery-ui-1.10.0.custom.min',
 	        'jquery.dropkick': 'vendor/jquery.dropkick-1.0.0',
 	        'jquery.tagsinput': 'vendor/jquery.tagsinput',
@@ -95,8 +96,12 @@ module.exports = {
 				// , include: [path.join(__dirname, '../src'), path.join(__dirname, '../browser/library/js')]
 			}
 			, {
+				test: require.resolve("jquery")
+				, loader: "expose?$!expose?jQuery"
+			}
+			, {
 				test: /jquery-ui|bootstrap-tooltip|jquery\.dropkick|jquery\.tagsinput/
-				, loader: 'imports?jquery'
+				, loader: 'imports?jQuery=jquery'
 			}
 			, {
 				test: /text!\.(text|tpl)$/
