@@ -11,5 +11,8 @@
     "boss" : true,
     "eqnull" : true,
     "esversion": 6,
-    "browserify": true
+    "browserify": true,
+    "globals": {
+        "console": true
+    }
 }
