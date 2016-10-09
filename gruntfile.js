@@ -2,142 +2,60 @@
 
 module.exports = function(grunt) {
     "use strict";
-    var pkg, config;
 
-    pkg = grunt.file.readJSON('package.json');
-
-    config = {
-        banner : [
-            '/**\n',
-            ' * <%= pkg.name %> v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n',
-            ' * <%= pkg.description %>\n',
-            ' *\n',
-            ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>\n',
-            ' * Licensed <%= pkg.license %>\n',
-            ' */\n'
-        ].join(''),
-
-        sources : [
-            'build/intro.js',
-            'node_modules/lodash/lodash.js',
-            'build/include-lodash.js',
-            'src/constants.js',
-            'src/complex.js',
-            'src/scratchpad.js',
-            'src/math-helpers.js',
-            'src/pm-lib.js',
-            'src/pm-lib-momentum.js',
-            'src/pm-crystals.js',
-            'src/pm-properties.js',
-            'src/pm-plothelpers.js',
-            // add more...
-            // can use wildcards. eg: src/thing-*.js
-            'build/outro.js'
-        ],
-
-        browserDir: 'browser',
-        browserDistDir: 'browser-dist',
-
-        pkg : pkg
-    };
-
-    // setup dynamic filenames
-    config.dist = 'dist/phasematch.js';
+    var spdcalcDevWebpack = require('./config/webpack-ui-dev.config');
+    var webpack = require('webpack');
+    var merge = require('lodash/merge');
 
     // Project configuration.
     grunt.initConfig({
-        pkg : config.pkg,
-        config: config,
         // checks the coding conventions
         lint : {
             files : ['gruntfile.js', 'test/*.js', 'src/*']
         },
         // clean up temporary/build files
         clean : {
-            phasematch : ['dist/'],
-            browser: ['<%= config.browserDistDir %>']
+            dist : ['dist/']
         },
         webpack: {
-            phasematchDev: require('./config/webpack-pm-dev.config')
-            ,browserDev: require('./config/webpack-ui-dev.config')
+            options: {
+
+            }
+            , phasematch: require('./config/webpack-pm.config')
+            , spdcalc: merge({}, spdcalcDevWebpack, {
+                devtool: '#source-map'
+                , cache: false
+                , plugins: [
+            		new webpack.optimize.DedupePlugin()
+            		, new webpack.optimize.UglifyJsPlugin()
+                ]
+            })
         },
         'webpack-dev-server': {
             options: {
-                watch: true
-                , keepalive: true
-                , contentBase: __dirname + '/dist'
+                webpack: spdcalcDevWebpack
                 , stats: {
                     // Configure the console output
-                    colors: true,
-                    modules: true,
-                    reasons: true
+                    colors: true
+                    , modules: true
+                    , reasons: true
                 }
             }
-            , browserDev: (() => {
-                var cfg = Object.create(require('./config/webpack-ui-dev.config'));
-                cfg.entry.spdcalc.unshift("webpack-dev-server/client?http://localhost:8080/");
-                return cfg;
-            })()
-        },
-        copy: {
-            phasematch: {
-                files: [{
-                    // flatten: true,
-                    expand: true,
-                    cwd: 'dist',
-                    src: ['phasematch.js', 'phasematch.js.map'],
-                    dest: '<%= config.browserDir %>/library/js/vendor/'
-                }]
-            }
-        },
-        bgShell: {
-            _defaults: {
-                bg: false
-            },
-
-            watchCompass: {
-                cmd: 'compass watch',
-                bg: true
-            },
-
-            httpserver: {
-                cmd: 'node node_modules/http-server/bin/http-server -p 8080 <%= config.browserDir %>',
-                bg: false
-            },
-
-            httpserverDist: {
-                cmd: 'node node_modules/http-server/bin/http-server -p 8080 <%= config.browserDistDir %>',
-                bg: true
-            },
-
-            cleanCompass: {
-                cmd: 'compass clean --config <%= compass.browser.options.config %>',
-                options: {
-                    stdout: true,
-                    stderr: true,
-                    failOnError: true
-                }
-            },
-        },
-        // r.js optimization task
-        requirejs: {
-            browser: {
-                options: require('./build/require-build')
-            }
-        },
-        compass: {
-            browser: {
-                options: {
-                    config: 'config/compass.rb',
-                    force: true
+            , spdcalc: {
+                watch: true
+                , inline: true // auto refresh browser
+                , keepalive: true // keep grunt process alive
+                , contentBase: __dirname + '/dist' // where root of web server is
+                , webpack: {
+                    debug: true
                 }
             }
         },
         // unit tests on the concatenated javascript
         jasmine : {
             tests : {
-                src : config.dist,
-                options : {
+                src : 'dist/'
+                , options : {
                     specs : 'test/spec/*.spec.js',
                     template : 'test/grunt.tmpl'
                 }
@@ -145,34 +63,38 @@ module.exports = function(grunt) {
         },
         // check coding conventions on src files
         jshint : {
-            options : {
-                jshintrc : 'config/jshint.json'
-            },
-            phasematch : ['src/*.js'],
-            browser:  ['<%= config.browserDir %>/library/js/{.,modules,mediators}/*.js']
+            options : require('./config/jshint.json')
+            , phasematch : ['src/*.js']
+            , spdcalc: {
+                options: {
+                    browser: true
+                    , devel: true
+                    , globals: {
+                        define: true
+                    }
+                }
+                , src: ['browser/library/js/{.,modules,mediators}/*.js']
+
+            }
         }
     });
 
     // register grunt plugins
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-compass');
-    grunt.loadNpmTasks('grunt-bg-shell');
-    grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-webpack');
 
-
-    grunt.registerTask('cleanup', ['clean', 'bgShell:cleanCompass']);
-    grunt.registerTask('dev', [ 'webpack:browserDev', 'webpack-dev-server:browserDev']);
-    grunt.registerTask('server-dist', [ 'bgShell:httpserverDist' ]);
-    grunt.registerTask('build-browser', ['cleanup', 'jshint:browser', 'compass', 'requirejs:browser']);
-
-    grunt.registerTask('build-phasematch', ['jshint:phasematch', 'clean', 'webpack:phasematchDev', 'copy:phasematch']);
+    grunt.registerTask('dev', [ 'webpack-dev-server:spdcalc']);
+    grunt.registerTask('build-phasematch', [
+        'jshint:phasematch'
+        , 'webpack:phasematch'
+    ]);
+    grunt.registerTask('build-spdcalc', [
+        // 'jshint:spdcalc',
+        'webpack:spdcalc'
+    ]);
 
     // Default task executes a build for phasematch library.
-    grunt.registerTask('default', ['build-phasematch']);
+    grunt.registerTask('default', [ 'clean', 'build-phasematch', 'build-spdcalc']);
 };

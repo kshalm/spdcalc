@@ -10,12 +10,6 @@
     "undef" : true,
     "boss" : true,
     "eqnull" : true,
-    "browser" : true,
-    "node": true,
     "esversion": 6,
-    "globals" : {
-        "require": true,
-        "module" : true,
-        "exports" : true
-    }
+    "browserify": true
 }

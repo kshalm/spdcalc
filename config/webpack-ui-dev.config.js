@@ -4,16 +4,17 @@ var compass = require('compass-importer');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
+	cache: true,
 	devtool: 'eval',
     entry: {
 		spdcalc: [
 			// 'webpack-hot-middleware/client',
-			// 'babel-polyfill',
+			'babel-polyfill',
 			'spdcalc'
 		]
 	},
 	output: {
-		library: 'PhaseMatchUI',
+		library: 'spdcalc',
 		path: path.join(__dirname, '../dist/'),
 		filename: '[name].js'
 	},
@@ -35,7 +36,8 @@ module.exports = {
 	        //  This is where you can add paths to any plugins or vendor scripts.
 	        //
 
-	        'phasematch': 'vendor/phasematch',
+	        // 'phasematch': 'vendor/phasematch',
+			'phasematch': path.join(__dirname, '../src/phasematch'),
 
 	        // third party
 	        // 'd3': 'vendor/d3.v3',
@@ -78,8 +80,8 @@ module.exports = {
 			{
 				test: /\.js$/
 				, loader: 'babel'
-				, exclude: /node_modules/
-				, include: path.join(__dirname, 'src')
+				, exclude: /node_modules|vendor/
+				// , include: [path.join(__dirname, '../src'), path.join(__dirname, '../browser/library/js')]
 			}
 			, {
 				test: /jquery-ui|bootstrap-tooltip|jquery\.dropkick|jquery\.tagsinput/

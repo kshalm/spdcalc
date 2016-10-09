@@ -1,3 +1,5 @@
+require('babel-polyfill');
+
 var PhaseMatch = {
     constants: require('./constants')
     , Complex: require('./complex')
