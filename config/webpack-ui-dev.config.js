@@ -33,6 +33,8 @@ module.exports = {
         })
 		,new CopyWebpackPlugin([
             { from: 'node_modules/mathjax/extensions', to: 'extensions' }
+			,{ from: 'node_modules/mathjax/jax', to: 'jax' }
+			,{ from: 'node_modules/mathjax/fonts', to: 'fonts' }
 		], {
 			copyUnmodified: true
 		})
