@@ -42,6 +42,7 @@
     "grunt-contrib-jshint": "latest",
     "grunt-contrib-requirejs": "*",
     "grunt-contrib-uglify": "latest",
+    "grunt-serve": "^0.1.6",
     "grunt-webpack": "^1.0.14",
     "http-server": "*",
     "imports-loader": "^0.6.5",

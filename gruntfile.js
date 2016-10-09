@@ -77,6 +77,15 @@ module.exports = function(grunt) {
 
             }
         }
+        // serve built source
+        , serve: {
+            options: {
+                port: 8080
+                , serve: {
+                    path: './dist/'
+                }
+            }
+        }
     });
 
     // register grunt plugins
@@ -84,6 +93,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-webpack');
+    grunt.loadNpmTasks('grunt-serve');
 
     grunt.registerTask('dev', [ 'webpack-dev-server:spdcalc']);
     grunt.registerTask('build-phasematch', [
@@ -96,5 +106,5 @@ module.exports = function(grunt) {
     ]);
 
     // Default task executes a build for phasematch library.
-    grunt.registerTask('default', [ 'clean', 'build-phasematch', 'build-spdcalc']);
+    grunt.registerTask('default', [ 'clean', 'build-phasematch', 'build-spdcalc', 'serve']);
 };
