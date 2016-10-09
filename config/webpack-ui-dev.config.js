@@ -2,6 +2,7 @@ var path = require('path');
 var webpack = require('webpack');
 var compass = require('compass-importer');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
 	cache: true,
@@ -20,15 +21,21 @@ module.exports = {
 		path: path.join(__dirname, '../dist/'),
 		filename: '[name].js'
 	},
+	devServer: {
+		outputPath: path.join(__dirname, 'dist')
+	},
 	plugins: [
 		new webpack.optimize.OccurenceOrderPlugin()
 		// ,new webpack.HotModuleReplacementPlugin()
 		,new webpack.NoErrorsPlugin()
-		// ,new webpack.optimize.DedupePlugin()
-		// ,new webpack.optimize.UglifyJsPlugin()
 		,new ExtractTextPlugin('site.css', {
             allChunks: true
         })
+		,new CopyWebpackPlugin([
+            { from: 'node_modules/mathjax/extensions', to: 'extensions' }
+		], {
+			copyUnmodified: true
+		})
 	],
 	resolve: {
 	    modulesDirectories: ['browser', 'browser/library/js', 'node_modules']
