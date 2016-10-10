@@ -77,7 +77,7 @@ define(
                 // get throttled so they don't do double refreshes
 
                 self.refresh = debounce( self.refresh, 100, self );
-                self.checkautocalc = debounce( self.checkautocalc, 50, self );
+                self.checkautocalc = debounce( self.checkautocalc, 100, self );
             },
 
             initEvents: function(){

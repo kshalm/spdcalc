@@ -141,7 +141,7 @@ SPDCprop.prototype = {
             this.auto_calc_Theta();
         }
 
-        this.auto_calc_collection_focus();
+        //this.auto_calc_collection_focus();
 
         // Set the positions of the signal, idler, pump waists
         this.z0p = 0 *con.um;
@@ -356,6 +356,7 @@ SPDCprop.prototype = {
     },
 
     auto_calc_collection_focus : function (){
+        console.log("Calculating Signal/idler focus position");
         this.lambda_i = 1/(1/this.lambda_p - 1/this.lambda_s);
         var props = this;
         props.update_all_angles();

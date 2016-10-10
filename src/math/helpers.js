@@ -533,19 +533,19 @@ helpers.caddI = function caddI(a,ai,b,bi){
 
 // Returns real part of the principal square root of a complex number
 helpers.csqrtR = function csqrtR(a,ai){
-    var r = Math.sqrt(sq(a)+sq(ai));
+    var rSqrt = Math.sqrt(Math.sqrt(sq(a)+sq(ai)));
     var arg = Math.atan2(ai,a);
-    var real = Math.sqrt(r)*Math.cos(arg/2);
+    var real = rSqrt*Math.cos(arg/2);
     // return real;
     return helpers.sign(real)*real; //returns the real value
 };
 
 // Returns imag part of the principal square root of a complex number
 helpers.csqrtI = function csqrtI(a,ai){
-    var r = Math.sqrt(sq(a)+sq(ai));
+    var rSqrt = Math.sqrt(Math.sqrt(sq(a)+sq(ai)));
     var arg = Math.atan2(ai,a);
-    var real = Math.sqrt(r)*Math.cos(arg/2);
-    var imag = Math.sqrt(r)*Math.sin(arg/2);
+    var real = rSqrt*Math.cos(arg/2);
+    var imag = rSqrt*Math.sin(arg/2);
     // return imag;
     return helpers.sign(real)*imag; //returns the imag value
 };

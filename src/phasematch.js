@@ -1049,33 +1049,41 @@ PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_s
     // using just one array for both ws and wi.
 
     // loop over ws1
+    var twoPiCdelT = 2*Math.PI*con.c * delT;
+
     for (var j=0; j<dim; j++){
+
+        var lambda_s_j_inv = 1/lambda_s[j];
 
         // loop over wi1
         for (var k=0; k<dim; k++){
             var A_real = PM_JSA_real[j][k];
             var A_imag = PM_JSA_imag[j][k];
 
+            var lambda_s_k_inv = 1/lambda_s[k];
+
             // loop over ws2
             for (var l=0; l<dim; l++){
                 var C_real = PM_JSA_real[l][k];
                 var C_imag = PM_JSA_imag[l][k];
 
+                // for the signal signal phase
+                var lambda_i_l_inv = 1/lambda_i[l];
+                var ARG_ss = twoPiCdelT *(lambda_s_j_inv - lambda_i_l_inv );
+                var Phase_ss_real = Math.cos(ARG_ss);
+                var Phase_ss_imag = Math.sin(ARG_ss);
+
                 // loop over wi2
                 for (var m=0; m<dim; m++){
 
-                    // for the signal signal phase
-                    var ARG_ss = 2*Math.PI*con.c *(1/lambda_s[j] - 1/lambda_i[l])*delT;
-                    var Phase_ss_real = Math.cos(ARG_ss);
-                    var Phase_ss_imag = Math.sin(ARG_ss);
-
                     // for the idler idler phase
-                    var ARG_ii = 2*Math.PI*con.c *(1/lambda_s[k] - 1/lambda_i[m])*delT;
+                    var lambda_i_m_inv = 1/lambda_i[m];
+                    var ARG_ii = twoPiCdelT *(lambda_s_k_inv - lambda_i_m_inv);
                     var Phase_ii_real = Math.cos(ARG_ii);
                     var Phase_ii_imag = Math.sin(ARG_ii);
 
                     // for the signal/idler phase
-                    var ARG_si = 2*Math.PI*con.c *(1/lambda_s[j] - 1/lambda_i[m])*delT;
+                    var ARG_si = twoPiCdelT *(lambda_s_j_inv - lambda_i_m_inv);
                     var Phase_si_real = Math.cos(ARG_si);
                     var Phase_si_imag = Math.sin(ARG_si);
 
@@ -1091,14 +1099,14 @@ PhaseMatch.calc_2HOM_rate = function calc_HOM_rate(delT, ls_start, ls_stop, li_s
                     var Arg2_real = C_real*D_real - C_imag*D_imag;
                     var Arg2_imag = C_real*D_imag + C_imag*D_real; //minus here b/c of complex conjugate
 
-                    var Intf_ss_real = (Arg1_real - (Phase_ss_real * Arg2_real - Phase_ss_imag*Arg2_imag))/2;
-                    var Intf_ss_imag = (Arg1_imag - (Phase_ss_real * Arg2_imag + Phase_ss_imag * Arg2_real))/2;
+                    var Intf_ss_real = (Arg1_real - (Phase_ss_real * Arg2_real - Phase_ss_imag*Arg2_imag))*0.5;
+                    var Intf_ss_imag = (Arg1_imag - (Phase_ss_real * Arg2_imag + Phase_ss_imag * Arg2_real))*0.5;
 
-                    var Intf_ii_real = (Arg1_real - (Phase_ii_real * Arg2_real - Phase_ii_imag*Arg2_imag))/2;
-                    var Intf_ii_imag = (Arg1_imag - (Phase_ii_real * Arg2_imag + Phase_ii_imag * Arg2_real))/2;
+                    var Intf_ii_real = (Arg1_real - (Phase_ii_real * Arg2_real - Phase_ii_imag*Arg2_imag))*0.5;
+                    var Intf_ii_imag = (Arg1_imag - (Phase_ii_real * Arg2_imag + Phase_ii_imag * Arg2_real))*0.5;
 
-                    var Intf_si_real = (Arg1_real - (Phase_si_real * Arg2_real - Phase_si_imag*Arg2_imag))/2;
-                    var Intf_si_imag = (Arg1_imag - (Phase_si_real * Arg2_imag + Phase_si_imag * Arg2_real))/2;
+                    var Intf_si_real = (Arg1_real - (Phase_si_real * Arg2_real - Phase_si_imag*Arg2_imag))*0.5;
+                    var Intf_si_imag = (Arg1_imag - (Phase_si_real * Arg2_imag + Phase_si_imag * Arg2_real))*0.5;
 
                     rate_ss += sq(Intf_ss_real) + sq(Intf_ss_imag);
                     rate_ii += sq(Intf_ii_real) + sq(Intf_ii_imag);
