@@ -278,7 +278,7 @@ body {
 }
 .plot-wrapper.spinner:after {
     content: '';
-    background: rgba(255, 255, 255, 0.8) image-url("spinner.gif") no-repeat center center;
+    background: rgba(255, 255, 255, 0.8) url("../images/spinner.gif") no-repeat center center;
     position: absolute;
     top: 0;
     left: 0;

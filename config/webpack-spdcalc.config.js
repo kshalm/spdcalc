@@ -105,7 +105,7 @@ module.exports = {
 			}
 			,{
                 test: /\.(jpe?g|png|gif|svg)$/
-                , loader: 'file'
+                , loader: 'file-loader'
             }
 		],
 		postLoaders: []
