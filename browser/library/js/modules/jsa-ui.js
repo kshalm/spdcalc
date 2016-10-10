@@ -124,7 +124,7 @@ define(
                 var self = this;
                 return self.workers[this.nWorkers-1].exec('jsaHelper.doCalcSchmidt', [PM])
                         .then(function( S ){
-                            self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
+                            self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
                         });
 
             },

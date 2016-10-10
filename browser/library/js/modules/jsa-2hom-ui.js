@@ -218,21 +218,21 @@ define(
                             data_ss.push({
                                 x: delT[i]/1e-15,
                                 y: HOM[0][i]
-                            })
+                            });
                         }
 
                         for (i = 0, l = HOM[1].length; i < l; i ++){
                             data_ii.push({
                                 x: delT[i]/1e-15,
                                 y: HOM[1][i]
-                            })
+                            });
                         }
 
                         for (i = 0, l = HOM[2].length; i < l; i ++){
                             data_si.push({
                                 x: delT[i]/1e-15,
                                 y: HOM[2][i]
-                            })
+                            });
                         }
 
 

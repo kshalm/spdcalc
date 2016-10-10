@@ -141,7 +141,7 @@ define(
                 var self = this;
                 return self.workers[this.nWorkers-1].exec('jsaHelper.doCalcSchmidt', [PM])
                         .then(function( S ){
-                            self.plotSingles.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
+                            self.plotSingles.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
                         });
 
             },
@@ -174,7 +174,7 @@ define(
                 var Pn = props.clone();
                 Pn.phi_i = Pn.phi_s + Math.PI;
                 Pn.update_all_angles();
-                props.optimum_idler()
+                props.optimum_idler();
                 // console.log("Theta_s - Theta_i: ",(props.theta_s)*180/Math.PI, (props.theta_i)*180/Math.PI,  (props.theta_s - props.theta_i)*180/Math.PI);
                 // Pn.optimum_idler(P);
                 // P.theta_i_e = PhaseMatch.find_external_angle(P,"idler");
@@ -254,7 +254,7 @@ define(
             calcRSingles: function(props, propsJSON,lambda_s,lambda_i_range,grid_size, norm, Nthreads){
                 // @TODO: Not sure I need the sqrt here.
                 // var norm = Math.sqrt(PhaseMatch.normalize_joint_spectrum_singles(props));
-                var norm = 1;
+                norm = 1;
 
                 // The calculation is split up and reutrned as a series of promises
                 var starttime = new Date();
@@ -299,7 +299,7 @@ define(
                         self.plotSingles.setYRange([ converter.to('nano', self.plotOpts.get('li_start')), converter.to('nano', self.plotOpts.get('li_stop')) ]);
 
                         var endtime = new Date();
-                        self.calcRCoinc(props, propsJSON,lambda_s,lambda_i_range,grid_size, Nthreads)
+                        self.calcRCoinc(props, propsJSON,lambda_s,lambda_i_range,grid_size, Nthreads);
                         return true;
 
                     });
@@ -382,7 +382,7 @@ define(
                     ;
 
                     console.log("From calc:", Rc, Rs, eff);
-                
+
                 return eff;
             },
 

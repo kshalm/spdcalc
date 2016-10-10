@@ -42,7 +42,7 @@ define(
             // use a d3 scale to control the color mapping
             // colorScale: d3.scale.linear()
             colorScale: function(logplot, zrangeArr){
-                // var colorsc;
+                var colorsc;
                 if (logplot){
                     //make sure we don't set any of the domain values to 0.
                     if (zrangeArr[0] === 0){
@@ -52,13 +52,12 @@ define(
                         zrangeArr[1] = 0.01;
                     }
 
-                    var colorsc = d3.scale.log()
+                    colorsc = d3.scale.log()
                         .domain(zrangeArr).interpolate( d3.interpolateLab)
                         .range(["hsl(210, 100%, 100%)", "hsl(210, 29%, 29%)"]);
                         // .interpolate(d3.interpolateLab);
-                }
-                else{
-                    var colorsc =  d3.scale.linear()
+                } else {
+                    colorsc =  d3.scale.linear()
                         .domain(zrangeArr)
                         .range(["hsl(210, 100%, 100%)", "hsl(210, 29%, 29%)"])
                         .interpolate(d3.interpolateLab);
@@ -87,15 +86,11 @@ define(
             }
 
             return data2D;
-        };
-
-        function defaultColorScale( val ){
-
-            return d3.rgb(scale( val ));
         }
 
         function HeatMap( options ){
 
+            var self = this;
             options = $.extend({}, defaults, options);
             this.labels = options.labels;
             this.antialias = options.antialias;
@@ -148,7 +143,7 @@ define(
                 };
             }
 
-            
+
 
 
             this.margin = defaults.margins;
@@ -165,21 +160,20 @@ define(
             var calcXindex = function(val){
                     var range = self.scales.x.domain();
                     var index = Math.floor(((val-range[0])/(range[1]- range[0]))*self.cols);
-                    
+
                     return index;
             };
 
             var calcYindex = function(val){
                     var range = self.scales.y.domain();
                     var index = Math.floor(((val-range[0])/(range[1]- range[0]))*self.rows);
-                    
+
                     return index;
             };
 
-            var self = this;
             $(this.el).on('mousemove', function(e){
                 var offset = $(self.canvas).offset();
-                
+
                 var x = e.pageX - offset.left;
                 var y = e.pageY - offset.top;
                 self.el.css("cursor", "auto");
@@ -285,10 +279,10 @@ define(
 
             // these only make cosmetic changes...
             setXRange: function( xrangeArr ){
-                
+
                 this.scales.x.domain( xrangeArr );
                 this.refreshAxes();
-                
+
             },
 
             setYRange: function( yrangeArr ){
@@ -306,7 +300,7 @@ define(
 
             setLogPlot: function(bool){
                 this.logplot = bool;
-                
+
                 this.scales.z = defaults.colorScale(this.logplot, this.scales.z.domain()).copy();
                 // this.refreshAxes();
                 this.plotData(this.data);
@@ -399,7 +393,7 @@ define(
                 var xColorBarPos = function(){
                     xpos = xpos+(colorBarWidth/colorBarVals.length);
                     return xpos;
-                }
+                };
 
                 var barwidth = colorBarWidth/colorBarVals.length;
 
@@ -429,20 +423,20 @@ define(
                     ;
 
                 var vals = [].concat(dom);
+                var zAxis;
                 if (this.logplot){
                     vals.splice(1, 0, dom[0]+dom[1]/10);
-                    var zAxis = d3.svg.axis()
+                    zAxis = d3.svg.axis()
                     // .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
                     .scale( d3.scale.log().domain( dom ).range([0, colorBarWidth]) )
                     .tickValues( vals )
                     .tickFormat( d3.format( '.2f' ) )
                     .orient("top")
                     ;
-                    
-                }
-                else{
+
+                } else {
                     vals.splice(1, 0, (dom[1]-dom[0]) / 2 +dom[0]);
-                    var zAxis = d3.svg.axis()
+                    zAxis = d3.svg.axis()
                     .scale( d3.scale.linear().domain( dom ).range([0, colorBarWidth]) )
                     .tickValues( vals )
                     .tickFormat( d3.format( '.2f' ) )
@@ -518,8 +512,8 @@ define(
                     ,x = this.scales.x
                     ,y = this.scales.y
                     ;
-                
-                
+
+
                 cols *= scale;
                 rows *= scale;
 
@@ -527,18 +521,18 @@ define(
                 rows = Math.floor(rows);
 
                 scale = Math.sqrt((cols -1 )*(rows-1)) / Math.sqrt((this.width) * (this.height) );
-                
 
-                for ( var i = 0; i < cols; ++i ){
+
+                for ( let i = 0; i < cols; ++i ){
 
                     xvals.push( x.invert( i / scale ) );
                 }
 
-                for ( var i = 0; i < rows; ++i ){
+                for ( let i = 0; i < rows; ++i ){
 
                     yvals.push( y.invert( i / scale ) );
                 }
-                
+
 
                 return {
                     title: this.elTitle.text(),
@@ -568,7 +562,7 @@ define(
                 for (var y = 0; y < height; ++y) {
                     for (var i = 0; i < scale; ++i) {
                         for (var x = 0; x < width; ++x) {
-                            var src_p = 4 * (y * width + x);
+                            src_p = 4 * (y * width + x);
                             for (var j = 0; j < scale; ++j) {
                                 var tmp = src_p;
                                 d[dst_p++] = src[tmp++];

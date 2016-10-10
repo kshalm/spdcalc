@@ -86,7 +86,7 @@ define(
                     format: {x: '.0f'},
                     width: 400,
                     height: 200,
-                    yrange: [.4,1.2]
+                    yrange: [0.4,1.2]
                 });
 
                 self.plot1d.resize(400,150);
@@ -243,9 +243,11 @@ define(
             },
 
             calc: function( props ){
-                var self = this,
-                    threshold = 0.5
-                    ,props = self.parameters.getProps()
+
+                props = this.parameters.getProps();
+
+                var self = this
+                    ,threshold = 0.5
                     ,lim = PhaseMatch.autorange_lambda(props, threshold)
                     ,tsi = PhaseMatch.autorange_delT(props, lim.lambda_s.min, lim.lambda_s.max)
                     ,data1d = []
@@ -310,7 +312,7 @@ define(
                             data1d.push({
                                 x: delT[i]/1e-15,
                                 y: HOM[i]
-                            })
+                            });
                         }
                         self.data1d = data1d;
                         self.draw();
@@ -346,7 +348,7 @@ define(
                 var self = this;
                 return self.workers[self.nWorkers-1].exec('jsaHelper.doCalcSchmidt', [PM], true)
                         .then(function( S ){
-                            self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000) + ")";
+                            self.plot.setTitle("Schmidt Number = " + Math.round(1000*S)/1000);
                         });
 
             },

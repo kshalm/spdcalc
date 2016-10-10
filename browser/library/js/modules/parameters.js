@@ -180,7 +180,7 @@ define(
                     ){
                         ser += '&' + encodeURIComponent( key ) + '=' + encodeURIComponent( pfx + val );
                     }
-                };
+                }
 
                 return ser.substr(1);
             },
@@ -202,7 +202,7 @@ define(
                     self.props.auto_calc_collection_focus( self.props );
                     // console.log("poling period: ", self.props.poling_period);
                 }
-                
+
 
             },
 

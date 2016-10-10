@@ -282,7 +282,7 @@ define(
                             grid_size
                         );
 
-                var xrange = Wp;
+                xrange = Wp;
 
 
                 for (var i = 0; i<Nthreads-1; i++){

@@ -136,7 +136,7 @@ define(
                 // var W = Math.max(props.W_sx, props.W_sy);
                 var convertfromFWHM = 1/(2 * Math.sqrt(Math.log(2)));
                 var W = props.W_sx * convertfromFWHM;
-                var W = props.lambda_s/(Math.PI * W); // angular spread
+                W = props.lambda_s/(Math.PI * W); // angular spread
 
                 var x_start = X_0 - scale*W/2;
                 var x_stop = X_0 + scale*W/2;
@@ -201,7 +201,7 @@ define(
                 var data =[];
 
                 data = [
-                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: .9, title: 'Idler collection FWHM', labelX: (X0)*deg, labelY: (Y0+5*W/2)*deg},
+                    { X0: X0 * deg, Y0: Y0 * deg, r: W * deg, opacity: 0.9, title: 'Idler collection FWHM', labelX: (X0)*deg, labelY: (Y0+5*W/2)*deg},
                     { X0: X0 * deg, Y0: Y0 * deg, r: 1.699 * W * deg, opacity: 0.3, title: 'Idler collection 1/e^2', labelX: (X0)*deg, labelY: -1*(Y0+5*W/2)*deg },
                 ];
                 var xx = self.plot2dSignal.scales.x;

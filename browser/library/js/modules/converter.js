@@ -10,7 +10,7 @@ define(function(){
 
     function convertFrom( unit, val ){
 
-        if (!val) return 0;
+        if (!val) { return 0; }
 
         if ( !(unit in units) ){
             throw 'Unit "' + unit + '" not defined in units.';
@@ -21,7 +21,7 @@ define(function(){
 
     function convertTo( unit, val, precision ){
 
-        if (!val) return 0;
+        if (!val) { return 0; }
 
         precision = precision === undefined ? 2 : precision;
 

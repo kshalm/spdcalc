@@ -73,7 +73,7 @@ define(
                 return;
             },
 
-            
+
 
             calc: function( props ){
                 var self = this;
@@ -85,7 +85,7 @@ define(
                 P.phi_i = P.phi_s + Math.PI;
                 P.update_all_angles();
                 P.optimum_idler(P);
-                
+
                 var pm_singles = PhaseMatch.calc_PM_tz_k_singles(P);
                 // console.log("Singles");
                 // console.log("REAL: ", pm_singles[0], "IMAG: ", pm_singles[1]);
@@ -122,7 +122,7 @@ define(
             //     }, 10);
 
             //     return dfd.promise;
-            return
+                return;
             }
 
 

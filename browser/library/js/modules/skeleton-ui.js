@@ -34,24 +34,6 @@ define(
 
         };
 
-        function checkRecalc(){
-
-            var self = this;
-
-            clearTimeout( to );
-
-            if (self.calculating){
-                return;
-            }
-
-            to = setTimeout(function(){
-
-                // recalc and draw
-                self.refresh();
-
-            }, 100);
-        }
-
         /**
          * @module SkeletonUI
          * @implements {Stapes}

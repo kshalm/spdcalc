@@ -21,7 +21,7 @@ define(
         'use strict';
 
         var con = PhaseMatch.constants;
-        
+
         /**
          * @module JSAUI
          * @implements {Stapes}
@@ -93,7 +93,7 @@ define(
                 var lim = PhaseMatch.autorange_lambda(props, threshold);
                 var l_start = lim.lambda_s.min;
                 var l_stop =  lim.lambda_s.max;
-                
+
                 var data1d = [];
                 var dataPMXY = [];
                 var dataJSA = [];
@@ -102,11 +102,11 @@ define(
 
                 var self = this
                     ,PMJSA = PhaseMatch.calc_JSA(
-                        props, 
-                        l_start, 
-                        l_stop, 
+                        props,
                         l_start,
-                        l_stop, 
+                        l_stop,
+                        l_start,
+                        l_stop,
                         dim
                     )
                     ;
@@ -126,18 +126,18 @@ define(
                 // Theta vs Phi in crystal
                 var PMThetaPhi = PhaseMatch.calc_theta_phi(props, 0, 90*Math.PI/180, 0, 180*Math.PI/180, dim);
                 self.dataThetaPhi = PMThetaPhi;
-                
-                
+
+
                 // Hong-Ou-Mandel dip
-                var t_start = -800e-15;
-                var t_stop = 800e-15;
+                t_start = -800e-15;
+                t_stop = 800e-15;
                 var delT = PhaseMatch.linspace(t_start, t_stop, dim);
                 var HOM = PhaseMatch.calc_HOM_scan(props, t_start, t_stop, l_start, l_stop, l_start, l_stop, dim);
                 for ( var i = 0, l = HOM.length; i < l; i ++){
                     data1d.push({
                         x: delT[i]/1e-15,
                         y: HOM[i]
-                    })
+                    });
                 }
 
                 self.data1d = data1d;
@@ -150,8 +150,8 @@ define(
                     ;
 
                 if (!self.dataJSA ||
-                    !self.dataPMXY || 
-                    !self.dataLambdasThetas || 
+                    !self.dataPMXY ||
+                    !self.dataLambdasThetas ||
                     !self.dataThetaPhi ||
                     !self.data1d
                 ){

@@ -136,7 +136,7 @@ define(
                 // var W = Math.max(props.W_sx, props.W_sy);
                 var convertfromFWHM = 1/(2 * Math.sqrt(Math.log(2)));
                 var W = props.W * convertfromFWHM;
-                var W = props.lambda_p/(Math.PI * W); // angular spread
+                W = props.lambda_p/(Math.PI * W); // angular spread
 
                 var x_start = X_0 - scale*W/2;
                 var x_stop = X_0 + scale*W/2;
