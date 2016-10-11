@@ -366,10 +366,9 @@ SPDCprop.prototype = {
                 ,ls_stop = this.lambda_s + this.lambda_s *bw
                 ,li_start = this.lambda_i - this.lambda_i *bw
                 ,li_stop = this.lambda_i + this.lambda_i *bw
-                ,dim = 10
+                ,dim = 2
                 ,lambda_s = helpers.linspace(ls_start, ls_stop, dim)
                 ,lambda_i = helpers.linspace(li_start, li_stop, dim)
-                ,n = 20
                 ;
 
         props.nslices = 10;
@@ -380,8 +379,6 @@ SPDCprop.prototype = {
             props.z0s = focus;
             props.z0i = focus;
                 //PlotHelpers.calc_heralding_plot_focus_position_p = function calc_heralding_plot_focus_position_p(props, WsRange, ls_start, ls_stop, li_start, li_stop, n){
-            // var eff = [1];
-            // var eff = PlotHelpers.calc_heralding_plot_focus_position_p(props, [focus], ls_start, ls_stop, li_start, li_stop, n);
             var JSI_coinc = PlotHelpers.calc_JSI_p(props, lambda_s, lambda_i, dim, 1);
             var coinc = helpers.Sum(JSI_coinc);
             // console.log(coinc, focus*1e6);
@@ -390,12 +387,10 @@ SPDCprop.prototype = {
 
         var guess = -this.L/2;
         var startTime = new Date();
-        // props.z0s = guess;
-        // props.z0i = guess;
-        var ans = nelderMead(max_coinc, guess, 10);
+        var ans = nelderMead(max_coinc, guess, 40);
 
-        // Run again wiht better initial conditions based on previous optimization
-        ans = nelderMead(max_coinc, ans, 20);
+        // Run again with better initial conditions based on previous optimization
+        // ans = nelderMead(max_coinc, ans, 20);
         var endTime = new Date();
 
 
@@ -404,13 +399,6 @@ SPDCprop.prototype = {
         this.z0s = ans;
         this.z0i = this.z0s;
 
-        // console.log("New focus Position:", ans*1e6, this.z0s * 1e6);
-        // // console.log("Theta autocalc = ", timeDiff, ans);
-        // // props.theta = ans;
-        // // console.log("After autocalc: ", props.theta_i * 180/Math.PI);
-        // props.update_all_angles(props);
-
-        // // props.calcfibercoupling = fiber;
         // // calculate the walkoff angle
         // this.calc_walkoff_angles();
         // // console.log("Walkoff:", this.walkoff_p*180/Math.PI);
