@@ -13,7 +13,8 @@ var helpers = require('./math/helpers');
 var sq = helpers.sq;
 var Crystals = require('./pm-crystals');
 var nelderMead = require('./math/nelder-mead');
-var PhaseMatch = require('./phasematch');
+var pmLib = require('./pm-lib');
+var PlotHelpers = require('./pm-plothelpers');
 
 // These are the names associated with the types
 // The "type" property is stored as an integer
@@ -27,7 +28,6 @@ properties.PMTypes = [
 
 properties.apodization_L = [];
 properties.apodization_coeff = [];
-// PhaseMatch.zweights = [];
 
 var spdcDefaults = {
     lambda_p: 775 * con.nm,
@@ -105,8 +105,8 @@ SPDCprop.prototype = {
         this.update_all_angles();
 
         // Find internal angles for signal and idler
-        this.theta_s = PhaseMatch.find_internal_angle(this, "signal");
-        this.theta_i = PhaseMatch.find_internal_angle(this, "idler");
+        this.theta_s = pmLib.find_internal_angle(this, "signal");
+        this.theta_i = pmLib.find_internal_angle(this, "idler");
         // console.log("Angle diff at beginning: ", (this.theta_s - this.theta_i)*180/Math.PI);
         // this.theta_s = 0;
 
@@ -123,7 +123,7 @@ SPDCprop.prototype = {
         this.update_all_angles();
 
         // set the external angle of the idler
-        // this.theta_i_e = PhaseMatch.find_external_angle(this, "idler");
+        // this.theta_i_e = pmLib.find_external_angle(this, "idler");
         // console.log("From init external angle is: ", this.theta_i_e *180/Math.PI, this.theta_s_e *180/Math.PI, this.theta_i *180/Math.PI, this.theta_s *180/Math.PI);
 
         //set the apodization length and Gaussian profile
@@ -131,7 +131,7 @@ SPDCprop.prototype = {
         this.set_apodization_coeff();
 
         // this.numzint = 16;
-        // this.zweights = PhaseMatch.NintegrateWeights(this.numzint);
+        // this.zweights = helpers.NintegrateWeights(this.numzint);
 
         this.set_zint();
 
@@ -247,7 +247,7 @@ SPDCprop.prototype = {
 
         props.optimum_idler();
         // set the external idler angle
-        props.theta_i_e = PhaseMatch.find_external_angle(props,"idler");
+        props.theta_i_e = pmLib.find_external_angle(props,"idler");
         // props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
         // props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
         // console.log(props.n_s, props.n_s, props.n_i);
@@ -276,9 +276,9 @@ SPDCprop.prototype = {
         var min_delK = function(x){
             if (x>Math.PI/2 || x<0){return 1e12;}
             props.theta = x;
-            props.theta_s = PhaseMatch.find_internal_angle(props, "signal");
+            props.theta_s = pmLib.find_internal_angle(props, "signal");
             props.update_all_angles(props);
-            var delK =  PhaseMatch.calc_delK(props);
+            var delK =  pmLib.calc_delK(props);
             // Returning all 3 delK components can lead to errors in the search
             // return Math.sqrt(sq(delK[0]) + sq(delK[1]) + sq(delK[2]) );
             return Math.sqrt(sq(delK[2]) );
@@ -289,12 +289,12 @@ SPDCprop.prototype = {
         // var theta_s = props.theta_s;
         // var theta_s_e = props.theta_s_e;
         // props.theta_s_e = theta_s_e +0.01;
-        // PhaseMatch.find_internal_angle(props, "signal");
+        // pmLib.find_internal_angle(props, "signal");
         // props.theta_s = theta_s + 0.01;
         var ans = nelderMead(min_delK, guess, 30);
         // props.theta = ans;
         // props.theta_s_e = theta_s_e;
-        // PhaseMatch.find_internal_angle(props, "signal");
+        // pmLib.find_internal_angle(props, "signal");
         // props.theta_s = theta_s;
         // Run again wiht better initial conditions based on previous optimization
         ans = nelderMead(min_delK, ans, 30);
@@ -327,12 +327,12 @@ SPDCprop.prototype = {
                 P.poling_period = x;
                 // Calculate the angle for the idler photon
                 P.optimum_idler();
-                var delK = PhaseMatch.calc_delK(P);
+                var delK = pmLib.calc_delK(P);
                 return Math.sqrt(sq(delK[2]) );
                 // return Math.sqrt(sq(delK[2]) +sq(delK[0])+ sq(delK[1]));
             };
 
-            var delK_guess = (PhaseMatch.calc_delK(P)[2]);
+            var delK_guess = (pmLib.calc_delK(P)[2]);
             var guess = 2*Math.PI/delK_guess;
 
             if (guess<0){
@@ -379,10 +379,10 @@ SPDCprop.prototype = {
 
             props.z0s = focus;
             props.z0i = focus;
-                //PhaseMatch.calc_heralding_plot_focus_position_p = function calc_heralding_plot_focus_position_p(props, WsRange, ls_start, ls_stop, li_start, li_stop, n){
+                //PlotHelpers.calc_heralding_plot_focus_position_p = function calc_heralding_plot_focus_position_p(props, WsRange, ls_start, ls_stop, li_start, li_stop, n){
             // var eff = [1];
-            // var eff = PhaseMatch.calc_heralding_plot_focus_position_p(props, [focus], ls_start, ls_stop, li_start, li_stop, n);
-            var JSI_coinc = PhaseMatch.calc_JSI_p(props, lambda_s, lambda_i, dim, 1);
+            // var eff = PlotHelpers.calc_heralding_plot_focus_position_p(props, [focus], ls_start, ls_stop, li_start, li_stop, n);
+            var JSI_coinc = PlotHelpers.calc_JSI_p(props, lambda_s, lambda_i, dim, 1);
             var coinc = helpers.Sum(JSI_coinc);
             // console.log(coinc, focus*1e6);
             return (1/(coinc+1));
@@ -447,8 +447,8 @@ SPDCprop.prototype = {
         //Update the index of refraction for the idler
         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
-        // console.log("External angle of the idler is:", PhaseMatch.find_external_angle(P,"idler")*180/Math.PI );
-        // P.theta_i_e = PhaseMatch.find_external_angle(P,"idler");
+        // console.log("External angle of the idler is:", pmLib.find_external_angle(P,"idler")*180/Math.PI );
+        // P.theta_i_e = pmLib.find_external_angle(P,"idler");
     },
 
     optimum_signal : function (){
@@ -481,7 +481,7 @@ SPDCprop.prototype = {
             props.S_i = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_i, props.phi_i);
             props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
 
-            var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
+            var PMtmp =  pmLib.phasematch_Int_Phase(props);
             return 1-PMtmp[0];
         };
 
@@ -503,7 +503,7 @@ SPDCprop.prototype = {
             props.S_s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s);
             props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
 
-            var PMtmp =  PhaseMatch.phasematch_Int_Phase(props);
+            var PMtmp =  pmLib.phasematch_Int_Phase(props);
             return 1-PMtmp[0];
         };
 
@@ -648,7 +648,7 @@ SPDCprop.prototype = {
             // P.W_sx = P.W_ix;
             // P.W_sy = P.W_iy;
             // console.log("Theta external before swap: ", P.theta_s_e * 180/Math.PI);
-            // P.theta_s_e = PhaseMatch.find_external_angle(P, "signal");
+            // P.theta_s_e = pmLib.find_external_angle(P, "signal");
             P.theta_s_e = P.theta_i_e;
             // console.log("Theta external after swap: ", P.theta_s_e * 180/Math.PI);
             // console.log("");
@@ -795,6 +795,70 @@ SPDCprop.prototype = {
 
         return clone;
     }
+};
+
+
+/*
+ * To deal with possible floating point errors, convert from meters to microns before performing the calculations.
+ */
+properties.convertToMicrons = function convertToMicrons (props){
+    var  P = props
+        // ,mu = 1E6
+        ,mu = 1
+        ;
+
+    // // P.L = P.L*mu;
+    // console.log("Length: " + (P.L * mu).toString());
+    P.lambda_p = P.lambda_p * mu;
+    P.lambda_s = P.lambda_s * mu;
+    P.lambda_i = P.lambda_i * mu;
+    P.W = P.W * mu;
+    P.p_bw = P.p_bw * mu;
+    P.W_sx = P.W_sx * mu;
+    P.W_ix = P.W_ix * mu;
+    // console.log("P.L about to set");
+    P.L = P.L * mu;
+    // // console.log("set P.L");
+    // P.poling_period = P.poling_period * mu;
+    // P.apodization_FWHM = P.apodization_FWHM * mu;
+
+    // P.update_all_angles();
+    // P.set_apodization_L();
+    // P.set_apodization_coeff();
+    // P.set_zint();
+
+    return P;
+
+};
+
+properties.convertToMeters = function convertToMeters (props){
+    var  P = props
+        // ,mu = 1E-6
+        ,mu = 1
+        ;
+
+    // // P.L = P.L*mu;
+    // console.log("Length: " + (P.L * mu).toString());
+    P.lambda_p = P.lambda_p * mu;
+    P.lambda_s = P.lambda_s * mu;
+    P.lambda_i = P.lambda_i * mu;
+    P.W = P.W * mu;
+    P.p_bw = P.p_bw * mu;
+    P.W_sx = P.W_sx * mu;
+    P.W_ix = P.W_ix * mu;
+    // console.log("P.L about to set");
+    P.L = P.L * mu;
+    // // console.log("set P.L");
+    // P.poling_period = P.poling_period * mu;
+    // P.apodization_FWHM = P.apodization_FWHM * mu;
+
+    // P.update_all_angles();
+    // P.set_apodization_L();
+    // P.set_apodization_coeff();
+    // P.set_zint();
+
+    return P;
+
 };
 
 properties.SPDCprop = SPDCprop;

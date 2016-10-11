@@ -6,7 +6,8 @@ var PlotHelpers = module.exports = {};
 var helpers = require('./math/helpers');
 var sq = helpers.sq;
 var con = require('./constants');
-var PhaseMatch = require('./phasematch');
+var pmLib = require('./pm-lib');
+var properties = require('./pm-properties');
 
 PlotHelpers.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_stop, dim){
 
@@ -26,7 +27,7 @@ PlotHelpers.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_
     var todeg = 180/Math.PI;
     // // console.log(P.phi_i*todeg, P.phi_s*todeg);
     // P.theta_i = P.theta_s;
-    // var centerpm = PhaseMatch.phasematch(P);
+    // var centerpm = pmLib.phasematch(P);
     // // console.log(sq(centerpm[0]) + sq(centerpm[1]));
 
 
@@ -41,7 +42,7 @@ PlotHelpers.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_
     var maxpm = 0;
 
     // calculate normalization
-    var PMN = PhaseMatch.phasematch(P);
+    var PMN = pmLib.phasematch(P);
     var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
 
 
@@ -55,7 +56,7 @@ PlotHelpers.calc_JSA = function calc_JSA(props, ls_start, ls_stop, li_start, li_
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-        var PM = PhaseMatch.phasematch(P);
+        var PM = pmLib.phasematch(P);
         PMreal[i] = PM[0]/norm;
         PMimag[i] = PM[1]/norm;
         // C_check = PM[2];
@@ -97,7 +98,7 @@ PlotHelpers.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm
     P.update_all_angles();
     P.optimum_idler(P);
 
-    // P = PhaseMatch.convertToMicrons(P);
+    // P = properties.convertToMicrons(P);
 
     // P.S_p = P.calc_Coordinate_Transform(P.theta, P.phi, 0, 0);
     // P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
@@ -108,7 +109,7 @@ PlotHelpers.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm
     // // console.log("Inside JSA_p:  Theta_s: " + (P.theta_s*todeg).toString() + ", Theta_i: " + (P.theta_i*todeg).toString() );
     // // console.log(P.phi_i*todeg, P.phi_s*todeg);
     // P.theta_i = P.theta_s;
-    // var centerpm = PhaseMatch.phasematch(P);
+    // var centerpm = pmLib.phasematch(P);
     // // console.log(sq(centerpm[0]) + sq(centerpm[1]));
 
 
@@ -123,7 +124,7 @@ PlotHelpers.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm
     var maxpm = 0;
 
     // calculate normalization
-    // var PMN = PhaseMatch.phasematch(P);
+    // var PMN = pmLib.phasematch(P);
     // var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
 
 
@@ -141,7 +142,7 @@ PlotHelpers.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm
             // P.lambda_s = P.lambda_s *1E6;
             // P.lambda_i = P.lambda_i *1E6;
 
-            var PM = PhaseMatch.phasematch(P);
+            var PM = pmLib.phasematch(P);
             PMreal[i + lambda_s.length*j] = PM[0]/norm;
             PMimag[i + lambda_s.length*j] = PM[1]/norm;
         }
@@ -277,7 +278,7 @@ PlotHelpers.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lam
         ,norm_const = props.get_rates_constant();
 
     // calculate normalization
-    // var PMN = PhaseMatch.phasematch(P);
+    // var PMN = pmLib.phasematch(P);
     // var norm = Math.sqrt(sq(PMN[0]) + sq(PMN[1]));
 
 
@@ -306,7 +307,7 @@ PlotHelpers.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lam
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
             // var P_i = P.clone();
-            var PM = PhaseMatch.phasematch_singles(P);
+            var PM = pmLib.phasematch_singles(P);
             PMreal_s[i + lambda_s.length*j] = ( PM[0]  /norm ) ;
             PMimag_s[i + lambda_s.length*j] = ( PM[1]  /norm ) ;
             PMmag_s[i + lambda_s.length*j] = (Math.sqrt(sq(PMreal_s[i + lambda_s.length*j]) + sq(PMimag_s[i + lambda_s.length*j])))* norm_const  *(dOmega_s * dOmega_i) *lomega /scale_s;
@@ -316,7 +317,7 @@ PlotHelpers.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lam
             // but the signal and idler wavelengths and other properties stay the same
             // so there is no need to transpose the PMmag_i array.
             P.swap_signal_idler();
-            var PM_i = PhaseMatch.phasematch_singles(P);
+            var PM_i = pmLib.phasematch_singles(P);
             P.swap_signal_idler();
             PMreal_i[i + lambda_s.length*j] = ( PM_i[0] /norm );
             PMimag_i[i + lambda_s.length*j] = ( PM_i[1] /norm );
@@ -371,7 +372,7 @@ PlotHelpers.calc_PM_Curves = function calc_PM_Curves(props, l_start, l_stop, lp_
             P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
             P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-            PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+            PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
         }
     }
     // // console.log(P.lambda_p, P.lambda_s, P.lambda_i);
@@ -449,7 +450,7 @@ PlotHelpers.calc_PM_Pump_Theta_Phi = function calc_PM_Pump_Theta_Phi(props, thet
         //crystal has changed angle, so update all angles and indices
         P.update_all_angles();
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
         // if (isNaN(PM[i])){
         //     // // console.log("theta", P.theta*180/Math.PI, P.phi*180/Math.PI);
         // }
@@ -487,7 +488,7 @@ PlotHelpers.calc_PM_Pump_Theta_Poling = function calc_PM_Pump_Theta_Poling(props
         //crystal has changed angle, so update all angles and indices
         P.update_all_angles();
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
     }
     return PM;
 };
@@ -521,7 +522,7 @@ PlotHelpers.calc_PM_Pump_Theta_Poling = function calc_PM_Pump_Theta_Poling(props
 //         //crystal has changed angle, so update all angles and indices
 //         P.update_all_angles();
 
-//         PM[i] = PhaseMatch.phasematch_Int_Phase(P);
+//         PM[i] = pmLib.phasematch_Int_Phase(P);
 //     }
 //     return PM;
 // };
@@ -553,7 +554,7 @@ PlotHelpers.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, 
 
 
     // Find the stopping angle to integrate over
-    var int_angles = PhaseMatch.autorange_theta(P);
+    var int_angles = pmLib.autorange_theta(P);
     var tstart = int_angles[0];
     var tstop  = int_angles[1];
     if (P.theta_s*180/Math.PI < 4){
@@ -579,7 +580,7 @@ PlotHelpers.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, 
 //     //console.log("number of integration points: " + numint.toString());
 
     P.theta_s_e = x_stop;
-    var theta_stop  = PhaseMatch.find_internal_angle(P,"signal");
+    var theta_stop  = pmLib.find_internal_angle(P,"signal");
     var int_weights = helpers.NintegrateWeights(numint),
         diff   = (tstop - tstart),
         dtheta = (diff/numint)
@@ -599,12 +600,12 @@ PlotHelpers.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, 
     for (var k = 0; k<dim; k++){
         if (theta_x_e[k] < 0){
             P.theta_s_e = -1*theta_x_e[k];
-            X[k] = -1*PhaseMatch.find_internal_angle(P,"signal");
+            X[k] = -1*pmLib.find_internal_angle(P,"signal");
             Y[dim - k -1] = X[k];
         }
         else {
             P.theta_s_e = theta_x_e[k];
-            X[k] = PhaseMatch.find_internal_angle(P,"signal");
+            X[k] = pmLib.find_internal_angle(P,"signal");
             Y[dim - k -1] = X[k];
         }
     }
@@ -622,10 +623,10 @@ PlotHelpers.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, 
         P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
         // Now calculate the PM function
-        var pm_result = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        var pm_result = pmLib.phasematch_Int_Phase(P)["phasematch"];
         // return [pm_result,0];
 
-        // var pm_result = PhaseMatch.phasematch(P);
+        // var pm_result = pmLib.phasematch(P);
         return pm_result;
     };
 
@@ -658,10 +659,10 @@ PlotHelpers.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, 
             //     P.S_i = P.calc_Coordinate_Transform(P.theta, P.phi, P.theta_i, P.phi_i);
             //     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
             //     // Now calculate the PM function
-            //     var pm_result = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+            //     var pm_result = pmLib.phasematch_Int_Phase(P)["phasematch"];
             //     // return [pm_result,0];
             //
-            //     // var pm_result = PhaseMatch.phasematch(P);
+            //     // var pm_result = pmLib.phasematch(P);
             //     return pm_result;
 
             for (var j=0; j<numint; j++){
@@ -678,7 +679,7 @@ PlotHelpers.calc_XY = function calc_XY(props, x_start, x_stop, y_start, y_stop, 
             //calculate the correct idler angle analytically.
             // // console.log('hello');
             P.optimum_idler(P);
-            PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+            PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
         }
 
 
@@ -722,12 +723,12 @@ PlotHelpers.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start
     for (var k = 0; k<dim; k++){
         if (theta_x_e[k] < 0){
             P.theta_s_e = -1*theta_x_e[k];
-            X[k] = -1*PhaseMatch.find_internal_angle(P,"signal");
+            X[k] = -1*pmLib.find_internal_angle(P,"signal");
             Y[dim - k -1] = X[k];
         }
         else {
             P.theta_s_e = theta_x_e[k];
-            X[k] = PhaseMatch.find_internal_angle(P,"signal");
+            X[k] = pmLib.find_internal_angle(P,"signal");
             Y[dim - k -1] = X[k];
         }
 
@@ -759,7 +760,7 @@ PlotHelpers.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start
         }
 
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
 
     }
 
@@ -804,7 +805,7 @@ PlotHelpers.calc_XY_both = function calc_XY_both(props, x_start, x_stop, y_start
             P.optimum_idler(P);
         }
 
-        PM[i] += PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        PM[i] += pmLib.phasematch_Int_Phase(P)["phasematch"];
 
     }
 
@@ -828,7 +829,7 @@ PlotHelpers.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, 
 
     for (var k = 0; k<dim; k++){
         P.theta_s_e = theta_s_e[k];
-        theta_s[k] = PhaseMatch.find_internal_angle(P,"signal");
+        theta_s[k] = pmLib.find_internal_angle(P,"signal");
     }
     var i;
     var lambda_s = helpers.linspace(l_start, l_stop, dim);
@@ -859,15 +860,15 @@ PlotHelpers.calc_lambda_s_vs_theta_s = function calc_lambda_s_vs_theta_s(props, 
         }
 
         // if (i%dim === 0){
-        //     theta_s_e[dim - index_i -1] = PhaseMatch.find_external_angle(P,"signal")*radtodeg;
+        //     theta_s_e[dim - index_i -1] = pmLib.find_external_angle(P,"signal")*radtodeg;
         // }
-        // theta_s_e[index_i] = PhaseMatch.find_external_angle(P,"signal")*radtodeg;
+        // theta_s_e[index_i] = pmLib.find_external_angle(P,"signal")*radtodeg;
 
         // P.optimum_idler(P); //Need to find the optimum idler for each angle.
         // P.calc_wbar();
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
-        // PM[i] = PhaseMatch.calc_delK(P);
+        PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
+        // PM[i] = pmLib.calc_delK(P);
 
     }
     var endTime = new Date();
@@ -907,7 +908,7 @@ PlotHelpers.calc_theta_phi = function calc_theta_phi(props, t_start, t_stop, p_s
         P.optimum_idler(P);
         // P.calc_wbar();
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
 
     }
     return PM;
@@ -928,11 +929,11 @@ PlotHelpers.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x
 
     for (var k = 0; k<dim; k++){
         P.theta_s_e = theta_s_e[k];
-        X[k] = PhaseMatch.find_internal_angle(P,"signal");
+        X[k] = pmLib.find_internal_angle(P,"signal");
     }
 
     var i;
-    // var X = PhaseMatch.linspace(x_start, x_stop, dim);
+    // var X = helpers.linspace(x_start, x_stop, dim);
     var Y = helpers.linspace(y_start, y_stop, dim);
 
     var N = dim * dim;
@@ -962,7 +963,7 @@ PlotHelpers.calc_signal_theta_phi = function calc_calc_signal_theta_phi(props, x
             P.optimum_idler(P);
         }
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
 
     }
     var endTime = new Date();
@@ -986,9 +987,9 @@ PlotHelpers.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idl
 
     for (var k = 0; k<dim; k++){
         P.theta_s_e = theta_s_e[k];
-        X[k] = PhaseMatch.find_internal_angle(P,"signal");
+        X[k] = pmLib.find_internal_angle(P,"signal");
         P.theta_i_e = theta_i_e[k];
-        Y[k] = PhaseMatch.find_internal_angle(P,"idler");
+        Y[k] = pmLib.find_internal_angle(P,"idler");
         // Y[k] = X[k];
     }
 
@@ -1016,8 +1017,8 @@ PlotHelpers.calc_signal_theta_vs_idler_theta = function calc_signal_theta_vs_idl
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
-        // PM[i] = PhaseMatch.calc_delK(P);
+        PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
+        // PM[i] = pmLib.calc_delK(P);
 
     }
     var endTime = new Date();
@@ -1050,7 +1051,7 @@ PlotHelpers.calc_signal_phi_vs_idler_phi = function calc_signal_phi_vs_idler_phi
         P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
         P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-        PM[i] = PhaseMatch.phasematch_Int_Phase(P)["phasematch"];
+        PM[i] = pmLib.phasematch_Int_Phase(P)["phasematch"];
 
     }
 
@@ -1121,9 +1122,9 @@ PlotHelpers.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_sto
         }
 
         //now calculate the JSI for these values
-        var jsa = PhaseMatch.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, dimjsa);
-        var jsa2d = PhaseMatch.create_2d_array(jsa, dimjsa, dimjsa);
-        S[i] = PhaseMatch.calc_Schmidt(jsa2d);
+        var jsa = PlotHelpers.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, dimjsa);
+        var jsa2d = helpers.create_2d_array(jsa, dimjsa, dimjsa);
+        S[i] = pmLib.calc_Schmidt(jsa2d);
 
         if (S[i]<maxschmidt){
             maxschmidt = S[i];
@@ -1135,7 +1136,7 @@ PlotHelpers.calc_schmidt_plot = function calc_schmidt_plot(props, x_start, x_sto
 
     // // console.log("max pm value = ", maxpm);
     // // console.log("Lowest Schmidt = ", maxschmidt, " , X = ", x_ideal, ", Y = ", y_ideal);
-    // // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
+    // // console.log("HOM dip = ",pmLib.calc_HOM_JSA(P, 0e-15));
 
     return S;
 
@@ -1203,9 +1204,9 @@ PlotHelpers.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yran
         }
 
         //now calculate the JSI for these values
-        var jsa = PhaseMatch.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, dimjsa);
-        var jsa2d = PhaseMatch.create_2d_array(jsa, dimjsa, dimjsa);
-        S[i] = PhaseMatch.calc_Schmidt(jsa2d);
+        var jsa = PlotHelpers.calc_JSI(P, ls_start, ls_stop, li_start, li_stop, dimjsa);
+        var jsa2d = helpers.create_2d_array(jsa, dimjsa, dimjsa);
+        S[i] = pmLib.calc_Schmidt(jsa2d);
         // // console.log(S[i]);
 
         if (S[i]<maxschmidt){
@@ -1219,7 +1220,7 @@ PlotHelpers.calc_schmidt_plot_p = function calc_schmidt_plot(props, xrange, yran
 
     // // console.log("max pm value = ", maxpm);
     // // console.log("Lowest Schmidt = ", maxschmidt, " , X = ", x_ideal, ", Y = ", y_ideal);
-    // // console.log("HOM dip = ",PhaseMatch.calc_HOM_JSA(P, 0e-15));
+    // // console.log("HOM dip = ",pmLib.calc_HOM_JSA(P, 0e-15));
     // // console.log(S[0]);
     return S;
 
@@ -1280,7 +1281,7 @@ PlotHelpers.calc_heralding_plot_p = function calc_heralding_plot_p(props, WpRang
     //     P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
     //     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-    //     var PM = PhaseMatch.phasematch_singles(P);
+    //     var PM = pmLib.phasematch_singles(P);
     //     // P.swap_signal_idler();
     //     // // console.log("inside singles: " + PM[0].toString() + ", i*" + PM[1].toString() + " P.n_p: " +P.n_p.toString() + ", Weights:" + lambdaWeights[0].toString());
     //     return Math.sqrt(sq(PM[0]) + sq(PM[1]));
@@ -1296,7 +1297,7 @@ PlotHelpers.calc_heralding_plot_p = function calc_heralding_plot_p(props, WpRang
     //     P_i.n_s = P_i.calc_Index_PMType(P_i.lambda_s, P_i.type, P_i.S_s, "signal");
     //     P_i.n_i = P_i.calc_Index_PMType(P_i.lambda_i, P_i.type, P_i.S_i, "idler");
 
-    //     var PM = PhaseMatch.phasematch_singles(P_i);
+    //     var PM = pmLib.phasematch_singles(P_i);
     //     // // console.log("inside singles: " + PM[0].toString() + ", i*" + PM[1].toString() + " P_i.n_p: " +P.n_p.toString() + ", Weights:" + lambdaWeights[0].toString());
     //     return Math.sqrt(sq(PM[0]) + sq(PM[1]));
     // };
@@ -1311,13 +1312,13 @@ PlotHelpers.calc_heralding_plot_p = function calc_heralding_plot_p(props, WpRang
     //     P.n_s = P.calc_Index_PMType(P.lambda_s, P.type, P.S_s, "signal");
     //     P.n_i = P.calc_Index_PMType(P.lambda_i, P.type, P.S_i, "idler");
 
-    //     var PM = PhaseMatch.phasematch(P);
+    //     var PM = pmLib.phasematch(P);
     //     return (sq(PM[0]) + sq(PM[1]));
     // };
 
 
     function calc_singles_rate( ){
-        var JSI_singles = PhaseMatch.calc_JSI_Singles_p(P, lambda_s,lambda_i, dim, 1);
+        var JSI_singles = PlotHelpers.calc_JSI_Singles_p(P, lambda_s,lambda_i, dim, 1);
 
         // Now, since the calculation is done in terms of omega_s, omega_i, need to figure out
         // step size of the Riemman sum.
@@ -1333,8 +1334,8 @@ PlotHelpers.calc_heralding_plot_p = function calc_heralding_plot_p(props, WpRang
 
     function calc_coinc_rate( ){
 
-        // var JSI_coinc = PhaseMatch.calc_JSI_p(P, lambda_s,lambda_i, dim, 1);
-        var JSI_coinc = PhaseMatch.calc_JSI_rates_p(P, lambda_s,lambda_i, dim, 1);
+        // var JSI_coinc = PlotHelpers.calc_JSI_p(P, lambda_s,lambda_i, dim, 1);
+        var JSI_coinc = PlotHelpers.calc_JSI_rates_p(P, lambda_s,lambda_i, dim, 1);
 
         return helpers.Sum(JSI_coinc);
     }
@@ -1440,13 +1441,13 @@ PlotHelpers.calc_heralding_plot_focus_position_p = function calc_heralding_plot_
     var PHI_i = 1/Math.cos(P_i.theta_s_e);
 
     function calc_singles_rate( ){
-        var JSI_singles = PhaseMatch.calc_JSI_Singles_p(P, lambda_s,lambda_i, dim, 1);
+        var JSI_singles = PlotHelpers.calc_JSI_Singles_p(P, lambda_s,lambda_i, dim, 1);
         // // console.log(helpers.Sum(JSI_singles[0]).toString());
         return [helpers.Sum(JSI_singles[0]), helpers.Sum(JSI_singles[1])];
     }
 
     function calc_coinc_rate( ){
-        var JSI_coinc = PhaseMatch.calc_JSI_p(P, lambda_s,lambda_i, dim, 1);
+        var JSI_coinc = PlotHelpers.calc_JSI_p(P, lambda_s,lambda_i, dim, 1);
         return helpers.Sum(JSI_coinc);
     }
 

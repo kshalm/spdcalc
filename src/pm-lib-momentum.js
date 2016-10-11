@@ -1,80 +1,20 @@
 /**
  * Phasematching Library for momentum space calculations
  */
+
+module.exports = {};
 var ellipticity = 1.0;
 var con = require('./constants');
 var helpers = require('./math/helpers');
 var sq = helpers.sq;
-var PhaseMatch = require('./phasematch');
-
-/*
- * To deal with possible floating point errors, convert from meters to microns before performing the calculations.
- */
-var convertToMicrons = function convertToMicrons (props){
-    var  P = props
-        // ,mu = 1E6
-        ,mu = 1
-        ;
-
-    // // P.L = P.L*mu;
-    // console.log("Length: " + (P.L * mu).toString());
-    P.lambda_p = P.lambda_p * mu;
-    P.lambda_s = P.lambda_s * mu;
-    P.lambda_i = P.lambda_i * mu;
-    P.W = P.W * mu;
-    P.p_bw = P.p_bw * mu;
-    P.W_sx = P.W_sx * mu;
-    P.W_ix = P.W_ix * mu;
-    // console.log("P.L about to set");
-    P.L = P.L * mu;
-    // // console.log("set P.L");
-    // P.poling_period = P.poling_period * mu;
-    // P.apodization_FWHM = P.apodization_FWHM * mu;
-
-    // P.update_all_angles();
-    // P.set_apodization_L();
-    // P.set_apodization_coeff();
-    // P.set_zint();
-
-    return P;
-
-};
-
-var convertToMeters = function convertToMeters (props){
-    var  P = props
-        // ,mu = 1E-6
-        ,mu = 1
-        ;
-
-    // // P.L = P.L*mu;
-    // console.log("Length: " + (P.L * mu).toString());
-    P.lambda_p = P.lambda_p * mu;
-    P.lambda_s = P.lambda_s * mu;
-    P.lambda_i = P.lambda_i * mu;
-    P.W = P.W * mu;
-    P.p_bw = P.p_bw * mu;
-    P.W_sx = P.W_sx * mu;
-    P.W_ix = P.W_ix * mu;
-    // console.log("P.L about to set");
-    P.L = P.L * mu;
-    // // console.log("set P.L");
-    // P.poling_period = P.poling_period * mu;
-    // P.apodization_FWHM = P.apodization_FWHM * mu;
-
-    // P.update_all_angles();
-    // P.set_apodization_L();
-    // P.set_apodization_coeff();
-    // P.set_zint();
-
-    return P;
-
-};
+var pmLib = require('./pm-lib');
+var properties = require('./pm-properties');
 
 /*
  * Get the constants and terms used in the calculation of the momentum
  * space joint spectrum for the coincidences.
  */
-var calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
+module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // console.log("hi");
     // console.log("\n");
     // var todeg = 180/Math.PI;
@@ -103,7 +43,7 @@ var calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // var RHOpx  = 0;
 
 
-    convertToMicrons(P);
+    properties.convertToMicrons(P);
 
     var omega_s = twoPIc / (P.lambda_s ),
         omega_i = twoPIc / (P.lambda_i),
@@ -114,7 +54,7 @@ var calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     // console.log("frequencies2:" + (P.lambda_p*1E9).toString() + ", " + (omega_p/twoPI*1E-9).toString() + ", " + (omega_s*1E-9).toString() + ", " + (omega_i*1E-9).toString() + ", ")
     // convertToMicrons(P);
 
-    var delK = PhaseMatch.calc_delK(P);
+    var delK = pmLib.calc_delK(P);
     var delKx = delK[0],
         delKy = delK[1],
         delKz = delK[2]
@@ -536,7 +476,7 @@ var calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         PMz_imag = 0;
     }
 
-    convertToMeters(P);
+    properties.convertToMeters(P);
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
     // console.log(PMz_real.toString());
@@ -549,7 +489,7 @@ var calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
  * Get the constants and terms used in the calculation of the momentum
  * space joint spectrum for the singles counts from the Idler.
  */
-var calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
+module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     // console.log("hi");
     // console.log("\n");
     var toMicrons= 1;
@@ -584,7 +524,7 @@ var calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     var RHOpx = P.walkoff_p; //pump walkoff angle.
     // var RHOpx = 0
 
-    convertToMicrons(P);
+    properties.convertToMicrons(P);
     var omega_s = twoPIc / (P.lambda_s ),
         omega_i = twoPIc / (P.lambda_i),
         omega_p = omega_s + omega_i
@@ -1037,7 +977,7 @@ var calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         return [real, imag];
     };
 
-    var delK = PhaseMatch.calc_delK(P);
+    var delK = pmLib.calc_delK(P);
     var delKx = delK[0],
         delKy = delK[1],
         delKz = delK[2]
@@ -1083,7 +1023,7 @@ var calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         PMz_real = Math.exp(-0.193*sq(arg));
         PMz_imag = 0;
     }
-    convertToMeters(P);
+    properties.convertToMeters(P);
     P.lambda_p = lambda_p; //set back to the original lambda_p
     P.n_p = n_p;
 
@@ -1093,12 +1033,3 @@ var calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     return [PMz_real, PMz_imag, PMt];
 
 };
-
-
-
-Object.assign(module.exports, {
-    convertToMicrons: convertToMicrons
-    , convertToMeters: convertToMeters
-    , calc_PM_tz_k_coinc: calc_PM_tz_k_coinc
-    , calc_PM_tz_k_singles: calc_PM_tz_k_singles
-});

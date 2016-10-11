@@ -4,7 +4,8 @@
 var nm = Math.pow(10, -9);
 var um = Math.pow(10, -6);
 var pm = Math.pow(10, -12);
-var lightspeed =  2.99792458 * Math.pow(10, 8);
+var mu = 1;
+var c =  2.99792458 * Math.pow(10, 8) * mu;
 var twoPI = 2 * Math.PI;
 var e0 = 8.854 * Math.pow(10,-12);
 
@@ -13,7 +14,7 @@ module.exports = {
     um: um,
     nm: nm,
     pm: pm,
-    c: lightspeed,
+    c: c,
     e0: e0,
     twoPI: twoPI
 };

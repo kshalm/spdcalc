@@ -13,7 +13,7 @@
       "email": "kshalm@gmail.com"
     }
   ],
-  "main": null,
+  "main": "src/phasematch.js",
   "repository": {
     "type": "git",
     "url": ""
