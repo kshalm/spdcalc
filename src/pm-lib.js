@@ -1121,14 +1121,13 @@ module.exports.calc_2HOM_norm = function calc_HOM_norm(PM_JSA_real, PM_JSA_imag,
 
                 // loop over wi2
                 for (var m=0; m<dim; m++){
-
                     var B_real = PM_JSA_real[l][m];
                     var B_imag = PM_JSA_imag[l][m];
 
                     var Arg1_real = A_real*B_real - A_imag*B_imag;
                     var Arg1_imag = A_real*B_imag + A_imag*B_real;
 
-                    rate += sq(Arg1_real) + sq(Arg1_imag);
+                    rate += (Arg1_real*Arg1_real) + (Arg1_imag*Arg1_imag);
 
                 }
             }

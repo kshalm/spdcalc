@@ -6,7 +6,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
 	cache: true,
-	devtool: 'eval',
+	devtool: 'source-map',
     entry: {
 		spdcalc: [
 			// 'webpack-hot-middleware/client',

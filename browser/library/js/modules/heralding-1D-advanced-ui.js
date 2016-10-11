@@ -45,7 +45,7 @@ define(
         var jsahomUI = SkeletonUI.subclass({
 
             constructor: SkeletonUI.prototype.constructor,
-            nWorkers: 6,
+            nWorkers: 4,
             tplPlots: tplJSALayout,
             showPlotOpts: [
                 'npts-heralding-waist',
@@ -395,14 +395,14 @@ define(
                 self.calcRSingles( P );
                 // self.calcRCoinc( props );
 
-                var starttime = new Date();
+                // var starttime = new Date();
 
                 for (var i = 0; i<Nthreads-1; i++){
                     yrange.push(Ws.subarray(i*divisions,i*divisions + divisions));
                 }
                 yrange.push( Ws.subarray((Nthreads-1)*divisions, Ws.length));
 
-                starttime = new Date();
+                var starttime = new Date();
                 // The calculation is split up and reutrned as a series of promises
                 for (var j = 0; j < Nthreads; j++){
                     promises[j] = self.workers[j].exec('jsaHelper.doCalcHeraldingEff', [
@@ -508,7 +508,8 @@ define(
                         }
                         self.dataR_coin = dataR_coin;
 
-
+                        var endtime = new Date();
+                        console.log("Efficiency time: " + (endtime - starttime));
                         self.draw();
 
                         // Calculate max and min efficiencies
@@ -528,7 +529,8 @@ define(
 
                         self.set_slider_values(props.W_sx, po.get('Ws_start'), po.get('Ws_stop'));
 
-                        var endtime = new Date();
+
+
                         return true;
                 });
 

@@ -213,67 +213,99 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     // console.log("hs:", hs, hi, zhs, zhi);
 
-    // As a function of z along the crystal, calculate the z-dependent coefficients
-    var calczterms = function(z){
-        // console.log("inside calczterms");
-        // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
-        var A1 = [ As_r, As_i + Cs + Ds * z],
-            A3 = [ Ai_r, Ai_i + Ci + Di * z],
-            A2 = [ Bs_r, Bs_i + Cs + Ds * z],
-            A4 = [ Bi_r, Bi_i + Ci + Di * z],
-            // A5 = [ Es_r, Es_i + hs],
-            // A7 = [ Ei_r, Ei_i + hi],
-            A5 = [ GAM3s, -DEL3s],
-            A7 = [ GAM3i, -DEL3i],
-            //1i*0.5.*L.*(1 + Xi).*tan(Rho);
-            A6 = [ 0, n*(1+z)],
-            A8 = [ mx_real, mx_imag - m * z],
-            A9 = [ my_real, my_imag - m * z],
-            // A9 = A8, //Pump waist is symmetric
-            A10 = [hh_r, hh_i + ee + ff * z]
-            ;
+    // // As a function of z along the crystal, calculate the z-dependent coefficients
+    // var calczterms = function(z){
+    //     // console.log("inside calczterms");
+    //     // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
+    //     var A1 = [ As_r, As_i + Cs + Ds * z],
+    //         A3 = [ Ai_r, Ai_i + Ci + Di * z],
+    //         A2 = [ Bs_r, Bs_i + Cs + Ds * z],
+    //         A4 = [ Bi_r, Bi_i + Ci + Di * z],
+    //         // A5 = [ Es_r, Es_i + hs],
+    //         // A7 = [ Ei_r, Ei_i + hi],
+    //         A5 = [ GAM3s, -DEL3s],
+    //         A7 = [ GAM3i, -DEL3i],
+    //         //1i*0.5.*L.*(1 + Xi).*tan(Rho);
+    //         A6 = [ 0, n*(1+z)],
+    //         A8 = [ mx_real, mx_imag - m * z],
+    //         A9 = [ my_real, my_imag - m * z],
+    //         // A9 = A8, //Pump waist is symmetric
+    //         A10 = [hh_r, hh_i + ee + ff * z]
+    //         ;
+    //
+    //     return [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10];
+    // };
 
-        // console.log("Terms in Karina's order going from A1-A11");
-
-        // console.log("A1:", A1);
-        // console.log("A2:", A2);
-        // console.log("A3:", A3);
-        // console.log("A4:", A4);
-        // console.log("A5:", A5);
-        // console.log("A6:", A6);
-        // console.log("A7:", A7);
-        // console.log("A8:", A8);
-        // console.log("A9:", A9);
-        // console.log("A10:", A10);
-
-        // OK A
-        return [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10];
-    };
+    var A1R = As_r,
+        A1IO = As_i + Cs,
+        A1I = 0,
+        A2R = Bs_r,
+        A2IO = Bs_i + Cs,
+        A2I = 0,
+        A3R = Ai_r,
+        A3IO = Ai_i + Ci,
+        A3I = 0,
+        A4R = Bi_r,
+        A4IO = Bi_i + Ci,
+        A4I = 0,
+        A5R = GAM3s,
+        A5I = -DEL3s,
+        A6R = 0,
+        A6IO = n,
+        A6I = 0,
+        A7R = GAM3i,
+        A7I = -DEL3i,
+        A8R = mx_real,
+        A8IO = mx_imag,
+        A8I = 0,
+        A9R = my_real,
+        A9IO = my_imag,
+        A9I = 0,
+        A10R = hh_r,
+        A10IO = hh_i + ee,
+        A10I = 0
+        ;
 
     var zintfunc = function(z){
         // z = 0;
-        var terms = calczterms(z);
-        var A1R = terms[0][0],
-            A1I = terms[0][1],
-            A2R = terms[1][0],
-            A2I = terms[1][1],
-            A3R = terms[2][0],
-            A3I = terms[2][1],
-            A4R = terms[3][0],
-            A4I = terms[3][1],
-            A5R = terms[4][0],
-            A5I = terms[4][1],
-            A6R = terms[5][0],
-            A6I = terms[5][1],
-            A7R = terms[6][0],
-            A7I = terms[6][1],
-            A8R = terms[7][0],
-            A8I = terms[7][1],
-            A9R = terms[8][0],
-            A9I = terms[8][1],
-            A10R = terms[9][0],
-            A10I = terms[9][1]
+        // var terms = calczterms(z);
+        // var A1R = terms[0][0],
+        //     A1I = terms[0][1],
+        //     A2R = terms[1][0],
+        //     A2I = terms[1][1],
+        //     A3R = terms[2][0],
+        //     A3I = terms[2][1],
+        //     A4R = terms[3][0],
+        //     A4I = terms[3][1],
+        //     A5R = terms[4][0],
+        //     A5I = terms[4][1],
+        //     A6R = terms[5][0],
+        //     A6I = terms[5][1],
+        //     A7R = terms[6][0],
+        //     A7I = terms[6][1],
+        //     A8R = terms[7][0],
+        //     A8I = terms[7][1],
+        //     A9R = terms[8][0],
+        //     A9I = terms[8][1],
+        //     A10R = terms[9][0],
+        //     A10I = terms[9][1]
+        //     ;
+
+        var  m_z = m*z
+            ,Ds_z = Ds *z
+            ,Di_z = Di *z
+            ,ff_z = ff*z
             ;
+
+        A1I = A1IO + Ds_z;
+        A2I = A2IO + Ds_z;
+        A3I = A3IO + Di_z;
+        A4I = A4IO + Di_z;
+        A6I = A6IO * (1+z);
+        A8I = A8IO - m_z;
+        A9I = A9IO - m_z;
+        A10I = A10IO + ff_z;
+
         // (-4 A3 + A8^2/A1)
         // console.log("hello");
         // console.log("A1R: " + A1R.toString() + "   A2R: " + A2R.toString()+"A3R: " + A3R.toString() + "   A4R: " + A4R.toString()+"A5R: " + A5R.toString() + "   A6R: " + A6R.toString()+"A7R: " + A7R.toString() + "   A8R: " + A8R.toString()+"A9R: " + A9R.toString() + "   A10R: " + A10R.toString());
@@ -697,37 +729,36 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         // return [D1R, D1I, D3R, D3I, H1R, H1I, H3R, H3I, P1R, P1I, P3R, P3I, Q1R, Q1I, Q3R, Q3I, A1, B1, B3];
     };
 
-    // As a function of z2 along the crystal, calculate the z2-dependent coefficients
-    var calcz2terms = function(z2){
-        // z2 = 0;
-        // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
-        var  A2 = 2 * z0 - L*z2
-            ,B2 = (1 - z2)
-            ,B4 = (1 + z2)
-        ;
-        return [A2, B2, B4];
-        // return [D2R, D2I, D4R, D4I, H2R, H2I, H4R, H4I, P2R, P2I, P4R, P4I, Q2R, Q2I, Q4R, Q4I, A2, B2, B4];
-    };
+    // // As a function of z2 along the crystal, calculate the z2-dependent coefficients
+    // var calcz2terms = function(z2){
+    //     // z2 = 0;
+    //     // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
+    //     var  A2 = 2 * z0 - L*z2
+    //         ,B2 = (1 - z2)
+    //         ,B4 = (1 + z2)
+    //     ;
+    //     return [A2, B2, B4];
+    //     // return [D2R, D2I, D4R, D4I, H2R, H2I, H4R, H4I, P2R, P2I, P4R, P4I, Q2R, Q2I, Q4R, Q4I, A2, B2, B4];
+    // };
 
     var zintfunc = function(z1, z2, Cz1){
         // z1 = 0;
         // z2 =0;
         // Get the terms that depend only on z2. We already have the terms depending only on z1 in Cz1
-        var  Cz2 = calcz2terms(z2)
-            ,B0 = z1-z2
+        // var  Cz2 = calcz2terms(z2)
+        var  B0 = z1-z2
             // From Cz1
             ,A1 = Cz1[0]
             ,B1 = Cz1[1]
             ,B3 = Cz1[2]
 
-            // From Cz2
-            ,A2 = Cz2[0]
-            ,B2 = Cz2[1]
-            ,B4 = Cz2[2]
+            // terms that depend on z2
+            ,A2 = 2 * z0 - L*z2
+            ,B2 = (1 - z2)
+            ,B4 = (1 + z2)
 
             // Now terms that depend on both z1 and z2
             ,B6a = C4 * B0
-
 
             ,gamma1I = -k_p*L*B1 + k_s * A1
             ,gamma2I = (-k_p*L*B2 + k_s * A2)
@@ -761,18 +792,6 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
             //Now to calculate the term EE
             // EE = 1/4*(-  2*Wx^2 + I B6a + C5/X11*(C9 - I A1)^2 - I C5/X12*(C9 + I A2)^2  )
-            // ,EE1R = helpers.cmultiplyR(C9, -A1, C9, -A1)
-            // ,EE1I = helpers.cmultiplyI(C9, -A1, C9, -A1)
-            // ,EE2R = helpers.cmultiplyR(C9, A2, C9, A2)
-            // ,EE2I = helpers.cmultiplyI(C9, A2, C9, A2)
-            // ,EE3R = C5 * helpers.cdivideR(EE1R, EE1I, X11R, X11I)
-            // ,EE3I = C5 * helpers.cdivideI(EE1R, EE1I, X11R, X11I)
-            // ,EE4R = C5 * helpers.cdivideR(EE2R, EE2I, X12R, X12I)
-            // ,EE4I = C5 * helpers.cdivideI(EE2R, EE2I, X12R, X12I)
-            // ,EE5R = helpers.cmultiplyR(0, 1, EE4R, EE4I)
-            // ,EE5I = helpers.cmultiplyI(0, 1, EE4R, EE4I)
-            // ,EER = 0.25 * (-2*Wx_SQ + EE3R - EE5R)
-            // ,EEI = 0.25 * (B6a + EE3I - EE5I)
 
             ,EE1R = helpers.cmultiplyR(A1, C9, A1, C9)
             ,EE1I = helpers.cmultiplyI(A1, C9, A1, C9)
@@ -850,17 +869,6 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             ,IIgamI = IIgam2I - IIgam4R
             ,IIR = 2*GAM4s + KpKs * (IIrhoR + IIgamR)
             ,III = 0.5*(C3 * B0) + KpKs * (IIrhoI + IIgamI)
-
-            // ,IIR = 0
-            // ,III = 0
-            // ,HHR = 0
-            // ,HHI = 0
-            // ,GGR = 0
-            // ,GGI = 0
-            // // ,II2R = helpers.cmultiplyR(B6, 0, 0, 2*C7)
-            // ,II2I = helpers.cmultiplyI(B6, 0, 0, 2*C7)
-            // ,IIR = 0.25 * helpers.caddR(II1R, II1I, II2R, II2I)
-            // ,III = 0.25 * helpers.caddI(II1R, II1I, II2R, II2I)
 
             // Now calculate terms in the numerator
             // Exp(-(GG^2/(4 EE)) - HH^2/(4 FF) + II)
