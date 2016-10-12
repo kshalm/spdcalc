@@ -561,7 +561,7 @@ helpers.csqrtI = function csqrtI(a,ai){
 };
 
 // Returns imag part of the principal square root of a complex number
-helpers.csqrt = function csqrtI(a,ai){
+helpers.csqrt = function csqrt(a,ai){
     // var rSqrt = Math.sqrt(Math.sqrt((a*a)+(ai*ai)));
     // var arg = Math.atan2(ai,a)*.5;
     // var real = rSqrt*Math.cos(arg);

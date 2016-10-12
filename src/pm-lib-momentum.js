@@ -213,28 +213,6 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     // console.log("hs:", hs, hi, zhs, zhi);
 
-    // // As a function of z along the crystal, calculate the z-dependent coefficients
-    // var calczterms = function(z){
-    //     // console.log("inside calczterms");
-    //     // Represent complex numbers as a two-array. x[0] = Real, x[1] = Imag
-    //     var A1 = [ As_r, As_i + Cs + Ds * z],
-    //         A3 = [ Ai_r, Ai_i + Ci + Di * z],
-    //         A2 = [ Bs_r, Bs_i + Cs + Ds * z],
-    //         A4 = [ Bi_r, Bi_i + Ci + Di * z],
-    //         // A5 = [ Es_r, Es_i + hs],
-    //         // A7 = [ Ei_r, Ei_i + hi],
-    //         A5 = [ GAM3s, -DEL3s],
-    //         A7 = [ GAM3i, -DEL3i],
-    //         //1i*0.5.*L.*(1 + Xi).*tan(Rho);
-    //         A6 = [ 0, n*(1+z)],
-    //         A8 = [ mx_real, mx_imag - m * z],
-    //         A9 = [ my_real, my_imag - m * z],
-    //         // A9 = A8, //Pump waist is symmetric
-    //         A10 = [hh_r, hh_i + ee + ff * z]
-    //         ;
-    //
-    //     return [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10];
-    // };
 
     var A1R = As_r,
         A1IO = As_i + Cs,
