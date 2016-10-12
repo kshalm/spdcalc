@@ -468,6 +468,7 @@ helpers.Nintegrate2D_3_8_singles = function Nintegrate2D_3_8_singles(f, fz1 ,a,b
         ,dy = (d-c)/n
         ,result1 = 0
         ,result2 = 0
+        ,scale = dx * dy * 9/64
         ;
 
     for (var j=0; j<n+2; j++){
@@ -485,7 +486,7 @@ helpers.Nintegrate2D_3_8_singles = function Nintegrate2D_3_8_singles(f, fz1 ,a,b
         }
     }
 
-    return [result1*dx*dy*9/64, result2*dx*dy*9/64];
+    return [result1*scale, result2*scale];
 
 };
 
@@ -516,11 +517,11 @@ helpers.cmultiplyI = function cmultiplyI(a,b,c,d){
 };
 
 helpers.cdivideR = function cdivideR(a,b,c,d){
-    return (a*c+b*d)/(sq(c)+sq(d));
+    return (a*c+b*d)/((c*c)+(d*d));
 };
 
 helpers.cdivideI = function cdivideI(a,b,c,d){
-    return (b*c-a*d)/(sq(c)+sq(d));
+    return (b*c-a*d)/((c*c)+(d*d));
 };
 
 helpers.caddR = function caddR(a,ai,b,bi){
@@ -533,21 +534,46 @@ helpers.caddI = function caddI(a,ai,b,bi){
 
 // Returns real part of the principal square root of a complex number
 helpers.csqrtR = function csqrtR(a,ai){
-    var rSqrt = Math.sqrt(Math.sqrt(sq(a)+sq(ai)));
-    var arg = Math.atan2(ai,a);
-    var real = rSqrt*Math.cos(arg/2);
-    // return real;
-    return helpers.sign(real)*real; //returns the real value
+    // var rSqrt = Math.sqrt(Math.sqrt((a*a)+(ai*ai)));
+    // var arg = Math.atan2(ai,a)*0.5;
+    // var real = rSqrt*Math.cos(arg);
+    // // return real;
+    // return helpers.sign(real)*real; //returns the real value
+    var r = Math.sqrt((a*a)+(ai*ai));
+    var realNum = a + r;
+    var real = realNum / Math.sqrt(2*realNum);
+    return real;
 };
 
 // Returns imag part of the principal square root of a complex number
 helpers.csqrtI = function csqrtI(a,ai){
-    var rSqrt = Math.sqrt(Math.sqrt(sq(a)+sq(ai)));
-    var arg = Math.atan2(ai,a);
-    var real = rSqrt*Math.cos(arg/2);
-    var imag = rSqrt*Math.sin(arg/2);
-    // return imag;
-    return helpers.sign(real)*imag; //returns the imag value
+    // var rSqrt = Math.sqrt(Math.sqrt((a*a)+(ai*ai)));
+    // var arg = Math.atan2(ai,a)*.5;
+    // var real = rSqrt*Math.cos(arg);
+    // var imag = rSqrt*Math.sin(arg);
+    // // return imag;
+    // return helpers.sign(real)*imag; //returns the imag value
+
+    var r = Math.sqrt((a*a)+(ai*ai));
+    var realNum = a + r;
+    var imag = ai / Math.sqrt(2*realNum);
+    return imag;
+};
+
+// Returns imag part of the principal square root of a complex number
+helpers.csqrt = function csqrtI(a,ai){
+    // var rSqrt = Math.sqrt(Math.sqrt((a*a)+(ai*ai)));
+    // var arg = Math.atan2(ai,a)*.5;
+    // var real = rSqrt*Math.cos(arg);
+    // var imag = rSqrt*Math.sin(arg);
+    // // return imag;
+    // return helpers.sign(real)*imag; //returns the imag value
+
+    var r = Math.sqrt((a*a)+(ai*ai));
+    var realNum = a + r;
+    var imag = ai / Math.sqrt(2*realNum);
+    var real = realNum / Math.sqrt(2*realNum);
+    return [real,imag];
 };
 
 // http://jsperf.com/signs/3
