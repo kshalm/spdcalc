@@ -829,10 +829,10 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // IIgam = kp*ks*(\[Alpha]3^2/X11 - I \[Alpha]3c^2/X12)
             // IIdelk = 2 \[CapitalGamma]4s + 0.5 I (C3*B0)
 
-            ,IIrho1R = sq(B4) * helpers.cdivideR(0, 1, Y22R, Y22I)
-            ,IIrho1I = sq(B4) * helpers.cdivideI(0, 1, Y22R, Y22I)
-            ,IIrho2R = sq(B3) * helpers.cdivideR(1, 0, Y21R, Y21I)
-            ,IIrho2I = sq(B3) * helpers.cdivideI(1, 0, Y21R, Y21I)
+            ,IIrho1R = (B4*B4) * helpers.cdivideR(0, 1, Y22R, Y22I)
+            ,IIrho1I = (B4*B4) * helpers.cdivideI(0, 1, Y22R, Y22I)
+            ,IIrho2R = (B3*B3) * helpers.cdivideR(1, 0, Y21R, Y21I)
+            ,IIrho2I = (B3*B3) * helpers.cdivideI(1, 0, Y21R, Y21I)
             ,IIrhoR = 0.25 * LRho_sq * (IIrho1R - IIrho2R)
             ,IIrhoI = 0.25 * LRho_sq * (IIrho1I - IIrho2I)
             ,IIgam1R = helpers.cmultiplyR(alpha3R, alpha3I, alpha3R, alpha3I)
@@ -878,7 +878,7 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
             // Now calculate the full term in the integral.
             // @TODO: Not sure how to correctly handle the apodization in the double length integral
-            ,pmzcoeff = Math.exp(- 1/2*sq(z1/bw)) * Math.exp(- 1/2*sq(z2/bw))// apodization
+            ,pmzcoeff = Math.exp(- 1/2*(z1*z1/(bw*bw))) * Math.exp(- 1/2*(z2*z2/(bw*bw)))// apodization
             // ,pmzcoeff = 1
             // Exponential using Euler's formula
             ,coeffR = Math.exp(EXPR)
