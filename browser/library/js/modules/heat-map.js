@@ -532,7 +532,7 @@ define(
 
                     yvals.push( y.invert( i / scale ) );
                 }
-
+                // console.log("Exporting DATA", create2DArray( data, cols, rows ));
 
                 return {
                     title: this.elTitle.text(),

@@ -68,7 +68,7 @@ var spdcDefaults = {
     singles: false,
     autocalfocus: true,
     z0s: -2000/2 * con.um,
-    deff: 1 * con.pm,
+    deff: 1.0 * con.pm,
     Pav: 1e-3
 
     // z0: 2000/2 * con.um
@@ -531,7 +531,7 @@ SPDCprop.prototype = {
         var N_num = Math.pow(2, 1.5) * Math.pow(this.deff, 2) * Math.pow(this.L,2) * this.Pav;
         var N_den = Math.pow(Math.PI, 0.5) * con.e0 * Math.pow(con.c,3) * bw_pump;
         var N = N_num/N_den;
-        // console.log(N, N_num, Math.pow(this.deff, 2) * Math.pow(this.L,2), this.L, this.Pav);
+        console.log(N, Math.pow(this.deff, 2) * Math.pow(this.L,2), this.Pav);
         return (N);
     },
 

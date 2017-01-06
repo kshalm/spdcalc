@@ -122,6 +122,8 @@ PlotHelpers.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm
     var PMimag = new Float64Array( N );
 
     var maxpm = 0;
+    var twoPIc = 2*Math.PI*con.c;
+        
 
     // calculate normalization
     // var PMN = pmLib.phasematch(P);
@@ -143,8 +145,14 @@ PlotHelpers.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm
             // P.lambda_i = P.lambda_i *1E6;
 
             var PM = pmLib.phasematch(P);
-            PMreal[i + lambda_s.length*j] = PM[0]/norm;
-            PMimag[i + lambda_s.length*j] = PM[1]/norm;
+            var  omega_s = twoPIc / (P.lambda_s )
+                ,omega_i = twoPIc / (P.lambda_i )
+                ,n_squared = sq(P.n_s*P.n_i) 
+                // ,lomega = Math.sqrt(omega_s * omega_i /n_squared)
+                ,lomega = 1;
+                ;
+            PMreal[i + lambda_s.length*j] = PM[0] * lomega/norm  ;
+            PMimag[i + lambda_s.length*j] = PM[1] * lomega/norm ;
         }
     }
 
@@ -192,9 +200,10 @@ PlotHelpers.calc_JSI_rates_p = function calc_JSI_rates_p(props, lambda_s, lambda
         ,inv_lambda_i_sq = 0
         ,dlambda_s = Math.abs(lambda_s[lambda_s.length-1] - lambda_s[0])/lambda_s.length
         ,dlambda_i = Math.abs(lambda_i[lambda_i.length-1] - lambda_i[0])/lambda_i.length
-        ,norm_sum_s = twoPIc * dlambda_s
-        ,norm_sum_i = twoPIc * dlambda_i
+        // ,norm_sum_s = twoPIc * dlambda_s
+        // ,norm_sum_i = twoPIc * dlambda_i
         ,lomega = omega_s * omega_i /sq(props.n_s*props.n_i)
+        // ,lomega = 1
         ,norm_const = props.get_rates_constant();
 
     // for (var l = 0; l<lambda_s.length; l++){
@@ -205,8 +214,8 @@ PlotHelpers.calc_JSI_rates_p = function calc_JSI_rates_p(props, lambda_s, lambda
     //     inv_lambda_i_sq += 1/sq(lambda_i[k]);
     // }
 
-    var d_omega_s = norm_sum_s /sq(props.lambda_s);
-    var d_omega_i = norm_sum_i /sq(props.lambda_i);
+    var d_omega_s = twoPIc * dlambda_s /sq(props.lambda_s);
+    var d_omega_i = twoPIc * dlambda_i /sq(props.lambda_i);
 
     // var d_omega_s = 1;
     // var d_omega_i = 1;

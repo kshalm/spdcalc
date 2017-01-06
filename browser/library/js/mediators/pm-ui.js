@@ -7,8 +7,8 @@ define(
         'tpl!templates/pm-ui.tpl',
         'tpl!templates/parameters-panel.tpl',
         'tpl!templates/plot-opts.tpl',
-        'text!templates/converters/heat-map-as-csv.tpl',
-        'text!templates/converters/line-plot-as-csv.tpl',
+        'tpl!templates/converters/heat-map-as-csv.tpl',
+        'tpl!templates/converters/line-plot-as-csv.tpl',
         'dot',
         'jquery-ui',
         'bootstrap-tooltip',
@@ -181,13 +181,52 @@ define(
 
                                 'export-csv': function( data ){
 
-                                    var tpl = {
+                                    var lineArray = [];
+                                    // lineArray.push(data.title + '\n'); //Plot title
+                                    lineArray.push("Parameters");
+
+                                    // Cycle throught he relevant properties
+                                    var pm = self.parameters.getAll();
+                                    lineArray.push(["Crystal:", pm.crystal].join(' '));
+                                    lineArray.push(["PM Type:", pm.type].join(' '));
+                                    lineArray.push(["Crystal Length (m):", pm.L].join(' '));
+                                    lineArray.push(["Crystal Theta (rad):", pm.theta].join(' '));
+                                    lineArray.push(["Crystal Phi (rad):", pm.phi].join(' '));
+                                    lineArray.push(["Crystal Temperature (C):", pm.temp].join(' '));
+                                    if (pm.enable_pp){
+                                        lineArray.push(["Poling Period (m):", pm.poling_period].join(' '));
+                                        if (pm.calc_apodization){
+                                            lineArray.push(["Number of apodization steps:", pm.apodization].join(' '));
+                                            lineArray.push(["Apodization FWHM (m)", pm.apodization_FWHM].join(' '));
+                                        }
+                                    }
+
+                                    lineArray.push(["Pump Wavelength (m):", pm.lambda_p].join(' '));
+                                    lineArray.push(["Signal Wavelength (m):", pm.lambda_s].join(' '));
+                                    lineArray.push(["Idler Wavelength (m):", pm.lambda_i].join(' '));
+                                    lineArray.push(["Pump Bandwidth FWHM (m):", pm.lambda_bw].join(' '));
+                                    lineArray.push(["Signal Angle Internal (rad):", pm.theta_s].join(' '));
+                                    lineArray.push(["Idler Angle Internal (rad):", pm.theta_i].join(' '));
+                                    lineArray.push(["Signal Angle External (rad):", pm.theta_s_e].join(' '));
+                                    lineArray.push(["Idler Angle External (rad):", pm.theta_i_e].join(' '));
+                                    lineArray.push(["Pump Waist Radius(1/e^2) (m):", pm.W].join(' '));
+                                    lineArray.push(["Signal Waist Radius(1/e^2) (m):", pm.W_sx].join(' '));
+                                    lineArray.push(["Idler Waist Radius(1/e^2) (m):", pm.W_ix].join(' '));
+                                    lineArray.push(["Signal/Idler Focus Position inside crystal (m):", pm.L + pm.z0s].join(' '));
+                                    lineArray.push('\n');
+
+                                    var     tpl = {
                                         PhaseMatch: PhaseMatch
                                     };
 
                                     if (data.type === 'heat-map'){
 
                                         tpl.render = tplHeatMapAsCSV;
+                                        lineArray.push("x: " + data.x.label);
+                                        lineArray.push(data.x.values.join(','));
+                                        lineArray.push("y: " + data.y.label);
+                                        lineArray.push(data.y.values.join(','));
+                                        lineArray.push("Data");
 
                                     } else {
 
@@ -222,15 +261,54 @@ define(
                                         data.data = dataNew;
                                     }
 
-                                    var csv = tpl.render({
-                                        meta: self.parameters.getAll(),
-                                        plot: data
+                                    // Turn the data itself into a CSV format
+                                    data.data.forEach(function (infoArray, index) {
+                                        var line = infoArray.join(",");
+                                        lineArray.push(line);
                                     });
+
+                                    var csvContent = lineArray.join("\n");
+                                    var encodedUri = encodeURI(csvContent);
+                                    var filename = 'spdcalc_data.csv'
+                                    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                                    if (navigator.msSaveBlob) { // IE 10+
+                                        navigator.msSaveBlob(blob, filename);
+                                    } else {
+                                        var link = document.createElement("a");
+                                        if (link.download !== undefined) { // feature detection
+                                            // Browsers that support HTML5 download attribute
+                                            var url = URL.createObjectURL(blob);
+                                            link.setAttribute("href", url);
+                                            link.setAttribute("download", filename);
+                                            link.style.visibility = 'hidden';
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                        }
+                                    }
+
+                                    // var link = document.createElement("a");
+                                    // link.setAttribute("href", encodedUri);
+                                    // link.setAttribute("download", "data.csv");
+                                    // document.body.appendChild(link); // Required for FF
+
+                                    // link.click();
+
+                                    // var csv = tpl.render({
+                                    //     meta: self.parameters.getAll(),
+                                    //     plot: data
+                                    // });
+
+                                    // var ans = csv({
+                                    //     meta: self.parameters.getAll(),
+                                    //     plot: data
+                                    // });
 
 
                                     // return;
+                                    // console.log("INSIDE:", csvContent);
 
-                                    document.location = 'data:Application/octet-stream,' + window.encodeURIComponent(csv);
+                                    // document.location = 'data:Application/octet-stream,' + window.encodeURIComponent(csvContent);
                                 }
                             });
                         }
