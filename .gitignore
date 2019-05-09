@@ -1,7 +1,11 @@
 .DS_Store
 node_modules
-.sass-cache
-build/lodash.js
 dist/*
 _SpecRunner.html
-.grunt
+
+/target
+**/*.rs.bk
+Cargo.lock
+bin/
+pkg/
+wasm-pack.log
