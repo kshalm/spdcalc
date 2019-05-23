@@ -1,7 +1,9 @@
 mod utils;
 mod junk;
 extern crate wasm_bindgen;
+extern crate num;
 
+use num::traits::Pow;
 use wasm_bindgen::prelude::*;
 // use std::time::{Duration, SystemTime, UNIX_EPOCH};
 // use std::f64::consts::PI;
@@ -69,6 +71,39 @@ pub fn reserve_array_test(size: usize) -> String {
     let elapsed = end - start;
 
     return format_args!("[{}, {}]", size, elapsed).to_string();
+}
+
+fn gaussian( x :f64, y :f64, sigma :f64, x_o :f64, y_o :f64, a :f64 ) -> f64 {
+    let s2 = 2.0 * sigma;
+    let x2:f64 = (x - x_o).pow(2);
+    let y2:f64 = (y - y_o).pow(2);
+
+    a * ( -x2 / s2 - y2 / s2 ).exp()
+}
+
+#[wasm_bindgen]
+pub fn get_gaussian(width: usize, height: usize) -> Vec<f64> {
+    let len = width * height;
+    let mut arr = vec![];
+    let sigma = width as f64 / 3.0;
+    let x_o = width as f64 / 2.0;
+    let y_o = height as f64 / 2.0;
+    let mut x = 0_f64;
+    let mut y = 0_f64;
+
+    for _ in 0..len {
+        let z = gaussian( x, y, sigma, x_o, y_o, 2.0 );
+        arr.push( z );
+
+        x = x + 1.0;
+
+        if (x as usize) >= width {
+            x = 0.0;
+            y += 1.0;
+        }
+    }
+
+    arr
 }
 
 // fn perf_to_system(amt: f64) -> SystemTime {
