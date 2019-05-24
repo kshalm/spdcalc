@@ -82,7 +82,32 @@ fn gaussian( x :f64, y :f64, sigma :f64, x_o :f64, y_o :f64, a :f64 ) -> f64 {
 }
 
 #[wasm_bindgen]
-pub fn get_gaussian(width: usize, height: usize) -> *const f64 {
+pub fn get_gaussian(width: usize, height: usize) -> Vec<f64> {
+    let len = width * height;
+    let mut arr = vec![];
+    let sigma = width as f64 / 3.0;
+    let x_o = width as f64 / 2.0;
+    let y_o = height as f64 / 2.0;
+    let mut x = 0_f64;
+    let mut y = 0_f64;
+
+    for _ in 0..len {
+        let z = gaussian( x, y, sigma, x_o, y_o, 2.0 );
+        arr.push( z );
+
+        x = x + 1.0;
+
+        if (x as usize) >= width {
+            x = 0.0;
+            y += 1.0;
+        }
+    }
+
+    arr
+}
+
+#[wasm_bindgen]
+pub fn get_gaussian_ptr(width: usize, height: usize) -> *const f64 {
     let len = width * height;
     let mut arr = vec![];
     let sigma = width as f64 / 3.0;
