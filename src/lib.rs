@@ -82,7 +82,7 @@ fn gaussian( x :f64, y :f64, sigma :f64, x_o :f64, y_o :f64, a :f64 ) -> f64 {
 }
 
 #[wasm_bindgen]
-pub fn get_gaussian(width: usize, height: usize) -> Vec<f64> {
+pub fn get_gaussian(width: usize, height: usize) -> *const f64 {
     let len = width * height;
     let mut arr = vec![];
     let sigma = width as f64 / 3.0;
@@ -103,7 +103,7 @@ pub fn get_gaussian(width: usize, height: usize) -> Vec<f64> {
         }
     }
 
-    arr
+    arr.as_ptr()
 }
 
 // fn perf_to_system(amt: f64) -> SystemTime {
