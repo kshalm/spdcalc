@@ -1,0 +1,15 @@
+[tasks.build]
+install_crate = { crate_name = "pyo3-pack", binary = "pyo3-pack", test_arg = "--help" }
+toolchain = "nightly"
+command = "pyo3-pack"
+args = ["build", "-i", "python3"]
+
+[tasks.release]
+install_crate = { crate_name = "pyo3-pack", binary = "pyo3-pack", test_arg = "--help" }
+toolchain = "nightly"
+command = "pyo3-pack"
+args = ["build", "--release", "-i", "python3"]
+
+[tasks.clean]
+command = "cargo"
+args = ["clean"]
