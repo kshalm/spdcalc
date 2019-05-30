@@ -1,0 +1,15 @@
+[package]
+name = "pyspdcalc"
+version = "0.1.0"
+authors = ["Jasper <jasper.palfree@colorado.edu>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies.pyo3]
+version = "0.7.0"
+features = ["extension-module"]
+
+[dependencies.spdcalc]
+path = '../spdcalc'

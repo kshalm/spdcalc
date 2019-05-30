@@ -10,3 +10,7 @@ pub fn calc(val: f64) -> f64 {
     let y = x.sqrt() - x.exp();
     return y.norm();
 }
+
+pub fn add(a :f64, b :f64) -> f64 {
+    a + b + 3.0
+}

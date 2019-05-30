@@ -1,7 +1,7 @@
 mod utils;
-mod junk;
 extern crate wasm_bindgen;
 extern crate num;
+extern crate spdcalc;
 
 use num::traits::Pow;
 use wasm_bindgen::prelude::*;
@@ -46,7 +46,7 @@ pub fn speed_test(amount: usize) -> String {
 
     let mut total = 0.0;
     for _i in 0..test_values.len() {
-        total += junk::calc( 1.0 / test_values[_i] );
+        total += spdcalc::junk::calc( 1.0 / test_values[_i] );
     }
 
     let end = performance.now();
