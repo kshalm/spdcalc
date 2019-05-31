@@ -5,6 +5,7 @@ authors = ["Jasper <jasper.palfree@colorado.edu>"]
 edition = "2018"
 
 [lib]
+name = "pyspdcalc"
 crate-type = ["cdylib"]
 
 [dependencies.pyo3]

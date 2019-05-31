@@ -4,6 +4,23 @@ toolchain = "nightly"
 command = "pyo3-pack"
 args = ["build", "-i", "python3"]
 
+[tasks.dev]
+install_crate = { crate_name = "pyo3-pack", binary = "pyo3-pack", test_arg = "--help" }
+toolchain = "nightly"
+command = "pyo3-pack"
+args = ["develop"]
+dependencies = ["pip_install"]
+
+[tasks.pip_install]
+command = "pipenv"
+args = ["install", "--dev"]
+
+# [tasks.pip_dev]
+# toolchain = "nightly"
+# command = "pipenv"
+# args = ["run", "pyo3-pack", "develop"]
+# dependencies = ["pip_install"]
+
 [tasks.release]
 install_crate = { crate_name = "pyo3-pack", binary = "pyo3-pack", test_arg = "--help" }
 toolchain = "nightly"

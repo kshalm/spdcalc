@@ -12,5 +12,5 @@ pub fn calc(val: f64) -> f64 {
 }
 
 pub fn add(a :f64, b :f64) -> f64 {
-    a + b + 3.0
+    a + b + 4.0
 }
