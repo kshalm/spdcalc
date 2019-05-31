@@ -14,6 +14,8 @@ pub struct Indicies(f64, f64, f64);
 pub enum OpticAxisType {
   PositiveUniaxial,
   NegativeUniaxial,
+  PositiveBiaxial,
+  NegativeBiaxial,
 }
 
 /// Meta information about the crystal
@@ -27,6 +29,8 @@ pub struct CrystalMeta {
   axis_type: OpticAxisType,
   /// Point Group (class) of the crystal
   point_group: PointGroup,
+  /// Whether or not temperature dependence is known
+  temperature_dependence_known: bool,
 }
 
 // crystal re-exports
