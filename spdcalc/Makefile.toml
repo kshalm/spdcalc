@@ -5,3 +5,8 @@ args = ["build"]
 [tasks.clean]
 command = "cargo"
 args = ["clean"]
+
+[tasks.lint]
+install_crate = { rustup_component_name = "clippy" }
+command = "cargo"
+args = ["clippy"]
