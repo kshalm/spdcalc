@@ -4,8 +4,9 @@ mod meta;
 pub use self::meta::*;
 
 // crystal re-exports
-mod bbo_1;
-mod ktp;
+pub mod bbo_1;
+pub mod ktp;
+pub mod bibo_1;
 
 /// The type of crystal
 #[derive(Debug)]

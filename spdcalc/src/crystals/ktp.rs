@@ -28,6 +28,7 @@ const DNZ :f64 = 1.6e-5;
 /// let expected = Indicies(1.7569629746332105, 1.7660029942396933, 1.8575642248650441);
 /// assert_eq!(indicies, expected)
 /// ```
+#[allow(clippy::unreadable_literal)]
 pub fn get_indicies( wavelength :f64, temperature :f64 ) -> Indicies {
   let lambda_sq = (wavelength * 1e6).powi(2);
 
@@ -59,9 +60,9 @@ pub fn get_indicies( wavelength :f64, temperature :f64 ) -> Indicies {
       - 0.01491 * lambda_sq
     ).sqrt();
 
-  nx = nx + (temperature - 20.0) * DNX;
-  ny = ny + (temperature - 20.0) * DNY;
-  nz = nz + (temperature - 20.0) * DNZ;
+  nx += (temperature - 20.0) * DNX;
+  ny += (temperature - 20.0) * DNY;
+  nz += (temperature - 20.0) * DNZ;
 
   Indicies(nx, ny, nz)
 }
