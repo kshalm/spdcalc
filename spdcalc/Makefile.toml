@@ -10,3 +10,7 @@ args = ["clean"]
 install_crate = { rustup_component_name = "clippy" }
 command = "cargo"
 args = ["clippy"]
+
+[tasks.docs]
+command = "cargo"
+args = ["doc", "--no-deps"]

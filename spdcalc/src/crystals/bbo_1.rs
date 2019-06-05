@@ -1,6 +1,6 @@
 //! # BBO1 Crystal
 //!
-//! [More Information](http://www.newlightphotonics.com/bbo-properties.html)
+//! [More Information](http://www.newlightphotonics.com/v1/bbo-properties.html)
 
 use super::*;
 
@@ -16,6 +16,16 @@ pub const META :CrystalMeta = CrystalMeta {
 const DNO :f64 = -9.3e-6;
 const DNE :f64 = -16.6e-6;
 
+/// Get refractive Indicies
+///
+/// ## Example
+/// ```
+/// use spdcalc::crystals::*;
+/// let nm = 1e-9;
+/// let indicies = bbo_1::get_indicies( 720.0 * nm, 293.0 );
+/// let expected = Indicies(1.6607191519167868, 1.6607191519167868, 1.5420245834707935);
+/// assert_eq!(indicies, expected)
+/// ```
 pub fn get_indicies( wavelength :f64, temperature :f64 ) -> Indicies {
   let lambda_sq = (wavelength * 1.0e6).powi(2); // Convert for Sellmeir Coefficients
 
