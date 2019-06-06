@@ -9,3 +9,5 @@ Cargo.lock
 bin/
 web/pkg/
 **/wasm-pack.log
+
+spdcalc/src/main.rs
