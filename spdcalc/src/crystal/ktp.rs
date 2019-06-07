@@ -18,18 +18,18 @@ const DNX :f64 = 1.1e-5;
 const DNY :f64 = 1.3e-5;
 const DNZ :f64 = 1.6e-5;
 
-/// Get refractive Indicies
+/// Get refractive Indices
 ///
 /// # Example
 /// ```
-/// use spdcalc::crystals::*;
+/// use spdcalc::crystal::*;
 /// let nm = 1e-9;
-/// let indicies = ktp::get_indicies( 720.0 * nm, 293.0 );
-/// let expected = Indicies(1.7569629746332105, 1.7660029942396933, 1.8575642248650441);
-/// assert_eq!(indicies, expected)
+/// let indices = ktp::get_indices( 720.0 * nm, 293.0 );
+/// let expected = Indices(1.7569629746332105, 1.7660029942396933, 1.8575642248650441);
+/// assert_eq!(indices, expected)
 /// ```
 #[allow(clippy::unreadable_literal)]
-pub fn get_indicies( wavelength :f64, temperature :f64 ) -> Indicies {
+pub fn get_indices( wavelength :f64, temperature :f64 ) -> Indices {
   let lambda_sq = (wavelength * 1e6).powi(2);
 
   // http://www.redoptronics.com/KTP-crystal.html
@@ -64,5 +64,5 @@ pub fn get_indicies( wavelength :f64, temperature :f64 ) -> Indicies {
   ny += (temperature - 20.0) * DNY;
   nz += (temperature - 20.0) * DNZ;
 
-  Indicies(nx, ny, nz)
+  Indices(nx, ny, nz)
 }

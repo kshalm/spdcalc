@@ -16,18 +16,18 @@ pub const META :CrystalMeta = CrystalMeta {
 const DNO :f64 = -9.3e-6;
 const DNE :f64 = -16.6e-6;
 
-/// Get refractive Indicies
+/// Get refractive Indices
 ///
 /// ## Example
 /// ```
-/// use spdcalc::crystals::*;
+/// use spdcalc::crystal::*;
 /// let nm = 1e-9;
-/// let indicies = bbo_1::get_indicies( 720.0 * nm, 293.0 );
-/// let expected = Indicies(1.6607191519167868, 1.6607191519167868, 1.5420245834707935);
-/// assert_eq!(indicies, expected)
+/// let indices = bbo_1::get_indices( 720.0 * nm, 293.0 );
+/// let expected = Indices(1.6607191519167868, 1.6607191519167868, 1.5420245834707935);
+/// assert_eq!(indices, expected)
 /// ```
 #[allow(clippy::unreadable_literal)]
-pub fn get_indicies( wavelength :f64, temperature :f64 ) -> Indicies {
+pub fn get_indices( wavelength :f64, temperature :f64 ) -> Indices {
   let lambda_sq = (wavelength * 1.0e6).powi(2); // Convert for Sellmeir Coefficients
 
   let mut no = (2.7359 + 0.01878 / (lambda_sq - 0.01822) - 0.01354 * lambda_sq).sqrt();
@@ -36,5 +36,5 @@ pub fn get_indicies( wavelength :f64, temperature :f64 ) -> Indicies {
   no += (temperature - 20.0) * DNO;
   ne += (temperature - 20.0) * DNE;
 
-  Indicies(no, no, ne)
+  Indices(no, no, ne)
 }

@@ -1,8 +1,3 @@
-/// Indicies of refraction (n_x, n_y, n_z)
-#[derive(Debug)]
-#[derive(PartialEq, PartialOrd)]
-pub struct Indicies(pub f64, pub f64, pub f64);
-
 /// Type of Optic Axis the crystal has
 #[derive(Debug)]
 pub enum OpticAxisType {

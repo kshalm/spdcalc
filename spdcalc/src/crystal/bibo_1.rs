@@ -12,18 +12,18 @@ pub const META :CrystalMeta = CrystalMeta {
   temperature_dependence_known: false,
 };
 
-/// Get refractive Indicies
+/// Get refractive Indices
 ///
 /// # Example
 /// ```
-/// use spdcalc::crystals::*;
+/// use spdcalc::crystal::*;
 /// let nm = 1e-9;
-/// let indicies = bibo_1::get_indicies( 720.0 * nm, 293.0 );
-/// let expected = Indicies(1.770147077637903, 1.7990347340642352, 1.93622182289392);
-/// assert_eq!(indicies, expected)
+/// let indices = bibo_1::get_indices( 720.0 * nm, 293.0 );
+/// let expected = Indices(1.770147077637903, 1.7990347340642352, 1.93622182289392);
+/// assert_eq!(indices, expected)
 /// ```
 #[allow(clippy::unreadable_literal)]
-pub fn get_indicies( wavelength :f64, temperature :f64 ) -> Indicies {
+pub fn get_indices( wavelength :f64, temperature :f64 ) -> Indices {
   let lambda_sq = (wavelength * 1e6).powi(2);
 
   let nx = (
@@ -44,5 +44,5 @@ pub fn get_indicies( wavelength :f64, temperature :f64 ) -> Indicies {
     - 0.0226 * lambda_sq
   ).sqrt();
 
-  Indicies(nx, ny, nz)
+  Indices(nx, ny, nz)
 }

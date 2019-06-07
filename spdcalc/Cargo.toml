@@ -9,3 +9,4 @@ crate-type = ["rlib"]
 
 [dependencies]
 num = "0.2"
+nalgebra = "0.18"
