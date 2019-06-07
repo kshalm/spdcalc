@@ -2,6 +2,15 @@
 //!
 //! [Reference](http://dx.doi.org/10.1063/1.1668320)
 //! [More Information](http://www.redoptronics.com/KTP-crystal.html)
+//!
+//! # Example
+//! ```
+//! use spdcalc::crystal::*;
+//! let nm = 1e-9;
+//! let indices = Crystals::KTP.get_indices( 720.0 * nm, 293.0 );
+//! let expected = Indices(1.7569629746332105, 1.7660029942396933, 1.8575642248650441);
+//! assert_eq!(indices, expected)
+//! ```
 
 use super::*;
 
@@ -19,15 +28,6 @@ const DNY :f64 = 1.3e-5;
 const DNZ :f64 = 1.6e-5;
 
 /// Get refractive Indices
-///
-/// # Example
-/// ```
-/// use spdcalc::crystal::*;
-/// let nm = 1e-9;
-/// let indices = ktp::get_indices( 720.0 * nm, 293.0 );
-/// let expected = Indices(1.7569629746332105, 1.7660029942396933, 1.8575642248650441);
-/// assert_eq!(indices, expected)
-/// ```
 #[allow(clippy::unreadable_literal)]
 pub fn get_indices( wavelength :f64, temperature :f64 ) -> Indices {
   let lambda_sq = (wavelength * 1e6).powi(2);
