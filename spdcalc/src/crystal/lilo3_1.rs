@@ -13,9 +13,18 @@ use super::*;
 use sellmeier::SellmeierCrystal;
 use sellmeier::equations::SellmeierStandard;
 use sellmeier::temperature_dependence::None;
+use crate::crystal::CrystalMeta;
 
 #[allow(non_upper_case_globals)]
 pub const LiIO3_1 :SellmeierCrystal<SellmeierStandard, None> = SellmeierCrystal {
+  meta: CrystalMeta {
+    name: "LiIO3 ref 1",
+    reference_url: "https://aip.scitation.org/doi/abs/10.1063/1.1654145",
+    axis_type: OpticAxisType::NegativeUniaxial,
+    point_group: PointGroup::HM_622,
+    temperature_dependence_known: false,
+  },
+
   eqn: SellmeierStandard {
     a: [2.03132, 2.03132, 1.83086],
     b1: [1.37623, 1.37623, 1.08807],
