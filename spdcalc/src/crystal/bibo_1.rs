@@ -23,25 +23,25 @@ pub const META :CrystalMeta = CrystalMeta {
 /// assert_eq!(indices, expected)
 /// ```
 #[allow(clippy::unreadable_literal)]
-pub fn get_indices( wavelength :f64, temperature :f64 ) -> Indices {
-  let lambda_sq = (wavelength * 1e6).powi(2);
+pub fn get_indices( wavelength :f64, _temperature :f64 ) -> Indices {
+  let wl_sq = (wavelength * 1e6).powi(2);
 
   let nx = (
     3.0740
-    + 0.0323 / (lambda_sq - 0.0316)
-    - 0.01337 * lambda_sq
+    + 0.0323 / (wl_sq - 0.0316)
+    - 0.01337 * wl_sq
   ).sqrt();
 
   let ny = (
     3.1685
-    + 0.0373 / (lambda_sq - 0.0346)
-    - 0.01750 * lambda_sq
+    + 0.0373 / (wl_sq - 0.0346)
+    - 0.01750 * wl_sq
   ).sqrt();
 
   let nz = (
     3.6545
-    + 0.0511 / (lambda_sq - 0.0371)
-    - 0.0226 * lambda_sq
+    + 0.0511 / (wl_sq - 0.0371)
+    - 0.0226 * wl_sq
   ).sqrt();
 
   Indices(nx, ny, nz)
