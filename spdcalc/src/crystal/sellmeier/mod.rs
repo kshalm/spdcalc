@@ -31,8 +31,8 @@ impl<Q, T> SellmeierCrystal<Q, T>
   }
 }
 
-/// Calculate indices for a crystal based on sellmeier equation and temperature dependence
-pub fn get_indices<Q, T>(
+// Calculate indices for a crystal based on sellmeier equation and temperature dependence
+fn get_indices<Q, T>(
   equation: &Q,
   wavelength: f64,
   temperature_dependence: &T,

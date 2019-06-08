@@ -10,3 +10,14 @@ crate-type = ["rlib"]
 [dependencies]
 num = "0.2"
 nalgebra = "0.18"
+
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "crystals"
+harness = false
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = 3
