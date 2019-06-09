@@ -27,12 +27,14 @@ impl SellmeierEquation for SellmeierStandard {
 
     let l = wavelength * 1e6;
     let l_sq = l * l;
-    let one = Vector3::repeat(1.);
+    let one_by_l_sq = Vector3::repeat(l_sq);
 
     let n = a
-      + b1.component_div( &(one - c1 / l_sq) )
-      + b2.component_div( &(one - c2 / l_sq) )
-      + b3.component_div( &(one - c3 / l_sq) );
+      + (
+        b1.component_div( &(one_by_l_sq - c1) )
+        + b2.component_div( &(one_by_l_sq - c2) )
+        + b3.component_div( &(one_by_l_sq - c3) )
+      ) * l_sq;
 
     n.apply_into( |i| i.sqrt() )
   }
