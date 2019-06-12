@@ -7,7 +7,7 @@
 //! use spdcalc::crystal::*;
 //! let nm = 1e-9;
 //! let indices = Crystals::AgGaS2_1.get_indices( 720.0 * nm, 293.0 );
-//! let expected = Indices(2.5551373236904933, 2.5551373236904933, 2.50400310043117);
+//! let expected = Indices(2.5551373236904937, 2.5551373236904937, 2.50400310043117);
 //! assert_eq!(indices, expected)
 //! ```
 use super::*;
