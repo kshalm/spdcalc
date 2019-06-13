@@ -1,6 +1,8 @@
 //! Defines types of crystals used in spdc.
 extern crate nalgebra as na;
 use na::*;
+use dim::si::Kelvin;
+use dim::si::Unitless;
 
 mod meta;
 pub use self::meta::*;
@@ -18,16 +20,7 @@ pub mod sellmeier;
 // use sellmeier::temperature_dependence::TemperatureDependence;
 
 /// Indices of refraction (n_x, n_y, n_z)
-#[derive(Debug)]
-#[derive(PartialEq, PartialOrd)]
-pub struct Indices(pub f64, pub f64, pub f64);
-
-use std::convert::From;
-impl From<Vector3<f64>> for Indices {
-  fn from(item: Vector3<f64>) -> Self {
-    Indices(item.x, item.y, item.z)
-  }
-}
+pub type Indices = Vector3<Unitless<f64>>;
 
 /// The type of crystal
 #[derive(Debug)]
@@ -46,24 +39,25 @@ impl Crystals {
   ///
   /// ## Example
   /// ```
+  /// use spdcalc::dim::si;
   /// use spdcalc::Crystals;
   /// use spdcalc::crystal::Indices;
   /// let crystal = Crystals::BBO_1;
   /// let nm = 1e-9;
-  /// let indices = crystal.get_indices( 720.0 * nm, 293.0 );
-  /// let expected = Indices(1.6607191519167868, 1.6607191519167868, 1.5420245834707935);
-  /// assert_eq!(indices, expected)
+  /// let indices = crystal.get_indices( 720.0 * nm, 293.0 * si::K );
+  /// let expected = &[1.6607191519167868, 1.6607191519167868, 1.5420245834707935];
+  /// assert_eq!(indices, Indices::from_iterator(expected.iter().map(|n| si::ONE * (*n) )))
   /// ```
   pub fn get_indices(
     &self,
     wavelength :f64,
-    temperature :f64
+    temperature :Kelvin<f64>
   ) -> Indices {
     match &self {
       Crystals::BBO_1 => bbo_1::get_indices( wavelength, temperature ),
       Crystals::KTP => ktp::get_indices( wavelength, temperature ),
-      Crystals::LiIO3_1 => lilo3_1::LiIO3_1.get_indices( wavelength, temperature ).into(),
-      Crystals::AgGaS2_1 => aggas2_1::AgGaS2_1.get_indices( wavelength, temperature ).into(),
+      Crystals::LiIO3_1 => lilo3_1::LiIO3_1.get_indices( wavelength, temperature ),
+      Crystals::AgGaS2_1 => aggas2_1::AgGaS2_1.get_indices( wavelength, temperature ),
 
       // Crystals::Sellmeier(crystal) => crystal.get_indices(wavelength, temperature),
     }

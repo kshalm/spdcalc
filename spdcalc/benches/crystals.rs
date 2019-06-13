@@ -8,15 +8,15 @@ extern crate spdcalc;
 use spdcalc::crystal::{Indices, Crystals};
 
 fn bbo(n: f64) -> Indices {
-  Crystals::BBO_1.get_indices( n, 293.0 )
+  Crystals::BBO_1.get_indices( n, 293.0 * spdcalc::dim::si::K )
 }
 
 fn AgGaS2(n: f64) -> Indices {
-  Crystals::AgGaS2_1.get_indices( n, 293.0 )
+  Crystals::AgGaS2_1.get_indices( n, 293.0 * spdcalc::dim::si::K )
 }
 
 fn LiIO3_1(n: f64) -> Indices {
-  Crystals::LiIO3_1.get_indices( n, 293.0 )
+  Crystals::LiIO3_1.get_indices( n, 293.0 * spdcalc::dim::si::K )
 }
 
 fn criterion_benchmark(c: &mut Criterion) {

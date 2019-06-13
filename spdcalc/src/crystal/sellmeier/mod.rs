@@ -2,6 +2,7 @@ use super::*;
 
 // extern crate nalgebra as na;
 // use na::*;
+use dim::si::Kelvin;
 
 pub mod equations;
 use equations::*;
@@ -13,16 +14,16 @@ use temperature_dependence::*;
 /// Sellmeier Equation of specified form with specified temperature dependence
 #[derive(Debug)]
 pub struct SellmeierCrystal<Q, T>
-  where Q: SellmeierEquation, T: TemperatureDependence {
-  pub eqn: Q,
-  pub temperature_dependence: T,
-  pub meta: CrystalMeta,
+  where Q: SellmeierEquation, T :TemperatureDependence {
+  pub eqn :Q,
+  pub temperature_dependence :T,
+  pub meta :CrystalMeta,
 }
 
 impl<Q, T> SellmeierCrystal<Q, T>
-  where Q: SellmeierEquation, T: TemperatureDependence {
+  where Q :SellmeierEquation, T :TemperatureDependence {
 
-  pub fn get_indices(&self, wavelength: f64, temperature: f64) -> Vector3<f64> {
+  pub fn get_indices(&self, wavelength :f64, temperature :Kelvin<f64>) -> Indices {
     get_indices(&self.eqn, wavelength, &self.temperature_dependence, temperature)
   }
 
@@ -33,13 +34,12 @@ impl<Q, T> SellmeierCrystal<Q, T>
 
 // Calculate indices for a crystal based on sellmeier equation and temperature dependence
 fn get_indices<Q, T>(
-  equation: &Q,
-  wavelength: f64,
-  temperature_dependence: &T,
-  temperature: f64
-) -> Vector3<f64>
-where Q: SellmeierEquation, T: TemperatureDependence {
-
+  equation :&Q,
+  wavelength :f64,
+  temperature_dependence :&T,
+  temperature :Kelvin<f64>
+) -> Indices
+where Q :SellmeierEquation, T :TemperatureDependence {
   let n = equation.get_indices(wavelength);
   temperature_dependence.apply(n, temperature)
 }

@@ -3,10 +3,11 @@
 //! ## Example
 //! ```
 //! use spdcalc::crystal::*;
+//! use spdcalc::dim::si;
 //! let nm = 1e-9;
-//! let indices = Crystals::LiIO3_1.get_indices( 720.0 * nm, 0. ); // no temperature dependence
-//! let expected = Indices(1.8719412177557622, 1.8719412177557622, 1.7283584186311833);
-//! assert_eq!(indices, expected)
+//! let indices = Crystals::LiIO3_1.get_indices( 720.0 * nm, 0. * si::K ); // no temperature dependence
+//! let expected = &[1.8719412177557622, 1.8719412177557622, 1.7283584186311833];
+//! assert_eq!(indices, Indices::from_iterator(expected.iter().map(|n| si::ONE * (*n) )))
 //! ```
 use super::*;
 

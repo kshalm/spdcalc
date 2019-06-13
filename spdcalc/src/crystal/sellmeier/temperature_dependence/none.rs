@@ -1,7 +1,7 @@
 use super::*;
-
+use dim::si::Kelvin;
 pub struct None;
 
 impl TemperatureDependence for None {
-  fn apply(&self, n: Vector3<f64>, _temperature: f64) -> Vector3<f64> { n }
+  fn apply(&self, n :Indices, _temperature :Kelvin<f64>) -> Indices { n }
 }
