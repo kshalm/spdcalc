@@ -1,6 +1,7 @@
 use dim::si::Kelvin;
 use super::*;
 use dim::si;
+use crate::utils::*;
 
 /// Coefficients to calculate temperature dependence of crystals
 /// > n = n + (T - 20°K) * dn
@@ -10,7 +11,7 @@ pub struct Standard {
 
 impl TemperatureDependence for Standard {
   fn apply(&self, n :Indices, temperature :Kelvin<f64>) -> Indices {
-    let dn = dim_vector3!(&self.dn; si::Unitless<f64>);
+    let dn = dim_vector3(si::ONE, &self.dn);
     let f = (temperature - (20.0 * si::K)) / si::K;
     n + dn * f
   }

@@ -1,5 +1,6 @@
 use super::*;
 use dim::si;
+use crate::utils::*;
 
 /// Standard form:
 /// > n² = A + b1 * λ² / (λ² - c1) + b2 * λ² / (λ² - c2) + b3 * λ² / (λ² - c3)
@@ -16,15 +17,15 @@ pub struct SellmeierStandard {
 
 impl SellmeierEquation for SellmeierStandard {
   fn get_indices(&self, wavelength: f64) -> Indices {
-    let a = dim_vector3!(&self.a; si::Unitless<f64>);
+    let a = dim_vector3(si::ONE, &self.a);
 
-    let b1 = dim_vector3!(&self.b1; si::Unitless<f64>);
-    let b2 = dim_vector3!(&self.b2; si::Unitless<f64>);
-    let b3 = dim_vector3!(&self.b3; si::Unitless<f64>);
+    let b1 = dim_vector3(si::ONE, &self.b1);
+    let b2 = dim_vector3(si::ONE, &self.b2);
+    let b3 = dim_vector3(si::ONE, &self.b3);
 
-    let c1 = dim_vector3!(&self.c1; si::Unitless<f64>);
-    let c2 = dim_vector3!(&self.c2; si::Unitless<f64>);
-    let c3 = dim_vector3!(&self.c3; si::Unitless<f64>);
+    let c1 = dim_vector3(si::ONE, &self.c1);
+    let c2 = dim_vector3(si::ONE, &self.c2);
+    let c3 = dim_vector3(si::ONE, &self.c3);
 
     let l = wavelength * 1e6;
     let l_sq = si::ONE * l * l;

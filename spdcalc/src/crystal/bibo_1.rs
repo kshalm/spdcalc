@@ -18,11 +18,12 @@ pub const META :CrystalMeta = CrystalMeta {
 /// # Example
 /// ```
 /// use spdcalc::crystal::*;
+/// use spdcalc::utils::dim_vector3;
 /// use spdcalc::dim::si;
 /// let nm = 1e-9;
 /// let indices = bibo_1::get_indices( 720.0 * nm, 293.0 * si::K );
-/// let expected = &[1.770147077637903, 1.7990347340642352, 1.93622182289392];
-/// assert_eq!(indices, Indices::from_iterator(expected.iter().map(|n| si::ONE * (*n) )))
+/// let expected = dim_vector3(si::ONE, &[1.770147077637903, 1.7990347340642352, 1.93622182289392]);
+/// assert_eq!(indices, expected)
 /// ```
 #[allow(clippy::unreadable_literal)]
 pub fn get_indices( wavelength :f64, _temperature :si::Kelvin<f64> ) -> Indices {

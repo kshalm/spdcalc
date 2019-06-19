@@ -5,11 +5,12 @@
 //! ## Example
 //! ```
 //! use spdcalc::crystal::*;
+//! use spdcalc::utils::dim_vector3;
 //! use spdcalc::dim::si;
 //! let nm = 1e-9;
 //! let indices = Crystals::AgGaS2_1.get_indices( 720.0 * nm, 293.0 * si::K );
-//! let expected = &[2.5551373236904937, 2.5551373236904937, 2.50400310043117];
-//! assert_eq!(indices, Indices::from_iterator(expected.iter().map(|n| si::ONE * (*n) )))
+//! let expected = dim_vector3(si::ONE, &[2.5551373236904937, 2.5551373236904937, 2.50400310043117]);
+//! assert_eq!(indices, expected)
 //! ```
 use super::*;
 

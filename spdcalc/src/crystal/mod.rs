@@ -40,13 +40,14 @@ impl Crystals {
   /// ## Example
   /// ```
   /// use spdcalc::dim::si;
+  /// use spdcalc::utils::dim_vector3;
   /// use spdcalc::Crystals;
   /// use spdcalc::crystal::Indices;
   /// let crystal = Crystals::BBO_1;
   /// let nm = 1e-9;
   /// let indices = crystal.get_indices( 720.0 * nm, 293.0 * si::K );
-  /// let expected = &[1.6607191519167868, 1.6607191519167868, 1.5420245834707935];
-  /// assert_eq!(indices, Indices::from_iterator(expected.iter().map(|n| si::ONE * (*n) )))
+  /// let expected = dim_vector3(si::ONE, &[1.6607191519167868, 1.6607191519167868, 1.5420245834707935]);
+  /// assert_eq!(indices, expected)
   /// ```
   pub fn get_indices(
     &self,

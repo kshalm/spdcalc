@@ -3,11 +3,12 @@
 //! ## Example
 //! ```
 //! use spdcalc::crystal::*;
+//! use spdcalc::utils::dim_vector3;
 //! use spdcalc::dim::si;
 //! let nm = 1e-9;
 //! let indices = Crystals::LiIO3_1.get_indices( 720.0 * nm, 0. * si::K ); // no temperature dependence
-//! let expected = &[1.8719412177557622, 1.8719412177557622, 1.7283584186311833];
-//! assert_eq!(indices, Indices::from_iterator(expected.iter().map(|n| si::ONE * (*n) )))
+//! let expected = dim_vector3(si::ONE, &[1.8719412177557622, 1.8719412177557622, 1.7283584186311833]);
+//! assert_eq!(indices, expected)
 //! ```
 use super::*;
 

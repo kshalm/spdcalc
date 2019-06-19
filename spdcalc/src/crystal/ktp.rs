@@ -6,11 +6,12 @@
 //! # Example
 //! ```
 //! use spdcalc::crystal::*;
+//! use spdcalc::utils::dim_vector3;
 //! use spdcalc::dim::si;
 //! let nm = 1e-9;
 //! let indices = Crystals::KTP.get_indices( 720.0 * nm, 293.0 * si::K );
-//! let expected = &[1.7569629746332105, 1.7660029942396933, 1.8575642248650441];
-//! assert_eq!(indices, Indices::from_iterator(expected.iter().map(|n| si::ONE * (*n) )))
+//! let expected = dim_vector3(si::ONE, &[1.7569629746332105, 1.7660029942396933, 1.8575642248650441]);
+//! assert_eq!(indices, expected)
 //! ```
 
 use super::*;

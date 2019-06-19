@@ -33,6 +33,7 @@ struct Beam {
   theta :Angle, // internal angle
   phi :Angle,
   waist :Vector2<Length>,
+  r_index :RIndex,
 }
 
 enum BeamType {
