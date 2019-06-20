@@ -21,6 +21,7 @@ extern "C" {
   fn log(a : &str);
 }
 
+#[allow(unused_macros)]
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
@@ -129,6 +130,23 @@ pub fn get_gaussian_ptr(width : usize, height : usize) -> *const f64 {
   }
 
   arr.as_ptr()
+}
+
+#[wasm_bindgen]
+pub fn get_indices(name : String, wavelength : f64, temperature : f64) -> Vec<f64> {
+  let lamda = wavelength * spdcalc::dim::ucum::M;
+  let kelvin = temperature * spdcalc::dim::ucum::K;
+  let crystal = match name.as_ref() {
+    "bbo" => spdcalc::Crystals::BBO_1,
+    "ktp" => spdcalc::Crystals::KTP,
+    "bibo" => spdcalc::Crystals::BiBO_1,
+    "aggas2" => spdcalc::Crystals::AgGaS2_1,
+    "liio3" => spdcalc::Crystals::LiIO3_1,
+    _ => panic!(),
+  };
+
+  let indices = crystal.get_indices(lamda, kelvin);
+  indices.iter().map(|i| i.value_unsafe).collect()
 }
 
 // fn perf_to_system(amt: f64) -> SystemTime {

@@ -7,10 +7,10 @@
 //! ```
 //! use spdcalc::{crystal::*, dim::ucum, utils::dim_vector3};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystals::KTP.get_indices(720.0 * nm, 293.0 * ucum::K);
+//! let indices = Crystal::KTP.get_indices(720.0 * nm, 30 * ucum::DEGR);
 //! let expected = dim_vector3(
 //!   ucum::ONE,
-//!   &[1.7569629746332105, 1.7660029942396933, 1.8575642248650441],
+//!   &[1.7540699746332105, 1.7625839942396933, 1.8533562248650441],
 //! );
 //! assert_eq!(indices, expected)
 //! ```
@@ -18,7 +18,7 @@
 use super::*;
 use dim::{
   f64prefixes::MICRO,
-  ucum::{self, Kelvin, K, M},
+  ucum::{self, Kelvin, DEGR, K, M},
 };
 
 pub const META : CrystalMeta = CrystalMeta {
@@ -53,9 +53,11 @@ pub fn get_indices(wavelength : Wavelength, temperature : Kelvin<f64>) -> Indice
   let mut nz =
     ucum::ONE * (1.9446 + 1.3617 * lambda_sq / (lambda_sq - 0.047) - 0.01491 * lambda_sq).sqrt();
 
-  nx += (temperature - 20.0 * K) * DNX / K;
-  ny += (temperature - 20.0 * K) * DNY / K;
-  nz += (temperature - 20.0 * K) * DNZ / K;
+  let f = (temperature - 20.0 * DEGR) / K;
+
+  nx += f * DNX;
+  ny += f * DNY;
+  nz += f * DNZ;
 
   Indices::new(nx, ny, nz)
 }

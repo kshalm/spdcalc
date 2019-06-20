@@ -14,6 +14,7 @@ dimensioned = "0.7"
 
 [dev-dependencies]
 criterion = "0.2"
+float-cmp = "0.5"
 
 [[bench]]
 name = "crystals"

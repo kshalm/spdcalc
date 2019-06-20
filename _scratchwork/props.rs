@@ -1,10 +1,10 @@
 struct SPDCProperties {
   pm_type :PMType,
-  crystal :Crystal,
-  pump :Beam,
+  crystal :CrystalSetup,
+  pump :Photon,
   pump_bandwidth :Length,
-  signal :Beam,
-  idler :Beam,
+  signal :Photon,
+  idler :Photon,
 
   periodic_polling :Option<PeriodicPolling>,
 }
@@ -19,16 +19,17 @@ enum PMType {
   Type2_e_oe,
 }
 
-struct Crystal {
-  type :CrystalType,
+struct CrystalSetup {
+  crystal :Crystal,
+  pm_type: PMType,
   theta :Angle,
   phi :Angle,
   length :Length,
   temperature :Temperature,
 }
 
-struct Beam {
-  type: BeamType,
+struct Photon {
+  type: PhotonType,
   wavelength :Wavelength,
   theta :Angle, // internal angle
   phi :Angle,
@@ -36,26 +37,26 @@ struct Beam {
   r_index :RIndex,
 }
 
-enum BeamType {
+enum PhotonType {
   Pump,
   Signal,
   Idler,
 }
 
-impl Beam {
-  fn new( theta_external: Angle ) -> Beam {
-    Beam {
+impl Photon {
+  fn new( theta_external: Angle ) -> Photon {
+    Photon {
       theta: calc_internal_theta( theta_external ),
     }
   }
 
-  fn calc_refractive_index( &self, crystal :Crystal, pm_type :PMType ) -> Unitless<f64> {
+  fn calc_refractive_index( &self, crystal :CrystalSetup, pm_type :PMType ) -> Unitless<f64> {
     // rotated indices
     let indices = crystal.get_indices();
 
   }
 
-  fn get_group_velocity( &self, crystal :Crystal, pm_type :PMType ) -> Velocity<f64> {
+  fn get_group_velocity( &self, crystal :CrystalSetup, pm_type :PMType ) -> Velocity<f64> {
 
   }
 
@@ -107,7 +108,7 @@ var spdcDefaults = {
     // apodization: 30,
     // apodization_FWHM: 1600 * con.um,
     use_guassian_approx: false, // for testing
-    // crystal: Crystals('KTP-3'),
+    // crystal: CrystalSetups('KTP-3'),
     // temp: 20,
     // enable_pp: true,
 
