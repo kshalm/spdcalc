@@ -1,6 +1,6 @@
 //! Types used by spdcalc
-use na::*;
 use dim::ucum;
+use na::*;
 
 /// Index of refraction
 pub type RIndex = ucum::Unitless<f64>;

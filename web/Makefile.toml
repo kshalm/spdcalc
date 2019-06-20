@@ -17,3 +17,8 @@ dependencies = [
   "cargo_clean",
   "pkg_clean",
 ]
+
+[tasks.format]
+command = "cargo"
+toolchain = "nightly"
+args = ["fmt"]

@@ -1,7 +1,7 @@
 mod utils;
-extern crate wasm_bindgen;
 extern crate num;
 extern crate spdcalc;
+extern crate wasm_bindgen;
 
 use num::traits::Pow;
 use wasm_bindgen::prelude::*;
@@ -12,13 +12,13 @@ use wasm_bindgen::prelude::*;
 // allocator.
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+static ALLOC : wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 // lifted from the `console_log` example
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(a: &str);
+  #[wasm_bindgen(js_namespace = console)]
+  fn log(a : &str);
 }
 
 macro_rules! console_log {
@@ -26,109 +26,109 @@ macro_rules! console_log {
 }
 
 #[wasm_bindgen]
-pub fn browser_debug(){
-    utils::set_panic_hook();
+pub fn browser_debug() {
+  utils::set_panic_hook();
 }
 
 #[wasm_bindgen]
 #[no_mangle]
-pub fn speed_test(amount: usize) -> String {
-    let window = web_sys::window().expect("should have a window in this context");
-    let performance = window
-        .performance()
-        .expect("performance should be available");
+pub fn speed_test(amount : usize) -> String {
+  let window = web_sys::window().expect("should have a window in this context");
+  let performance = window
+    .performance()
+    .expect("performance should be available");
 
-    let test_values = init(amount);
+  let test_values = init(amount);
 
-    // console_log!("WASM: Testing with {} calculations", test_values.len());
+  // console_log!("WASM: Testing with {} calculations", test_values.len());
 
-    let start = performance.now();
+  let start = performance.now();
 
-    let mut total = 0.0;
-    for _i in 0..test_values.len() {
-        total += spdcalc::junk::calc( 1.0 / test_values[_i] );
-    }
+  let mut total = 0.0;
+  for _i in 0..test_values.len() {
+    total += spdcalc::junk::calc(1.0 / test_values[_i]);
+  }
 
-    let end = performance.now();
+  let end = performance.now();
 
-    let elapsed = end - start;
-    // console_log!("WASM: Calculation took {} ms", elapsed);
-    return format_args!("[{}, {}]", total, elapsed).to_string();
+  let elapsed = end - start;
+  // console_log!("WASM: Calculation took {} ms", elapsed);
+  return format_args!("[{}, {}]", total, elapsed).to_string();
 }
 
 #[wasm_bindgen]
-pub fn reserve_array_test(size: usize) -> String {
-    let window = web_sys::window().expect("should have a window in this context");
-    let performance = window
-        .performance()
-        .expect("performance should be available");
+pub fn reserve_array_test(size : usize) -> String {
+  let window = web_sys::window().expect("should have a window in this context");
+  let performance = window
+    .performance()
+    .expect("performance should be available");
 
-    let start = performance.now();
+  let start = performance.now();
 
-    let _arr = init( size );
+  let _arr = init(size);
 
-    let end = performance.now();
-    let elapsed = end - start;
+  let end = performance.now();
+  let elapsed = end - start;
 
-    return format_args!("[{}, {}]", size, elapsed).to_string();
+  return format_args!("[{}, {}]", size, elapsed).to_string();
 }
 
-fn gaussian( x :f64, y :f64, sigma :f64, x_o :f64, y_o :f64, a :f64 ) -> f64 {
-    let s2 = 2.0 * sigma;
-    let x2:f64 = (x - x_o).pow(2);
-    let y2:f64 = (y - y_o).pow(2);
+fn gaussian(x : f64, y : f64, sigma : f64, x_o : f64, y_o : f64, a : f64) -> f64 {
+  let s2 = 2.0 * sigma;
+  let x2 : f64 = (x - x_o).pow(2);
+  let y2 : f64 = (y - y_o).pow(2);
 
-    a * ( -x2 / s2 - y2 / s2 ).exp()
-}
-
-#[wasm_bindgen]
-pub fn get_gaussian(width: usize, height: usize) -> Vec<f64> {
-    let len = width * height;
-    let mut arr = vec![];
-    let sigma = width as f64 / 3.0;
-    let x_o = width as f64 / 2.0;
-    let y_o = height as f64 / 2.0;
-    let mut x = 0_f64;
-    let mut y = 0_f64;
-
-    for _ in 0..len {
-        let z = gaussian( x, y, sigma, x_o, y_o, 2.0 );
-        arr.push( z );
-
-        x = x + 1.0;
-
-        if (x as usize) >= width {
-            x = 0.0;
-            y += 1.0;
-        }
-    }
-
-    arr
+  a * (-x2 / s2 - y2 / s2).exp()
 }
 
 #[wasm_bindgen]
-pub fn get_gaussian_ptr(width: usize, height: usize) -> *const f64 {
-    let len = width * height;
-    let mut arr = vec![];
-    let sigma = width as f64 / 3.0;
-    let x_o = width as f64 / 2.0;
-    let y_o = height as f64 / 2.0;
-    let mut x = 0_f64;
-    let mut y = 0_f64;
+pub fn get_gaussian(width : usize, height : usize) -> Vec<f64> {
+  let len = width * height;
+  let mut arr = vec![];
+  let sigma = width as f64 / 3.0;
+  let x_o = width as f64 / 2.0;
+  let y_o = height as f64 / 2.0;
+  let mut x = 0_f64;
+  let mut y = 0_f64;
 
-    for _ in 0..len {
-        let z = gaussian( x, y, sigma, x_o, y_o, 2.0 );
-        arr.push( z );
+  for _ in 0..len {
+    let z = gaussian(x, y, sigma, x_o, y_o, 2.0);
+    arr.push(z);
 
-        x = x + 1.0;
+    x = x + 1.0;
 
-        if (x as usize) >= width {
-            x = 0.0;
-            y += 1.0;
-        }
+    if (x as usize) >= width {
+      x = 0.0;
+      y += 1.0;
     }
+  }
 
-    arr.as_ptr()
+  arr
+}
+
+#[wasm_bindgen]
+pub fn get_gaussian_ptr(width : usize, height : usize) -> *const f64 {
+  let len = width * height;
+  let mut arr = vec![];
+  let sigma = width as f64 / 3.0;
+  let x_o = width as f64 / 2.0;
+  let y_o = height as f64 / 2.0;
+  let mut x = 0_f64;
+  let mut y = 0_f64;
+
+  for _ in 0..len {
+    let z = gaussian(x, y, sigma, x_o, y_o, 2.0);
+    arr.push(z);
+
+    x = x + 1.0;
+
+    if (x as usize) >= width {
+      x = 0.0;
+      y += 1.0;
+    }
+  }
+
+  arr.as_ptr()
 }
 
 // fn perf_to_system(amt: f64) -> SystemTime {
@@ -137,13 +137,13 @@ pub fn get_gaussian_ptr(width: usize, height: usize) -> *const f64 {
 //     UNIX_EPOCH + Duration::new(secs, nanos)
 // }
 
-fn init(amount: usize) -> Vec<f64> {
-    let mut test_values = vec![];
-    test_values.reserve(amount);
+fn init(amount : usize) -> Vec<f64> {
+  let mut test_values = vec![];
+  test_values.reserve(amount);
 
-    for _i in 0..amount {
-        test_values.push( (_i + 1) as f64 );
-    }
+  for _i in 0..amount {
+    test_values.push((_i + 1) as f64);
+  }
 
-    return test_values;
+  return test_values;
 }

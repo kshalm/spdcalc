@@ -30,3 +30,13 @@ args = ["build", "--release", "-i", "python3"]
 [tasks.clean]
 command = "cargo"
 args = ["clean"]
+
+[tasks.format]
+command = "cargo"
+toolchain = "nightly"
+args = ["fmt"]
+
+[tasks.test]
+command = "cargo"
+toolchain = "nightly"
+args = ["test", "--all-features"]

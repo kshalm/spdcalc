@@ -14,3 +14,8 @@ args = ["clippy"]
 [tasks.docs]
 command = "cargo"
 args = ["doc", "--no-deps"]
+
+[tasks.format]
+command = "cargo"
+toolchain = "nightly"
+args = ["fmt"]

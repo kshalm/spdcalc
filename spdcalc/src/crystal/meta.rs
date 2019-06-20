@@ -94,13 +94,13 @@ pub enum PointGroup {
 #[derive(Debug)]
 pub struct CrystalMeta {
   /// The name of the crystal
-  pub name: &'static str,
+  pub name : &'static str,
   /// A url to a reference for the crystal
-  pub reference_url: &'static str,
+  pub reference_url : &'static str,
   /// Optic axis type of the crystal
-  pub axis_type: OpticAxisType,
+  pub axis_type : OpticAxisType,
   /// Point Group (class) of the crystal
-  pub point_group: PointGroup,
+  pub point_group : PointGroup,
   /// Whether or not temperature dependence is known
-  pub temperature_dependence_known: bool,
+  pub temperature_dependence_known : bool,
 }
