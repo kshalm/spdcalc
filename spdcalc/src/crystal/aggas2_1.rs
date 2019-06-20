@@ -6,10 +6,10 @@
 //! ```
 //! use spdcalc::crystal::*;
 //! use spdcalc::utils::dim_vector3;
-//! use spdcalc::dim::si;
-//! let nm = 1e-9;
-//! let indices = Crystals::AgGaS2_1.get_indices( 720.0 * nm, 293.0 * si::K );
-//! let expected = dim_vector3(si::ONE, &[2.5551373236904937, 2.5551373236904937, 2.50400310043117]);
+//! use spdcalc::dim::ucum;
+//! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
+//! let indices = Crystals::AgGaS2_1.get_indices( 720.0 * nm, 293.0 * ucum::K );
+//! let expected = dim_vector3(ucum::ONE, &[2.5551373236904937, 2.5551373236904937, 2.50400310043117]);
 //! assert_eq!(indices, expected)
 //! ```
 use super::*;

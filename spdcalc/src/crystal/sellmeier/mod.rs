@@ -2,7 +2,8 @@ use super::*;
 
 // extern crate nalgebra as na;
 // use na::*;
-use dim::si::Kelvin;
+use dim::ucum;
+use dim::ucum::Kelvin;
 
 pub mod equations;
 use equations::*;
@@ -23,7 +24,7 @@ pub struct SellmeierCrystal<Q, T>
 impl<Q, T> SellmeierCrystal<Q, T>
   where Q :SellmeierEquation, T :TemperatureDependence {
 
-  pub fn get_indices(&self, wavelength :f64, temperature :Kelvin<f64>) -> Indices {
+  pub fn get_indices(&self, wavelength :Wavelength, temperature :Kelvin<f64>) -> Indices {
     get_indices(&self.eqn, wavelength, &self.temperature_dependence, temperature)
   }
 
@@ -35,7 +36,7 @@ impl<Q, T> SellmeierCrystal<Q, T>
 // Calculate indices for a crystal based on sellmeier equation and temperature dependence
 fn get_indices<Q, T>(
   equation :&Q,
-  wavelength :f64,
+  wavelength :Wavelength,
   temperature_dependence :&T,
   temperature :Kelvin<f64>
 ) -> Indices

@@ -5,15 +5,15 @@ use criterion::Criterion;
 use criterion::black_box;
 
 extern crate spdcalc;
-use spdcalc::dim::si;
+use spdcalc::dim::ucum;
 extern crate nalgebra as na;
 
-fn create_from_values( _n :i32, arr :[f64 ;3] ) -> na::Vector3<si::Unitless<f64>> {
-  na::Vector3::new(si::ONE * arr[0], si::ONE * arr[1], si::ONE * arr[2])
+fn create_from_values( _n :i32, arr :[f64 ;3] ) -> na::Vector3<ucum::Unitless<f64>> {
+  na::Vector3::new(ucum::ONE * arr[0], ucum::ONE * arr[1], ucum::ONE * arr[2])
 }
 
-fn create_from_iterator( _n :i32, arr :[f64 ;3] ) -> na::Vector3<si::Unitless<f64>> {
-  na::Vector3::from_iterator( (&arr).iter().map(|n| si::ONE * (*n) ) )
+fn create_from_iterator( _n :i32, arr :[f64 ;3] ) -> na::Vector3<ucum::Unitless<f64>> {
+  na::Vector3::from_iterator( (&arr).iter().map(|n| ucum::ONE * (*n) ) )
 }
 
 const ARR :[f64 ;3] = [1.0, 2.0, 3.0];

@@ -1,8 +1,7 @@
 //! Defines types of crystals used in spdc.
 extern crate nalgebra as na;
-use na::*;
-use dim::si::Kelvin;
-use dim::si::Unitless;
+use dim::ucum::Kelvin;
+use crate::*;
 
 mod meta;
 pub use self::meta::*;
@@ -18,9 +17,6 @@ pub mod aggas2_1;
 pub mod sellmeier;
 // use sellmeier::equations::SellmeierEquation;
 // use sellmeier::temperature_dependence::TemperatureDependence;
-
-/// Indices of refraction (n_x, n_y, n_z)
-pub type Indices = Vector3<Unitless<f64>>;
 
 /// The type of crystal
 #[derive(Debug)]
@@ -39,19 +35,18 @@ impl Crystals {
   ///
   /// ## Example
   /// ```
-  /// use spdcalc::dim::si;
+  /// use spdcalc::dim::ucum;
   /// use spdcalc::utils::dim_vector3;
   /// use spdcalc::Crystals;
-  /// use spdcalc::crystal::Indices;
   /// let crystal = Crystals::BBO_1;
-  /// let nm = 1e-9;
-  /// let indices = crystal.get_indices( 720.0 * nm, 293.0 * si::K );
-  /// let expected = dim_vector3(si::ONE, &[1.6607191519167868, 1.6607191519167868, 1.5420245834707935]);
+  /// let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
+  /// let indices = crystal.get_indices( 720.0 * nm, 293.0 * ucum::K );
+  /// let expected = dim_vector3(ucum::ONE, &[1.6607191519167868, 1.6607191519167868, 1.5420245834707935]);
   /// assert_eq!(indices, expected)
   /// ```
   pub fn get_indices(
     &self,
-    wavelength :f64,
+    wavelength :Wavelength,
     temperature :Kelvin<f64>
   ) -> Indices {
     match &self {

@@ -1,6 +1,6 @@
 use super::*;
-use dim::si;
-use crate::utils::*;
+use dim::ucum;
+use crate::*;
 
 /// Standard form:
 /// > n² = A + b1 * λ² / (λ² - c1) + b2 * λ² / (λ² - c2) + b3 * λ² / (λ² - c3)
@@ -16,19 +16,19 @@ pub struct SellmeierStandard {
 }
 
 impl SellmeierEquation for SellmeierStandard {
-  fn get_indices(&self, wavelength: f64) -> Indices {
-    let a = dim_vector3(si::ONE, &self.a);
+  fn get_indices(&self, wavelength: Wavelength) -> Indices {
+    let a = na::Vector3::from_column_slice(&self.a);
 
-    let b1 = dim_vector3(si::ONE, &self.b1);
-    let b2 = dim_vector3(si::ONE, &self.b2);
-    let b3 = dim_vector3(si::ONE, &self.b3);
+    let b1 = na::Vector3::from_column_slice(&self.b1);
+    let b2 = na::Vector3::from_column_slice(&self.b2);
+    let b3 = na::Vector3::from_column_slice(&self.b3);
 
-    let c1 = dim_vector3(si::ONE, &self.c1);
-    let c2 = dim_vector3(si::ONE, &self.c2);
-    let c3 = dim_vector3(si::ONE, &self.c3);
+    let c1 = na::Vector3::from_column_slice(&self.c1);
+    let c2 = na::Vector3::from_column_slice(&self.c2);
+    let c3 = na::Vector3::from_column_slice(&self.c3);
 
-    let l = wavelength * 1e6;
-    let l_sq = si::ONE * l * l;
+    let l = wavelength.value_unsafe * 1e6;
+    let l_sq = l * l;
     let one_by_l_sq = Vector3::repeat(l_sq);
 
     let n = a
@@ -38,6 +38,6 @@ impl SellmeierEquation for SellmeierStandard {
         + b3.component_div( &(one_by_l_sq - c3) )
       ) * l_sq;
 
-    n.apply_into( |i| si::ONE * i.sqrt() )
+    n.map( |i| ucum::ONE * i.sqrt() )
   }
 }

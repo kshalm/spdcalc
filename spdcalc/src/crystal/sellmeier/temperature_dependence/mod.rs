@@ -1,5 +1,5 @@
 extern crate nalgebra as na;
-use dim::si::Kelvin;
+use dim::ucum::Kelvin;
 use crate::crystal::Indices;
 
 pub mod none;

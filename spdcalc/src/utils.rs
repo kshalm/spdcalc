@@ -1,6 +1,6 @@
 // macro_rules! dim_vector3 {
 //   ( $slice:expr;$units:ty ) => (
-//     na::Vector3::<$units>::new(si::ONE * $slice[0], si::ONE * $slice[1], si::ONE * $slice[2])
+//     na::Vector3::<$units>::new(ucum::ONE * $slice[0], ucum::ONE * $slice[1], ucum::ONE * $slice[2])
 //   )
 // }
 

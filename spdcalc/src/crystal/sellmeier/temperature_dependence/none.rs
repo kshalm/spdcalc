@@ -1,5 +1,5 @@
 use super::*;
-use dim::si::Kelvin;
+use dim::ucum::Kelvin;
 pub struct None;
 
 impl TemperatureDependence for None {
