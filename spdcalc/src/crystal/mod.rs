@@ -24,6 +24,7 @@ pub mod sellmeier;
 pub enum Crystals {
   BBO_1,
   KTP,
+  BiBO_1,
 
   LiIO3_1,
   AgGaS2_1,
@@ -52,6 +53,7 @@ impl Crystals {
     match &self {
       Crystals::BBO_1 => bbo_1::get_indices( wavelength, temperature ),
       Crystals::KTP => ktp::get_indices( wavelength, temperature ),
+      Crystals::BiBO_1 => bbo_1::get_indices( wavelength, temperature ),
       Crystals::LiIO3_1 => lilo3_1::LiIO3_1.get_indices( wavelength, temperature ),
       Crystals::AgGaS2_1 => aggas2_1::AgGaS2_1.get_indices( wavelength, temperature ),
 
@@ -66,6 +68,7 @@ impl Crystals {
     match &self {
       Crystals::BBO_1 => &bbo_1::META,
       Crystals::KTP => &ktp::META,
+      Crystals::BiBO_1 => &bbo_1::META,
       Crystals::LiIO3_1 => lilo3_1::LiIO3_1.get_meta(),
       Crystals::AgGaS2_1 => aggas2_1::AgGaS2_1.get_meta(),
 

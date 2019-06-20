@@ -27,6 +27,7 @@ impl SellmeierEquation for SellmeierStandard {
     let c2 = na::Vector3::from_column_slice(&self.c2);
     let c3 = na::Vector3::from_column_slice(&self.c3);
 
+    // convert to millimeters
     let l = wavelength.value_unsafe * 1e6;
     let l_sq = l * l;
     let one_by_l_sq = Vector3::repeat(l_sq);
