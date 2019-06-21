@@ -5,9 +5,9 @@
 //!
 //! # Example
 //! ```
-//! use spdcalc::{crystal::*, dim::ucum, utils::dim_vector3};
+//! use spdcalc::{crystal::*, dim::ucum, utils::dim_vector3, utils::*};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystal::KTP.get_indices(720.0 * nm, 30 * ucum::DEGR);
+//! let indices = Crystal::KTP.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 //! let expected = dim_vector3(
 //!   ucum::ONE,
 //!   &[1.7540699746332105, 1.7625839942396933, 1.8533562248650441],
@@ -16,9 +16,10 @@
 //! ```
 
 use super::*;
+use crate::utils::*;
 use dim::{
   f64prefixes::MICRO,
-  ucum::{self, Kelvin, DEGR, K, M},
+  ucum::{self, Kelvin, K, M},
 };
 
 pub const META : CrystalMeta = CrystalMeta {
@@ -53,7 +54,7 @@ pub fn get_indices(wavelength : Wavelength, temperature : Kelvin<f64>) -> Indice
   let mut nz =
     ucum::ONE * (1.9446 + 1.3617 * lambda_sq / (lambda_sq - 0.047) - 0.01491 * lambda_sq).sqrt();
 
-  let f = (temperature - 20.0 * DEGR) / K;
+  let f = (temperature - from_celsius_to_kelvin(20.0)) / K;
 
   nx += f * DNX;
   ny += f * DNY;

@@ -1,6 +1,5 @@
 //! Constants for spdcalc
 
-use dim::ucum;
 use dim::si;
 
 pub use si::HBAR;

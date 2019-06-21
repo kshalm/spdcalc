@@ -80,7 +80,7 @@ impl Photon {
   }
 
   /// get the direction in the provided photon's reference frame
-  pub fn get_direction_in_frame(&self, other : &Photon) -> Direction {
+  pub fn get_direction_in_frame(&self, _other : &Photon) -> Direction {
     unimplemented!();
     // FIXME
     self.direction
@@ -105,6 +105,7 @@ impl Photon {
 mod tests {
   extern crate float_cmp;
   use float_cmp::*;
+  use crate::utils::*;
   use super::*;
   use ucum::*;
   use dim::f64prefixes::*;
@@ -120,7 +121,7 @@ mod tests {
       theta : -3.0 * DEG,
       phi : 1.0 * DEG,
       length : 2_000.0 * MICRO * M,
-      temperature : 20.0 * DEGR,
+      temperature : from_celsius_to_kelvin(20.0),
     };
 
     let signal = Photon::new(PhotonType::Signal, theta, phi, wavelength, waist, &crystal_setup);

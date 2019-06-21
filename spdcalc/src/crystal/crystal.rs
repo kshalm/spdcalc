@@ -18,10 +18,10 @@ impl Crystal {
   ///
   /// ## Example
   /// ```
-  /// use spdcalc::{dim::ucum, utils::dim_vector3, Crystal};
+  /// use spdcalc::{dim::ucum, utils::dim_vector3, Crystal, utils::*};
   /// let crystal = Crystal::BBO_1;
   /// let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-  /// let indices = crystal.get_indices(720.0 * nm, 30. * ucum::DEGR);
+  /// let indices = crystal.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
   /// let expected = dim_vector3(
   ///   ucum::ONE,
   ///   &[1.6631650519167869, 1.6631650519167869, 1.5463903834707935],

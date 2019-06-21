@@ -4,9 +4,9 @@
 //!
 //! ## Example
 //! ```
-//! use spdcalc::{crystal::*, dim::ucum, utils::dim_vector3};
+//! use spdcalc::{crystal::*, dim::ucum, utils::dim_vector3, utils::*};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystal::BBO_1.get_indices(720.0 * nm, 30.0 * ucum::DEGR);
+//! let indices = Crystal::BBO_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 //! let expected = dim_vector3(
 //!   ucum::ONE,
 //!   &[1.6631650519167869, 1.6631650519167869, 1.5463903834707935],
@@ -15,9 +15,10 @@
 //! ```
 
 use super::*;
+use crate::utils::*;
 use dim::{
   f64prefixes::MICRO,
-  ucum::{self, Kelvin, K, DEGR, M},
+  ucum::{self, Kelvin, K, M},
 };
 
 pub const META : CrystalMeta = CrystalMeta {
@@ -40,7 +41,7 @@ pub fn get_indices(wavelength : Wavelength, temperature : Kelvin<f64>) -> Indice
   let mut no = (2.7359 + 0.01878 / (l_sq - 0.01822) - 0.01354 * l_sq).sqrt() * ucum::ONE;
   let mut ne = (2.3753 + 0.01224 / (l_sq - 0.01667) - 0.01516 * l_sq).sqrt() * ucum::ONE;
 
-  let f = (temperature - 20.0 * DEGR) / K;
+  let f = (temperature - from_celsius_to_kelvin(20.0)) / K;
 
   no += f * DNO;
   ne += f * DNE;

@@ -4,12 +4,12 @@
 //!
 //! ## Example
 //! ```
-//! use spdcalc::{crystal::*, dim::ucum, utils::dim_vector3};
+//! use spdcalc::{crystal::*, dim::ucum, utils::dim_vector3, utils::*};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystal::AgGaS2_1.get_indices(720.0 * nm, 30. * ucum::DEGR);
+//! let indices = Crystal::AgGaS2_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 //! let expected = dim_vector3(
 //!   ucum::ONE,
-//!   &[2.837020760678037, 2.837020760678037, 2.8283867598339847],
+//!   &[2.5146353236904937, 2.5146353236904937, 2.46323810043117],
 //! );
 //! assert_eq!(indices, expected)
 //! ```

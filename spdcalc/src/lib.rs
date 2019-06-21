@@ -13,6 +13,7 @@ pub mod junk;
 pub mod utils;
 pub use crystal::Crystal;
 
+#[allow(unused_imports)]
 #[cfg(test)]
 #[macro_use]
 extern crate float_cmp;

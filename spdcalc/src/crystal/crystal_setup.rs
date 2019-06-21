@@ -1,5 +1,4 @@
 use super::*;
-use crate::*;
 use photon::PhotonType;
 use dim::ucum::*;
 use na::{Vector3, Rotation3};
