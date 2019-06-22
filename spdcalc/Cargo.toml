@@ -11,6 +11,9 @@ crate-type = ["rlib"]
 num = "0.2"
 nalgebra = "0.18"
 dimensioned = "0.7"
+nelder_mead = { git = "https://github.com/JD557/nelder-mead.rs" }
+# serde = "1.0"
+# argmin = "0.2"
 
 [dev-dependencies]
 criterion = "0.2"

@@ -6,6 +6,8 @@ use crate::*;
 use crate::crystal::CrystalSetup;
 use dim::ucum;
 use na::*;
+use std::f64::consts::{FRAC_PI_2};
+use std::f64;
 
 /// The type of photon (pump/signal/idler)
 pub enum PhotonType {
@@ -45,6 +47,7 @@ impl Photon {
     waist : WaistSize,
     crystal_setup : &CrystalSetup
   ) -> Self {
+    assert!( *(theta/ucum::RAD) <= FRAC_PI_2 && *(theta/ucum::RAD) >= 0. );
 
     let r_index = ucum::ONE;
 
@@ -64,6 +67,42 @@ impl Photon {
     p
   }
 
+  pub fn calc_direction( phi : Angle, theta : Angle ) -> Direction {
+    let theta_rad = *(theta / ucum::RAD);
+    let phi_rad = *(phi / ucum::RAD);
+    Unit::new_normalize(
+      Vector3::new(
+        f64::sin(theta_rad) * f64::cos(phi_rad),
+        f64::sin(theta_rad) * f64::sin(phi_rad),
+        f64::cos(theta_rad)
+      )
+    )
+  }
+
+  pub fn calc_internal_theta_from_external( photon : &Photon, external : Angle ) -> Angle {
+    assert!( *(external/ucum::RAD) <= FRAC_PI_2 && *(external/ucum::RAD) >= 0. );
+
+    let snell_external = f64::sin(*(external/ucum::RAD));
+    let guess = *(external/ucum::RAD);
+    let phi = photon.get_phi();
+
+    let curve = |internal| {
+      let direction = Photon::calc_direction( phi, internal * ucum::RAD );
+      let n = photon.crystal_setup.get_index_along(photon.wavelength, direction, &photon.kind);
+
+      num::abs(snell_external - (*n) * f64::sin(internal))
+    };
+
+    let (theta, ..) = utils::nelder_mead_1d( curve, guess, 100, 0., FRAC_PI_2 );
+
+    theta * ucum::RAD
+  }
+
+  pub fn calc_external_theta_from_internal(r_index: RIndex, internal : Angle) -> Angle {
+    // snells law
+    f64::asin(*r_index * f64::sin(*(internal/ucum::RAD))) * ucum::RAD
+  }
+
   /// Get index of refraction along direction of propagation
   pub fn get_index(&self) -> RIndex {
     self.r_index
@@ -73,7 +112,26 @@ impl Photon {
     self.direction
   }
 
+  pub fn get_phi(&self) -> Angle {
+    self.phi
+  }
+
+  pub fn get_theta(&self) -> Angle {
+    self.theta
+  }
+
+  pub fn set_from_external_theta(&mut self, external : Angle) {
+    let theta = Photon::calc_internal_theta_from_external(self, external);
+    self.set_angles(self.phi, theta);
+  }
+
+  pub fn get_external_theta(&self) -> Angle {
+    // snells law
+    Photon::calc_external_theta_from_internal(self.r_index, self.theta)
+  }
+
   pub fn set_angles(&mut self, phi : Angle, theta : Angle){
+    assert!( *(theta/ucum::RAD) <= FRAC_PI_2 && *(theta/ucum::RAD) >= 0. );
     self.phi = phi;
     self.theta = theta;
     self.update_direction();
@@ -87,16 +145,7 @@ impl Photon {
   }
 
   fn update_direction(&mut self){
-    let theta = self.theta;
-    let phi = self.phi;
-    self.direction = Unit::new_normalize(
-      Vector3::new(
-        f64::sin(theta.value_unsafe) * f64::cos(phi.value_unsafe),
-        f64::sin(theta.value_unsafe) * f64::sin(phi.value_unsafe),
-        f64::cos(theta.value_unsafe)
-      )
-    );
-
+    self.direction = Photon::calc_direction(self.phi, self.theta);
     self.r_index = self.crystal_setup.get_index_along(self.wavelength, self.direction, &self.kind);
   }
 }
@@ -147,5 +196,23 @@ mod tests {
     let n = signal.get_index();
     let expected = 1.6465859604517012;
     assert!(approx_eq!(f64, n.value_unsafe, expected, ulps = 2), "actual: {}, expected: {}", n.value_unsafe, expected)
+  }
+
+  #[test]
+  fn external_angle_test_for_zero(){
+    let (.., signal) = init();
+    let theta = Photon::calc_internal_theta_from_external(&signal, 0. * ucum::DEG);
+    assert_eq!(*(theta/ucum::RAD), 0.);
+  }
+
+  #[test]
+  fn external_angle_test(){
+    let (.., signal) = init();
+    let theta = Photon::calc_internal_theta_from_external(&signal, 13. * ucum::DEG);
+    let theta_external = Photon::calc_external_theta_from_internal(signal.get_index(), theta);
+    let actual = *(theta_external/ucum::DEG);
+    let expected = 13.;
+    // FIXME only getting accuracy of 1e-2 degrees
+    assert!(approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-2), "actual: {}, expected: {}", actual, expected);
   }
 }
