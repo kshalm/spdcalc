@@ -215,4 +215,15 @@ mod tests {
     // FIXME only getting accuracy of 1e-2 degrees
     assert!(approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-2), "actual: {}, expected: {}", actual, expected);
   }
+
+  #[test]
+  fn external_angle_test_from_internal(){
+    let (.., signal) = init();
+    let theta_external = signal.get_external_theta();
+    let theta = Photon::calc_internal_theta_from_external(&signal, theta_external);
+    let actual = *(theta/ucum::DEG);
+    let expected = *(signal.get_theta()/ucum::DEG);
+    // FIXME only getting accuracy of 1e-8 degrees
+    assert!(approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-8), "actual: {}, expected: {}", actual, expected);
+  }
 }
