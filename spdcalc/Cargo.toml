@@ -12,6 +12,8 @@ num = "0.2"
 nalgebra = "0.18"
 dimensioned = "0.7"
 nelder_mead = { git = "https://github.com/JD557/nelder-mead.rs" }
+optimize = "0.1"
+ndarray = "0.11" # can't upgrade... needs 0.11
 # serde = "1.0"
 # argmin = "0.2"
 
@@ -19,14 +21,19 @@ nelder_mead = { git = "https://github.com/JD557/nelder-mead.rs" }
 criterion = "0.2"
 float-cmp = "0.5"
 
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = 3
+
+# Benchmarks
 [[bench]]
 name = "crystals"
 harness = false
 
 [[bench]]
-name = "dev"
+name = "math"
 harness = false
 
-[profile.release]
-# Tell `rustc` to optimize for small code size.
-opt-level = 3
+[[bench]]
+name = "dev"
+harness = false

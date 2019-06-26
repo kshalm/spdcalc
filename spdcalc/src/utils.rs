@@ -3,9 +3,12 @@
 //     na::Vector3::<$units>::new(ucum::ONE * $slice[0], ucum::ONE * $slice[1],
 // ucum::ONE * $slice[2])   )
 // }
-
+extern crate optimize;
+extern crate ndarray;
+use optimize::*;
+use ndarray::{Array, ArrayView1};
 use dim::ucum;
-use nelder_mead::{*, params::*, bounds::*};
+// use nelder_mead::{*, params::*, bounds::*};
 // use argmin::prelude::*;
 // use argmin::solver::neldermead::NelderMead;
 // use serde::{Deserialize, Serialize};
@@ -59,18 +62,39 @@ pub fn from_kelvin_to_celsius( k : ucum::Kelvin<f64> ) -> f64 {
 //   }
 // }
 
-/// nelder mead optimization. Returns tuple of (x, f(x))
-pub fn nelder_mead_1d( func : impl Fn(f64) -> f64, guess : f64, max_iter: u32, min: f64, max: f64 ) -> (f64, f64) {
-  let (x, fx) = minimize(
-    |args| func(args[0]),
-    vec![guess],
-    (max-min)/100.,
-    Params::default(),
-    Bounds { min: vec![min], max: vec![max] },
-    max_iter
+/// nelder mead optimization. Returns x
+pub fn nelder_mead_1d( func : impl Fn(f64) -> f64, guess : f64, max_iter: u32, min: f64, max: f64, tolerance : f64 ) -> f64 {
+
+  let minimizer = NelderMeadBuilder::default()
+    .xtol(tolerance)
+    .ftol(tolerance)
+    .maxiter(max_iter as usize)
+    .build()
+    .unwrap();
+
+  let cost = |args : ArrayView1<f64>| {
+    let x = args[0];
+    if x > max || x < min { std::f64::INFINITY } // high cost if x outside bounds
+    else { func(x) }
+  };
+
+  let ans = minimizer.minimize(
+    &cost,
+    Array::from_vec(vec![guess]).view()
   );
 
-  (x[0], fx)
+  ans[0]
+
+  // let (x, _fx) = minimize(
+  //   |args| func(args[0]),
+  //   vec![guess],
+  //   (max-min)/100.,
+  //   Params::default(),
+  //   Bounds { min: vec![min], max: vec![max] },
+  //   max_iter
+  // );
+  //
+  // x[0]
 
   // let cost = NelderMead1d { func };
   //

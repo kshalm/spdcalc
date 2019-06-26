@@ -93,12 +93,14 @@ impl Photon {
       num::abs(snell_external - (*n) * f64::sin(internal))
     };
 
-    let (theta, ..) = utils::nelder_mead_1d( curve, guess, 100, 0., FRAC_PI_2 );
+    let theta = utils::nelder_mead_1d( curve, guess, 100, 0., FRAC_PI_2, 1e-12 );
 
     theta * ucum::RAD
   }
 
-  pub fn calc_external_theta_from_internal(r_index: RIndex, internal : Angle) -> Angle {
+  pub fn calc_external_theta_from_internal(photon: &Photon, internal : Angle) -> Angle {
+    let direction = Photon::calc_direction(photon.phi, internal);
+    let r_index = photon.crystal_setup.get_index_along(photon.wavelength, direction, &photon.kind);
     // snells law
     f64::asin(*r_index * f64::sin(*(internal/ucum::RAD))) * ucum::RAD
   }
@@ -127,7 +129,7 @@ impl Photon {
 
   pub fn get_external_theta(&self) -> Angle {
     // snells law
-    Photon::calc_external_theta_from_internal(self.r_index, self.theta)
+    Photon::calc_external_theta_from_internal(&self, self.theta)
   }
 
   pub fn set_angles(&mut self, phi : Angle, theta : Angle){
@@ -209,11 +211,10 @@ mod tests {
   fn external_angle_test(){
     let (.., signal) = init();
     let theta = Photon::calc_internal_theta_from_external(&signal, 13. * ucum::DEG);
-    let theta_external = Photon::calc_external_theta_from_internal(signal.get_index(), theta);
+    let theta_external = Photon::calc_external_theta_from_internal(&signal, theta);
     let actual = *(theta_external/ucum::DEG);
     let expected = 13.;
-    // FIXME only getting accuracy of 1e-2 degrees
-    assert!(approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-2), "actual: {}, expected: {}", actual, expected);
+    assert!(approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-9), "actual: {}, expected: {}", actual, expected);
   }
 
   #[test]
@@ -223,7 +224,6 @@ mod tests {
     let theta = Photon::calc_internal_theta_from_external(&signal, theta_external);
     let actual = *(theta/ucum::DEG);
     let expected = *(signal.get_theta()/ucum::DEG);
-    // FIXME only getting accuracy of 1e-8 degrees
-    assert!(approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-8), "actual: {}, expected: {}", actual, expected);
+    assert!(approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-9), "actual: {}, expected: {}", actual, expected);
   }
 }
