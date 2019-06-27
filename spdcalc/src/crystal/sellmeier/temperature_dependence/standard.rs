@@ -10,8 +10,8 @@ pub struct Standard {
 
 impl TemperatureDependence for Standard {
   fn apply(&self, n : Indices, temperature : Kelvin<f64>) -> Indices {
-    let dn = dim_vector3(ucum::ONE, &self.dn);
-    let f = (temperature - from_celsius_to_kelvin(20.0)) / ucum::K;
-    n + dn * f
+    let dn = na::Vector3::from_column_slice(&self.dn);
+    let f = *((temperature - from_celsius_to_kelvin(20.0)) / ucum::K);
+    n + ucum::Unitless::new(dn * f)
   }
 }

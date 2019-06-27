@@ -9,7 +9,7 @@ pub type Angle = ucum::Radian<f64>;
 pub type RIndex = ucum::Unitless<f64>;
 
 /// Indices of refraction (n_x, n_y, n_z)
-pub type Indices = Vector3<RIndex>;
+pub type Indices = ucum::Unitless<Vector3<f64>>;
 
 /// Wavelength
 pub type Wavelength = ucum::Meter<f64>;
@@ -21,6 +21,7 @@ pub type WaistSize = Vector2<ucum::Meter<f64>>;
 pub type Direction = Unit<Vector3<f64>>;
 
 pub type Momentum = ucum::MilliJouleSecond<f64>;
+pub type Momentum3 = ucum::MilliJouleSecond<Vector3<f64>>;
 
 /// An enum to signify the sign (+1, -1)
 pub enum Sign {

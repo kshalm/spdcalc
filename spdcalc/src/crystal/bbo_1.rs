@@ -4,13 +4,10 @@
 //!
 //! ## Example
 //! ```
-//! use spdcalc::{crystal::*, dim::ucum, utils::dim_vector3, utils::*};
+//! use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::*};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
 //! let indices = Crystal::BBO_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
-//! let expected = dim_vector3(
-//!   ucum::ONE,
-//!   &[1.6631650519167869, 1.6631650519167869, 1.5463903834707935],
-//! );
+//! let expected = ucum::Unitless::new(Vector3::new(1.6631650519167869, 1.6631650519167869, 1.5463903834707935));
 //! assert_eq!(indices, expected)
 //! ```
 
@@ -18,7 +15,7 @@ use super::*;
 use crate::utils::*;
 use dim::{
   f64prefixes::MICRO,
-  ucum::{self, Kelvin, K, M},
+  ucum::{Kelvin, K, M},
 };
 
 pub const META : CrystalMeta = CrystalMeta {
@@ -38,13 +35,13 @@ const DNE : f64 = -16.6e-6;
 pub fn get_indices(wavelength : Wavelength, temperature : Kelvin<f64>) -> Indices {
   let l_sq = (wavelength / (MICRO * M)).powi(2); // Convert for Sellmeier Coefficients
 
-  let mut no = (2.7359 + 0.01878 / (l_sq - 0.01822) - 0.01354 * l_sq).sqrt() * ucum::ONE;
-  let mut ne = (2.3753 + 0.01224 / (l_sq - 0.01667) - 0.01516 * l_sq).sqrt() * ucum::ONE;
+  let mut no = (2.7359 + 0.01878 / (l_sq - 0.01822) - 0.01354 * l_sq).sqrt();
+  let mut ne = (2.3753 + 0.01224 / (l_sq - 0.01667) - 0.01516 * l_sq).sqrt();
 
-  let f = (temperature - from_celsius_to_kelvin(20.0)) / K;
+  let f = *((temperature - from_celsius_to_kelvin(20.0)) / K);
 
   no += f * DNO;
   ne += f * DNE;
 
-  Indices::new(no, no, ne)
+  Indices::new(na::Vector3::new(no, no, ne))
 }

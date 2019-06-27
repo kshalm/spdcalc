@@ -1,5 +1,5 @@
 pub extern crate dimensioned as dim;
-extern crate nalgebra as na;
+pub extern crate nalgebra as na;
 
 pub mod types;
 pub use types::*;

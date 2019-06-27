@@ -37,6 +37,6 @@ impl SellmeierEquation for SellmeierStandard {
         + b3.component_div(&(one_by_l_sq - c3)))
         * l_sq;
 
-    n.map(|i| ucum::ONE * i.sqrt())
+    ucum::Unitless::new( n.map(|i| i.sqrt()) )
   }
 }

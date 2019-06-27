@@ -1,5 +1,4 @@
 use crate::*;
-use na::Vector3;
 use dim::ucum;
 use photon::Photon;
 
@@ -15,26 +14,25 @@ pub fn calc_delta_k(
   pp: Option<PeriodicPolling>
 ) -> Momentum3 {
 
-  let r_s = signal.get_direction().as_ref();
-  let n_s = signal.get_index();
-  let lam_s = signal.get_wavelength();
+  let r_s = signal.get_direction();
+  let ns_by_ls = *(ucum::M * signal.get_index() / signal.get_wavelength());
 
-  let r_i = idler.get_direction().as_ref();
-  let n_i = idler.get_index();
-  let lam_i = idler.get_wavelength();
+  let r_i = idler.get_direction();
+  let ni_by_li = *(ucum::M * idler.get_index() / idler.get_wavelength());
 
-  let mut dk :Vector3<Momentum> = HBAR * PI2 * (
-    r_s * (n_s / lam_s)
-    + r_i * (n_i / lam_i)
-  );
+  let np_by_lp = *(ucum::M * pump.get_index() / pump.get_wavelength());
 
-  dk.z = HBAR * PI2 * ucum::M * (pump.get_index() / pump.get_wavelength()) - dk.z;
+  let mut dk =
+      r_s.as_ref() * ns_by_ls
+    + r_i.as_ref() * ni_by_li;
 
-  match pp {
+  dk.z = np_by_lp - dk.z;
+
+  PI2 * match pp {
     Some(poling) => {
-      dk.z -= HBAR * PI2 * ucum::M / (poling.sign * poling.period);
-      dk
+      dk.z -= PI2 / (poling.sign * (*(poling.period/ucum::M)));
+      Momentum3::new(dk)
     },
-    None => dk,
+    None => Momentum3::new(dk),
   }
 }

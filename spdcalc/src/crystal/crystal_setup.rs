@@ -50,9 +50,9 @@ impl CrystalSetup {
 
   pub fn get_index_along(&self, wavelength : Wavelength, direction : Direction, photon_type : &PhotonType) -> RIndex {
     // Calculation follows https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
-    let indices = self.crystal.get_indices(wavelength, self.temperature);
-    let n_inv2 = indices.map(|i| i.value_unsafe.powi(-2));
-    let crystal_rotation = Rotation3::from_euler_angles(0., self.theta.value_unsafe, self.phi.value_unsafe);
+    let indices = *self.crystal.get_indices(wavelength, self.temperature);
+    let n_inv2 = indices.map(|i| i.powi(-2));
+    let crystal_rotation = Rotation3::from_euler_angles(0., *(self.theta/RAD), *(self.phi/RAD));
     let s = crystal_rotation * direction;
     let s_squared = s.map(|i| i * i);
 
@@ -75,7 +75,7 @@ impl CrystalSetup {
     let slow = 1;
     let fast = -1;
 
-    dim::ucum::ONE * match &self.pm_type {
+    ONE * match &self.pm_type {
       PMType::Type0_o_oo =>
         solve_for_n(b, c, fast),
       PMType::Type0_e_ee =>
