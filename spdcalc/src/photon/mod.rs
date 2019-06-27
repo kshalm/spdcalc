@@ -47,7 +47,7 @@ impl Photon {
     waist : WaistSize,
     crystal_setup : &CrystalSetup
   ) -> Self {
-    assert!( *(theta/ucum::RAD) <= FRAC_PI_2 && *(theta/ucum::RAD) >= 0. );
+    assert!( *(theta/ucum::RAD) <= PI && *(theta/ucum::RAD) >= 0. );
 
     let r_index = ucum::ONE;
 
@@ -80,7 +80,7 @@ impl Photon {
   }
 
   pub fn calc_internal_theta_from_external( photon : &Photon, external : Angle ) -> Angle {
-    assert!( *(external/ucum::RAD) <= FRAC_PI_2 && *(external/ucum::RAD) >= 0. );
+    assert!( *(external/ucum::RAD) <= PI && *(external/ucum::RAD) >= 0. );
 
     let snell_external = f64::sin(*(external/ucum::RAD));
     let guess = *(external/ucum::RAD);
@@ -142,7 +142,7 @@ impl Photon {
   }
 
   pub fn set_angles(&mut self, phi : Angle, theta : Angle){
-    assert!( *(theta/ucum::RAD) <= FRAC_PI_2 && *(theta/ucum::RAD) >= 0. );
+    assert!( *(theta/ucum::RAD) <= PI && *(theta/ucum::RAD) >= 0. );
     self.phi = phi;
     self.theta = theta;
     self.update_direction();
