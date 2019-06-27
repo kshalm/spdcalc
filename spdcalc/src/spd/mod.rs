@@ -13,18 +13,26 @@ pub fn calc_delta_k(
   signal :&Photon,
   idler :&Photon,
   pp: Option<PeriodicPolling>
-) -> Vector3<Momentum> {
+) -> Momentum3 {
+
+  let r_s = signal.get_direction().as_ref();
+  let n_s = signal.get_index();
+  let lam_s = signal.get_wavelength();
+
+  let r_i = idler.get_direction().as_ref();
+  let n_i = idler.get_index();
+  let lam_i = idler.get_wavelength();
 
   let mut dk :Vector3<Momentum> = HBAR * PI2 * (
-    signal.get_direction() * (signal.get_index() / signal.get_wavelength())
-    + idler.get_direction() * (idler.get_index() / idler.get_wavelength())
+    r_s * (n_s / lam_s)
+    + r_i * (n_i / lam_i)
   );
 
-  dk.z = PI2 * (pulse.get_index() / pulse.get_wavelength()) - dk.z;
+  dk.z = HBAR * PI2 * ucum::M * (pump.get_index() / pump.get_wavelength()) - dk.z;
 
   match pp {
     Some(poling) => {
-      dk.z -= PI2 / (poling.period * poling.sign);
+      dk.z -= HBAR * PI2 * ucum::M / (poling.sign * poling.period);
       dk
     },
     None => dk,

@@ -20,7 +20,7 @@ pub type WaistSize = Vector2<ucum::Meter<f64>>;
 /// A 3d unit vector for directions
 pub type Direction = Unit<Vector3<f64>>;
 
-pub type Momentum = dim::si::JouleSecond<f64>;
+pub type Momentum = ucum::MilliJouleSecond<f64>;
 
 /// An enum to signify the sign (+1, -1)
 pub enum Sign {
@@ -29,12 +29,12 @@ pub enum Sign {
 }
 
 impl<T> std::ops::Mul<T> for Sign
-where T : std::ops::Mul<i32> {
-  type Output = <T as std::ops::Mul<i32>>::Output;
+where T : std::ops::Mul<f64> {
+  type Output = <T as std::ops::Mul<f64>>::Output;
   fn mul(self, rhs :T) -> Self::Output {
     match self {
-      Sign::POSITIVE => rhs * 1,
-      Sign::NEGATIVE => rhs * (-1),
+      Sign::POSITIVE => rhs * 1.,
+      Sign::NEGATIVE => rhs * (-1.),
     }
   }
 }
