@@ -7,6 +7,7 @@ pub mod constants;
 pub use constants::*;
 
 pub mod photon;
+pub mod spd;
 
 pub mod crystal;
 pub mod junk;

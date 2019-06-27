@@ -18,11 +18,11 @@ pub enum PhotonType {
 
 /// The photon
 pub struct Photon {
-  pub wavelength : Wavelength,
   pub waist : WaistSize,
 
   // private
 
+  wavelength : Wavelength,
   // the kind of photon
   kind : PhotonType,
   // crystal setup
@@ -122,6 +122,15 @@ impl Photon {
     self.theta
   }
 
+  pub fn get_wavelength(&self) -> Wavelength {
+    self.wavelength
+  }
+
+  pub fn set_wavelength(&mut self, w : Wavelength) {
+    self.wavelength = w;
+    self.update_index();
+  }
+
   pub fn set_from_external_theta(&mut self, external : Angle) {
     let theta = Photon::calc_internal_theta_from_external(self, external);
     self.set_angles(self.phi, theta);
@@ -146,9 +155,13 @@ impl Photon {
     self.direction
   }
 
+  fn update_index(&mut self){
+    self.r_index = self.crystal_setup.get_index_along(self.wavelength, self.direction, &self.kind);
+  }
+
   fn update_direction(&mut self){
     self.direction = Photon::calc_direction(self.phi, self.theta);
-    self.r_index = self.crystal_setup.get_index_along(self.wavelength, self.direction, &self.kind);
+    self.update_index()
   }
 }
 
@@ -183,7 +196,7 @@ mod tests {
   #[test]
   fn direction_vector_test(){
     let (crystal_setup, signal) = init();
-    let crystal_rotation = Rotation3::from_euler_angles(0., crystal_setup.theta.value_unsafe, crystal_setup.phi.value_unsafe);
+    let crystal_rotation = Rotation3::from_euler_angles(0., *(crystal_setup.theta/ucum::RAD), *(crystal_setup.phi/ucum::RAD));
     let s = signal.get_direction();
     let dir = crystal_rotation * s;
     let expected = Vector3::new( -0.00006370990344706924, 0.0018256646987702438, 0.9999983314433358 );
@@ -197,7 +210,7 @@ mod tests {
     let (.., signal) = init();
     let n = signal.get_index();
     let expected = 1.6465859604517012;
-    assert!(approx_eq!(f64, n.value_unsafe, expected, ulps = 2), "actual: {}, expected: {}", n.value_unsafe, expected)
+    assert!(approx_eq!(f64, *n, expected, ulps = 2), "actual: {}, expected: {}", *n, expected)
   }
 
   #[test]
