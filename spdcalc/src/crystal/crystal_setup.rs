@@ -1,5 +1,5 @@
 use super::*;
-use photon::PhotonType;
+use photon::{Photon, PhotonType};
 use dim::ucum::*;
 use na::{Vector3, Rotation3};
 
@@ -48,12 +48,24 @@ impl CrystalSetup {
   //   };
   // }
 
+  pub fn get_local_direction(&self, direction : Direction) -> Direction {
+    let crystal_rotation = Rotation3::from_euler_angles(0., *(self.theta/RAD), *(self.phi/RAD));
+    crystal_rotation * direction
+  }
+
+  pub fn get_local_direction_for(&self, photon : &Photon) -> Direction {
+    self.get_local_direction(photon.get_direction())
+  }
+
+  pub fn get_index_for(&self, photon : &Photon) -> RIndex {
+    self.get_index_along(photon.get_wavelength(), photon.get_direction(), &photon.get_type())
+  }
+
   pub fn get_index_along(&self, wavelength : Wavelength, direction : Direction, photon_type : &PhotonType) -> RIndex {
     // Calculation follows https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
     let indices = *self.crystal.get_indices(wavelength, self.temperature);
     let n_inv2 = indices.map(|i| i.powi(-2));
-    let crystal_rotation = Rotation3::from_euler_angles(0., *(self.theta/RAD), *(self.phi/RAD));
-    let s = crystal_rotation * direction;
+    let s = self.get_local_direction(direction);
     let s_squared = s.map(|i| i * i);
 
     let sum_recip = Vector3::new(

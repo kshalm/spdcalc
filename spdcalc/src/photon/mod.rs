@@ -10,6 +10,7 @@ use std::f64::consts::{FRAC_PI_2};
 use std::f64;
 
 /// The type of photon (pump/signal/idler)
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub enum PhotonType {
   Pump,
   Signal,
@@ -23,16 +24,12 @@ pub struct Photon {
   // private
 
   wavelength : Wavelength,
-  // the kind of photon
-  kind : PhotonType,
-  // crystal setup
-  crystal_setup : CrystalSetup,
+  // the type of photon
+  photon_type : PhotonType,
   /// (internal) azimuthal angle [0, π]
   theta : Angle,
   /// polar angle [0, 2π]
   phi : Angle,
-  /// refractive index
-  r_index : RIndex,
   /// direction of propagation
   direction: Direction,
 }
@@ -40,25 +37,20 @@ pub struct Photon {
 impl Photon {
 
   pub fn new(
-    kind : PhotonType,
-    theta : Angle,
+    photon_type : PhotonType,
     phi : Angle,
+    theta : Angle,
     wavelength : Wavelength,
-    waist : WaistSize,
-    crystal_setup : &CrystalSetup
+    waist : WaistSize
   ) -> Self {
     assert!( *(theta/ucum::RAD) <= PI && *(theta/ucum::RAD) >= 0. );
 
-    let r_index = ucum::ONE;
-
     let mut p = Photon {
-      kind,
+      photon_type,
       wavelength,
       waist,
       theta,
       phi,
-      crystal_setup: crystal_setup.clone(),
-      r_index,
       direction : Direction::new_normalize(na::Vector3::x())
     };
 
@@ -79,7 +71,7 @@ impl Photon {
     )
   }
 
-  pub fn calc_internal_theta_from_external( photon : &Photon, external : Angle ) -> Angle {
+  pub fn calc_internal_theta_from_external( photon : &Photon, external : Angle, crystal_setup : &CrystalSetup ) -> Angle {
     assert!( *(external/ucum::RAD) <= PI && *(external/ucum::RAD) >= 0. );
 
     let snell_external = f64::sin(*(external/ucum::RAD));
@@ -88,7 +80,7 @@ impl Photon {
 
     let curve = |internal| {
       let direction = Photon::calc_direction( phi, internal * ucum::RAD );
-      let n = photon.crystal_setup.get_index_along(photon.wavelength, direction, &photon.kind);
+      let n = crystal_setup.get_index_along(photon.wavelength, direction, &photon.photon_type);
 
       num::abs(snell_external - (*n) * f64::sin(internal))
     };
@@ -98,16 +90,20 @@ impl Photon {
     theta * ucum::RAD
   }
 
-  pub fn calc_external_theta_from_internal(photon: &Photon, internal : Angle) -> Angle {
+  pub fn calc_external_theta_from_internal(photon: &Photon, internal : Angle, crystal_setup : &CrystalSetup) -> Angle {
     let direction = Photon::calc_direction(photon.phi, internal);
-    let r_index = photon.crystal_setup.get_index_along(photon.wavelength, direction, &photon.kind);
+    let r_index = crystal_setup.get_index_along(photon.wavelength, direction, &photon.photon_type);
     // snells law
     f64::asin(*r_index * f64::sin(*(internal/ucum::RAD))) * ucum::RAD
   }
 
+  pub fn get_type(&self) -> PhotonType {
+    self.photon_type
+  }
+
   /// Get index of refraction along direction of propagation
-  pub fn get_index(&self) -> RIndex {
-    self.r_index
+  pub fn get_index(&self, crystal_setup : &CrystalSetup) -> RIndex {
+    crystal_setup.get_index_for(&self)
   }
 
   pub fn get_direction(&self) -> Direction {
@@ -128,17 +124,16 @@ impl Photon {
 
   pub fn set_wavelength(&mut self, w : Wavelength) {
     self.wavelength = w;
-    self.update_index();
   }
 
-  pub fn set_from_external_theta(&mut self, external : Angle) {
-    let theta = Photon::calc_internal_theta_from_external(self, external);
+  pub fn set_from_external_theta(&mut self, external : Angle, crystal_setup : &CrystalSetup) {
+    let theta = Photon::calc_internal_theta_from_external(self, external, crystal_setup);
     self.set_angles(self.phi, theta);
   }
 
-  pub fn get_external_theta(&self) -> Angle {
+  pub fn get_external_theta(&self, crystal_setup : &CrystalSetup) -> Angle {
     // snells law
-    Photon::calc_external_theta_from_internal(&self, self.theta)
+    Photon::calc_external_theta_from_internal(&self, self.theta, crystal_setup)
   }
 
   pub fn set_angles(&mut self, phi : Angle, theta : Angle){
@@ -155,13 +150,8 @@ impl Photon {
     self.direction
   }
 
-  fn update_index(&mut self){
-    self.r_index = self.crystal_setup.get_index_along(self.wavelength, self.direction, &self.kind);
-  }
-
   fn update_direction(&mut self){
     self.direction = Photon::calc_direction(self.phi, self.theta);
-    self.update_index()
   }
 }
 
@@ -188,7 +178,7 @@ mod tests {
       temperature : from_celsius_to_kelvin(20.0),
     };
 
-    let signal = Photon::new(PhotonType::Signal, theta, phi, wavelength, waist, &crystal_setup);
+    let signal = Photon::new(PhotonType::Signal, phi, theta, wavelength, waist);
 
     (crystal_setup, signal)
   }
@@ -207,24 +197,24 @@ mod tests {
 
   #[test]
   fn refractive_index_test() {
-    let (.., signal) = init();
-    let n = signal.get_index();
+    let (crystal_setup, signal) = init();
+    let n = signal.get_index(&crystal_setup);
     let expected = 1.6465859604517012;
     assert!(approx_eq!(f64, *n, expected, ulps = 2), "actual: {}, expected: {}", *n, expected)
   }
 
   #[test]
   fn external_angle_test_for_zero(){
-    let (.., signal) = init();
-    let theta = Photon::calc_internal_theta_from_external(&signal, 0. * ucum::DEG);
+    let (crystal_setup, signal) = init();
+    let theta = Photon::calc_internal_theta_from_external(&signal, 0. * ucum::DEG, &crystal_setup);
     assert_eq!(*(theta/ucum::RAD), 0.);
   }
 
   #[test]
   fn external_angle_test(){
-    let (.., signal) = init();
-    let theta = Photon::calc_internal_theta_from_external(&signal, 13. * ucum::DEG);
-    let theta_external = Photon::calc_external_theta_from_internal(&signal, theta);
+    let (crystal_setup, signal) = init();
+    let theta = Photon::calc_internal_theta_from_external(&signal, 13. * ucum::DEG, &crystal_setup);
+    let theta_external = Photon::calc_external_theta_from_internal(&signal, theta, &crystal_setup);
     let actual = *(theta_external/ucum::DEG);
     let expected = 13.;
     assert!(approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-9), "actual: {}, expected: {}", actual, expected);
@@ -232,9 +222,9 @@ mod tests {
 
   #[test]
   fn external_angle_test_from_internal(){
-    let (.., signal) = init();
-    let theta_external = signal.get_external_theta();
-    let theta = Photon::calc_internal_theta_from_external(&signal, theta_external);
+    let (crystal_setup, signal) = init();
+    let theta_external = signal.get_external_theta(&crystal_setup);
+    let theta = Photon::calc_internal_theta_from_external(&signal, theta_external, &crystal_setup);
     let actual = *(theta/ucum::DEG);
     let expected = *(signal.get_theta()/ucum::DEG);
     assert!(approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-9), "actual: {}, expected: {}", actual, expected);
