@@ -4,16 +4,30 @@ use photon::{Photon, PhotonType};
 use crystal::CrystalSetup;
 use dim::f64prefixes::MILLI;
 
-pub struct PeriodicPolling {
+mod autocalc;
+pub use autocalc::*;
+
+pub struct PeriodicPoling {
   pub period : ucum::Meter<f64>,
   pub sign: Sign,
 }
 
+impl PeriodicPoling {
+  /// Get the factor 1 / (sign * poling_period)
+  pub fn pp_factor(self) -> f64 {
+    *(ucum::M / (self.sign * self.period))
+  }
+
+  // pub fn auto_calc()
+}
+
+/// Calculate the optimum idler photon from signal, pulse,
+/// crystal and optional periodic poling.
 pub fn get_optimum_idler(
   signal :&Photon,
   pump :&Photon,
   crystal_setup :&CrystalSetup,
-  pp: Option<PeriodicPolling>
+  pp: Option<PeriodicPoling>
 ) -> Photon {
 
   let ls = signal.get_wavelength();
@@ -22,7 +36,7 @@ pub fn get_optimum_idler(
   let np = pump.get_index(&crystal_setup);
 
   let del_k_pp = match pp {
-    Some(poling) => signal.get_wavelength() / (poling.sign * poling.period),
+    Some(poling) => signal.get_wavelength() * poling.pp_factor() / ucum::M,
     None => ucum::Unitless::new(0.0),
   };
 
@@ -60,7 +74,7 @@ pub fn calc_delta_k(
   idler :&Photon,
   pump :&Photon,
   crystal_setup :&CrystalSetup,
-  pp: Option<PeriodicPolling>
+  pp: Option<PeriodicPoling>
 ) -> Momentum3 {
 
   let r_s = signal.get_direction();
@@ -72,6 +86,7 @@ pub fn calc_delta_k(
 
   // These are negative because we are subtracting signal and idler.
   // Pump is zero along x and y
+  // \vec{\Delta k} = \vec{k_{pulse}} - \vec{k_{signal}} - \vec{k_{idler}}
   let mut dk =
     - r_s.as_ref() * ns_over_ls
     - r_i.as_ref() * ni_over_li;
@@ -81,7 +96,7 @@ pub fn calc_delta_k(
   // put into milliJoule seconds
   (PI2 / MILLI) * match pp {
     Some(poling) => {
-      dk.z -= 1.0 / (poling.sign * (*(poling.period/ucum::M)));
+      dk.z -= poling.pp_factor();
       Momentum3::new(dk)
     },
     None => Momentum3::new(dk),
@@ -121,7 +136,7 @@ mod tests {
   #[test]
   fn optimum_idler_test() {
     let (crystal_setup, signal, _idler, pump) = init();
-    let pp = PeriodicPolling{
+    let pp = PeriodicPoling{
       period: 0.00004656366863331685 * ucum::M,
       sign: Sign::POSITIVE,
     };
@@ -144,7 +159,7 @@ mod tests {
   fn calc_delta_k_test() {
     let (crystal_setup, signal, idler, pump) = init();
     let expected = na::Vector3::new(-30851.482867892322, -8266.62991975434, 186669.00855689016);
-    let pp = PeriodicPolling{
+    let pp = PeriodicPoling{
       period: 0.00004656366863331685 * ucum::M,
       sign: Sign::POSITIVE,
     };

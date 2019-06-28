@@ -38,15 +38,6 @@ fn solve_for_n(b :f64, c :f64, sign : i16) -> f64 {
 }
 
 impl CrystalSetup {
-  // pub fn get_optimal_theta( pump_wl : Wavelength, signal_wl : Wavelength ) -> Angle {
-  //   let idler_wl = (pump_wl - signal_wl) / (pump_wl * signal_wl);
-  //
-  //   let min_delk = |x| {
-  //     // original code had if (x>Math.PI/2 || x<0){return 1e12;}... i don't know why
-  //
-  //
-  //   };
-  // }
 
   pub fn get_local_direction(&self, direction : Direction) -> Direction {
     let crystal_rotation = Rotation3::from_euler_angles(0., *(self.theta/RAD), *(self.phi/RAD));
