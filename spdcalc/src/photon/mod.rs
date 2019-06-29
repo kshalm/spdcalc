@@ -18,6 +18,7 @@ pub enum PhotonType {
 }
 
 /// The photon
+#[derive(Debug, Copy, Clone)]
 pub struct Photon {
   pub waist : WaistSize,
 
@@ -43,7 +44,7 @@ impl Photon {
     wavelength : Wavelength,
     waist : WaistSize
   ) -> Self {
-    assert!( *(theta/ucum::RAD) <= PI && *(theta/ucum::RAD) >= 0. );
+    assert!( *(theta/ucum::RAD) <= PI && *(theta/ucum::RAD) >= 0., "theta: {}", theta );
 
     let mut p = Photon {
       photon_type,

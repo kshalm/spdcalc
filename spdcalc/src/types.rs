@@ -24,6 +24,7 @@ pub type Momentum = ucum::MilliJouleSecond<f64>;
 pub type Momentum3 = ucum::MilliJouleSecond<Vector3<f64>>;
 
 /// An enum to signify the sign (+1, -1)
+#[derive(Debug, Copy, Clone)]
 pub enum Sign {
   POSITIVE,
   NEGATIVE,

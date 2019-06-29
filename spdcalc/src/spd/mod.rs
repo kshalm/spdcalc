@@ -1,5 +1,6 @@
 use crate::*;
 use dim::ucum;
+use math::*;
 use photon::{Photon, PhotonType};
 use crystal::CrystalSetup;
 use dim::f64prefixes::MILLI;
@@ -7,6 +8,7 @@ use dim::f64prefixes::MILLI;
 mod autocalc;
 pub use autocalc::*;
 
+#[derive(Debug, Copy, Clone)]
 pub struct PeriodicPoling {
   pub period : ucum::Meter<f64>,
   pub sign: Sign,
@@ -40,7 +42,7 @@ pub fn get_optimum_idler(
     None => ucum::Unitless::new(0.0),
   };
 
-  let phi = signal.get_phi() + (PI * ucum::RAD);
+  let mut phi = signal.get_phi() + (PI * ucum::RAD);
   let ns_z = ns * f64::cos(*(signal.get_theta() / ucum::RAD));
   let ls_over_lp = ls / lp;
   let np_by_ls_over_lp = np * ls_over_lp;
@@ -55,7 +57,13 @@ pub fn get_optimum_idler(
     + del_k_pp * del_k_pp;
 
   let numerator = ns * f64::sin(*(signal.get_theta() / ucum::RAD));
-  let theta = f64::asin( (*numerator) / (*arg).sqrt() ) * ucum::RAD;
+  let mut val = (*numerator) / (*arg).sqrt();
+  // means it's trying to give a negative theta.. so rotate to other side in phi
+  if val > 1.0 {
+    val = 2.0 - val;
+    phi -= PI * ucum::RAD;
+  }
+  let theta = f64::asin( val ) * ucum::RAD;
   let wavelength = ls * lp / (ls - lp);
 
   Photon::new(
@@ -101,6 +109,30 @@ pub fn calc_delta_k(
     },
     None => Momentum3::new(dk),
   }
+}
+
+/// Calculate the walkoff angle for the pump
+pub fn calc_pump_walkoff(pump : &Photon, crystal_setup :&CrystalSetup) -> Angle {
+  assert!(pump.get_type() == PhotonType::Pump);
+
+  // TODO Ask krister about this............
+
+  // n_{pump}(\theta)
+  let np_of_theta = Func(|x :&[f64]| {
+    let theta = x[0];
+    let mut setup = crystal_setup.clone();
+    setup.theta = theta * ucum::RAD;
+
+    *pump.get_index(&setup)
+  });
+
+  // derrivative at theta
+  let theta = *(crystal_setup.theta/ucum::RAD);
+  let np_prime = NumericalDifferentiation::new(np_of_theta).gradient(&[theta])[0];
+  let np = *pump.get_index(&crystal_setup);
+
+  // walkoff
+  (np_prime / np) * ucum::RAD
 }
 
 #[cfg(test)]
@@ -172,5 +204,14 @@ mod tests {
     assert!(approx_eq!(f64, del_k.x, expected.x, ulps = 2, epsilon = 1e-9), "actual: {}, expected: {}", del_k.x, expected.x);
     assert!(approx_eq!(f64, del_k.y, expected.y, ulps = 2, epsilon = 1e-9), "actual: {}, expected: {}", del_k.y, expected.y);
     assert!(approx_eq!(f64, del_k.z, expected.z, ulps = 2, epsilon = 1e-9), "actual: {}, expected: {}", del_k.z, expected.z);
+  }
+
+  #[test]
+  fn calc_walkoff_test() {
+    let (crystal_setup, _signal, _idler, pump) = init();
+    let expected = 0.01;
+    let actual = *(calc_pump_walkoff(&pump, &crystal_setup) / ucum::RAD);
+
+    assert!(approx_eq!(f64, actual, expected, ulps = 2), "actual: {}, expected: {}", actual, expected);
   }
 }

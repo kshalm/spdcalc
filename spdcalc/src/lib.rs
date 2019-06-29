@@ -6,6 +6,8 @@ pub use types::*;
 pub mod constants;
 pub use constants::*;
 
+pub mod math;
+
 pub mod photon;
 pub mod spd;
 
