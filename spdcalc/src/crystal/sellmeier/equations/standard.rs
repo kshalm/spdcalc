@@ -1,5 +1,8 @@
 use super::*;
-use dim::ucum;
+use dim::{
+  f64prefixes::MICRO,
+  ucum::{self, M},
+};
 
 /// Standard form:
 /// > n² = A + b1 * λ² / (λ² - c1) + b2 * λ² / (λ² - c2) + b3 * λ² / (λ² - c3)
@@ -26,8 +29,8 @@ impl SellmeierEquation for SellmeierStandard {
     let c2 = na::Vector3::from_column_slice(&self.c2);
     let c3 = na::Vector3::from_column_slice(&self.c3);
 
-    // convert to millimeters
-    let l = wavelength.value_unsafe * 1e6;
+    // convert to micrometers
+    let l = *(wavelength / (MICRO * M));
     let l_sq = l * l;
     let one_by_l_sq = Vector3::repeat(l_sq);
 

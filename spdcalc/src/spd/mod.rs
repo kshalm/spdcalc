@@ -191,6 +191,25 @@ mod tests {
     (crystal_setup, signal, idler, pump)
   }
 
+  fn init_defaults() -> (CrystalSetup, Photon, Photon, Photon) {
+    let wavelength = 1550. * NANO * M;
+    let waist = WaistSize::new(Vector2::new(100.0 * MICRO, 100.0 * MICRO));
+    let crystal_setup = CrystalSetup{
+      crystal: Crystal::KTP,
+      pm_type : crystal::PMType::Type2_e_eo,
+      theta : 90. * DEG,
+      phi : 0. * DEG,
+      length : 2_000.0 * MICRO * M,
+      temperature : from_celsius_to_kelvin(20.0),
+    };
+
+    let signal = Photon::new(PhotonType::Signal, 0. * DEG, 0. * DEG, wavelength, waist);
+    let idler = Photon::new(PhotonType::Idler, 0. * DEG, 0. * RAD, wavelength, waist);
+    let pump = Photon::new(PhotonType::Pump, 0. * DEG, 0. * DEG, 775. * NANO * M, waist);
+
+    (crystal_setup, signal, idler, pump)
+  }
+
   #[test]
   fn optimum_idler_test() {
     let (crystal_setup, signal, _idler, pump) = init();
@@ -210,6 +229,28 @@ mod tests {
 
     let theta_i = *(idler.get_theta()/ucum::RAD);
     let theta_i_expected = 0.16946290635813477;
+    assert!(approx_eq!(f64, theta_i, theta_i_expected, ulps = 2), "actual: {}, expected: {}", theta_i, theta_i_expected);
+  }
+
+  #[test]
+  fn optimum_idler_zero_angles_test(){
+    let (crystal_setup, signal, _idler, pump) = init_defaults();
+    let pp = PeriodicPoling{
+      period: 0.00004656366863331685 * ucum::M,
+      sign: Sign::POSITIVE,
+    };
+    let idler = get_optimum_idler(&signal, &pump, &crystal_setup, Some(pp));
+
+    let li = *(idler.get_wavelength() / ucum::M);
+    let li_expected = 1550. * NANO;
+    assert!(approx_eq!(f64, li, li_expected, ulps = 2), "actual: {}, expected: {}", li, li_expected);
+
+    let phi_i = *(idler.get_phi()/ucum::DEG);
+    let phi_i_expected = 180.;
+    assert!(approx_eq!(f64, phi_i, phi_i_expected, ulps = 2), "actual: {}, expected: {}", phi_i, phi_i_expected);
+
+    let theta_i = *(idler.get_theta()/ucum::RAD);
+    let theta_i_expected = 0.;
     assert!(approx_eq!(f64, theta_i, theta_i_expected, ulps = 2), "actual: {}, expected: {}", theta_i, theta_i_expected);
   }
 

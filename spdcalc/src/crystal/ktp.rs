@@ -41,7 +41,7 @@ pub fn get_indices(wavelength : Wavelength, temperature : Kelvin<f64>) -> Indice
   let mut nx = (2.10468 + 0.89342 * lambda_sq / (lambda_sq - 0.04438) - 0.01036 * lambda_sq).sqrt();
 
   let mut ny =
-    if wavelength.value_unsafe < (1.2 * 1e6) {
+    if *(wavelength / (MICRO * M)) < 1.2 {
       (2.14559 + 0.87629 * lambda_sq / (lambda_sq - 0.0485) - 0.01173 * lambda_sq).sqrt()
     } else {
       (2.0993 + 0.922683 * lambda_sq / (lambda_sq - 0.0467695) - 0.0138408 * lambda_sq).sqrt()

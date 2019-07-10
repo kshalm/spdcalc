@@ -36,8 +36,10 @@ impl AutoCalc {
         pp,
       );
 
-      // del_k.value_unsafe.norm_squared()
-      del_k.value_unsafe.z.abs()
+      let del_k_vec = *(del_k / ucum::J / ucum::S);
+
+      // del_k_vec.norm_squared()
+      del_k_vec.z.abs()
     };
 
     let guess = PI / 2.0;
@@ -58,7 +60,7 @@ impl AutoCalc {
         sign: Sign::POSITIVE,
       }),
     );
-    let z = del_k_guess.value_unsafe.z;
+    let z = (*(del_k_guess / ucum::J / ucum::S)).z;
     let guess = if z == 0. { 0. } else { PI2 / z };
     let sign = if guess >= 0. { Sign::POSITIVE } else { Sign::NEGATIVE };
 
@@ -76,10 +78,12 @@ impl AutoCalc {
         pp,
       );
 
-      del_k.value_unsafe.z.abs()
+      let del_k_vec = *(del_k / ucum::J / ucum::S);
+
+      del_k_vec.z.abs()
     };
 
-    let period = utils::nelder_mead_1d( delta_k, guess.abs(), 1000, std::f64::MIN, std::f64::INFINITY, 1e-12 );
+    let period = utils::nelder_mead_1d( delta_k, guess.abs(), 1000, std::f64::MIN, 1., 1e-12 );
 
     PeriodicPoling {
       period: period * ucum::M,
@@ -122,8 +126,9 @@ mod tests {
   //       pp,
   //     );
   //
-  //     let del_k_z = del_k.value_unsafe.z.abs();
-  //     // del_k.value_unsafe.z.abs()
+  //     let del_k_vec = *(del_k / ucum::J / ucum::S);
+  //     let del_k_z = del_k_vec.z.abs();
+  //     // del_k_vec.z.abs()
   //     data.push_str(&format!("{}, {}\n", period, del_k_z));
   //   }
   //
@@ -166,7 +171,7 @@ mod tests {
     let crystal_setup = CrystalSetup{
       crystal: Crystal::KTP,
       pm_type : crystal::PMType::Type2_e_eo,
-      theta : 0.0 * DEG,
+      theta : 90.0 * DEG,
       phi : 0.0 * DEG,
       length : 2_000.0 * MICRO * M,
       temperature : from_celsius_to_kelvin(20.0),
@@ -203,11 +208,31 @@ mod tests {
   #[test]
   fn optimal_pp_test(){
     let auto_calc = init2();
-    let period = *(auto_calc.calc_periodic_poling().period / ucum::M);
+    let pp = auto_calc.calc_periodic_poling();
+    let period = *(pp.period / ucum::M);
     let period_exptected = 0.00004652032850062386;
+
+    // let n_s = auto_calc.signal.get_index(&auto_calc.crystal_setup);
+    // let n_i = auto_calc.idler.get_index(&auto_calc.crystal_setup);
+    // let n_p = auto_calc.pump.get_index(&auto_calc.crystal_setup);
+    //
+    // println!("crystal {:#?}", auto_calc.crystal_setup);
+    // println!("indices lamda_s: {}", auto_calc.crystal_setup.crystal.get_indices(auto_calc.signal.get_wavelength(), auto_calc.crystal_setup.temperature));
+    //
+    // println!("signal {:#?}", auto_calc.signal);
+    // println!("idler {:#?}", auto_calc.idler);
+    //
+    // let r_s = auto_calc.crystal_setup.get_local_direction_for(&auto_calc.signal);
+    // println!("r_s: {}", r_s.as_ref());
+    //
+    // println!("n_s: {}", n_s);
+    // println!("n_i: {}", n_i);
+    // println!("n_p: {}", n_p);
+    //
+    // let del_k = calc_delta_k(&auto_calc.signal, &auto_calc.idler, &auto_calc.pump, &auto_calc.crystal_setup, Some(pp));
+    // println!("del_k: {}", del_k);
     // println!("{} m", period);
 
-    // FIXME.... very low accuracy
-    assert!(approx_eq!(f64, period, period_exptected, ulps = 2, epsilon = 1e-5), "actual: {}, expected: {}", period, period_exptected);
+    assert!(approx_eq!(f64, period, period_exptected, ulps = 2, epsilon = 1e-16), "actual: {}, expected: {}", period, period_exptected);
   }
 }

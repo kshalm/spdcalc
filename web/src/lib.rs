@@ -146,7 +146,7 @@ pub fn get_indices(name : String, wavelength : f64, temperature : f64) -> Vec<f6
   };
 
   let indices = crystal.get_indices(lamda, kelvin);
-  indices.iter().map(|i| i.value_unsafe).collect()
+  indices.iter().map(|i| *i).collect()
 }
 
 // fn perf_to_system(amt: f64) -> SystemTime {
