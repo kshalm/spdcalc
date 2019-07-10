@@ -1,0 +1,15 @@
+{
+  "name": "spdcalc-old",
+  "version": "0.0.1",
+  "author": "",
+  "contributors": [
+  ],
+  "keywords": [],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "lodash": "^4.6.1"
+  },
+  "bundledDependencies": [],
+  "license": "GPL-3.0"
+}
