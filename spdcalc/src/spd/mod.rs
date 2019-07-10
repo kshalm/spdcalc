@@ -4,23 +4,48 @@ use math::*;
 use photon::{Photon, PhotonType};
 use crystal::CrystalSetup;
 use dim::f64prefixes::MILLI;
+use num::Complex;
 
 mod autocalc;
 pub use autocalc::*;
+mod periodic_poling;
+pub use periodic_poling::*;
 
-#[derive(Debug, Copy, Clone)]
-pub struct PeriodicPoling {
-  pub period : ucum::Meter<f64>,
-  pub sign: Sign,
+pub struct SPD {
+  pub signal :Photon,
+  pub idler :Photon,
+  pub pump :Photon,
+  pub crystal_setup :CrystalSetup,
+  pub pp :Option<PeriodicPoling>,
+  pub fiber_coupling :bool,
 }
 
-impl PeriodicPoling {
-  /// Get the factor 1 / (sign * poling_period)
-  pub fn pp_factor(self) -> f64 {
-    *(ucum::M / (self.sign * self.period))
+#[allow(non_snake_case)]
+pub fn calc_coinciddence_phasematch( spd :&SPD ) -> (Complex<f64>, f64) {
+
+  // crystal length
+  let L = *(spd.crystal_setup.length / ucum::M);
+
+  let delk = *(calc_delta_k(&spd.signal, &spd.idler, &spd.pump, &spd.crystal_setup, spd.pp) / ucum::J / ucum::S);
+  let arg = delk.z * 0.5 * L;
+
+  if !spd.fiber_coupling {
+    // no fiber coupling
+    let pmz = Complex::new(f64::sin(arg) / arg, 0.);
+    let waist = *(spd.pump.waist / ucum::M);
+    // TODO: check with krister... is this supposed to be w.x * w.y?
+    let pmt = waist.norm() * f64::exp(-0.5 * (delk.x.powi(2) * delk.y.powi(2)));
+
+    return (pmz, pmt);
   }
 
-  // pub fn auto_calc()
+  // TODO: if use_gaussian_approx...
+
+  calc_coinciddence_phasematch_fiber_coupling(spd)
+}
+
+fn calc_coinciddence_phasematch_fiber_coupling( spd: &SPD ) -> (Complex<f64>, f64) {
+  unimplemented!()
 }
 
 /// Calculate the optimum idler photon from signal, pulse,
@@ -138,6 +163,7 @@ pub fn calc_pump_walkoff(pump : &Photon, crystal_setup :&CrystalSetup) -> Angle 
 #[cfg(test)]
 mod tests {
   use super::*;
+  use na::Vector2;
   use crate::crystal::CrystalSetup;
   extern crate float_cmp;
   use float_cmp::*;
@@ -148,7 +174,7 @@ mod tests {
 
   fn init() -> (CrystalSetup, Photon, Photon, Photon) {
     let wavelength = 1550. * NANO * M;
-    let waist = WaistSize::new(100.0 * MICRO * M, 100.0 * MICRO * M);
+    let waist = WaistSize::new(Vector2::new(100.0 * MICRO, 100.0 * MICRO));
     let crystal_setup = CrystalSetup{
       crystal: Crystal::BBO_1,
       pm_type : crystal::PMType::Type2_e_eo,

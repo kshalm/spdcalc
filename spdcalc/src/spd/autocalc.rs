@@ -91,6 +91,7 @@ impl AutoCalc {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use na::Vector2;
   extern crate float_cmp;
   use float_cmp::*;
   use crate::utils::*;
@@ -98,8 +99,8 @@ mod tests {
   use ucum::*;
   use dim::f64prefixes::*;
 
-  use std::fs;
-  use std::io::prelude::*;
+  // use std::fs;
+  // use std::io::prelude::*;
 
   // fn write_data(auto : AutoCalc){
   //   let pp = auto.pp.map(|p| p.clone());
@@ -131,7 +132,7 @@ mod tests {
 
   fn init() -> AutoCalc {
     let wavelength = 1550. * NANO * M;
-    let waist = WaistSize::new(100.0 * MICRO * M, 100.0 * MICRO * M);
+    let waist = WaistSize::new(Vector2::new(100.0 * MICRO, 100.0 * MICRO));
     let crystal_setup = CrystalSetup{
       crystal: Crystal::BBO_1,
       pm_type : crystal::PMType::Type2_e_eo,
@@ -161,7 +162,7 @@ mod tests {
 
   fn init2() -> AutoCalc {
     let wavelength = 1550. * NANO * M;
-    let waist = WaistSize::new(100.0 * MICRO * M, 100.0 * MICRO * M);
+    let waist = WaistSize::new(Vector2::new(100.0 * MICRO, 100.0 * MICRO));
     let crystal_setup = CrystalSetup{
       crystal: Crystal::KTP,
       pm_type : crystal::PMType::Type2_e_eo,

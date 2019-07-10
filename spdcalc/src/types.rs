@@ -15,7 +15,7 @@ pub type Indices = ucum::Unitless<Vector3<f64>>;
 pub type Wavelength = ucum::Meter<f64>;
 
 /// 2D vector holding the x,y of the waist
-pub type WaistSize = Vector2<ucum::Meter<f64>>;
+pub type WaistSize = ucum::Meter<Vector2<f64>>;
 
 /// A 3d unit vector for directions
 pub type Direction = Unit<Vector3<f64>>;
