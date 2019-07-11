@@ -136,7 +136,8 @@ pub fn calc_delta_k(
   }
 }
 
-/// Calculate the walkoff angle for the pump
+/// Calculate the spatial walk-off for the pump
+/// [See equation (37) of Couteau, Christophe. "Spontaneous parametric down-conversion"](https://arxiv.org/pdf/1809.00127.pdf)
 pub fn calc_pump_walkoff(pump : &Photon, crystal_setup :&CrystalSetup) -> Angle {
   assert!(pump.get_type() == PhotonType::Pump);
 

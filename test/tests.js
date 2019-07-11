@@ -44,10 +44,10 @@ function walkoff_calc_version_2( P, h = 0.1 ){
    //calculate the derivative
    var deltheta = h * Math.PI/180;
 
-   var S_p = P.calc_Coordinate_Transform(P.theta - 0.5 * deltheta, P.phi, P.theta_s, P.theta_i);
+   var S_p = P.calc_Coordinate_Transform(P.theta - 0.5 * deltheta, P.phi, 0, 0);
    var ne1_p = P.calc_Index_PMType(P.lambda_p, P.type, S_p, "pump");
 
-   S_p = P.calc_Coordinate_Transform(P.theta + 0.5 * deltheta, P.phi, P.theta_s, P.theta_i);
+   S_p = P.calc_Coordinate_Transform(P.theta + 0.5 * deltheta, P.phi, 0, 0);
    var ne2_p = P.calc_Index_PMType(P.lambda_p, P.type, S_p, "pump");
 
    //set back to original theta
