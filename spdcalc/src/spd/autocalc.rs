@@ -6,12 +6,12 @@ use crystal::CrystalSetup;
 use std::f64::consts::{FRAC_PI_2};
 
 /// Helper to autocalculate various values
-struct AutoCalc {
-  signal :Photon,
-  idler :Photon,
-  pump :Photon,
-  crystal_setup :CrystalSetup,
-  pp :Option<PeriodicPoling>,
+pub struct AutoCalc {
+  pub signal :Photon,
+  pub idler :Photon,
+  pub pump :Photon,
+  pub crystal_setup :CrystalSetup,
+  pub pp :Option<PeriodicPoling>,
 }
 
 impl AutoCalc {

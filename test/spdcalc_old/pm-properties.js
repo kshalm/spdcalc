@@ -582,14 +582,14 @@ SPDCprop.prototype = {
     },
 
 
-     calc_walkoff_angles: function(){
+     calc_walkoff_angles: function( h = 0.1 ){
         // Calculate the pump walkoff angle
         var P = this;
         var ne_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
         var origin_theta = P.theta;
 
         //calculate the derivative
-        var deltheta = 0.1*Math.PI/180;
+        var deltheta = h * Math.PI/180;
 
         var theta = P.theta - deltheta/2;
         this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);

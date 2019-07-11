@@ -191,10 +191,10 @@ mod tests {
     (crystal_setup, signal, idler, pump)
   }
 
-  fn init_defaults() -> (CrystalSetup, Photon, Photon, Photon) {
+  fn init_defaults() -> (CrystalSetup, Photon, Photon, Photon, Option<PeriodicPoling>) {
     let wavelength = 1550. * NANO * M;
     let waist = WaistSize::new(Vector2::new(100.0 * MICRO, 100.0 * MICRO));
-    let crystal_setup = CrystalSetup{
+    let mut crystal_setup = CrystalSetup{
       crystal: Crystal::KTP,
       pm_type : crystal::PMType::Type2_e_eo,
       theta : 90. * DEG,
@@ -202,12 +202,22 @@ mod tests {
       length : 2_000.0 * MICRO * M,
       temperature : from_celsius_to_kelvin(20.0),
     };
+    let pp = Some(PeriodicPoling{
+      period: 1. * ucum::M,
+      sign: Sign::POSITIVE,
+    });
 
     let signal = Photon::new(PhotonType::Signal, 0. * DEG, 0. * DEG, wavelength, waist);
-    let idler = Photon::new(PhotonType::Idler, 0. * DEG, 0. * RAD, wavelength, waist);
     let pump = Photon::new(PhotonType::Pump, 0. * DEG, 0. * DEG, 775. * NANO * M, waist);
+    let mut idler = get_optimum_idler(&signal, &pump, &crystal_setup, pp);
 
-    (crystal_setup, signal, idler, pump)
+    let ac = spd::autocalc::AutoCalc{ signal, idler, pump, crystal_setup, pp };
+    let theta = ac.calc_crystal_theta();
+    crystal_setup.theta = theta;
+
+    idler = get_optimum_idler(&signal, &pump, &crystal_setup, pp);
+
+    (crystal_setup, signal, idler, pump, pp)
   }
 
   #[test]
@@ -234,12 +244,7 @@ mod tests {
 
   #[test]
   fn optimum_idler_zero_angles_test(){
-    let (crystal_setup, signal, _idler, pump) = init_defaults();
-    let pp = PeriodicPoling{
-      period: 0.00004656366863331685 * ucum::M,
-      sign: Sign::POSITIVE,
-    };
-    let idler = get_optimum_idler(&signal, &pump, &crystal_setup, Some(pp));
+    let (crystal_setup, signal, idler, pump, pp) = init_defaults();
 
     let li = *(idler.get_wavelength() / ucum::M);
     let li_expected = 1550. * NANO;
@@ -275,8 +280,9 @@ mod tests {
 
   #[test]
   fn calc_walkoff_test() {
-    let (crystal_setup, _signal, _idler, pump) = init();
-    let expected = 0.01;
+    let (crystal_setup, signal, idler, pump, pp) = init_defaults();
+
+    let expected = 7.235298472624982e-13;
     let actual = *(calc_pump_walkoff(&pump, &crystal_setup) / ucum::RAD);
 
     assert!(approx_eq!(f64, actual, expected, ulps = 2), "actual: {}, expected: {}", actual, expected);
