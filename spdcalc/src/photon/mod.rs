@@ -37,6 +37,7 @@ pub struct Photon {
 
 impl Photon {
 
+  /// create a photon
   pub fn new(
     photon_type : PhotonType,
     phi : Angle,
@@ -58,6 +59,52 @@ impl Photon {
     p.update_direction();
 
     p
+  }
+
+  /// create a signal photon
+  pub fn signal(
+    phi : Angle,
+    theta : Angle,
+    wavelength : Wavelength,
+    waist : WaistSize
+  ) -> Self {
+    Self::new(
+      PhotonType::Signal,
+      phi,
+      theta,
+      wavelength,
+      waist
+    )
+  }
+
+  /// create a idler photon
+  pub fn idler(
+    phi : Angle,
+    theta : Angle,
+    wavelength : Wavelength,
+    waist : WaistSize
+  ) -> Self {
+    Self::new(
+      PhotonType::Idler,
+      phi,
+      theta,
+      wavelength,
+      waist
+    )
+  }
+
+  /// create a pump photon
+  pub fn pump(
+    wavelength : Wavelength,
+    waist : WaistSize
+  ) -> Self {
+    Self::new(
+      PhotonType::Pump,
+      0. * ucum::RAD,
+      0. * ucum::RAD,
+      wavelength,
+      waist
+    )
   }
 
   pub fn calc_direction( phi : Angle, theta : Angle ) -> Direction {
@@ -179,7 +226,7 @@ mod tests {
       temperature : from_celsius_to_kelvin(20.0),
     };
 
-    let signal = Photon::new(PhotonType::Signal, phi, theta, wavelength, waist);
+    let signal = Photon::signal(phi, theta, wavelength, waist);
 
     (crystal_setup, signal)
   }
