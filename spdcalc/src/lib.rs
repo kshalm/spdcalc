@@ -15,6 +15,7 @@ pub mod crystal;
 pub mod junk;
 pub mod utils;
 pub use crystal::Crystal;
+pub mod plotting;
 
 #[allow(unused_imports)]
 #[cfg(test)]

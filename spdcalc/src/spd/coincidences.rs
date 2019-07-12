@@ -40,6 +40,18 @@ pub fn phasematch( spd :&SPD ) -> Complex<f64> {
   alpha * pmz
 }
 
+pub fn phasematch_collinear( spd :&SPD ) -> Complex<f64> {
+  let zero = 0. * ucum::RAD;
+  let signal = Photon::signal( zero, zero, spd.signal.get_wavelength(), spd.signal.waist );
+  let idler = Photon::idler( zero, zero, spd.idler.get_wavelength(), spd.idler.waist );
+
+  phasematch(&SPD {
+    signal,
+    idler,
+    .. *spd
+  })
+}
+
 #[allow(non_snake_case)]
 pub fn calc_coincidence_phasematch( spd :&SPD ) -> (Complex<f64>, f64) {
 
