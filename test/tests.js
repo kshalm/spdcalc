@@ -134,7 +134,18 @@ function derrivativeTest(){
   console.log('x^2 convergence: ', result)
 }
 
+function pump_spectrum(){
+  let props = defaultProps()
+  props.auto_calc_Theta()
+
+  let sp = spdc.pump_spectrum(props)
+
+  console.log(`Pump Spectrum: ${sp}`)
+}
+
 // poling_period()
 // walkoff()
-walkoff_convergence()
+// walkoff_convergence()
 // derrivativeTest()
+
+pump_spectrum()

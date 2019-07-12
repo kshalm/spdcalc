@@ -5,10 +5,12 @@ use photon::{Photon, PhotonType};
 use crystal::CrystalSetup;
 use dim::f64prefixes::{MILLI, NANO, MICRO};
 use std::f64::consts::{FRAC_PI_2};
-use num::Complex;
 
 mod periodic_poling;
 pub use periodic_poling::*;
+
+mod coincidences;
+pub use coincidences::*;
 
 pub struct SPD {
   pub signal :Photon,
@@ -17,6 +19,7 @@ pub struct SPD {
   pub crystal_setup :CrystalSetup,
   pub pp :Option<PeriodicPoling>,
   pub fiber_coupling :bool,
+  pub pump_bandwidth :Wavelength,
 }
 
 impl Default for SPD {
@@ -42,6 +45,7 @@ impl Default for SPD {
       crystal_setup,
       pp: None,
       fiber_coupling: false,
+      pump_bandwidth: 5.35 * NANO * ucum::M,
     }
   }
 }
@@ -147,34 +151,6 @@ impl SPD {
   pub fn calc_pump_walkoff( &self ) -> Angle {
     calc_pump_walkoff(&self.pump, &self.crystal_setup)
   }
-}
-
-#[allow(non_snake_case)]
-pub fn calc_coinciddence_phasematch( spd :&SPD ) -> (Complex<f64>, f64) {
-
-  // crystal length
-  let L = *(spd.crystal_setup.length / ucum::M);
-
-  let delk = *(spd.calc_delta_k() / ucum::J / ucum::S);
-  let arg = delk.z * 0.5 * L;
-
-  if !spd.fiber_coupling {
-    // no fiber coupling
-    let pmz = Complex::new(f64::sin(arg) / arg, 0.);
-    let waist = *(spd.pump.waist / ucum::M);
-    // TODO: check with krister... is this supposed to be w.x * w.y?
-    let pmt = waist.x * waist.y * f64::exp(-0.5 * (delk.x.powi(2) + delk.y.powi(2)));
-
-    return (pmz, pmt);
-  }
-
-  // TODO: if use_gaussian_approx...
-
-  calc_coinciddence_phasematch_fiber_coupling(spd)
-}
-
-fn calc_coinciddence_phasematch_fiber_coupling( _spd: &SPD ) -> (Complex<f64>, f64) {
-  unimplemented!()
 }
 
 /// Calculate the optimum idler photon from signal, pulse,
@@ -464,7 +440,7 @@ mod tests {
     let pump = Photon::pump(775. * NANO * M, waist);
     let idler = get_optimum_idler(&signal, &pump, &crystal_setup, pp);
 
-    let spd = SPD { signal, idler, pump, crystal_setup, pp, fiber_coupling: false };
+    let spd = SPD { signal, idler, pump, crystal_setup, pp, ..SPD::default() };
 
     let theta = *(spd.calc_optimum_crystal_theta() / ucum::RAD);
     let theta_exptected = 0.6302501999499033;
