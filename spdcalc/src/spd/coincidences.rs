@@ -105,6 +105,10 @@ mod tests {
     spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
     spd.assign_optimum_theta();
 
+    // FIXME This isn't matching.
+    // spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
+    // spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
+
     let amp = calc_coincidence_phasematch( &spd );
     let delk = spd.calc_delta_k();
 

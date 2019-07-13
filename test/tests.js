@@ -153,8 +153,8 @@ function phasematch(){
   props.auto_calc_Theta()
   props.calcfibercoupling = false
 
-  let amp = spdc.phasematch( props )
   let delk = spdc.calc_delK( props )
+  let amp = spdc.phasematch( props )
 
   show(props)
 
