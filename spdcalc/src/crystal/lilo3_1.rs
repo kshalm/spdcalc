@@ -2,12 +2,14 @@
 //!
 //! ## Example
 //! ```
-//! use spdcalc::crystal::*;
-//! use spdcalc::na::Vector3;
-//! use spdcalc::dim::ucum;
+//! use spdcalc::{crystal::*, dim::ucum, na::Vector3};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystal::LiIO3_1.get_indices( 720.0 * nm, 0. * ucum::K ); // no temperature dependence
-//! let expected = ucum::Unitless::new(Vector3::new(1.8719412177557622, 1.8719412177557622, 1.7283584186311833));
+//! let indices = Crystal::LiIO3_1.get_indices(720.0 * nm, 0. * ucum::K); // no temperature dependence
+//! let expected = ucum::Unitless::new(Vector3::new(
+//!   1.8719412177557622,
+//!   1.8719412177557622,
+//!   1.7283584186311833,
+//! ));
 //! assert_eq!(indices, expected)
 //! ```
 use super::*;

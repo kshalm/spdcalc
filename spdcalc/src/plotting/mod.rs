@@ -1,8 +1,8 @@
 use super::*;
-use spd::*;
+use dim::ucum;
 use math::lerp;
 use na::Vector2;
-use dim::ucum;
+use spd::*;
 
 /// Holds configuration for drawing heatmaps
 #[derive(Debug, Copy, Clone)]
@@ -23,17 +23,17 @@ impl IntoIterator for HistogramConfig {
 
   fn into_iter(self) -> Self::IntoIter {
     HistogramConfigIterator {
-      cfg: self,
-      index: 0,
-      total: self.x_count * self.y_count,
+      cfg :   self,
+      index : 0,
+      total : self.x_count * self.y_count,
     }
   }
 }
 
 pub struct HistogramConfigIterator {
-  cfg: HistogramConfig,
-  index: usize,
-  total: usize,
+  cfg :   HistogramConfig,
+  index : usize,
+  total : usize,
 }
 
 impl Iterator for HistogramConfigIterator {
@@ -51,35 +51,38 @@ impl Iterator for HistogramConfigIterator {
 
     self.index += 1;
 
-    Some( Vector2::new(x, y) )
+    Some(Vector2::new(x, y))
   }
 }
 
 /// Create a JSI plot
-pub fn plot_JSI( params :&SPD, cfg: &HistogramConfig ) -> Vec<f64> {
-  let norm_amp = phasematch_collinear( &params );
+pub fn plot_JSI(params : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
+  let norm_amp = phasematch_collinear(&params);
   // norm of intensity
   let norm = norm_amp.re.powi(2) + norm_amp.im.powi(2);
 
-  cfg.into_iter().map(|coords| {
-    let l_s = coords.x;
-    let l_i = coords.y;
+  cfg
+    .into_iter()
+    .map(|coords| {
+      let l_s = coords.x;
+      let l_i = coords.y;
 
-    let mut signal = params.signal.clone();
-    let mut idler = params.idler.clone();
+      let mut signal = params.signal.clone();
+      let mut idler = params.idler.clone();
 
-    signal.set_wavelength(l_s * ucum::M);
-    idler.set_wavelength(l_i * ucum::M);
+      signal.set_wavelength(l_s * ucum::M);
+      idler.set_wavelength(l_i * ucum::M);
 
-    let spd = SPD {
-      signal,
-      idler,
-      .. *params
-    };
+      let spd = SPD {
+        signal,
+        idler,
+        ..*params
+      };
 
-    let amplitude = phasematch( &spd );
+      let amplitude = phasematch(&spd);
 
-    // intensity
-    (amplitude.re.powi(2) + amplitude.im.powi(2)) / norm
-  }).collect()
+      // intensity
+      (amplitude.re.powi(2) + amplitude.im.powi(2)) / norm
+    })
+    .collect()
 }

@@ -18,11 +18,15 @@ impl Crystal {
   ///
   /// ## Example
   /// ```
-  /// use spdcalc::{dim::ucum, na::Vector3, Crystal, utils::*};
+  /// use spdcalc::{dim::ucum, na::Vector3, utils::*, Crystal};
   /// let crystal = Crystal::BBO_1;
   /// let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
   /// let indices = crystal.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
-  /// let expected = ucum::Unitless::new(Vector3::new(1.6631650519167869, 1.6631650519167869, 1.5463903834707935));
+  /// let expected = ucum::Unitless::new(Vector3::new(
+  ///   1.6631650519167869,
+  ///   1.6631650519167869,
+  ///   1.5463903834707935,
+  /// ));
   /// assert_eq!(indices, expected)
   /// ```
   pub fn get_indices(&self, wavelength : Wavelength, temperature : Kelvin<f64>) -> Indices {

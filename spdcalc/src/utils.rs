@@ -3,11 +3,11 @@
 //     na::Vector3::<$units>::new(ucum::ONE * $slice[0], ucum::ONE * $slice[1],
 // ucum::ONE * $slice[2])   )
 // }
-extern crate optimize;
 extern crate ndarray;
-use optimize::*;
-use ndarray::{Array, ArrayView1};
+extern crate optimize;
 use dim::ucum;
+use ndarray::{Array, ArrayView1};
+use optimize::*;
 // use nelder_mead::{*, params::*, bounds::*};
 // use argmin::prelude::*;
 // use argmin::solver::neldermead::NelderMead;
@@ -28,16 +28,15 @@ where
 }
 
 /// convert from celsius to kelvin
-pub fn from_celsius_to_kelvin( c : f64 ) -> ucum::Kelvin<f64> {
+pub fn from_celsius_to_kelvin(c : f64) -> ucum::Kelvin<f64> {
   ucum::Kelvin::new(c + 273.15)
 }
 
 /// convert from kelvin to celsius
-pub fn from_kelvin_to_celsius( k : ucum::Kelvin<f64> ) -> f64 {
-  *(k/ucum::K) - 273.15
+pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
+  *(k / ucum::K) - 273.15
 }
 
-//
 // #[derive(Clone, Default, Serialize, Deserialize)]
 // struct NelderMead1d<F: FnMut(f64) -> f64> {
 //   func: F,
@@ -45,8 +44,8 @@ pub fn from_kelvin_to_celsius( k : ucum::Kelvin<f64> ) -> f64 {
 //
 // impl<F : FnMut(f64) -> f64> ArgminOp for NelderMead1d<F>
 // where
-//   F: serde::Serialize + std::clone::Clone + std::marker::Sync + std::marker::Send
-// {
+//   F: serde::Serialize + std::clone::Clone + std::marker::Sync +
+// std::marker::Send {
 //   /// Type of the parameter vector
 //   type Param = Vec<f64>;
 //   /// Type of the return value computed by the cost function
@@ -63,8 +62,14 @@ pub fn from_kelvin_to_celsius( k : ucum::Kelvin<f64> ) -> f64 {
 // }
 
 /// nelder mead optimization. Returns x
-pub fn nelder_mead_1d( func : impl Fn(f64) -> f64, guess : f64, max_iter: u32, min: f64, max: f64, tolerance : f64 ) -> f64 {
-
+pub fn nelder_mead_1d(
+  func : impl Fn(f64) -> f64,
+  guess : f64,
+  max_iter : u32,
+  min : f64,
+  max : f64,
+  tolerance : f64,
+) -> f64 {
   let minimizer = NelderMeadBuilder::default()
     .xtol(tolerance)
     .ftol(tolerance)
@@ -74,14 +79,16 @@ pub fn nelder_mead_1d( func : impl Fn(f64) -> f64, guess : f64, max_iter: u32, m
 
   let cost = |args : ArrayView1<f64>| {
     let x = args[0];
-    if x > max || x < min { std::f64::INFINITY } // high cost if x outside bounds
-    else { func(x) }
+    if x > max || x < min {
+      std::f64::INFINITY
+    }
+    // high cost if x outside bounds
+    else {
+      func(x)
+    }
   };
 
-  let ans = minimizer.minimize(
-    &cost,
-    Array::from_vec(vec![guess]).view()
-  );
+  let ans = minimizer.minimize(&cost, Array::from_vec(vec![guess]).view());
 
   ans[0]
 
@@ -98,8 +105,8 @@ pub fn nelder_mead_1d( func : impl Fn(f64) -> f64, guess : f64, max_iter: u32, m
 
   // let cost = NelderMead1d { func };
   //
-  // // Set up solver -- note that the proper choice of the vertices is very important!
-  // let solver = NelderMead::new()
+  // // Set up solver -- note that the proper choice of the vertices is very
+  // important! let solver = NelderMead::new()
   //   .with_initial_params(vec![guess])
   //   .sd_tolerance(0.0001);
   //

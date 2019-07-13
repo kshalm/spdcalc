@@ -4,6 +4,7 @@ extern crate spdcalc;
 extern crate wasm_bindgen;
 
 use num::traits::Pow;
+use spdcalc::{crystal::Crystal, dim::f64prefixes::NANO};
 use wasm_bindgen::prelude::*;
 // use std::time::{Duration, SystemTime, UNIX_EPOCH};
 // use std::f64::consts::PI;
@@ -137,16 +138,33 @@ pub fn get_indices(name : String, wavelength : f64, temperature : f64) -> Vec<f6
   let lamda = wavelength * spdcalc::dim::ucum::M;
   let kelvin = temperature * spdcalc::dim::ucum::K;
   let crystal = match name.as_ref() {
-    "bbo" => spdcalc::Crystals::BBO_1,
-    "ktp" => spdcalc::Crystals::KTP,
-    "bibo" => spdcalc::Crystals::BiBO_1,
-    "aggas2" => spdcalc::Crystals::AgGaS2_1,
-    "liio3" => spdcalc::Crystals::LiIO3_1,
+    "bbo" => Crystal::BBO_1,
+    "ktp" => Crystal::KTP,
+    "bibo" => Crystal::BiBO_1,
+    "aggas2" => Crystal::AgGaS2_1,
+    "liio3" => Crystal::LiIO3_1,
     _ => panic!(),
   };
 
   let indices = crystal.get_indices(lamda, kelvin);
   indices.iter().map(|i| *i).collect()
+}
+
+#[wasm_bindgen]
+pub fn get_JSI_data(width : usize, height : usize) -> Vec<f64> {
+  let mut params = spdcalc::spd::SPD::default();
+  params.assign_optimum_theta();
+  params.pp = Some(params.calc_periodic_poling());
+
+  let cfg = spdcalc::plotting::HistogramConfig {
+    x_range : (1490.86 * NANO, 1609.14 * NANO),
+    y_range : (1495.05 * NANO, 1614.03 * NANO),
+
+    x_count : width,
+    y_count : height,
+  };
+
+  spdcalc::plotting::plot_JSI(&params, &cfg)
 }
 
 // fn perf_to_system(amt: f64) -> SystemTime {

@@ -3,7 +3,7 @@ use super::*;
 #[derive(Debug, Copy, Clone)]
 pub struct PeriodicPoling {
   pub period : ucum::Meter<f64>,
-  pub sign: Sign,
+  pub sign :   Sign,
 }
 
 impl PeriodicPoling {

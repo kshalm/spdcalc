@@ -11,6 +11,11 @@ function defaultProps(){
   const props = new spdc.SPDCprop({crystal: 'BBO-1', enable_pp: false, theta_s_e: 3 * Math.PI/180})
   //{crystal: 'BBO-1', enable_pp: false, theta_s_e: 3 * Math.PI/180}
 
+
+  return props
+}
+
+function show( props ){
   console.log(`Indices (${props.lambda_i})`, props.crystal.indicies(props.lambda_i, props.temp))
 
   console.log(`Pump: φ(${props.phi}), θ(${props.theta}), λ(${print_nm(props.lambda_p)})`)
@@ -18,7 +23,7 @@ function defaultProps(){
   console.log(`Signal (external): θ(${props.theta_s_e})`)
   console.log(`Idler: φ(${props.phi_i}), θ(${props.theta_i}), λ(${print_nm(props.lambda_i)})`)
   console.log(`Idler (external): θ(${props.theta_i_e})`)
-  return props
+  console.log(`n_p: ${props.n_p}, n_s: ${props.n_s}, n_i: ${props.n_i}`)
 }
 
 function poling_period(){
@@ -143,9 +148,26 @@ function pump_spectrum(){
   console.log(`Pump Spectrum: ${sp}`)
 }
 
+function phasematch(){
+  let props = defaultProps()
+  props.auto_calc_Theta()
+  props.calcfibercoupling = false
+
+  let amp = spdc.phasematch( props )
+  let delk = spdc.calc_delK( props )
+
+  show(props)
+
+  console.log('delk', delk)
+  console.log('S_s', props.S_s)
+
+  console.log('PM amplitued', amp)
+}
+
 // poling_period()
 // walkoff()
 // walkoff_convergence()
 // derrivativeTest()
 
-pump_spectrum()
+// pump_spectrum()
+phasematch()

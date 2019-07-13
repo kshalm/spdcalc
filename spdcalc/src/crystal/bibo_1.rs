@@ -23,7 +23,11 @@ pub const META : CrystalMeta = CrystalMeta {
 /// use spdcalc::{crystal::*, dim::ucum, na::Vector3};
 /// let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
 /// let indices = bibo_1::get_indices(720.0 * nm, 293.0 * ucum::K);
-/// let expected = ucum::Unitless::new(Vector3::new(1.770147077637903, 1.7990347340642352, 1.93622182289392));
+/// let expected = ucum::Unitless::new(Vector3::new(
+///   1.770147077637903,
+///   1.7990347340642352,
+///   1.93622182289392,
+/// ));
 /// assert_eq!(indices, expected)
 /// ```
 #[allow(clippy::unreadable_literal)]

@@ -2,11 +2,11 @@
 extern crate criterion;
 use criterion::{black_box, Criterion};
 
-extern crate optimize;
 extern crate ndarray;
-use optimize::*;
+extern crate optimize;
 use ndarray::{Array, ArrayView1};
-use nelder_mead::{*, params::*, bounds::*};
+use nelder_mead::{bounds::*, params::*, *};
+use optimize::*;
 
 fn nelder_mead_optimize(_n : i32) -> f64 {
   let n = 0.33;
@@ -25,14 +25,16 @@ fn nelder_mead_optimize(_n : i32) -> f64 {
 
   let cost = |args : ArrayView1<f64>| {
     let x = args[0];
-    if x > max || x < min { std::f64::INFINITY } // high cost if x outside bounds
-    else { func(x) }
+    if x > max || x < min {
+      std::f64::INFINITY
+    }
+    // high cost if x outside bounds
+    else {
+      func(x)
+    }
   };
 
-  let ans = minimizer.minimize(
-    &cost,
-    Array::from_vec(vec![guess]).view()
-  );
+  let ans = minimizer.minimize(&cost, Array::from_vec(vec![guess]).view());
 
   ans[0]
 }
@@ -48,10 +50,13 @@ fn nelder_mead_nm(_n : i32) -> f64 {
   let (x, fx) = minimize(
     |args| func(args[0]),
     vec![guess],
-    (max-min)/100.,
+    (max - min) / 100.,
     Params::default(),
-    Bounds { min: vec![min], max: vec![max] },
-    max_iter
+    Bounds {
+      min : vec![min],
+      max : vec![max],
+    },
+    max_iter,
   );
 
   x[0]

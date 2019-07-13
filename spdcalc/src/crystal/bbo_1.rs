@@ -7,7 +7,11 @@
 //! use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::*};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
 //! let indices = Crystal::BBO_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
-//! let expected = ucum::Unitless::new(Vector3::new(1.6631650519167869, 1.6631650519167869, 1.5463903834707935));
+//! let expected = ucum::Unitless::new(Vector3::new(
+//!   1.6631650519167869,
+//!   1.6631650519167869,
+//!   1.5463903834707935,
+//! ));
 //! assert_eq!(indices, expected)
 //! ```
 

@@ -31,9 +31,11 @@ pub enum Sign {
 }
 
 impl<T> std::ops::Mul<T> for Sign
-where T : std::ops::Mul<f64> {
+where
+  T : std::ops::Mul<f64>,
+{
   type Output = <T as std::ops::Mul<f64>>::Output;
-  fn mul(self, rhs :T) -> Self::Output {
+  fn mul(self, rhs : T) -> Self::Output {
     match self {
       Sign::POSITIVE => rhs * 1.,
       Sign::NEGATIVE => rhs * (-1.),
