@@ -156,7 +156,8 @@ pub fn get_jsi_data(width : usize, height : usize) -> Vec<f64> {
   let mut params = spdcalc::spd::SPD { ..defaults };
   // params.crystal_setup.crystal = spdcalc::crystal::Crystal::BiBO_1;
   params.pp = Some(params.calc_periodic_poling());
-  params.assign_optimum_theta();
+  params.crystal_setup.theta = 0.5515891191131287 * spdcalc::dim::ucum::RAD;
+  // params.assign_optimum_theta();
 
   let cfg = spdcalc::plotting::HistogramConfig {
     x_range : (1490.86 * NANO, 1609.14 * NANO),

@@ -87,7 +87,7 @@ impl SPD {
       del_k_vec.z.abs()
     };
 
-    let guess = FRAC_PI_2;
+    let guess = PI / 6.;
     let theta = utils::nelder_mead_1d(delta_k, guess, 1000, 0., FRAC_PI_2, 1e-12);
 
     theta * ucum::RAD
@@ -519,6 +519,23 @@ mod tests {
 
     assert!(
       approx_eq!(f64, theta, theta_exptected, ulps = 2, epsilon = 1e-5),
+      "actual: {}, expected: {}",
+      theta,
+      theta_exptected
+    );
+  }
+
+  #[test]
+  fn optimal_theta_test_2() {
+    let mut spd = SPD::default();
+    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
+
+    let theta = *(spd.calc_optimum_crystal_theta() / ucum::RAD);
+    let theta_exptected = 0.5515891191131287;
+    // println!("{} deg", theta/ucum::DEG);
+
+    assert!(
+      approx_eq!(f64, theta, theta_exptected, ulps = 2, epsilon = 1e-9),
       "actual: {}, expected: {}",
       theta,
       theta_exptected
