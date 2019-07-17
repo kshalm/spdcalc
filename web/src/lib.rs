@@ -151,10 +151,12 @@ pub fn get_indices(name : String, wavelength : f64, temperature : f64) -> Vec<f6
 }
 
 #[wasm_bindgen]
-pub fn get_JSI_data(width : usize, height : usize) -> Vec<f64> {
-  let mut params = spdcalc::spd::SPD::default();
-  params.assign_optimum_theta();
+pub fn get_jsi_data(width : usize, height : usize) -> Vec<f64> {
+  let defaults = spdcalc::spd::SPD::default();
+  let mut params = spdcalc::spd::SPD { ..defaults };
+  // params.crystal_setup.crystal = spdcalc::crystal::Crystal::BiBO_1;
   params.pp = Some(params.calc_periodic_poling());
+  params.assign_optimum_theta();
 
   let cfg = spdcalc::plotting::HistogramConfig {
     x_range : (1490.86 * NANO, 1609.14 * NANO),

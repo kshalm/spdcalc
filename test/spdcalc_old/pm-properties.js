@@ -586,22 +586,17 @@ SPDCprop.prototype = {
         // Calculate the pump walkoff angle
         var P = this;
         var ne_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
-        var origin_theta = P.theta;
 
         //calculate the derivative
         var deltheta = h * Math.PI/180;
 
         var theta = P.theta - deltheta/2;
-        this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
-        var ne1_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+        var S_p = this.calc_Coordinate_Transform(theta, this.phi, 0, 0);
+        var ne1_p = this.calc_Index_PMType(P.lambda_p, P.type, S_p, "pump");
 
         theta = theta + deltheta;
-        this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
-        var ne2_p = this.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
-
-        //set back to original theta
-        theta = origin_theta;
-        this.S_p = this.calc_Coordinate_Transform(theta,this.phi, this.theta_s, this.theta_i);
+        S_p = this.calc_Coordinate_Transform(theta, this.phi, 0, 0);
+        var ne2_p = this.calc_Index_PMType(P.lambda_p, P.type, S_p, "pump");
 
         this.walkoff_p = -1/ne_p *(ne1_p - ne2_p)/deltheta;
         // console.log("Walkoff:", this.walkoff_p*180/Math.PI);

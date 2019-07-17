@@ -38,7 +38,7 @@ impl Default for SPD {
 
     let waist = WaistSize::new(na::Vector2::new(100.0 * MICRO, 100.0 * MICRO));
     let signal = Photon::signal(0. * DEG, 0. * DEG, 1550. * NANO * M, waist);
-    let idler = Photon::idler(0. * DEG, 180. * DEG, 1550. * NANO * M, waist);
+    let idler = Photon::idler(180. * DEG, 0. * DEG, 1550. * NANO * M, waist);
     let pump = Photon::pump(775. * NANO * M, waist);
 
     SPD {
@@ -54,6 +54,18 @@ impl Default for SPD {
 }
 
 impl SPD {
+  /// create a copy with the pump wavelength set to correspond to the
+  /// crystal phasematching function
+  pub fn with_phasematched_pump(self) -> Self {
+    let l_s = self.signal.get_wavelength();
+    let l_i = self.idler.get_wavelength();
+    let wavelength = (l_s * l_i) / (l_s + l_i);
+    let pump = Photon::pump(wavelength, self.pump.waist);
+    SPD {
+      pump,
+      ..self
+    }
+  }
   /// automatically calculate the optimal crystal theta
   /// by minimizing delta k
   pub fn calc_optimum_crystal_theta(&self) -> Angle {

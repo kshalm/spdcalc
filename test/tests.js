@@ -142,6 +142,7 @@ function derrivativeTest(){
 function pump_spectrum(){
   let props = defaultProps()
   props.auto_calc_Theta()
+  props.calcfibercoupling = false
 
   let sp = spdc.pump_spectrum(props)
 
@@ -152,8 +153,10 @@ function phasematch(){
   let props = defaultProps()
   props.auto_calc_Theta()
   props.calcfibercoupling = false
+  // props.update_all_angles()
 
   let delk = spdc.calc_delK( props )
+  let amp_pm_tz = spdc.calc_PM_tz_k_coinc( props )
   let amp = spdc.phasematch( props )
 
   show(props)
@@ -161,7 +164,11 @@ function phasematch(){
   console.log('delk', delk)
   console.log('S_s', props.S_s)
 
+  console.log('PMtz amp', amp_pm_tz)
   console.log('PM amplitued', amp)
+  var arg = props.L/2*(delk[2]);
+  console.log('arg', arg)
+  console.log('sinc', Math.sin(arg)/arg)
 }
 
 // poling_period()
@@ -169,5 +176,5 @@ function phasematch(){
 // walkoff_convergence()
 // derrivativeTest()
 
-// pump_spectrum()
 phasematch()
+// pump_spectrum()

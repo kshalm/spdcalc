@@ -31,8 +31,9 @@ fn pump_spectrum(signal : &Photon, idler : &Photon, pump : &Photon, p_bw : Wavel
 }
 
 pub fn phasematch(spd : &SPD) -> Complex<f64> {
-  let (pmz, pmt) = calc_coincidence_phasematch(&spd);
-  let alpha = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+  let spd_pm = spd.with_phasematched_pump();
+  let (pmz, pmt) = calc_coincidence_phasematch(&spd_pm);
+  let alpha = pump_spectrum(&spd_pm.signal, &spd_pm.idler, &spd_pm.pump, spd_pm.pump_bandwidth);
 
   alpha * pmt * pmz
 }
@@ -103,13 +104,15 @@ mod tests {
     let mut spd = SPD::default();
     // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
     spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
+    // spd.assign_optimum_idler();
     spd.assign_optimum_theta();
 
     // FIXME This isn't matching.
     // spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
     // spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
 
-    let amp = calc_coincidence_phasematch( &spd );
+    let amp = phasematch( &spd );
+    let amp_pm_tz = calc_coincidence_phasematch( &spd );
     let delk = spd.calc_delta_k();
 
     println!("n_p: {}", spd.pump.get_index(&spd.crystal_setup));
@@ -119,6 +122,9 @@ mod tests {
     println!("{:#?}", spd);
     println!("{}", *(delk / ucum::J / ucum::S));
 
-    println!("{}, {}", amp.0, amp.1);
+    println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
+    println!("phasematch {}", amp);
+
+    // println!("pump spectrum {}", pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth));
   }
 }

@@ -35,8 +35,10 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     // Get the pump index corresponding to the crystal phasematching function
     // to calculate the K vector mismatch
+    console.log('n_p orig', P.n_p)
     P.lambda_p =1/(1/P.lambda_s + 1/P.lambda_i);
     P.n_p = P.calc_Index_PMType(P.lambda_p, P.type, P.S_p, "pump");
+    console.log('n_p new', P.n_p)
 
     // P.calc_walkoff_angles();
     var RHOpx = P.walkoff_p; //pump walkoff angle.
@@ -452,6 +454,8 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
     };
 
     var arg = P.L/2*(delKz);
+
+    console.log('arg inside', arg)
     var PMt = 1;
 
     if (P.calcfibercoupling){
