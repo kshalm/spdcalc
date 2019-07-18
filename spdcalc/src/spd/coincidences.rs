@@ -11,6 +11,7 @@ where
   fwhm / (2. * f64::sqrt(2. * f64::ln(2.)))
 }
 
+/// Calculate the pump spectrum
 #[allow(non_snake_case)]
 fn pump_spectrum(signal : &Photon, idler : &Photon, pump : &Photon, p_bw : Wavelength) -> f64 {
   let PI2c = PI2 * C_;
@@ -30,28 +31,20 @@ fn pump_spectrum(signal : &Photon, idler : &Photon, pump : &Photon, p_bw : Wavel
   (-0.25 * x * x).exp()
 }
 
+/// calculate the phasematching
 pub fn phasematch(spd : &SPD) -> Complex<f64> {
-  let spd_pm = spd.with_phasematched_pump();
-  let (pmz, pmt) = calc_coincidence_phasematch(&spd_pm);
-  let alpha = pump_spectrum(&spd_pm.signal, &spd_pm.idler, &spd_pm.pump, spd_pm.pump_bandwidth);
+
+  // calculate coincidences with pump wavelength to match signal/idler
+  let (pmz, pmt) = calc_coincidence_phasematch( &spd.with_phasematched_pump() );
+
+  // calculate pump spectrum with original pump
+  let alpha = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
 
   alpha * pmt * pmz
 }
 
-pub fn phasematch_collinear(spd : &SPD) -> Complex<f64> {
-  let zero = 0. * ucum::RAD;
-  let signal = Photon::signal(zero, zero, spd.signal.get_wavelength(), spd.signal.waist);
-  let idler = Photon::idler(zero, zero, spd.idler.get_wavelength(), spd.idler.waist);
-
-  phasematch(&SPD {
-    signal,
-    idler,
-    ..*spd
-  })
-}
-
 #[allow(non_snake_case)]
-pub fn calc_coincidence_phasematch(spd : &SPD) -> (Complex<f64>, f64) {
+fn calc_coincidence_phasematch(spd : &SPD) -> (Complex<f64>, f64) {
   // crystal length
   let L = *(spd.crystal_setup.length / ucum::M);
 
@@ -104,13 +97,14 @@ mod tests {
     // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
     spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
     // spd.assign_optimum_idler();
-    spd.assign_optimum_theta();
+    // spd.assign_optimum_theta();
 
     // FIXME This isn't matching.
-    // spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
-    // spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
+    spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
+    spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
 
     let amp = phasematch( &spd );
+    /*
     let amp_pm_tz = calc_coincidence_phasematch( &spd );
     let delk = spd.calc_delta_k();
 
@@ -123,7 +117,54 @@ mod tests {
 
     println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
     println!("phasematch {}", amp);
+    */
 
-    // println!("pump spectrum {}", pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth));
+    let actual = amp;
+    let expected = Complex::new(0.9999999456740692, 0.);
+
+    assert!(
+      approx_eq!(f64, actual.re, expected.re, ulps = 2, epsilon = 1e-12),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+    assert!(
+      approx_eq!(f64, actual.im, expected.im, ulps = 2, epsilon = 1e-12),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+  }
+
+  #[test]
+  fn phasematch_collinear_test(){
+    let spd = SPD::default();
+
+    let amp = phasematch( &spd.to_collinear() );
+    let actual = amp.re.powi(2) + amp.im.powi(2);
+    let expected = 1.;
+
+    /*
+    let zero = 0. * ucum::RAD;
+    let signal = Photon::signal(zero, zero, spd.signal.get_wavelength(), spd.signal.waist);
+    let idler = Photon::idler(zero, zero, spd.idler.get_wavelength(), spd.idler.waist);
+
+    let mut spd_collinear = SPD {
+      signal,
+      idler,
+      ..spd
+    };
+
+    spd_collinear.assign_optimum_theta();
+
+    println!("theta {}", spd_collinear.crystal_setup.theta);
+    */
+
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
   }
 }

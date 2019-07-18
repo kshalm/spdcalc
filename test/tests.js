@@ -171,10 +171,22 @@ function phasematch(){
   console.log('sinc', Math.sin(arg)/arg)
 }
 
+function phasematch_norm(){
+  let props = defaultProps()
+  props.auto_calc_Theta()
+  props.calcfibercoupling = false
+
+  show(props)
+
+  let norm = spdc.normalize_joint_spectrum(props)
+  console.log('norm', norm)
+}
+
 // poling_period()
 // walkoff()
 // walkoff_convergence()
 // derrivativeTest()
 
-phasematch()
+// phasematch()
 // pump_spectrum()
+phasematch_norm()

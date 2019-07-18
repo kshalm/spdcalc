@@ -172,13 +172,6 @@ impl Photon {
     self.update_direction();
   }
 
-  /// get the direction in the provided photon's reference frame
-  pub fn get_direction_in_frame(&self, _other : &Photon) -> Direction {
-    unimplemented!();
-    // FIXME
-    self.direction
-  }
-
   fn update_direction(&mut self) {
     self.direction = Photon::calc_direction(self.phi, self.theta);
   }

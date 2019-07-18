@@ -56,8 +56,9 @@ impl Iterator for HistogramConfigIterator {
 }
 
 /// Create a JSI plot
-pub fn plot_JSI(params : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
-  let norm_amp = phasematch_collinear(&params);
+pub fn plot_jsi(params : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
+  // calculate the collinear phasematch to normalize against
+  let norm_amp = phasematch(&params.to_collinear());
   // norm of intensity
   let norm = norm_amp.re.powi(2) + norm_amp.im.powi(2);
 

@@ -155,19 +155,19 @@ pub fn get_jsi_data(width : usize, height : usize) -> Vec<f64> {
   let defaults = spdcalc::spd::SPD::default();
   let mut params = spdcalc::spd::SPD { ..defaults };
   // params.crystal_setup.crystal = spdcalc::crystal::Crystal::BiBO_1;
-  params.pp = Some(params.calc_periodic_poling());
-  params.crystal_setup.theta = 0.5515891191131287 * spdcalc::dim::ucum::RAD;
-  // params.assign_optimum_theta();
+  // params.pp = Some(params.calc_periodic_poling());
+  // params.crystal_setup.theta = 0.5515891191131287 * spdcalc::dim::ucum::RAD;
+  params.assign_optimum_theta();
 
   let cfg = spdcalc::plotting::HistogramConfig {
-    x_range : (1490.86 * NANO, 1609.14 * NANO),
-    y_range : (1495.05 * NANO, 1614.03 * NANO),
+    x_range : (1000. * NANO, 2000. * NANO),
+    y_range : (1000. * NANO, 2000. * NANO),
 
     x_count : width,
     y_count : height,
   };
 
-  spdcalc::plotting::plot_JSI(&params, &cfg)
+  spdcalc::plotting::plot_jsi(&params, &cfg)
 }
 
 // fn perf_to_system(amt: f64) -> SystemTime {
