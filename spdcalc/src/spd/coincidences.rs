@@ -62,8 +62,7 @@ pub fn calc_coincidence_phasematch(spd : &SPD) -> (Complex<f64>, f64) {
     // no fiber coupling
     let pmz = Complex::new(f64::sin(arg) / arg, 0.);
     let waist = *(spd.pump.waist / ucum::M);
-    // TODO: check with krister... is this supposed to be w.x * w.y?
-    let pmt = f64::exp(-0.5 * (delk.x.powi(2) + delk.y.powi(2)) * waist.x * waist.y);
+    let pmt = f64::exp(-0.5 * ((delk.x * waist.x).powi(2) + (delk.y * waist.y).powi(2)));
 
     return (pmz, pmt);
   }
