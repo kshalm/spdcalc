@@ -34,11 +34,15 @@ fn pump_spectrum(signal : &Photon, idler : &Photon, pump : &Photon, p_bw : Wavel
 /// calculate the phasematching
 pub fn phasematch(spd : &SPD) -> Complex<f64> {
 
-  // calculate coincidences with pump wavelength to match signal/idler
-  let (pmz, pmt) = calc_coincidence_phasematch( &spd.with_phasematched_pump() );
-
   // calculate pump spectrum with original pump
   let alpha = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+
+  if alpha < spd.pump_spectrum_threshold {
+    return Complex::new(0., 0.);
+  }
+
+  // calculate coincidences with pump wavelength to match signal/idler
+  let (pmz, pmt) = calc_coincidence_phasematch( &spd.with_phasematched_pump() );
 
   alpha * pmt * pmz
 }

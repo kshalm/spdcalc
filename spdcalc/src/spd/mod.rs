@@ -23,6 +23,8 @@ pub struct SPD {
   pub pp :             Option<PeriodicPoling>,
   pub fiber_coupling : bool,
   pub pump_bandwidth : Wavelength,
+  /// Cutoff amplitude below which the phasematching will be considered zero
+  pub pump_spectrum_threshold: f64,
 }
 
 impl Default for SPD {
@@ -49,6 +51,7 @@ impl Default for SPD {
       pp : None,
       fiber_coupling : false,
       pump_bandwidth : 5.35 * NANO * ucum::M,
+      pump_spectrum_threshold: 1e-9,
     }
   }
 }
