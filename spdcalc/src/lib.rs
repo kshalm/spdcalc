@@ -6,15 +6,13 @@ pub use types::*;
 pub mod constants;
 pub use constants::*;
 
+pub mod utils;
 pub mod math;
 
+pub mod crystal;
+pub use crystal::Crystal;
 pub mod photon;
 pub mod spd;
-
-pub mod crystal;
-pub mod junk;
-pub mod utils;
-pub use crystal::Crystal;
 pub mod plotting;
 
 #[allow(unused_imports)]

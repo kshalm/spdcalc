@@ -11,6 +11,4 @@ impl PeriodicPoling {
   pub fn pp_factor(self) -> f64 {
     *(ucum::M / (self.sign * self.period))
   }
-
-  // pub fn auto_calc()
 }

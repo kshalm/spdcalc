@@ -112,7 +112,7 @@ impl SPD {
     };
 
     let guess = PI / 6.;
-    let theta = utils::nelder_mead_1d(delta_k, guess, 1000, 0., FRAC_PI_2, 1e-12);
+    let theta = nelder_mead_1d(delta_k, guess, 1000, 0., FRAC_PI_2, 1e-12);
 
     theta * ucum::RAD
   }
@@ -150,7 +150,7 @@ impl SPD {
       del_k_vec.z.abs()
     };
 
-    let period = utils::nelder_mead_1d(
+    let period = nelder_mead_1d(
       delta_k,
       guess.abs(),
       1000,
@@ -280,8 +280,6 @@ pub fn calc_delta_k(
 /// [See equation (37) of Couteau, Christophe. "Spontaneous parametric down-conversion"](https://arxiv.org/pdf/1809.00127.pdf)
 pub fn calc_pump_walkoff(pump : &Photon, crystal_setup : &CrystalSetup) -> Angle {
   assert!(pump.get_type() == PhotonType::Pump);
-
-  // TODO Ask krister about this............
 
   // n_{e}(\theta)
   let np_of_theta = Func(|x : &[f64]| {
