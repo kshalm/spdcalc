@@ -20,6 +20,7 @@ use sellmeier::{equations::SellmeierStandard, temperature_dependence::None, Sell
 #[allow(non_upper_case_globals)]
 pub const LiIO3_1 : SellmeierCrystal<SellmeierStandard, None> = SellmeierCrystal {
   meta : CrystalMeta {
+    id : "LiIO3_1",
     name : "LiIO3 ref 1",
     reference_url : "https://aip.scitation.org/doi/abs/10.1063/1.1654145",
     axis_type : OpticAxisType::NegativeUniaxial,

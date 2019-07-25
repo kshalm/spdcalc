@@ -23,8 +23,9 @@ use dim::{
 };
 
 pub const META : CrystalMeta = CrystalMeta {
+  id : "BBO_1",
   name : "BBO ref 1",
-  reference_url : "http://www.newlightphotonics.com/bbo-properties.html",
+  reference_url : "http://www.newlightphotonics.com/v1/bbo-properties.html",
   axis_type : OpticAxisType::NegativeUniaxial,
   point_group : PointGroup::HM_3m,
   temperature_dependence_known : true,

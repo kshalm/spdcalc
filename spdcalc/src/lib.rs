@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate serde_derive;
+
 pub extern crate dimensioned as dim;
 pub extern crate nalgebra as na;
 

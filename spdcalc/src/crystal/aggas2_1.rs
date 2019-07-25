@@ -22,6 +22,7 @@ use sellmeier::{equations::SellmeierStandard, temperature_dependence::Standard, 
 #[allow(non_upper_case_globals)]
 pub const AgGaS2_1 : SellmeierCrystal<SellmeierStandard, Standard> = SellmeierCrystal {
   meta : CrystalMeta {
+    id : "AgGaS2_1",
     name : "AgGaS2 ref 1",
     reference_url : "http://www.redoptronics.com/AgGaS2-AgGaSe2.html",
     axis_type : OpticAxisType::NegativeUniaxial,

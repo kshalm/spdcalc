@@ -9,6 +9,7 @@ use dim::{
 };
 
 pub const META : CrystalMeta = CrystalMeta {
+  id : "BiBO_1",
   name : "BiBO",
   reference_url : "http://www.newlightphotonics.com/v1/bibo-properties.html",
   axis_type : OpticAxisType::PositiveBiaxial,

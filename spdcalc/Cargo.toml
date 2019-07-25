@@ -14,7 +14,8 @@ dimensioned = "0.7"
 nelder_mead = { git = "https://github.com/JD557/nelder-mead.rs" }
 optimize = "0.1"
 ndarray = "0.11" # can't upgrade... needs 0.11
-# serde = "1.0"
+serde = "^1.0.59"
+serde_derive = "^1.0.59"
 # argmin = "0.2"
 
 [dev-dependencies]

@@ -14,6 +14,17 @@ pub enum Crystal {
 }
 
 impl Crystal {
+
+  pub fn get_all_meta() -> Vec<CrystalMeta> {
+    vec!(
+      bbo_1::META,
+      ktp::META,
+      bibo_1::META,
+      *lilo3_1::LiIO3_1.get_meta(),
+      *aggas2_1::AgGaS2_1.get_meta(),
+    )
+  }
+
   /// Get the crystal refraction indices for this crystal
   ///
   /// ## Example

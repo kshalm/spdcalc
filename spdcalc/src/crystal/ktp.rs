@@ -24,6 +24,7 @@ use dim::{
 };
 
 pub const META : CrystalMeta = CrystalMeta {
+  id : "KTP",
   name : "KTP ref 1",
   reference_url : "http://dx.doi.org/10.1063/1.1668320",
   axis_type : OpticAxisType::PositiveBiaxial,
