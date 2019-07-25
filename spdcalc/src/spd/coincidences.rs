@@ -2,6 +2,10 @@ use super::*;
 use dim::ucum::C_;
 use num::Complex;
 
+fn sinc( x : f64 ) -> f64 {
+  if x == 0. { 1. } else { f64::sin(x) / x }
+}
+
 // http://mathworld.wolfram.com/GaussianFunction.html
 // FWHM / sigma = 2 * sqrt(2 * ln(2))
 fn fwhm_to_sigma<T>(fwhm : T) -> <T as std::ops::Div<f64>>::Output
@@ -57,7 +61,7 @@ fn calc_coincidence_phasematch(spd : &SPD) -> (Complex<f64>, f64) {
 
   if !spd.fiber_coupling {
     // no fiber coupling
-    let pmz = Complex::new(f64::sin(arg) / arg, 0.);
+    let pmz = Complex::new(sinc(arg), 0.);
     let waist = *(spd.pump.waist / ucum::M);
     let pmt = f64::exp(-0.5 * ((delk.x * waist.x).powi(2) + (delk.y * waist.y).powi(2)));
 
