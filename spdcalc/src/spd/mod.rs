@@ -25,6 +25,13 @@ pub struct SPD {
   pub pump_bandwidth : Wavelength,
   /// Cutoff amplitude below which the phasematching will be considered zero
   pub pump_spectrum_threshold: f64,
+
+  /// Pump collection focus location on z axis
+  pub z0p : ucum::Meter<f64>,
+  /// Signal collection focus location on z axis
+  pub z0s : ucum::Meter<f64>,
+  /// Idler collection focus location on z axis
+  pub z0i : ucum::Meter<f64>,
 }
 
 impl Default for SPD {
@@ -52,6 +59,9 @@ impl Default for SPD {
       fiber_coupling : false,
       pump_bandwidth : 5.35 * NANO * ucum::M,
       pump_spectrum_threshold: 1e-9,
+      z0p: 0. * ucum::M,
+      z0s: -0.5 * crystal_setup.length,
+      z0i: -0.5 * crystal_setup.length,
     }
   }
 }
@@ -127,6 +137,8 @@ impl SPD {
       Some(PeriodicPoling {
         period : 1e30 * ucum::M,
         sign :   Sign::POSITIVE,
+        // FIXME need to take into account apodization
+        apodization: None,
       }),
     );
     let z = (*(del_k_guess / ucum::J / ucum::S)).z;
@@ -141,6 +153,8 @@ impl SPD {
       let pp = Some(PeriodicPoling {
         period : period * ucum::M,
         sign,
+        // FIXME need to take into account apodization
+        apodization: None,
       });
       let idler = get_optimum_idler(&self.signal, &self.pump, &self.crystal_setup, pp);
       let del_k = calc_delta_k(&self.signal, &idler, &self.pump, &self.crystal_setup, pp);
@@ -162,6 +176,8 @@ impl SPD {
     PeriodicPoling {
       period : period * ucum::M,
       sign,
+      // FIXME need to take into account apodization
+      apodization: None,
     }
   }
 
@@ -326,6 +342,7 @@ mod tests {
     let pp = PeriodicPoling {
       period : 0.00004656366863331685 * ucum::M,
       sign :   Sign::POSITIVE,
+      apodization: None,
     };
 
     let idler = get_optimum_idler(&signal, &pump, &crystal_setup, Some(pp));
@@ -410,6 +427,7 @@ mod tests {
     let pp = PeriodicPoling {
       period : 0.00004656366863331685 * ucum::M,
       sign :   Sign::POSITIVE,
+      apodization: None,
     };
 
     let idler = get_optimum_idler(&signal, &pump, &crystal_setup, Some(pp));
@@ -448,6 +466,7 @@ mod tests {
     let pp = Some(PeriodicPoling {
       period : 1. * ucum::M,
       sign :   Sign::POSITIVE,
+      apodization: None,
     });
     let mut spd = SPD {
       pp,
@@ -524,6 +543,7 @@ mod tests {
     let pp = Some(PeriodicPoling {
       period : 0.00004656366863331685 * ucum::M,
       sign :   Sign::POSITIVE,
+      apodization: None,
     });
 
     let mut signal = Photon::signal(15. * DEG, 10. * DEG, 1550. * NANO * M, waist);
@@ -576,6 +596,7 @@ mod tests {
     let pp = Some(PeriodicPoling {
       period : 1. * ucum::M,
       sign :   Sign::POSITIVE,
+      apodization: None,
     });
     let crystal_setup = CrystalSetup {
       crystal :     Crystal::KTP,
