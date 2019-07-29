@@ -1,6 +1,9 @@
 mod differentiation;
 pub use differentiation::*;
 
+mod integration;
+pub use integration::*;
+
 mod nelder_mead;
 pub use self::nelder_mead::*;
 
@@ -19,7 +22,7 @@ where
 
 // http://mathworld.wolfram.com/GaussianFunction.html
 // FWHM / sigma = 2 * sqrt(2 * ln(2))
-fn fwhm_to_sigma<T>(fwhm : T) -> <T as std::ops::Div<f64>>::Output
+pub fn fwhm_to_sigma<T>(fwhm : T) -> <T as std::ops::Div<f64>>::Output
 where
   T : std::ops::Div<f64>,
 {
