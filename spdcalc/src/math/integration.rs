@@ -6,7 +6,7 @@ pub struct SimpsonIntegration<F : Fn(f64) -> T, T> {
 }
 
 impl<F : Fn(f64) -> T, T> SimpsonIntegration<F, T>
-where T: Zero + std::ops::Div<f64, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
+where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
   /// Creates a new integrable function by using the supplied `Fn(f64) -> T` in
   /// combination with numeric integration via simpson's rule to find the integral.
   pub fn new(function : F) -> Self {
@@ -44,6 +44,28 @@ where T: Zero + std::ops::Div<f64, Output=T> + std::ops::Mul<f64, Output=T> + st
       acc + (self.function)( x ) * (*a_n)
     });
 
-    result / 3.
+    result * (dx / 3.)
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  extern crate float_cmp;
+  use float_cmp::*;
+
+  #[test]
+  fn integrator_test() {
+    let integrator = SimpsonIntegration::new(|x| x.sin());
+    let actual = integrator.integrate(0., std::f64::consts::PI, 1000);
+
+    let expected = 2.;
+
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-11),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
   }
 }
