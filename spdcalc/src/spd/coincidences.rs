@@ -2,6 +2,7 @@ use crate::math::fwhm_to_sigma;
 use super::*;
 use dim::ucum::{C_, RAD, M};
 use num::{Complex, clamp};
+use std::cmp::max;
 
 fn sinc( x : f64 ) -> f64 {
   if x == 0. { 1. } else { f64::sin(x) / x }
@@ -288,14 +289,19 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
       )
     );
 
+    // println!(
+    //   "A1: {}\nA2: {}\nA3: {}\nA4: {}\nA5: {}\nA6: {}\nA7: {}\nA8: {}\nA9: {}\nA10: {}",
+    //   A1, A2, A3, A4, A5, A6, A7, A8, A9, A10
+    // );
+    // println!("num: {}, denom: {}", numerator, denominator);
     // Now calculate the full term in the integral.
     return pmzcoeff * numerator / denominator;
   });
 
   // TODO: ask krister what the point of zslice is
   let zslice = 1e-4 * clamp((*(L/M) / 2.5e-3).sqrt(), 1., 5.);
-  let mut slices = zslice as i32;
-  slices = slices + slices % 2; // nearest even
+  let mut slices = (*(L/M) / zslice) as i32;
+  slices = max(slices + slices % 2, 4); // nearest even.. minimum 4
 
   let result = 0.5 * integrator.integrate(-1., 1., slices);
 
@@ -354,6 +360,54 @@ mod tests {
 
     let actual = amp;
     let expected = Complex::new(0.9999999456740692, 0.);
+
+    assert!(
+      approx_eq!(f64, actual.re, expected.re, ulps = 2, epsilon = 1e-12),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+    assert!(
+      approx_eq!(f64, actual.im, expected.im, ulps = 2, epsilon = 1e-12),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+  }
+
+  #[test]
+  fn phasematch_fiber_coupling_test(){
+    let mut spd = SPD {
+      fiber_coupling: true,
+      ..SPD::default()
+    };
+    // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
+    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
+    // spd.assign_optimum_idler();
+    // spd.assign_optimum_theta();
+
+    // FIXME This isn't matching.
+    spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
+    spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
+
+    let amp = phasematch( &spd );
+    /*
+    let amp_pm_tz = calc_coincidence_phasematch( &spd );
+    let delk = spd.calc_delta_k();
+
+    println!("n_p: {}", spd.pump.get_index(&spd.crystal_setup));
+    println!("n_s: {}", spd.signal.get_index(&spd.crystal_setup));
+    println!("n_i: {}", spd.idler.get_index(&spd.crystal_setup));
+
+    println!("{:#?}", spd);
+    println!("{}", *(delk / ucum::J / ucum::S));
+
+    println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
+    println!("phasematch {}", amp);
+    */
+
+    let actual = amp;
+    let expected = Complex::new(8250651115384583., 3275554174418546.5);
 
     assert!(
       approx_eq!(f64, actual.re, expected.re, ulps = 2, epsilon = 1e-12),

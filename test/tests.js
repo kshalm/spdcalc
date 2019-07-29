@@ -152,7 +152,7 @@ function pump_spectrum(){
 function phasematch(){
   let props = defaultProps()
   props.auto_calc_Theta()
-  props.calcfibercoupling = false
+  // props.calcfibercoupling = false
   // props.update_all_angles()
 
   let delk = spdc.calc_delK( props )
@@ -187,6 +187,6 @@ function phasematch_norm(){
 // walkoff_convergence()
 // derrivativeTest()
 
-// phasematch()
+phasematch()
 // pump_spectrum()
-phasematch_norm()
+// phasematch_norm()

@@ -16,6 +16,7 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
   /// Get simpson weights
   fn get_weights( steps : i32 ) -> Vec<f64> {
     assert!( steps.is_even() );
+    assert!( steps >= 4 );
 
     // n steps of...
     // 1, 4, 2, 4, 2, ..., 4, 1

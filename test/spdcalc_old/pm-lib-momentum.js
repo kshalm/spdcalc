@@ -289,6 +289,7 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         // (-4 A3 + A8^2/A1)
         // console.log("hello");
         // console.log("A1R: " + A1R.toString() + "   A2R: " + A2R.toString()+"A3R: " + A3R.toString() + "   A4R: " + A4R.toString()+"A5R: " + A5R.toString() + "   A6R: " + A6R.toString()+"A7R: " + A7R.toString() + "   A8R: " + A8R.toString()+"A9R: " + A9R.toString() + "   A10R: " + A10R.toString());
+        // console.log("A1I: " + A1I.toString() + "   A2I: " + A2I.toString()+"A3I: " + A3I.toString() + "   A4I: " + A4I.toString()+"A5I: " + A5I.toString() + "   A6I: " + A6I.toString()+"A7I: " + A7I.toString() + "   A8I: " + A8I.toString()+"A9I: " + A9I.toString() + "   A10I: " + A10I.toString());
         // First calculate terms in the exponential of the integral
         //   E^(1/4 (4 A10 - A5^2/A1 - A6^2/A2 - (-2 A1 A7 + A5 A8)^2/(A1 (4 A1 A3 - A8^2)) - (A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2)))
         // )
