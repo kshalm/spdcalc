@@ -31,12 +31,22 @@ pub struct CrystalSetup {
 }
 
 // internal helper to solve Equation (11)
-// sign = (slow: 1, fast: -1)
-fn solve_for_n(b : f64, c : f64, sign : i16) -> f64 {
+// sign = (slow: positive, fast: negative)
+fn solve_for_n(b : f64, c : f64, sign : Sign) -> f64 {
   let d = b * b - 4.0 * c;
-  let n = (2.0 / (b + (sign as f64) * d.sqrt())).sqrt();
-  // assert!(n.is_finite(), "Unable to solve for refractive index");
-  n
+  if d < 0. {
+    // this means the index is imaginary => decay
+    // return the real part of the index, which is zero
+    0.
+  } else {
+    let denom = b + sign * d.sqrt();
+    if denom < 0. {
+      // again... imaginary solution
+      0.
+    } else {
+      (2.0 / denom).sqrt()
+    }
+  }
 }
 
 impl CrystalSetup {
@@ -85,8 +95,8 @@ impl CrystalSetup {
     let b = s_squared.dot(&sum_recip);
     let c = s_squared.dot(&prod_recip);
 
-    let slow = 1;
-    let fast = -1;
+    let slow = Sign::POSITIVE;
+    let fast = Sign::NEGATIVE;
 
     ONE
       * match &self.pm_type {
@@ -104,10 +114,7 @@ impl CrystalSetup {
             PhotonType::Idler => fast,
             _ => slow,
           };
-          let n = solve_for_n(b, c, sign);
-          // FIXME remove
-          assert!(n.is_finite(), "Unable to solve for refractive index. {:#?}", self);
-          n
+          solve_for_n(b, c, sign)
         }
         PMType::Type2_e_oe => {
           let sign = match photon_type {

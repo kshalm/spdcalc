@@ -299,7 +299,10 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
     return pmzcoeff * numerator / denominator;
   });
 
-  // TODO: ask krister what the point of zslice is
+  // TODO: Improve this determination of integration steps
+  // this tries to set reasonable defaults for the number
+  // of steps based on the length of the crystal. Errors
+  // get introduced if there are too many steps, or too few.
   let zslice = 1e-4 * clamp((*(L/M) / 2.5e-3).sqrt(), 1., 5.);
   let mut slices = (*(L/M) / zslice) as i32;
   slices = max(slices + slices % 2, 4); // nearest even.. minimum 4

@@ -80,8 +80,6 @@ pub fn plot_jsi(params : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
         ..*params
       };
 
-      println!("signal: {}, idler: {}", signal.get_wavelength(), idler.get_wavelength());
-
       let amplitude = phasematch(&spd);
 
       // intensity

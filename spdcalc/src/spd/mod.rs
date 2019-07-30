@@ -508,7 +508,7 @@ mod tests {
     };
 
     spd.crystal_setup.crystal = Crystal::BBO_1;
-    spd.crystal_setup.theta = 0.000006055454452393343 * ucum::RAD;
+    spd.crystal_setup.theta = 0. * ucum::RAD;
 
     spd.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
     spd.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
