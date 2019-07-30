@@ -129,6 +129,7 @@ impl SPD {
 
   /// automatically calculate the optimal poling period and sign
   pub fn calc_periodic_poling(&self) -> PeriodicPoling {
+    let apodization = self.pp.and_then(|poling| poling.apodization);
     let del_k_guess = calc_delta_k(
       &self.signal,
       &self.idler,
@@ -137,8 +138,7 @@ impl SPD {
       Some(PeriodicPoling {
         period : 1e30 * ucum::M,
         sign :   Sign::POSITIVE,
-        // FIXME need to take into account apodization
-        apodization: None,
+        apodization,
       }),
     );
     let z = (*(del_k_guess / ucum::J / ucum::S)).z;
@@ -153,8 +153,7 @@ impl SPD {
       let pp = Some(PeriodicPoling {
         period : period * ucum::M,
         sign,
-        // FIXME need to take into account apodization
-        apodization: None,
+        apodization,
       });
       let idler = get_optimum_idler(&self.signal, &self.pump, &self.crystal_setup, pp);
       let del_k = calc_delta_k(&self.signal, &idler, &self.pump, &self.crystal_setup, pp);
@@ -176,8 +175,7 @@ impl SPD {
     PeriodicPoling {
       period : period * ucum::M,
       sign,
-      // FIXME need to take into account apodization
-      apodization: None,
+      apodization,
     }
   }
 
@@ -487,6 +485,37 @@ mod tests {
     // println!("signal theta: {}", signal.get_theta());
 
     let expected = 6.68453818039121e-2;
+    let actual = *(calc_pump_walkoff(&spd.pump, &spd.crystal_setup) / ucum::RAD);
+
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-8),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+  }
+
+  #[test]
+  fn calc_walkoff_zero_test() {
+    let pp = Some(PeriodicPoling {
+        sign: Sign::POSITIVE,
+        period: 52.56968559402202 * MICRO * ucum::M,
+        apodization: None,
+    });
+    let mut spd = SPD {
+      pp,
+      ..SPD::default()
+    };
+
+    spd.crystal_setup.crystal = Crystal::BBO_1;
+    spd.crystal_setup.theta = 0.000006055454452393343 * ucum::RAD;
+
+    spd.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
+    spd.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
+    spd.idler.set_wavelength(0.0000015 * ucum::M);
+    spd.signal.set_wavelength(0.0000015555555555555556 * ucum::M);
+
+    let expected = 0.;
     let actual = *(calc_pump_walkoff(&spd.pump, &spd.crystal_setup) / ucum::RAD);
 
     assert!(

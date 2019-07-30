@@ -80,7 +80,7 @@ impl<F : Function> Function1 for NumericalDifferentiation<F> {
           EPSILON.powf(1. / 3.) * x_i.abs()
         };
 
-        assert!(h.is_finite());
+        assert!(h.is_finite(), "Derivative 'h' is infinite!");
 
         x[i] = x_i + h;
 
@@ -94,7 +94,7 @@ impl<F : Function> Function1 for NumericalDifferentiation<F> {
 
         let d_i = 0.5 * (forward - backward) / h;
 
-        assert!(d_i.is_finite());
+        assert!(d_i.is_finite(), "Derivative is infinite!");
 
         d_i
       })

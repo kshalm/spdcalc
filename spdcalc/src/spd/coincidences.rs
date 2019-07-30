@@ -192,15 +192,16 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
     *((-0.50 * Wy_SQ)/M2),
     *((z0/k_p)/M2)
   );
-  let m  = L / (2. * k_p);
-  let n  = 0.5 * L * f64::tan(*(spd.calc_pump_walkoff() / RAD));
+  let m = L / (2. * k_p);
+  let n = 0.5 * L * f64::tan(*(spd.calc_pump_walkoff() / RAD));
 
   let hh = Complex::new(
     *(GAM4s + GAM4i),
     *(-DEL4s + DEL4i)
   );
 
-  let pp_factor = spd.pp.map_or(1., |p| p.pp_factor());
+  // TODO check with krister... bug in old code? no check for pp enabled
+  let pp_factor = spd.pp.map_or(0., |p| p.pp_factor());
   let dksi = k_s + k_i + PI2 * pp_factor / M;
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
@@ -391,23 +392,47 @@ mod tests {
     spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
 
     let amp = phasematch( &spd );
-    /*
-    let amp_pm_tz = calc_coincidence_phasematch( &spd );
-    let delk = spd.calc_delta_k();
-
-    println!("n_p: {}", spd.pump.get_index(&spd.crystal_setup));
-    println!("n_s: {}", spd.signal.get_index(&spd.crystal_setup));
-    println!("n_i: {}", spd.idler.get_index(&spd.crystal_setup));
-
-    println!("{:#?}", spd);
-    println!("{}", *(delk / ucum::J / ucum::S));
-
-    println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
-    println!("phasematch {}", amp);
-    */
 
     let actual = amp;
     let expected = Complex::new(8250651115384583., 3275554174418546.5);
+
+    assert!(
+      approx_eq!(f64, actual.re, expected.re, ulps = 2, epsilon = 1e-12),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+    assert!(
+      approx_eq!(f64, actual.im, expected.im, ulps = 2, epsilon = 1e-12),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+  }
+
+  #[test]
+  fn phasematch_fiber_coupling_pp_test(){
+    let mut spd = SPD {
+      fiber_coupling: true,
+      pp: Some(PeriodicPoling {
+        sign: Sign::NEGATIVE,
+        period: 0.000018041674656364844 * ucum::M,
+        apodization: None,
+      }),
+      ..SPD::default()
+    };
+    // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
+    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
+    // spd.assign_optimum_idler();
+    // spd.assign_optimum_theta();
+
+    // FIXME This isn't matching.
+    spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
+
+    let amp = phasematch( &spd );
+
+    let actual = amp;
+    let expected = Complex::new(4795251242193317., 9607597843961730.);
 
     assert!(
       approx_eq!(f64, actual.re, expected.re, ulps = 2, epsilon = 1e-12),

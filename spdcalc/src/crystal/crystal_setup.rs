@@ -34,7 +34,9 @@ pub struct CrystalSetup {
 // sign = (slow: 1, fast: -1)
 fn solve_for_n(b : f64, c : f64, sign : i16) -> f64 {
   let d = b * b - 4.0 * c;
-  (2.0 / (b + (sign as f64) * d.sqrt())).sqrt()
+  let n = (2.0 / (b + (sign as f64) * d.sqrt())).sqrt();
+  // assert!(n.is_finite(), "Unable to solve for refractive index");
+  n
 }
 
 impl CrystalSetup {
@@ -102,7 +104,10 @@ impl CrystalSetup {
             PhotonType::Idler => fast,
             _ => slow,
           };
-          solve_for_n(b, c, sign)
+          let n = solve_for_n(b, c, sign);
+          // FIXME remove
+          assert!(n.is_finite(), "Unable to solve for refractive index. {:#?}", self);
+          n
         }
         PMType::Type2_e_oe => {
           let sign = match photon_type {

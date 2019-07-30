@@ -5,8 +5,6 @@ use super::*;
 pub struct Apodization {
   /// Full-width half-max
   pub fwhm : ucum::Meter<f64>,
-  /// number of apodization steps to take
-  pub steps : i32,
 }
 
 /// Periodic Poling settings

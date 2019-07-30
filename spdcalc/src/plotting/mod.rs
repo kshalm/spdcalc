@@ -80,10 +80,47 @@ pub fn plot_jsi(params : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
         ..*params
       };
 
+      println!("signal: {}, idler: {}", signal.get_wavelength(), idler.get_wavelength());
+
       let amplitude = phasematch(&spd);
 
       // intensity
       (amplitude.re.powi(2) + amplitude.im.powi(2)) / norm
     })
     .collect()
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use dim::f64prefixes::{MICRO, NANO};
+
+  #[test]
+  fn plot_jsi_test() {
+    let mut spd = SPD {
+      fiber_coupling: true,
+      pp: Some(PeriodicPoling {
+        sign: Sign::POSITIVE,
+        period: 52.56968559402202 * MICRO * ucum::M,
+        apodization: None,
+      }),
+      ..SPD::default()
+    };
+
+    spd.crystal_setup.crystal = Crystal::BBO_1;
+    spd.crystal_setup.theta = 0. * ucum::DEG;
+
+    spd.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
+    spd.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
+
+    let cfg = HistogramConfig {
+      x_range : (1500. * NANO, 1600. * NANO),
+      y_range : (1500. * NANO, 1600. * NANO),
+
+      x_count : 10,
+      y_count : 10,
+    };
+
+    plot_jsi(&spd, &cfg);
+  }
 }

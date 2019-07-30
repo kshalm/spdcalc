@@ -24,6 +24,7 @@ function show( props ){
   console.log(`Idler: φ(${props.phi_i}), θ(${props.theta_i}), λ(${print_nm(props.lambda_i)})`)
   console.log(`Idler (external): θ(${props.theta_i_e})`)
   console.log(`n_p: ${props.n_p}, n_s: ${props.n_s}, n_i: ${props.n_i}`)
+  console.log(`pp: ${props.enable_pp}, period: ${props.poling_sign * props.poling_period}, apodization: ${props.calc_apodization}, fwhm: ${props.apodization_FWHM}`)
 }
 
 function poling_period(){
@@ -171,6 +172,24 @@ function phasematch(){
   console.log('sinc', Math.sin(arg)/arg)
 }
 
+function phasematch_pp(){
+  let props = defaultProps()
+  props.set('enable_pp', true)
+  props.calc_poling_period()
+  // props.auto_calc_Theta()
+  // props.calcfibercoupling = false
+  // props.update_all_angles()
+
+  let delk = spdc.calc_delK( props )
+  let amp_pm_tz = spdc.calc_PM_tz_k_coinc( props )
+  let amp = spdc.phasematch( props )
+
+  show(props)
+
+  console.log('PMtz amp', amp_pm_tz)
+  console.log('PM amplitued', amp)
+}
+
 function phasematch_norm(){
   let props = defaultProps()
   props.auto_calc_Theta()
@@ -187,6 +206,7 @@ function phasematch_norm(){
 // walkoff_convergence()
 // derrivativeTest()
 
-phasematch()
+// phasematch()
+phasematch_pp()
 // pump_spectrum()
 // phasematch_norm()
