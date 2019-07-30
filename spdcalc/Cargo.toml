@@ -28,6 +28,10 @@ opt-level = 3
 
 # Benchmarks
 [[bench]]
+name = "plot"
+harness = false
+
+[[bench]]
 name = "crystals"
 harness = false
 

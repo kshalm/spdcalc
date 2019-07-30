@@ -4,18 +4,18 @@ extern crate criterion;
 use criterion::{black_box, Criterion};
 
 extern crate spdcalc;
-use spdcalc::{crystal::Crystals, dim::ucum::M, *};
+use spdcalc::{crystal::Crystal, dim::ucum::M, *};
 
 fn bbo(n : Wavelength) -> Indices {
-  Crystals::BBO_1.get_indices(n, 293.0 * spdcalc::dim::ucum::K)
+  Crystal::BBO_1.get_indices(n, 293.0 * spdcalc::dim::ucum::K)
 }
 
 fn AgGaS2(n : Wavelength) -> Indices {
-  Crystals::AgGaS2_1.get_indices(n, 293.0 * spdcalc::dim::ucum::K)
+  Crystal::AgGaS2_1.get_indices(n, 293.0 * spdcalc::dim::ucum::K)
 }
 
 fn LiIO3_1(n : Wavelength) -> Indices {
-  Crystals::LiIO3_1.get_indices(n, 293.0 * spdcalc::dim::ucum::K)
+  Crystal::LiIO3_1.get_indices(n, 293.0 * spdcalc::dim::ucum::K)
 }
 
 fn criterion_benchmark(c : &mut Criterion) {
