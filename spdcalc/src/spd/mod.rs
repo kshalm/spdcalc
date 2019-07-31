@@ -129,6 +129,12 @@ impl SPD {
 
   /// automatically calculate the optimal poling period and sign
   pub fn calc_periodic_poling(&self) -> PeriodicPoling {
+    let sign = PeriodicPoling::compute_sign(
+      &self.signal,
+      &self.idler,
+      &self.pump,
+      &self.crystal_setup
+    );
     let apodization = self.pp.and_then(|poling| poling.apodization);
     let del_k_guess = calc_delta_k(
       &self.signal,
@@ -137,17 +143,12 @@ impl SPD {
       &self.crystal_setup,
       Some(PeriodicPoling {
         period : 1e30 * ucum::M,
-        sign :   Sign::POSITIVE,
+        sign,
         apodization,
       }),
     );
     let z = (*(del_k_guess / ucum::J / ucum::S)).z;
     let guess = if z == 0. { 0. } else { PI2 / z };
-    let sign = if guess >= 0. {
-      Sign::POSITIVE
-    } else {
-      Sign::NEGATIVE
-    };
 
     let delta_k = |period| {
       let pp = Some(PeriodicPoling {
