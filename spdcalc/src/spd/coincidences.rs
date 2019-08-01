@@ -329,11 +329,12 @@ mod tests {
 
   #[test]
   fn pump_spectrum_test() {
-    let spd = SPD::default();
+    let mut spd = SPD::default();
 
+    spd.signal.set_wavelength(1500. * NANO * M);
     let actual = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
 
-    let expected = 1.;
+    let expected = 0.0003094554168558373;
 
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2),
