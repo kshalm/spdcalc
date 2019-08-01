@@ -256,21 +256,25 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
 
     // First calculate terms in the exponential of the integral
     // exp(1/4 (4 A10 - A5^2/A1 - A6^2/A2 - (-2 A1 A7 + A5 A8)^2/(A1 (4 A1 A3 - A8^2)) - (A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2))))
+    let A6sq = A6 * A6;
+    let A8sq = A8 * A8;
+    let A9sq = A9 * A9;
+    let term4 = -2. * A1 * A7 + A5 * A8;
+    let term5 = -2. * A2 + A9;
     let numerator = ((
       4. * A10
-      - A5.powf(2.) / A1
-      - A6.powf(2.) / A2
-      - (-2. * A1 * A7 + A5 * A8).powf(2.) / (A1 * (4. * A1 * A3 - A8.powf(2.)))
-      - (A6.powf(2.) * (-2. * A2 + A9).powf(2.)) / (A2 * (4. * A2 * A4 - A9.powf(2.)))
+      - (A5 * A5) / A1
+      - A6sq / A2
+      - (term4 * term4) / (A1 * (4. * A1 * A3 - A8sq))
+      - (A6sq * term5 * term5) / (A2 * (4. * A2 * A4 - A9sq))
     ) / 4.).exp();
-
 
     // Now deal with the denominator in the integral:
     // Sqrt[A1 A2 (-4 A3 + A8^2/A1) (-4 A4 + A9^2/A2)]
     let denominator = (
       A1 * A2
-      * (-4. * A3 + A8.powf(2.) / A1)
-      * (-4. * A4 + A9.powf(2.) / A2)
+      * (-4. * A3 + A8sq / A1)
+      * (-4. * A4 + A9sq / A2)
     ).sqrt();
 
     // Take into account apodized crystals
