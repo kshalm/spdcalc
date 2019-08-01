@@ -211,7 +211,7 @@ function phasematch_norm(){
 // walkoff_convergence()
 // derrivativeTest()
 
-phasematch()
-// phasematch_pp()
+// phasematch()
+phasematch_pp()
 // pump_spectrum()
 // phasematch_norm()

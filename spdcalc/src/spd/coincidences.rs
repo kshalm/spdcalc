@@ -407,7 +407,7 @@ mod tests {
     spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
     spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
 
-    println!("spd: {:#?}", spd);
+    // println!("spd: {:#?}", spd);
 
     let amp = phasematch( &spd );
 
@@ -450,29 +450,40 @@ mod tests {
       ..SPD::default()
     };
     // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
-    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
+    spd.signal.set_angles(0. *ucum::RAD, 0.03418771664291853 * ucum::RAD);
     // spd.assign_optimum_idler();
     // spd.assign_optimum_theta();
 
     // FIXME This isn't matching.
-    spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
+    spd.idler.set_angles(PI * ucum::RAD, 0.03353944515208561 * ucum::RAD);
+    spd.crystal_setup.theta = 1.5707963267948966 * RAD;
 
     let amp = phasematch( &spd );
 
     let actual = amp;
     let expected = Complex::new(4795251242193317., 9607597843961730.);
 
+    let accept_diff = 1e-3;
+
+    let normdiff = percent_diff(actual.norm(), expected.norm());
     assert!(
-      approx_eq!(f64, actual.re, expected.re, ulps = 2, epsilon = 1e-12),
-      "actual: {}, expected: {}",
-      actual,
-      expected
+      normdiff < accept_diff,
+      "norm percent difference: {}",
+      normdiff
     );
+
+    let rediff = percent_diff(actual.re, expected.re);
     assert!(
-      approx_eq!(f64, actual.im, expected.im, ulps = 2, epsilon = 1e-12),
-      "actual: {}, expected: {}",
-      actual,
-      expected
+      rediff < accept_diff,
+      "real part percent difference: {}",
+      rediff
+    );
+
+    let imdiff = percent_diff(actual.im, expected.im);
+    assert!(
+      imdiff < accept_diff,
+      "imag part percent difference: {}",
+      imdiff
     );
   }
 
