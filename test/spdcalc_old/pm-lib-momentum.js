@@ -105,6 +105,8 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         PSI_i = (k_i/P.n_i) * Math.sin(P.theta_i_e) * Math.cos(P.phi_i)
         ;
 
+    // console.log("PHI_s", PHI_s)
+
     var bw;  // Apodization 1/e^2
 
     // Take into account apodized crystals
@@ -195,6 +197,7 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
 
     // console.log("INSIDE COINCIDENCES");
 
+    // console.log("Wx_SQ", Wx_SQ);
     // console.log("GAM1s:", GAM1s);
     // console.log("GAM2s:", GAM2s);
     // console.log("GAM3s:", GAM3s);
@@ -246,6 +249,10 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         A10I = 0
         ;
 
+    // console.log('As', As_r, As_i)
+    // console.log('Cs', Cs)
+    // console.log('Ds', Ds)
+
     var zintfunc = function(z){
         // z = 0;
         // var terms = calczterms(z);
@@ -285,6 +292,18 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         A8I = A8IO - m_z;
         A9I = A9IO - m_z;
         A10I = A10IO + ff_z;
+
+        // console.log("z", z)
+        // console.log(A1R, A1I)
+        // console.log(A2R, A2I)
+        // console.log(A3R, A3I)
+        // console.log(A4R, A4I)
+        // console.log(A5R, A5I)
+        // console.log(A6R, A6I)
+        // console.log(A7R, A7I)
+        // console.log(A8R, A8I)
+        // console.log(A9R, A9I)
+        // console.log(A10R, A10I)
 
         // (-4 A3 + A8^2/A1)
         // console.log("hello");
@@ -390,7 +409,6 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             EXPR = 0.25 * helpers.caddR(EXP6R_c, EXP6I_c, -1*EXP5R, -1*EXP5I),
             EXPI = 0.25 * helpers.caddI(EXP6R_c, EXP6I_c, -1*EXP5R, -1*EXP5I),
 
-
             //////////////////////////////////////////////////////////////////////////////
             // Now deal with the denominator in the integral:
             // Sqrt[A1 A2 (-4 A3 + A8^2/A1) (-4 A4 + A9^2/A2)]
@@ -431,6 +449,8 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             imag = helpers.cdivideI(EReal, EImag, DENR, DENI)
             ;
             var EXPRadd = (EXP1R -EXP2R -EXP3R -EXP4R -EXP5R)/4;
+            // console.log('numerator', EReal, EImag)
+            // console.log('denominator', DENR, DENI)
 
 
             // console.log("Exponent: ", EXPR, EXPI);

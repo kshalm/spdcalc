@@ -143,7 +143,10 @@ function derrivativeTest(){
 function pump_spectrum(){
   let props = defaultProps()
   props.auto_calc_Theta()
+  props.lambda_s = 1500 * 1e-9
   props.calcfibercoupling = false
+
+  show(props)
 
   let sp = spdc.pump_spectrum(props)
 
@@ -152,6 +155,8 @@ function pump_spectrum(){
 
 function phasematch(){
   let props = defaultProps()
+  props.set('enable_pp', false)
+  props.poling_period = 1e16
   props.auto_calc_Theta()
   // props.calcfibercoupling = false
   // props.update_all_angles()
@@ -206,7 +211,7 @@ function phasematch_norm(){
 // walkoff_convergence()
 // derrivativeTest()
 
-// phasematch()
-phasematch_pp()
+phasematch()
+// phasematch_pp()
 // pump_spectrum()
 // phasematch_norm()

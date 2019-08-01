@@ -197,7 +197,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
 
   let hh = Complex::new(
     *(GAM4s + GAM4i),
-    *(-DEL4s + DEL4i)
+    -*(DEL4s + DEL4i)
   );
 
   // let A5R = GAM3s;
@@ -208,7 +208,6 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   // let A7I = -DEL3i;
   let A7 = Complex::new(*(GAM3i/M), -*(DEL3i/M));
 
-  // TODO check with krister... bug in old code? no check for pp enabled
   let pp_factor = spd.pp.map_or(0., |p| p.pp_factor());
   let dksi = k_s + k_i + PI2 * pp_factor / M;
   let ee = 0.5 * L * (k_p + dksi);
@@ -327,6 +326,10 @@ mod tests {
   extern crate float_cmp;
   use float_cmp::*;
 
+  fn percent_diff(actual : f64, expected : f64) -> f64 {
+    100. * (expected - actual).abs() / expected
+  }
+
   #[test]
   fn pump_spectrum_test() {
     let mut spd = SPD::default();
@@ -404,22 +407,34 @@ mod tests {
     spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
     spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
 
+    println!("spd: {:#?}", spd);
+
     let amp = phasematch( &spd );
 
     let actual = amp;
-    let expected = Complex::new(8250651115384583., 3275554174418546.5);
+    let expected = Complex::new(8250651139145388., 3275554113628917.5);
 
+    let accept_diff = 1e-4;
+
+    let normdiff = percent_diff(actual.norm(), expected.norm());
     assert!(
-      approx_eq!(f64, actual.re, expected.re, ulps = 2, epsilon = 1e-12),
-      "actual: {}, expected: {}",
-      actual,
-      expected
+      normdiff < accept_diff,
+      "norm percent difference: {}",
+      normdiff
     );
+
+    let rediff = percent_diff(actual.re, expected.re);
     assert!(
-      approx_eq!(f64, actual.im, expected.im, ulps = 2, epsilon = 1e-12),
-      "actual: {}, expected: {}",
-      actual,
-      expected
+      rediff < accept_diff,
+      "real part percent difference: {}",
+      rediff
+    );
+
+    let imdiff = percent_diff(actual.im, expected.im);
+    assert!(
+      imdiff < accept_diff,
+      "imag part percent difference: {}",
+      imdiff
     );
   }
 
