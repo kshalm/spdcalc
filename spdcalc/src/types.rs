@@ -42,3 +42,16 @@ where
     }
   }
 }
+
+impl<T> From<T> for Sign
+where
+  T: num::Zero + std::cmp::PartialOrd
+{
+  fn from(item : T) -> Self {
+    if item < T::zero() {
+      Sign::NEGATIVE
+    } else {
+      Sign::POSITIVE
+    }
+  }
+}

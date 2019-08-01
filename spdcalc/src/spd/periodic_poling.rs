@@ -22,16 +22,14 @@ impl PeriodicPoling {
   /// calculate the sign needed by this periodic poling
   pub fn compute_sign(
     signal: &Photon,
-    idler: &Photon,
     pump: &Photon,
     crystal_setup: &CrystalSetup
   ) -> Sign {
+    let idler = get_optimum_idler(&signal, &pump, &crystal_setup, None);
     let delkz = (calc_delta_k(&signal, &idler, &pump, &crystal_setup, None)/J/S).z;
-    if delkz >= 0. {
-      Sign::POSITIVE
-    } else {
-      Sign::NEGATIVE
-    }
+
+    // converts to sign
+    delkz.into()
   }
 
   /// Get the factor 1 / (sign * poling_period)

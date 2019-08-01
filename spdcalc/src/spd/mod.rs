@@ -14,6 +14,8 @@ pub use periodic_poling::*;
 mod coincidences;
 pub use coincidences::*;
 
+const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
+
 #[derive(Debug, Copy, Clone)]
 pub struct SPD {
   pub signal :         Photon,
@@ -128,55 +130,72 @@ impl SPD {
   }
 
   /// automatically calculate the optimal poling period and sign
-  pub fn calc_periodic_poling(&self) -> PeriodicPoling {
-    let sign = PeriodicPoling::compute_sign(
-      &self.signal,
-      &self.idler,
-      &self.pump,
-      &self.crystal_setup
-    );
-    let apodization = self.pp.and_then(|poling| poling.apodization);
-    let del_k_guess = calc_delta_k(
-      &self.signal,
-      &self.idler,
-      &self.pump,
-      &self.crystal_setup,
-      Some(PeriodicPoling {
-        period : 1e30 * ucum::M,
-        sign,
-        apodization,
-      }),
-    );
-    let z = (*(del_k_guess / ucum::J / ucum::S)).z;
-    let guess = if z == 0. { 0. } else { PI2 / z };
+  pub fn calc_periodic_poling(&self) -> Result<Option<PeriodicPoling>, &str> {
 
-    let delta_k = |period| {
-      let pp = Some(PeriodicPoling {
-        period : period * ucum::M,
-        sign,
-        apodization,
-      });
+    // pull the apodization if there is any
+    let apodization = self.pp.and_then(|poling| poling.apodization);
+
+    // z component of delta k, based on periodic poling
+    let delta_kz = |pp| {
       let idler = get_optimum_idler(&self.signal, &self.pump, &self.crystal_setup, pp);
       let del_k = calc_delta_k(&self.signal, &idler, &self.pump, &self.crystal_setup, pp);
 
       let del_k_vec = *(del_k / ucum::J / ucum::S);
 
-      del_k_vec.z.abs()
+      del_k_vec.z
     };
 
+    // maximum period is the length of the crystal
+    let max_period = *(self.crystal_setup.length / M);
+    // minimum period... typical poling periods are on the order of microns
+    let min_period = std::f64::MIN_POSITIVE;
+
+    let z = delta_kz(None);
+
+    if z == 0. {
+      // z is already zero, that means there is already perfect phasematching
+      // no poling period needed
+      return Ok(None);
+    }
+
+    // base our guess on the delta k calculation without periodic poling
+    let guess = PI2 / z;
+    // the sign of the z component of delta k gives the sign of pp
+    let sign = z.into();
+
+    // minimizable delta k function based on period (using predetermined sign)
+    let delta_kz_of_p = |period| {
+      let pp = Some(PeriodicPoling {
+        period : period * ucum::M,
+        sign,
+        apodization,
+      });
+
+      delta_kz(pp).abs()
+    };
+
+    // minimize...
     let period = nelder_mead_1d(
-      delta_k,
+      delta_kz_of_p,
       guess.abs(),
       1000,
-      std::f64::MIN,
-      std::f64::INFINITY,
+      min_period,
+      max_period,
       1e-12,
     );
 
-    PeriodicPoling {
-      period : period * ucum::M,
-      sign,
-      apodization,
+    if period < min_period {
+      Err(IMPOSSIBLE_POLING_PERIOD)
+    } else if period > max_period {
+      Err(IMPOSSIBLE_POLING_PERIOD)
+    } else {
+      Ok(
+        Some(PeriodicPoling {
+          period : period * ucum::M,
+          sign,
+          apodization,
+        })
+      )
     }
   }
 
@@ -193,7 +212,8 @@ impl SPD {
 
   /// assign the optimum periodic_poling for this setup
   pub fn assign_optimum_periodic_poling(&mut self) {
-    self.pp = Some(self.calc_periodic_poling());
+    self.pp = self.calc_periodic_poling()
+      .expect("Could not determine a valid poling period to assign");
   }
 
   pub fn calc_delta_k(&self) -> Momentum3 {
@@ -591,14 +611,14 @@ mod tests {
     };
 
     let theta = *(spd.calc_optimum_crystal_theta() / ucum::RAD);
-    let theta_exptected = 0.6302501999499033;
+    let theta_expected = 0.6302501999499033;
     // println!("{} deg", theta/ucum::DEG);
 
     assert!(
-      approx_eq!(f64, theta, theta_exptected, ulps = 2, epsilon = 1e-5),
+      approx_eq!(f64, theta, theta_expected, ulps = 2, epsilon = 1e-5),
       "actual: {}, expected: {}",
       theta,
-      theta_exptected
+      theta_expected
     );
   }
 
@@ -608,26 +628,20 @@ mod tests {
     spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
 
     let theta = *(spd.calc_optimum_crystal_theta() / ucum::RAD);
-    let theta_exptected = 0.5515891191131287;
+    let theta_expected = 0.5515891191131287;
     // println!("{} deg", theta/ucum::DEG);
-
 
     // FIXME assuming this theta is better than the old Version
     assert!(
-      approx_eq!(f64, theta, theta_exptected, ulps = 2, epsilon = 1e-2),
+      approx_eq!(f64, theta, theta_expected, ulps = 2, epsilon = 1e-2),
       "actual: {}, expected: {}",
       theta,
-      theta_exptected
+      theta_expected
     );
   }
 
   #[test]
   fn optimal_pp_test() {
-    let pp = Some(PeriodicPoling {
-      period : 1. * ucum::M,
-      sign :   Sign::POSITIVE,
-      apodization: None,
-    });
     let crystal_setup = CrystalSetup {
       crystal :     Crystal::KTP,
       pm_type :     crystal::PMType::Type2_e_eo,
@@ -636,16 +650,18 @@ mod tests {
       length :      2_000.0 * MICRO * M,
       temperature : from_celsius_to_kelvin(20.0),
     };
+
     let mut spd = SPD {
-      pp,
+      pp: None,
       crystal_setup,
       ..SPD::default()
     };
+
     spd.idler = get_optimum_idler(&spd.signal, &spd.pump, &spd.crystal_setup, spd.pp);
 
-    let pp = spd.calc_periodic_poling();
+    let pp = spd.calc_periodic_poling().expect("Could not determine poling period");
     let period = *(pp.period / ucum::M);
-    let period_exptected = 0.00004652032850062386;
+    let period_expected = 0.00004652032850062386;
 
     // let n_s = spd.signal.get_index(&spd.crystal_setup);
     // let n_i = spd.idler.get_index(&spd.crystal_setup);
@@ -671,10 +687,10 @@ mod tests {
     // println!("{} m", period);
 
     assert!(
-      approx_eq!(f64, period, period_exptected, ulps = 2, epsilon = 1e-16),
+      approx_eq!(f64, period, period_expected, ulps = 2, epsilon = 1e-16),
       "actual: {}, expected: {}",
       period,
-      period_exptected
+      period_expected
     );
   }
 }
