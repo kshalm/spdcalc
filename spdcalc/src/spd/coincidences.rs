@@ -200,6 +200,14 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
     *(-DEL4s + DEL4i)
   );
 
+  // let A5R = GAM3s;
+  // let A5I = -DEL3s;
+  let A5 = Complex::new(*(GAM3s/M), -*(DEL3s/M));
+  let A5sq = A5 * A5;
+  // let A7R = GAM3i;
+  // let A7I = -DEL3i;
+  let A7 = Complex::new(*(GAM3i/M), -*(DEL3i/M));
+
   // TODO check with krister... bug in old code? no check for pp enabled
   let pp_factor = spd.pp.map_or(0., |p| p.pp_factor());
   let dksi = k_s + k_i + PI2 * pp_factor / M;
@@ -229,17 +237,9 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
     // let A4I = Bi_i + Ci + Di_z;
     let A4 = Bi + CiDi;
 
-    // let A5R = GAM3s;
-    // let A5I = -DEL3s;
-    let A5 = Complex::new(*(GAM3s/M), -*(DEL3s/M));
-
     // let A6R = 0.;
     // let A6I = n * (1 + z);
     let A6 = Complex::new(0., *(n/M) * (1. + z));
-
-    // let A7R = GAM3i;
-    // let A7I = -DEL3i;
-    let A7 = Complex::new(*(GAM3i/M), -*(DEL3i/M));
 
     // let A8R = mx_real;
     // let A8I = mx_imag - m * z;
@@ -259,22 +259,27 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
     let A6sq = A6 * A6;
     let A8sq = A8 * A8;
     let A9sq = A9 * A9;
+    let invA1 = A1.inv();
+    let invA2 = A2.inv();
     let term4 = -2. * A1 * A7 + A5 * A8;
     let term5 = -2. * A2 + A9;
     let numerator = ((
       4. * A10
-      - (A5 * A5) / A1
-      - A6sq / A2
-      - (term4 * term4) / (A1 * (4. * A1 * A3 - A8sq))
-      - (A6sq * term5 * term5) / (A2 * (4. * A2 * A4 - A9sq))
+      - invA1 * (
+        A5sq
+        + (term4 * term4) / (4. * A1 * A3 - A8sq)
+      )
+      - invA2 * A6sq * (
+        1. + (term5 * term5) / (4. * A2 * A4 - A9sq)
+      )
     ) / 4.).exp();
 
     // Now deal with the denominator in the integral:
     // Sqrt[A1 A2 (-4 A3 + A8^2/A1) (-4 A4 + A9^2/A2)]
     let denominator = (
       A1 * A2
-      * (-4. * A3 + A8sq / A1)
-      * (-4. * A4 + A9sq / A2)
+      * (-4. * A3 + A8sq * invA1)
+      * (-4. * A4 + A9sq * invA2)
     ).sqrt();
 
     // Take into account apodized crystals
