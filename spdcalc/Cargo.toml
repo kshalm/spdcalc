@@ -36,6 +36,10 @@ name = "crystals"
 harness = false
 
 [[bench]]
+name = "spd"
+harness = false
+
+[[bench]]
 name = "math"
 harness = false
 

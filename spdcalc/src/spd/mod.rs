@@ -249,25 +249,30 @@ pub fn get_optimum_idler(
     None => ucum::Unitless::new(0.0),
   };
 
-  let mut phi = signal.get_phi() + (PI * ucum::RAD);
-  let ns_z = ns * f64::cos(*(signal.get_theta() / ucum::RAD));
+  let theta_s = *(signal.get_theta() / ucum::RAD);
+  let ns_z = ns * f64::cos(theta_s);
   let ls_over_lp = ls / lp;
   let np_by_ls_over_lp = np * ls_over_lp;
 
-  let arg = (ns * ns)
-    + np_by_ls_over_lp.powi(2)
-    + 2. * (del_k_pp * ns_z - np_by_ls_over_lp * ns_z - del_k_pp * np_by_ls_over_lp)
-    + del_k_pp * del_k_pp;
+  // old code...
+  // let arg = (ns * ns)
+  //   + np_by_ls_over_lp.powi(2)
+  //   + 2. * (del_k_pp * ns_z - np_by_ls_over_lp * ns_z - del_k_pp * np_by_ls_over_lp)
+  //   + del_k_pp * del_k_pp;
 
-  let numerator = ns * f64::sin(*(signal.get_theta() / ucum::RAD));
-  let mut val = (*numerator) / (*arg).sqrt();
-  // means it's trying to give a negative theta.. so rotate to other side in phi
-  if val > 1.0 {
-    val = 2.0 - val;
-    phi -= PI * ucum::RAD;
-  }
+  // simplified calculation
+  let numerator = ns * f64::sin(theta_s);
+  let arg =
+    (ns_z - np_by_ls_over_lp + del_k_pp).powi(2)
+    + numerator.powi(2);
+
+  let val = (*numerator) / arg.sqrt();
+
+  assert!(val <= 1.0, "Invalid solution for optimal idler theta");
+
   let theta = f64::asin(val) * ucum::RAD;
   let wavelength = ls * lp / (ls - lp);
+  let phi = signal.get_phi() + (PI * ucum::RAD);
 
   Photon::idler(
     phi,
@@ -660,7 +665,7 @@ mod tests {
     spd.idler = get_optimum_idler(&spd.signal, &spd.pump, &spd.crystal_setup, spd.pp);
 
     let pp = spd.calc_periodic_poling().expect("Could not determine poling period");
-    let period = *(pp.period / ucum::M);
+    let period = *(pp.unwrap().period / ucum::M);
     let period_expected = 0.00004652032850062386;
 
     // let n_s = spd.signal.get_index(&spd.crystal_setup);
