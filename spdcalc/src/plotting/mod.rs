@@ -6,7 +6,6 @@ use dim::{
   ucum::{self, M},
   f64prefixes::{NANO},
 };
-use std::cmp::min;
 
 /// Holds configuration for drawing heatmaps
 #[derive(Debug, Copy, Clone)]
@@ -26,6 +25,7 @@ impl IntoIterator for HistogramConfig {
   type IntoIter = HistogramConfigIterator;
 
   fn into_iter(self) -> Self::IntoIter {
+
     HistogramConfigIterator {
       cfg :   self,
       index : 0,
@@ -148,7 +148,10 @@ pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> 
 #[cfg(test)]
 mod tests {
   use super::*;
+  use dim::ucum::{RAD};
   use dim::f64prefixes::{MICRO, NANO};
+  extern crate float_cmp;
+  use float_cmp::*;
 
   #[test]
   fn plot_jsi_test() {
@@ -176,6 +179,71 @@ mod tests {
       y_count : 10,
     };
 
-    plot_jsi(&spd, &cfg);
+    let data = plot_jsi(&spd, &cfg);
+
+    assert_eq!(
+      data.len(),
+      100
+    );
+  }
+
+  #[test]
+  fn calc_plot_config_for_jsi_test(){
+    let mut spd = SPD {
+      fiber_coupling: true,
+      ..SPD::default()
+    };
+
+    spd.pump.set_angles(0. * RAD, 0.5515891191131287 * RAD);
+    spd.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
+    spd.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
+
+    let ranges = calc_plot_config_for_jsi(&spd, 100, 0.5);
+
+    let xmin = ranges.x_range.0;
+    let xmax = ranges.x_range.1;
+    let ymin = ranges.y_range.0;
+    let ymax = ranges.y_range.1;
+
+    let expected_xmin = 0.0000014430000000000002;
+    let expected_xmax = 0.0000016570000000000002;
+    let expected_ymin = 0.0000014559807256235829;
+    let expected_ymax = 0.0000016741392215568861;
+
+    let mut actual = xmin;
+    let mut expected = expected_xmin;
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+
+    actual = xmax;
+    expected = expected_xmax;
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+
+    actual = ymin;
+    expected = expected_ymin;
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+
+    actual = ymax;
+    expected = expected_ymax;
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
   }
 }

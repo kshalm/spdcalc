@@ -206,12 +206,22 @@ function phasematch_norm(){
   console.log('norm', norm)
 }
 
+function autorange_lambda(){
+  let props = defaultProps()
+  props.auto_calc_Theta()
+  show(props)
+
+  let ranges = spdc.autorange_lambda(props, 0.5)
+  console.log(ranges)
+}
+
 // poling_period()
 // walkoff()
 // walkoff_convergence()
 // derrivativeTest()
 
-phasematch()
+// phasematch()
 // phasematch_pp()
 // pump_spectrum()
 // phasematch_norm()
+autorange_lambda()
