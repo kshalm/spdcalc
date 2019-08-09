@@ -1,8 +1,11 @@
 use super::*;
-use dim::ucum;
-use math::lerp;
+use math::{lerp, nelder_mead_1d};
 use na::Vector2;
 use spd::*;
+use dim::{
+  ucum::{self, M},
+  f64prefixes::{NANO},
+};
 
 /// Holds configuration for drawing heatmaps
 #[derive(Debug, Copy, Clone)]
@@ -22,6 +25,7 @@ impl IntoIterator for HistogramConfig {
   type IntoIter = HistogramConfigIterator;
 
   fn into_iter(self) -> Self::IntoIter {
+
     HistogramConfigIterator {
       cfg :   self,
       index : 0,
@@ -56,9 +60,9 @@ impl Iterator for HistogramConfigIterator {
 }
 
 /// Create a JSI plot
-pub fn plot_jsi(params : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
+pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
-  let norm_amp = phasematch(&params.to_collinear());
+  let norm_amp = phasematch(&spd.to_collinear());
   // norm of intensity
   let norm = norm_amp.re.powi(2) + norm_amp.im.powi(2);
 
@@ -68,8 +72,8 @@ pub fn plot_jsi(params : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
       let l_s = coords.x;
       let l_i = coords.y;
 
-      let mut signal = params.signal.clone();
-      let mut idler = params.idler.clone();
+      let mut signal = spd.signal.clone();
+      let mut idler = spd.idler.clone();
 
       signal.set_wavelength(l_s * ucum::M);
       idler.set_wavelength(l_i * ucum::M);
@@ -77,21 +81,77 @@ pub fn plot_jsi(params : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
       let spd = SPD {
         signal,
         idler,
-        ..*params
+        ..*spd
       };
 
       let amplitude = phasematch(&spd);
 
       // intensity
-      (amplitude.re.powi(2) + amplitude.im.powi(2)) / norm
+      amplitude.norm_sqr() / norm
     })
     .collect()
+}
+
+fn get_recip_wavelength( w : f64, l_p : f64 ) -> f64 {
+  l_p * w / (w - l_p)
+}
+
+/// Automatically calculate the ranges for creating a JSI based on the
+/// spd parameters and a specified threshold
+pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> HistogramConfig {
+
+  let l_p = *(spd.pump.get_wavelength() / M);
+  let l_s = *(spd.signal.get_wavelength() / M);
+
+  let peak = phasematch_gaussian_approximation(&spd).norm_sqr();
+  let target = threshold * peak;
+
+  let pm_diff = |l_s| {
+    let mut spd = spd.clone();
+    spd.signal.set_wavelength( l_s * M );
+    spd.assign_optimum_idler();
+
+    let local = phasematch_gaussian_approximation(&spd).norm_sqr();
+
+    let diff = target - local;
+    diff.abs()
+  };
+
+  let guess = 0.9 * l_s;
+  let ans = nelder_mead_1d(pm_diff, guess, 1000, std::f64::MIN_POSITIVE, 1., 1e-12);
+
+  // FIXME WHAT ARE THESE NUMBERS
+  let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spd.pump_bandwidth / (NANO * M))).min(35e-9);
+  let diff = (ans - l_s).abs().min(diff_max);
+
+  let x_range = (
+    l_s - 10. * diff,
+    l_s + 10. * diff
+  );
+
+  let y_range = (
+    get_recip_wavelength(x_range.1, l_p),
+    get_recip_wavelength(x_range.0, l_p)
+  );
+
+  let x_count = size;
+  let y_count = size;
+
+  HistogramConfig {
+    x_range,
+    y_range,
+    x_count,
+    y_count,
+  }
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
+  use dim::ucum::{RAD};
   use dim::f64prefixes::{MICRO, NANO};
+  extern crate float_cmp;
+  use float_cmp::*;
 
   #[test]
   fn plot_jsi_test() {
@@ -119,6 +179,71 @@ mod tests {
       y_count : 10,
     };
 
-    plot_jsi(&spd, &cfg);
+    let data = plot_jsi(&spd, &cfg);
+
+    assert_eq!(
+      data.len(),
+      100
+    );
+  }
+
+  #[test]
+  fn calc_plot_config_for_jsi_test(){
+    let mut spd = SPD {
+      fiber_coupling: true,
+      ..SPD::default()
+    };
+
+    spd.pump.set_angles(0. * RAD, 0.5515891191131287 * RAD);
+    spd.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
+    spd.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
+
+    let ranges = calc_plot_config_for_jsi(&spd, 100, 0.5);
+
+    let xmin = ranges.x_range.0;
+    let xmax = ranges.x_range.1;
+    let ymin = ranges.y_range.0;
+    let ymax = ranges.y_range.1;
+
+    let expected_xmin = 0.0000014430000000000002;
+    let expected_xmax = 0.0000016570000000000002;
+    let expected_ymin = 0.0000014559807256235829;
+    let expected_ymax = 0.0000016741392215568861;
+
+    let mut actual = xmin;
+    let mut expected = expected_xmin;
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+
+    actual = xmax;
+    expected = expected_xmax;
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+
+    actual = ymin;
+    expected = expected_ymin;
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+
+    actual = ymax;
+    expected = expected_ymax;
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
   }
 }

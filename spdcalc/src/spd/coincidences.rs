@@ -44,6 +44,19 @@ pub fn phasematch(spd : &SPD) -> Complex<f64> {
   alpha * pmt * pmz
 }
 
+/// calculate the phasematching using a gaussian approximation
+#[allow(non_snake_case)]
+pub fn phasematch_gaussian_approximation(spd : &SPD) -> Complex<f64> {
+  // crystal length
+  let L = *(spd.crystal_setup.length / ucum::M);
+
+  let delk = *(spd.calc_delta_k() / ucum::J / ucum::S);
+  let arg = L * 0.5 * delk.z;
+
+  // FIXME magic number. ask krister
+  Complex::new(f64::exp(-0.193 * arg.powi(2)), 0.)
+}
+
 #[allow(non_snake_case)]
 fn calc_coincidence_phasematch(spd : &SPD) -> (Complex<f64>, f64) {
   if spd.fiber_coupling {
