@@ -14,6 +14,9 @@ pub use periodic_poling::*;
 mod coincidences;
 pub use coincidences::*;
 
+mod computations;
+pub use computations::*;
+
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 
 #[derive(Debug, Copy, Clone)]

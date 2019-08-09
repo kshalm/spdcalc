@@ -1,6 +1,6 @@
 use super::*;
-use math::{lerp, nelder_mead_1d};
-use na::Vector2;
+use math::{nelder_mead_1d};
+use utils::Iterator2D;
 use spd::*;
 use dim::{
   ucum::{self, M},
@@ -15,47 +15,21 @@ pub struct HistogramConfig {
   /// the y axis range (min, max)
   pub y_range : (f64, f64),
   /// the x axis number of bins
-  pub x_count : usize,
+  pub x_count : i32,
   /// the y axis number of bins
-  pub y_count : usize,
+  pub y_count : i32,
 }
 
 impl IntoIterator for HistogramConfig {
-  type Item = Vector2<f64>; // x, y
-  type IntoIter = HistogramConfigIterator;
+  type Item = (f64, f64); // x, y
+  type IntoIter = Iterator2D;
 
   fn into_iter(self) -> Self::IntoIter {
-
-    HistogramConfigIterator {
-      cfg :   self,
-      index : 0,
-      total : self.x_count * self.y_count,
-    }
-  }
-}
-
-pub struct HistogramConfigIterator {
-  cfg :   HistogramConfig,
-  index : usize,
-  total : usize,
-}
-
-impl Iterator for HistogramConfigIterator {
-  type Item = Vector2<f64>; // x, y
-
-  fn next(&mut self) -> Option<Self::Item> {
-    if self.index >= self.total {
-      return None;
-    }
-
-    let xt = ((self.index % self.cfg.x_count) as f64) / ((self.cfg.x_count - 1) as f64);
-    let yt = ((self.index / self.cfg.y_count) as f64) / ((self.cfg.y_count - 1) as f64);
-    let x = lerp(self.cfg.x_range.0, self.cfg.x_range.1, xt);
-    let y = lerp(self.cfg.y_range.0, self.cfg.y_range.1, yt);
-
-    self.index += 1;
-
-    Some(Vector2::new(x, y))
+    Iterator2D::new(
+      self.x_range,
+      self.y_range,
+      (self.x_count, self.y_count)
+    )
   }
 }
 
@@ -64,27 +38,13 @@ pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
   let norm_amp = phasematch(&spd.to_collinear());
   // norm of intensity
-  let norm = norm_amp.re.powi(2) + norm_amp.im.powi(2);
+  let norm = norm_amp.norm_sqr();
 
   cfg
     .into_iter()
     .map(|coords| {
-      let l_s = coords.x;
-      let l_i = coords.y;
-
-      let mut signal = spd.signal.clone();
-      let mut idler = spd.idler.clone();
-
-      signal.set_wavelength(l_s * ucum::M);
-      idler.set_wavelength(l_i * ucum::M);
-
-      let spd = SPD {
-        signal,
-        idler,
-        ..*spd
-      };
-
-      let amplitude = phasematch(&spd);
+      let (l_s, l_i) = coords;
+      let amplitude = calc_jsa(&spd, l_s * ucum::M, l_i * ucum::M);
 
       // intensity
       amplitude.norm_sqr() / norm
@@ -98,7 +58,7 @@ fn get_recip_wavelength( w : f64, l_p : f64 ) -> f64 {
 
 /// Automatically calculate the ranges for creating a JSI based on the
 /// spd parameters and a specified threshold
-pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> HistogramConfig {
+pub fn calc_plot_config_for_jsi( spd : &SPD, size : i32, threshold : f64 ) -> HistogramConfig {
 
   let l_p = *(spd.pump.get_wavelength() / M);
   let l_s = *(spd.signal.get_wavelength() / M);
@@ -112,8 +72,8 @@ pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> 
     spd.assign_optimum_idler();
 
     let local = phasematch_gaussian_approximation(&spd).norm_sqr();
-
     let diff = target - local;
+
     diff.abs()
   };
 
