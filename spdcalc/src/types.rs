@@ -14,6 +14,9 @@ pub type Indices = ucum::Unitless<Vector3<f64>>;
 /// Wavelength
 pub type Wavelength = ucum::Meter<f64>;
 
+/// Time
+pub type Time = ucum::Second<f64>;
+
 /// 2D vector holding the x,y of the waist
 pub type WaistSize = ucum::Meter<Vector2<f64>>;
 

@@ -22,7 +22,7 @@ pub struct HistogramConfig {
 
 impl IntoIterator for HistogramConfig {
   type Item = (f64, f64); // x, y
-  type IntoIter = Iterator2D;
+  type IntoIter = Iterator2D<f64>;
 
   fn into_iter(self) -> Self::IntoIter {
     Iterator2D::new(
@@ -154,7 +154,6 @@ mod tests {
       ..SPD::default()
     };
 
-    spd.pump.set_angles(0. * RAD, 0.5515891191131287 * RAD);
     spd.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
     spd.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
 

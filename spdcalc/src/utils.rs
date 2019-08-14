@@ -27,19 +27,19 @@ pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
 
 /// An iterator that will iterate through rows and columns, giving you the
 /// coordinates at every iteration. Like a 2d linspace.
-pub struct Iterator2D {
-  x_range : (f64, f64),
-  y_range : (f64, f64),
+pub struct Iterator2D<T> {
+  x_range : (T, T),
+  y_range : (T, T),
   shape : (u32, u32),
   index : u32,
   total : u32,
 }
 
-impl Iterator2D {
+impl<T> Iterator2D<T> {
   /// Create a new 2d iterator
   pub fn new(
-    x_range : (f64, f64),
-    y_range : (f64, f64),
+    x_range : (T, T),
+    y_range : (T, T),
     shape : (u32, u32)
   ) -> Self {
     Iterator2D {
@@ -60,8 +60,9 @@ impl Iterator2D {
   }
 }
 
-impl Iterator for Iterator2D {
-  type Item = (f64, f64); // x, y
+impl<T> Iterator for Iterator2D<T>
+where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+  type Item = (T, T); // x, y
 
   fn next(&mut self) -> Option<Self::Item> {
     if self.index >= self.total {

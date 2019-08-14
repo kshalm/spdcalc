@@ -86,7 +86,7 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
     )
     .enumerate()
     .fold(T::zero(), |acc, (index, coords)| {
-      let (nx, ny) = Iterator2D::get_2d_indices(index as u32, shape);
+      let (nx, ny) = Iterator2D::<f64>::get_2d_indices(index as u32, shape);
       let a_n = Self::get_weight(nx, ny, divs);
       let (x, y) = coords;
 
