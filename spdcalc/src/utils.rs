@@ -30,9 +30,9 @@ pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
 pub struct Iterator2D {
   x_range : (f64, f64),
   y_range : (f64, f64),
-  shape : (i32, i32),
-  index : i32,
-  total : i32,
+  shape : (u32, u32),
+  index : u32,
+  total : u32,
 }
 
 impl Iterator2D {
@@ -40,7 +40,7 @@ impl Iterator2D {
   pub fn new(
     x_range : (f64, f64),
     y_range : (f64, f64),
-    shape : (i32, i32)
+    shape : (u32, u32)
   ) -> Self {
     Iterator2D {
       x_range,
@@ -52,7 +52,7 @@ impl Iterator2D {
   }
 
   // get the 2d indices (row, column) from the linear index
-  pub fn get_2d_indices( index : i32, shape : (i32, i32) ) -> (i32, i32) {
+  pub fn get_2d_indices( index : u32, shape : (u32, u32) ) -> (u32, u32) {
     (
       (index % shape.0),
       (index / shape.1)

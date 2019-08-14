@@ -325,7 +325,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   // of steps based on the length of the crystal. Errors
   // get introduced if there are too many steps, or too few.
   let zslice = 1e-4 * clamp((*(L/M) / 2.5e-3).sqrt(), 1., 5.);
-  let mut slices = (*(L/M) / zslice) as i32;
+  let mut slices = (*(L/M) / zslice) as u32;
   slices = max(slices + slices % 2, 4); // nearest even.. minimum 4
 
   let result = 0.5 * integrator.integrate(-1., 1., slices);

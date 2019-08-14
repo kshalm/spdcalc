@@ -1,6 +1,21 @@
 use num::{Integer, Zero};
 use crate::utils::Iterator2D;
 
+/// Get simpson weight for index
+fn get_simpson_weight( n : u32, divs : u32 ) -> f64 {
+  // n divs of...
+  // 1, 4, 2, 4, 2, ..., 4, 1
+  if n == 0 || n == divs {
+    1.
+  } else {
+    if n.is_odd() {
+      4.
+    } else {
+      2.
+    }
+  }
+}
+
 /// Integrator that implements Simpson's rule
 pub struct SimpsonIntegration<F : Fn(f64) -> T, T> {
   function : F,
@@ -15,28 +30,19 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
   }
 
   /// Get simpson weight for index
-  pub fn get_weight( n : i32, steps : i32 ) -> f64 {
-    assert!( steps.is_even() );
-    assert!( steps >= 4 );
-    // n steps of...
-    // 1, 4, 2, 4, 2, ..., 4, 1
-    if n == 0 || n == steps {
-      1.
-    } else {
-      if n.is_odd() {
-        4.
-      } else {
-        2.
-      }
-    }
+  pub fn get_weight( n : u32, divs : u32 ) -> f64 {
+    get_simpson_weight(n, divs)
   }
 
-  /// Numerically integrate from `a` to `b`, in `steps` steps
-  pub fn integrate(&self, a : f64, b : f64, steps : i32) -> T {
-    let dx = (b - a) / (steps as f64);
+  /// Numerically integrate from `a` to `b`, in `divs` divisions
+  pub fn integrate(&self, a : f64, b : f64, divs : u32) -> T {
+    assert!( divs.is_even() );
+    assert!( divs >= 4 );
+
+    let dx = (b - a) / (divs as f64);
 
     let mut i = 0;
-    let result = (0..=steps).map(|n| Self::get_weight(n, steps)).fold(T::zero(), |acc, a_n| {
+    let result = (0..=divs).map(|n| Self::get_weight(n, divs)).fold(T::zero(), |acc, a_n| {
       let x = a + (i as f64) * dx;
       i = i + 1;
 
@@ -60,14 +66,18 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
   }
 
   /// Get simpson weight for index
-  pub fn get_weight( nx : i32, ny : i32, steps : i32 ) -> f64 {
-    SimpsonIntegration::get_weight(nx, steps) * SimpsonIntegration::get_weight(ny, steps)
+  pub fn get_weight( nx : u32, ny : u32, divs : u32 ) -> f64 {
+    get_simpson_weight(nx, divs) * get_simpson_weight(ny, divs)
   }
 
-  /// Numerically integrate from `a` to `b`, in `steps` steps
-  pub fn integrate(&self, x_range: (f64, f64), y_range: (f64, f64), steps : i32) -> T {
-    let dx = (x_range.1 - x_range.0) / (steps as f64);
-    let dy = (y_range.1 - y_range.0) / (steps as f64);
+  /// Numerically integrate from `a` to `b`, in `divs` divisions
+  pub fn integrate(&self, x_range: (f64, f64), y_range: (f64, f64), divs : u32) -> T {
+    assert!( divs.is_even() );
+    assert!( divs >= 4 );
+
+    let steps = divs + 1;
+    let dx = (x_range.1 - x_range.0) / (divs as f64);
+    let dy = (y_range.1 - y_range.0) / (divs as f64);
     let shape = (steps, steps);
     let result = Iterator2D::new(
       x_range,
@@ -76,8 +86,8 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
     )
     .enumerate()
     .fold(T::zero(), |acc, (index, coords)| {
-      let (nx, ny) = Iterator2D::get_2d_indices(index as i32, shape);
-      let a_n = Self::get_weight(nx, ny, steps);
+      let (nx, ny) = Iterator2D::get_2d_indices(index as u32, shape);
+      let a_n = Self::get_weight(nx, ny, divs);
       let (x, y) = coords;
 
       acc + (self.function)( x, y ) * a_n
@@ -92,13 +102,29 @@ mod tests {
   use super::*;
   extern crate float_cmp;
   use float_cmp::*;
+  use std::f64::consts::PI;
 
   #[test]
   fn integrator_test() {
     let integrator = SimpsonIntegration::new(|x| x.sin());
-    let actual = integrator.integrate(0., std::f64::consts::PI, 1000);
+    let actual = integrator.integrate(0., PI, 1000);
 
     let expected = 2.;
+
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-11),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+  }
+
+  #[test]
+  fn integrator_2d_test() {
+    let integrator = SimpsonIntegration2D::new(|x, y| x.sin() * y.powi(3));
+    let actual = integrator.integrate((0., PI), (0., 2.), 1000);
+
+    let expected = (2_f64).powi(4) * 2. / 4.;
 
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-11),
