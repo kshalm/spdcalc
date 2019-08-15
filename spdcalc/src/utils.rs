@@ -26,11 +26,11 @@ pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct Steps<T>(pub T, pub T, pub u32);
+pub struct Steps<T>(pub T, pub T, pub usize);
 
 impl<T> Steps<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
-  pub fn divisions(&self) -> u32 {
+  pub fn divisions(&self) -> usize {
     self.2 - 1
   }
 
@@ -54,7 +54,7 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
 
 pub struct StepIterator<T> {
   steps: Steps<T>,
-  index: u32,
+  index: usize,
 }
 
 impl<T> Iterator for StepIterator<T>
@@ -79,8 +79,8 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
 pub struct Iterator2D<T> {
   x_steps : Steps<T>,
   y_steps : Steps<T>,
-  index : u32,
-  total : u32,
+  index : usize,
+  total : usize,
 }
 
 impl<T> Iterator2D<T> {
@@ -99,7 +99,7 @@ impl<T> Iterator2D<T> {
   }
 
   // get the 2d indices (row, column) from the linear index
-  pub fn get_2d_indices( index : u32, shape : (u32, u32) ) -> (u32, u32) {
+  pub fn get_2d_indices( index : usize, shape : (usize, usize) ) -> (usize, usize) {
     (
       (index % shape.0),
       (index / shape.1)

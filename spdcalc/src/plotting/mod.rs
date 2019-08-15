@@ -17,9 +17,9 @@ pub struct HistogramConfig {
   /// the y axis range (min, max)
   pub y_range : (f64, f64),
   /// the x axis number of bins
-  pub x_count : u32,
+  pub x_count : usize,
   /// the y axis number of bins
-  pub y_count : u32,
+  pub y_count : usize,
 }
 
 impl IntoIterator for HistogramConfig {
@@ -59,7 +59,7 @@ fn get_recip_wavelength( w : f64, l_p : f64 ) -> f64 {
 
 /// Automatically calculate the ranges for creating a JSI based on the
 /// spd parameters and a specified threshold
-pub fn calc_plot_config_for_jsi( spd : &SPD, size : u32, threshold : f64 ) -> HistogramConfig {
+pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> HistogramConfig {
 
   let l_p = *(spd.pump.get_wavelength() / M);
   let l_s = *(spd.signal.get_wavelength() / M);
@@ -113,7 +113,7 @@ pub fn calc_HOM_rate_series(
   time_shift : Steps<Time>,
   ls_range : (Wavelength, Wavelength),
   li_range : (Wavelength, Wavelength),
-  divisions : u32
+  divisions : usize
 ) -> Vec<f64> {
 
   // define the range of the jsa grid

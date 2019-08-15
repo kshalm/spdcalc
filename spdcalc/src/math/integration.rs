@@ -2,7 +2,7 @@ use num::{Integer, Zero};
 use crate::utils::{Iterator2D, Steps};
 
 /// Get simpson weight for index
-fn get_simpson_weight( n : u32, divs : u32 ) -> f64 {
+fn get_simpson_weight( n : usize, divs : usize ) -> f64 {
   // n divs of...
   // 1, 4, 2, 4, 2, ..., 4, 1
   if n == 0 || n == divs {
@@ -30,12 +30,12 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
   }
 
   /// Get simpson weight for index
-  pub fn get_weight( n : u32, divs : u32 ) -> f64 {
+  pub fn get_weight( n : usize, divs : usize ) -> f64 {
     get_simpson_weight(n, divs)
   }
 
   /// Numerically integrate from `a` to `b`, in `divs` divisions
-  pub fn integrate(&self, a : f64, b : f64, divs : u32) -> T {
+  pub fn integrate(&self, a : f64, b : f64, divs : usize) -> T {
     assert!( divs.is_even() );
     assert!( divs >= 4 );
 
@@ -64,12 +64,12 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
   }
 
   /// Get simpson weight for index
-  pub fn get_weight( nx : u32, ny : u32, divs : u32 ) -> f64 {
+  pub fn get_weight( nx : usize, ny : usize, divs : usize ) -> f64 {
     get_simpson_weight(nx, divs) * get_simpson_weight(ny, divs)
   }
 
   /// Numerically integrate from `a` to `b`, in `divs` divisions
-  pub fn integrate(&self, x_range: (f64, f64), y_range: (f64, f64), divs : u32) -> T {
+  pub fn integrate(&self, x_range: (f64, f64), y_range: (f64, f64), divs : usize) -> T {
     assert!( divs.is_even() );
     assert!( divs >= 4 );
 
@@ -83,7 +83,7 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
     )
     .enumerate()
     .fold(T::zero(), |acc, (index, coords)| {
-      let (nx, ny) = Iterator2D::<f64>::get_2d_indices(index as u32, shape);
+      let (nx, ny) = Iterator2D::<f64>::get_2d_indices(index as usize, shape);
       let a_n = Self::get_weight(nx, ny, divs);
       let (x, y) = coords;
 
