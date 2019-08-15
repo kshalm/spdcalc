@@ -28,6 +28,17 @@ pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
 #[derive(Debug, Copy, Clone)]
 pub struct Steps<T>(pub T, pub T, pub u32);
 
+impl<T> Steps<T>
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
+  pub fn divisions(&self) -> u32 {
+    self.2 - 1
+  }
+
+  pub fn division_width(&self) -> T {
+    (self.1 - self.0) / (self.divisions() as f64)
+  }
+}
+
 impl<T> IntoIterator for Steps<T>
 where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   type Item = T;
@@ -64,6 +75,7 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
 
 /// An iterator that will iterate through rows and columns, giving you the
 /// coordinates at every iteration. Like a 2d linspace.
+#[derive(Copy, Clone)]
 pub struct Iterator2D<T> {
   x_steps : Steps<T>,
   y_steps : Steps<T>,

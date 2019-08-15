@@ -51,11 +51,11 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
   }
 }
 
-pub struct SimpsonIntegration2D<F : Fn(f64, f64) -> T, T> {
+pub struct SimpsonIntegration2D<F : Fn(f64, f64, usize) -> T, T> {
   function : F,
 }
 
-impl<F : Fn(f64, f64) -> T, T> SimpsonIntegration2D<F, T>
+impl<F : Fn(f64, f64, usize) -> T, T> SimpsonIntegration2D<F, T>
 where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
   /// Creates a new integrable function by using the supplied `Fn(f64, f64) -> T` in
   /// combination with numeric integration via simpson's rule to find the integral.
@@ -87,7 +87,7 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
       let a_n = Self::get_weight(nx, ny, divs);
       let (x, y) = coords;
 
-      acc + (self.function)( x, y ) * a_n
+      acc + (self.function)( x, y, index ) * a_n
     });
 
     result * (dx * dy / 9.)
@@ -118,7 +118,7 @@ mod tests {
 
   #[test]
   fn integrator_2d_test() {
-    let integrator = SimpsonIntegration2D::new(|x, y| x.sin() * y.powi(3));
+    let integrator = SimpsonIntegration2D::new(|x, y, _index| x.sin() * y.powi(3));
     let actual = integrator.integrate((0., PI), (0., 2.), 1000);
 
     let expected = (2_f64).powi(4) * 2. / 4.;
