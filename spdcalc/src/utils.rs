@@ -25,12 +25,48 @@ pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
   *(k / ucum::K) - 273.15
 }
 
+#[derive(Debug, Copy, Clone)]
+pub struct Steps<T>(pub T, pub T, pub u32);
+
+impl<T> IntoIterator for Steps<T>
+where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+  type Item = T;
+  type IntoIter = StepIterator<T>;
+
+  fn into_iter(self) -> Self::IntoIter {
+    StepIterator {
+      steps: self,
+      index: 0,
+    }
+  }
+}
+
+pub struct StepIterator<T> {
+  steps: Steps<T>,
+  index: u32,
+}
+
+impl<T> Iterator for StepIterator<T>
+where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+  type Item = T;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    if self.index >= self.steps.2 {
+      return None;
+    }
+
+    let progress = (self.index as f64) / ((self.steps.2 - 1) as f64);
+    self.index += 1;
+
+    Some(lerp(self.steps.0, self.steps.1, progress))
+  }
+}
+
 /// An iterator that will iterate through rows and columns, giving you the
 /// coordinates at every iteration. Like a 2d linspace.
 pub struct Iterator2D<T> {
-  x_range : (T, T),
-  y_range : (T, T),
-  shape : (u32, u32),
+  x_steps : Steps<T>,
+  y_steps : Steps<T>,
   index : u32,
   total : u32,
 }
@@ -38,16 +74,15 @@ pub struct Iterator2D<T> {
 impl<T> Iterator2D<T> {
   /// Create a new 2d iterator
   pub fn new(
-    x_range : (T, T),
-    y_range : (T, T),
-    shape : (u32, u32)
+    x_steps : Steps<T>,
+    y_steps : Steps<T>
   ) -> Self {
+    let total = x_steps.2 * y_steps.2;
     Iterator2D {
-      x_range,
-      y_range,
-      shape,
+      x_steps,
+      y_steps,
+      total,
       index: 0,
-      total: shape.0 * shape.1,
     }
   }
 
@@ -69,12 +104,12 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
       return None;
     }
 
-    let (x_count, y_count) = self.shape;
-    let (nx, ny) = Self::get_2d_indices(self.index, self.shape);
-    let xt = (nx as f64) / ((x_count - 1) as f64);
-    let yt = (ny as f64) / ((y_count - 1) as f64);
-    let x = lerp(self.x_range.0, self.x_range.1, xt);
-    let y = lerp(self.y_range.0, self.y_range.1, yt);
+    let shape = (self.x_steps.2, self.y_steps.2);
+    let (nx, ny) = Self::get_2d_indices(self.index, shape);
+    let xt = (nx as f64) / ((shape.0 - 1) as f64);
+    let yt = (ny as f64) / ((shape.1 - 1) as f64);
+    let x = lerp(self.x_steps.0, self.x_steps.1, xt);
+    let y = lerp(self.y_steps.0, self.y_steps.1, yt);
 
     self.index += 1;
 

@@ -1,5 +1,5 @@
 use num::{Integer, Zero};
-use crate::utils::Iterator2D;
+use crate::utils::{Iterator2D, Steps};
 
 /// Get simpson weight for index
 fn get_simpson_weight( n : u32, divs : u32 ) -> f64 {
@@ -41,10 +41,8 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
 
     let dx = (b - a) / (divs as f64);
 
-    let mut i = 0;
-    let result = (0..=divs).map(|n| Self::get_weight(n, divs)).fold(T::zero(), |acc, a_n| {
+    let result = (0..=divs).map(|n| Self::get_weight(n, divs)).enumerate().fold(T::zero(), |acc, (i, a_n)| {
       let x = a + (i as f64) * dx;
-      i = i + 1;
 
       acc + (self.function)( x ) * a_n
     });
@@ -80,9 +78,8 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
     let dy = (y_range.1 - y_range.0) / (divs as f64);
     let shape = (steps, steps);
     let result = Iterator2D::new(
-      x_range,
-      y_range,
-      shape
+      Steps(x_range.0, x_range.1, steps),
+      Steps(y_range.0, y_range.1, steps)
     )
     .enumerate()
     .fold(T::zero(), |acc, (index, coords)| {

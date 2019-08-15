@@ -1,6 +1,6 @@
 use super::*;
 use math::{nelder_mead_1d};
-use utils::Iterator2D;
+use utils::{Iterator2D, Steps};
 use spd::*;
 use dim::{
   ucum::{self, M},
@@ -26,9 +26,8 @@ impl IntoIterator for HistogramConfig {
 
   fn into_iter(self) -> Self::IntoIter {
     Iterator2D::new(
-      self.x_range,
-      self.y_range,
-      (self.x_count, self.y_count)
+      Steps(self.x_range.0, self.x_range.1, self.x_count),
+      Steps(self.y_range.0, self.y_range.1, self.y_count)
     )
   }
 }
