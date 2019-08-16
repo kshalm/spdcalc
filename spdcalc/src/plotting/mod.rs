@@ -144,8 +144,6 @@ pub fn calc_HOM_rate_series(
       let f_si = jsa_si[index];
       let f_is = jsa_is[index];
 
-      // println!("dt {}, f_si {}, f_is {}", delta_t, f_si, f_is);
-
       f_si.conj() * f_is * shift
     });
 
