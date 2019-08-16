@@ -19,7 +19,7 @@ pub fn calc_jsa( spd : &SPD, l_s : Wavelength, l_i : Wavelength ) -> Complex<f64
 }
 
 /// Calculate the normalized JSI for given parameters at specified signal/idler wavelengths.
-pub fn calc_jsi( spd : &SPD, l_s : Wavelength, l_i : Wavelength ) -> f64 {
+pub fn calc_normalized_jsi( spd : &SPD, l_s : Wavelength, l_i : Wavelength ) -> f64 {
   // calculate the collinear phasematch to normalize against
   let norm_amp = phasematch(&spd.to_collinear());
   // norm of intensity

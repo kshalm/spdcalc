@@ -76,14 +76,13 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
     let steps = divs + 1;
     let dx = (x_range.1 - x_range.0) / (divs as f64);
     let dy = (y_range.1 - y_range.0) / (divs as f64);
-    let shape = (steps, steps);
     let result = Iterator2D::new(
       Steps(x_range.0, x_range.1, steps),
       Steps(y_range.0, y_range.1, steps)
     )
     .enumerate()
     .fold(T::zero(), |acc, (index, coords)| {
-      let (nx, ny) = Iterator2D::<f64>::get_2d_indices(index as usize, shape);
+      let (nx, ny) = Iterator2D::<f64>::get_2d_indices(index as usize, steps);
       let a_n = Self::get_weight(nx, ny, divs);
       let (x, y) = coords;
 

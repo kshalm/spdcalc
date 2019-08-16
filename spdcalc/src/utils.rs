@@ -25,6 +25,17 @@ pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
   *(k / ucum::K) - 273.15
 }
 
+/// Utility for creating evenly spaced steps between two endpoints
+///
+/// ## Example:
+/// ```
+/// use spdcalc::utils::Steps;
+///
+/// let arr : Vec<f64> = Steps(0., 1., 100).into_iter().collect();
+/// assert_eq!(arr.len(), 100);
+/// assert!((arr[0] - 0.).abs() < 1e-12);
+/// assert!((arr[99] - 1.).abs() < 1e-12);
+/// ```
 #[derive(Debug, Copy, Clone)]
 pub struct Steps<T>(pub T, pub T, pub usize);
 
@@ -75,6 +86,19 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
 
 /// An iterator that will iterate through rows and columns, giving you the
 /// coordinates at every iteration. Like a 2d linspace.
+///
+/// ## Example
+///
+/// ```
+/// use spdcalc::utils::{Steps, Iterator2D};
+///
+/// let x_steps = Steps(0., 100., 11); // 0-100 in 10 steps = [0, 10, 20, ..., 100]
+/// let y_steps = Steps(0., 10., 6); // 0-10 in 5 steps = [0, 2, 4, 6, 8, 10]
+/// let grid : Vec<f64> = Iterator2D::new(x_steps, y_steps).map(|(x, y)| {
+///    x * y
+/// }).collect();
+/// assert_eq!(grid[12], 20.);
+/// ```
 #[derive(Copy, Clone)]
 pub struct Iterator2D<T> {
   x_steps : Steps<T>,
@@ -99,10 +123,10 @@ impl<T> Iterator2D<T> {
   }
 
   // get the 2d indices (row, column) from the linear index
-  pub fn get_2d_indices( index : usize, shape : (usize, usize) ) -> (usize, usize) {
+  pub fn get_2d_indices( index : usize, cols : usize ) -> (usize, usize) {
     (
-      (index % shape.0),
-      (index / shape.1)
+      (index % cols),
+      (index / cols)
     )
   }
 }
@@ -116,10 +140,11 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
       return None;
     }
 
-    let shape = (self.x_steps.2, self.y_steps.2);
-    let (nx, ny) = Self::get_2d_indices(self.index, shape);
-    let xt = (nx as f64) / ((shape.0 - 1) as f64);
-    let yt = (ny as f64) / ((shape.1 - 1) as f64);
+    let cols = self.x_steps.2;
+    let rows = self.y_steps.2;
+    let (nx, ny) = Self::get_2d_indices(self.index, cols);
+    let xt = (nx as f64) / ((cols - 1) as f64);
+    let yt = (ny as f64) / ((rows - 1) as f64);
     let x = lerp(self.x_steps.0, self.x_steps.1, xt);
     let y = lerp(self.y_steps.0, self.y_steps.1, yt);
 
