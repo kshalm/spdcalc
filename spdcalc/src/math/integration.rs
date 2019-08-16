@@ -1,5 +1,6 @@
 use num::{Integer, Zero};
 use crate::utils::{Iterator2D, Steps};
+use crate::math::*;
 
 /// Get simpson weight for index
 fn get_simpson_weight( n : usize, divs : usize ) -> f64 {
@@ -15,6 +16,55 @@ fn get_simpson_weight( n : usize, divs : usize ) -> f64 {
     }
   }
 }
+
+// fn get_max_error_constant(func : &impl Fn(f64) -> f64, a : f64, b : f64) -> f64 {
+//   let df = NumericalDifferentiation::new(Func(|x| (*func)(x[0])));
+//   let d2f = NumericalDifferentiation::new(Func(|x| df.gradient(&x)[0]));
+//   let d3f = NumericalDifferentiation::new(Func(|x| d2f.gradient(&x)[0]));
+//   let d4f = NumericalDifferentiation::new(Func(|x| d3f.gradient(&x)[0]));
+//
+//   // fourth derrivative... yes a bit of a bad way to do this
+//   // hack way of maximizing using a minimizer
+//   let d4fabs = |x| 1./(1. + d4f.gradient(&[x])[0].abs());
+//   let xmax = nelder_mead_1d(
+//     d4fabs,
+//     a,
+//     1000,
+//     a,
+//     b,
+//     1e-12
+//   );
+//
+//   println!("xmax {}", xmax);
+//
+//   1./d4fabs(xmax) - 1.
+// }
+//
+// #[allow(non_snake_case)]
+// pub fn simpson_max_error(func : impl Fn(f64) -> f64, a : f64, b : f64, n : usize) -> f64 {
+//   let M = get_max_error_constant(&func, a, b);
+//   M * (b - a).abs().powi(5) / (n as f64).powi(4) / 180.
+// }
+//
+// #[allow(non_snake_case)]
+// pub fn calc_required_divisions_for_simpson_precision(func : impl Fn(f64) -> f64, a : f64, b : f64, precision : f64) -> usize {
+//   let M = get_max_error_constant(&func, a, b);
+//   let x_at_max = nelder_mead_1d(
+//     |x| 1./(1. + func(x).abs()),
+//     a,
+//     1000,
+//     a,
+//     b,
+//     1e-12
+//   );
+//
+//   let err = precision * (1./func(x_at_max).abs() - 1.);
+//   println!("err {}, M {}", err, M);
+//   let n = (M * (b - a).powi(5) / err / 180.).abs().sqrt().sqrt();
+//
+//   let divs = n.ceil() as usize;
+//   (divs + divs % 2).max(4) // even number >= 4
+// }
 
 /// Integrator that implements Simpson's rule
 pub struct SimpsonIntegration<F : Fn(f64) -> T, T> {
@@ -106,6 +156,8 @@ mod tests {
     let actual = integrator.integrate(0., PI, 1000);
 
     let expected = 2.;
+
+    // println!("divisions {}", calc_required_divisions_for_simpson_precision(|x| 10e6 * x.sin(), 0., PI, 1e-8));
 
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-11),
