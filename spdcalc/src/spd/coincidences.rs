@@ -226,7 +226,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
 
-  let integrator = SimpsonIntegration::new(|z| {
+  let fn_z = |z : f64| {
 
     let Ds_z = Ds * z;
     let Di_z = Di * z;
@@ -318,16 +318,28 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
     // println!("num: {}, denom: {}", numerator, denominator);
     // Now calculate the full term in the integral.
     return pmzcoeff * numerator / denominator;
-  });
+  };
+
+  // let divisions = calc_required_divisions_for_simpson_precision(
+  //   |z| fn_z(z).norm(),
+  //   -1.,
+  //   1.,
+  //   1.
+  // );
+
+  let integrator = SimpsonIntegration::new(fn_z);
 
   // TODO: Improve this determination of integration steps
   // this tries to set reasonable defaults for the number
   // of steps based on the length of the crystal. Errors
   // get introduced if there are too many steps, or too few.
-  let zslice = 1e-4 * clamp((*(L/M) / 2.5e-3).sqrt(), 1., 5.);
+  let zslice = 1e-4 * clamp((*(L/M) / 2.5e-3).sqrt(), 0., 5.);
   let mut slices = (*(L/M) / zslice) as usize;
   slices = max(slices + slices % 2, 4); // nearest even.. minimum 4
 
+  // if divisions > 1000 {
+  //   println!("Would have run integrator with {} divisions", divisions);
+  // }
   let result = 0.5 * integrator.integrate(-1., 1., slices);
 
   (result, 1.)

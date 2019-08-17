@@ -64,13 +64,15 @@ pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> 
   let l_p = *(spd.pump.get_wavelength() / M);
   let l_s = *(spd.signal.get_wavelength() / M);
 
+  let mut spd = spd.clone();
+  spd.assign_optimum_idler();
   let peak = phasematch_gaussian_approximation(&spd).norm_sqr();
   let target = threshold * peak;
 
   let pm_diff = |l_s| {
     let mut spd = spd.clone();
     spd.signal.set_wavelength( l_s * M );
-    spd.assign_optimum_idler();
+    // spd.assign_optimum_idler();
 
     let local = phasematch_gaussian_approximation(&spd).norm_sqr();
     let diff = target - local;
@@ -79,7 +81,7 @@ pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> 
   };
 
   let guess = 0.9 * l_s;
-  let ans = nelder_mead_1d(pm_diff, guess, 1000, std::f64::MIN_POSITIVE, 1., 1e-12);
+  let ans = nelder_mead_1d(pm_diff, guess, 1000, std::f64::MIN_POSITIVE, l_s, 1e-12);
 
   // FIXME WHAT ARE THESE NUMBERS
   let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spd.pump_bandwidth / (NANO * M))).min(35e-9);

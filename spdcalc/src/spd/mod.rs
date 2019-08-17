@@ -72,8 +72,8 @@ impl Default for SPD {
 }
 
 impl SPD {
-  /// create a copy with the pump wavelength set to correspond to the
-  /// crystal phasematching function
+  /// create a copy with the pump wavelength set to phasematch
+  /// with the signal and idler
   pub fn with_phasematched_pump(self) -> Self {
     let l_s = self.signal.get_wavelength();
     let l_i = self.idler.get_wavelength();
