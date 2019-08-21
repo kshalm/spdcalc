@@ -1,6 +1,5 @@
 use num::{Integer, Zero};
 use crate::utils::{Iterator2D, Steps};
-use crate::math::*;
 
 /// Get simpson weight for index
 fn get_simpson_weight( n : usize, divs : usize ) -> f64 {

@@ -6,7 +6,6 @@ use math::SimpsonIntegration2D;
 use spd::*;
 use dim::{
   ucum::{self, M, C_},
-  f64prefixes::{NANO},
 };
 
 /// Holds configuration for drawing heatmaps
@@ -75,17 +74,22 @@ pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> 
     // spd.assign_optimum_idler();
 
     let local = phasematch_gaussian_approximation(&spd).norm_sqr();
-    let diff = target - local;
-
-    diff.abs()
+    if local < std::f64::EPSILON {
+      std::f64::MAX
+    } else {
+      let diff = target - local;
+      diff.abs()
+    }
   };
 
-  let guess = 0.9 * l_s;
-  let ans = nelder_mead_1d(pm_diff, guess, 1000, std::f64::MIN_POSITIVE, l_s, 1e-12);
+  let guess = l_s - 1e-9;
+  let ans = nelder_mead_1d(pm_diff, guess, 1000, std::f64::MIN, l_s, 1e-12);
 
   // FIXME WHAT ARE THESE NUMBERS
-  let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spd.pump_bandwidth / (NANO * M))).min(35e-9);
-  let diff = (ans - l_s).abs().min(diff_max);
+  // let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spd.pump_bandwidth / (NANO * M))).min(35e-9);
+  let diff = (ans - l_s).abs(); //.min(diff_max);
+  // println!("l_s {}, diff {}", l_s, diff);
+  // println!("target {}, jsi(ans) {}", target, pm_diff(ans));
 
   let x_range = (
     l_s - 10. * diff,
@@ -207,8 +211,11 @@ mod tests {
 
     spd.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
     spd.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
+    spd.assign_optimum_theta();
 
     let ranges = calc_plot_config_for_jsi(&spd, 100, 0.5);
+
+    // println!("{:#?}", ranges);
 
     let xmin = ranges.x_range.0;
     let xmax = ranges.x_range.1;
@@ -223,7 +230,7 @@ mod tests {
     let mut actual = xmin;
     let mut expected = expected_xmin;
     assert!(
-      approx_eq!(f64, actual, expected, ulps = 2),
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 50. * NANO),
       "actual: {}, expected: {}",
       actual,
       expected
@@ -232,7 +239,7 @@ mod tests {
     actual = xmax;
     expected = expected_xmax;
     assert!(
-      approx_eq!(f64, actual, expected, ulps = 2),
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 50. * NANO),
       "actual: {}, expected: {}",
       actual,
       expected
@@ -241,7 +248,7 @@ mod tests {
     actual = ymin;
     expected = expected_ymin;
     assert!(
-      approx_eq!(f64, actual, expected, ulps = 2),
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 50. * NANO),
       "actual: {}, expected: {}",
       actual,
       expected
@@ -250,7 +257,7 @@ mod tests {
     actual = ymax;
     expected = expected_ymax;
     assert!(
-      approx_eq!(f64, actual, expected, ulps = 2),
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 50. * NANO),
       "actual: {}, expected: {}",
       actual,
       expected

@@ -4,8 +4,16 @@ use dim::ucum::{C_, RAD, M};
 use num::{Complex, clamp};
 use std::cmp::max;
 
+// ensures that the Gaussian and sinc functions have the same widths.
+// ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
+const GAUSSIAN_SINC_GAMMA_FACTOR : f64 = 0.193;
+
 fn sinc( x : f64 ) -> f64 {
   if x == 0. { 1. } else { f64::sin(x) / x }
+}
+
+fn gaussian_pm( x : f64 ) -> f64 {
+  f64::exp(-GAUSSIAN_SINC_GAMMA_FACTOR * x.powi(2))
 }
 
 /// Calculate the pump spectrum
@@ -47,14 +55,23 @@ pub fn phasematch(spd : &SPD) -> Complex<f64> {
 /// calculate the phasematching using a gaussian approximation
 #[allow(non_snake_case)]
 pub fn phasematch_gaussian_approximation(spd : &SPD) -> Complex<f64> {
+  // calculate pump spectrum with original pump
+  let alpha = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+
+  if alpha < spd.pump_spectrum_threshold {
+    return Complex::new(0., 0.);
+  }
+
+  let spd = spd.with_phasematched_pump();
+
   // crystal length
   let L = *(spd.crystal_setup.length / ucum::M);
 
   let delk = *(spd.calc_delta_k() / ucum::J / ucum::S);
   let arg = L * 0.5 * delk.z;
+  let pmz = Complex::new(gaussian_pm(arg), 0.);
 
-  // FIXME magic number. ask krister
-  Complex::new(f64::exp(-0.193 * arg.powi(2)), 0.)
+  alpha * pmz
 }
 
 #[allow(non_snake_case)]
@@ -476,12 +493,12 @@ mod tests {
     };
     // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
     spd.signal.set_angles(0. *ucum::RAD, 0.03418771664291853 * ucum::RAD);
-    // spd.assign_optimum_idler();
     // spd.assign_optimum_theta();
 
     // FIXME This isn't matching.
     spd.idler.set_angles(PI * ucum::RAD, 0.03353944515208561 * ucum::RAD);
     spd.crystal_setup.theta = 1.5707963267948966 * RAD;
+    // spd.assign_optimum_idler();
 
     let amp = phasematch( &spd );
 
