@@ -11,8 +11,8 @@ use std::f64::consts::FRAC_PI_2;
 mod periodic_poling;
 pub use periodic_poling::*;
 
-mod coincidences;
-pub use coincidences::*;
+mod phasematch;
+pub use phasematch::*;
 
 mod computations;
 pub use computations::*;
@@ -322,6 +322,10 @@ pub fn calc_delta_k(
 /// Calculate the spatial walk-off for the pump
 /// [See equation (37) of Couteau, Christophe. "Spontaneous parametric down-conversion"](https://arxiv.org/pdf/1809.00127.pdf)
 pub fn calc_pump_walkoff(pump : &Photon, crystal_setup : &CrystalSetup) -> Angle {
+  // ***
+  // NOTE: in the original version of the program this was TOTALLY bugged
+  // and gave the wrong values completely
+  // ***
   assert!(pump.get_type() == PhotonType::Pump);
 
   // n_{e}(\theta)

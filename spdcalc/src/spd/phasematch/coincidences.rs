@@ -1,40 +1,8 @@
 use crate::math::fwhm_to_sigma;
 use super::*;
-use dim::ucum::{C_, RAD, M};
+use dim::ucum::{RAD, M};
 use num::{Complex, clamp};
 use std::cmp::max;
-
-// ensures that the Gaussian and sinc functions have the same widths.
-// ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
-const GAUSSIAN_SINC_GAMMA_FACTOR : f64 = 0.193;
-
-fn sinc( x : f64 ) -> f64 {
-  if x == 0. { 1. } else { f64::sin(x) / x }
-}
-
-fn gaussian_pm( x : f64 ) -> f64 {
-  f64::exp(-GAUSSIAN_SINC_GAMMA_FACTOR * x.powi(2))
-}
-
-/// Calculate the pump spectrum
-#[allow(non_snake_case)]
-fn pump_spectrum(signal : &Photon, idler : &Photon, pump : &Photon, p_bw : Wavelength) -> f64 {
-  let PI2c = PI2 * C_;
-  let lamda_s = signal.get_wavelength();
-  let lamda_i = idler.get_wavelength();
-  let lamda_p = pump.get_wavelength();
-
-  let w = PI2c * (1. / lamda_s + 1. / lamda_i - 1. / lamda_p);
-
-  // convert from wavelength to w
-  let fwhm = PI2c / (lamda_p * lamda_p) * p_bw;
-  let sigma_I = fwhm_to_sigma(fwhm);
-  let x = w / sigma_I;
-
-  // Convert from intensity to Amplitude
-  // A^2 ~ I ... so extra factor of two here making this 1/4
-  (-0.25 * x * x).exp()
-}
 
 /// calculate the phasematching
 pub fn phasematch(spd : &SPD) -> Complex<f64> {
@@ -106,7 +74,6 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   // let omega_i = PI2c / spd.idler.get_wavelength();
   // let omega_p = omega_s + omega_i;
 
-  // Height of the collected spots from the axis.
   let theta_s = *(spd.signal.get_theta() / RAD);
   let phi_s = *(spd.signal.get_phi() / RAD);
   let theta_i = *(spd.idler.get_theta() / RAD);
@@ -114,6 +81,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
   let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
 
+  // Height of the collected spots from the axis.
   let hs = L * 0.5 * f64::tan(theta_s) * f64::cos(phi_s);
   let hi = L * 0.5 * f64::tan(theta_i) * f64::cos(phi_i);
 
@@ -370,23 +338,6 @@ mod tests {
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * (expected - actual).abs() / expected
-  }
-
-  #[test]
-  fn pump_spectrum_test() {
-    let mut spd = SPD::default();
-
-    spd.signal.set_wavelength(1500. * NANO * M);
-    let actual = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
-
-    let expected = 0.0003094554168558373;
-
-    assert!(
-      approx_eq!(f64, actual, expected, ulps = 2),
-      "actual: {}, expected: {}",
-      actual,
-      expected
-    );
   }
 
   #[test]
