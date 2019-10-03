@@ -705,6 +705,34 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ,alpha3cI = - alpha3I
         ;
 
+    // console.log(
+    //   `ks_f: ${ks_f}
+    //   SIN_THETA_s_e: ${SIN_THETA_s_e}
+    //   COS_PHI_s: ${COS_PHI_s}
+    //   GAM2s: ${GAM2s}
+    //   GAM1s: ${GAM1s}
+    //   GAM3s: ${GAM3s}
+    //   GAM4s: ${GAM4s}
+    //   zhs: ${zhs}
+    //   DEL2s: ${DEL2s}
+    //   DEL1s: ${DEL1s}
+    //   DEL3s: ${DEL3s}
+    //   KpKs: ${KpKs}
+    //
+    //   C7: ${C7}
+    //   C3: ${C3}
+    //   C4: ${C4}
+    //   C5: ${C5}
+    //   C9: ${C9}
+    //   C10: ${C10}
+    //   LRho: ${LRho}
+    //   LRho_sq: ${LRho_sq}
+    //
+    //   alpha1: ${alpha1R} + i ${alpha1I}
+    //   alpha2: ${alpha2R} + i ${alpha2I}
+    //   alpha3: ${alpha3R} + i ${alpha3I}`
+    // )
+
             // M1R = -2 * DEL3s
     //     ,M1I = -2 * GAM3s
     //     ,M2R = M1R //M2 is the complex conjugate of M1
@@ -923,21 +951,32 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
             // ,imag = 1 * EImag
             ;
 
+        // console.log("B1, B2: ", B1, B2);
+        // console.log("A1, A2: ", A1, A2);
+        // console.log("AA1:", AA1R, AA1I);
+        // console.log("BB1:",BB1R, BB1I);
+        // console.log("AA2:", AA2R, AA2I);
+        // console.log("BB2:",BB2R, BB2I);
+        //
+        // console.log('Ha', HaR, HaI);
+        // console.log('Hb', HbR, HbI);
+        // console.log('Hc', HcR, HcI);
+        // console.log('Hd', HdR, HdI);
+        //
         // console.log("X11:", X11R, X11I);
         // console.log("X12:", X12R, X12I);
         // console.log("Y21:", Y21R, Y21I);
         // console.log("Y22:", Y22R, Y22I);
         // console.log("Gamma1 ", gamma1I);
         // console.log("Gamma2 ", gamma2I);
-        // console.log("AA1:", AA1R, AA1I);
-        // console.log("BB1:",BB1R, BB1I);
-        // console.log("AA2:", AA2R, AA2I);
-        // console.log("BB2:",BB2R, BB2I);
         // console.log("EE: ", EER, EEI);
         // console.log("FF: ", FFR, FFI);
         // console.log("GG: ", GGR, GGI);
         // console.log("HH: ", HHR, HHI);
         // console.log("II: ", IIR, III);
+        //
+        // console.log('num', EReal, EImag)
+        // console.log('denom', DenR, DenI)
         // console.log("Exponent: ", EXPR, EXPI);
         // console.log("Denominator: ", DenR, DenI);
         // console.log("RESULT: ", real*0.5, imag*0.5);
@@ -958,8 +997,6 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
 
 
 
-        // console.log("B1, B2: ", B1, B2);
-        // console.log("A1, A2: ", A1, A2);
 
         // console.log("GG^2/4EE", -EXP2R, -EXP2I);
         // console.log("HH^2/4FF", -EXP4R, -EXP4I);
@@ -999,7 +1036,8 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
     var PMt = 1;
     if (P.calcfibercoupling){
         var dz = 2/P.numz2Dint;
-        var pmintz = helpers.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
+// NOTE FROM JASPER I JUST MODIFIED THIS TO NOT USE 3/8 simpson. now it's better accuracy
+        var pmintz = helpers.Nintegrate2D_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint);
         // var  z1 = 0
         //     ,z2 = 0.5
         // var z1 = 0.5

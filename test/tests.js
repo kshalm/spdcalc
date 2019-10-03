@@ -192,7 +192,7 @@ function phasematch_pp(){
   show(props)
 
   console.log('PMtz amp', amp_pm_tz)
-  console.log('PM amplitued', amp)
+  console.log('PM amplitude', amp)
 }
 
 function phasematch_norm(){
@@ -215,6 +215,44 @@ function autorange_lambda(){
   console.log(ranges)
 }
 
+function singles(){
+  let props = defaultProps()
+  props.set('enable_pp', false)
+  props.poling_period = 1e16
+  props.auto_calc_Theta()
+  // props.calcfibercoupling = false
+  // props.update_all_angles()
+
+  let delk = spdc.calc_delK( props )
+  let amp_pm_tz = spdc.calc_PM_tz_k_singles( props )
+  let amp = spdc.phasematch_singles( props )
+
+  show(props)
+
+  console.log('delk', delk)
+  console.log('S_s', props.S_s)
+
+  console.log('PMtz singles amp', amp_pm_tz)
+  console.log('PM singles amplitude', amp)
+}
+
+function integrator_test(){
+  let n = 33
+  let w = spdc.Nintegrate2DWeights_3_8(n)
+  let result = spdc.Nintegrate2D_3_8((x, y) => {
+    return Math.sin(x) * y * y * y
+  }, 0, Math.PI, 0, 2, n, w)
+
+  let actual = result
+  let expected = Math.pow(2, 4) / 2
+
+  console.log('result', actual)
+  console.log('expected', expected);
+
+  let diff = 100. * Math.abs(expected - actual) / expected
+  console.log('percent diff', diff)
+}
+
 // poling_period()
 // walkoff()
 // walkoff_convergence()
@@ -224,4 +262,7 @@ function autorange_lambda(){
 // phasematch_pp()
 // pump_spectrum()
 // phasematch_norm()
-autorange_lambda()
+// autorange_lambda()
+
+singles()
+// integrator_test()

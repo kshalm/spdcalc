@@ -13,7 +13,9 @@ where T : std::ops::Mul<Output = T> + Copy {
 pub fn phasematch_singles(spd : &SPD) -> Complex<f64> {
 
   // calculate pump spectrum with original pump
-  let alpha = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+  let mut alpha = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+  // TODO: Ask krister. not sure why we square this one
+  alpha = alpha * alpha;
 
   if alpha < spd.pump_spectrum_threshold {
     return Complex::new(0., 0.);
@@ -92,28 +94,28 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
 
   // Now calculate the the coeficients that get repeatedly used. This is from
   // Karina's code. Assume a symmetric pump waist (Wx = Wy)
-  let ks_f = k_s / n_s;
-  let SIN_THETA_s_e = f64::sin(theta_s_e);
+  let ks_f = k_s / n_s; // exact
+  let SIN_THETA_s_e = f64::sin(theta_s_e); // 1e-9
   let COS_PHI_s = f64::cos(phi_s);
-  let GAM2s = -0.25 * Ws_SQ;
-  let GAM1s = GAM2s * PHI_s;
-  let GAM3s = -2. * ks_f * GAM1s * SIN_THETA_s_e * COS_PHI_s;
-  let GAM4s = -0.5 * ks_f * SIN_THETA_s_e * COS_PHI_s * GAM3s;
-  let zhs = z0s + hs * SIN_THETA_s_e * COS_PHI_s;
-  let DEL2s = 0.5 / ks_f * zhs;
-  let DEL1s = DEL2s * PHI_s;
-  let DEL3s = -hs - zhs * PHI_s * SIN_THETA_s_e * COS_PHI_s;
-  let KpKs = *(k_p * k_s * M2);
+  let GAM2s = -0.25 * Ws_SQ; // exact
+  let GAM1s = GAM2s * PHI_s; // 1e-10
+  let GAM3s = -2. * ks_f * GAM1s * SIN_THETA_s_e * COS_PHI_s; // 1e-10
+  let GAM4s = -0.5 * ks_f * SIN_THETA_s_e * COS_PHI_s * GAM3s; // 1e-5
+  let zhs = z0s + hs * SIN_THETA_s_e * COS_PHI_s; // 1e-13
+  let DEL2s = 0.5 / ks_f * zhs; // 1e-9
+  let DEL1s = DEL2s * PHI_s; // 1e-9
+  let DEL3s = -hs - zhs * PHI_s * SIN_THETA_s_e * COS_PHI_s; // 1e-11
+  let KpKs = *(k_p * k_s * M2); // exact
   let pp_factor = spd.pp.map_or(0., |p| p.pp_factor());
 
   let dksi = k_s + k_i + PI2 * pp_factor / M;
-  let C7 = k_p - dksi;
-  let C3 = L * C7;
-  let C4 = L * (1./k_i - 1./k_p);
-  let C5 = k_s/k_p;
-  let C9 = Complex::new(*(k_p * Wx_SQ / M), 0.);
-  let C10 = Complex::new(*(k_p * Wy_SQ / M), 0.);
-  let LRho = L * RHOpx;
+  let C7 = k_p - dksi; // 1e-7
+  let C3 = L * C7; // 1e-10
+  let C4 = L * (1./k_i - 1./k_p); // 1e-13
+  let C5 = k_s/k_p; // exact
+  let C9 = Complex::new(*(k_p * Wx_SQ / M), 0.); // exact
+  let C10 = Complex::new(*(k_p * Wy_SQ / M), 0.); // exact
+  let LRho = L * RHOpx; // DIFFERENT SIGN and 1e-5
   let LRho_sq = LRho * LRho;
 
   let alpha1 = 4. * KpKs * Complex::new(*(GAM1s/M2), -*(DEL1s/M2));
@@ -139,8 +141,8 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
     let B4 = 1. + z2;
 
     let B6a = *(C4 * B0 / M2);
-    let gamma1 = *(-k_p_L * B1 + k_s * A1) * imag;
-    let gamma2 = *(-k_p_L * B2 + k_s * A2) * imag;
+    let gamma1 = *(-k_p_L * B1 + k_s * A1) * imag; // exact
+    let gamma2 = *(-k_p_L * B2 + k_s * A2) * imag; // exact
     let Ha = alpha1 + gamma1;
     let Hb = alpha2 + gamma1;
     let Hc = alpha1.conj() - gamma2;
@@ -164,8 +166,8 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
     let EE = 0.25 * (
       - Complex::new(2. * (*(Wx_SQ / M2)), 0.)
       + imag * B6a
-      + sq((*C5) / X11 * (C9 - imag * (*(A1/M))))
-      - sq(imag * (*C5) / X12 * (C9 + imag * (*(A2/M))))
+      + (*C5) / X11 * sq(C9 - imag * (*(A1/M)))
+      - imag * (*C5) / X12 * sq(C9 + imag * (*(A2/M)))
     );
 
     // Now to calculate the term FF
@@ -173,8 +175,8 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
     let FF = 0.25 * (
       - Complex::new(2. * (*(Wy_SQ / M2)), 0.)
       + imag * B6a
-      - sq((*C5) / Y21 * (imag * C10 + (*(A1/M))))
-      + sq(imag * (*C5) / Y22 * (-imag * C10 + (*(A2/M))))
+      - (*C5) / Y21 * sq(imag * C10 + (*(A1/M)))
+      + imag * (*C5) / Y22 * sq(-imag * C10 + (*(A2/M)))
     );
 
     // Now to calculate the term GG
@@ -208,9 +210,9 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
     // Exp(-(GG^2/(4 EE)) - HH^2/(4 FF) + II)
     let numerator = (-sq(GG) / (4. * EE) - sq(HH) / (4. * FF) + II).exp();
 
-    // Now calculate terms in the DENominator
+    // Now calculate terms in the Denominator
     // 8 * Sqrt[AA1 BB1 AA2 BB2 EE FF]
-    let denominator = 2. * 8. * (AA1 * BB1 * AA2 * BB2 * EE * FF).sqrt();
+    let denominator = 8. * (AA1 * BB1 * AA2 * BB2 * EE * FF).sqrt();
 
     // Take into account apodized crystals
     // Apodization 1/e^2
@@ -231,7 +233,7 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
     );
 
     // Now calculate the full term in the integral.
-    return pmzcoeff * numerator / denominator;
+    return 0.5 * pmzcoeff * numerator / denominator;
   };
 
   let zslice = 1e-4 * clamp((*(L/M) / 2.5e-3).sqrt(), 0., 5.);
@@ -239,6 +241,8 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
   divisions = max(divisions + divisions % 2, 4); // nearest even.. minimum 4
 
   // NOTE: original implementation used simpson 3/8. Using regular simpson 2d here.
+  // ALSO: the original 3/8 integration method had a bug which resulted in a
+  // percent difference of around 1%-9% depending on step size.
   let integrator = SimpsonIntegration2D::new(fn_z);
   let result = 0.5 * integrator.integrate((-1., 1.), (-1., 1.), divisions);
 
@@ -256,6 +260,58 @@ mod tests {
   }
 
   #[test]
-  fn test(){
+  fn phasematch_singles_test(){
+    let mut spd = SPD::default();
+    spd.fiber_coupling = true;
+    // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
+    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
+    // spd.assign_optimum_idler();
+    // spd.assign_optimum_theta();
+
+    // FIXME This isn't matching.
+    spd.idler.set_angles(PI * ucum::RAD, 0.03178987094602039 * ucum::RAD);
+    spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
+
+    let amp = phasematch_singles( &spd );
+
+    // let amp_pm_tz = calc_singles_phasematch( &spd );
+    // let delk = spd.calc_delta_k();
+    //
+    // println!("n_p: {}", spd.pump.get_index(&spd.crystal_setup));
+    // println!("n_s: {}", spd.signal.get_index(&spd.crystal_setup));
+    // println!("n_i: {}", spd.idler.get_index(&spd.crystal_setup));
+    //
+    // println!("{:#?}", spd);
+    // println!("{}", *(delk / ucum::J / ucum::S));
+    //
+    // println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
+    // println!("phasematch {}", amp);
+
+
+    let actual = amp;
+    let expected = Complex::new(9.518213235754354e+23, -73139981.39944905);
+
+    let accept_diff = 1e-4;
+
+    let normdiff = percent_diff(actual.norm(), expected.norm());
+    assert!(
+      normdiff < accept_diff,
+      "norm percent difference: {}",
+      normdiff
+    );
+
+    let rediff = percent_diff(actual.re, expected.re);
+    assert!(
+      rediff < accept_diff,
+      "real part percent difference: {}",
+      rediff
+    );
+
+    let imdiff = percent_diff(actual.im, expected.im);
+    assert!(
+      imdiff < accept_diff,
+      "imag part percent difference: {}",
+      imdiff
+    );
   }
 }

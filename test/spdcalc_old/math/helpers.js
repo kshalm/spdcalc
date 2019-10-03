@@ -490,6 +490,55 @@ helpers.Nintegrate2D_3_8_singles = function Nintegrate2D_3_8_singles(f, fz1 ,a,b
 
 };
 
+helpers.Nintegrate2D_singles = function Nintegrate2D_singles(f, fz1, a,b,c,d,n,w){
+    var weights;
+
+    if (n%2 !== 0){
+        n = n+1; //guarantee that n is even
+    }
+
+    if (w === null || w === undefined){
+      weights = new Array(n+1);
+      weights[0] = 1;
+      weights[n] = 1;
+      for (var i=1; i<n; i++){
+          if(i%2===0){
+              //even case
+              weights[i] = 2;
+          }
+          else{
+              weights[i] = 4;
+          }
+      }
+  }
+  else {
+    weights = w;
+  }
+
+    // if (n<50){
+    //     console.log(weights);
+    // }
+
+    var dx = (b-a)/n;
+    var dy = (d-c)/n;
+    var result1 = 0;
+    var result2 = 0;
+
+    for (var j=0; j<n+1; j++){
+        let x = a +j*dx
+          ,Cz1 = fz1(x)
+        for (var k=0; k<n+1; k++){
+            var result = f(x, c+k*dy, Cz1)
+            var weight = weights[j]*weights[k]
+            result1 += result[0] * weight;
+            result2 += result[1] * weight;
+        }
+    }
+
+    return [result1*dx*dy/9, result2*dx*dy/9];
+
+};
+
 
 helpers.RiemannSum2D = function RiemannSum2D(f, a, b, c, d, n){
     var dx = (b-a)/n;
