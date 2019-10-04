@@ -285,7 +285,7 @@ mod tests {
     // println!("{}", *(delk / ucum::J / ucum::S));
     //
     // println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
-    // println!("phasematch {}", amp);
+    // println!("phasematch singles {}", amp);
 
 
     let actual = amp;
