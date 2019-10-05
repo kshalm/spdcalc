@@ -1,13 +1,8 @@
-use crate::math::fwhm_to_sigma;
+use crate::math::{fwhm_to_sigma, sq};
 use super::*;
 use dim::ucum::{RAD, M};
 use num::{Complex, clamp};
 use std::cmp::max;
-
-fn sq<T>( n : T ) -> T
-where T : std::ops::Mul<Output = T> + Copy {
-  n * n
-}
 
 /// calculate the phasematching
 pub fn phasematch_singles(spd : &SPD) -> Complex<f64> {

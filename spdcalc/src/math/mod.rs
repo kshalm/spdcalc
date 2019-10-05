@@ -7,6 +7,12 @@ pub use integration::*;
 mod nelder_mead;
 pub use self::nelder_mead::*;
 
+/// Square a value
+pub fn sq<T>( n : T ) -> <T as std::ops::Mul>::Output
+where T : std::ops::Mul + Copy {
+  n * n
+}
+
 /// Simple implementation of linear interpolation
 pub fn lerp<T>(
   first : T,

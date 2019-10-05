@@ -1,4 +1,6 @@
 use super::*;
+use dim::f64prefixes::{PICO, MILLI};
+use dim::ucum::{ M, V };
 
 /// The type of crystal
 #[derive(Debug, Copy, Clone)]
@@ -61,5 +63,10 @@ impl Crystal {
       Crystal::AgGaS2_1 => aggas2_1::AgGaS2_1.get_meta(),
       // Crystal::Sellmeier(crystal) => crystal.get_meta(),
     }
+  }
+
+  pub fn get_effective_nonlinear_coefficient(&self) -> MetersPerMilliVolt<f64> {
+    // TODO: enhance crystals to compute this
+    1. * PICO * M / V
   }
 }

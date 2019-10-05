@@ -2,7 +2,7 @@ use crate::*;
 use crystal::CrystalSetup;
 use dim::{
   f64prefixes::{MICRO, MILLI, NANO},
-  ucum::{self, DEG, M},
+  ucum::{self, DEG, M, MILLIW, MilliWatt},
 };
 use math::*;
 use photon::{Photon, PhotonType};
@@ -28,6 +28,7 @@ pub struct SPD {
   pub pp :             Option<PeriodicPoling>,
   pub fiber_coupling : bool,
   pub pump_bandwidth : Wavelength,
+  pub pump_average_power : MilliWatt<f64>,
   /// Cutoff amplitude below which the phasematching will be considered zero
   pub pump_spectrum_threshold: f64,
 
@@ -64,6 +65,7 @@ impl Default for SPD {
       fiber_coupling : false,
       pump_bandwidth : 5.35 * NANO * ucum::M,
       pump_spectrum_threshold: 1e-9,
+      pump_average_power: 1. * MILLIW,
       z0p: 0. * ucum::M,
       z0s: -0.5 * crystal_setup.length,
       z0i: -0.5 * crystal_setup.length,

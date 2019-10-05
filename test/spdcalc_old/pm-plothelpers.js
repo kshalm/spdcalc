@@ -123,7 +123,7 @@ PlotHelpers.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm
 
     var maxpm = 0;
     var twoPIc = 2*Math.PI*con.c;
-        
+
 
     // calculate normalization
     // var PMN = pmLib.phasematch(P);
@@ -147,7 +147,7 @@ PlotHelpers.calc_JSA_p = function calc_JSA_p(props, lambda_s,lambda_i, dim, norm
             var PM = pmLib.phasematch(P);
             var  omega_s = twoPIc / (P.lambda_s )
                 ,omega_i = twoPIc / (P.lambda_i )
-                ,n_squared = sq(P.n_s*P.n_i) 
+                ,n_squared = sq(P.n_s*P.n_i)
                 // ,lomega = Math.sqrt(omega_s * omega_i /n_squared)
                 ,lomega = 1;
                 ;
@@ -278,7 +278,7 @@ PlotHelpers.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lam
         ,dOmega_i
         ,pumpScale = Math.pow(P.W,2) // May need to later include the ellipticity parameter
         ,scale_s = 1/(Ws_SQ * PHI_s *pumpScale)
-        ,scale_i =1/(Wi_SQ * PHI_i * pumpScale) //assume symmetric coupling geometry
+        ,scale_i = 1/(Wi_SQ * PHI_i * pumpScale) //assume symmetric coupling geometry
         ,dlambda_s = Math.abs(lambda_s[lambda_s.length-1] - lambda_s[0])/lambda_s.length
         ,dlambda_i = Math.abs(lambda_i[lambda_i.length-1] - lambda_i[0])/lambda_i.length
         ,norm_sum_s = twoPIc * dlambda_s
