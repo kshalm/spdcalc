@@ -10,20 +10,22 @@ pub use heralding::*;
 
 /// Holds configuration for drawing heatmaps
 #[derive(Debug, Copy, Clone)]
-pub struct HistogramConfig {
+pub struct HistogramConfig<T>
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   /// the x axis range (min, max)
-  pub x_range : (f64, f64),
+  pub x_range : (T, T),
   /// the y axis range (min, max)
-  pub y_range : (f64, f64),
+  pub y_range : (T, T),
   /// the x axis number of bins
   pub x_count : usize,
   /// the y axis number of bins
   pub y_count : usize,
 }
 
-impl IntoIterator for HistogramConfig {
-  type Item = (f64, f64); // x, y
-  type IntoIter = Iterator2D<f64>;
+impl<T> IntoIterator for HistogramConfig<T>
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+  type Item = (T, T); // x, y
+  type IntoIter = Iterator2D<T>;
 
   fn into_iter(self) -> Self::IntoIter {
     Iterator2D::new(

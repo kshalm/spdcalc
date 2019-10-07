@@ -2,19 +2,18 @@ use super::*;
 use spd::*;
 use math::{nelder_mead_1d};
 use dim::{
-  ucum::{self, M},
+  ucum::{M},
 };
 
 /// Create a JSI plot
-pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
+pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig<Wavelength>) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
   let norm_amp = phasematch_coincidences(&spd.to_collinear());
 
   cfg
     .into_iter()
-    .map(|coords| {
-      let (l_s, l_i) = coords;
-      let amplitude = calc_jsa(&spd, l_s * ucum::M, l_i * ucum::M);
+    .map(|(l_s, l_i)| {
+      let amplitude = calc_jsa(&spd, l_s, l_i);
 
       // intensity
       (amplitude / norm_amp).norm_sqr()
@@ -28,7 +27,7 @@ fn get_recip_wavelength( w : f64, l_p : f64 ) -> f64 {
 
 /// Automatically calculate the ranges for creating a JSI based on the
 /// spd parameters and a specified threshold
-pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> HistogramConfig {
+pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> HistogramConfig<Wavelength> {
 
   let jsa_units = JSAUnits::new(1.);
   let l_p = *(spd.pump.get_wavelength() / M);
@@ -63,13 +62,13 @@ pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> 
   // println!("target {}, jsi(ans) {}", target, pm_diff(ans));
 
   let x_range = (
-    l_s - 10. * diff,
-    l_s + 10. * diff
+    (l_s - 10. * diff) * M,
+    (l_s + 10. * diff) * M
   );
 
   let y_range = (
-    get_recip_wavelength(x_range.1, l_p),
-    get_recip_wavelength(x_range.0, l_p)
+    get_recip_wavelength(*(x_range.1 / M), l_p) * M,
+    get_recip_wavelength(*(x_range.0 / M), l_p) * M
   );
 
   let x_count = size;
@@ -87,7 +86,7 @@ pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> 
 #[cfg(test)]
 mod tests {
   use super::*;
-  use dim::ucum::{RAD};
+  use dim::ucum::{self, RAD};
   use dim::f64prefixes::{MICRO, NANO};
   extern crate float_cmp;
   use float_cmp::*;
