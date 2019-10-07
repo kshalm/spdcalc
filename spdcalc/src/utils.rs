@@ -100,14 +100,16 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
 /// assert_eq!(grid[12], 20.);
 /// ```
 #[derive(Copy, Clone)]
-pub struct Iterator2D<T> {
+pub struct Iterator2D<T>
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
   x_steps : Steps<T>,
   y_steps : Steps<T>,
   index : usize,
   total : usize,
 }
 
-impl<T> Iterator2D<T> {
+impl<T> Iterator2D<T>
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
   /// Create a new 2d iterator
   pub fn new(
     x_steps : Steps<T>,
@@ -122,17 +124,21 @@ impl<T> Iterator2D<T> {
     }
   }
 
-  // get the 2d indices (row, column) from the linear index
+  /// get the 2d indices (row, column) from the linear index
   pub fn get_2d_indices( index : usize, cols : usize ) -> (usize, usize) {
     (
       (index % cols),
       (index / cols)
     )
   }
+
+  /// Get the x step size
+  pub fn get_dx(&self) -> T { self.x_steps.division_width() }
+  pub fn get_dy(&self) -> T { self.y_steps.division_width() }
 }
 
 impl<T> Iterator for Iterator2D<T>
-where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   type Item = (T, T); // x, y
 
   fn next(&mut self) -> Option<Self::Item> {

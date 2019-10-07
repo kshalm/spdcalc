@@ -24,7 +24,7 @@ fn get_rates_constant(spd : &SPD) -> f64 {
 // Calculate the coincidence rates per unit wavelength * wavelength.
 // Integrating over all wavelengths (all array items) will give total coincidence rate.
 #[allow(non_snake_case)]
-pub fn calc_jsi_rate_distribution(spd : &SPD, cfg : &HistogramConfig) -> Vec<Hertz<f64>> {
+pub fn calc_jsi_rate_distribution(spd : &SPD, wavelength_range : &Iterator2D<Wavelength>) -> Vec<Hertz<f64>> {
 
   let PI2c = PI2 * C_;
   let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
@@ -53,8 +53,8 @@ pub fn calc_jsi_rate_distribution(spd : &SPD, cfg : &HistogramConfig) -> Vec<Her
   let scale = Ws_SQ * PHI_s
             * Wi_SQ * PHI_i
             * Wp_SQ;
-  let dlambda_s = (cfg.x_range.1 - cfg.x_range.0).abs() / ((cfg.x_count - 1) as f64) * M;
-  let dlambda_i = (cfg.y_range.1 - cfg.y_range.0).abs() / ((cfg.y_count - 1) as f64) * M;
+  let dlambda_s = wavelength_range.get_dx();
+  let dlambda_i = wavelength_range.get_dy();
   let lomega = omega_s * omega_i / sq(n_s * n_i);
   let norm_const = get_rates_constant(&spd) * (M * M * S * S * S);
 
@@ -65,11 +65,10 @@ pub fn calc_jsi_rate_distribution(spd : &SPD, cfg : &HistogramConfig) -> Vec<Her
 
   let jsa_units = JSAUnits::new(1.);
 
-  cfg
-    .into_iter()
+  wavelength_range
     .map(|(l_s, l_i)| {
       // TODO: ask krister why he didn't normalize this in original code
-      let amplitude = calc_jsa(&spd, l_s * M, l_i * M) / jsa_units;
+      let amplitude = calc_jsa(&spd, l_s, l_i) / jsa_units;
 
       amplitude.norm_sqr() * sq(jsa_units) * factor
     })
