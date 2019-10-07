@@ -253,6 +253,22 @@ function integrator_test(){
   console.log('percent diff', diff)
 }
 
+function heralding_test(){
+  var grid_size = 5
+  var Ws = spdc.linspace(
+    30 * 1e-6,
+    130 * 1e-6,
+    grid_size
+  );
+  // oops... not the right test
+  var Wi = spdc.linspace(
+    30 * 1e-6,
+    130 * 1e-6,
+    grid_size
+  );
+  spdc.calc_heralding_plot_p()
+}
+
 // poling_period()
 // walkoff()
 // walkoff_convergence()

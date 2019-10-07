@@ -144,11 +144,11 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
 }
 
 pub struct HeraldingResults {
-  signal_singles_rate : f64,
-  idler_singles_rate : f64,
-  coincidences_rate : f64,
-  signal_efficiency : f64,
-  idler_efficiency : f64,
+  pub signal_singles_rate : f64,
+  pub idler_singles_rate : f64,
+  pub coincidences_rate : f64,
+  pub signal_efficiency : f64,
+  pub idler_efficiency : f64,
 }
 
 impl HeraldingResults {
@@ -185,6 +185,8 @@ impl HeraldingResults {
   }
 }
 
+/// Calculate the count rates, and efficiencies for signal, idler singles and coincidences
+/// as well as the efficiencies over a range of signal/idler waist sizes.
 pub fn plot_heralding_results_by_signal_idler_waist(
   spd : &SPD,
   si_waists : &HistogramConfig<Meter<f64>>,
@@ -206,4 +208,17 @@ pub fn plot_heralding_results_by_signal_idler_waist(
       )
     })
     .collect()
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  fn percent_diff(actual : f64, expected : f64) -> f64 {
+    100. * (expected - actual).abs() / expected
+  }
+
+  #[test]
+  fn heralding_test() {
+  }
 }
