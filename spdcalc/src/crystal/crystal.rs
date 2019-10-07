@@ -1,5 +1,5 @@
 use super::*;
-use dim::f64prefixes::{PICO, MILLI};
+use dim::f64prefixes::{PICO};
 use dim::ucum::{ M, V };
 
 /// The type of crystal

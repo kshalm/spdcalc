@@ -5,21 +5,21 @@ use num::{Complex, clamp};
 use std::cmp::max;
 
 /// calculate the phasematching
-pub fn phasematch_singles(spd : &SPD) -> Complex<f64> {
+pub fn phasematch_singles(spd : &SPD) -> JSAUnits<Complex<f64>> {
 
   // calculate pump spectrum with original pump
-  let mut alpha = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
-  // TODO: Ask krister. not sure why we square this one
-  alpha = alpha * alpha;
+  let alpha = *pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
 
   if alpha < spd.pump_spectrum_threshold {
-    return Complex::new(0., 0.);
+    return JSAUnits::new(Complex::new(0., 0.));
   }
 
   // calculate coincidences with pump wavelength to match signal/idler
   let (pmz, pmt) = calc_singles_phasematch( &spd.with_phasematched_pump() );
+  let h = pmt * pmz;
 
-  alpha * pmt * pmz
+  // F_s = |\alpha(\omega_s + \omega_i)|^2 h(\omega_s, \omega_i).
+  JSAUnits::new(sq(alpha) * h)
 }
 
 #[allow(non_snake_case)]
@@ -70,6 +70,7 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
   let k_s = PI2 * n_s / spd.signal.get_wavelength(); //  * f64::cos(theta_s),
   let k_i = PI2 * n_i / spd.idler.get_wavelength(); // * f64::cos(theta_i)
 
+  // TODO: ask krister... is this really sec^2 ????
   let PHI_s = f64::cos(theta_s_e).powi(-2); // External angle for the signal???? Is PHI_s z component?
   // let PHI_i = f64::cos(theta_i_e).powi(-2); // External angle for the idler????
   // let PSI_s = (k_s / n_s) * f64::sin(theta_s_e) * f64::cos(phi_s); // Looks to be the y component of the ks,i
@@ -228,7 +229,7 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
     );
 
     // Now calculate the full term in the integral.
-    return 0.5 * pmzcoeff * numerator / denominator;
+    return pmzcoeff * numerator / denominator;
   };
 
   let zslice = 1e-4 * clamp((*(L/M) / 2.5e-3).sqrt(), 0., 5.);
@@ -239,7 +240,9 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
   // ALSO: the original 3/8 integration method had a bug which resulted in a
   // percent difference of around 1%-9% depending on step size.
   let integrator = SimpsonIntegration2D::new(fn_z);
-  let result = 0.5 * integrator.integrate((-1., 1.), (-1., 1.), divisions);
+
+  // h(\omega_s, \omega_i) = \frac{1}{4} \int_{-1}^{1} d\xi_1 \int_{-1}^{1} d\xi_2 \psi(\xi_1, \xi_2).
+  let result = 0.25 * integrator.integrate((-1., 1.), (-1., 1.), divisions);
 
   (result, 1.)
 }
@@ -247,8 +250,8 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  extern crate float_cmp;
-  use float_cmp::*;
+  // extern crate float_cmp;
+  // use float_cmp::*;
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * (expected - actual).abs() / expected
@@ -267,7 +270,8 @@ mod tests {
     spd.idler.set_angles(PI * ucum::RAD, 0.03178987094602039 * ucum::RAD);
     spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
 
-    let amp = phasematch_singles( &spd );
+    let jsa_units = JSAUnits::new(1.);
+    let amp = *(phasematch_singles( &spd ) / jsa_units);
 
     // let amp_pm_tz = calc_singles_phasematch( &spd );
     // let delk = spd.calc_delta_k();

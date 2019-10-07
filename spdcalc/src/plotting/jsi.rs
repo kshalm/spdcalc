@@ -8,9 +8,7 @@ use dim::{
 /// Create a JSI plot
 pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
-  let norm_amp = phasematch(&spd.to_collinear());
-  // norm of intensity
-  let norm = norm_amp.norm_sqr();
+  let norm_amp = phasematch_coincidences(&spd.to_collinear());
 
   cfg
     .into_iter()
@@ -19,7 +17,7 @@ pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig) -> Vec<f64> {
       let amplitude = calc_jsa(&spd, l_s * ucum::M, l_i * ucum::M);
 
       // intensity
-      amplitude.norm_sqr() / norm
+      (amplitude / norm_amp).norm_sqr()
     })
     .collect()
 }
@@ -32,12 +30,13 @@ fn get_recip_wavelength( w : f64, l_p : f64 ) -> f64 {
 /// spd parameters and a specified threshold
 pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> HistogramConfig {
 
+  let jsa_units = JSAUnits::new(1.);
   let l_p = *(spd.pump.get_wavelength() / M);
   let l_s = *(spd.signal.get_wavelength() / M);
 
   let mut spd = spd.clone();
   spd.assign_optimum_idler();
-  let peak = phasematch_gaussian_approximation(&spd).norm_sqr();
+  let peak = (*(phasematch_coincidences_gaussian_approximation(&spd) / jsa_units)).norm_sqr();
   let target = threshold * peak;
 
   let pm_diff = |l_s| {
@@ -45,7 +44,7 @@ pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> 
     spd.signal.set_wavelength( l_s * M );
     // spd.assign_optimum_idler();
 
-    let local = phasematch_gaussian_approximation(&spd).norm_sqr();
+    let local = (*(phasematch_coincidences_gaussian_approximation(&spd) / jsa_units)).norm_sqr();
     if local < std::f64::EPSILON {
       std::f64::MAX
     } else {

@@ -21,11 +21,13 @@ pub fn calc_HOM_rate_series(
     Steps(ls_range.0, ls_range.1, divisions + 1),
     Steps(li_range.0, li_range.1, divisions + 1)
   );
+
+  let jsa_units = JSAUnits::new(1.);
   // calculate the jsa values once for each integrand
   // signal, idler
-  let jsa_si : Vec<Complex<f64>> = iter.clone().map(|(ls, li)| calc_jsa( &spd, ls, li )).collect();
+  let jsa_si : Vec<Complex<f64>> = iter.clone().map(|(ls, li)| *(calc_jsa( &spd, ls, li ) / jsa_units)).collect();
   // idler, signal
-  let jsa_is : Vec<Complex<f64>> = iter.map(|(ls, li)| calc_jsa( &spd, li, ls )).collect();
+  let jsa_is : Vec<Complex<f64>> = iter.map(|(ls, li)| *(calc_jsa( &spd, li, ls ) / jsa_units)).collect();
 
   let x_range = (*(ls_range.0 / M), *(ls_range.1 / M));
   let y_range = (*(li_range.0 / M), *(li_range.1 / M));

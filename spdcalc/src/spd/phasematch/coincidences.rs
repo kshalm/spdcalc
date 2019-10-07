@@ -5,29 +5,30 @@ use num::{Complex, clamp};
 use std::cmp::max;
 
 /// calculate the phasematching
-pub fn phasematch(spd : &SPD) -> Complex<f64> {
+pub fn phasematch_coincidences(spd : &SPD) -> JSAUnits<Complex<f64>> {
 
   // calculate pump spectrum with original pump
-  let alpha = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+  let alpha = *pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
 
   if alpha < spd.pump_spectrum_threshold {
-    return Complex::new(0., 0.);
+    return JSAUnits::new(Complex::new(0., 0.));
   }
 
   // calculate coincidences with pump wavelength to match signal/idler
   let (pmz, pmt) = calc_coincidence_phasematch( &spd.with_phasematched_pump() );
+  let g = pmt * pmz;
 
-  alpha * pmt * pmz
+  JSAUnits::new(alpha * g)
 }
 
 /// calculate the phasematching using a gaussian approximation
 #[allow(non_snake_case)]
-pub fn phasematch_gaussian_approximation(spd : &SPD) -> Complex<f64> {
+pub fn phasematch_coincidences_gaussian_approximation(spd : &SPD) -> JSAUnits<Complex<f64>> {
   // calculate pump spectrum with original pump
-  let alpha = pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+  let alpha = *pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
 
   if alpha < spd.pump_spectrum_threshold {
-    return Complex::new(0., 0.);
+    return JSAUnits::new(Complex::new(0., 0.));
   }
 
   let spd = spd.with_phasematched_pump();
@@ -39,7 +40,7 @@ pub fn phasematch_gaussian_approximation(spd : &SPD) -> Complex<f64> {
   let arg = L * 0.5 * delk.z;
   let pmz = Complex::new(gaussian_pm(arg), 0.);
 
-  alpha * pmz
+  JSAUnits::new(alpha * pmz)
 }
 
 #[allow(non_snake_case)]
@@ -341,7 +342,7 @@ mod tests {
   }
 
   #[test]
-  fn phasematch_test(){
+  fn phasematch_coincidences_test(){
     let mut spd = SPD::default();
     // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
     spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
@@ -352,7 +353,8 @@ mod tests {
     spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
     spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
 
-    let amp = phasematch( &spd );
+    let jsa_units = JSAUnits::new(1.);
+    let amp = *(phasematch_coincidences( &spd ) / jsa_units);
     /*
     let amp_pm_tz = calc_coincidence_phasematch( &spd );
     let delk = spd.calc_delta_k();
@@ -401,8 +403,8 @@ mod tests {
     spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
 
     // println!("spd: {:#?}", spd);
-
-    let amp = phasematch( &spd );
+    let jsa_units = JSAUnits::new(1.);
+    let amp = *(phasematch_coincidences( &spd ) / jsa_units);
 
     let actual = amp;
     let expected = Complex::new(8250651139145388., 3275554113628917.5);
@@ -451,7 +453,8 @@ mod tests {
     spd.crystal_setup.theta = 1.5707963267948966 * RAD;
     // spd.assign_optimum_idler();
 
-    let amp = phasematch( &spd );
+    let jsa_units = JSAUnits::new(1.);
+    let amp = *(phasematch_coincidences( &spd ) / jsa_units);
 
     let actual = amp;
     let expected = Complex::new(4795251242193317., 9607597843961730.);
@@ -484,7 +487,8 @@ mod tests {
   fn phasematch_collinear_test(){
     let spd = SPD::default();
 
-    let amp = phasematch( &spd.to_collinear() );
+    let jsa_units = JSAUnits::new(1.);
+    let amp = *(phasematch_coincidences( &spd.to_collinear() ) / jsa_units);
     let actual = amp.re.powi(2) + amp.im.powi(2);
     let expected = 1.;
 

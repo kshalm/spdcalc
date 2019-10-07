@@ -30,6 +30,7 @@ pub type Momentum = ucum::MilliJouleSecond<f64>;
 pub type Momentum3 = ucum::MilliJouleSecond<Vector3<f64>>;
 
 derived!(ucum, UCUM: MetersPerMilliVolt = Meter / MilliVolt );
+derived!(ucum, UCUM: JSAUnits = Unitless / Meter / Meter / Meter / Meter ); // 1/m^4
 
 /// An enum to signify the sign (+1, -1)
 #[derive(Debug, Copy, Clone)]
