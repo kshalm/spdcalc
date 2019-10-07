@@ -110,8 +110,8 @@ mod tests {
     spd.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
 
     let cfg = HistogramConfig {
-      x_range : (1500. * NANO, 1600. * NANO),
-      y_range : (1500. * NANO, 1600. * NANO),
+      x_range : (1500. * NANO * M, 1600. * NANO * M),
+      y_range : (1500. * NANO * M, 1600. * NANO * M),
 
       x_count : 10,
       y_count : 10,
@@ -140,10 +140,10 @@ mod tests {
 
     // println!("{:#?}", ranges);
 
-    let xmin = ranges.x_range.0;
-    let xmax = ranges.x_range.1;
-    let ymin = ranges.y_range.0;
-    let ymax = ranges.y_range.1;
+    let xmin = *(ranges.x_range.0 / M);
+    let xmax = *(ranges.x_range.1 / M);
+    let ymin = *(ranges.y_range.0 / M);
+    let ymax = *(ranges.y_range.1 / M);
 
     let expected_xmin = 0.0000014430000000000002;
     let expected_xmax = 0.0000016570000000000002;
