@@ -4,7 +4,7 @@ use std::f64::consts::{SQRT_2};
 use math::{fwhm_to_sigma, sq};
 use na::Vector2;
 use dim::{
-  ucum::{M, S, C_, Meter, Hertz, RAD, EPS_0},
+  ucum::{self, UCUM, M, S, C_, Meter, Hertz, RAD, EPS_0},
 };
 
 #[allow(non_snake_case)]
@@ -18,50 +18,95 @@ fn get_rates_constant(spd : &SPD) -> f64 {
   let bw_pump = 2. * fwhm_to_sigma(PI2c * (1. / (lamda_p - 0.5 * p_bw) - 1. / (lamda_p + 0.5 * p_bw)));
   let N_num = 2. / SQRT_2 * sq(L * deff) * spd.pump_average_power;
   let N_den = PI.sqrt() * EPS_0 * C_ * C_ * C_ * bw_pump;
-
+  dbg!(bw_pump);
+  dbg!(N_num);
+  dbg!(N_den);
   *((N_num / N_den) / (M * M * S * S * S))
 }
 
-// Calculate the coincidence rates per unit wavelength * wavelength.
-// Integrating over all wavelengths (all array items) will give total coincidence rate.
+derived!(ucum, UCUM: SinglesRateConstUnits = Meter * Meter * Meter * Meter * Meter * Meter * Second * Second * Second );
+/// Calculates \eta = \frac{2 \sqrt{2}}{\sqrt{\pi}} \frac{\mathbb{K}^2 d_{eff}^2 A_m^2}{\epsilon_0 c^3} (W_{sf}^2\sec\theta_{sf} ) \frac{W_{0x}W_{0y} L^2 P_{av}}{\sigma}.
+/// with units m^6 s^3
+#[allow(non_snake_case)]
+fn calc_singles_rate_constant(spd : &SPD) -> SinglesRateConstUnits<f64> {
+  let PI2c = PI2 * C_;
+  // K degeneracy factor (nonlinear polarization).
+  // K = 1 for non-degenerate emission frequencies.
+  // K = 1/2 for degenerate emission frequencies.
+  let degeneracy_factor = 1.0_f64;
+  // A_m = e^{i\frac{\pi}{2}m} \mathrm{sinc}\left ( {\frac{\pi}{2}m} \right ): periodic poling coefficient. Am = 1 for m = 0 (no periodic poling);
+  // and A_m = 2i/\pi for m = 1 (sinusoidal variation)
+  let periodic_poling_coeff = 1.0_f64;
+  let constants = (2. * SQRT_2 / PI.sqrt())
+    * degeneracy_factor.powi(2)
+    * periodic_poling_coeff.powi(2) / (EPS_0 * C_ * C_ * C_);
+
+  let p_bw = spd.pump_bandwidth;
+  let lamda_p = spd.pump.get_wavelength();
+  // TODO: ask krister why there's a factor of 2 here again. and why we're doing this for sigma
+  let sigma = 2. * fwhm_to_sigma(PI2c * (
+    1. / (lamda_p - 0.5 * p_bw)
+    - 1. / (lamda_p + 0.5 * p_bw)
+  ));
+
+  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+
+  let Wp = *(spd.pump.waist / M);
+  let Ws = *(spd.signal.waist / M);
+
+  let Wp_SQ = (Wp.x * Wp.y) * M * M;
+  let Ws_SQ = (Ws.x * Ws.y) * M * M;
+
+  let sec_s = 1. / f64::cos(theta_s_e);
+
+  let L = spd.crystal_setup.length;
+  let Pav = spd.pump_average_power;
+  let deff = spd.crystal_setup.crystal.get_effective_nonlinear_coefficient();
+
+  constants * sq(deff) * (Ws_SQ * sec_s) * Wp_SQ * sq(L) * Pav / sigma
+}
+
+derived!(ucum, UCUM: CoincRateConstUnits = Meter * Meter * Meter * Meter * Meter * Meter * Meter * Meter * Second * Second * Second );
+/// Calculates \eta = \frac{2 \sqrt{2}}{\sqrt{\pi}} \frac{\mathbb{K}^2 d_{eff}^2 A_m^2}{\epsilon_0 c^3} (W_{sf}^2\sec\theta_{sf} ) (W_{if}^2\sec\theta_{if}) \frac{W_{0x}W_{0y} L^2 P_{av}}{\sigma}.
+/// with units (m^8 s^3)
+#[allow(non_snake_case)]
+fn calc_coincidence_rate_constant(spd : &SPD) -> CoincRateConstUnits<f64> {
+
+  let Wi = *(spd.idler.waist / M);
+  let Wi_SQ = (Wi.x * Wi.y) * M * M;
+  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
+  let sec_i = 1. / f64::cos(theta_i_e);
+
+  calc_singles_rate_constant(&spd) * (Wi_SQ * sec_i)
+}
+
+
+
+/// Calculate the coincidence rates per unit wavelength * wavelength.
+/// Integrating over all wavelengths (all array items) will give total coincidence rate.
 #[allow(non_snake_case)]
 pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Iterator2D<Wavelength>) -> Vec<Hertz<f64>> {
 
   let PI2c = PI2 * C_;
-  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
-  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
-
-  let Wp = *(spd.pump.waist / M);
-  let Ws = *(spd.signal.waist / M);
-  let Wi = *(spd.idler.waist / M);
-
-  let Wp_SQ = Wp.norm_squared() * M * M;
-  let Ws_SQ = Ws.norm_squared() * M * M;
-  let Wi_SQ = Wi.norm_squared() * M * M;
-
   // let n_p = spd.pump.get_index(&spd.crystal_setup);
   let n_s = spd.signal.get_index(&spd.crystal_setup);
   let n_i = spd.idler.get_index(&spd.crystal_setup);
   let lamda_s = spd.signal.get_wavelength();
   let lamda_i = spd.idler.get_wavelength();
 
-  let PHI_s = 1. / f64::cos(theta_s_e);
-  let PHI_i = 1. / f64::cos(theta_i_e);
-  let omega_s = PI2c / lamda_s; //  * f64::cos(theta_s),
-  let omega_i = PI2c / lamda_i; // * f64::cos(theta_i)
+  let omega_s = PI2c / lamda_s;
+  let omega_i = PI2c / lamda_i;
 
-  let scale = Ws_SQ * PHI_s
-            * Wi_SQ * PHI_i
-            * Wp_SQ;
-  let dlambda_s = wavelength_range.get_dx();
-  let dlambda_i = wavelength_range.get_dy();
+  // NOTE: original version incorrectly computed the step size.
+  // originally it was (x_f - x_i) / n_{points}, which should be (x_f - x_i / (n-1))
+  let dlamda_s = wavelength_range.get_dx();
+  let dlamda_i = wavelength_range.get_dy();
   let lomega = omega_s * omega_i / sq(n_s * n_i);
-  let norm_const = get_rates_constant(&spd) * (M * M * S * S * S);
 
-  let d_omega_s = PI2c * dlambda_s / sq(lamda_s);
-  let d_omega_i = PI2c * dlambda_i / sq(lamda_i);
-
-  let factor = scale * norm_const * d_omega_s * d_omega_i * lomega;
+  let d_omega_s = PI2c * dlamda_s / sq(lamda_s);
+  let d_omega_i = PI2c * dlamda_i / sq(lamda_i);
+  let eta = calc_coincidence_rate_constant(&spd);
+  let factor = eta * lomega * d_omega_s * d_omega_i;
 
   let jsa_units = JSAUnits::new(1.);
 
@@ -75,8 +120,9 @@ pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Itera
     .collect()
 }
 
-// Calculate the singles rate per unit wavelength * wavelength.
-// Integrating over all wavelengths (all array items) will give total singles rate.
+/// Calculate the singles rate per unit wavelength * wavelength.
+/// Integrating over all wavelengths (all array items) will give total singles rate.
+/// technically this distribution has units of 1/(s m^2).. but we return 1/s
 #[allow(non_snake_case)]
 pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2D<Wavelength>) -> Vec<(Hertz<f64>, Hertz<f64>)> {
 
@@ -106,10 +152,10 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
 
   let scale_s = Ws_SQ * PHI_s * Wp_SQ;
   let scale_i = Wi_SQ * PHI_i * Wp_SQ;
-  let dlambda_s = wavelength_range.get_dx();
-  let dlambda_i = wavelength_range.get_dy();
+  let dlamda_s = wavelength_range.get_dx();
+  let dlamda_i = wavelength_range.get_dy();
   let lomega = omega_s * omega_i / sq(n_s * n_i);
-  let norm_const = get_rates_constant(&spd) * (M * M * S * S * S);
+  let eta_s = calc_singles_rate_constant(&spd) / scale_s;
 
   // spd with signal and idler swapped
   let spd_swap = SPD {
@@ -118,26 +164,25 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
     ..*spd
   };
 
-  // TODO: ask krister. still don't understand normalization
-  let jsa_norm = calc_jsa_singles_normalization(&spd);
+  let jsa_units = JSAUnits::new(1.);
 
   wavelength_range
     .map(|(l_s, l_i)| {
-      let amplitude_s = *(calc_jsa_singles(&spd, l_s, l_i) / jsa_norm);
-      let amplitude_i = *(calc_jsa_singles(&spd_swap, l_s, l_i) / jsa_norm);
+      let amplitude_s = *(calc_jsa_singles(&spd, l_s, l_i) / jsa_units);
+      let amplitude_i = *(calc_jsa_singles(&spd_swap, l_s, l_i) / jsa_units);
 
       // TODO: optimize by pulling these out???
-      let d_omega_s = PI2c * dlambda_s / sq(l_s);
-      let d_omega_i = PI2c * dlambda_i / sq(l_i);
+      let d_omega_s = PI2c * dlamda_s / sq(l_s);
+      let d_omega_i = PI2c * dlamda_i / sq(l_i);
 
-      let f = norm_const * d_omega_s * d_omega_i * lomega;
+      let f = eta_s * d_omega_s * d_omega_i * lomega;
       let factor_s = scale_s * f;
       let factor_i = scale_i * f;
 
-      // FIXME: dimensional analysis doesn't make sense with normalization......
+      // technically this distribution has units of 1/(s m^2).. but we return 1/s
       (
-        amplitude_s.norm() * factor_s / M / M / M / M / M / M,
-        amplitude_i.norm() * factor_i / M / M / M / M / M / M,
+        amplitude_s.norm() * factor_s * jsa_units / M / M,
+        amplitude_i.norm() * factor_i * jsa_units / M / M,
       )
     })
     .collect()
@@ -213,12 +258,126 @@ pub fn plot_heralding_results_by_signal_idler_waist(
 #[cfg(test)]
 mod tests {
   use super::*;
+  // extern crate float_cmp;
+  // use float_cmp::*;
+  use dim::f64prefixes::{NANO};
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * (expected - actual).abs() / expected
   }
 
   #[test]
-  fn heralding_test() {
+  fn coincidence_rates_test() {
+    let mut spd = SPD::default();
+    spd.fiber_coupling = true;
+    spd.crystal_setup.crystal = Crystal::KTP;
+    spd.assign_optimum_periodic_poling();
+
+    let wavelength_range = Iterator2D::new(
+      Steps(1490.86 * NANO * M, 1609.14 * NANO * M, 30),
+      Steps(1495.05 * NANO * M, 1614.03 * NANO * M, 30)
+    );
+
+    let rates = calc_coincidences_rate_distribution(&spd, &wavelength_range);
+    let actual = rates.iter().map(|&r| *(r * S)).sum();
+    let expected = 9383.009533773818;
+
+    let accept_diff = 1e-4;
+    let pdiff = percent_diff(actual, expected);
+
+    assert!(
+      pdiff < accept_diff,
+      "norm percent difference: {}. (actual: {}, expected: {})",
+      pdiff,
+      actual,
+      expected
+    );
+  }
+
+  #[test]
+  fn singles_rates_test() {
+    let mut spd = SPD::default();
+    spd.fiber_coupling = true;
+    spd.crystal_setup.crystal = Crystal::KTP;
+    spd.assign_optimum_periodic_poling();
+
+    let wavelength_range = Iterator2D::new(
+      Steps(1490.86 * NANO * M, 1609.14 * NANO * M, 30),
+      Steps(1495.05 * NANO * M, 1614.03 * NANO * M, 30)
+    );
+
+    let rates = calc_singles_rate_distributions(&spd, &wavelength_range);
+    let actual = rates.iter()
+      .map(|&(r_s, r_i)|
+        ( *(r_s * S), *(r_i * S) )
+      )
+      // sum tuples
+      .fold((0., 0.), |col, (r_s, r_i)|
+        (col.0 + r_s, col.1 + r_i)
+      );
+
+    let expected = (10556.90581692082, 10557.14761885458);
+
+    let accept_diff = 1e-4;
+    let pdiff_s = percent_diff(actual.0, expected.0);
+
+    assert!(
+      pdiff_s < accept_diff,
+      "norm percent difference: {}. (actual: {}, expected: {})",
+      pdiff_s,
+      actual.0,
+      expected.0
+    );
+
+    let pdiff_i = percent_diff(actual.1, expected.1);
+
+    assert!(
+      pdiff_i < accept_diff,
+      "norm percent difference: {}. (actual: {}, expected: {})",
+      pdiff_i,
+      actual.1,
+      expected.1
+    );
+  }
+
+  #[test]
+  fn efficiency_test() {
+    let mut spd = SPD::default();
+    spd.fiber_coupling = true;
+    spd.crystal_setup.crystal = Crystal::KTP;
+    spd.assign_optimum_periodic_poling();
+
+    let wavelength_range = Iterator2D::new(
+      Steps(1490.86 * NANO * M, 1609.14 * NANO * M, 30),
+      Steps(1495.05 * NANO * M, 1614.03 * NANO * M, 30)
+    );
+
+    let coinc_rate_distr = calc_coincidences_rate_distribution(&spd, &wavelength_range);
+    let singles_rate_distrs = calc_singles_rate_distributions(&spd, &wavelength_range);
+
+    let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
+
+    let accept_diff = 1e-4;
+
+    let expected_idler = 0.8888029974402673;
+    let pdiff_i = percent_diff(results.idler_efficiency, expected_idler);
+    assert!(
+      pdiff_i < accept_diff,
+      "norm percent difference: {}. (actual: {}, expected: {})",
+      pdiff_i,
+      results.idler_efficiency,
+      expected_idler
+    );
+
+    let expected_signal = 0.8887826402101449;
+    let pdiff_s = percent_diff(results.signal_efficiency, expected_signal);
+
+    assert!(
+      pdiff_s < accept_diff,
+      "norm percent difference: {}. (actual: {}, expected: {})",
+      pdiff_s,
+      results.signal_efficiency,
+      expected_signal
+    );
   }
 }

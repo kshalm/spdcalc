@@ -253,20 +253,45 @@ function integrator_test(){
   console.log('percent diff', diff)
 }
 
-function heralding_test(){
-  var grid_size = 5
-  var Ws = spdc.linspace(
-    30 * 1e-6,
-    130 * 1e-6,
-    grid_size
+function rates_test(){
+  let props = new spdc.SPDCprop({
+    crystal: 'KTP-3'
+    , enable_pp: true
+    , theta: 90 * Math.PI/180
+  })
+  props.calc_poling_period()
+  props.update_all_angles()
+  // props.auto_calc_collection_focus()
+
+  let dim = 30
+  let lamda_s = spdc.linspace(
+    1490.86 * 1e-9,
+    1609.14 * 1e-9,
+    dim
   );
-  // oops... not the right test
-  var Wi = spdc.linspace(
-    30 * 1e-6,
-    130 * 1e-6,
-    grid_size
+  let lamda_i = spdc.linspace(
+    1495.05 * 1e-9,
+    1614.03 * 1e-9,
+    dim
   );
-  spdc.calc_heralding_plot_p()
+
+  let rates = spdc.calc_JSI_rates_p(props, lamda_s, lamda_i, dim, 1)
+
+  let sum = spdc.Sum(rates)
+  console.log('coinc rate sum', sum)
+
+  let singles_rates = spdc.calc_JSI_Singles_p(props, lamda_s, lamda_i, dim, 1)
+  let sum_s_s = spdc.Sum(singles_rates[0])
+  let sum_s_i = spdc.Sum(singles_rates[1])
+
+  console.log('singles s rate sum', sum_s_s)
+  console.log('singles i rate sum', sum_s_i)
+
+  let eff_i = sum / sum_s_s
+  let eff_s = sum / sum_s_i
+
+  console.log('idler efficiency', eff_i)
+  console.log('signal efficiency', eff_s)
 }
 
 // poling_period()
@@ -280,5 +305,6 @@ function heralding_test(){
 // phasematch_norm()
 // autorange_lambda()
 
-singles()
+// singles()
 // integrator_test()
+rates_test()

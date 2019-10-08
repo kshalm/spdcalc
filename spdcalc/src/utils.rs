@@ -45,6 +45,16 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
     self.2 - 1
   }
 
+  /// Get the width of the gap between each step.
+  ///
+  /// ## Example:
+  /// ```
+  /// use spdcalc::utils::Steps;
+  ///
+  /// let steps = Steps(0., 4., 3); // 3 steps: |0| --- |2| --- |4|
+  /// let dx = 2.;
+  /// assert!((steps.division_width() - dx).abs() < 1e-12);
+  /// ```
   pub fn division_width(&self) -> T {
     (self.1 - self.0) / (self.divisions() as f64)
   }

@@ -198,8 +198,9 @@ PlotHelpers.calc_JSI_rates_p = function calc_JSI_rates_p(props, lambda_s, lambda
         ,scale = (sq(props.W_sx) * PHI_s * sq(props.W_ix) * PHI_i * sq(props.W))
         ,inv_lambda_s_sq = 0
         ,inv_lambda_i_sq = 0
-        ,dlambda_s = Math.abs(lambda_s[lambda_s.length-1] - lambda_s[0])/lambda_s.length
-        ,dlambda_i = Math.abs(lambda_i[lambda_i.length-1] - lambda_i[0])/lambda_i.length
+// NOTE FROM JASPER: i changed this to be 1/(lamda_s.length - 1) from 1/lamda_s.length
+        ,dlambda_s = Math.abs(lambda_s[lambda_s.length-1] - lambda_s[0])/(lambda_s.length-1)
+        ,dlambda_i = Math.abs(lambda_i[lambda_i.length-1] - lambda_i[0])/(lambda_i.length-1)
         // ,norm_sum_s = twoPIc * dlambda_s
         // ,norm_sum_i = twoPIc * dlambda_i
         ,lomega = omega_s * omega_i /sq(props.n_s*props.n_i)
@@ -279,8 +280,9 @@ PlotHelpers.calc_JSI_Singles_p = function calc_JSI_Singles_p(props, lambda_s,lam
         ,pumpScale = Math.pow(P.W,2) // May need to later include the ellipticity parameter
         ,scale_s = 1/(Ws_SQ * PHI_s *pumpScale)
         ,scale_i = 1/(Wi_SQ * PHI_i * pumpScale) //assume symmetric coupling geometry
-        ,dlambda_s = Math.abs(lambda_s[lambda_s.length-1] - lambda_s[0])/lambda_s.length
-        ,dlambda_i = Math.abs(lambda_i[lambda_i.length-1] - lambda_i[0])/lambda_i.length
+// NOTE FROM JASPER: i changed this to be 1/(lamda_s.length - 1) from 1/lamda_s.length
+        ,dlambda_s = Math.abs(lambda_s[lambda_s.length-1] - lambda_s[0])/(lambda_s.length-1)
+        ,dlambda_i = Math.abs(lambda_i[lambda_i.length-1] - lambda_i[0])/(lambda_i.length-1)
         ,norm_sum_s = twoPIc * dlambda_s
         ,norm_sum_i = twoPIc * dlambda_i
         ,lomega = omega_s * omega_i /sq(props.n_s*props.n_i)
