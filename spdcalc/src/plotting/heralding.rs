@@ -7,23 +7,6 @@ use dim::{
   ucum::{self, UCUM, M, S, C_, Meter, Hertz, RAD, EPS_0},
 };
 
-#[allow(non_snake_case)]
-fn get_rates_constant(spd : &SPD) -> f64 {
-  let PI2c = PI2 * C_;
-  let L = spd.crystal_setup.length;
-  let deff = spd.crystal_setup.crystal.get_effective_nonlinear_coefficient();
-  let p_bw = spd.pump_bandwidth;
-  let lamda_p = spd.pump.get_wavelength();
-
-  let bw_pump = 2. * fwhm_to_sigma(PI2c * (1. / (lamda_p - 0.5 * p_bw) - 1. / (lamda_p + 0.5 * p_bw)));
-  let N_num = 2. / SQRT_2 * sq(L * deff) * spd.pump_average_power;
-  let N_den = PI.sqrt() * EPS_0 * C_ * C_ * C_ * bw_pump;
-  dbg!(bw_pump);
-  dbg!(N_num);
-  dbg!(N_den);
-  *((N_num / N_den) / (M * M * S * S * S))
-}
-
 derived!(ucum, UCUM: SinglesRateConstUnits = Meter * Meter * Meter * Meter * Meter * Meter * Second * Second * Second );
 /// Calculates \eta = \frac{2 \sqrt{2}}{\sqrt{\pi}} \frac{\mathbb{K}^2 d_{eff}^2 A_m^2}{\epsilon_0 c^3} (W_{sf}^2\sec\theta_{sf} ) \frac{W_{0x}W_{0y} L^2 P_{av}}{\sigma}.
 /// with units m^6 s^3
