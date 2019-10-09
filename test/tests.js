@@ -345,6 +345,54 @@ function heralding_apodization_test(){
   console.log('calcuation took', (Date.now() - start) + 'ms')
 }
 
+function test_for_krister(){
+  let props = new spdc.SPDCprop({
+    crystal: 'KTP-3'
+    , L: 12000 * 1e-6
+    , enable_pp: true
+    , theta: 90 * Math.PI/180
+    , calc_apodization: true
+    , apodization_FWHM: 8000 * 1e-6
+  })
+  props.update_all_angles()
+  props.calc_poling_period()
+  props.auto_calc_collection_focus()
+
+  show(props)
+
+  let dim = 30
+  let lamda_s = spdc.linspace(
+    1540.18 * 1e-9,
+    1559.82 * 1e-9,
+    dim
+  );
+  let lamda_i = spdc.linspace(
+    1540.30 * 1e-9,
+    1559.95 * 1e-9,
+    dim
+  );
+
+  let start = Date.now()
+  let rates = spdc.calc_JSI_rates_p(props, lamda_s, lamda_i, dim, 1)
+
+  let sum = spdc.Sum(rates)
+  console.log('coinc rate sum', sum)
+
+  let singles_rates = spdc.calc_JSI_Singles_p(props, lamda_s, lamda_i, dim, 1)
+  let sum_s_s = spdc.Sum(singles_rates[0])
+  let sum_s_i = spdc.Sum(singles_rates[1])
+
+  console.log('singles s rate sum', sum_s_s)
+  console.log('singles i rate sum', sum_s_i)
+
+  let eff_i = sum / sum_s_s
+  let eff_s = sum / sum_s_i
+
+  console.log('idler efficiency', eff_i)
+  console.log('signal efficiency', eff_s)
+  console.log('calcuation took', (Date.now() - start) + 'ms')
+}
+
 // poling_period()
 // walkoff()
 // walkoff_convergence()
@@ -358,5 +406,7 @@ function heralding_apodization_test(){
 
 // singles()
 // integrator_test()
-rates_test()
+// rates_test()
 // heralding_apodization_test()
+
+test_for_krister()
