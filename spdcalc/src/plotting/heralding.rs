@@ -86,9 +86,12 @@ pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Itera
   let dlamda_i = wavelength_range.get_dy();
   let lomega = omega_s * omega_i / sq(n_s * n_i);
 
+  let eta = calc_coincidence_rate_constant(&spd);
+
+  // NOTE: moving this inside the integral and using running lamda values
+  // results in efficiency change of ~0.01%
   let d_omega_s = PI2c * dlamda_s / sq(lamda_s);
   let d_omega_i = PI2c * dlamda_i / sq(lamda_i);
-  let eta = calc_coincidence_rate_constant(&spd);
   let factor = eta * lomega * d_omega_s * d_omega_i;
 
   let jsa_units = JSAUnits::new(1.);
