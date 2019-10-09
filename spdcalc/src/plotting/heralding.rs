@@ -95,7 +95,6 @@ pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Itera
 
   wavelength_range
     .map(|(l_s, l_i)| {
-      // TODO: ask krister why he didn't normalize this in original code
       let amplitude = calc_jsa(&spd, l_s, l_i) / jsa_units;
 
       amplitude.norm_sqr() * sq(jsa_units) * factor
@@ -171,6 +170,7 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
     .collect()
 }
 
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct HeraldingResults {
   pub signal_singles_rate : f64,
   pub idler_singles_rate : f64,
@@ -243,7 +243,7 @@ mod tests {
   use super::*;
   // extern crate float_cmp;
   // use float_cmp::*;
-  use dim::f64prefixes::{NANO};
+  use dim::f64prefixes::{NANO, MICRO};
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * (expected - actual).abs() / expected
@@ -324,6 +324,64 @@ mod tests {
   }
 
   #[test]
+  fn efficiency_apodization_test() {
+    let mut spd = SPD::default();
+    spd.fiber_coupling = true;
+    spd.crystal_setup.crystal = Crystal::KTP;
+    spd.crystal_setup.length = 1000. * MICRO * M;
+    spd.assign_optimum_periodic_poling();
+    spd.pp = spd.pp.map(|pp| {
+      PeriodicPoling {
+        apodization: Some(Apodization {
+          fwhm: 1000. * MICRO * M
+        }),
+        ..pp
+      }
+    });
+    // spd.assign_optimum_periodic_poling();
+
+    let wavelength_range = Iterator2D::new(
+      Steps(1490.86 * NANO * M, 1609.14 * NANO * M, 30),
+      Steps(1495.05 * NANO * M, 1614.03 * NANO * M, 30)
+    );
+
+    let coinc_rate_distr = calc_coincidences_rate_distribution(&spd, &wavelength_range);
+    let singles_rate_distrs = calc_singles_rate_distributions(&spd, &wavelength_range);
+
+    let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
+
+    let accept_diff = 1e-4;
+
+    // old bugged code would have given
+    // coinc rate sum 3005.068611324783
+    // singles s rate sum 3448.594543844433
+    // singles i rate sum 3448.71420649685
+    // idler efficiency 0.8713893654702548
+    // signal efficiency 0.8713591302125567
+
+    let expected_idler = 0.8890414777632809;
+    let pdiff_i = percent_diff(results.idler_efficiency, expected_idler);
+    assert!(
+      pdiff_i < accept_diff,
+      "norm percent difference: {}. (actual: {}, expected: {})",
+      pdiff_i,
+      results.idler_efficiency,
+      expected_idler
+    );
+
+    let expected_signal = 0.8890107154534013;
+    let pdiff_s = percent_diff(results.signal_efficiency, expected_signal);
+
+    assert!(
+      pdiff_s < accept_diff,
+      "norm percent difference: {}. (actual: {}, expected: {})",
+      pdiff_s,
+      results.signal_efficiency,
+      expected_signal
+    );
+  }
+
+  #[test]
   fn efficiency_test() {
     let mut spd = SPD::default();
     spd.fiber_coupling = true;
@@ -341,6 +399,13 @@ mod tests {
     let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
 
     let accept_diff = 1e-4;
+
+    // old bugged code would give
+    // coinc rate sum 8767.90113100421
+    // singles s rate sum 10192.880932347976
+    // singles i rate sum 10193.119015740884
+    // idler efficiency 0.8601985237734435
+    // signal efficiency 0.860178431887653
 
     let expected_idler = 0.8888029974402673;
     let pdiff_i = percent_diff(results.idler_efficiency, expected_idler);

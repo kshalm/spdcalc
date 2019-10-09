@@ -452,7 +452,6 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
             // console.log('numerator', EReal, EImag)
             // console.log('denominator', DENR, DENI)
 
-
             // console.log("Exponent: ", EXPR, EXPI);
             // // console.log("4A10: ", EXP1R, EXP1I);
             // // console.log("A5^2/A1: ", EXP2R, EXP2I);
@@ -1038,6 +1037,7 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         var dz = 2/P.numz2Dint;
 // NOTE FROM JASPER I JUST MODIFIED THIS TO NOT USE 3/8 simpson. now it's better accuracy
         var pmintz = helpers.Nintegrate2D_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint);
+        // var pmintz = helpers.Nintegrate2D_3_8_singles(zintfunc, calcz1terms, -1, 1, -1, 1, P.numz2Dint, P.z2Dweights);
         // var  z1 = 0
         //     ,z2 = 0.5
         // var z1 = 0.5
