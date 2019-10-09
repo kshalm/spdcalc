@@ -275,6 +275,7 @@ function rates_test(){
     dim
   );
 
+  let start = Date.now()
   let rates = spdc.calc_JSI_rates_p(props, lamda_s, lamda_i, dim, 1)
 
   let sum = spdc.Sum(rates)
@@ -292,6 +293,7 @@ function rates_test(){
 
   console.log('idler efficiency', eff_i)
   console.log('signal efficiency', eff_s)
+  console.log('calcuation took', (Date.now() - start) + 'ms')
 }
 
 // poling_period()
