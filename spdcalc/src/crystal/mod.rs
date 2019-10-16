@@ -16,6 +16,7 @@ mod linbo3_1;
 mod linb_mgo;
 mod kdp_1;
 mod aggase2_1;
+mod aggase2_2;
 
 /// useful for custom crystals
 pub mod sellmeier;
