@@ -10,7 +10,7 @@ use dim::{
 };
 
 pub const META : CrystalMeta = CrystalMeta {
-  id : "LiNB-MgO",
+  id : "LiNB_MgO",
   name : "LiNbO3 (5% MgO doped)",
   reference_url : "https://link.springer.com/article/10.1007/s00340-008-2998-2",
   axis_type : OpticAxisType::NegativeUniaxial,

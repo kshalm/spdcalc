@@ -11,7 +11,7 @@ use dim::{
 };
 
 pub const META : CrystalMeta = CrystalMeta {
-  id : "KDP-1",
+  id : "KDP_1",
   name : "KDP ref 1",
   reference_url : "http://www.newlightphotonics.com/v1/KDP-crystal.html",
   axis_type : OpticAxisType::NegativeUniaxial,

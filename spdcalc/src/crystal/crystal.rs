@@ -12,6 +12,7 @@ pub enum Crystal {
   LiNbO3_1,
   LiNb_MgO,
   KDP_1,
+  AgGaSe2_1,
 
   LiIO3_1,
   AgGaS2_1,
@@ -28,7 +29,8 @@ impl Crystal {
       linbo3_1::META,
       linb_mgo::META,
       kdp_1::META,
-      *lilo3_1::LiIO3_1.get_meta(),
+      aggase2_1::META,
+      *liio3_1::LiIO3_1.get_meta(),
       *aggas2_1::AgGaS2_1.get_meta(),
     )
   }
@@ -56,7 +58,8 @@ impl Crystal {
       Crystal::LiNb_MgO => linb_mgo::get_indices(wavelength, temperature),
       Crystal::BiBO_1 => bibo_1::get_indices(wavelength, temperature),
       Crystal::KDP_1 => kdp_1::get_indices(wavelength, temperature),
-      Crystal::LiIO3_1 => lilo3_1::LiIO3_1.get_indices(wavelength, temperature),
+      Crystal::AgGaSe2_1 => aggase2_1::get_indices(wavelength, temperature),
+      Crystal::LiIO3_1 => liio3_1::LiIO3_1.get_indices(wavelength, temperature),
       Crystal::AgGaS2_1 => aggas2_1::AgGaS2_1.get_indices(wavelength, temperature),
       // Crystal::Sellmeier(crystal) => crystal.get_indices(wavelength, temperature),
     }
@@ -71,7 +74,8 @@ impl Crystal {
       Crystal::LiNbO3_1 => &linbo3_1::META,
       Crystal::LiNb_MgO => &linb_mgo::META,
       Crystal::KDP_1 => &kdp_1::META,
-      Crystal::LiIO3_1 => lilo3_1::LiIO3_1.get_meta(),
+      Crystal::AgGaSe2_1 => &aggase2_1::META,
+      Crystal::LiIO3_1 => liio3_1::LiIO3_1.get_meta(),
       Crystal::AgGaS2_1 => aggas2_1::AgGaS2_1.get_meta(),
       // Crystal::Sellmeier(crystal) => crystal.get_meta(),
     }

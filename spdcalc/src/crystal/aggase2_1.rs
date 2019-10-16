@@ -1,7 +1,7 @@
-//! # LiNbO3 ref 1
+//! # AgGaSe2-1
 //!
-//! [More Information](http://www.newlightphotonics.com/v1/LN-crystal.html)
-//!
+//! H. Kildal, J. Mikkelsen, Opt. Commun. 9, 315 (1973)
+//! [Information](http://www.newlightphotonics.com/v1/AGSE.html)
 
 use super::*;
 use crate::utils::from_celsius_to_kelvin;
@@ -11,18 +11,18 @@ use dim::{
 };
 
 pub const META : CrystalMeta = CrystalMeta {
-  id : "LiNbO3_1",
-  name : "LiNbO3 1",
-  reference_url : "http://www.newlightphotonics.com/v1/LN-crystal.html",
+  id : "AgGaSe2_1",
+  name : "AgGaSe2 Ref 1",
+  reference_url : "http://www.newlightphotonics.com/v1/AGSE.html",
   axis_type : OpticAxisType::NegativeUniaxial,
   point_group : PointGroup::HM_3m,
   temperature_dependence_known : true,
 };
 
 // from Newlight Photonics
-const DNX : f64 = -0.874e-6;
+const DNX : f64 = 15e-5;
 const DNY : f64 = DNX;
-const DNZ : f64 = 39.073e-6;
+const DNZ : f64 = 15e-5;
 
 /// Get refractive Indices
 ///
@@ -33,21 +33,21 @@ const DNZ : f64 = 39.073e-6;
 /// ```
 /// use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::from_celsius_to_kelvin};
 /// let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-/// let indices = Crystal::LiNbO3_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
+/// let indices = Crystal::AgGaSe2_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 /// let expected = ucum::Unitless::new(Vector3::new(
-///   2.267284807097424,
-///   2.267284807097424,
-///   2.18667811845247,
+///   2.837020760678037,
+///   2.837020760678037,
+///   2.8283867598339847,
 /// ));
 /// assert_eq!(indices, expected)
 /// ```
 #[allow(clippy::unreadable_literal)]
 pub fn get_indices(wavelength : Wavelength, temperature : ucum::Kelvin<f64>) -> Indices {
-  let lambda_sq = (wavelength / (MICRO * M)).powi(2);
+  let lambda = wavelength / (MICRO * M);
 
-  let mut nx = (4.9048 + 0.11768 / (lambda_sq - 0.04750) - 0.027169 * lambda_sq).sqrt();
+  let mut nx = (3.9362 + 2.9113 / (1.0 - (0.38821 / lambda).powi(2)) + 1.7954 / (1.0 - (40.0 / lambda).powi(2))).sqrt();
   let mut ny = nx;
-  let mut nz = (4.5820 + 0.099169 / (lambda_sq - 0.044432) -  0.021950 * lambda_sq).sqrt();
+  let mut nz = (3.3132 + 3.3616 / (1.0 - (0.38201 / lambda).powi(2)) + 1.7677 / (1.0 - (40.0 / lambda).powi(2))).sqrt();
 
   let f = *((temperature - from_celsius_to_kelvin(20.0)) / K);
 
