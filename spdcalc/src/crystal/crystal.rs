@@ -9,10 +9,11 @@ pub enum Crystal {
   BBO_1,
   KTP,
   BiBO_1,
+  LiNbO3_1,
+  LiNb_MgO,
 
   LiIO3_1,
   AgGaS2_1,
-  LiNbO3_1,
   // Sellmeier(sellmeier::SellmeierCrystal<Q, T>),
 }
 
@@ -24,6 +25,7 @@ impl Crystal {
       ktp::META,
       bibo_1::META,
       linbo3_1::META,
+      linb_mgo::META,
       *lilo3_1::LiIO3_1.get_meta(),
       *aggas2_1::AgGaS2_1.get_meta(),
     )
@@ -49,6 +51,7 @@ impl Crystal {
       Crystal::BBO_1 => bbo_1::get_indices(wavelength, temperature),
       Crystal::KTP => ktp::get_indices(wavelength, temperature),
       Crystal::LiNbO3_1 => linbo3_1::get_indices(wavelength, temperature),
+      Crystal::LiNb_MgO => linb_mgo::get_indices(wavelength, temperature),
       Crystal::BiBO_1 => bibo_1::get_indices(wavelength, temperature),
       Crystal::LiIO3_1 => lilo3_1::LiIO3_1.get_indices(wavelength, temperature),
       Crystal::AgGaS2_1 => aggas2_1::AgGaS2_1.get_indices(wavelength, temperature),
@@ -63,6 +66,7 @@ impl Crystal {
       Crystal::KTP => &ktp::META,
       Crystal::BiBO_1 => &bibo_1::META,
       Crystal::LiNbO3_1 => &linbo3_1::META,
+      Crystal::LiNb_MgO => &linb_mgo::META,
       Crystal::LiIO3_1 => lilo3_1::LiIO3_1.get_meta(),
       Crystal::AgGaS2_1 => aggas2_1::AgGaS2_1.get_meta(),
       // Crystal::Sellmeier(crystal) => crystal.get_meta(),
