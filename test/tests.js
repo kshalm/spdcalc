@@ -7,6 +7,13 @@ function print_nm( val ){
 
 const deg = Math.PI/180
 
+function crystal_indices(){
+  let type = 'LiNbO3-1'
+  let indices = spdc.Crystals(type).indicies(720e-9, 30)
+
+  console.log(`indices for ${type}:`, indices)
+}
+
 function defaultProps(){
   const props = new spdc.SPDCprop({crystal: 'BBO-1', enable_pp: false, theta_s_e: 3 * Math.PI/180})
   //{crystal: 'BBO-1', enable_pp: false, theta_s_e: 3 * Math.PI/180}
@@ -393,6 +400,7 @@ function test_for_krister(){
   console.log('calcuation took', (Date.now() - start) + 'ms')
 }
 
+crystal_indices()
 // poling_period()
 // walkoff()
 // walkoff_convergence()
@@ -409,4 +417,4 @@ function test_for_krister(){
 // rates_test()
 // heralding_apodization_test()
 
-test_for_krister()
+// test_for_krister()

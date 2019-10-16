@@ -7,11 +7,12 @@ mod meta;
 pub use self::meta::*;
 
 // crystal re-exports
-pub mod aggas2_1;
-pub mod bbo_1;
-pub mod bibo_1;
-pub mod ktp;
-pub mod lilo3_1;
+mod aggas2_1;
+mod bbo_1;
+mod bibo_1;
+mod ktp;
+mod lilo3_1;
+mod linbo3_1;
 
 /// useful for custom crystals
 pub mod sellmeier;
