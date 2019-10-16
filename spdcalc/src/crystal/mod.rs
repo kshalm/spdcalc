@@ -12,6 +12,7 @@ mod bbo_1;
 mod bibo_1;
 mod ktp;
 mod liio3_1;
+mod liio3_2;
 mod linbo3_1;
 mod linb_mgo;
 mod kdp_1;

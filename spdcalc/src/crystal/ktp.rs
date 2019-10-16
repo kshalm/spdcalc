@@ -29,6 +29,7 @@ pub const META : CrystalMeta = CrystalMeta {
   reference_url : "http://dx.doi.org/10.1063/1.1668320",
   axis_type : OpticAxisType::PositiveBiaxial,
   point_group : PointGroup::HM_mm2,
+  transmission_range: Some(ValidWavelengthRange(350e-9, 3500e-9)),
   temperature_dependence_known : true,
 };
 

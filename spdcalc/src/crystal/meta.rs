@@ -90,6 +90,9 @@ pub enum PointGroup {
   HM_mi3m,
 }
 
+#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
+pub struct ValidWavelengthRange(pub f64, pub f64);
+
 /// Meta information about the crystal
 #[derive(Debug, Serialize, Deserialize, Copy, Clone)]
 pub struct CrystalMeta {
@@ -103,6 +106,8 @@ pub struct CrystalMeta {
   pub axis_type : OpticAxisType,
   /// Point Group (class) of the crystal
   pub point_group : PointGroup,
+  /// The wavelength range within which the crystal transmits light
+  pub transmission_range : Option<ValidWavelengthRange>,
   /// Whether or not temperature dependence is known
   pub temperature_dependence_known : bool,
 }

@@ -8,7 +8,7 @@ function print_nm( val ){
 const deg = Math.PI/180
 
 function crystal_indices(){
-  let type = 'AgGaSe2-2'
+  let type = 'LiIO3-2'
   let indices = spdc.Crystals(type).indicies(720e-9, 30)
 
   console.log(`indices for ${type}:`, indices)

@@ -28,6 +28,7 @@ pub const META : CrystalMeta = CrystalMeta {
   reference_url : "http://www.newlightphotonics.com/v1/bbo-properties.html",
   axis_type : OpticAxisType::NegativeUniaxial,
   point_group : PointGroup::HM_3m,
+  transmission_range: Some(ValidWavelengthRange(189e-9, 3_500e-9)),
   temperature_dependence_known : true,
 };
 

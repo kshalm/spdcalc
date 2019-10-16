@@ -14,6 +14,7 @@ pub const META : CrystalMeta = CrystalMeta {
   reference_url : "http://www.newlightphotonics.com/v1/bibo-properties.html",
   axis_type : OpticAxisType::PositiveBiaxial,
   point_group : PointGroup::HM_2,
+  transmission_range: Some(ValidWavelengthRange(286e-9, 2_500e-9)),
   temperature_dependence_known : false,
 };
 

@@ -15,6 +15,7 @@ pub const META : CrystalMeta = CrystalMeta {
   reference_url : "https://link.springer.com/article/10.1007/s00340-008-2998-2",
   axis_type : OpticAxisType::NegativeUniaxial,
   point_group : PointGroup::HM_3m,
+  transmission_range: Some(ValidWavelengthRange(440e-9, 4_000e-9)),
   temperature_dependence_known : true,
 };
 

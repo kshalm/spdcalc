@@ -16,6 +16,7 @@ pub const META : CrystalMeta = CrystalMeta {
   reference_url : "http://www.newlightphotonics.com/v1/KDP-crystal.html",
   axis_type : OpticAxisType::NegativeUniaxial,
   point_group : PointGroup::HM_i42m,
+  transmission_range: Some(ValidWavelengthRange(200e-9, 1_500e-9)),
   temperature_dependence_known : false,
 };
 

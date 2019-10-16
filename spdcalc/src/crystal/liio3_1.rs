@@ -25,6 +25,7 @@ pub const LiIO3_1 : SellmeierCrystal<SellmeierStandard, None> = SellmeierCrystal
     reference_url : "https://aip.scitation.org/doi/abs/10.1063/1.1654145",
     axis_type : OpticAxisType::NegativeUniaxial,
     point_group : PointGroup::HM_622,
+    transmission_range: Some(ValidWavelengthRange(300e-9, 5_000e-9)),
     temperature_dependence_known : false,
   },
 
