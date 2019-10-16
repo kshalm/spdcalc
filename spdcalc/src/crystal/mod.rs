@@ -14,6 +14,7 @@ mod ktp;
 mod lilo3_1;
 mod linbo3_1;
 mod linb_mgo;
+mod kdp_1;
 
 /// useful for custom crystals
 pub mod sellmeier;
