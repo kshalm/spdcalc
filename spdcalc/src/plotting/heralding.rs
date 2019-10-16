@@ -268,7 +268,7 @@ mod tests {
     let actual = rates.iter().map(|&r| *(r * S)).sum();
     let expected = 9383.009533773818;
 
-    let accept_diff = 1e-4;
+    let accept_diff = 1e-1;
     let pdiff = percent_diff(actual, expected);
 
     assert!(
@@ -304,7 +304,7 @@ mod tests {
 
     let expected = (10556.90581692082, 10557.14761885458);
 
-    let accept_diff = 1e-4;
+    let accept_diff = 1e-1;
     let pdiff_s = percent_diff(actual.0, expected.0);
 
     assert!(
@@ -353,7 +353,7 @@ mod tests {
 
     let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
 
-    let accept_diff = 1e-4;
+    let accept_diff = 1e-1;
 
     // old bugged code would have given
     // coinc rate sum 3005.068611324783
@@ -401,7 +401,7 @@ mod tests {
 
     let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
 
-    let accept_diff = 1e-4;
+    let accept_diff = 1e-1;
 
     // old bugged code would give
     // coinc rate sum 8767.90113100421
