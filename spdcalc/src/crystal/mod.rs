@@ -6,7 +6,7 @@ use dim::ucum::Kelvin;
 mod meta;
 pub use self::meta::*;
 
-// crystal re-exports
+// crystals
 mod aggas2_1;
 mod bbo_1;
 mod bibo_1;
