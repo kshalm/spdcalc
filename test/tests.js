@@ -48,6 +48,14 @@ function poling_period(){
   console.log('DeltaK:', del_k)
 }
 
+function waist_position(){
+  const props = defaultProps()
+  show(props)
+  props.auto_calc_collection_focus()
+
+  console.log(`Waist position: ${props.z0s}`)
+}
+
 function walkoff(){
   const props = defaultProps()
   props.auto_calc_Theta()
@@ -400,7 +408,7 @@ function test_for_krister(){
   console.log('calcuation took', (Date.now() - start) + 'ms')
 }
 
-crystal_indices()
+// crystal_indices()
 // poling_period()
 // walkoff()
 // walkoff_convergence()
@@ -418,3 +426,4 @@ crystal_indices()
 // heralding_apodization_test()
 
 // test_for_krister()
+waist_position()

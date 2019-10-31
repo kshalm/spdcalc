@@ -7,6 +7,7 @@ use dim::{
 use math::*;
 use photon::{Photon, PhotonType};
 use std::f64::consts::FRAC_PI_2;
+use crate::plotting::HistogramConfig;
 
 mod periodic_poling;
 pub use periodic_poling::*;
@@ -33,11 +34,11 @@ pub struct SPD {
   pub pump_spectrum_threshold: f64,
 
   /// Pump collection focus location on z axis
-  pub z0p : ucum::Meter<f64>,
+  pub z0p : Distance,
   /// Signal collection focus location on z axis
-  pub z0s : ucum::Meter<f64>,
+  pub z0s : Distance,
   /// Idler collection focus location on z axis
-  pub z0i : ucum::Meter<f64>,
+  pub z0i : Distance,
 }
 
 impl Default for SPD {
@@ -134,6 +135,53 @@ impl SPD {
     theta * ucum::RAD
   }
 
+  pub fn calc_optimum_waist_position(&self) -> Distance {
+    let mut spd = self.clone();
+    spd.fiber_coupling = true;
+    spd.assign_optimum_idler();
+
+    let bw = 0.01;
+    let l_s = spd.signal.get_wavelength();
+    let l_i = spd.idler.get_wavelength();
+
+    let cfg = HistogramConfig {
+      x_range: (l_s * (1. - bw), l_s * (1. + bw)),
+      y_range: (l_i * (1. - bw), l_i * (1. + bw)),
+      x_count: 4,
+      y_count: 4,
+    };
+
+    let max_coinc = |z| {
+      let mut spd_at_z = spd.clone();
+      spd_at_z.z0s = z * M;
+      spd_at_z.z0i = z * M;
+
+      let coinc : f64 = cfg
+        .into_iter()
+        .map(|(l_s, l_i)| {
+          let amp = *(calc_jsa( &spd_at_z, l_s, l_i ) / JSAUnits::new(1.));
+
+          amp.norm_sqr()
+        })
+        .sum();
+
+      1. / (coinc + 1.)
+    };
+
+    let len = *(self.crystal_setup.length / M);
+    let guess = -0.5 * len;
+    let z = nelder_mead_1d(
+      max_coinc,
+      guess,
+      1000,
+      -len,
+      0.,
+      1e-40,
+    );
+
+    z * M
+  }
+
   /// automatically calculate the optimal poling period and sign
   pub fn calc_periodic_poling(&self) -> Result<Option<PeriodicPoling>, &str> {
 
@@ -219,6 +267,13 @@ impl SPD {
   pub fn assign_optimum_periodic_poling(&mut self) {
     self.pp = self.calc_periodic_poling()
       .expect("Could not determine a valid poling period to assign");
+  }
+
+  /// assign the optimum collection focus (waist position)
+  pub fn assign_optimum_waist_position(&mut self){
+    let z = self.calc_optimum_waist_position();
+    self.z0s = z;
+    self.z0i = z;
   }
 
   pub fn calc_delta_k(&self) -> Momentum3 {
@@ -705,6 +760,23 @@ mod tests {
       "actual: {}, expected: {}",
       period,
       period_expected
+    );
+  }
+
+  #[test]
+  fn optimal_waist_position_test() {
+    let spd = SPD {
+      ..SPD::default()
+    };
+
+    let expected = -0.0006303915149149511;
+    let actual = *(spd.calc_optimum_waist_position() / M);
+
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-6),
+      "actual: {}, expected: {}",
+      actual,
+      expected
     );
   }
 }
