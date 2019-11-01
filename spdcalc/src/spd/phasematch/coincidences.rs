@@ -453,7 +453,7 @@ mod tests {
     // spd.assign_optimum_theta();
 
     // FIXME This isn't matching.
-    spd.idler.set_angles(PI * ucum::RAD, 0.03353944515208561 * ucum::RAD);
+    spd.idler.set_angles(PI * ucum::RAD, 0.031789820056487665 * ucum::RAD);
     spd.crystal_setup.theta = 1.5707963267948966 * RAD;
     // spd.assign_optimum_idler();
     spd.set_signal_waist_position(-0.0006311635856188344 * M);

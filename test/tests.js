@@ -255,6 +255,27 @@ function singles(){
   console.log('PM singles amplitude', amp)
 }
 
+function singles_pp(){
+  let props = defaultProps()
+  props.set('enable_pp', true)
+  props.calc_poling_period()
+  props.auto_calc_collection_focus()
+  // props.calcfibercoupling = false
+  // props.update_all_angles()
+
+  let delk = spdc.calc_delK( props )
+  let amp_pm_tz = spdc.calc_PM_tz_k_singles( props )
+  let amp = spdc.phasematch_singles( props )
+
+  show(props)
+
+  console.log('delk', delk)
+  console.log('S_s', props.S_s)
+
+  console.log('PMtz singles amp', amp_pm_tz)
+  console.log('PM singles amplitude', amp)
+}
+
 function integrator_test(){
   let n = 33
   let w = spdc.Nintegrate2DWeights_3_8(n)
@@ -423,7 +444,8 @@ function test_for_krister(){
 // phasematch_norm()
 // autorange_lambda()
 
-singles()
+// singles()
+singles_pp()
 // integrator_test()
 // rates_test()
 // heralding_apodization_test()

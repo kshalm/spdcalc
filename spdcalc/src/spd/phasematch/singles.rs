@@ -315,4 +315,70 @@ mod tests {
       imdiff
     );
   }
+
+  #[test]
+  fn phasematch_singles_pp_test(){
+    let mut spd = SPD {
+      fiber_coupling: true,
+      pp: Some(PeriodicPoling {
+        sign: Sign::NEGATIVE,
+        period: 0.000018041674656364844 * ucum::M,
+        apodization: None,
+      }),
+      ..SPD::default()
+    };
+    // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
+    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
+    // spd.assign_optimum_idler();
+    // spd.assign_optimum_theta();
+
+    // FIXME This isn't matching.
+    spd.idler.set_angles(PI * ucum::RAD, 0.031789820056487665 * ucum::RAD);
+    spd.crystal_setup.theta = 1.5707963267948966 * ucum::RAD;
+    spd.set_signal_waist_position(-0.0006311635856188344 * M);
+    spd.set_idler_waist_position(-0.0006311635856188344 * M);
+
+    let jsa_units = JSAUnits::new(1.);
+    let amp = *(phasematch_singles( &spd ) / jsa_units);
+
+    // let amp_pm_tz = calc_singles_phasematch( &spd );
+    // let delk = spd.calc_delta_k();
+    //
+    // println!("n_p: {}", spd.pump.get_index(&spd.crystal_setup));
+    // println!("n_s: {}", spd.signal.get_index(&spd.crystal_setup));
+    // println!("n_i: {}", spd.idler.get_index(&spd.crystal_setup));
+    //
+    // println!("{:#?}", spd);
+    // println!("{}", *(delk / ucum::J / ucum::S));
+    //
+    // println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
+    // println!("phasematch singles {}", amp);
+
+
+    let actual = amp;
+    let expected = Complex::new(1.6675811413977128e+24, -126659122.3067034);
+
+    let accept_diff = 1e-4;
+
+    let normdiff = percent_diff(actual.norm(), expected.norm());
+    assert!(
+      normdiff < accept_diff,
+      "norm percent difference: {}",
+      normdiff
+    );
+
+    let rediff = percent_diff(actual.re, expected.re);
+    assert!(
+      rediff < accept_diff,
+      "real part percent difference: {}",
+      rediff
+    );
+
+    let imdiff = percent_diff(actual.im, expected.im);
+    assert!(
+      imdiff < accept_diff,
+      "imag part percent difference: {}",
+      imdiff
+    );
+  }
 }

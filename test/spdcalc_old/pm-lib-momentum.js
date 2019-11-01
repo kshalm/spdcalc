@@ -196,7 +196,7 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ;
 
     // console.log("INSIDE COINCIDENCES");
-
+    // console.log('zhs, zhi', zhs, zhi)
     // console.log("Wx_SQ", Wx_SQ);
     // console.log("GAM1s:", GAM1s);
     // console.log("GAM2s:", GAM2s);
@@ -688,6 +688,7 @@ module.exports.calc_PM_tz_k_singles = function calc_PM_tz_k_singles (P){
         ,LRho = L * RHOpx
         ,LRho_sq = sq(LRho)
         ;
+
     // Imaginary Terms
     var  alpha1R = 4*KpKs * GAM1s
         ,alpha1I = - 4*KpKs * DEL1s
