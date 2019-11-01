@@ -125,4 +125,13 @@ impl CrystalSetup {
         }
       }
   }
+
+  // z_{s,i} = -\frac{1}{2}\frac{L}{n_z(\lambda_{s,i})}
+  pub fn calc_optimal_waist_position(&self, photon : &Photon) -> Distance {
+    -0.5 * self.length / self.get_index_along(
+      photon.get_wavelength(),
+      na::Unit::new_normalize(na::Vector3::z()),
+      &photon.get_type()
+    )
+  }
 }

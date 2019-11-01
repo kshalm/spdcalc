@@ -7,7 +7,6 @@ use dim::{
 use math::*;
 use photon::{Photon, PhotonType};
 use std::f64::consts::FRAC_PI_2;
-use crate::plotting::HistogramConfig;
 
 mod periodic_poling;
 pub use periodic_poling::*;
@@ -33,12 +32,10 @@ pub struct SPD {
   /// Cutoff amplitude below which the phasematching will be considered zero
   pub pump_spectrum_threshold: f64,
 
-  /// Pump collection focus location on z axis
-  pub z0p : Distance,
-  /// Signal collection focus location on z axis
-  pub z0s : Distance,
-  /// Idler collection focus location on z axis
-  pub z0i : Distance,
+  // Signal collection focus location on z axis. If None... autocalc
+  pub z0s : Option<Distance>,
+  // Idler collection focus location on z axis. If None... autocalc
+  pub z0i : Option<Distance>,
 }
 
 impl Default for SPD {
@@ -67,9 +64,8 @@ impl Default for SPD {
       pump_bandwidth : 5.35 * NANO * ucum::M,
       pump_spectrum_threshold: 1e-9,
       pump_average_power: 1. * MILLIW,
-      z0p: 0. * ucum::M,
-      z0s: -0.5 * crystal_setup.length,
-      z0i: -0.5 * crystal_setup.length,
+      z0s: None,
+      z0i: None,
     }
   }
 }
@@ -84,6 +80,16 @@ impl SPD {
     let pump = Photon::pump(wavelength, self.pump.waist);
     SPD {
       pump,
+      ..self
+    }
+  }
+
+  pub fn with_swapped_signal_idler(self) -> Self {
+    SPD {
+      signal: self.idler,
+      idler: self.signal,
+      z0s: self.z0i,
+      z0i: self.z0s,
       ..self
     }
   }
@@ -106,6 +112,42 @@ impl SPD {
     };
 
     spd_collinear
+  }
+
+  /// Automatically use optimal waist position for signal
+  pub fn auto_signal_waist_position(&mut self){
+    self.z0s = None;
+  }
+
+  /// Override waist position for signal
+  pub fn set_signal_waist_position(&mut self, z : Distance){
+    assert!(z <= 0. * M, "Waist position must be a negative value.");
+    self.z0s = Some(z);
+  }
+
+  /// Get the signal waist position relative to the end of the crystal
+  pub fn get_signal_waist_position(&self) -> Distance {
+    self.z0s.unwrap_or_else(||
+      self.crystal_setup.calc_optimal_waist_position(&self.signal)
+    )
+  }
+
+  /// Automatically use optimal waist position for idler
+  pub fn auto_idler_waist_position(&mut self){
+    self.z0i = None;
+  }
+
+  /// Override waist position for idler
+  pub fn set_idler_waist_position(&mut self, z : Distance){
+    assert!(z <= 0. * M, "Waist position must be a negative value.");
+    self.z0i = Some(z);
+  }
+
+  /// Get the idler waist position relative to the end of the crystal
+  pub fn get_idler_waist_position(&self) -> Distance {
+    self.z0s.unwrap_or_else(||
+      self.crystal_setup.calc_optimal_waist_position(&self.idler)
+    )
   }
 
   /// automatically calculate the optimal crystal theta
@@ -133,53 +175,6 @@ impl SPD {
     let theta = nelder_mead_1d(delta_k, guess, 1000, 0., FRAC_PI_2, 1e-12);
 
     theta * ucum::RAD
-  }
-
-  pub fn calc_optimum_waist_position(&self) -> Distance {
-    let mut spd = self.clone();
-    spd.fiber_coupling = true;
-    spd.assign_optimum_idler();
-
-    let bw = 0.01;
-    let l_s = spd.signal.get_wavelength();
-    let l_i = spd.idler.get_wavelength();
-
-    let cfg = HistogramConfig {
-      x_range: (l_s * (1. - bw), l_s * (1. + bw)),
-      y_range: (l_i * (1. - bw), l_i * (1. + bw)),
-      x_count: 4,
-      y_count: 4,
-    };
-
-    let max_coinc = |z| {
-      let mut spd_at_z = spd.clone();
-      spd_at_z.z0s = z * M;
-      spd_at_z.z0i = z * M;
-
-      let coinc : f64 = cfg
-        .into_iter()
-        .map(|(l_s, l_i)| {
-          let amp = *(calc_jsa( &spd_at_z, l_s, l_i ) / JSAUnits::new(1.));
-
-          amp.norm_sqr()
-        })
-        .sum();
-
-      1. / (coinc + 1.)
-    };
-
-    let len = *(self.crystal_setup.length / M);
-    let guess = -0.5 * len;
-    let z = nelder_mead_1d(
-      max_coinc,
-      guess,
-      1000,
-      -len,
-      0.,
-      1e-40,
-    );
-
-    z * M
   }
 
   /// automatically calculate the optimal poling period and sign
@@ -267,13 +262,6 @@ impl SPD {
   pub fn assign_optimum_periodic_poling(&mut self) {
     self.pp = self.calc_periodic_poling()
       .expect("Could not determine a valid poling period to assign");
-  }
-
-  /// assign the optimum collection focus (waist position)
-  pub fn assign_optimum_waist_position(&mut self){
-    let z = self.calc_optimum_waist_position();
-    self.z0s = z;
-    self.z0i = z;
   }
 
   pub fn calc_delta_k(&self) -> Momentum3 {
@@ -760,23 +748,6 @@ mod tests {
       "actual: {}, expected: {}",
       period,
       period_expected
-    );
-  }
-
-  #[test]
-  fn optimal_waist_position_test() {
-    let spd = SPD {
-      ..SPD::default()
-    };
-
-    let expected = -0.0006303915149149511;
-    let actual = *(spd.calc_optimum_waist_position() / M);
-
-    assert!(
-      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-6),
-      "actual: {}, expected: {}",
-      actual,
-      expected
     );
   }
 }

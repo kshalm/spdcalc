@@ -108,9 +108,9 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   // let PSI_s = (k_s / n_s) * f64::sin(theta_s_e) * f64::cos(phi_s); // Looks to be the y component of the ks,i
   // let PSI_i = (k_i / n_i) * f64::sin(theta_i_e) * f64::cos(phi_i);
 
-  let z0 = spd.z0p; //put pump in middle of the crystal
-  let z0s = spd.z0s; //-P.L/(2*Math.cos(P.theta_s_e))
-  let z0i = spd.z0i; //-P.L/(2*Math.cos(P.theta_i_e))
+  let z0 = 0. * M; //put pump in middle of the crystal
+  let z0s = spd.get_signal_waist_position();
+  let z0i = spd.get_idler_waist_position();
 
   // Now put the waist of the signal & idler at the center fo the crystal.
   // W = Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
@@ -401,14 +401,18 @@ mod tests {
     // FIXME This isn't matching.
     spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
     spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
+    spd.set_signal_waist_position(-0.0007348996031796276 * M);
+    spd.set_idler_waist_position(-0.0007348996031796276 * M);
 
     // println!("spd: {:#?}", spd);
     let jsa_units = JSAUnits::new(1.);
     let amp = *(phasematch_coincidences( &spd ) / jsa_units);
 
     let actual = amp;
-    let expected = Complex::new(8250651139145388., 3275554113628917.5);
+    let expected = Complex::new(6366426621087856., 6187462963260917.);
 
+    // NOTE: this is not a great test anymore because the new analytic
+    // computation of the waist position is more accurate
     let accept_diff = 1e-4;
 
     let normdiff = percent_diff(actual.norm(), expected.norm());
@@ -452,12 +456,14 @@ mod tests {
     spd.idler.set_angles(PI * ucum::RAD, 0.03353944515208561 * ucum::RAD);
     spd.crystal_setup.theta = 1.5707963267948966 * RAD;
     // spd.assign_optimum_idler();
+    spd.set_signal_waist_position(-0.0006311635856188344 * M);
+    spd.set_idler_waist_position(-0.0006311635856188344 * M);
 
     let jsa_units = JSAUnits::new(1.);
     let amp = *(phasematch_coincidences( &spd ) / jsa_units);
 
     let actual = amp;
-    let expected = Complex::new(4795251242193317., 9607597843961730.);
+    let expected = Complex::new(12188962614046546.0, 2293944114986065.5);
 
     let accept_diff = 1e-3;
 

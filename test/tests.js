@@ -174,6 +174,7 @@ function phasematch(){
   props.set('enable_pp', false)
   props.poling_period = 1e16
   props.auto_calc_Theta()
+  props.auto_calc_collection_focus()
   // props.calcfibercoupling = false
   // props.update_all_angles()
 
@@ -197,6 +198,7 @@ function phasematch_pp(){
   let props = defaultProps()
   props.set('enable_pp', true)
   props.calc_poling_period()
+  props.auto_calc_collection_focus()
   // props.auto_calc_Theta()
   // props.calcfibercoupling = false
   // props.update_all_angles()
@@ -236,6 +238,7 @@ function singles(){
   props.set('enable_pp', false)
   props.poling_period = 1e16
   props.auto_calc_Theta()
+  props.auto_calc_collection_focus()
   // props.calcfibercoupling = false
   // props.update_all_angles()
 
@@ -420,10 +423,10 @@ function test_for_krister(){
 // phasematch_norm()
 // autorange_lambda()
 
-// singles()
+singles()
 // integrator_test()
 // rates_test()
 // heralding_apodization_test()
 
 // test_for_krister()
-waist_position()
+// waist_position()

@@ -76,8 +76,8 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
   // let PSI_s = (k_s / n_s) * f64::sin(theta_s_e) * f64::cos(phi_s); // Looks to be the y component of the ks,i
   // let PSI_i = (k_i / n_i) * f64::sin(theta_i_e) * f64::cos(phi_i);
 
-  let z0 = spd.z0p; //put pump in middle of the crystal
-  let z0s = spd.z0s; //-P.L/(2*Math.cos(P.theta_s_e))
+  let z0 = 0. * M; //put pump in middle of the crystal
+  let z0s = spd.get_signal_waist_position();
 
   let RHOpx = *(spd.calc_pump_walkoff() / RAD);
 
@@ -269,6 +269,8 @@ mod tests {
     // FIXME This isn't matching.
     spd.idler.set_angles(PI * ucum::RAD, 0.03178987094602039 * ucum::RAD);
     spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
+    spd.set_signal_waist_position(-0.0007348996031796276 * M);
+    spd.set_idler_waist_position(-0.0007348996031796276 * M);
 
     let jsa_units = JSAUnits::new(1.);
     let amp = *(phasematch_singles( &spd ) / jsa_units);
@@ -288,7 +290,7 @@ mod tests {
 
 
     let actual = amp;
-    let expected = Complex::new(9.518213235754354e+23, -73139981.39944905);
+    let expected = Complex::new(9.518572188658382e+23, 95667755.72451791);
 
     let accept_diff = 1e-4;
 
