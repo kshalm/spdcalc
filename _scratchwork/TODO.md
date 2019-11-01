@@ -13,3 +13,26 @@ Spawn workers for computations dynamically so they can be terminated if they run
 Fix autocompute strategy. Make graphs wait before updating. Perhaps create that
 plot store module for tracking plots added to the page. Have them listen to
 a specific action on parameters before updating.
+
+
+= Index of refraction data =
+
+plot vs wavelengths
+values for current wavelength
+
+= autocalc waist position =
+
+maybe we don't need optimization at all,
+just set it to L/2 in free space and then divide by index of refraction for
+whichever beam.
+
+= freeze state =
+lock certain plots in current state so parameter changes don't affect it
+keep track of parameters used to compute current state
+ability to label that module
+unlocked => no refresh button
+locked => has refresh button
+
+= group modules =
+modules can be loaded with several plots, larger card
+around certain plots that are linked

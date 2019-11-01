@@ -36,7 +36,7 @@ pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
 /// assert!((arr[0] - 0.).abs() < 1e-12);
 /// assert!((arr[99] - 1.).abs() < 1e-12);
 /// ```
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Steps<T>(pub T, pub T, pub usize);
 
 impl<T> Steps<T>

@@ -216,6 +216,17 @@ impl HeraldingResults {
   }
 }
 
+/// Get the heralding results for a given spd setup and signal/idler wavelength range
+pub fn calc_heralding_results(spd : &SPD, wavelength_range : &HistogramConfig<Wavelength>) -> HeraldingResults {
+  let coincidences_rate_distribution = calc_coincidences_rate_distribution(&spd, &wavelength_range.into_iter());
+  let singles_rate_distributions = calc_singles_rate_distributions(&spd, &wavelength_range.into_iter());
+
+  HeraldingResults::from_distributions(
+    coincidences_rate_distribution,
+    singles_rate_distributions
+  )
+}
+
 /// Calculate the count rates, and efficiencies for signal, idler singles and coincidences
 /// as well as the efficiencies over a range of signal/idler waist sizes.
 pub fn plot_heralding_results_by_signal_idler_waist(
@@ -230,13 +241,7 @@ pub fn plot_heralding_results_by_signal_idler_waist(
       spd.signal.waist = Meter::new(Vector2::new(*(ws / M), *(ws / M)));
       spd.idler.waist = Meter::new(Vector2::new(*(wi / M), *(wi / M)));
 
-      let coincidences_rate_distribution = calc_coincidences_rate_distribution(&spd, &wavelength_range.into_iter());
-      let singles_rate_distributions = calc_singles_rate_distributions(&spd, &wavelength_range.into_iter());
-
-      HeraldingResults::from_distributions(
-        coincidences_rate_distribution,
-        singles_rate_distributions
-      )
+      calc_heralding_results(&spd, &wavelength_range)
     })
     .collect()
 }
