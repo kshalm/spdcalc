@@ -237,10 +237,11 @@ function singles(){
   let props = defaultProps()
   props.set('enable_pp', false)
   props.poling_period = 1e16
+
   props.auto_calc_Theta()
   props.auto_calc_collection_focus()
   // props.calcfibercoupling = false
-  // props.update_all_angles()
+  props.update_all_angles()
 
   let delk = spdc.calc_delK( props )
   let amp_pm_tz = spdc.calc_PM_tz_k_singles( props )
@@ -444,8 +445,8 @@ function test_for_krister(){
 // phasematch_norm()
 // autorange_lambda()
 
-// singles()
-singles_pp()
+singles()
+// singles_pp()
 // integrator_test()
 // rates_test()
 // heralding_apodization_test()

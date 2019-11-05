@@ -250,8 +250,8 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  // extern crate float_cmp;
-  // use float_cmp::*;
+  extern crate float_cmp;
+  use float_cmp::*;
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * (expected - actual).abs() / expected
@@ -261,14 +261,13 @@ mod tests {
   fn phasematch_singles_test(){
     let mut spd = SPD::default();
     spd.fiber_coupling = true;
-    // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
+    spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
+    // spd.signal.set_from_external_theta(0.0523598775598298 * ucum::RAD, &spd.crystal_setup);
     spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
     // spd.assign_optimum_idler();
     // spd.assign_optimum_theta();
-
-    // FIXME This isn't matching.
     spd.idler.set_angles(PI * ucum::RAD, 0.03178987094602039 * ucum::RAD);
-    spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
+
     spd.set_signal_waist_position(-0.0007348996031796276 * M);
     spd.set_idler_waist_position(-0.0007348996031796276 * M);
 
@@ -301,18 +300,11 @@ mod tests {
       normdiff
     );
 
-    let rediff = percent_diff(actual.re, expected.re);
     assert!(
-      rediff < accept_diff,
-      "real part percent difference: {}",
-      rediff
-    );
-
-    let imdiff = percent_diff(actual.im, expected.im);
-    assert!(
-      imdiff < accept_diff,
-      "imag part percent difference: {}",
-      imdiff
+      approx_eq!(f64, actual.arg(), expected.arg(), ulps = 2, epsilon = 1e-14),
+      "actual: {}, expected: {}",
+      actual.arg(),
+      expected.arg()
     );
   }
 
@@ -328,7 +320,7 @@ mod tests {
       ..SPD::default()
     };
     // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
-    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
+    spd.signal.set_angles(0. *ucum::RAD, 0.0341877166429185 * ucum::RAD);
     // spd.assign_optimum_idler();
     // spd.assign_optimum_theta();
 
