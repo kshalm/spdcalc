@@ -94,6 +94,13 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   }
 }
 
+impl<T> ExactSizeIterator for StepIterator<T>
+where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+  fn len(&self) -> usize {
+    self.steps.2
+  }
+}
+
 /// An iterator that will iterate through rows and columns, giving you the
 /// coordinates at every iteration. Like a 2d linspace.
 ///
@@ -167,5 +174,13 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
     self.index += 1;
 
     Some((x, y))
+  }
+}
+
+
+impl<T> ExactSizeIterator for Iterator2D<T>
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+  fn len(&self) -> usize {
+    self.total
   }
 }
