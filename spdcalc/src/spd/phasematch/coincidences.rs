@@ -346,6 +346,7 @@ mod tests {
   #[test]
   fn phasematch_coincidences_test(){
     let mut spd = SPD::default();
+    spd.fiber_coupling = false;
     // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
     spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
     // spd.assign_optimum_idler();
@@ -493,7 +494,10 @@ mod tests {
 
   #[test]
   fn phasematch_collinear_test(){
-    let spd = SPD::default();
+    let spd = SPD {
+      fiber_coupling: false,
+      ..SPD::default()
+    };
 
     let jsa_units = JSAUnits::new(1.);
     let amp = *(phasematch_coincidences( &spd.to_collinear() ) / jsa_units);

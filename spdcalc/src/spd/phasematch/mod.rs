@@ -49,6 +49,7 @@ mod tests {
   #[test]
   fn pump_spectrum_test() {
     let mut spd = SPD::default();
+    spd.fiber_coupling = false;
 
     spd.signal.set_wavelength(1500. * NANO * M);
     let actual = *pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);

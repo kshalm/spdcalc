@@ -60,7 +60,7 @@ impl Default for SPD {
       pump,
       crystal_setup,
       pp : None,
-      fiber_coupling : false,
+      fiber_coupling : true,
       pump_bandwidth : 5.35 * NANO * ucum::M,
       pump_spectrum_threshold: 1e-9,
       pump_average_power: 1. * MILLIW,
