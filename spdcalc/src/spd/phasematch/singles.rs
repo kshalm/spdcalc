@@ -54,11 +54,12 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
   // Height of the collected spots from the axis.
   let hs = L * 0.5 * f64::tan(theta_s) * f64::cos(phi_s);
 
+  let Wp = *(spd.pump.waist / M);
+  let Wp_SQ = (Wp.x * Wp.y) * M * M;
+  let Ws = *(spd.signal.waist / M);
+  let Ws_SQ = (Ws.x * Ws.y) * M * M;
+
   let ellipticity = 1.0_f64;
-  // Setup constants
-  // TODO: enhancement, account for y component of waist. currently only taking x into account
-  let Wp_SQ = (*(spd.pump.waist / ucum::M)).x.powi(2) * M2;
-  let Ws_SQ = (*(spd.signal.waist / ucum::M)).x.powi(2) * M2;
   let Wx_SQ = Wp_SQ * ellipticity.powi(2);
   let Wy_SQ = Wp_SQ;
 

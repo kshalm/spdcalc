@@ -67,6 +67,14 @@ fn calc_coincidence_rate_constant(spd : &SPD) -> CoincRateConstUnits<f64> {
 pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Iterator2D<Wavelength>) -> Vec<Hertz<f64>> {
 
   let PI2c = PI2 * C_;
+
+  let Ws = *(spd.signal.waist / M);
+  let Wi = *(spd.idler.waist / M);
+
+  if Ws.x == 0. || Ws.y == 0. || Wi.x == 0. || Wi.y == 0. {
+    return vec![0. / S; wavelength_range.len()];
+  }
+
   // let n_p = spd.pump.get_index(&spd.crystal_setup);
   let n_s = spd.signal.get_index(&spd.crystal_setup);
   let n_i = spd.idler.get_index(&spd.crystal_setup);
@@ -109,15 +117,20 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
 
   let PI2c = PI2 * C_;
 
-  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
-  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
-
   let Ws = *(spd.signal.waist / M);
   let Wi = *(spd.idler.waist / M);
 
   // TODO: ask krister, why are we squaring waist like this?
   let Ws_SQ = (Ws.x * Ws.y) * M * M;
   let Wi_SQ = (Wi.x * Wi.y) * M * M;
+
+  // early out...
+  if *(Ws_SQ / M / M) == 0. || *(Wi_SQ / M / M) == 0. {
+    return vec![(0. / S, 0. / S); wavelength_range.len()];
+  }
+
+  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
 
   // let n_p = spd.pump.get_index(&spd.crystal_setup);
   let n_s = spd.signal.get_index(&spd.crystal_setup);
@@ -193,8 +206,8 @@ impl HeraldingResults {
         (col.0 + r_s, col.1 + r_i)
       );
 
-    let signal_efficiency = if coincidences_rate == 0. { 0. } else { coincidences_rate / idler_singles_rate };
-    let idler_efficiency = if coincidences_rate == 0. { 0. } else { coincidences_rate / signal_singles_rate };
+    let signal_efficiency = if idler_singles_rate == 0. { 0. } else { coincidences_rate / idler_singles_rate };
+    let idler_efficiency = if signal_singles_rate == 0. { 0. } else { coincidences_rate / signal_singles_rate };
 
     HeraldingResults {
       signal_singles_rate,
@@ -245,6 +258,26 @@ mod tests {
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * (expected - actual).abs() / expected
+  }
+
+  #[test]
+  fn zero_rates_test() {
+    let mut spd = SPD::default();
+    spd.fiber_coupling = true;
+    spd.crystal_setup.crystal = Crystal::KTP;
+    spd.signal.waist = Meter::new(Vector2::new(0., 0.));
+    spd.idler.waist = Meter::new(Vector2::new(0., 0.));
+    spd.assign_optimum_periodic_poling();
+
+    let wavelength_range = HistogramConfig {
+      x_range: (1490.86 * NANO * M, 1609.14 * NANO * M),
+      y_range: (1495.05 * NANO * M, 1614.03 * NANO * M),
+      x_count: 10,
+      y_count: 10,
+    };
+
+    let results = calc_heralding_results(&spd, &wavelength_range);
+    assert_eq!(results.coincidences_rate, 0.);
   }
 
   #[test]
