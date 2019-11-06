@@ -67,7 +67,13 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   // crystal length
   let L = spd.crystal_setup.length;
 
-  // let delk = spd.calc_delta_k();
+  // TODO: ask krister. does this work to filter out lobes?
+  // let delk = *(spd.calc_delta_k() / ucum::J / ucum::S);
+  // let arg = *(L * 0.5 * delk.z / M);
+  //
+  // if arg > PI2 || arg < -PI2 {
+  //   return (Complex::new(0., 0.), 1.);
+  // }
 
   // energy matching condition
   // let PI2c = PI2 * C_;
