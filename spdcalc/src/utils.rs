@@ -166,8 +166,8 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
     let cols = self.x_steps.2;
     let rows = self.y_steps.2;
     let (nx, ny) = Self::get_2d_indices(self.index, cols);
-    let xt = (nx as f64) / ((cols - 1) as f64);
-    let yt = (ny as f64) / ((rows - 1) as f64);
+    let xt = if cols > 1 { (nx as f64) / ((cols - 1) as f64) } else { 0. };
+    let yt = if rows > 1 { (ny as f64) / ((rows - 1) as f64) } else { 0. };
     let x = lerp(self.x_steps.0, self.x_steps.1, xt);
     let y = lerp(self.y_steps.0, self.y_steps.1, yt);
 
