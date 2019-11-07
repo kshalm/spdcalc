@@ -9,7 +9,7 @@ mod heralding;
 pub use heralding::*;
 
 /// Holds configuration for drawing heatmaps
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct HistogramConfig<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   /// the x axis range (min, max)
