@@ -249,6 +249,26 @@ pub fn plot_heralding_results_by_signal_idler_waist(
     .collect()
 }
 
+/// Calculate the count rates, and efficiencies for signal, idler singles and coincidences
+/// as well as the efficiencies over a range of pump vs signal/idler waist sizes.
+pub fn plot_heralding_results_by_pump_signal_idler_waist(
+  spd : &SPD,
+  ps_waists : &HistogramConfig<Meter<f64>>,
+  wavelength_range : &HistogramConfig<Wavelength>
+) -> Vec<HeraldingResults> {
+  ps_waists
+    .into_iter()
+    .map(|(wp, ws)| {
+      let mut spd = spd.clone();
+      spd.pump.waist = Meter::new(Vector2::new(*(wp / M), *(wp / M)));
+      spd.signal.waist = Meter::new(Vector2::new(*(ws / M), *(ws / M)));
+      spd.idler.waist = spd.signal.waist.clone();
+
+      calc_heralding_results(&spd, &wavelength_range)
+    })
+    .collect()
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
