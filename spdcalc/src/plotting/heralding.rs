@@ -113,6 +113,63 @@ pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Itera
 /// Integrating over all wavelengths (all array items) will give total singles rate.
 /// technically this distribution has units of 1/(s m^2).. but we return 1/s
 #[allow(non_snake_case)]
+pub fn calc_singles_rate_distribution_signal(spd : &SPD, wavelength_range : &Iterator2D<Wavelength>) -> Vec<Hertz<f64>> {
+
+  let PI2c = PI2 * C_;
+
+  let Ws = *(spd.signal.waist / M);
+  let Wi = *(spd.idler.waist / M);
+
+  // TODO: ask krister, why are we squaring waist like this?
+  let Ws_SQ = (Ws.x * Ws.y) * M * M;
+  let Wi_SQ = (Wi.x * Wi.y) * M * M;
+
+  // early out...
+  if *(Ws_SQ / M / M) == 0. || *(Wi_SQ / M / M) == 0. {
+    return vec![0. / S; wavelength_range.len()];
+  }
+
+  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+
+  // let n_p = spd.pump.get_index(&spd.crystal_setup);
+  let n_s = spd.signal.get_index(&spd.crystal_setup);
+  let n_i = spd.idler.get_index(&spd.crystal_setup);
+  let lamda_s = spd.signal.get_wavelength();
+  let lamda_i = spd.idler.get_wavelength();
+
+  let PHI_s = 1. / f64::cos(theta_s_e);
+  let omega_s = PI2c / lamda_s;
+  let omega_i = PI2c / lamda_i;
+
+  let scale_s = Ws_SQ * PHI_s;
+  let dlamda_s = wavelength_range.get_dx();
+  let dlamda_i = wavelength_range.get_dy();
+  let lomega = omega_s * omega_i / sq(n_s * n_i);
+  let eta_s = calc_rate_constant(&spd);
+
+  let jsa_units = JSAUnits::new(1.);
+
+  wavelength_range
+    .map(|(l_s, l_i)| {
+      let amplitude_s = *(calc_jsa_singles(&spd, l_s, l_i) / jsa_units);
+
+      // TODO: optimize by pulling these out???
+      let d_omega_s = PI2c * dlamda_s / sq(l_s);
+      let d_omega_i = PI2c * dlamda_i / sq(l_i);
+
+      let f = eta_s * d_omega_s * d_omega_i * lomega;
+      let factor_s = scale_s * f;
+
+      // technically this distribution has units of 1/(s m^2).. but we return 1/s
+      amplitude_s.norm() * factor_s * jsa_units / M / M
+    })
+    .collect()
+}
+
+/// Calculate the singles rate for both signal and idler per unit wavelength * wavelength.
+/// Integrating over all wavelengths (all array items) will give total singles rate.
+/// technically this distribution has units of 1/(s m^2).. but we return 1/s
+#[allow(non_snake_case)]
 pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2D<Wavelength>) -> Vec<(Hertz<f64>, Hertz<f64>)> {
 
   let PI2c = PI2 * C_;

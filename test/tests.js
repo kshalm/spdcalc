@@ -215,13 +215,18 @@ function phasematch_pp(){
 
 function phasematch_norm(){
   let props = defaultProps()
-  props.auto_calc_Theta()
-  props.calcfibercoupling = false
+  // props.auto_calc_Theta()
+  // props.calcfibercoupling = false
+  props.set('enable_pp', true)
+  props.calc_poling_period()
+  props.auto_calc_collection_focus()
 
   show(props)
 
   let norm = spdc.normalize_joint_spectrum(props)
   console.log('norm', norm)
+  let norm_singles = spdc.normalize_joint_spectrum_singles(props)
+  console.log('norm singles', norm_singles)
 }
 
 function autorange_lambda(){
@@ -235,6 +240,7 @@ function autorange_lambda(){
 
 function singles(){
   let props = defaultProps()
+  props.theta = 0
   props.set('enable_pp', false)
   props.poling_period = 1e16
 
@@ -442,10 +448,10 @@ function test_for_krister(){
 // phasematch()
 // phasematch_pp()
 // pump_spectrum()
-// phasematch_norm()
+phasematch_norm()
 // autorange_lambda()
 
-singles()
+// singles()
 // singles_pp()
 // integrator_test()
 // rates_test()

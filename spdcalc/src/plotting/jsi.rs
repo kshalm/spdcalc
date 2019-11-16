@@ -6,14 +6,32 @@ use dim::{
 };
 
 /// Create a JSI plot
-pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig<Wavelength>) -> Vec<f64> {
+/// if no normalization is provided, it will automatically calculate it
+pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
-  let norm_amp = phasematch_coincidences(&spd.to_collinear());
+  let norm_amp = norm.unwrap_or_else(|| calc_jsa_normalization(&spd));
 
   cfg
     .into_iter()
     .map(|(l_s, l_i)| {
       let amplitude = calc_jsa(&spd, l_s, l_i);
+
+      // intensity
+      (amplitude / norm_amp).norm_sqr()
+    })
+    .collect()
+}
+
+/// Create a singles JSI plot for the signal (tip: swap signal/idler if you want idler jsi)
+/// if no normalization is provided, it will automatically calculate it
+pub fn plot_jsi_singles(spd : &SPD, cfg : &HistogramConfig<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
+  // calculate the collinear phasematch to normalize against
+  let norm_amp = norm.unwrap_or_else(|| calc_jsa_singles_normalization(&spd));
+
+  cfg
+    .into_iter()
+    .map(|(l_s, l_i)| {
+      let amplitude = calc_jsa_singles(&spd, l_s, l_i);
 
       // intensity
       (amplitude / norm_amp).norm_sqr()
@@ -117,7 +135,7 @@ mod tests {
       y_count : 10,
     };
 
-    let data = plot_jsi(&spd, &cfg);
+    let data = plot_jsi(&spd, &cfg, None);
 
     assert_eq!(
       data.len(),
