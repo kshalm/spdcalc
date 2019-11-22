@@ -10,6 +10,9 @@ integration steps depend on sinc lobe width vs grid size
 
 update comlink-loader to expose worker so it can be terminated
 
+= optimization =
+
+return heralding results as arrays
 
 = Index of refraction data =
 
