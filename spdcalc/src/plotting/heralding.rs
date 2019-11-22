@@ -240,6 +240,7 @@ pub struct HeraldingResults {
   pub coincidences_rate : f64,
   pub signal_efficiency : f64,
   pub idler_efficiency : f64,
+  pub symmetric_efficiency : f64,
 }
 
 impl HeraldingResults {
@@ -265,6 +266,11 @@ impl HeraldingResults {
 
     let signal_efficiency = if idler_singles_rate == 0. { 0. } else { coincidences_rate / idler_singles_rate };
     let idler_efficiency = if signal_singles_rate == 0. { 0. } else { coincidences_rate / signal_singles_rate };
+    let symmetric_efficiency = if signal_singles_rate == 0. || idler_singles_rate == 0. {
+      0.
+    } else {
+      coincidences_rate / (signal_singles_rate * idler_singles_rate).sqrt()
+    };
 
     HeraldingResults {
       signal_singles_rate,
@@ -272,6 +278,7 @@ impl HeraldingResults {
       coincidences_rate,
       signal_efficiency,
       idler_efficiency,
+      symmetric_efficiency,
     }
   }
 }
