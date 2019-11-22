@@ -289,6 +289,9 @@ pub fn get_optimum_idler(
 ) -> Photon {
   let ls = signal.get_wavelength();
   let lp = pump.get_wavelength();
+
+  assert!(ls > lp, "Signal wavelength must be greater than Pump wavelength");
+
   let ns = signal.get_index(&crystal_setup);
   let np = pump.get_index(&crystal_setup);
 

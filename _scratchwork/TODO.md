@@ -14,6 +14,8 @@ update comlink-loader to expose worker so it can be terminated
 
 return heralding results as arrays
 
+try using complex.finv() in singles calc
+
 = Index of refraction data =
 
 plot vs wavelengths
