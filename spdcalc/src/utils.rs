@@ -87,7 +87,8 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
       return None;
     }
 
-    let progress = (self.index as f64) / ((self.steps.2 - 1) as f64);
+    // if we have only one step... then just set progress to be zero
+    let progress = if self.steps.2 > 1 { (self.index as f64) / ((self.steps.2 - 1) as f64) } else { 0. };
     self.index += 1;
 
     Some(lerp(self.steps.0, self.steps.1, progress))

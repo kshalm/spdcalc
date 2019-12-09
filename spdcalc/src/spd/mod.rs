@@ -85,11 +85,22 @@ impl SPD {
   }
 
   pub fn with_swapped_signal_idler(self) -> Self {
+    // if we have type 2, we need to swap the PM type
+    let pm_type = match self.crystal_setup.pm_type {
+      crystal::PMType::Type2_e_eo => crystal::PMType::Type2_e_oe,
+      crystal::PMType::Type2_e_oe => crystal::PMType::Type2_e_eo,
+      _ => self.crystal_setup.pm_type,
+    };
+
     SPD {
       signal: self.idler,
       idler: self.signal,
       z0s: self.z0i,
       z0i: self.z0s,
+      crystal_setup: CrystalSetup {
+        pm_type,
+        ..self.crystal_setup
+      },
       ..self
     }
   }

@@ -43,3 +43,6 @@ locked => has refresh button
 = group modules =
 modules can be loaded with several plots, larger card
 around certain plots that are linked
+
+= for waist stuff =
+verify lambda/n >> 20 ??
