@@ -22,7 +22,7 @@ use dim::{
 };
 
 pub const META : CrystalMeta = CrystalMeta {
-  id : "LiIO3-2",
+  id : "LiIO3_2",
   name : "LiIO3 ref 2",
   reference_url : "http://www.newlightphotonics.com/v1/bbo-properties.html",
   axis_type : OpticAxisType::NegativeUniaxial,
