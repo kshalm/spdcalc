@@ -352,7 +352,7 @@ pub fn get_optimum_idler(
 
   let val = (*numerator) / arg.sqrt();
 
-  assert!(val <= 1.0, "Invalid solution for optimal idler theta");
+  assert!(val <= 1.0 && val >= 0., "Invalid solution for optimal idler theta");
 
   let theta = f64::asin(val) * ucum::RAD;
   let wavelength = ls * lp / (ls - lp);
