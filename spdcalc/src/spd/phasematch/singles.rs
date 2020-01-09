@@ -49,7 +49,7 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
 
   let theta_s = *(spd.signal.get_theta() / RAD);
   let phi_s = *(spd.signal.get_phi() / RAD);
-  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_s_e = *(spd.get_signal_fiber_theta() / RAD);
 
   // Height of the collected spots from the axis.
   let hs = L * 0.5 * f64::tan(theta_s) * f64::cos(phi_s);

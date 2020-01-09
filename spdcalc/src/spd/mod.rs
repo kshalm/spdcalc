@@ -2,7 +2,7 @@ use crate::*;
 use crystal::CrystalSetup;
 use dim::{
   f64prefixes::{MICRO, MILLI, NANO},
-  ucum::{self, DEG, M, MILLIW, MilliWatt},
+  ucum::{self, RAD, DEG, M, MILLIW, MilliWatt},
 };
 use math::*;
 use photon::{Photon, PhotonType};
@@ -27,6 +27,12 @@ pub struct SPD {
   pub crystal_setup :  CrystalSetup,
   pub pp :             Option<PeriodicPoling>,
   pub fiber_coupling : bool,
+
+  /// The amount the fiber is offset from the beam
+  pub signal_fiber_theta_offset : Angle,
+  /// The amount the fiber is offset from the beam
+  pub idler_fiber_theta_offset : Angle,
+
   pub pump_bandwidth : Wavelength,
   pub pump_average_power : MilliWatt<f64>,
   /// Cutoff amplitude below which the phasematching will be considered zero
@@ -61,6 +67,8 @@ impl Default for SPD {
       crystal_setup,
       pp : None,
       fiber_coupling : true,
+      signal_fiber_theta_offset : 0. * RAD,
+      idler_fiber_theta_offset : 0. * RAD,
       pump_bandwidth : 5.35 * NANO * ucum::M,
       pump_spectrum_threshold: 1e-9,
       pump_average_power: 1. * MILLIW,
@@ -95,6 +103,8 @@ impl SPD {
     SPD {
       signal: self.idler,
       idler: self.signal,
+      signal_fiber_theta_offset: self.idler_fiber_theta_offset,
+      idler_fiber_theta_offset: self.signal_fiber_theta_offset,
       z0s: self.z0i,
       z0i: self.z0s,
       crystal_setup: CrystalSetup {
@@ -114,6 +124,8 @@ impl SPD {
     let mut spd_collinear = SPD {
       signal,
       idler,
+      signal_fiber_theta_offset: zero,
+      idler_fiber_theta_offset: zero,
       ..*self
     };
 
@@ -159,6 +171,16 @@ impl SPD {
     self.z0s.unwrap_or_else(||
       self.crystal_setup.calc_optimal_waist_position(&self.idler)
     )
+  }
+
+  /// The (external) angle of the fiber collection for the signal channel
+  pub fn get_signal_fiber_theta(&self) -> Angle {
+    self.signal.get_external_theta(&self.crystal_setup) + self.signal_fiber_theta_offset
+  }
+
+  /// The (external) angle of the fiber collection for the idler channel
+  pub fn get_idler_fiber_theta(&self) -> Angle {
+    self.idler.get_external_theta(&self.crystal_setup) + self.idler_fiber_theta_offset
   }
 
   /// automatically calculate the optimal crystal theta
