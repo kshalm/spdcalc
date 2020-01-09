@@ -8,7 +8,7 @@ use na::*;
 use std::f64::{self, consts::FRAC_PI_2};
 
 /// The type of photon (pump/signal/idler)
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum PhotonType {
   Pump,
   Signal,
