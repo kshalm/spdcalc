@@ -46,3 +46,10 @@ around certain plots that are linked
 
 = for waist stuff =
 verify lambda/n >> 20 ??
+
+
+two 1d plots
+singles and coincidences counts
+theta_i (optimal theta, max)
+theta_s (optimal theta, max)
+heatmaps?
