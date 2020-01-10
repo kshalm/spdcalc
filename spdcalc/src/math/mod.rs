@@ -1,4 +1,5 @@
 mod differentiation;
+use crate::constants::PI2;
 pub use differentiation::*;
 
 mod integration;
@@ -11,6 +12,11 @@ pub use self::nelder_mead::*;
 pub fn sq<T>( n : T ) -> <T as std::ops::Mul>::Output
 where T : std::ops::Mul + Copy {
   n * n
+}
+
+/// Normalize an angle to [0, 2π)
+pub fn normalize_angle(ang : f64) -> f64 {
+  (ang % PI2 + PI2) % PI2
 }
 
 /// Simple implementation of linear interpolation
