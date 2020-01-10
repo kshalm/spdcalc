@@ -4,7 +4,10 @@ use dim::ucum::{RAD, M};
 use num::{Complex, clamp};
 use std::cmp::max;
 
-/// calculate the phasematching
+/// Calculate the singles phasematching for the signal channel
+///
+/// tip: for the idler, use `SPD.with_swapped_signal_idler()` to swap
+/// the signal and idler, then use that as an input.
 pub fn phasematch_singles(spd : &SPD) -> JSAUnits<Complex<f64>> {
 
   // calculate pump spectrum with original pump
@@ -14,7 +17,8 @@ pub fn phasematch_singles(spd : &SPD) -> JSAUnits<Complex<f64>> {
     return JSAUnits::new(Complex::new(0., 0.));
   }
 
-  // calculate coincidences with pump wavelength to match signal/idler
+  // calculate singles with pump wavelength to match signal/idler
+  // then ensure the fiber theta offsets are applied to signal and idler
   let (pmz, pmt) = calc_singles_phasematch( &spd.with_phasematched_pump() );
   let h = pmt * pmz;
 

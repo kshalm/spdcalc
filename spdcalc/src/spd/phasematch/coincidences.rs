@@ -15,7 +15,7 @@ pub fn phasematch_coincidences(spd : &SPD) -> JSAUnits<Complex<f64>> {
   }
 
   // calculate coincidences with pump wavelength to match signal/idler
-  let (pmz, pmt) = calc_coincidence_phasematch( &spd.with_phasematched_pump().with_fiber_theta_offsets_applied() );
+  let (pmz, pmt) = calc_coincidence_phasematch( &spd.with_phasematched_pump() );
   let g = pmt * pmz;
 
   JSAUnits::new(alpha * g)
