@@ -126,6 +126,11 @@ impl Photon {
     f64::asin(*r_index * f64::sin(*(internal / ucum::RAD))) * ucum::RAD
   }
 
+  /// make a copy of this photon with a new type
+  pub fn with_new_type(self, photon_type : PhotonType) -> Self {
+    Self { photon_type, ..self }
+  }
+
   pub fn get_type(&self) -> PhotonType {
     self.photon_type
   }

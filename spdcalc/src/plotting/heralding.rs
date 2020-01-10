@@ -59,7 +59,17 @@ fn calc_coincidence_rate_constant(spd : &SPD) -> CoincRateConstUnits<f64> {
   calc_rate_constant(&spd) * (Ws_SQ * sec_s) * (Wi_SQ * sec_i)
 }
 
-
+derived!(ucum, UCUM: JacobianDetUnits = Unitless / Second / Second );
+// Used for coordinate transformation in double integrals
+// l(\omega_s, \omega_i) = \frac{\omega_s \omega_i}{n_s^2(\omega_s) n_i^2(\omega_i)}
+// but we input wavelengths
+fn calc_jacobian_det_lambda_to_omega(l_s : Wavelength, l_i : Wavelength, spd : &SPD) -> JacobianDetUnits<f64> {
+  let pi2c = PI2 * C_;
+  let n_s = spd.crystal_setup.get_index_along(l_s, spd.signal.get_direction(), &spd.signal.get_type());
+  let n_i = spd.crystal_setup.get_index_along(l_i, spd.idler.get_direction(), &spd.idler.get_type());
+  let denominator = l_s * l_i * sq(n_s * n_i);
+  pi2c * pi2c / denominator
+}
 
 /// Calculate the coincidence rates per unit wavelength * wavelength.
 /// Integrating over all wavelengths (all array items) will give total coincidence rate.
@@ -75,33 +85,29 @@ pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Itera
     return vec![0. / S; wavelength_range.len()];
   }
 
-  // let n_p = spd.pump.get_index(&spd.crystal_setup);
-  let n_s = spd.signal.get_index(&spd.crystal_setup);
-  let n_i = spd.idler.get_index(&spd.crystal_setup);
-  let lamda_s = spd.signal.get_wavelength();
-  let lamda_i = spd.idler.get_wavelength();
+  // apply angle adjustments for offset fiber theta
+  let spd = spd.with_fiber_theta_offsets_applied();
 
-  let omega_s = PI2c / lamda_s;
-  let omega_i = PI2c / lamda_i;
+  // let n_p = spd.pump.get_index(&spd.crystal_setup);
 
   // NOTE: original version incorrectly computed the step size.
   // originally it was (x_f - x_i) / n_{points}, which should be (x_f - x_i / (n-1))
   let dlamda_s = wavelength_range.get_dx();
   let dlamda_i = wavelength_range.get_dy();
-  let lomega = omega_s * omega_i / sq(n_s * n_i);
 
   let eta = calc_coincidence_rate_constant(&spd);
 
   // NOTE: moving this inside the integral and using running lamda values
   // results in efficiency change of ~0.01%
-  let d_omega_s = PI2c * dlamda_s / sq(lamda_s);
-  let d_omega_i = PI2c * dlamda_i / sq(lamda_i);
-  let factor = eta * lomega * d_omega_s * d_omega_i;
 
   let jsa_units = JSAUnits::new(1.);
 
   wavelength_range
     .map(|(l_s, l_i)| {
+      let d_omega_s = PI2c * dlamda_s / sq(l_s);
+      let d_omega_i = PI2c * dlamda_i / sq(l_i);
+      let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spd);
+      let factor = eta * lomega * d_omega_s * d_omega_i;
       let amplitude = calc_jsa(&spd, l_s, l_i) / jsa_units;
 
       amplitude.norm_sqr() * sq(jsa_units) * factor
@@ -129,37 +135,36 @@ pub fn calc_singles_rate_distribution_signal(spd : &SPD, wavelength_range : &Ite
     return vec![0. / S; wavelength_range.len()];
   }
 
+  // apply fiber offset theta for the signal only
+  let mut spd = spd.with_signal_fiber_theta_offsets_applied();
+  // place the idler at the correct angle for this adjusted signal position
+  // because we want to have a "bucket collector" at the idler channel
+  // to collect all modes
+  spd.assign_optimum_idler();
+
   let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
 
   // let n_p = spd.pump.get_index(&spd.crystal_setup);
-  let n_s = spd.signal.get_index(&spd.crystal_setup);
-  let n_i = spd.idler.get_index(&spd.crystal_setup);
-  let lamda_s = spd.signal.get_wavelength();
-  let lamda_i = spd.idler.get_wavelength();
-
   let PHI_s = 1. / f64::cos(theta_s_e);
-  let omega_s = PI2c / lamda_s;
-  let omega_i = PI2c / lamda_i;
 
   let scale_s = Ws_SQ * PHI_s;
   let dlamda_s = wavelength_range.get_dx();
   let dlamda_i = wavelength_range.get_dy();
-  let lomega = omega_s * omega_i / sq(n_s * n_i);
+
   let eta_s = calc_rate_constant(&spd);
 
   let jsa_units = JSAUnits::new(1.);
 
   wavelength_range
     .map(|(l_s, l_i)| {
-      let amplitude_s = *(calc_jsa_singles(&spd, l_s, l_i) / jsa_units);
-
-      // TODO: optimize by pulling these out???
       let d_omega_s = PI2c * dlamda_s / sq(l_s);
       let d_omega_i = PI2c * dlamda_i / sq(l_i);
 
+      let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spd);
       let f = eta_s * d_omega_s * d_omega_i * lomega;
       let factor_s = scale_s * f;
 
+      let amplitude_s = *(calc_jsa_singles(&spd, l_s, l_i) / jsa_units);
       // technically this distribution has units of 1/(s m^2).. but we return 1/s
       amplitude_s.norm() * factor_s * jsa_units / M / M
     })
@@ -186,44 +191,57 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
     return vec![(0. / S, 0. / S); wavelength_range.len()];
   }
 
-  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
-  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
+  // spd copy with signal and idler swapped
+  let mut spd_swap = spd.with_swapped_signal_idler();
 
+  // apply fiber offset theta for the signal only
+  let mut spd = spd.with_signal_fiber_theta_offsets_applied();
+  // place the idler at the correct angle for this adjusted signal position
+  // because we want to have a "bucket collector" at the idler channel
+  // to collect all modes
+  spd.assign_optimum_idler();
+
+  // remember... spd_swap has signal and idler swapped...
+  spd_swap = spd_swap.with_signal_fiber_theta_offsets_applied();
+  // place the "idler" (signal) at the correct angle for this adjusted signal position
+  // because we want to have a "bucket collector" at the "idler" channel
+  // to collect all modes
+  spd_swap.assign_optimum_idler();
+
+  // constants that work for both channels...
   // let n_p = spd.pump.get_index(&spd.crystal_setup);
-  let n_s = spd.signal.get_index(&spd.crystal_setup);
-  let n_i = spd.idler.get_index(&spd.crystal_setup);
-  let lamda_s = spd.signal.get_wavelength();
-  let lamda_i = spd.idler.get_wavelength();
+  let dlamda_s = wavelength_range.get_dx();
+  let dlamda_i = wavelength_range.get_dy();
+  let eta_s = calc_rate_constant(&spd);
 
+  let jsa_units = JSAUnits::new(1.);
+
+  // constants for signal or idler channel
+  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
   let PHI_s = 1. / f64::cos(theta_s_e);
+
+  // spd_swap.signal is idler
+  let theta_i_e = *(spd_swap.signal.get_external_theta(&spd.crystal_setup) / RAD);
   let PHI_i = 1. / f64::cos(theta_i_e);
-  let omega_s = PI2c / lamda_s;
-  let omega_i = PI2c / lamda_i;
 
   let scale_s = Ws_SQ * PHI_s;
   let scale_i = Wi_SQ * PHI_i;
-  let dlamda_s = wavelength_range.get_dx();
-  let dlamda_i = wavelength_range.get_dy();
-  let lomega = omega_s * omega_i / sq(n_s * n_i);
-  let eta_s = calc_rate_constant(&spd);
-
-  // spd with signal and idler swapped
-  let spd_swap = spd.with_swapped_signal_idler();
-  let jsa_units = JSAUnits::new(1.);
 
   wavelength_range
     .map(|(l_s, l_i)| {
-      let amplitude_s = *(calc_jsa_singles(&spd, l_s, l_i) / jsa_units);
-      let amplitude_i = *(calc_jsa_singles(&spd_swap, l_s, l_i) / jsa_units);
-
-      // TODO: optimize by pulling these out???
       let d_omega_s = PI2c * dlamda_s / sq(l_s);
       let d_omega_i = PI2c * dlamda_i / sq(l_i);
 
-      let f = eta_s * d_omega_s * d_omega_i * lomega;
-      let factor_s = scale_s * f;
-      let factor_i = scale_i * f;
+      let f = eta_s * d_omega_s * d_omega_i;
 
+      let lomega_s = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spd);
+      let factor_s = scale_s * lomega_s * f;
+
+      let lomega_i = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spd_swap);
+      let factor_i = scale_i * lomega_i * f;
+
+      let amplitude_s = *(calc_jsa_singles(&spd, l_s, l_i) / jsa_units);
+      let amplitude_i = *(calc_jsa_singles(&spd_swap, l_s, l_i) / jsa_units);
       // technically this distribution has units of 1/(s m^2).. but we return 1/s
       (
         amplitude_s.norm() * factor_s * jsa_units / M / M,

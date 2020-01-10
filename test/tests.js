@@ -439,6 +439,18 @@ function test_for_krister(){
   console.log('calcuation took', (Date.now() - start) + 'ms')
 }
 
+function swap_test(){
+  let props = defaultProps()
+  props.set('enable_pp', true)
+  props.calc_poling_period()
+  props.auto_calc_collection_focus()
+  props.optimum_idler()
+  console.log(props.theta_s, props.theta_i)
+  props.swap_signal_idler()
+  props.optimum_idler()
+  console.log(props.theta_s, props.theta_i)
+}
+
 // crystal_indices()
 // poling_period()
 // walkoff()
@@ -448,7 +460,7 @@ function test_for_krister(){
 // phasematch()
 // phasematch_pp()
 // pump_spectrum()
-phasematch_norm()
+// phasematch_norm()
 // autorange_lambda()
 
 // singles()
@@ -459,3 +471,4 @@ phasematch_norm()
 
 // test_for_krister()
 // waist_position()
+swap_test()
