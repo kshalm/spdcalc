@@ -15,7 +15,7 @@ pub fn phasematch_coincidences(spd : &SPD) -> JSAUnits<Complex<f64>> {
   }
 
   // calculate coincidences with pump wavelength to match signal/idler
-  let (pmz, pmt) = calc_coincidence_phasematch( &spd.with_phasematched_pump() );
+  let (pmz, pmt) = calc_coincidence_phasematch( &spd.with_phasematched_pump().with_fiber_theta_offsets_applied() );
   let g = pmt * pmz;
 
   JSAUnits::new(alpha * g)
@@ -85,8 +85,8 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   let phi_s = *(spd.signal.get_phi() / RAD);
   let theta_i = *(spd.idler.get_theta() / RAD);
   let phi_i = *(spd.idler.get_phi() / RAD);
-  let theta_s_e = *(spd.get_signal_fiber_theta() / RAD);
-  let theta_i_e = *(spd.get_idler_fiber_theta() / RAD);
+  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
 
   // Height of the collected spots from the axis.
   let hs = L * 0.5 * f64::tan(theta_s) * f64::cos(phi_s);

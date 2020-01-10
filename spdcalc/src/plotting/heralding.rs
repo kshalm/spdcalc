@@ -51,9 +51,9 @@ fn calc_coincidence_rate_constant(spd : &SPD) -> CoincRateConstUnits<f64> {
   let Ws_SQ = (Ws.x * Ws.y) * M * M;
   let Wi = *(spd.idler.waist / M);
   let Wi_SQ = (Wi.x * Wi.y) * M * M;
-  let theta_i_e = *(spd.get_idler_fiber_theta() / RAD);
+  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
   let sec_i = 1. / f64::cos(theta_i_e);
-  let theta_s_e = *(spd.get_signal_fiber_theta() / RAD);
+  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
   let sec_s = 1. / f64::cos(theta_s_e);
 
   calc_rate_constant(&spd) * (Ws_SQ * sec_s) * (Wi_SQ * sec_i)
@@ -129,7 +129,7 @@ pub fn calc_singles_rate_distribution_signal(spd : &SPD, wavelength_range : &Ite
     return vec![0. / S; wavelength_range.len()];
   }
 
-  let theta_s_e = *(spd.get_signal_fiber_theta() / RAD);
+  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
 
   // let n_p = spd.pump.get_index(&spd.crystal_setup);
   let n_s = spd.signal.get_index(&spd.crystal_setup);
@@ -186,8 +186,8 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
     return vec![(0. / S, 0. / S); wavelength_range.len()];
   }
 
-  let theta_s_e = *(spd.get_signal_fiber_theta() / RAD);
-  let theta_i_e = *(spd.get_idler_fiber_theta() / RAD);
+  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
 
   // let n_p = spd.pump.get_index(&spd.crystal_setup);
   let n_s = spd.signal.get_index(&spd.crystal_setup);

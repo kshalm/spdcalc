@@ -115,6 +115,39 @@ impl SPD {
     }
   }
 
+  /// Get a copy of self which has both fiber angle offsets applied
+  pub fn with_fiber_theta_offsets_applied(&self) -> Self {
+    let mut copy = self.clone();
+    let theta_s_e = self.signal.get_external_theta(&self.crystal_setup) + self.signal_fiber_theta_offset;
+    let theta_i_e = self.idler.get_external_theta(&self.crystal_setup) + self.idler_fiber_theta_offset;
+    copy.signal.set_from_external_theta(theta_s_e, &self.crystal_setup);
+    copy.idler.set_from_external_theta(theta_i_e, &self.crystal_setup);
+    copy.signal_fiber_theta_offset = 0. * RAD;
+    copy.idler_fiber_theta_offset = 0. * RAD;
+
+    copy
+  }
+
+  /// Get a copy of self which has the signal fiber angle offset applied
+  pub fn with_signal_fiber_theta_offsets_applied(&self) -> Self {
+    let mut copy = self.clone();
+    let theta_s_e = self.signal.get_external_theta(&self.crystal_setup) + self.signal_fiber_theta_offset;
+    copy.signal.set_from_external_theta(theta_s_e, &self.crystal_setup);
+    copy.signal_fiber_theta_offset = 0. * RAD;
+
+    copy
+  }
+
+  /// Get a copy of self which has the idler fiber angle offset applied
+  pub fn with_idler_fiber_theta_offsets_applied(&self) -> Self {
+    let mut copy = self.clone();
+    let theta_i_e = self.idler.get_external_theta(&self.crystal_setup) + self.idler_fiber_theta_offset;
+    copy.idler.set_from_external_theta(theta_i_e, &self.crystal_setup);
+    copy.idler_fiber_theta_offset = 0. * RAD;
+
+    copy
+  }
+
   // Create a collinear setup
   pub fn to_collinear(&self) -> Self {
     let zero = 0. * ucum::RAD;
@@ -171,16 +204,6 @@ impl SPD {
     self.z0s.unwrap_or_else(||
       self.crystal_setup.calc_optimal_waist_position(&self.idler)
     )
-  }
-
-  /// The (external) angle of the fiber collection for the signal channel
-  pub fn get_signal_fiber_theta(&self) -> Angle {
-    self.signal.get_external_theta(&self.crystal_setup) + self.signal_fiber_theta_offset
-  }
-
-  /// The (external) angle of the fiber collection for the idler channel
-  pub fn get_idler_fiber_theta(&self) -> Angle {
-    self.idler.get_external_theta(&self.crystal_setup) + self.idler_fiber_theta_offset
   }
 
   /// automatically calculate the optimal crystal theta

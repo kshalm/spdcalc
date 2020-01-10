@@ -156,8 +156,11 @@ impl Photon {
   }
 
   pub fn set_from_external_theta(&mut self, external : Angle, crystal_setup : &CrystalSetup) {
-    let theta = Photon::calc_internal_theta_from_external(self, external, crystal_setup);
-    self.set_angles(self.phi, theta);
+    use dim::Abs;
+    let theta = Photon::calc_internal_theta_from_external(self, external.abs(), crystal_setup);
+    // if angle is negative then turn by 180 deg along phi
+    let turn = if (external / ucum::RAD).is_sign_positive() { 0. } else { PI } * ucum::RAD;
+    self.set_angles(self.phi + turn, theta);
   }
 
   pub fn get_external_theta(&self, crystal_setup : &CrystalSetup) -> Angle {
