@@ -78,30 +78,30 @@ pub fn calc_normalized_jsi( spd : &SPD, l_s : Wavelength, l_i : Wavelength ) -> 
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+  // use super::*;
 
-  #[test]
-  fn jsi_normalization_test() {
-    let mut spd = SPD {
-      fiber_coupling: true,
-      pp: Some(PeriodicPoling {
-        sign: Sign::POSITIVE,
-        period: 46.0 * MICRO * ucum::M,
-        apodization: None,
-      }),
-      ..SPD::default()
-    };
-
-    spd.crystal_setup.crystal = Crystal::BBO_1;
-    spd.crystal_setup.theta = 0. * ucum::DEG;
-
-    spd.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
-    spd.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
-
-    let coinc_norm = calc_jsa_normalization(&spd);
-    let singles_norm = calc_jsa_singles_normalization(&spd);
-
-    dbg!(coinc_norm);
-    dbg!(singles_norm);
-  }
+  // #[test]
+  // fn jsi_normalization_test() {
+  //   let mut spd = SPD {
+  //     fiber_coupling: true,
+  //     pp: Some(PeriodicPoling {
+  //       sign: Sign::POSITIVE,
+  //       period: 46.0 * MICRO * ucum::M,
+  //       apodization: None,
+  //     }),
+  //     ..SPD::default()
+  //   };
+  //
+  //   spd.crystal_setup.crystal = Crystal::BBO_1;
+  //   spd.crystal_setup.theta = 0. * ucum::DEG;
+  //
+  //   spd.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
+  //   spd.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
+  //
+  //   let coinc_norm = calc_jsa_normalization(&spd);
+  //   let singles_norm = calc_jsa_singles_normalization(&spd);
+  //
+  //   dbg!(coinc_norm);
+  //   dbg!(singles_norm);
+  // }
 }
