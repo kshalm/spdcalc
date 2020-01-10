@@ -101,8 +101,8 @@ impl SPD {
     };
 
     SPD {
-      signal: self.idler,
-      idler: self.signal,
+      signal: self.idler.with_new_type(PhotonType::Signal),
+      idler: self.signal.with_new_type(PhotonType::Idler),
       signal_fiber_theta_offset: self.idler_fiber_theta_offset,
       idler_fiber_theta_offset: self.signal_fiber_theta_offset,
       z0s: self.z0i,
@@ -379,7 +379,7 @@ pub fn get_optimum_idler(
 
   let theta = f64::asin(val) * ucum::RAD;
   let wavelength = ls * lp / (ls - lp);
-  let phi = signal.get_phi() + (PI * ucum::RAD);
+  let phi = normalize_angle(*(signal.get_phi()/ucum::RAD) + PI) * ucum::RAD;
 
   Photon::idler(
     phi,
@@ -755,6 +755,38 @@ mod tests {
       theta_expected
     );
   }
+
+  #[test]
+  fn swap_signal_idler_test() {
+    let mut spd = SPD::default();
+    spd.crystal_setup.crystal = Crystal::BBO_1;
+    spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
+    spd.assign_optimum_periodic_poling();
+
+    spd.assign_optimum_idler();
+
+    let mut spd_swap = spd.with_swapped_signal_idler();
+    spd_swap.assign_optimum_idler();
+
+    let actual = *(spd.signal.get_theta() / ucum::RAD);
+    let expected = *(spd_swap.idler.get_theta() / ucum::RAD);
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-9),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+
+    let actual = *(spd.idler.get_theta() / ucum::RAD);
+    let expected = *(spd_swap.signal.get_theta() / ucum::RAD);
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-9),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+  }
+
 
   #[test]
   fn optimal_pp_test() {
