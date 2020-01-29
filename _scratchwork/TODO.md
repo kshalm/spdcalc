@@ -48,8 +48,6 @@ around certain plots that are linked
 verify lambda/n >> 20 ??
 
 
-two 1d plots
-singles and coincidences counts
-theta_i (optimal theta, max)
-theta_s (optimal theta, max)
-heatmaps?
+-[ ] lock button copy spd parameters to local
+
+-[ ] plot legend selection forgets upon refresh
