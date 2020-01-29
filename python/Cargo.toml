@@ -13,4 +13,4 @@ version = "0.7"
 features = ["extension-module"]
 
 [dependencies.spdcalc]
-path = '../spdcalc'
+path = '..'
