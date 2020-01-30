@@ -1,35 +1,40 @@
 [tasks.build]
-install_crate = { crate_name = "pyo3-pack", binary = "pyo3-pack", test_arg = "--help" }
+install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
-command = "pyo3-pack"
+command = "maturin"
 args = ["build", "-i", "python3"]
 
 [tasks.dev]
-install_crate = { crate_name = "pyo3-pack", binary = "pyo3-pack", test_arg = "--help" }
+install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
-command = "pyo3-pack"
-args = ["develop"]
+command = "pipenv"
+args = ["run", "maturin", "develop", "--release"]
 dependencies = ["pip_install"]
 
 [tasks.pip_install]
 command = "pipenv"
-args = ["install", "--dev"]
+args = ["install", "--dev", "--python", "3.7.5"]
 
 # [tasks.pip_dev]
 # toolchain = "nightly"
 # command = "pipenv"
-# args = ["run", "pyo3-pack", "develop"]
+# args = ["run", "maturin", "develop"]
 # dependencies = ["pip_install"]
 
 [tasks.release]
-install_crate = { crate_name = "pyo3-pack", binary = "pyo3-pack", test_arg = "--help" }
+install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
-command = "pyo3-pack"
+command = "maturin"
 args = ["build", "--release", "-i", "python3"]
+
+[tasks.clean_pip]
+command = "pipenv"
+args = ["--rm"]
 
 [tasks.clean]
 command = "cargo"
 args = ["clean"]
+dependencies = ["clean_pip"]
 
 [tasks.format]
 command = "cargo"

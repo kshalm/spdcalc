@@ -8,9 +8,9 @@ pytest = "*"
 pytest-runner = "*"
 pytest-benchmark = "*"
 wheel = "*"
-pyo3-pack = "*"
+maturin = "==0.7.7"
 
 [packages]
 
 [requires]
-python_version = "3.8"
+python_version = "3.7"

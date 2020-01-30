@@ -9,8 +9,8 @@ name = "pyspdcalc"
 crate-type = ["cdylib"]
 
 [dependencies.pyo3]
-version = "0.7"
+version = "0.8.1"
 features = ["extension-module"]
 
 [dependencies.spdcalc]
-path = '..'
+path = '../'
