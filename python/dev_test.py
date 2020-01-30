@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from pyspdcalc import PlotRange2D, test
+import pyspdcalc
 
-range = PlotRange2D(x_range=(0, 10), y_range=(20, 30), steps=(11, 11))
+range = pyspdcalc.plotting.PlotRange2D(x_range=(0, 10), y_range=(20, 30), steps=(11, 11))
 
-test(range)
+print(range.x_range)
