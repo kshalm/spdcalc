@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from pyspdcalc import sum_as_string
+from pyspdcalc import PlotRange2D, test
 
-assert sum_as_string(3,8) == "11"
-print("SUCCESS")
+range = PlotRange2D(x_range=(0, 10), y_range=(20, 30), steps=(11, 11))
+
+test(range)

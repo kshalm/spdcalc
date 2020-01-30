@@ -13,7 +13,7 @@ dependencies = ["pip_install"]
 
 [tasks.pip_install]
 command = "pipenv"
-args = ["install", "--dev", "--python", "3.7.5"]
+args = ["install", "--dev"]
 
 # [tasks.pip_dev]
 # toolchain = "nightly"
