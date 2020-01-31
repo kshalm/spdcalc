@@ -1,3 +1,4 @@
+use crate::SPDCError;
 use super::*;
 use dim::f64prefixes::{PICO};
 use dim::ucum::{ M, V };
@@ -26,7 +27,7 @@ impl Crystal {
   /// Get the crystal from its id string.
   ///
   /// useful for external language bindings and serialization
-  pub fn from_string( id : &str ) -> Result<Self, String> {
+  pub fn from_string( id : &str ) -> Result<Self, SPDCError> {
     match id.as_ref() {
       "BBO_1" => Ok(Crystal::BBO_1),
       "KTP" => Ok(Crystal::KTP),
@@ -39,7 +40,7 @@ impl Crystal {
       "AgGaS2_1" => Ok(Crystal::AgGaS2_1),
       "AgGaSe2_1" => Ok(Crystal::AgGaSe2_1),
       "AgGaSe2_2" => Ok(Crystal::AgGaSe2_2),
-      _ => Err(format!("Crystal {} is not defined", id)),
+      _ => Err(SPDCError::new(format!("Crystal {} is not defined", id))),
     }
   }
 

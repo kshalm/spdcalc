@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 import json
+import pprint
 from pyspdcalc import plotting, crystal
 
 range = plotting.PlotRange2D(x_range=(0, 10), y_range=(20, 30), steps=(11, 11))
 
-print(range.x_range)
+pp = pprint.PrettyPrinter(indent=2)
+pp.pprint(range.x_range)
+
+pp.pprint(crystal.Crystal.get_all_meta())
 
 crystal_type = crystal.Crystal('KTP')
 
-meta = json.loads(crystal_type.get_meta_json())
-print(meta)
+meta = crystal_type.get_meta()
+pp.pprint(meta)
