@@ -10,7 +10,9 @@ pp.pprint(range.x_range)
 
 pp.pprint(Crystal.get_all_meta())
 
-crystal_type = Crystal('KTP')
+crystal = Crystal('KTP')
 
-meta = crystal_type.get_meta()
+meta = crystal.get_meta()
 pp.pprint(meta)
+
+pp.pprint({ "indices": crystal.get_indices(775e-9, 273) })

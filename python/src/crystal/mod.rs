@@ -1,5 +1,8 @@
 use crate::{serde_error_to_py, json_to_dict};
-use spdcalc::crystal;
+use spdcalc::{
+  crystal,
+  dim::{ucum::{M, V}, f64prefixes::*},
+};
 
 use pyo3::{
   prelude::*,
@@ -31,6 +34,17 @@ impl Crystal {
     Ok(Self {
       crystal: c
     })
+  }
+
+  fn get_indices(&self, wavelength_meters: f64, temperature_kelvin: f64) -> Vec<f64> {
+    let w = spdcalc::Wavelength::new(wavelength_meters);
+    let temp = spdcalc::dim::ucum::Kelvin::new(temperature_kelvin);
+
+    self.crystal.get_indices(w, temp).as_slice().to_vec()
+  }
+
+  fn get_effective_nonlinear_coefficient(&self) -> f64 {
+    *(self.crystal.get_effective_nonlinear_coefficient() / (PICO * M / V))
   }
 
   fn get_meta(&self, py : Python) -> PyResult<PyObject> {
