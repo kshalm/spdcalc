@@ -1,21 +1,23 @@
 use crate::math::fwhm_to_sigma;
+use crate::*;
+use math::*;
 use super::*;
-use dim::ucum::{RAD, M};
+use dim::ucum::{RAD, M, J, S};
 use num::{Complex, clamp};
 use std::cmp::max;
 
 /// calculate the phasematching
-pub fn phasematch_coincidences(spd : &SPD) -> JSAUnits<Complex<f64>> {
+pub fn phasematch_coincidences(spdc_setup : &SPDCSetup) -> JSAUnits<Complex<f64>> {
 
   // calculate pump spectrum with original pump
-  let alpha = *pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+  let alpha = *pump_spectrum(&spdc_setup.signal, &spdc_setup.idler, &spdc_setup.pump, spdc_setup.pump_bandwidth);
 
-  if alpha < spd.pump_spectrum_threshold {
+  if alpha < spdc_setup.pump_spectrum_threshold {
     return JSAUnits::new(Complex::new(0., 0.));
   }
 
   // calculate coincidences with pump wavelength to match signal/idler
-  let (pmz, pmt) = calc_coincidence_phasematch( &spd.with_phasematched_pump() );
+  let (pmz, pmt) = calc_coincidence_phasematch( &spdc_setup.with_phasematched_pump() );
   let g = pmt * pmz;
 
   JSAUnits::new(alpha * g)
@@ -23,20 +25,20 @@ pub fn phasematch_coincidences(spd : &SPD) -> JSAUnits<Complex<f64>> {
 
 /// calculate the phasematching using a gaussian approximation
 #[allow(non_snake_case)]
-pub fn phasematch_coincidences_gaussian_approximation(spd : &SPD) -> JSAUnits<Complex<f64>> {
+pub fn phasematch_coincidences_gaussian_approximation(spdc_setup : &SPDCSetup) -> JSAUnits<Complex<f64>> {
   // calculate pump spectrum with original pump
-  let alpha = *pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+  let alpha = *pump_spectrum(&spdc_setup.signal, &spdc_setup.idler, &spdc_setup.pump, spdc_setup.pump_bandwidth);
 
-  if alpha < spd.pump_spectrum_threshold {
+  if alpha < spdc_setup.pump_spectrum_threshold {
     return JSAUnits::new(Complex::new(0., 0.));
   }
 
-  let spd = spd.with_phasematched_pump();
+  let spdc_setup = spdc_setup.with_phasematched_pump();
 
   // crystal length
-  let L = *(spd.crystal_setup.length / ucum::M);
+  let L = *(spdc_setup.crystal_setup.length / M);
 
-  let delk = *(spd.calc_delta_k() / ucum::J / ucum::S);
+  let delk = *(spdc_setup.calc_delta_k() / J / S);
   let arg = L * 0.5 * delk.z;
   let pmz = Complex::new(gaussian_pm(arg), 0.);
 
@@ -44,31 +46,31 @@ pub fn phasematch_coincidences_gaussian_approximation(spd : &SPD) -> JSAUnits<Co
 }
 
 #[allow(non_snake_case)]
-fn calc_coincidence_phasematch(spd : &SPD) -> (Complex<f64>, f64) {
-  if spd.fiber_coupling {
-    return calc_coincidence_phasematch_fiber_coupling(spd);
+fn calc_coincidence_phasematch(spdc_setup : &SPDCSetup) -> (Complex<f64>, f64) {
+  if spdc_setup.fiber_coupling {
+    return calc_coincidence_phasematch_fiber_coupling(spdc_setup);
   }
 
   // crystal length
-  let L = *(spd.crystal_setup.length / ucum::M);
+  let L = *(spdc_setup.crystal_setup.length / M);
 
-  let delk = *(spd.calc_delta_k() / ucum::J / ucum::S);
+  let delk = *(spdc_setup.calc_delta_k() / J / S);
   let arg = L * 0.5 * delk.z;
   // no fiber coupling
   let pmz = Complex::new(sinc(arg), 0.);
-  let waist = *(spd.pump.waist / ucum::M);
+  let waist = *(spdc_setup.pump.waist / M);
   let pmt = f64::exp(-0.5 * ((delk.x * waist.x).powi(2) + (delk.y * waist.y).powi(2)));
 
   (pmz, pmt)
 }
 
 #[allow(non_snake_case)]
-fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
+fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Complex<f64>, f64) {
   // crystal length
-  let L = spd.crystal_setup.length;
+  let L = spdc_setup.crystal_setup.length;
 
   // TODO: ask krister. does this work to filter out lobes?
-  // let delk = *(spd.calc_delta_k() / ucum::J / ucum::S);
+  // let delk = *(spdc_setup.calc_delta_k() / J / S);
   // let arg = *(L * 0.5 * delk.z / M);
   //
   // if arg > PI2 || arg < -PI2 {
@@ -77,26 +79,26 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
 
   // energy matching condition
   // let PI2c = PI2 * C_;
-  // let omega_s = PI2c / spd.signal.get_wavelength();
-  // let omega_i = PI2c / spd.idler.get_wavelength();
+  // let omega_s = PI2c / spdc_setup.signal.get_wavelength();
+  // let omega_i = PI2c / spdc_setup.idler.get_wavelength();
   // let omega_p = omega_s + omega_i;
 
-  let theta_s = *(spd.signal.get_theta() / RAD);
-  let phi_s = *(spd.signal.get_phi() / RAD);
-  let theta_i = *(spd.idler.get_theta() / RAD);
-  let phi_i = *(spd.idler.get_phi() / RAD);
-  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
-  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_s = *(spdc_setup.signal.get_theta() / RAD);
+  let phi_s = *(spdc_setup.signal.get_phi() / RAD);
+  let theta_i = *(spdc_setup.idler.get_theta() / RAD);
+  let phi_i = *(spdc_setup.idler.get_phi() / RAD);
+  let theta_s_e = *(spdc_setup.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
+  let theta_i_e = *(spdc_setup.idler.get_external_theta(&spdc_setup.crystal_setup) / RAD);
 
   // Height of the collected spots from the axis.
   let hs = L * 0.5 * f64::tan(theta_s) * f64::cos(phi_s);
   let hi = L * 0.5 * f64::tan(theta_i) * f64::cos(phi_i);
 
-  let Wp = *(spd.pump.waist / M);
+  let Wp = *(spdc_setup.pump.waist / M);
   let Wp_SQ = (Wp.x * Wp.y) * M * M;
-  let Ws = *(spd.signal.waist / M);
+  let Ws = *(spdc_setup.signal.waist / M);
   let Ws_SQ = (Ws.x * Ws.y) * M * M;
-  let Wi = *(spd.idler.waist / M);
+  let Wi = *(spdc_setup.idler.waist / M);
   let Wi_SQ = (Wi.x * Wi.y) * M * M;
 
   let ellipticity = 1.0_f64;
@@ -104,12 +106,12 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   let Wy_SQ = Wp_SQ;
 
   // Is this the k vector along the direction of propagation?
-  let n_p = spd.pump.get_index(&spd.crystal_setup);
-  let n_s = spd.signal.get_index(&spd.crystal_setup);
-  let n_i = spd.idler.get_index(&spd.crystal_setup);
-  let k_p = PI2 * n_p / spd.pump.get_wavelength();
-  let k_s = PI2 * n_s / spd.signal.get_wavelength(); //  * f64::cos(theta_s),
-  let k_i = PI2 * n_i / spd.idler.get_wavelength(); // * f64::cos(theta_i)
+  let n_p = spdc_setup.pump.get_index(&spdc_setup.crystal_setup);
+  let n_s = spdc_setup.signal.get_index(&spdc_setup.crystal_setup);
+  let n_i = spdc_setup.idler.get_index(&spdc_setup.crystal_setup);
+  let k_p = PI2 * n_p / spdc_setup.pump.get_wavelength();
+  let k_s = PI2 * n_s / spdc_setup.signal.get_wavelength(); //  * f64::cos(theta_s),
+  let k_i = PI2 * n_i / spdc_setup.idler.get_wavelength(); // * f64::cos(theta_i)
 
   let PHI_s = f64::cos(theta_s_e).powi(-2); // External angle for the signal???? Is PHI_s z component?
   let PHI_i = f64::cos(theta_i_e).powi(-2); // External angle for the idler????
@@ -117,8 +119,8 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   // let PSI_i = (k_i / n_i) * f64::sin(theta_i_e) * f64::cos(phi_i);
 
   let z0 = 0. * M; //put pump in middle of the crystal
-  let z0s = spd.get_signal_waist_position();
-  let z0i = spd.get_idler_waist_position();
+  let z0s = spdc_setup.get_signal_waist_position();
+  let z0i = spdc_setup.get_idler_waist_position();
 
   // Now put the waist of the signal & idler at the center fo the crystal.
   // W = Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
@@ -200,7 +202,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
     *((z0/k_p)/M2)
   );
   let m = L / (2. * k_p);
-  let n = 0.5 * L * f64::tan(*(spd.calc_pump_walkoff() / RAD));
+  let n = 0.5 * L * f64::tan(*(spdc_setup.calc_pump_walkoff() / RAD));
 
   let hh = Complex::new(
     *(GAM4s + GAM4i),
@@ -215,7 +217,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
   // let A7I = -DEL3i;
   let A7 = Complex::new(*(GAM3i/M), -*(DEL3i/M));
 
-  let pp_factor = spd.pp.map_or(0., |p| p.pp_factor());
+  let pp_factor = spdc_setup.pp.map_or(0., |p| p.pp_factor());
   let dksi = k_s + k_i + PI2 * pp_factor / M;
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
@@ -290,7 +292,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64)
 
     // Take into account apodized crystals
     // Apodization 1/e^2
-    let pmzcoeff = spd.pp.map_or(
+    let pmzcoeff = spdc_setup.pp.map_or(
       // if no periodic poling return 1.
       1.,
       // otherwise check apodization
@@ -351,29 +353,29 @@ mod tests {
 
   #[test]
   fn phasematch_coincidences_test(){
-    let mut spd = SPD::default();
-    spd.fiber_coupling = false;
-    // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
-    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
-    // spd.assign_optimum_idler();
-    // spd.assign_optimum_theta();
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.fiber_coupling = false;
+    // spdc_setup.signal.set_from_external_theta(3. * DEG, &spdc_setup.crystal_setup);
+    spdc_setup.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
+    // spdc_setup.assign_optimum_idler();
+    // spdc_setup.assign_optimum_theta();
 
     // FIXME This isn't matching.
-    spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
-    spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
+    spdc_setup.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
+    spdc_setup.crystal_setup.theta = 0.5515891191131287 * RAD;
 
     let jsa_units = JSAUnits::new(1.);
-    let amp = *(phasematch_coincidences( &spd ) / jsa_units);
+    let amp = *(phasematch_coincidences( &spdc_setup ) / jsa_units);
     /*
-    let amp_pm_tz = calc_coincidence_phasematch( &spd );
-    let delk = spd.calc_delta_k();
+    let amp_pm_tz = calc_coincidence_phasematch( &spdc_setup );
+    let delk = spdc_setup.calc_delta_k();
 
-    println!("n_p: {}", spd.pump.get_index(&spd.crystal_setup));
-    println!("n_s: {}", spd.signal.get_index(&spd.crystal_setup));
-    println!("n_i: {}", spd.idler.get_index(&spd.crystal_setup));
+    println!("n_p: {}", spdc_setup.pump.get_index(&spdc_setup.crystal_setup));
+    println!("n_s: {}", spdc_setup.signal.get_index(&spdc_setup.crystal_setup));
+    println!("n_i: {}", spdc_setup.idler.get_index(&spdc_setup.crystal_setup));
 
-    println!("{:#?}", spd);
-    println!("{}", *(delk / ucum::J / ucum::S));
+    println!("{:#?}", spdc_setup);
+    println!("{}", *(delk / J / S));
 
     println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
     println!("phasematch {}", amp);
@@ -398,24 +400,24 @@ mod tests {
 
   #[test]
   fn phasematch_fiber_coupling_test(){
-    let mut spd = SPD {
+    let mut spdc_setup = SPDCSetup {
       fiber_coupling: true,
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
-    // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
-    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
-    // spd.assign_optimum_idler();
-    // spd.assign_optimum_theta();
+    // spdc_setup.signal.set_from_external_theta(3. * DEG, &spdc_setup.crystal_setup);
+    spdc_setup.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
+    // spdc_setup.assign_optimum_idler();
+    // spdc_setup.assign_optimum_theta();
 
     // FIXME This isn't matching.
-    spd.idler.set_angles(PI * ucum::RAD, 0.03178987094605031 * ucum::RAD);
-    spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
-    spd.set_signal_waist_position(-0.0007348996031796276 * M);
-    spd.set_idler_waist_position(-0.0007348996031796276 * M);
+    spdc_setup.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
+    spdc_setup.crystal_setup.theta = 0.5515891191131287 * RAD;
+    spdc_setup.set_signal_waist_position(-0.0007348996031796276 * M);
+    spdc_setup.set_idler_waist_position(-0.0007348996031796276 * M);
 
-    // println!("spd: {:#?}", spd);
+    // println!("spdc_setup: {:#?}", spdc_setup);
     let jsa_units = JSAUnits::new(1.);
-    let amp = *(phasematch_coincidences( &spd ) / jsa_units);
+    let amp = *(phasematch_coincidences( &spdc_setup ) / jsa_units);
 
     let actual = amp;
     let expected = Complex::new(6366426621087856., 6187462963260917.);
@@ -448,28 +450,28 @@ mod tests {
 
   #[test]
   fn phasematch_fiber_coupling_pp_test(){
-    let mut spd = SPD {
+    let mut spdc_setup = SPDCSetup {
       fiber_coupling: true,
       pp: Some(PeriodicPoling {
         sign: Sign::NEGATIVE,
-        period: 0.000018041674656364844 * ucum::M,
+        period: 0.000018041674656364844 * M,
         apodization: None,
       }),
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
-    // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
-    spd.signal.set_angles(0. *ucum::RAD, 0.03418771664291853 * ucum::RAD);
-    // spd.assign_optimum_theta();
+    // spdc_setup.signal.set_from_external_theta(3. * DEG, &spdc_setup.crystal_setup);
+    spdc_setup.signal.set_angles(0. *RAD, 0.03418771664291853 * RAD);
+    // spdc_setup.assign_optimum_theta();
 
     // FIXME This isn't matching.
-    spd.idler.set_angles(PI * ucum::RAD, 0.031789820056487665 * ucum::RAD);
-    spd.crystal_setup.theta = 1.5707963267948966 * RAD;
-    // spd.assign_optimum_idler();
-    spd.set_signal_waist_position(-0.0006311635856188344 * M);
-    spd.set_idler_waist_position(-0.0006311635856188344 * M);
+    spdc_setup.idler.set_angles(PI * RAD, 0.031789820056487665 * RAD);
+    spdc_setup.crystal_setup.theta = 1.5707963267948966 * RAD;
+    // spdc_setup.assign_optimum_idler();
+    spdc_setup.set_signal_waist_position(-0.0006311635856188344 * M);
+    spdc_setup.set_idler_waist_position(-0.0006311635856188344 * M);
 
     let jsa_units = JSAUnits::new(1.);
-    let amp = *(phasematch_coincidences( &spd ) / jsa_units);
+    let amp = *(phasematch_coincidences( &spdc_setup ) / jsa_units);
 
     let actual = amp;
     let expected = Complex::new(12188962614046546.0, 2293944114986065.5);
@@ -500,25 +502,25 @@ mod tests {
 
   #[test]
   fn phasematch_collinear_test(){
-    let spd = SPD {
+    let spdc_setup = SPDCSetup {
       fiber_coupling: false,
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
 
     let jsa_units = JSAUnits::new(1.);
-    let amp = *(phasematch_coincidences( &spd.to_collinear() ) / jsa_units);
+    let amp = *(phasematch_coincidences( &spdc_setup.to_collinear() ) / jsa_units);
     let actual = amp.re.powi(2) + amp.im.powi(2);
     let expected = 1.;
 
     /*
-    let zero = 0. * ucum::RAD;
-    let signal = Photon::signal(zero, zero, spd.signal.get_wavelength(), spd.signal.waist);
-    let idler = Photon::idler(zero, zero, spd.idler.get_wavelength(), spd.idler.waist);
+    let zero = 0. * RAD;
+    let signal = Photon::signal(zero, zero, spdc_setup.signal.get_wavelength(), spdc_setup.signal.waist);
+    let idler = Photon::idler(zero, zero, spdc_setup.idler.get_wavelength(), spdc_setup.idler.waist);
 
-    let mut spd_collinear = SPD {
+    let mut spd_collinear = SPDCSetup {
       signal,
       idler,
-      ..spd
+      ..spdc_setup
     };
 
     spd_collinear.assign_optimum_theta();

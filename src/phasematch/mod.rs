@@ -1,5 +1,8 @@
-use super::*;
-use dim::ucum::{C_, ONE, Unitless};
+use crate::spdc_setup::*;
+use crate::photon::*;
+use crate::*;
+use math::*;
+use dim::{ucum::{C_, ONE, Unitless}};
 
 // ensures that the Gaussian and sinc functions have the same widths.
 // ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
@@ -45,14 +48,15 @@ mod tests {
   use super::*;
   extern crate float_cmp;
   use float_cmp::*;
+  use dim::{f64prefixes::NANO, ucum::{M}};
 
   #[test]
   fn pump_spectrum_test() {
-    let mut spd = SPD::default();
-    spd.fiber_coupling = false;
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.fiber_coupling = false;
 
-    spd.signal.set_wavelength(1500. * NANO * M);
-    let actual = *pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+    spdc_setup.signal.set_wavelength(1500. * NANO * M);
+    let actual = *pump_spectrum(&spdc_setup.signal, &spdc_setup.idler, &spdc_setup.pump, spdc_setup.pump_bandwidth);
 
     let expected = 0.0003094554168558373;
 

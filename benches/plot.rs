@@ -6,7 +6,7 @@ use criterion::{black_box, Criterion};
 extern crate spdcalc;
 use spdcalc::{
   plotting::*,
-  spd::*,
+  spdc_setup::*,
   dim::{
     f64prefixes::*,
     ucum:: {
@@ -18,7 +18,7 @@ use spdcalc::{
 
 fn jsi(size : usize, fiber_coupling : bool) -> Vec<f64> {
 
-  let mut params = SPD::default();
+  let mut params = SPDCSetup::default();
 
   params.crystal_setup.crystal = Crystal::KTP;
   params.assign_optimum_periodic_poling();
@@ -37,7 +37,7 @@ fn jsi(size : usize, fiber_coupling : bool) -> Vec<f64> {
 }
 
 fn heralding_histogram_si(size: usize) -> Vec<HeraldingResults> {
-  let mut params = SPD::default();
+  let mut params = SPDCSetup::default();
 
   params.crystal_setup.crystal = Crystal::KTP;
   params.assign_optimum_periodic_poling();

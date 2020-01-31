@@ -1,25 +1,26 @@
-use crate::math::{fwhm_to_sigma, sq};
+use crate::math::*;
+use crate::*;
 use super::*;
-use dim::ucum::{RAD, M};
+use dim::ucum::{RAD, M, J, S};
 use num::{Complex, clamp};
 use std::cmp::max;
 
 /// Calculate the singles phasematching for the signal channel
 ///
-/// tip: for the idler, use `SPD.with_swapped_signal_idler()` to swap
+/// tip: for the idler, use `SPDCSetup.with_swapped_signal_idler()` to swap
 /// the signal and idler, then use that as an input.
-pub fn phasematch_singles(spd : &SPD) -> JSAUnits<Complex<f64>> {
+pub fn phasematch_singles(spdc_setup : &SPDCSetup) -> JSAUnits<Complex<f64>> {
 
   // calculate pump spectrum with original pump
-  let alpha = *pump_spectrum(&spd.signal, &spd.idler, &spd.pump, spd.pump_bandwidth);
+  let alpha = *pump_spectrum(&spdc_setup.signal, &spdc_setup.idler, &spdc_setup.pump, spdc_setup.pump_bandwidth);
 
-  if alpha < spd.pump_spectrum_threshold {
+  if alpha < spdc_setup.pump_spectrum_threshold {
     return JSAUnits::new(Complex::new(0., 0.));
   }
 
   // calculate singles with pump wavelength to match signal/idler
   // then ensure the fiber theta offsets are applied to signal and idler
-  let (pmz, pmt) = calc_singles_phasematch( &spd.with_phasematched_pump() );
+  let (pmz, pmt) = calc_singles_phasematch( &spdc_setup.with_phasematched_pump() );
   let h = pmt * pmz;
 
   // F_s = |\alpha(\omega_s + \omega_i)|^2 h(\omega_s, \omega_i).
@@ -27,40 +28,40 @@ pub fn phasematch_singles(spd : &SPD) -> JSAUnits<Complex<f64>> {
 }
 
 #[allow(non_snake_case)]
-fn calc_singles_phasematch(spd : &SPD) -> (Complex<f64>, f64) {
-  if spd.fiber_coupling {
-    return calc_singles_phasematch_fiber_coupling(spd);
+fn calc_singles_phasematch(spdc_setup : &SPDCSetup) -> (Complex<f64>, f64) {
+  if spdc_setup.fiber_coupling {
+    return calc_singles_phasematch_fiber_coupling(spdc_setup);
   }
 
   // crystal length
-  let L = *(spd.crystal_setup.length / ucum::M);
+  let L = *(spdc_setup.crystal_setup.length / M);
 
-  let delk = *(spd.calc_delta_k() / ucum::J / ucum::S);
+  let delk = *(spdc_setup.calc_delta_k() / J / S);
   let arg = L * 0.5 * delk.z;
   // no fiber coupling
   let pmz = Complex::new(sinc(arg), 0.);
-  let waist = *(spd.pump.waist / ucum::M);
+  let waist = *(spdc_setup.pump.waist / M);
   let pmt = f64::exp(-0.5 * ((delk.x * waist.x).powi(2) + (delk.y * waist.y).powi(2)));
 
   (pmz, pmt)
 }
 
 #[allow(non_snake_case)]
-fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
+fn calc_singles_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Complex<f64>, f64) {
   // crystal length
   let M2 = M * M; // meters squared
-  let L = spd.crystal_setup.length;
+  let L = spdc_setup.crystal_setup.length;
 
-  let theta_s = *(spd.signal.get_theta() / RAD);
-  let phi_s = *(spd.signal.get_phi() / RAD);
-  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_s = *(spdc_setup.signal.get_theta() / RAD);
+  let phi_s = *(spdc_setup.signal.get_phi() / RAD);
+  let theta_s_e = *(spdc_setup.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
 
   // Height of the collected spots from the axis.
   let hs = L * 0.5 * f64::tan(theta_s) * f64::cos(phi_s);
 
-  let Wp = *(spd.pump.waist / M);
+  let Wp = *(spdc_setup.pump.waist / M);
   let Wp_SQ = (Wp.x * Wp.y) * M * M;
-  let Ws = *(spd.signal.waist / M);
+  let Ws = *(spdc_setup.signal.waist / M);
   let Ws_SQ = (Ws.x * Ws.y) * M * M;
 
   let ellipticity = 1.0_f64;
@@ -68,12 +69,12 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
   let Wy_SQ = Wp_SQ;
 
   // Is this the k vector along the direction of propagation?
-  let n_p = spd.pump.get_index(&spd.crystal_setup);
-  let n_s = spd.signal.get_index(&spd.crystal_setup);
-  let n_i = spd.idler.get_index(&spd.crystal_setup);
-  let k_p = PI2 * n_p / spd.pump.get_wavelength();
-  let k_s = PI2 * n_s / spd.signal.get_wavelength(); //  * f64::cos(theta_s),
-  let k_i = PI2 * n_i / spd.idler.get_wavelength(); // * f64::cos(theta_i)
+  let n_p = spdc_setup.pump.get_index(&spdc_setup.crystal_setup);
+  let n_s = spdc_setup.signal.get_index(&spdc_setup.crystal_setup);
+  let n_i = spdc_setup.idler.get_index(&spdc_setup.crystal_setup);
+  let k_p = PI2 * n_p / spdc_setup.pump.get_wavelength();
+  let k_s = PI2 * n_s / spdc_setup.signal.get_wavelength(); //  * f64::cos(theta_s),
+  let k_i = PI2 * n_i / spdc_setup.idler.get_wavelength(); // * f64::cos(theta_i)
 
   // TODO: ask krister... is this really sec^2 ????
   let PHI_s = f64::cos(theta_s_e).powi(-2); // External angle for the signal???? Is PHI_s z component?
@@ -82,9 +83,9 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
   // let PSI_i = (k_i / n_i) * f64::sin(theta_i_e) * f64::cos(phi_i);
 
   let z0 = 0. * M; //put pump in middle of the crystal
-  let z0s = spd.get_signal_waist_position();
+  let z0s = spdc_setup.get_signal_waist_position();
 
-  let RHOpx = *(spd.calc_pump_walkoff() / RAD);
+  let RHOpx = *(spdc_setup.calc_pump_walkoff() / RAD);
 
   // Now put the waist of the signal & idler at the center fo the crystal.
   // W = Wfi.*sqrt( 1 + 2.*1i.*(zi+hi.*sin(thetai_f))./(kif.*Wfi^2));
@@ -107,7 +108,7 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
   let DEL1s = DEL2s * PHI_s; // 1e-9
   let DEL3s = -hs - zhs * PHI_s * SIN_THETA_s_e * COS_PHI_s; // 1e-11
   let KpKs = *(k_p * k_s * M2); // exact
-  let pp_factor = spd.pp.map_or(0., |p| p.pp_factor());
+  let pp_factor = spdc_setup.pp.map_or(0., |p| p.pp_factor());
 
   let dksi = k_s + k_i + PI2 * pp_factor / M;
   let C7 = k_p - dksi; // 1e-7
@@ -218,7 +219,7 @@ fn calc_singles_phasematch_fiber_coupling(spd : &SPD) -> (Complex<f64>, f64) {
     // Take into account apodized crystals
     // Apodization 1/e^2
     // @TODO: From krister: Not sure how to correctly handle the apodization in the double length integral
-    let pmzcoeff = spd.pp.map_or(
+    let pmzcoeff = spdc_setup.pp.map_or(
       // if no periodic poling return 1.
       1.,
       // otherwise check apodization
@@ -264,30 +265,30 @@ mod tests {
 
   #[test]
   fn phasematch_singles_test(){
-    let mut spd = SPD::default();
-    spd.fiber_coupling = true;
-    spd.crystal_setup.theta = 0.5515891191131287 * ucum::RAD;
-    // spd.signal.set_from_external_theta(0.0523598775598298 * ucum::RAD, &spd.crystal_setup);
-    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
-    // spd.assign_optimum_idler();
-    // spd.assign_optimum_theta();
-    spd.idler.set_angles(PI * ucum::RAD, 0.03178987094602039 * ucum::RAD);
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.fiber_coupling = true;
+    spdc_setup.crystal_setup.theta = 0.5515891191131287 * RAD;
+    // spdc_setup.signal.set_from_external_theta(0.0523598775598298 * RAD, &spdc_setup.crystal_setup);
+    spdc_setup.signal.set_angles(0. *RAD, 0.03253866877817829 * RAD);
+    // spdc_setup.assign_optimum_idler();
+    // spdc_setup.assign_optimum_theta();
+    spdc_setup.idler.set_angles(PI * RAD, 0.03178987094602039 * RAD);
 
-    spd.set_signal_waist_position(-0.0007348996031796276 * M);
-    spd.set_idler_waist_position(-0.0007348996031796276 * M);
+    spdc_setup.set_signal_waist_position(-0.0007348996031796276 * M);
+    spdc_setup.set_idler_waist_position(-0.0007348996031796276 * M);
 
     let jsa_units = JSAUnits::new(1.);
-    let amp = *(phasematch_singles( &spd ) / jsa_units);
+    let amp = *(phasematch_singles( &spdc_setup ) / jsa_units);
 
-    // let amp_pm_tz = calc_singles_phasematch( &spd );
-    // let delk = spd.calc_delta_k();
+    // let amp_pm_tz = calc_singles_phasematch( &spdc_setup );
+    // let delk = spdc_setup.calc_delta_k();
     //
-    // println!("n_p: {}", spd.pump.get_index(&spd.crystal_setup));
-    // println!("n_s: {}", spd.signal.get_index(&spd.crystal_setup));
-    // println!("n_i: {}", spd.idler.get_index(&spd.crystal_setup));
+    // println!("n_p: {}", spdc_setup.pump.get_index(&spdc_setup.crystal_setup));
+    // println!("n_s: {}", spdc_setup.signal.get_index(&spdc_setup.crystal_setup));
+    // println!("n_i: {}", spdc_setup.idler.get_index(&spdc_setup.crystal_setup));
     //
-    // println!("{:#?}", spd);
-    // println!("{}", *(delk / ucum::J / ucum::S));
+    // println!("{:#?}", spdc_setup);
+    // println!("{}", *(delk / J / S));
     //
     // println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
     // println!("phasematch singles {}", amp);
@@ -315,38 +316,38 @@ mod tests {
 
   #[test]
   fn phasematch_singles_pp_test(){
-    let mut spd = SPD {
+    let mut spdc_setup = SPDCSetup {
       fiber_coupling: true,
       pp: Some(PeriodicPoling {
         sign: Sign::NEGATIVE,
-        period: 0.000018041674656364844 * ucum::M,
+        period: 0.000018041674656364844 * M,
         apodization: None,
       }),
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
-    // spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
-    spd.signal.set_angles(0. *ucum::RAD, 0.0341877166429185 * ucum::RAD);
-    // spd.assign_optimum_idler();
-    // spd.assign_optimum_theta();
+    // spdc_setup.signal.set_from_external_theta(3. * DEG, &spdc_setup.crystal_setup);
+    spdc_setup.signal.set_angles(0. *RAD, 0.0341877166429185 * RAD);
+    // spdc_setup.assign_optimum_idler();
+    // spdc_setup.assign_optimum_theta();
 
     // FIXME This isn't matching.
-    spd.idler.set_angles(PI * ucum::RAD, 0.031789820056487665 * ucum::RAD);
-    spd.crystal_setup.theta = 1.5707963267948966 * ucum::RAD;
-    spd.set_signal_waist_position(-0.0006311635856188344 * M);
-    spd.set_idler_waist_position(-0.0006311635856188344 * M);
+    spdc_setup.idler.set_angles(PI * RAD, 0.031789820056487665 * RAD);
+    spdc_setup.crystal_setup.theta = 1.5707963267948966 * RAD;
+    spdc_setup.set_signal_waist_position(-0.0006311635856188344 * M);
+    spdc_setup.set_idler_waist_position(-0.0006311635856188344 * M);
 
     let jsa_units = JSAUnits::new(1.);
-    let amp = *(phasematch_singles( &spd ) / jsa_units);
+    let amp = *(phasematch_singles( &spdc_setup ) / jsa_units);
 
-    // let amp_pm_tz = calc_singles_phasematch( &spd );
-    // let delk = spd.calc_delta_k();
+    // let amp_pm_tz = calc_singles_phasematch( &spdc_setup );
+    // let delk = spdc_setup.calc_delta_k();
     //
-    // println!("n_p: {}", spd.pump.get_index(&spd.crystal_setup));
-    // println!("n_s: {}", spd.signal.get_index(&spd.crystal_setup));
-    // println!("n_i: {}", spd.idler.get_index(&spd.crystal_setup));
+    // println!("n_p: {}", spdc_setup.pump.get_index(&spdc_setup.crystal_setup));
+    // println!("n_s: {}", spdc_setup.signal.get_index(&spdc_setup.crystal_setup));
+    // println!("n_i: {}", spdc_setup.idler.get_index(&spdc_setup.crystal_setup));
     //
-    // println!("{:#?}", spd);
-    // println!("{}", *(delk / ucum::J / ucum::S));
+    // println!("{:#?}", spdc_setup);
+    // println!("{}", *(delk / J / S));
     //
     // println!("pmtz {} {}", amp_pm_tz.0, amp_pm_tz.1);
     // println!("phasematch singles {}", amp);

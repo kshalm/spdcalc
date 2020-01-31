@@ -1,5 +1,6 @@
+use crate::computations::*;
 use super::*;
-use spd::*;
+use spdc_setup::*;
 use num::Complex;
 use math::SimpsonIntegration2D;
 use dim::{
@@ -9,7 +10,7 @@ use dim::{
 /// Hong–Ou–Mandel coincidence rate plot
 #[allow(non_snake_case)]
 pub fn calc_HOM_rate_series(
-  spd : &SPD,
+  spdc_setup : &SPDCSetup,
   time_shift : Steps<Time>,
   ls_range : (Wavelength, Wavelength),
   li_range : (Wavelength, Wavelength),
@@ -25,9 +26,9 @@ pub fn calc_HOM_rate_series(
   let jsa_units = JSAUnits::new(1.);
   // calculate the jsa values once for each integrand
   // signal, idler
-  let jsa_si : Vec<Complex<f64>> = iter.clone().map(|(ls, li)| *(calc_jsa( &spd, ls, li ) / jsa_units)).collect();
+  let jsa_si : Vec<Complex<f64>> = iter.clone().map(|(ls, li)| *(calc_jsa( &spdc_setup, ls, li ) / jsa_units)).collect();
   // idler, signal
-  let jsa_is : Vec<Complex<f64>> = iter.map(|(ls, li)| *(calc_jsa( &spd, li, ls ) / jsa_units)).collect();
+  let jsa_is : Vec<Complex<f64>> = iter.map(|(ls, li)| *(calc_jsa( &spdc_setup, li, ls ) / jsa_units)).collect();
 
   let x_range = (*(ls_range.0 / M), *(ls_range.1 / M));
   let y_range = (*(li_range.0 / M), *(li_range.1 / M));
@@ -65,20 +66,20 @@ mod tests {
 
   #[test]
   fn calc_hom_test() {
-    let mut spd = SPD {
+    let mut spdc_setup = SPDCSetup {
       fiber_coupling: true,
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
 
-    spd.crystal_setup.crystal = crystal::Crystal::KTP;
-    spd.assign_optimum_theta();
+    spdc_setup.crystal_setup.crystal = crystal::Crystal::KTP;
+    spdc_setup.assign_optimum_theta();
 
     let ls_range = (0.000001450 * M, 0.000001750 * M);
     let li_range = (0.000001450 * M, 0.000001750 * M);
 
     let divisions = 100;
     let steps = 100;
-    let rates = calc_HOM_rate_series(&spd, Steps(-300e-15 * S, 300e-15 * S, steps), ls_range, li_range, divisions);
+    let rates = calc_HOM_rate_series(&spdc_setup, Steps(-300e-15 * S, 300e-15 * S, steps), ls_range, li_range, divisions);
 
     // println!("rate: {:#?}", rates);
 

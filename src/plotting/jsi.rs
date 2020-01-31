@@ -1,5 +1,7 @@
 use super::*;
-use spd::*;
+use spdc_setup::*;
+use computations::*;
+use phasematch::*;
 use math::{nelder_mead_1d};
 use dim::{
   ucum::{M},
@@ -7,14 +9,14 @@ use dim::{
 
 /// Create a JSI plot
 /// if no normalization is provided, it will automatically calculate it
-pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
+pub fn plot_jsi(spdc_setup : &SPDCSetup, cfg : &HistogramConfig<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
-  let norm_amp = norm.unwrap_or_else(|| calc_jsa_normalization(&spd));
+  let norm_amp = norm.unwrap_or_else(|| calc_jsa_normalization(&spdc_setup));
 
   cfg
     .into_iter()
     .map(|(l_s, l_i)| {
-      let amplitude = calc_jsa(&spd, l_s, l_i);
+      let amplitude = calc_jsa(&spdc_setup, l_s, l_i);
 
       // intensity
       (amplitude / norm_amp).norm_sqr()
@@ -24,14 +26,14 @@ pub fn plot_jsi(spd : &SPD, cfg : &HistogramConfig<Wavelength>, norm : Option<JS
 
 /// Create a singles JSI plot for the signal (tip: swap signal/idler if you want idler jsi)
 /// if no normalization is provided, it will automatically calculate it
-pub fn plot_jsi_singles(spd : &SPD, cfg : &HistogramConfig<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
+pub fn plot_jsi_singles(spdc_setup : &SPDCSetup, cfg : &HistogramConfig<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
-  let norm_amp = norm.unwrap_or_else(|| calc_jsa_singles_normalization(&spd));
+  let norm_amp = norm.unwrap_or_else(|| calc_jsa_singles_normalization(&spdc_setup));
 
   cfg
     .into_iter()
     .map(|(l_s, l_i)| {
-      let amplitude = calc_jsa_singles(&spd, l_s, l_i);
+      let amplitude = calc_jsa_singles(&spdc_setup, l_s, l_i);
 
       // intensity
       (amplitude / norm_amp).norm_sqr()
@@ -44,24 +46,24 @@ fn get_recip_wavelength( w : f64, l_p : f64 ) -> f64 {
 }
 
 /// Automatically calculate the ranges for creating a JSI based on the
-/// spd parameters and a specified threshold
-pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> HistogramConfig<Wavelength> {
+/// spdc_setup parameters and a specified threshold
+pub fn calc_plot_config_for_jsi( spdc_setup : &SPDCSetup, size : usize, threshold : f64 ) -> HistogramConfig<Wavelength> {
 
   let jsa_units = JSAUnits::new(1.);
-  let l_p = *(spd.pump.get_wavelength() / M);
-  let l_s = *(spd.signal.get_wavelength() / M);
+  let l_p = *(spdc_setup.pump.get_wavelength() / M);
+  let l_s = *(spdc_setup.signal.get_wavelength() / M);
 
-  let mut spd = spd.clone();
-  spd.assign_optimum_idler();
-  let peak = (*(phasematch_coincidences_gaussian_approximation(&spd) / jsa_units)).norm_sqr();
+  let mut spdc_setup = spdc_setup.clone();
+  spdc_setup.assign_optimum_idler();
+  let peak = (*(phasematch_coincidences_gaussian_approximation(&spdc_setup) / jsa_units)).norm_sqr();
   let target = threshold * peak;
 
   let pm_diff = |l_s| {
-    let mut spd = spd.clone();
-    spd.signal.set_wavelength( l_s * M );
-    // spd.assign_optimum_idler();
+    let mut spdc_setup = spdc_setup.clone();
+    spdc_setup.signal.set_wavelength( l_s * M );
+    // spdc_setup.assign_optimum_idler();
 
-    let local = (*(phasematch_coincidences_gaussian_approximation(&spd) / jsa_units)).norm_sqr();
+    let local = (*(phasematch_coincidences_gaussian_approximation(&spdc_setup) / jsa_units)).norm_sqr();
     if local < std::f64::EPSILON {
       std::f64::MAX
     } else {
@@ -74,7 +76,7 @@ pub fn calc_plot_config_for_jsi( spd : &SPD, size : usize, threshold : f64 ) -> 
   let ans = nelder_mead_1d(pm_diff, guess, 1000, std::f64::MIN, l_s, 1e-12);
 
   // FIXME WHAT ARE THESE NUMBERS
-  // let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spd.pump_bandwidth / (NANO * M))).min(35e-9);
+  // let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spdc_setup.pump_bandwidth / (NANO * M))).min(35e-9);
   let diff = (ans - l_s).abs(); //.min(diff_max);
   // println!("l_s {}, diff {}", l_s, diff);
   // println!("target {}, jsi(ans) {}", target, pm_diff(ans));
@@ -111,21 +113,21 @@ mod tests {
 
   #[test]
   fn plot_jsi_test() {
-    let mut spd = SPD {
+    let mut spdc_setup = SPDCSetup {
       fiber_coupling: true,
       pp: Some(PeriodicPoling {
         sign: Sign::POSITIVE,
         period: 52.56968559402202 * MICRO * ucum::M,
         apodization: None,
       }),
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
 
-    spd.crystal_setup.crystal = Crystal::BBO_1;
-    spd.crystal_setup.theta = 0. * ucum::DEG;
+    spdc_setup.crystal_setup.crystal = Crystal::BBO_1;
+    spdc_setup.crystal_setup.theta = 0. * ucum::DEG;
 
-    spd.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
-    spd.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
+    spdc_setup.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
+    spdc_setup.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
 
     let cfg = HistogramConfig {
       x_range : (1500. * NANO * M, 1600. * NANO * M),
@@ -135,7 +137,7 @@ mod tests {
       y_count : 10,
     };
 
-    let data = plot_jsi(&spd, &cfg, None);
+    let data = plot_jsi(&spdc_setup, &cfg, None);
 
     assert_eq!(
       data.len(),
@@ -145,16 +147,16 @@ mod tests {
 
   #[test]
   fn calc_plot_config_for_jsi_test(){
-    let mut spd = SPD {
+    let mut spdc_setup = SPDCSetup {
       fiber_coupling: true,
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
 
-    spd.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
-    spd.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
-    spd.assign_optimum_theta();
+    spdc_setup.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
+    spdc_setup.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
+    spdc_setup.assign_optimum_theta();
 
-    let ranges = calc_plot_config_for_jsi(&spd, 100, 0.5);
+    let ranges = calc_plot_config_for_jsi(&spdc_setup, 100, 0.5);
 
     // println!("{:#?}", ranges);
 

@@ -1,7 +1,7 @@
 // extern crate spdcalc;
 // use spdcalc::{
 //   plotting::*,
-//   spd::*,
+//   spdc_setup::*,
 //   dim::{
 //     f64prefixes::*,
 //   },
@@ -19,7 +19,7 @@
 
 // fn jsi(size : usize, fiber_coupling : bool) -> Vec<f64> {
 //
-//   let mut params = SPD::default();
+//   let mut params = SPDCSetup::default();
 //
 //   params.crystal_setup.crystal = Crystal::KTP;
 //   params.assign_optimum_periodic_poling();

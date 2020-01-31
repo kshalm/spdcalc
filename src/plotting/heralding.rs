@@ -1,5 +1,6 @@
+use crate::computations::*;
 use super::*;
-use spd::*;
+use spdc_setup::*;
 use std::f64::consts::{SQRT_2};
 use math::{fwhm_to_sigma, sq};
 use na::Vector2;
@@ -11,7 +12,7 @@ derived!(ucum, UCUM: RateConstUnits = Meter * Meter * Meter * Meter * Second * S
 /// Calculates \eta = \frac{2 \sqrt{2}}{\sqrt{\pi}} \frac{\mathbb{K}^2 d_{eff}^2 A_m^2}{\epsilon_0 c^3} (W_{sf}^2\sec\theta_{sf} ) \frac{W_{0x}W_{0y} L^2 P_{av}}{\sigma}.
 /// with units m^6 s^3
 #[allow(non_snake_case)]
-fn calc_rate_constant(spd : &SPD) -> RateConstUnits<f64> {
+fn calc_rate_constant(spdc_setup : &SPDCSetup) -> RateConstUnits<f64> {
   let PI2c = PI2 * C_;
   // K degeneracy factor (nonlinear polarization).
   // K = 1 for non-degenerate emission frequencies.
@@ -24,20 +25,20 @@ fn calc_rate_constant(spd : &SPD) -> RateConstUnits<f64> {
     * degeneracy_factor.powi(2)
     * periodic_poling_coeff.powi(2) / (EPS_0 * C_ * C_ * C_);
 
-  let p_bw = spd.pump_bandwidth;
-  let lamda_p = spd.pump.get_wavelength();
+  let p_bw = spdc_setup.pump_bandwidth;
+  let lamda_p = spdc_setup.pump.get_wavelength();
   // TODO: ask krister why there's a factor of 2 here again. and why we're doing this for sigma
   let sigma = 2. * fwhm_to_sigma(PI2c * (
     1. / (lamda_p - 0.5 * p_bw)
     - 1. / (lamda_p + 0.5 * p_bw)
   ));
 
-  let Wp = *(spd.pump.waist / M);
+  let Wp = *(spdc_setup.pump.waist / M);
   let Wp_SQ = (Wp.x * Wp.y) * M * M;
 
-  let L = spd.crystal_setup.length;
-  let Pav = spd.pump_average_power;
-  let deff = spd.crystal_setup.crystal.get_effective_nonlinear_coefficient();
+  let L = spdc_setup.crystal_setup.length;
+  let Pav = spdc_setup.pump_average_power;
+  let deff = spdc_setup.crystal_setup.crystal.get_effective_nonlinear_coefficient();
 
   constants * sq(deff) * Wp_SQ * sq(L) * Pav / sigma
 }
@@ -46,27 +47,27 @@ derived!(ucum, UCUM: CoincRateConstUnits = Meter * Meter * Meter * Meter * Meter
 /// Calculates \eta = \frac{2 \sqrt{2}}{\sqrt{\pi}} \frac{\mathbb{K}^2 d_{eff}^2 A_m^2}{\epsilon_0 c^3} (W_{sf}^2\sec\theta_{sf} ) (W_{if}^2\sec\theta_{if}) \frac{W_{0x}W_{0y} L^2 P_{av}}{\sigma}.
 /// with units (m^8 s^3)
 #[allow(non_snake_case)]
-fn calc_coincidence_rate_constant(spd : &SPD) -> CoincRateConstUnits<f64> {
-  let Ws = *(spd.signal.waist / M);
+fn calc_coincidence_rate_constant(spdc_setup : &SPDCSetup) -> CoincRateConstUnits<f64> {
+  let Ws = *(spdc_setup.signal.waist / M);
   let Ws_SQ = (Ws.x * Ws.y) * M * M;
-  let Wi = *(spd.idler.waist / M);
+  let Wi = *(spdc_setup.idler.waist / M);
   let Wi_SQ = (Wi.x * Wi.y) * M * M;
-  let theta_i_e = *(spd.idler.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_i_e = *(spdc_setup.idler.get_external_theta(&spdc_setup.crystal_setup) / RAD);
   let sec_i = 1. / f64::cos(theta_i_e);
-  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_s_e = *(spdc_setup.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
   let sec_s = 1. / f64::cos(theta_s_e);
 
-  calc_rate_constant(&spd) * (Ws_SQ * sec_s) * (Wi_SQ * sec_i)
+  calc_rate_constant(&spdc_setup) * (Ws_SQ * sec_s) * (Wi_SQ * sec_i)
 }
 
 derived!(ucum, UCUM: JacobianDetUnits = Unitless / Second / Second );
 // Used for coordinate transformation in double integrals
 // l(\omega_s, \omega_i) = \frac{\omega_s \omega_i}{n_s^2(\omega_s) n_i^2(\omega_i)}
 // but we input wavelengths
-fn calc_jacobian_det_lambda_to_omega(l_s : Wavelength, l_i : Wavelength, spd : &SPD) -> JacobianDetUnits<f64> {
+fn calc_jacobian_det_lambda_to_omega(l_s : Wavelength, l_i : Wavelength, spdc_setup : &SPDCSetup) -> JacobianDetUnits<f64> {
   let pi2c = PI2 * C_;
-  let n_s = spd.crystal_setup.get_index_along(l_s, spd.signal.get_direction(), &spd.signal.get_type());
-  let n_i = spd.crystal_setup.get_index_along(l_i, spd.idler.get_direction(), &spd.idler.get_type());
+  let n_s = spdc_setup.crystal_setup.get_index_along(l_s, spdc_setup.signal.get_direction(), &spdc_setup.signal.get_type());
+  let n_i = spdc_setup.crystal_setup.get_index_along(l_i, spdc_setup.idler.get_direction(), &spdc_setup.idler.get_type());
   let denominator = l_s * l_i * sq(n_s * n_i);
   pi2c * pi2c / denominator
 }
@@ -74,28 +75,28 @@ fn calc_jacobian_det_lambda_to_omega(l_s : Wavelength, l_i : Wavelength, spd : &
 /// Calculate the coincidence rates per unit wavelength * wavelength.
 /// Integrating over all wavelengths (all array items) will give total coincidence rate.
 #[allow(non_snake_case)]
-pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Iterator2D<Wavelength>) -> Vec<Hertz<f64>> {
+pub fn calc_coincidences_rate_distribution(spdc_setup : &SPDCSetup, wavelength_range : &Iterator2D<Wavelength>) -> Vec<Hertz<f64>> {
 
   let PI2c = PI2 * C_;
 
-  let Ws = *(spd.signal.waist / M);
-  let Wi = *(spd.idler.waist / M);
+  let Ws = *(spdc_setup.signal.waist / M);
+  let Wi = *(spdc_setup.idler.waist / M);
 
   if Ws.x == 0. || Ws.y == 0. || Wi.x == 0. || Wi.y == 0. {
     return vec![0. / S; wavelength_range.len()];
   }
 
   // apply angle adjustments for offset fiber theta
-  let spd = spd.with_fiber_theta_offsets_applied();
+  let spdc_setup = spdc_setup.with_fiber_theta_offsets_applied();
 
-  // let n_p = spd.pump.get_index(&spd.crystal_setup);
+  // let n_p = spdc_setup.pump.get_index(&spdc_setup.crystal_setup);
 
   // NOTE: original version incorrectly computed the step size.
   // originally it was (x_f - x_i) / n_{points}, which should be (x_f - x_i / (n-1))
   let dlamda_s = wavelength_range.get_dx();
   let dlamda_i = wavelength_range.get_dy();
 
-  let eta = calc_coincidence_rate_constant(&spd);
+  let eta = calc_coincidence_rate_constant(&spdc_setup);
 
   // NOTE: moving this inside the integral and using running lamda values
   // results in efficiency change of ~0.01%
@@ -106,9 +107,9 @@ pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Itera
     .map(|(l_s, l_i)| {
       let d_omega_s = PI2c * dlamda_s / sq(l_s);
       let d_omega_i = PI2c * dlamda_i / sq(l_i);
-      let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spd);
+      let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spdc_setup);
       let factor = eta * lomega * d_omega_s * d_omega_i;
-      let amplitude = calc_jsa(&spd, l_s, l_i) / jsa_units;
+      let amplitude = calc_jsa(&spdc_setup, l_s, l_i) / jsa_units;
 
       amplitude.norm_sqr() * sq(jsa_units) * factor
     })
@@ -119,12 +120,12 @@ pub fn calc_coincidences_rate_distribution(spd : &SPD, wavelength_range : &Itera
 /// Integrating over all wavelengths (all array items) will give total singles rate.
 /// technically this distribution has units of 1/(s m^2).. but we return 1/s
 #[allow(non_snake_case)]
-pub fn calc_singles_rate_distribution_signal(spd : &SPD, wavelength_range : &Iterator2D<Wavelength>) -> Vec<Hertz<f64>> {
+pub fn calc_singles_rate_distribution_signal(spdc_setup : &SPDCSetup, wavelength_range : &Iterator2D<Wavelength>) -> Vec<Hertz<f64>> {
 
   let PI2c = PI2 * C_;
 
-  let Ws = *(spd.signal.waist / M);
-  let Wi = *(spd.idler.waist / M);
+  let Ws = *(spdc_setup.signal.waist / M);
+  let Wi = *(spdc_setup.idler.waist / M);
 
   // TODO: ask krister, why are we squaring waist like this?
   let Ws_SQ = (Ws.x * Ws.y) * M * M;
@@ -136,22 +137,22 @@ pub fn calc_singles_rate_distribution_signal(spd : &SPD, wavelength_range : &Ite
   }
 
   // apply fiber offset theta for the signal only
-  let mut spd = spd.with_signal_fiber_theta_offsets_applied();
+  let mut spdc_setup = spdc_setup.with_signal_fiber_theta_offsets_applied();
   // place the idler at the correct angle for this adjusted signal position
   // because we want to have a "bucket collector" at the idler channel
   // to collect all modes
-  spd.assign_optimum_idler();
+  spdc_setup.assign_optimum_idler();
 
-  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_s_e = *(spdc_setup.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
 
-  // let n_p = spd.pump.get_index(&spd.crystal_setup);
+  // let n_p = spdc_setup.pump.get_index(&spdc_setup.crystal_setup);
   let PHI_s = 1. / f64::cos(theta_s_e);
 
   let scale_s = Ws_SQ * PHI_s;
   let dlamda_s = wavelength_range.get_dx();
   let dlamda_i = wavelength_range.get_dy();
 
-  let eta_s = calc_rate_constant(&spd);
+  let eta_s = calc_rate_constant(&spdc_setup);
 
   let jsa_units = JSAUnits::new(1.);
 
@@ -160,11 +161,11 @@ pub fn calc_singles_rate_distribution_signal(spd : &SPD, wavelength_range : &Ite
       let d_omega_s = PI2c * dlamda_s / sq(l_s);
       let d_omega_i = PI2c * dlamda_i / sq(l_i);
 
-      let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spd);
+      let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spdc_setup);
       let f = eta_s * d_omega_s * d_omega_i * lomega;
       let factor_s = scale_s * f;
 
-      let amplitude_s = *(calc_jsa_singles(&spd, l_s, l_i) / jsa_units);
+      let amplitude_s = *(calc_jsa_singles(&spdc_setup, l_s, l_i) / jsa_units);
       // technically this distribution has units of 1/(s m^2).. but we return 1/s
       amplitude_s.norm() * factor_s * jsa_units / M / M
     })
@@ -175,12 +176,12 @@ pub fn calc_singles_rate_distribution_signal(spd : &SPD, wavelength_range : &Ite
 /// Integrating over all wavelengths (all array items) will give total singles rate.
 /// technically this distribution has units of 1/(s m^2).. but we return 1/s
 #[allow(non_snake_case)]
-pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2D<Wavelength>) -> Vec<(Hertz<f64>, Hertz<f64>)> {
+pub fn calc_singles_rate_distributions(spdc_setup : &SPDCSetup, wavelength_range : &Iterator2D<Wavelength>) -> Vec<(Hertz<f64>, Hertz<f64>)> {
 
   let PI2c = PI2 * C_;
 
-  let Ws = *(spd.signal.waist / M);
-  let Wi = *(spd.idler.waist / M);
+  let Ws = *(spdc_setup.signal.waist / M);
+  let Wi = *(spdc_setup.idler.waist / M);
 
   // TODO: ask krister, why are we squaring waist like this?
   let Ws_SQ = (Ws.x * Ws.y) * M * M;
@@ -191,15 +192,15 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
     return vec![(0. / S, 0. / S); wavelength_range.len()];
   }
 
-  // spd copy with signal and idler swapped
-  let mut spd_swap = spd.with_swapped_signal_idler();
+  // spdc_setup copy with signal and idler swapped
+  let mut spd_swap = spdc_setup.with_swapped_signal_idler();
 
   // apply fiber offset theta for the signal only
-  let mut spd = spd.with_signal_fiber_theta_offsets_applied();
+  let mut spdc_setup = spdc_setup.with_signal_fiber_theta_offsets_applied();
   // place the idler at the correct angle for this adjusted signal position
   // because we want to have a "bucket collector" at the idler channel
   // to collect all modes
-  spd.assign_optimum_idler();
+  spdc_setup.assign_optimum_idler();
 
   // remember... spd_swap has signal and idler swapped...
   spd_swap = spd_swap.with_signal_fiber_theta_offsets_applied();
@@ -209,19 +210,19 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
   spd_swap.assign_optimum_idler();
 
   // constants that work for both channels...
-  // let n_p = spd.pump.get_index(&spd.crystal_setup);
+  // let n_p = spdc_setup.pump.get_index(&spdc_setup.crystal_setup);
   let dlamda_s = wavelength_range.get_dx();
   let dlamda_i = wavelength_range.get_dy();
-  let eta_s = calc_rate_constant(&spd);
+  let eta_s = calc_rate_constant(&spdc_setup);
 
   let jsa_units = JSAUnits::new(1.);
 
   // constants for signal or idler channel
-  let theta_s_e = *(spd.signal.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_s_e = *(spdc_setup.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
   let PHI_s = 1. / f64::cos(theta_s_e);
 
   // spd_swap.signal is idler
-  let theta_i_e = *(spd_swap.signal.get_external_theta(&spd.crystal_setup) / RAD);
+  let theta_i_e = *(spd_swap.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
   let PHI_i = 1. / f64::cos(theta_i_e);
 
   let scale_s = Ws_SQ * PHI_s;
@@ -234,13 +235,13 @@ pub fn calc_singles_rate_distributions(spd : &SPD, wavelength_range : &Iterator2
 
       let f = eta_s * d_omega_s * d_omega_i;
 
-      let lomega_s = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spd);
+      let lomega_s = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spdc_setup);
       let factor_s = scale_s * lomega_s * f;
 
       let lomega_i = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spd_swap);
       let factor_i = scale_i * lomega_i * f;
 
-      let amplitude_s = *(calc_jsa_singles(&spd, l_s, l_i) / jsa_units);
+      let amplitude_s = *(calc_jsa_singles(&spdc_setup, l_s, l_i) / jsa_units);
       let amplitude_i = *(calc_jsa_singles(&spd_swap, l_s, l_i) / jsa_units);
       // technically this distribution has units of 1/(s m^2).. but we return 1/s
       (
@@ -301,10 +302,10 @@ impl HeraldingResults {
   }
 }
 
-/// Get the heralding results for a given spd setup and signal/idler wavelength range
-pub fn calc_heralding_results(spd : &SPD, wavelength_range : &HistogramConfig<Wavelength>) -> HeraldingResults {
-  let coincidences_rate_distribution = calc_coincidences_rate_distribution(&spd, &wavelength_range.into_iter());
-  let singles_rate_distributions = calc_singles_rate_distributions(&spd, &wavelength_range.into_iter());
+/// Get the heralding results for a given spdc_setup setup and signal/idler wavelength range
+pub fn calc_heralding_results(spdc_setup : &SPDCSetup, wavelength_range : &HistogramConfig<Wavelength>) -> HeraldingResults {
+  let coincidences_rate_distribution = calc_coincidences_rate_distribution(&spdc_setup, &wavelength_range.into_iter());
+  let singles_rate_distributions = calc_singles_rate_distributions(&spdc_setup, &wavelength_range.into_iter());
 
   HeraldingResults::from_distributions(
     coincidences_rate_distribution,
@@ -315,18 +316,18 @@ pub fn calc_heralding_results(spd : &SPD, wavelength_range : &HistogramConfig<Wa
 /// Calculate the count rates, and efficiencies for signal, idler singles and coincidences
 /// as well as the efficiencies over a range of signal/idler waist sizes.
 pub fn plot_heralding_results_by_signal_idler_waist(
-  spd : &SPD,
+  spdc_setup : &SPDCSetup,
   si_waists : &HistogramConfig<Meter<f64>>,
   wavelength_range : &HistogramConfig<Wavelength>
 ) -> Vec<HeraldingResults> {
   si_waists
     .into_iter()
     .map(|(ws, wi)| {
-      let mut spd = spd.clone();
-      spd.signal.waist = Meter::new(Vector2::new(*(ws / M), *(ws / M)));
-      spd.idler.waist = Meter::new(Vector2::new(*(wi / M), *(wi / M)));
+      let mut spdc_setup = spdc_setup.clone();
+      spdc_setup.signal.waist = Meter::new(Vector2::new(*(ws / M), *(ws / M)));
+      spdc_setup.idler.waist = Meter::new(Vector2::new(*(wi / M), *(wi / M)));
 
-      calc_heralding_results(&spd, &wavelength_range)
+      calc_heralding_results(&spdc_setup, &wavelength_range)
     })
     .collect()
 }
@@ -334,19 +335,19 @@ pub fn plot_heralding_results_by_signal_idler_waist(
 /// Calculate the count rates, and efficiencies for signal, idler singles and coincidences
 /// as well as the efficiencies over a range of pump vs signal/idler waist sizes.
 pub fn plot_heralding_results_by_pump_signal_idler_waist(
-  spd : &SPD,
+  spdc_setup : &SPDCSetup,
   ps_waists : &HistogramConfig<Meter<f64>>,
   wavelength_range : &HistogramConfig<Wavelength>
 ) -> Vec<HeraldingResults> {
   ps_waists
     .into_iter()
     .map(|(wp, ws)| {
-      let mut spd = spd.clone();
-      spd.pump.waist = Meter::new(Vector2::new(*(wp / M), *(wp / M)));
-      spd.signal.waist = Meter::new(Vector2::new(*(ws / M), *(ws / M)));
-      spd.idler.waist = spd.signal.waist.clone();
+      let mut spdc_setup = spdc_setup.clone();
+      spdc_setup.pump.waist = Meter::new(Vector2::new(*(wp / M), *(wp / M)));
+      spdc_setup.signal.waist = Meter::new(Vector2::new(*(ws / M), *(ws / M)));
+      spdc_setup.idler.waist = spdc_setup.signal.waist.clone();
 
-      calc_heralding_results(&spd, &wavelength_range)
+      calc_heralding_results(&spdc_setup, &wavelength_range)
     })
     .collect()
 }
@@ -364,12 +365,12 @@ mod tests {
 
   #[test]
   fn zero_rates_test() {
-    let mut spd = SPD::default();
-    spd.fiber_coupling = true;
-    spd.crystal_setup.crystal = Crystal::KTP;
-    spd.signal.waist = Meter::new(Vector2::new(0., 0.));
-    spd.idler.waist = Meter::new(Vector2::new(0., 0.));
-    spd.assign_optimum_periodic_poling();
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.fiber_coupling = true;
+    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.signal.waist = Meter::new(Vector2::new(0., 0.));
+    spdc_setup.idler.waist = Meter::new(Vector2::new(0., 0.));
+    spdc_setup.assign_optimum_periodic_poling();
 
     let wavelength_range = HistogramConfig {
       x_range: (1490.86 * NANO * M, 1609.14 * NANO * M),
@@ -378,23 +379,23 @@ mod tests {
       y_count: 10,
     };
 
-    let results = calc_heralding_results(&spd, &wavelength_range);
+    let results = calc_heralding_results(&spdc_setup, &wavelength_range);
     assert_eq!(results.coincidences_rate, 0.);
   }
 
   #[test]
   fn coincidence_rates_test() {
-    let mut spd = SPD::default();
-    spd.fiber_coupling = true;
-    spd.crystal_setup.crystal = Crystal::KTP;
-    spd.assign_optimum_periodic_poling();
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.fiber_coupling = true;
+    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.assign_optimum_periodic_poling();
 
     let wavelength_range = Iterator2D::new(
       Steps(1490.86 * NANO * M, 1609.14 * NANO * M, 30),
       Steps(1495.05 * NANO * M, 1614.03 * NANO * M, 30)
     );
 
-    let rates = calc_coincidences_rate_distribution(&spd, &wavelength_range);
+    let rates = calc_coincidences_rate_distribution(&spdc_setup, &wavelength_range);
     let actual = rates.iter().map(|&r| *(r * S)).sum();
     let expected = 9383.009533773818;
 
@@ -412,17 +413,17 @@ mod tests {
 
   #[test]
   fn singles_rates_test() {
-    let mut spd = SPD::default();
-    spd.fiber_coupling = true;
-    spd.crystal_setup.crystal = Crystal::KTP;
-    spd.assign_optimum_periodic_poling();
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.fiber_coupling = true;
+    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.assign_optimum_periodic_poling();
 
     let wavelength_range = Iterator2D::new(
       Steps(1490.86 * NANO * M, 1609.14 * NANO * M, 30),
       Steps(1495.05 * NANO * M, 1614.03 * NANO * M, 30)
     );
 
-    let rates = calc_singles_rate_distributions(&spd, &wavelength_range);
+    let rates = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
     let actual = rates.iter()
       .map(|&(r_s, r_i)|
         ( *(r_s * S), *(r_i * S) )
@@ -458,12 +459,12 @@ mod tests {
 
   #[test]
   fn efficiency_apodization_test() {
-    let mut spd = SPD::default();
-    spd.fiber_coupling = true;
-    spd.crystal_setup.crystal = Crystal::KTP;
-    spd.crystal_setup.length = 1000. * MICRO * M;
-    spd.assign_optimum_periodic_poling();
-    spd.pp = spd.pp.map(|pp| {
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.fiber_coupling = true;
+    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.length = 1000. * MICRO * M;
+    spdc_setup.assign_optimum_periodic_poling();
+    spdc_setup.pp = spdc_setup.pp.map(|pp| {
       PeriodicPoling {
         apodization: Some(Apodization {
           fwhm: 1000. * MICRO * M
@@ -471,15 +472,15 @@ mod tests {
         ..pp
       }
     });
-    // spd.assign_optimum_periodic_poling();
+    // spdc_setup.assign_optimum_periodic_poling();
 
     let wavelength_range = Iterator2D::new(
       Steps(1490.86 * NANO * M, 1609.14 * NANO * M, 30),
       Steps(1495.05 * NANO * M, 1614.03 * NANO * M, 30)
     );
 
-    let coinc_rate_distr = calc_coincidences_rate_distribution(&spd, &wavelength_range);
-    let singles_rate_distrs = calc_singles_rate_distributions(&spd, &wavelength_range);
+    let coinc_rate_distr = calc_coincidences_rate_distribution(&spdc_setup, &wavelength_range);
+    let singles_rate_distrs = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
 
     let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
 
@@ -516,18 +517,18 @@ mod tests {
 
   #[test]
   fn efficiency_test() {
-    let mut spd = SPD::default();
-    spd.fiber_coupling = true;
-    spd.crystal_setup.crystal = Crystal::KTP;
-    spd.assign_optimum_periodic_poling();
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.fiber_coupling = true;
+    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.assign_optimum_periodic_poling();
 
     let wavelength_range = Iterator2D::new(
       Steps(1490.86 * NANO * M, 1609.14 * NANO * M, 30),
       Steps(1495.05 * NANO * M, 1614.03 * NANO * M, 30)
     );
 
-    let coinc_rate_distr = calc_coincidences_rate_distribution(&spd, &wavelength_range);
-    let singles_rate_distrs = calc_singles_rate_distributions(&spd, &wavelength_range);
+    let coinc_rate_distr = calc_coincidences_rate_distribution(&spdc_setup, &wavelength_range);
+    let singles_rate_distrs = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
 
     let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
 

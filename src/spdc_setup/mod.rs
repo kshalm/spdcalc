@@ -11,16 +11,10 @@ use std::f64::consts::FRAC_PI_2;
 mod periodic_poling;
 pub use periodic_poling::*;
 
-mod phasematch;
-pub use phasematch::*;
-
-mod computations;
-pub use computations::*;
-
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 
 #[derive(Debug, Copy, Clone)]
-pub struct SPD {
+pub struct SPDCSetup {
   pub signal :         Photon,
   pub idler :          Photon,
   pub pump :           Photon,
@@ -44,7 +38,7 @@ pub struct SPD {
   pub z0i : Option<Distance>,
 }
 
-impl Default for SPD {
+impl Default for SPDCSetup {
   fn default() -> Self {
     let crystal_setup = CrystalSetup {
       crystal :     Crystal::BBO_1,
@@ -60,7 +54,7 @@ impl Default for SPD {
     let idler = Photon::idler(180. * DEG, 0. * DEG, 1550. * NANO * M, waist);
     let pump = Photon::pump(775. * NANO * M, waist);
 
-    SPD {
+    SPDCSetup {
       signal,
       idler,
       pump,
@@ -78,7 +72,7 @@ impl Default for SPD {
   }
 }
 
-impl SPD {
+impl SPDCSetup {
   /// create a copy with the pump wavelength set to phasematch
   /// with the signal and idler
   pub fn with_phasematched_pump(self) -> Self {
@@ -86,7 +80,7 @@ impl SPD {
     let l_i = self.idler.get_wavelength();
     let wavelength = (l_s * l_i) / (l_s + l_i);
     let pump = Photon::pump(wavelength, self.pump.waist);
-    SPD {
+    SPDCSetup {
       pump,
       ..self
     }
@@ -100,7 +94,7 @@ impl SPD {
       _ => self.crystal_setup.pm_type,
     };
 
-    SPD {
+    SPDCSetup {
       signal: self.idler.with_new_type(PhotonType::Signal),
       idler: self.signal.with_new_type(PhotonType::Idler),
       signal_fiber_theta_offset: self.idler_fiber_theta_offset,
@@ -154,7 +148,7 @@ impl SPD {
     let signal = Photon::signal(zero, zero, self.signal.get_wavelength(), self.signal.waist);
     let idler = Photon::idler(zero, zero, self.idler.get_wavelength(), self.idler.waist);
 
-    let mut spd_collinear = SPD {
+    let mut spd_collinear = SPDCSetup {
       signal,
       idler,
       signal_fiber_theta_offset: zero,
@@ -512,9 +506,9 @@ mod tests {
 
   #[test]
   fn optimum_idler_zero_angles_test() {
-    let spd = SPD::default();
+    let spdc_setup = SPDCSetup::default();
 
-    let idler = get_optimum_idler(&spd.signal, &spd.pump, &spd.crystal_setup, None);
+    let idler = get_optimum_idler(&spdc_setup.signal, &spdc_setup.pump, &spdc_setup.crystal_setup, None);
 
     let li = *(idler.get_wavelength() / ucum::M);
     let li_expected = 1550. * NANO;
@@ -603,17 +597,17 @@ mod tests {
       sign :   Sign::POSITIVE,
       apodization: None,
     });
-    let mut spd = SPD {
+    let mut spdc_setup = SPDCSetup {
       pp,
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
 
-    spd
+    spdc_setup
       .signal
-      .set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
+      .set_from_external_theta(3. * ucum::DEG, &spdc_setup.crystal_setup);
 
-    let theta = 31.603728550521122 * ucum::DEG; // spd.calc_optimum_crystal_theta();
-    spd.crystal_setup.theta = theta;
+    let theta = 31.603728550521122 * ucum::DEG; // spdc_setup.calc_optimum_crystal_theta();
+    spdc_setup.crystal_setup.theta = theta;
 
     // println!("theta {}", theta/ucum::DEG);
 
@@ -622,7 +616,7 @@ mod tests {
     // println!("signal theta: {}", signal.get_theta());
 
     let expected = 6.68453818039121e-2;
-    let actual = *(calc_pump_walkoff(&spd.pump, &spd.crystal_setup) / ucum::RAD);
+    let actual = *(calc_pump_walkoff(&spdc_setup.pump, &spdc_setup.crystal_setup) / ucum::RAD);
 
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-8),
@@ -639,21 +633,21 @@ mod tests {
         period: 52.56968559402202 * MICRO * ucum::M,
         apodization: None,
     });
-    let mut spd = SPD {
+    let mut spdc_setup = SPDCSetup {
       pp,
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
 
-    spd.crystal_setup.crystal = Crystal::BBO_1;
-    spd.crystal_setup.theta = 0. * ucum::RAD;
+    spdc_setup.crystal_setup.crystal = Crystal::BBO_1;
+    spdc_setup.crystal_setup.theta = 0. * ucum::RAD;
 
-    spd.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
-    spd.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
-    spd.idler.set_wavelength(0.0000015 * ucum::M);
-    spd.signal.set_wavelength(0.0000015555555555555556 * ucum::M);
+    spdc_setup.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
+    spdc_setup.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
+    spdc_setup.idler.set_wavelength(0.0000015 * ucum::M);
+    spdc_setup.signal.set_wavelength(0.0000015555555555555556 * ucum::M);
 
     let expected = 0.;
-    let actual = *(calc_pump_walkoff(&spd.pump, &spd.crystal_setup) / ucum::RAD);
+    let actual = *(calc_pump_walkoff(&spdc_setup.pump, &spdc_setup.crystal_setup) / ucum::RAD);
 
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-8),
@@ -717,16 +711,16 @@ mod tests {
     let pump = Photon::pump(775. * NANO * M, waist);
     let idler = get_optimum_idler(&signal, &pump, &crystal_setup, pp);
 
-    let spd = SPD {
+    let spdc_setup = SPDCSetup {
       signal,
       idler,
       pump,
       crystal_setup,
       pp,
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
 
-    let theta = *(spd.calc_optimum_crystal_theta() / ucum::RAD);
+    let theta = *(spdc_setup.calc_optimum_crystal_theta() / ucum::RAD);
     let theta_expected = 0.6302501999499033;
     // println!("{} deg", theta/ucum::DEG);
 
@@ -740,10 +734,10 @@ mod tests {
 
   #[test]
   fn optimal_theta_test_2() {
-    let mut spd = SPD::default();
-    spd.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.signal.set_angles(0. *ucum::RAD, 0.03253866877817829 * ucum::RAD);
 
-    let theta = *(spd.calc_optimum_crystal_theta() / ucum::RAD);
+    let theta = *(spdc_setup.calc_optimum_crystal_theta() / ucum::RAD);
     let theta_expected = 0.5515891191131287;
     // println!("{} deg", theta/ucum::DEG);
 
@@ -758,17 +752,17 @@ mod tests {
 
   #[test]
   fn swap_signal_idler_test() {
-    let mut spd = SPD::default();
-    spd.crystal_setup.crystal = Crystal::BBO_1;
-    spd.signal.set_from_external_theta(3. * ucum::DEG, &spd.crystal_setup);
-    spd.assign_optimum_periodic_poling();
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.crystal_setup.crystal = Crystal::BBO_1;
+    spdc_setup.signal.set_from_external_theta(3. * ucum::DEG, &spdc_setup.crystal_setup);
+    spdc_setup.assign_optimum_periodic_poling();
 
-    spd.assign_optimum_idler();
+    spdc_setup.assign_optimum_idler();
 
-    let mut spd_swap = spd.with_swapped_signal_idler();
+    let mut spd_swap = spdc_setup.with_swapped_signal_idler();
     spd_swap.assign_optimum_idler();
 
-    let actual = *(spd.signal.get_theta() / ucum::RAD);
+    let actual = *(spdc_setup.signal.get_theta() / ucum::RAD);
     let expected = *(spd_swap.idler.get_theta() / ucum::RAD);
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-9),
@@ -777,7 +771,7 @@ mod tests {
       expected
     );
 
-    let actual = *(spd.idler.get_theta() / ucum::RAD);
+    let actual = *(spdc_setup.idler.get_theta() / ucum::RAD);
     let expected = *(spd_swap.signal.get_theta() / ucum::RAD);
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-9),
@@ -799,39 +793,39 @@ mod tests {
       temperature : from_celsius_to_kelvin(20.0),
     };
 
-    let mut spd = SPD {
+    let mut spdc_setup = SPDCSetup {
       pp: None,
       crystal_setup,
-      ..SPD::default()
+      ..SPDCSetup::default()
     };
 
-    spd.idler = get_optimum_idler(&spd.signal, &spd.pump, &spd.crystal_setup, spd.pp);
+    spdc_setup.idler = get_optimum_idler(&spdc_setup.signal, &spdc_setup.pump, &spdc_setup.crystal_setup, spdc_setup.pp);
 
-    let pp = spd.calc_periodic_poling().expect("Could not determine poling period");
+    let pp = spdc_setup.calc_periodic_poling().expect("Could not determine poling period");
     let period = *(pp.unwrap().period / ucum::M);
     let period_expected = 0.00004652032850062386;
 
-    // let n_s = spd.signal.get_index(&spd.crystal_setup);
-    // let n_i = spd.idler.get_index(&spd.crystal_setup);
-    // let n_p = spd.pump.get_index(&spd.crystal_setup);
+    // let n_s = spdc_setup.signal.get_index(&spdc_setup.crystal_setup);
+    // let n_i = spdc_setup.idler.get_index(&spdc_setup.crystal_setup);
+    // let n_p = spdc_setup.pump.get_index(&spdc_setup.crystal_setup);
     //
-    // println!("crystal {:#?}", spd.crystal_setup);
+    // println!("crystal {:#?}", spdc_setup.crystal_setup);
     // println!("indices lamda_s: {}",
-    // spd.crystal_setup.crystal.get_indices(spd.signal.get_wavelength(),
-    // spd.crystal_setup.temperature));
+    // spdc_setup.crystal_setup.crystal.get_indices(spdc_setup.signal.get_wavelength(),
+    // spdc_setup.crystal_setup.temperature));
     //
-    // println!("signal {:#?}", spd.signal);
-    // println!("idler {:#?}", spd.idler);
+    // println!("signal {:#?}", spdc_setup.signal);
+    // println!("idler {:#?}", spdc_setup.idler);
     //
-    // let r_s = spd.crystal_setup.get_local_direction_for(&spd.signal);
+    // let r_s = spdc_setup.crystal_setup.get_local_direction_for(&spdc_setup.signal);
     // println!("r_s: {}", r_s.as_ref());
     //
     // println!("n_s: {}", n_s);
     // println!("n_i: {}", n_i);
     // println!("n_p: {}", n_p);
     //
-    // let del_k = calc_delta_k(&spd.signal, &spd.idler, &spd.pump,
-    // &spd.crystal_setup, Some(pp)); println!("del_k: {}", del_k);
+    // let del_k = calc_delta_k(&spdc_setup.signal, &spdc_setup.idler, &spdc_setup.pump,
+    // &spdc_setup.crystal_setup, Some(pp)); println!("del_k: {}", del_k);
     // println!("{} m", period);
 
     assert!(

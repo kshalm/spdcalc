@@ -18,8 +18,15 @@ pub mod math;
 
 pub mod crystal;
 pub use crystal::Crystal;
+
 pub mod photon;
-pub mod spd;
+pub use photon::Photon;
+
+pub mod spdc_setup;
+pub use spdc_setup::SPDCSetup;
+
+pub mod phasematch;
+pub mod computations;
 pub mod plotting;
 
 #[allow(unused_imports)]
