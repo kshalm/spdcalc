@@ -9,7 +9,7 @@ use pyo3::{
 #[pyclass]
 #[text_signature = "(x_range, y_range, steps, /)"]
 #[derive(Copy, Clone)]
-struct PlotRange2D {
+pub struct PlotRange2D {
   #[pyo3(get, set)]
   x_range: (f64, f64),
   #[pyo3(get, set)]
@@ -42,9 +42,9 @@ where T : spdcalc::dim::Dimensioned<Value=f64> + std::ops::Div<f64, Output=T> + 
   }
 }
 
-#[pymodule]
-pub fn plotting(_py : Python, m : &PyModule) -> PyResult<()> {
-  m.add_class::<PlotRange2D>()?;
-
-  Ok(())
-}
+// #[pymodule]
+// pub fn plotting(_py : Python, m : &PyModule) -> PyResult<()> {
+//   m.add_class::<PlotRange2D>()?;
+//
+//   Ok(())
+// }

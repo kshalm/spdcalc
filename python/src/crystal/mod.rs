@@ -12,7 +12,7 @@ use pyo3::{
 #[pyclass]
 #[text_signature = "(id, /)"]
 #[derive(Copy, Clone)]
-struct Crystal {
+pub struct Crystal {
   crystal : crystal::Crystal,
 }
 
@@ -39,9 +39,9 @@ impl Crystal {
   }
 }
 
-#[pymodule]
-pub fn crystal(_py : Python, m : &PyModule) -> PyResult<()> {
-  m.add_class::<Crystal>()?;
-
-  Ok(())
-}
+// #[pymodule]
+// pub fn crystal(_py : Python, m : &PyModule) -> PyResult<()> {
+//   m.add_class::<Crystal>()?;
+//
+//   Ok(())
+// }
