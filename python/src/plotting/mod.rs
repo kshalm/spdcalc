@@ -1,11 +1,8 @@
-extern crate spdcalc;
 use spdcalc::plotting::*;
 
-// python
-// https://pyo3.rs/v0.9.0-alpha.1/
 use pyo3::{
   prelude::*,
-  types::{PyTuple},
+  // types::{PyTuple},
   // wrap_pyfunction
 };
 

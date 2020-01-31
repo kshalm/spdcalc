@@ -36,8 +36,8 @@ where
     )
   }
 
-  pub fn get_meta(&self) -> &CrystalMeta {
-    &self.meta
+  pub fn get_meta(&self) -> CrystalMeta {
+    self.meta
   }
 }
 

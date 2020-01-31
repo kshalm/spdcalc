@@ -5,12 +5,16 @@ use pyo3::{
   wrap_pymodule
 };
 
+mod crystal;
+use crystal::*;
+
 mod plotting;
 use plotting::*;
 
 /// This module is a python module implemented in Rust.
 #[pymodule]
 fn pyspdcalc(_py : Python, m : &PyModule) -> PyResult<()> {
+  m.add_wrapped(wrap_pymodule!(crystal))?;
   m.add_wrapped(wrap_pymodule!(plotting))?;
 
   Ok(())

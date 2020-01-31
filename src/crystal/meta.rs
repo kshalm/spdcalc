@@ -1,5 +1,5 @@
 /// Type of Optic Axis the crystal has
-#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
+#[derive(Debug, Serialize, PartialEq, Deserialize, Copy, Clone)]
 pub enum OpticAxisType {
   PositiveUniaxial,
   NegativeUniaxial,
@@ -16,7 +16,7 @@ pub enum OpticAxisType {
 ///
 /// [General Information](https://en.wikipedia.org/wiki/Crystallographic_point_group)
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
+#[derive(Debug, Serialize, PartialEq, Deserialize, Copy, Clone)]
 pub enum PointGroup {
   /// Triclinic 1
   HM_1,
@@ -90,11 +90,11 @@ pub enum PointGroup {
   HM_mi3m,
 }
 
-#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
+#[derive(Debug, Serialize, PartialEq, Deserialize, Copy, Clone)]
 pub struct ValidWavelengthRange(pub f64, pub f64);
 
 /// Meta information about the crystal
-#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
+#[derive(Debug, Serialize, PartialEq, Deserialize, Copy, Clone)]
 pub struct CrystalMeta {
   /// the internal enum name
   pub id : &'static str,
