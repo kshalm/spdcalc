@@ -1,3 +1,5 @@
+use std::fmt;
+use std::str::FromStr;
 use super::*;
 use dim::ucum::*;
 use na::{Rotation3, Vector3};
@@ -20,12 +22,33 @@ pub enum PMType {
   Type2_e_oe,
 }
 
+impl fmt::Display for PMType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+impl FromStr for PMType {
+  type Err = SPDCError;
+
+  fn from_str(s : &str) -> Result<Self, Self::Err> {
+    match s.as_ref() {
+      "Type0_o_oo" => Ok(PMType::Type0_o_oo),
+      "Type0_e_ee" => Ok(PMType::Type0_e_ee),
+      "Type1_e_oo" => Ok(PMType::Type1_e_oo),
+      "Type2_e_eo" => Ok(PMType::Type2_e_eo),
+      "Type2_e_oe" => Ok(PMType::Type2_e_oe),
+      _ => Err(SPDCError(format!("PMType {} is not defined", s))),
+    }
+  }
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct CrystalSetup {
   pub crystal :     Crystal,
   pub pm_type :     PMType,
-  pub theta :       Angle,
   pub phi :         Angle,
+  pub theta :       Angle,
   pub length :      Meter<f64>,
   pub temperature : Kelvin<f64>,
 }

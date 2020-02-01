@@ -8,12 +8,14 @@ use pyo3::{
   prelude::*,
   PyErr,
   exceptions::{KeyError},
-  // types::{PyList},
+  types::{PyType},
   // wrap_pyfunction
 };
 
+mod crystal_setup;
+pub use crystal_setup::*;
+
 #[pyclass]
-#[text_signature = "(id, /)"]
 #[derive(Copy, Clone)]
 pub struct Crystal {
   crystal : crystal::Crystal,
@@ -29,7 +31,12 @@ impl Crystal {
   }
 
   #[new]
-  fn new(id : String) -> PyResult<Self> {
+  fn new() -> PyResult<Self> {
+    unimplemented!("TODO: implement creation of crystal from sellemeir coefficients")
+  }
+
+  #[classmethod]
+  fn from_id(_cls: &PyType, id : String) -> PyResult<Self> {
     let c = crystal::Crystal::from_string(&id).map_err(|e| PyErr::new::<KeyError, _>(e.0))?;
     Ok(Self {
       crystal: c

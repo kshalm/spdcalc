@@ -1,4 +1,6 @@
 use crate::SPDCError;
+use std::fmt;
+use std::str::FromStr;
 use super::*;
 use dim::f64prefixes::{PICO};
 use dim::ucum::{ M, V };
@@ -20,6 +22,20 @@ pub enum Crystal {
   LiIO3_1,
   AgGaS2_1,
   // Sellmeier(sellmeier::SellmeierCrystal<Q, T>),
+}
+
+impl fmt::Display for Crystal {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", self.get_meta().id)
+  }
+}
+
+impl FromStr for Crystal {
+  type Err = SPDCError;
+
+  fn from_str(s : &str) -> Result<Self, Self::Err> {
+    Crystal::from_string(s)
+  }
 }
 
 impl Crystal {

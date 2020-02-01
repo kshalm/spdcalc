@@ -1,7 +1,8 @@
 //! # Photon
 //!
 //! Used for pump, signal, idler data
-
+use std::fmt;
+use std::str::FromStr;
 use crate::{crystal::CrystalSetup, *};
 use dim::ucum;
 use na::*;
@@ -13,6 +14,27 @@ pub enum PhotonType {
   Pump,
   Signal,
   Idler,
+}
+
+impl fmt::Display for PhotonType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+impl FromStr for PhotonType {
+  type Err = SPDCError;
+
+  fn from_str(s : &str) -> Result<Self, Self::Err> {
+    let mut s = String::from(s);
+    s.make_ascii_lowercase();
+    match s.as_str() {
+      "pump" => Ok(PhotonType::Pump),
+      "signal" => Ok(PhotonType::Signal),
+      "idler" => Ok(PhotonType::Idler),
+      _ => Err(SPDCError::new("Can not parse photon type".to_string())),
+    }
+  }
 }
 
 /// The photon
