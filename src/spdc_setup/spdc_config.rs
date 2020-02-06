@@ -21,15 +21,19 @@ pub struct SPDCConfig<'a> {
 
   pub signal_wavelength: Option<f64>, // nm
   pub signal_phi: Option<f64>, // deg
-  pub signal_theta: Option<f64>, // external theta degrees
+  pub signal_theta: Option<f64>,
+  pub signal_theta_external: Option<f64>,
   pub signal_waist: Option<f64>, // microns
   pub signal_waist_position: Option<f64>, // microns
 
+  // Not required, will use optimal idler if not specified
   pub idler_wavelength: Option<f64>, // nm
   pub idler_phi: Option<f64>,
   pub idler_theta: Option<f64>,
+  pub idler_theta_external: Option<f64>,
   pub idler_waist: Option<f64>, // microns
   pub idler_waist_position: Option<f64>,
+  // ---
 
   pub periodic_poling_enabled: Option<bool>,
   pub poling_period: Option<f64>, // microns
@@ -59,13 +63,15 @@ impl<'a> Default for SPDCConfig<'a> {
       signal_wavelength: Some(1550. * NANO),
       signal_phi: Some(0.),
       signal_theta: Some(0.),
+      signal_theta_external: None,
       signal_waist: Some(100. * MICRO),
       signal_waist_position: None,
 
-      idler_wavelength: Some(1550. * NANO),
-      idler_phi: Some(PI),
-      idler_theta: Some(0.),
-      idler_waist: Some(100. * MICRO),
+      idler_wavelength: None,
+      idler_phi: None,
+      idler_theta: None,
+      idler_theta_external: None,
+      idler_waist: None,
       idler_waist_position: None,
 
       periodic_poling_enabled: Some(false),
@@ -100,12 +106,14 @@ impl<'a> SPDCConfig<'a> {
       signal_wavelength: self.signal_wavelength.or(default.signal_wavelength),
       signal_phi: self.signal_phi.or(default.signal_phi),
       signal_theta: self.signal_theta.or(default.signal_theta),
+      signal_theta_external: self.signal_theta_external.or(default.signal_theta_external),
       signal_waist: self.signal_waist.or(default.signal_waist),
       signal_waist_position: self.signal_waist_position.or(default.signal_waist_position),
 
       idler_wavelength: self.idler_wavelength.or(default.idler_wavelength),
       idler_phi: self.idler_phi.or(default.idler_phi),
       idler_theta: self.idler_theta.or(default.idler_theta),
+      idler_theta_external: self.idler_theta_external.or(default.idler_theta_external),
       idler_waist: self.idler_waist.or(default.idler_waist),
       idler_waist_position: self.idler_waist_position.or(default.idler_waist_position),
 
@@ -128,8 +136,7 @@ impl TryFrom<SPDCConfig<'_>> for SPDCSetup {
   type Error = SPDCError;
 
   fn try_from(config : SPDCConfig) -> Result<Self, Self::Error> {
-    let config = config.with_defaults();
-
+    // --- Crystal Setup ---
     let crystal_setup = CrystalSetup {
       crystal :     config.crystal.ok_or_else(|| empty_err("crystal"))?.parse()?,
       pm_type :     config.pm_type.ok_or_else(|| empty_err("pm_type"))?.parse()?,
@@ -138,32 +145,36 @@ impl TryFrom<SPDCConfig<'_>> for SPDCSetup {
       length :      config.crystal_length.ok_or_else(|| empty_err("crystal_length"))? * M,
       temperature : config.crystal_temperature.ok_or_else(|| empty_err("crystal_temperature"))? * K,
     };
+    // --- /Crystal Setup ---
 
+    // --- Pump ---
     let w = config.pump_waist.ok_or_else(|| empty_err("pump_waist"))?;
     let waist = WaistSize::new(na::Vector2::new(w, w));
     let pump = Photon::pump(
       config.pump_wavelength.ok_or_else(|| empty_err("pump_wavelength"))? * M,
       waist
     );
+    // --- /Pump ---
 
+    // --- Signal ---
     let w = config.signal_waist.ok_or_else(|| empty_err("signal_waist"))?;
     let waist = WaistSize::new(na::Vector2::new(w, w));
-    let signal = Photon::signal(
+    let mut signal = Photon::signal(
       config.signal_phi.ok_or_else(|| empty_err("signal_phi"))? * RAD,
-      config.signal_theta.ok_or_else(|| empty_err("signal_theta"))? * RAD,
+      0. * RAD,
       config.signal_wavelength.ok_or_else(|| empty_err("signal_wavelength"))? * M,
       waist
     );
 
-    let w = config.idler_waist.ok_or_else(|| empty_err("idler_waist"))?;
-    let waist = WaistSize::new(na::Vector2::new(w, w));
-    let idler = Photon::idler(
-      config.idler_phi.ok_or_else(|| empty_err("idler_phi"))? * RAD,
-      config.idler_theta.ok_or_else(|| empty_err("idler_theta"))? * RAD,
-      config.idler_wavelength.ok_or_else(|| empty_err("idler_wavelength"))? * M,
-      waist
-    );
+    // if external angle is specified, it overrides
+    if let Some(signal_theta_external) = config.signal_theta {
+      signal.set_from_external_theta(signal_theta_external * RAD, &crystal_setup);
+    } else {
+      signal.set_angles(signal.get_phi(), config.signal_theta.ok_or_else(|| empty_err("signal_theta"))? * RAD);
+    }
+    // --- /Signal ---
 
+    // --- PeriodicPoling ---
     let periodic_poling_enabled = config.periodic_poling_enabled.ok_or_else(|| empty_err("periodic_poling_enabled"))?;
     let pp = if periodic_poling_enabled {
       let apodization_enabled = config.apodization_enabled.ok_or_else(|| empty_err("apodization_enabled"))?;
@@ -176,15 +187,48 @@ impl TryFrom<SPDCConfig<'_>> for SPDCSetup {
       };
 
       let period = config.poling_period.ok_or_else(|| empty_err("poling_period"))?;
+      if period <= 0. {
+        return Err(SPDCError::new("poling_period must be greater than zero".to_string()));
+      }
+
       Some(PeriodicPoling {
         apodization,
-        period: period.abs() * M,
-        sign: period.into(),
+        period: period * M,
+        sign: PeriodicPoling::compute_sign(&signal, &pump, &crystal_setup),
       })
 
     } else {
       None
     };
+    // --- /PeriodicPoling ---
+
+    // --- Idler ---
+    let mut idler = spdc_setup::get_optimum_idler(&signal, &pump, &crystal_setup, pp);
+
+    if let Some(waist) = config.idler_waist {
+      idler.waist = WaistSize::new(na::Vector2::new(waist, waist));
+    }
+
+    if let Some(wavelength) = config.idler_wavelength {
+      idler.set_wavelength(wavelength * M);
+    }
+
+    let theta = if let Some(theta_e) = config.idler_theta_external {
+      Photon::calc_internal_theta_from_external(&idler, theta_e * RAD, &crystal_setup)
+    } else if let Some(theta) = config.idler_theta {
+      theta * RAD
+    } else {
+      idler.get_theta()
+    };
+
+    let phi = if let Some(phi) = config.idler_phi {
+      phi * RAD
+    } else {
+      idler.get_phi()
+    };
+
+    idler.set_angles(phi, theta);
+    // --- /Idler ---
 
     let setup = SPDCSetup {
       signal,
