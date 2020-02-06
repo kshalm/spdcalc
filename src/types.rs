@@ -36,7 +36,7 @@ derived!(ucum, UCUM: MetersPerMilliVolt = Meter / MilliVolt );
 derived!(ucum, UCUM: JSAUnits = Unitless / Meter / Meter / Meter / Meter ); // 1/m^4
 
 /// An enum to signify the sign (+1, -1)
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Sign {
   POSITIVE,
   NEGATIVE,

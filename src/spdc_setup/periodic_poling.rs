@@ -2,14 +2,14 @@ use super::*;
 use ucum::{J, S};
 
 /// Apodization for periodic poling
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Apodization {
   /// Full-width half-max
   pub fwhm : ucum::Meter<f64>,
 }
 
 /// Periodic Poling settings
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct PeriodicPoling {
   pub period : ucum::Meter<f64>,
   pub sign :   Sign,

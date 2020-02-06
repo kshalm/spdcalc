@@ -6,7 +6,7 @@ use dim::f64prefixes::{PICO};
 use dim::ucum::{ M, V };
 
 /// The type of crystal
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(non_camel_case_types)]
 pub enum Crystal {
   BBO_1,

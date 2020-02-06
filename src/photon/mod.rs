@@ -38,7 +38,7 @@ impl FromStr for PhotonType {
 }
 
 /// The photon
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Photon {
   pub waist : WaistSize,
 
@@ -103,6 +103,10 @@ impl Photon {
       waist,
     )
   }
+
+  pub fn is_signal(&self) -> bool { self.photon_type == PhotonType::Signal }
+  pub fn is_idler(&self) -> bool { self.photon_type == PhotonType::Idler }
+  pub fn is_pump(&self) -> bool { self.photon_type == PhotonType::Pump }
 
   pub fn calc_direction(phi : Angle, theta : Angle) -> Direction {
     let theta_rad = *(theta / ucum::RAD);

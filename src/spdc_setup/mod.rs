@@ -1,19 +1,23 @@
+use std::convert::TryInto;
 use crate::*;
 use crystal::CrystalSetup;
 use dim::{
-  f64prefixes::{MICRO, MILLI, NANO},
-  ucum::{self, RAD, DEG, M, MILLIW, MilliWatt},
+  f64prefixes::{MILLI},
+  ucum::{self, RAD, M, MILLIW, MilliWatt},
 };
 use math::*;
 use photon::{Photon, PhotonType};
 use std::f64::consts::FRAC_PI_2;
+
+mod spdc_config;
+pub use spdc_config::*;
 
 mod periodic_poling;
 pub use periodic_poling::*;
 
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct SPDCSetup {
   pub signal :         Photon,
   pub idler :          Photon,
@@ -40,35 +44,7 @@ pub struct SPDCSetup {
 
 impl Default for SPDCSetup {
   fn default() -> Self {
-    let crystal_setup = CrystalSetup {
-      crystal :     Crystal::BBO_1,
-      pm_type :     crystal::PMType::Type2_e_eo,
-      theta :       90. * DEG,
-      phi :         0. * DEG,
-      length :      2_000.0 * MICRO * M,
-      temperature : utils::from_celsius_to_kelvin(20.0),
-    };
-
-    let waist = WaistSize::new(na::Vector2::new(100.0 * MICRO, 100.0 * MICRO));
-    let signal = Photon::signal(0. * DEG, 0. * DEG, 1550. * NANO * M, waist);
-    let idler = Photon::idler(180. * DEG, 0. * DEG, 1550. * NANO * M, waist);
-    let pump = Photon::pump(775. * NANO * M, waist);
-
-    SPDCSetup {
-      signal,
-      idler,
-      pump,
-      crystal_setup,
-      pp : None,
-      fiber_coupling : true,
-      signal_fiber_theta_offset : 0. * RAD,
-      idler_fiber_theta_offset : 0. * RAD,
-      pump_bandwidth : 5.35 * NANO * ucum::M,
-      pump_spectrum_threshold: 1e-9,
-      pump_average_power: 1. * MILLIW,
-      z0s: None,
-      z0i: None,
-    }
+    SPDCConfig::default().try_into().unwrap()
   }
 }
 
@@ -228,7 +204,7 @@ impl SPDCSetup {
   }
 
   /// automatically calculate the optimal poling period and sign
-  pub fn calc_periodic_poling(&self) -> Result<Option<PeriodicPoling>, &str> {
+  pub fn calc_optimum_periodic_poling(&self) -> Result<Option<PeriodicPoling>, SPDCError> {
 
     // pull the apodization if there is any
     let apodization = self.pp.and_then(|poling| poling.apodization);
@@ -283,9 +259,9 @@ impl SPDCSetup {
     );
 
     if period < min_period {
-      Err(IMPOSSIBLE_POLING_PERIOD)
+      Err(SPDCError::new(IMPOSSIBLE_POLING_PERIOD.to_string()))
     } else if period > max_period {
-      Err(IMPOSSIBLE_POLING_PERIOD)
+      Err(SPDCError::new(IMPOSSIBLE_POLING_PERIOD.to_string()))
     } else {
       Ok(
         Some(PeriodicPoling {
@@ -310,7 +286,7 @@ impl SPDCSetup {
 
   /// assign the optimum periodic_poling for this setup
   pub fn assign_optimum_periodic_poling(&mut self) {
-    self.pp = self.calc_periodic_poling()
+    self.pp = self.calc_optimum_periodic_poling()
       .expect("Could not determine a valid poling period to assign");
   }
 
@@ -449,6 +425,7 @@ mod tests {
   use super::*;
   use crate::crystal::CrystalSetup;
   use na::Vector2;
+  use dim::{f64prefixes::{MICRO, NANO}, ucum::{DEG}};
   extern crate float_cmp;
   use crate::utils::*;
   use float_cmp::*;
@@ -801,7 +778,7 @@ mod tests {
 
     spdc_setup.idler = get_optimum_idler(&spdc_setup.signal, &spdc_setup.pump, &spdc_setup.crystal_setup, spdc_setup.pp);
 
-    let pp = spdc_setup.calc_periodic_poling().expect("Could not determine poling period");
+    let pp = spdc_setup.calc_optimum_periodic_poling().expect("Could not determine poling period");
     let period = *(pp.unwrap().period / ucum::M);
     let period_expected = 0.00004652032850062386;
 

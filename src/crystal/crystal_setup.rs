@@ -7,7 +7,7 @@ use photon::{Photon, PhotonType};
 
 /// The phasematch type
 #[allow(non_camel_case_types)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum PMType {
   /// Type 0:   o -> o + o
   Type0_o_oo,
@@ -43,7 +43,7 @@ impl FromStr for PMType {
   }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct CrystalSetup {
   pub crystal :     Crystal,
   pub pm_type :     PMType,

@@ -7,16 +7,24 @@ use spdcalc::{
   na::{Unit, Vector3},
 };
 
-// use pyo3::{
-//   // prelude::*,
-//   // types::{PyType},
-//   // wrap_pyfunction
-// };
+use pyo3::{
+  PyObjectProtocol,
+  // prelude::*,
+  // types::{PyType},
+  // wrap_pyfunction
+};
 
 #[pyclass]
 #[derive(Copy, Clone)]
 pub struct CrystalSetup {
   pub crystal_setup: crystal::CrystalSetup
+}
+
+#[pyproto]
+impl PyObjectProtocol for CrystalSetup {
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("{:?}", self.crystal_setup))
+  }
 }
 
 #[pymethods]

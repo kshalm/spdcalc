@@ -7,6 +7,7 @@ use spdcalc::{
 use pyo3::{
   prelude::*,
   PyErr,
+  PyObjectProtocol,
   exceptions::{KeyError},
   types::{PyType},
   // wrap_pyfunction
@@ -19,6 +20,13 @@ pub use crystal_setup::*;
 #[derive(Copy, Clone)]
 pub struct Crystal {
   crystal : crystal::Crystal,
+}
+
+#[pyproto]
+impl PyObjectProtocol for Crystal {
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("{:?}", self.crystal))
+  }
 }
 
 #[pymethods]

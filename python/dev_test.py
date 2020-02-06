@@ -11,6 +11,7 @@ pp.pprint(range.x_range)
 pp.pprint(Crystal.get_all_meta())
 
 crystal = Crystal.from_id('KTP')
+pp.pprint(crystal)
 
 meta = crystal.get_meta()
 pp.pprint(meta)
@@ -28,3 +29,7 @@ pp.pprint(external_theta)
 
 index_along = setup.get_index_along(775e-9, [0, 1, 2], 'signal')
 pp.pprint(index_along)
+
+ap = Apodization(2e-9)
+poling = PeriodicPoling(3e-9, ap)
+pp.pprint(poling.get_apodization())

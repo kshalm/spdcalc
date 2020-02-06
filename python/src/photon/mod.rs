@@ -9,6 +9,7 @@ use spdcalc::{
 use pyo3::{
   prelude::*,
   types::{PyType},
+  PyObjectProtocol,
   // wrap_pyfunction
 };
 
@@ -16,6 +17,13 @@ use pyo3::{
 #[derive(Copy, Clone)]
 pub struct Photon {
   pub photon : photon::Photon,
+}
+
+#[pyproto]
+impl PyObjectProtocol for Photon {
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("{:?}", self.photon))
+  }
 }
 
 #[pymethods]
@@ -91,6 +99,10 @@ impl Photon {
 
     Self { photon }
   }
+
+  pub fn is_signal(&self) -> bool { self.photon.is_signal() }
+  pub fn is_idler(&self) -> bool { self.photon.is_idler() }
+  pub fn is_pump(&self) -> bool { self.photon.is_pump() }
 
   /// make a copy of this photon with a new type
   pub fn with_new_type(&self, photon_type : String) -> PyResult<Self> {
