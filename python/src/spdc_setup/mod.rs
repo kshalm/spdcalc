@@ -1,3 +1,4 @@
+use crate::{serde_error_to_py, json_to_dict};
 use crate::{Photon, CrystalSetup};
 use crate::exceptions::PySPDCError;
 use spdcalc::{
@@ -7,10 +8,13 @@ use spdcalc::{
 
 use pyo3::{
   prelude::*,
-  types::{PyType},
+  types::{PyType, PyDict},
   PyObjectProtocol,
   // wrap_pyfunction
 };
+
+mod from_dict;
+use from_dict::from_dict;
 
 #[pyclass]
 #[derive(Copy, Clone)]
@@ -106,7 +110,7 @@ pub struct SPDCSetup {
 #[pyproto]
 impl PyObjectProtocol for SPDCSetup {
   fn __repr__(&self) -> PyResult<String> {
-    Ok(format!("{:?}", self.spdc_setup))
+    Ok(format!("{:#?}", self.spdc_setup))
   }
 }
 
@@ -116,6 +120,22 @@ impl SPDCSetup {
   #[classmethod]
   pub fn default(_cls: &PyType) -> Self {
     Self { spdc_setup: spdc_setup::SPDCSetup::default() }
+  }
+
+  #[classmethod]
+  #[args(dict, with_defaults = "false")]
+  pub fn from_dict(_cls: &PyType, dict : &PyDict, with_defaults: bool) -> PyResult<Self> {
+    let spdc_setup = from_dict(dict, with_defaults)?;
+
+    Ok(Self { spdc_setup })
+  }
+
+  #[args(dict, with_idler = "false", with_autocomputed = "false")]
+  pub fn to_dict(&self, py: Python, with_idler: bool, with_autocomputed: bool) -> PyResult<PyObject> {
+    let config = self.spdc_setup.to_config(with_idler, with_autocomputed);
+    let str = serde_json::to_string(&config).map_err(serde_error_to_py)?;
+
+    json_to_dict(py, str)
   }
 
   pub fn get_signal(&self) -> Photon {

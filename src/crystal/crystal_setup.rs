@@ -22,6 +22,18 @@ pub enum PMType {
   Type2_e_oe,
 }
 
+impl PMType {
+  pub fn to_str(&self) -> &'static str {
+    match self {
+      PMType::Type0_o_oo => "Type0_o_oo",
+      PMType::Type0_e_ee => "Type0_e_ee",
+      PMType::Type1_e_oo => "Type1_e_oo",
+      PMType::Type2_e_eo => "Type2_e_eo",
+      PMType::Type2_e_oe => "Type2_e_oe",
+    }
+  }
+}
+
 impl fmt::Display for PMType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "{:?}", self)

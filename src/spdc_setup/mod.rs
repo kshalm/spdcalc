@@ -3,7 +3,7 @@ use crate::*;
 use crystal::CrystalSetup;
 use dim::{
   f64prefixes::{MILLI},
-  ucum::{self, RAD, M, MILLIW, MilliWatt},
+  ucum::{self, RAD, M, K, MILLIW, MilliWatt},
 };
 use math::*;
 use photon::{Photon, PhotonType};
@@ -302,6 +302,70 @@ impl SPDCSetup {
 
   pub fn calc_pump_walkoff(&self) -> Angle {
     calc_pump_walkoff(&self.pump, &self.crystal_setup)
+  }
+
+  /// Convert this setup to a flat configuration.
+  /// if `all` is `true`, every parameter (including autocomputed ones)
+  /// will be specified
+  pub fn to_config(&self, with_idler: bool, all: bool) -> SPDCConfig<'static> {
+    let setup = self;
+    let mut config = SPDCConfig {
+      crystal: Some(setup.crystal_setup.crystal.get_meta().id),
+      pm_type: Some(setup.crystal_setup.pm_type.to_str()),
+      crystal_phi: Some(*(setup.crystal_setup.phi / RAD)),
+      crystal_theta: Some(*(setup.crystal_setup.theta / RAD)),
+      crystal_length: Some(*(setup.crystal_setup.length / M)),
+      crystal_temperature: Some(*(setup.crystal_setup.temperature / K)),
+
+      pump_wavelength: Some(*(setup.pump.get_wavelength() / M)),
+      pump_waist: Some((setup.pump.waist/M).x),
+      pump_bandwidth: Some(*(setup.pump_bandwidth / M)),
+      pump_spectrum_threshold: Some(setup.pump_spectrum_threshold),
+      pump_average_power: Some(*(setup.pump_average_power * MILLI / MILLIW)), // W
+
+      signal_wavelength: Some(*(setup.signal.get_wavelength() / M)),
+      signal_phi: Some(*(setup.signal.get_phi() / RAD)),
+      signal_theta: Some(*(setup.signal.get_theta() / RAD)),
+      signal_theta_external: Some(*(setup.signal.get_external_theta(&setup.crystal_setup) / RAD)),
+      signal_waist: Some((setup.signal.waist/M).x),
+      signal_waist_position: setup.z0s.map(|z| *(z / M)),
+
+      idler_wavelength: None,
+      idler_phi: None,
+      idler_theta: None,
+      idler_theta_external: None,
+      idler_waist: None,
+      idler_waist_position: setup.z0i.map(|z| *(z / M)),
+
+      periodic_poling_enabled: Some(setup.pp.is_some()),
+      poling_period: setup.pp.map(|p| *(p.period / M)),
+
+      apodization_enabled: setup.pp.map(|p| p.apodization.is_some()),
+      apodization_fwhm: setup.pp.map(|p| p.apodization.map(|a| *(a.fwhm / M))).flatten(),
+
+      fiber_coupling: Some(setup.fiber_coupling),
+    };
+
+    if with_idler {
+      config.idler_wavelength = Some(*(setup.idler.get_wavelength() / M));
+      config.idler_phi = Some(*(setup.idler.get_phi() / RAD));
+      config.idler_theta = Some(*(setup.idler.get_theta() / RAD));
+      config.idler_theta_external = Some(*(setup.idler.get_external_theta(&setup.crystal_setup) / RAD));
+      config.idler_waist = Some((setup.idler.waist/M).x);
+    }
+
+    if all {
+      config.signal_waist_position = Some(*(setup.get_signal_waist_position() / M));
+      config.idler_waist_position = Some(*(setup.get_signal_waist_position() / M));
+    }
+
+    config
+  }
+}
+
+impl From<SPDCSetup> for SPDCConfig<'_> {
+  fn from(setup : SPDCSetup) -> SPDCConfig<'static> {
+    setup.to_config(false, false)
   }
 }
 

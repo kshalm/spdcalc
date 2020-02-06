@@ -33,3 +33,7 @@ pp.pprint(index_along)
 ap = Apodization(2e-9)
 poling = PeriodicPoling(3e-9, ap)
 pp.pprint(poling.get_apodization())
+
+setup = SPDCSetup.from_dict({ "crystal": "BBO_1" }, with_defaults=True)
+
+pp.pprint(setup.to_dict())
