@@ -39,6 +39,12 @@ pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Steps<T>(pub T, pub T, pub usize);
 
+impl<T> From<(T, T, usize)> for Steps<T> {
+  fn from( args : (T, T, usize) ) -> Self {
+    Self(args.0, args.1, args.2)
+  }
+}
+
 impl<T> Steps<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
   pub fn divisions(&self) -> usize {
@@ -99,6 +105,42 @@ impl<T> ExactSizeIterator for StepIterator<T>
 where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   fn len(&self) -> usize {
     self.steps.2
+  }
+}
+
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+pub struct Steps2D<T>(pub (T, T, usize), pub (T, T, usize));
+
+impl<T> Steps2D<T>
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
+  pub fn divisions(&self) -> (usize, usize) {
+    (Steps::from(self.0).divisions(), Steps::from(self.1).divisions())
+  }
+
+  /// Get the width of the gap between each step.
+  ///
+  /// ## Example:
+  /// ```
+  /// use spdcalc::utils::Steps2D;
+  ///
+  /// let steps = Steps2D((0., 4., 3), (0., 8., 3)); // 3 steps: |0| --- |2| --- |4| and |0| --- |4| --- |8|
+  /// let dx = 2.;
+  /// let dy = 4.;
+  /// assert!((steps.division_widths().0 - dx).abs() < 1e-12);
+  /// assert!((steps.division_widths().1 - dy).abs() < 1e-12);
+  /// ```
+  pub fn division_widths(&self) -> (T, T) {
+    (Steps::from(self.0).division_width(), Steps::from(self.1).division_width())
+  }
+}
+
+impl<T> IntoIterator for Steps2D<T>
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+  type Item = (T, T);
+  type IntoIter = Iterator2D<T>;
+
+  fn into_iter(self) -> Self::IntoIter {
+    Iterator2D::new(self.0.into(), self.1.into())
   }
 }
 
