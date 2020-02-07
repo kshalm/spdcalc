@@ -26,7 +26,7 @@ pub mod spdc_setup;
 pub use spdc_setup::SPDCSetup;
 
 pub mod phasematch;
-pub mod computations;
+pub mod jsa;
 pub mod plotting;
 
 #[allow(unused_imports)]

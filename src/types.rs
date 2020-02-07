@@ -5,6 +5,8 @@ use dim::ucum::{
 };
 use na::*;
 
+pub use num::Complex;
+
 /// Angles all in radians
 pub type Angle = ucum::Radian<f64>;
 

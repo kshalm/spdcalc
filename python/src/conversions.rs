@@ -18,3 +18,10 @@ result = json.loads(str)
   ", None, Some(locals))?;
   Ok(locals.get_item("result").to_object(py))
 }
+
+// struct Complex(spdcalc::Complex<f64>);
+// impl IntoPyObject for Complex {
+//   fn into_object(self, py: Python) -> PyObject {
+//     PyComplex::from_doubles
+//   }
+// }

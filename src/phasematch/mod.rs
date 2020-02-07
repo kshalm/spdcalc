@@ -1,35 +1,22 @@
 use crate::spdc_setup::*;
-use crate::photon::*;
 use crate::*;
 use math::*;
 use dim::{ucum::{C_, ONE, Unitless}};
 
-// ensures that the Gaussian and sinc functions have the same widths.
-// ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
-const GAUSSIAN_SINC_GAMMA_FACTOR : f64 = 0.193;
-
-fn sinc( x : f64 ) -> f64 {
-  if x == 0. { 1. } else { f64::sin(x) / x }
-}
-
-fn gaussian_pm( x : f64 ) -> f64 {
-  f64::exp(-GAUSSIAN_SINC_GAMMA_FACTOR * x.powi(2))
-}
-
 /// Calculate the pump spectrum
 #[allow(non_snake_case)]
-fn pump_spectrum(signal : &Photon, idler : &Photon, pump : &Photon, p_bw : Wavelength) -> Unitless<f64> {
+pub fn pump_spectrum(setup : &SPDCSetup) -> Unitless<f64> {
   let PI2c = PI2 * C_;
-  let lamda_s = signal.get_wavelength();
-  let lamda_i = idler.get_wavelength();
-  let lamda_p = pump.get_wavelength();
+  let lamda_s = setup.signal.get_wavelength();
+  let lamda_i = setup.idler.get_wavelength();
+  let lamda_p = setup.pump.get_wavelength();
 
-  let w = PI2c * (1. / lamda_s + 1. / lamda_i - 1. / lamda_p);
+  let delta_omega = PI2c * (1. / lamda_s + 1. / lamda_i - 1. / lamda_p);
 
   // convert from wavelength to \omega
-  let fwhm = PI2c / (lamda_p * lamda_p) * p_bw;
+  let fwhm = PI2c / (lamda_p * lamda_p) * setup.pump_bandwidth;
   let sigma_I = fwhm_to_sigma(fwhm);
-  let x = w / sigma_I;
+  let x = delta_omega / sigma_I;
 
   // Convert from intensity to Amplitude
   // A^2 ~ I ... so extra factor of two here making this 1/4
@@ -56,7 +43,7 @@ mod tests {
     spdc_setup.fiber_coupling = false;
 
     spdc_setup.signal.set_wavelength(1500. * NANO * M);
-    let actual = *pump_spectrum(&spdc_setup.signal, &spdc_setup.idler, &spdc_setup.pump, spdc_setup.pump_bandwidth);
+    let actual = *pump_spectrum(&spdc_setup);
 
     let expected = 0.0003094554168558373;
 

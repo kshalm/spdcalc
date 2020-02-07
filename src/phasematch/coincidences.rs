@@ -10,7 +10,7 @@ use std::cmp::max;
 pub fn phasematch_coincidences(spdc_setup : &SPDCSetup) -> JSAUnits<Complex<f64>> {
 
   // calculate pump spectrum with original pump
-  let alpha = *pump_spectrum(&spdc_setup.signal, &spdc_setup.idler, &spdc_setup.pump, spdc_setup.pump_bandwidth);
+  let alpha = *pump_spectrum(&spdc_setup);
 
   if alpha < spdc_setup.pump_spectrum_threshold {
     return JSAUnits::new(Complex::new(0., 0.));
@@ -27,7 +27,7 @@ pub fn phasematch_coincidences(spdc_setup : &SPDCSetup) -> JSAUnits<Complex<f64>
 #[allow(non_snake_case)]
 pub fn phasematch_coincidences_gaussian_approximation(spdc_setup : &SPDCSetup) -> JSAUnits<Complex<f64>> {
   // calculate pump spectrum with original pump
-  let alpha = *pump_spectrum(&spdc_setup.signal, &spdc_setup.idler, &spdc_setup.pump, spdc_setup.pump_bandwidth);
+  let alpha = *pump_spectrum(&spdc_setup);
 
   if alpha < spdc_setup.pump_spectrum_threshold {
     return JSAUnits::new(Complex::new(0., 0.));

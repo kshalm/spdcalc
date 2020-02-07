@@ -36,4 +36,8 @@ pp.pprint(poling.get_apodization())
 
 setup = SPDCSetup.from_dict({ "crystal": "BBO_1" }, with_defaults=True)
 
-pp.pprint(setup.to_dict())
+# pp.pprint(setup.to_dict())
+
+print('singles: {}'.format(phasematch.phasematch_singles(setup)))
+
+setup.copy()
