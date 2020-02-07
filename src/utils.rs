@@ -108,6 +108,21 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   }
 }
 
+/// Utility for creating evenly spaced steps between two endpoints in 2 dimensions
+///
+/// ## Example:
+/// ```
+/// use spdcalc::utils::Steps2D;
+///
+/// let arr : Vec<(f64, f64)> = Steps2D((0., 1., 100), (0., 100., 100)).into_iter().collect();
+/// assert_eq!(arr.len(), 100 * 100);
+/// assert!((arr[0].0 - 0.).abs() < 1e-12);
+/// assert!((arr[99].0 - 1.).abs() < 1e-12);
+/// assert!((arr[0].1 - 0.).abs() < 1e-12);
+/// assert!((arr[99].1 - 0.).abs() < 1e-12);
+/// assert!((arr[9999].0 - 1.).abs() < 1e-12);
+/// assert!((arr[9999].1 - 100.).abs() < 1e-12);
+/// ```
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Steps2D<T>(pub (T, T, usize), pub (T, T, usize));
 
