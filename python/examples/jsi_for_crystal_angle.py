@@ -27,15 +27,15 @@ ranges = Steps2D(
     (0, 90, 100)
 )
 
-def jsa_for_theta_phi(setup, theta, phi):
+def jsi_for_theta_phi(setup, theta, phi):
     crystal_setup = setup.get_crystal_setup()
     crystal_setup.theta = theta * deg
     crystal_setup.phi = phi * deg
     setup.set_crystal_setup(crystal_setup)
     return abs(phasematch.phasematch_coincidences(setup)) ** 2
 
-norm = abs(jsa_for_theta_phi(setup, 90, 0)) ** 2
-data = [ jsa_for_theta_phi(setup, theta, phi)/norm for (theta, phi) in ranges ]
+norm = abs(jsi_for_theta_phi(setup, 90, 0)) ** 2
+data = [ jsi_for_theta_phi(setup, theta, phi)/norm for (theta, phi) in ranges ]
 
 fig = go.Figure(data=go.Heatmap(
     z=to_matrix(data, 100),
