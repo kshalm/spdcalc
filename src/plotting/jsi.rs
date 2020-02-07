@@ -2,6 +2,7 @@ use super::*;
 use spdc_setup::*;
 use jsa::*;
 use phasematch::*;
+use utils::Steps2D;
 use math::{nelder_mead_1d};
 use dim::{
   ucum::{M},
@@ -9,7 +10,7 @@ use dim::{
 
 /// Create a JSI plot
 /// if no normalization is provided, it will automatically calculate it
-pub fn plot_jsi(spdc_setup : &SPDCSetup, cfg : &HistogramConfig<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
+pub fn plot_jsi(spdc_setup : &SPDCSetup, cfg : &Steps2D<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
   let norm_amp = norm.unwrap_or_else(|| calc_jsa_normalization(&spdc_setup));
 
@@ -26,7 +27,7 @@ pub fn plot_jsi(spdc_setup : &SPDCSetup, cfg : &HistogramConfig<Wavelength>, nor
 
 /// Create a singles JSI plot for the signal (tip: swap signal/idler if you want idler jsi)
 /// if no normalization is provided, it will automatically calculate it
-pub fn plot_jsi_singles(spdc_setup : &SPDCSetup, cfg : &HistogramConfig<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
+pub fn plot_jsi_singles(spdc_setup : &SPDCSetup, cfg : &Steps2D<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
   let norm_amp = norm.unwrap_or_else(|| calc_jsa_singles_normalization(&spdc_setup));
 
@@ -47,7 +48,7 @@ fn get_recip_wavelength( w : f64, l_p : f64 ) -> f64 {
 
 /// Automatically calculate the ranges for creating a JSI based on the
 /// spdc_setup parameters and a specified threshold
-pub fn calc_plot_config_for_jsi( spdc_setup : &SPDCSetup, size : usize, threshold : f64 ) -> HistogramConfig<Wavelength> {
+pub fn calc_plot_config_for_jsi( spdc_setup : &SPDCSetup, size : usize, threshold : f64 ) -> Steps2D<Wavelength> {
 
   let jsa_units = JSAUnits::new(1.);
   let l_p = *(spdc_setup.pump.get_wavelength() / M);
@@ -81,25 +82,22 @@ pub fn calc_plot_config_for_jsi( spdc_setup : &SPDCSetup, size : usize, threshol
   // println!("l_s {}, diff {}", l_s, diff);
   // println!("target {}, jsi(ans) {}", target, pm_diff(ans));
 
-  let x_range = (
+  let x_steps = (
     (l_s - 10. * diff) * M,
-    (l_s + 10. * diff) * M
+    (l_s + 10. * diff) * M,
+    size
   );
 
-  let y_range = (
-    get_recip_wavelength(*(x_range.1 / M), l_p) * M,
-    get_recip_wavelength(*(x_range.0 / M), l_p) * M
+  let y_steps = (
+    get_recip_wavelength(*(x_steps.1 / M), l_p) * M,
+    get_recip_wavelength(*(x_steps.0 / M), l_p) * M,
+    size
   );
 
-  let x_count = size;
-  let y_count = size;
-
-  HistogramConfig {
-    x_range,
-    y_range,
-    x_count,
-    y_count,
-  }
+  Steps2D(
+    x_steps,
+    y_steps,
+  )
 }
 
 
@@ -129,13 +127,10 @@ mod tests {
     spdc_setup.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
     spdc_setup.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
 
-    let cfg = HistogramConfig {
-      x_range : (1500. * NANO * M, 1600. * NANO * M),
-      y_range : (1500. * NANO * M, 1600. * NANO * M),
-
-      x_count : 10,
-      y_count : 10,
-    };
+    let cfg = Steps2D(
+      (1500. * NANO * M, 1600. * NANO * M, 10),
+      (1500. * NANO * M, 1600. * NANO * M, 10),
+    );
 
     let data = plot_jsi(&spdc_setup, &cfg, None);
 
@@ -160,10 +155,10 @@ mod tests {
 
     // println!("{:#?}", ranges);
 
-    let xmin = *(ranges.x_range.0 / M);
-    let xmax = *(ranges.x_range.1 / M);
-    let ymin = *(ranges.y_range.0 / M);
-    let ymax = *(ranges.y_range.1 / M);
+    let xmin = *((ranges.0).0 / M);
+    let xmax = *((ranges.0).1 / M);
+    let ymin = *((ranges.1).0 / M);
+    let ymax = *((ranges.1).1 / M);
 
     let expected_xmin = 0.0000014430000000000002;
     let expected_xmax = 0.0000016570000000000002;

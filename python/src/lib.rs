@@ -30,7 +30,7 @@ use jsa::*;
 
 #[pymodule]
 fn pyspdcalc(_py : Python, m : &PyModule) -> PyResult<()> {
-  m.add_class::<PlotRange2D>()?;
+  m.add_class::<Steps2D>()?;
   m.add_class::<Crystal>()?;
   m.add_class::<CrystalSetup>()?;
   m.add_class::<Photon>()?;

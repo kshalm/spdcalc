@@ -25,13 +25,10 @@ fn jsi(size : usize, fiber_coupling : bool) -> Vec<f64> {
   params.assign_optimum_idler();
   params.fiber_coupling = fiber_coupling;
 
-  let plot_cfg = HistogramConfig {
-    x_range : (1500. * NANO * M, 1600. * NANO * M),
-    y_range : (1500. * NANO * M, 1600. * NANO * M),
-
-    x_count : size,
-    y_count : size,
-  };
+  let plot_cfg = Steps2D(
+    (1500. * NANO * M, 1600. * NANO * M, size),
+    (1500. * NANO * M, 1600. * NANO * M, size)
+  );
 
   plot_jsi(&params, &plot_cfg, None)
 }
@@ -43,21 +40,15 @@ fn heralding_histogram_si(size: usize) -> Vec<HeraldingResults> {
   params.assign_optimum_periodic_poling();
   params.assign_optimum_idler();
 
-  let wavelength_range = HistogramConfig {
-    x_range : (1500. * NANO * M, 1600. * NANO * M),
-    y_range : (1500. * NANO * M, 1600. * NANO * M),
+  let wavelength_range = Steps2D(
+    (1500. * NANO * M, 1600. * NANO * M, size),
+    (1500. * NANO * M, 1600. * NANO * M, size)
+  );
 
-    x_count : size,
-    y_count : size,
-  };
-
-  let si_waists = HistogramConfig {
-    x_range : (40. * MICRO * M, 100. * MICRO * M),
-    y_range : (40. * MICRO * M, 100. * MICRO * M),
-
-    x_count : size,
-    y_count : size,
-  };
+  let si_waists = Steps2D(
+    (40. * MICRO * M, 100. * MICRO * M, size),
+    (40. * MICRO * M, 100. * MICRO * M, size)
+  );
 
   plot_heralding_results_by_signal_idler_waist(
     &params,

@@ -9,36 +9,30 @@ use pyo3::{
 #[pyclass]
 #[text_signature = "(x_range, y_range, steps, /)"]
 #[derive(Copy, Clone)]
-pub struct PlotRange2D {
+pub struct Steps2D {
   #[pyo3(get, set)]
-  x_range: (f64, f64),
+  x: (f64, f64, usize),
   #[pyo3(get, set)]
-  y_range: (f64, f64),
-  #[pyo3(get, set)]
-  steps: (usize, usize),
+  y: (f64, f64, usize),
 }
 
 #[pymethods]
-impl PlotRange2D {
+impl Steps2D {
   #[new]
-  fn new(x_range : (f64, f64), y_range : (f64, f64), steps : (usize, usize)) -> Self {
+  fn new(x : (f64, f64, usize), y : (f64, f64, usize)) -> Self {
     Self {
-      x_range,
-      y_range,
-      steps,
+      x, y
     }
   }
 }
 
-impl<T> From<PlotRange2D> for HistogramConfig<T>
+impl<T> From<Steps2D> for spdcalc::utils::Steps2D<T>
 where T : spdcalc::dim::Dimensioned<Value=f64> + std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
-  fn from( plot_range : PlotRange2D ) -> Self {
-    Self {
-      x_range: (T::new(plot_range.x_range.0), T::new(plot_range.x_range.1)),
-      y_range: (T::new(plot_range.y_range.0), T::new(plot_range.y_range.1)),
-      x_count: plot_range.steps.0,
-      y_count: plot_range.steps.1,
-    }
+  fn from( s2d : Steps2D ) -> Self {
+    Self (
+      (T::new(s2d.x.0), T::new(s2d.x.1), s2d.x.2),
+      (T::new(s2d.y.0), T::new(s2d.y.1), s2d.y.2)
+    )
   }
 }
 

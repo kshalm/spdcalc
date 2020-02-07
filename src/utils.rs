@@ -132,6 +132,10 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
     (Steps::from(self.0).divisions(), Steps::from(self.1).divisions())
   }
 
+  pub fn len(&self) -> usize {
+    (self.0).2 * (self.1).2
+  }
+
   /// Get the width of the gap between each step.
   ///
   /// ## Example:
