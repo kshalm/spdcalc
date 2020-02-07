@@ -1,5 +1,5 @@
 use super::*;
-use utils::{Iterator2D, Steps};
+use utils::{Steps};
 
 mod jsi;
 pub use jsi::*;

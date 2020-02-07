@@ -1,5 +1,6 @@
 use crate::jsa::*;
 use super::*;
+use utils::Steps2D;
 use spdc_setup::*;
 use num::Complex;
 use math::SimpsonIntegration2D;
@@ -12,16 +13,23 @@ use dim::{
 pub fn calc_HOM_rate_series(
   spdc_setup : &SPDCSetup,
   time_shift : Steps<Time>,
-  ls_range : (Wavelength, Wavelength),
-  li_range : (Wavelength, Wavelength),
-  divisions : usize
+  wavelength_ranges : &Steps2D<Wavelength>
 ) -> Vec<f64> {
 
+  let mut wavelength_ranges = wavelength_ranges.clone();
+  use num::Integer;
+  if (wavelength_ranges.0).2.is_even() {
+    (wavelength_ranges.0).2 += 1;
+    (wavelength_ranges.1).2 += 1;
+  }
+
+  let ls_range = wavelength_ranges.0;
+  let li_range = wavelength_ranges.1;
+  assert_eq!(ls_range.2, li_range.2);
+
+  let divisions = (wavelength_ranges.0).2 - 1;
   // define the range of the jsa grid
-  let iter = Iterator2D::new(
-    Steps(ls_range.0, ls_range.1, divisions + 1),
-    Steps(li_range.0, li_range.1, divisions + 1)
-  );
+  let iter = wavelength_ranges.into_iter();
 
   let jsa_units = JSAUnits::new(1.);
   // calculate the jsa values once for each integrand
@@ -74,12 +82,13 @@ mod tests {
     spdc_setup.crystal_setup.crystal = crystal::Crystal::KTP;
     spdc_setup.assign_optimum_theta();
 
-    let ls_range = (0.000001450 * M, 0.000001750 * M);
-    let li_range = (0.000001450 * M, 0.000001750 * M);
+    let wavelengths = Steps2D(
+      (0.000001450 * M, 0.000001750 * M, 100),
+      (0.000001450 * M, 0.000001750 * M, 100)
+    );
 
-    let divisions = 100;
     let steps = 100;
-    let rates = calc_HOM_rate_series(&spdc_setup, Steps(-300e-15 * S, 300e-15 * S, steps), ls_range, li_range, divisions);
+    let rates = calc_HOM_rate_series(&spdc_setup, Steps(-300e-15 * S, 300e-15 * S, steps), &wavelengths);
 
     // println!("rate: {:#?}", rates);
 
