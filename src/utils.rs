@@ -178,7 +178,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 /// }).collect();
 /// assert_eq!(grid[12], 20.);
 /// ```
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Iterator2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
   x_steps : Steps<T>,

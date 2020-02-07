@@ -1,44 +1,41 @@
-use spdcalc::plotting::*;
+use crate::{SPDCSetup, Steps2D};
+use spdcalc::{JSAUnits, plotting};
+use spdcalc::dim::ucum::S;
 
 use pyo3::{
   prelude::*,
   // types::{PyTuple},
-  // wrap_pyfunction
+  wrap_pyfunction
 };
 
-#[pyclass]
-#[text_signature = "(x_range, y_range, steps, /)"]
-#[derive(Copy, Clone)]
-pub struct Steps2D {
-  #[pyo3(get, set)]
-  x: (f64, f64, usize),
-  #[pyo3(get, set)]
-  y: (f64, f64, usize),
+#[pyfunction]
+fn plot_jsi(setup: &SPDCSetup, wavelength_steps_meters : &Steps2D, norm: Option<f64>) -> Vec<f64> {
+  plotting::plot_jsi(&setup.spdc_setup, &(*wavelength_steps_meters).into(), norm.map(|n| JSAUnits::new(n)))
 }
 
-#[pymethods]
-impl Steps2D {
-  #[new]
-  fn new(x : (f64, f64, usize), y : (f64, f64, usize)) -> Self {
-    Self {
-      x, y
-    }
-  }
+#[pyfunction]
+fn plot_jsi_singles(setup: &SPDCSetup, wavelength_steps_meters : &Steps2D, norm: Option<f64>) -> Vec<f64> {
+  plotting::plot_jsi_singles(&setup.spdc_setup, &(*wavelength_steps_meters).into(), norm.map(|n| JSAUnits::new(n)))
 }
 
-impl<T> From<Steps2D> for spdcalc::utils::Steps2D<T>
-where T : spdcalc::dim::Dimensioned<Value=f64> + std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
-  fn from( s2d : Steps2D ) -> Self {
-    Self (
-      (T::new(s2d.x.0), T::new(s2d.x.1), s2d.x.2),
-      (T::new(s2d.y.0), T::new(s2d.y.1), s2d.y.2)
-    )
-  }
+#[pyfunction]
+fn calc_plot_config_for_jsi(setup: &SPDCSetup, size : Option<usize>, threshold : Option<f64>) -> Steps2D {
+  plotting::calc_plot_config_for_jsi(&setup.spdc_setup, size.unwrap_or(100), threshold.unwrap_or(0.5)).into()
 }
 
-// #[pymodule]
-// pub fn plotting(_py : Python, m : &PyModule) -> PyResult<()> {
-//   m.add_class::<PlotRange2D>()?;
-//
-//   Ok(())
-// }
+#[pyfunction]
+fn calc_HOM_rate_series(setup: &SPDCSetup, wavelength_steps_meters : &Steps2D, timesteps: (f64, f64, usize)) -> Vec<f64> {
+  let (min, max, steps) = timesteps;
+  let timesteps = (min * S, max * S, steps);
+  plotting::calc_HOM_rate_series(&setup.spdc_setup, &(*wavelength_steps_meters).into(), &timesteps.into())
+}
+
+#[pymodule]
+pub fn plotting(_py : Python, m : &PyModule) -> PyResult<()> {
+  m.add_wrapped(wrap_pyfunction!(plot_jsi))?;
+  m.add_wrapped(wrap_pyfunction!(plot_jsi_singles))?;
+  m.add_wrapped(wrap_pyfunction!(calc_plot_config_for_jsi))?;
+  m.add_wrapped(wrap_pyfunction!(calc_HOM_rate_series))?;
+
+  Ok(())
+}

@@ -10,6 +10,9 @@ mod exceptions;
 mod conversions;
 use conversions::*;
 
+mod utils;
+use utils::*;
+
 mod crystal;
 use crystal::*;
 
@@ -40,6 +43,7 @@ fn pyspdcalc(_py : Python, m : &PyModule) -> PyResult<()> {
 
   m.add_wrapped(wrap_pymodule!(phasematch))?;
   m.add_wrapped(wrap_pymodule!(jsa))?;
+  m.add_wrapped(wrap_pymodule!(plotting))?;
 
   Ok(())
 }

@@ -12,8 +12,8 @@ use dim::{
 #[allow(non_snake_case)]
 pub fn calc_HOM_rate_series(
   spdc_setup : &SPDCSetup,
-  time_shift : Steps<Time>,
-  wavelength_ranges : &Steps2D<Wavelength>
+  wavelength_ranges : &Steps2D<Wavelength>,
+  time_shift : &Steps<Time>
 ) -> Vec<f64> {
 
   let mut wavelength_ranges = wavelength_ranges.clone();
@@ -88,7 +88,7 @@ mod tests {
     );
 
     let steps = 100;
-    let rates = calc_HOM_rate_series(&spdc_setup, Steps(-300e-15 * S, 300e-15 * S, steps), &wavelengths);
+    let rates = calc_HOM_rate_series(&spdc_setup, &wavelengths, &Steps(-300e-15 * S, 300e-15 * S, steps));
 
     // println!("rate: {:#?}", rates);
 
