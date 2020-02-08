@@ -2,7 +2,7 @@
 install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
 command = "maturin"
-args = ["build", "-i", "python3"]
+args = ["build"]
 
 [tasks.dev]
 install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
