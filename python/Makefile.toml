@@ -15,6 +15,11 @@ dependencies = ["pip_install"]
 command = "pipenv"
 args = ["install", "--dev"]
 
+[tasks.docs]
+command = "cargo"
+toolchain = "nightly"
+args = ["doc", "--no-deps"]
+
 # [tasks.pip_dev]
 # toolchain = "nightly"
 # command = "pipenv"

@@ -1,5 +1,3 @@
-// python
-// https://pyo3.rs/v0.9.0-alpha.1/
 use pyo3::{
   prelude::*,
   wrap_pymodule,
@@ -31,6 +29,17 @@ use phasematch::*;
 mod jsa;
 use jsa::*;
 
+/// The main python module for pyspdcalc.
+///
+/// Also contains submodules:
+/// pyspdcalc.phasematch - Phasematching functions
+/// pyspdcalc.jsa - JSA Calculation functions
+/// pyspdcalc.plotting - Helpers for getting plottable data
+///
+/// Example:
+/// ```python
+/// import pyspdcalc
+/// ```
 #[pymodule]
 fn pyspdcalc(_py : Python, m : &PyModule) -> PyResult<()> {
   m.add_class::<Steps2D>()?;

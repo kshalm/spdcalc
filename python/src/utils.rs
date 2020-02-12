@@ -7,12 +7,29 @@ use pyo3::{
   // wrap_pyfunction
 };
 
+/// A handy iterator for 2D linspaces.
+///
+/// Takes two tuples for x and y steps.
+/// Tuples are (start, stop, num_steps).
+/// Range is inclusive.
+///
+/// Example:
+/// ```python
+/// # x goes from [0, 20] in 5 steps... (0, 5, 10, 15, 20)
+/// # y goes from [0, 1] in 3 steps... (0, 0.5, 1)
+/// square = Steps2D((0, 20, 5), (0, 1, 3))
+/// for (x, y) in square:
+///     print(x, y)
+/// ```
 #[pyclass]
-#[text_signature = "(x_range, y_range, steps, /)"]
+#[text_signature = "(x_steps, y_steps, /)"]
 #[derive(Debug, Copy, Clone)]
 pub struct Steps2D {
+  /// x steps
   #[pyo3(get, set)]
   x: (f64, f64, usize),
+
+  /// y steps
   #[pyo3(get, set)]
   y: (f64, f64, usize),
 
@@ -29,11 +46,13 @@ impl Steps2D {
     }
   }
 
+  /// Get a list of x-axis values
   pub fn get_x_values(self) -> Vec<f64> {
     let steps = spdcalc::utils::Steps(self.x.0, self.x.1, self.x.2);
     steps.into_iter().collect()
   }
 
+  /// Get a list of y-axis values
   pub fn get_y_values(self) -> Vec<f64> {
     let steps = spdcalc::utils::Steps(self.y.0, self.y.1, self.y.2);
     steps.into_iter().collect()

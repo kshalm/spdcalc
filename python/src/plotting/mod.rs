@@ -8,28 +8,45 @@ use pyo3::{
   wrap_pyfunction
 };
 
+/// Get the Joint Spectral Intensity for coincidences over specified 2D range of wavelengths for signal/idler
+///
+/// Provide a SPDCSetup, Steps2D, and optional normalization
+/// if no normalization is provided, one will be calculated based on the colinear JSA
 #[pyfunction]
+#[text_signature = "(setup, wavelength_steps_meters, norm, /)"]
 fn plot_jsi(setup: &SPDCSetup, wavelength_steps_meters : &Steps2D, norm: Option<f64>) -> Vec<f64> {
   plotting::plot_jsi(&setup.spdc_setup, &(*wavelength_steps_meters).into(), norm.map(|n| JSAUnits::new(n)))
 }
 
+/// Get the Joint Spectral Intensity for singles over specified 2D range of wavelengths for signal/idler
+///
+/// Provide a SPDCSetup, Steps2D, and optional normalization
+/// if no normalization is provided, one will be calculated based on the colinear JSA
 #[pyfunction]
+#[text_signature = "(setup, wavelength_steps_meters, norm, /)"]
 fn plot_jsi_singles(setup: &SPDCSetup, wavelength_steps_meters : &Steps2D, norm: Option<f64>) -> Vec<f64> {
   plotting::plot_jsi_singles(&setup.spdc_setup, &(*wavelength_steps_meters).into(), norm.map(|n| JSAUnits::new(n)))
 }
 
+/// Get the Steps2D wavelength ranges for signal/idler that centers the JSI
 #[pyfunction]
-fn calc_plot_config_for_jsi(setup: &SPDCSetup, size : Option<usize>, threshold : Option<f64>) -> Steps2D {
-  plotting::calc_plot_config_for_jsi(&setup.spdc_setup, size.unwrap_or(100), threshold.unwrap_or(0.5)).into()
+#[text_signature = "(setup, size=100, threshold=0.5, /)"]
+fn calc_plot_config_for_jsi(setup: &SPDCSetup, size : usize, threshold : f64) -> Steps2D {
+  plotting::calc_plot_config_for_jsi(&setup.spdc_setup, size, threshold).into()
 }
 
+/// Get the Hong-Ou-Mandel plot data (coincidence rate vs. time delay)
+///
+/// Provide a SPDCSetup, Steps2D of wavelengths, and tuple of (min, max, steps) for time delay in seconds
 #[pyfunction]
-fn calc_HOM_rate_series(setup: &SPDCSetup, wavelength_steps_meters : &Steps2D, timesteps: (f64, f64, usize)) -> Vec<f64> {
-  let (min, max, steps) = timesteps;
+#[text_signature = "(setup, wavelength_steps_meters, timesteps_seconds, /)"]
+fn calc_HOM_rate_series(setup: &SPDCSetup, wavelength_steps_meters : &Steps2D, timesteps_seconds: (f64, f64, usize)) -> Vec<f64> {
+  let (min, max, steps) = timesteps_seconds;
   let timesteps = (min * S, max * S, steps);
   plotting::calc_HOM_rate_series(&setup.spdc_setup, &(*wavelength_steps_meters).into(), &timesteps.into())
 }
 
+/// Plotting helpers
 #[pymodule]
 pub fn plotting(_py : Python, m : &PyModule) -> PyResult<()> {
   m.add_wrapped(wrap_pyfunction!(plot_jsi))?;
