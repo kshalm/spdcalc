@@ -39,6 +39,7 @@ use jsa::*;
 /// Example:
 /// ```python
 /// import pyspdcalc
+/// from pyspdcalc import phasematch, jsa, plotting
 /// ```
 #[pymodule]
 fn pyspdcalc(_py : Python, m : &PyModule) -> PyResult<()> {

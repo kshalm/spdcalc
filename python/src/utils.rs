@@ -25,11 +25,9 @@ use pyo3::{
 #[text_signature = "(x_steps, y_steps, /)"]
 #[derive(Debug, Copy, Clone)]
 pub struct Steps2D {
-  /// x steps
   #[pyo3(get, set)]
   x: (f64, f64, usize),
 
-  /// y steps
   #[pyo3(get, set)]
   y: (f64, f64, usize),
 
@@ -47,12 +45,14 @@ impl Steps2D {
   }
 
   /// Get a list of x-axis values
+  #[text_signature = "($self)"]
   pub fn get_x_values(self) -> Vec<f64> {
     let steps = spdcalc::utils::Steps(self.x.0, self.x.1, self.x.2);
     steps.into_iter().collect()
   }
 
   /// Get a list of y-axis values
+  #[text_signature = "($self)"]
   pub fn get_y_values(self) -> Vec<f64> {
     let steps = spdcalc::utils::Steps(self.y.0, self.y.1, self.y.2);
     steps.into_iter().collect()

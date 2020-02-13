@@ -111,11 +111,11 @@ impl Photon {
     Self { photon }
   }
 
-  #[text_signature = "()"]
+  #[text_signature = "($self)"]
   pub fn is_signal(&self) -> bool { self.photon.is_signal() }
-  #[text_signature = "()"]
+  #[text_signature = "($self)"]
   pub fn is_idler(&self) -> bool { self.photon.is_idler() }
-  #[text_signature = "()"]
+  #[text_signature = "($self)"]
   pub fn is_pump(&self) -> bool { self.photon.is_pump() }
 
   /// make a copy of this photon with a new type
@@ -131,11 +131,13 @@ impl Photon {
   }
 
   /// Get index of refraction along direction of propagation
+  #[text_signature = "($self)"]
   pub fn get_index(&self, crystal_setup : &CrystalSetup) -> f64 {
     *self.photon.get_index(&crystal_setup.crystal_setup)
   }
 
   /// Get the direction unit vector
+  #[text_signature = "($self)"]
   pub fn get_direction(&self) -> Vec<f64> {
     self.photon.get_direction().as_slice().to_vec()
   }

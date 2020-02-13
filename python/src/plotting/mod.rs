@@ -30,10 +30,9 @@ fn plot_jsi_singles(setup: &SPDCSetup, wavelength_steps_meters : &Steps2D, norm:
 
 /// Get the Steps2D wavelength ranges for signal/idler that centers the JSI
 #[pyfunction]
-#[args = "(setup, size=100, threshold=0.5)"]
 #[text_signature = "(setup, size=100, threshold=0.5, /)"]
-fn calc_plot_config_for_jsi(setup: &SPDCSetup, size : usize, threshold : f64) -> Steps2D {
-  plotting::calc_plot_config_for_jsi(&setup.spdc_setup, size, threshold).into()
+fn calc_plot_config_for_jsi(setup: &SPDCSetup, size : Option<usize>, threshold : Option<f64>) -> Steps2D {
+  plotting::calc_plot_config_for_jsi(&setup.spdc_setup, size.unwrap_or(100), threshold.unwrap_or(0.5)).into()
 }
 
 /// Get the Hong-Ou-Mandel plot data (coincidence rate vs. time delay)

@@ -3,7 +3,7 @@ use crate::{Photon, CrystalSetup};
 use crate::exceptions::PySPDCError;
 use spdcalc::{
   spdc_setup,
-  dim::{f64prefixes::MILLI, ucum::{RAD, M, S, J, MILLIW}},
+  dim::{ucum::{RAD, M, S, J, MILLIW}},
 };
 
 use pyo3::{
@@ -206,7 +206,7 @@ impl SPDCSetup {
   /// If "with_autocomputed" is `True`, then the values
   /// which are normally autocomputed (namely, the signal
   /// and idler waist positions) will be included.
-  #[text_signature = "(with_idler = False, with_autocomputed = False, /)"]
+  #[text_signature = "($self, with_idler = False, with_autocomputed = False, /)"]
   #[args(with_idler = "false", with_autocomputed = "false")]
   pub fn to_dict(&self, py: Python, with_idler: bool, with_autocomputed: bool) -> PyResult<PyObject> {
     let config = self.spdc_setup.to_config(with_idler, with_autocomputed);
