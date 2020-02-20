@@ -26,11 +26,11 @@ args = ["doc", "--no-deps"]
 # args = ["run", "maturin", "develop"]
 # dependencies = ["pip_install"]
 
-[tasks.release]
+[tasks.publish]
 install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
 command = "maturin"
-args = ["build", "--release", "-i", "python3"]
+args = ["publish", "-i", "python3"]
 
 [tasks.clean_pip]
 command = "pipenv"
