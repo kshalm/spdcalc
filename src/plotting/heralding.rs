@@ -73,7 +73,7 @@ fn calc_jacobian_det_lambda_to_omega(l_s : Wavelength, l_i : Wavelength, spdc_se
   pi2c * pi2c / denominator
 }
 
-/// Calculate the coincidence rates per unit wavelength * wavelength.
+/// Calculate the coincidence rates for each wavelength^2.
 /// Integrating over all wavelengths (all array items) will give total coincidence rate.
 #[allow(non_snake_case)]
 pub fn calc_coincidences_rate_distribution(spdc_setup : &SPDCSetup, wavelength_range : &Steps2D<Wavelength>) -> Vec<Hertz<f64>> {
@@ -117,7 +117,7 @@ pub fn calc_coincidences_rate_distribution(spdc_setup : &SPDCSetup, wavelength_r
     .collect()
 }
 
-/// Calculate the singles rate per unit wavelength * wavelength.
+/// Calculate the singles rate per unit wavelength^2.
 /// Integrating over all wavelengths (all array items) will give total singles rate.
 /// technically this distribution has units of 1/(s m^2).. but we return 1/s
 #[allow(non_snake_case)]
@@ -173,7 +173,7 @@ pub fn calc_singles_rate_distribution_signal(spdc_setup : &SPDCSetup, wavelength
     .collect()
 }
 
-/// Calculate the singles rate for both signal and idler per unit wavelength * wavelength.
+/// Calculate the singles rate for both signal and idler per unit wavelength^2.
 /// Integrating over all wavelengths (all array items) will give total singles rate.
 /// technically this distribution has units of 1/(s m^2).. but we return 1/s
 #[allow(non_snake_case)]

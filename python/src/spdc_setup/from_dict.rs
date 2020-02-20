@@ -12,7 +12,11 @@ use pyo3::{
 #[inline]
 fn get_cfg<'a, T>(item : &str, dict : &'a PyDict) -> Result<Option<T>, PyErr>
 where T: pyo3::FromPyObject<'a> {
-  dict.get_item(item).filter(|v| !v.is_none()).map(|v| v.extract()).transpose()
+  dict.get_item(item)
+    .filter(|v| !v.is_none())
+    .map(|v| v.extract())
+    .transpose()
+    .map_err(|_e| PySPDCError(format!("Error parsing field {}", item)).into())
 }
 
 pub fn from_dict(dict : &PyDict, with_defaults: bool) -> Result<SPDCSetup, PyErr> {
