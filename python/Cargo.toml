@@ -1,8 +1,12 @@
 [package]
 name = "pyspdcalc"
 version = "0.1.0"
-authors = ["Jasper <jasper.palfree@colorado.edu>"]
+authors = ["Jasper Palfree <jasper.palfree@colorado.edu>", "Krister Shalm <lynden.shalm@nist.gov>"]
 edition = "2018"
+description="Python bindings for SPDCalc, the Spontaneous Parametric Downconversion Calculator"
+readme="README.md"
+
+# [package.metadata.maturin]
 
 [lib]
 name = "pyspdcalc"
