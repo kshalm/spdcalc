@@ -20,6 +20,11 @@ command = "cargo"
 toolchain = "nightly"
 args = ["doc", "--no-deps"]
 
+[tasks.sphinx]
+install_crate = "cargo-sphinx"
+command = "cargo"
+args = ["sphinx"]
+
 # [tasks.pip_dev]
 # toolchain = "nightly"
 # command = "pipenv"

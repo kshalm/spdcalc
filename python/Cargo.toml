@@ -5,6 +5,8 @@ authors = ["Jasper Palfree <jasper.palfree@colorado.edu>", "Krister Shalm <lynde
 edition = "2018"
 description="Python bindings for SPDCalc, the Spontaneous Parametric Downconversion Calculator"
 readme="README.md"
+keywords = ["physics", "spdc", "photonics"]
+license="MIT"
 
 # [package.metadata.maturin]
 
