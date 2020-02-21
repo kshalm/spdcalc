@@ -24,3 +24,10 @@ features = ["extension-module", "num-complex"]
 [dependencies.spdcalc]
 path = '../'
 version = "0.1"
+
+[package.metadata.sphinx]
+docs-path = "docs"
+commit-message = "(cargo-sphinx) Generate docs."
+sign-commit = false
+push-remote = "origin"
+push-branch = "gh-pages"

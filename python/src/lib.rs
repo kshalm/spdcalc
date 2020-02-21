@@ -31,16 +31,11 @@ use jsa::*;
 
 /// The main python module for pyspdcalc.
 ///
-/// Also contains submodules:
-/// pyspdcalc.phasematch - Phasematching functions
-/// pyspdcalc.jsa - JSA Calculation functions
-/// pyspdcalc.plotting - Helpers for getting plottable data
+/// Example
+/// -------
+///   import pyspdcalc
+///   from pyspdcalc import phasematch, jsa, plotting
 ///
-/// Example:
-/// ```python
-/// import pyspdcalc
-/// from pyspdcalc import phasematch, jsa, plotting
-/// ```
 #[pymodule]
 fn pyspdcalc(_py : Python, m : &PyModule) -> PyResult<()> {
   m.add_class::<Steps2D>()?;
