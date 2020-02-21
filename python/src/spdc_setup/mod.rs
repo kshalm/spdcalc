@@ -8,7 +8,7 @@ use spdcalc::{
 
 use pyo3::{
   prelude::*,
-  types::{PyType, PyDict},
+  types::{PyDict},
   PyObjectProtocol,
   // wrap_pyfunction
 };
@@ -139,8 +139,8 @@ impl PyObjectProtocol for SPDCSetup {
 impl SPDCSetup {
 
   /// Create a configuration with reasonable defaults
-  #[classmethod]
-  pub fn default(_cls: &PyType) -> Self {
+  #[staticmethod]
+  pub fn default() -> Self {
     Self { spdc_setup: spdc_setup::SPDCSetup::default() }
   }
 
@@ -189,10 +189,10 @@ impl SPDCSetup {
   ///
   /// To see all configuration values, look at the output of
   /// `SPDCSetup.default().to_dict()`
-  #[classmethod]
+  #[staticmethod]
   #[text_signature = "(dict, with_default = False, /)"]
   #[args(dict, with_defaults = "false")]
-  pub fn from_dict(_cls: &PyType, dict : &PyDict, with_defaults: bool) -> PyResult<Self> {
+  pub fn from_dict(dict : &PyDict, with_defaults: bool) -> PyResult<Self> {
     let spdc_setup = from_dict(dict, with_defaults)?;
 
     Ok(Self { spdc_setup })

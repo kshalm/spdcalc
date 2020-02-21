@@ -29,12 +29,12 @@ use phasematch::*;
 mod jsa;
 use jsa::*;
 
-/// The main python module for spdcalc.
+/// The top-level python module for spdcalc.
 ///
 /// Example
 /// -------
-///   import spdcalc
-///   from spdcalc import phasematch, jsa, plotting
+/// >>> import spdcalc
+/// >>> from spdcalc import phasematch, jsa, plotting
 ///
 #[pymodule]
 fn spdcalc(_py : Python, m : &PyModule) -> PyResult<()> {

@@ -1,5 +1,5 @@
 spdcalc
-=================
+=======
 
 .. toctree::
   :maxdepth: 2
