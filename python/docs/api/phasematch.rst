@@ -5,6 +5,6 @@ spdcalc.phasematch
   :maxdepth: 2
 
 
-.. currentmodule:: pyspdcalc.phasematch
-.. automodule:: pyspdcalc.phasematch
+.. currentmodule:: spdcalc.phasematch
+.. automodule:: spdcalc.phasematch
   :members:

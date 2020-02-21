@@ -29,15 +29,15 @@ use phasematch::*;
 mod jsa;
 use jsa::*;
 
-/// The main python module for pyspdcalc.
+/// The main python module for spdcalc.
 ///
 /// Example
 /// -------
-///   import pyspdcalc
-///   from pyspdcalc import phasematch, jsa, plotting
+///   import spdcalc
+///   from spdcalc import phasematch, jsa, plotting
 ///
 #[pymodule]
-fn pyspdcalc(_py : Python, m : &PyModule) -> PyResult<()> {
+fn spdcalc(_py : Python, m : &PyModule) -> PyResult<()> {
   m.add_class::<Steps2D>()?;
   m.add_class::<Crystal>()?;
   m.add_class::<CrystalSetup>()?;

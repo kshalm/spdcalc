@@ -2,7 +2,7 @@
 import yaml
 import os
 
-from pyspdcalc import *
+from spdcalc import *
 
 # current directory of this .py file
 dirpath = os.path.dirname(os.path.realpath(__file__))

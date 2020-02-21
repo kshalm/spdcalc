@@ -2,7 +2,7 @@
 import spectra
 import plotly.graph_objects as go
 from pint import UnitRegistry
-from pyspdcalc import *
+from spdcalc import *
 
 # This is useful for keeping track of units
 ureg = UnitRegistry()

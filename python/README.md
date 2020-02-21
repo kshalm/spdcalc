@@ -1,15 +1,15 @@
-# PySPDCalc
+# SPDCalc
 
 Python bindings for [SPDCalc](https://github.com/kshalm/spdcalc), the Spontaneous Parametric Downconversion Calculator
 
 ## Usage
 
 ```bash
-pip3 install pyspdcalc
+pip3 install spdcalc
 ```
 
 ```python
-from pyspdcalc import *
+from spdcalc import *
 
 # your code here...
 ```

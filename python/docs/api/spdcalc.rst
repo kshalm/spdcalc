@@ -4,6 +4,6 @@ spdcalc
 .. toctree::
   :maxdepth: 2
 
-.. currentmodule:: pyspdcalc
-.. automodule:: pyspdcalc
+.. currentmodule:: spdcalc
+.. automodule:: spdcalc
   :members:

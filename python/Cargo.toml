@@ -11,7 +11,7 @@ license="MIT"
 # [package.metadata.maturin]
 
 [lib]
-name = "pyspdcalc"
+name = "spdcalc"
 crate-type = ["cdylib"]
 
 [dependencies]

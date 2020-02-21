@@ -4,7 +4,7 @@ import pprint
 import spectra
 import plotly.graph_objects as go
 from pint import UnitRegistry
-from pyspdcalc import *
+from spdcalc import *
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
