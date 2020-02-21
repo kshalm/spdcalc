@@ -11,3 +11,5 @@ web/pkg/
 **/wasm-pack.log
 
 spdcalc/src/main.rs
+
+python/docs/_build
