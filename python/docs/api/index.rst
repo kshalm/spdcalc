@@ -5,4 +5,6 @@ API
   :maxdepth: 2
 
   spdcalc
+  plotting
+  jsa
   phasematch

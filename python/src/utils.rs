@@ -7,27 +7,38 @@ use pyo3::{
   // wrap_pyfunction
 };
 
+/// Steps2D(x_steps, y_steps)
+///
 /// A handy iterator for 2D linspaces.
 ///
 /// Takes two tuples for x and y steps.
 /// Tuples are (start, stop, num_steps).
 /// Range is inclusive.
 ///
-/// Example:
-/// ```python
-/// # x goes from [0, 20] in 5 steps... (0, 5, 10, 15, 20)
-/// # y goes from [0, 1] in 3 steps... (0, 0.5, 1)
-/// square = Steps2D((0, 20, 5), (0, 1, 3))
-/// for (x, y) in square:
-///     print(x, y)
-/// ```
+/// Example
+/// -------
+/// >>> # x goes from [0, 20] in 5 steps... (0, 5, 10, 15, 20)
+/// >>> # y goes from [0, 1] in 3 steps... (0, 0.5, 1)
+/// >>> square = Steps2D((0, 20, 5), (0, 1, 3))
+/// >>> for (x, y) in square:
+/// >>>    print(x, y)
+///
+/// Parameters
+/// ----------
+/// x_steps : (:obj:`float`, :obj:`float`, :obj:`int`)
+///   The x steps
+/// y_steps : (:obj:`float`, :obj:`float`, :obj:`int`)
+///   The y steps
 #[pyclass]
 #[text_signature = "(x_steps, y_steps, /)"]
 #[derive(Debug, Copy, Clone)]
 pub struct Steps2D {
+
+  /// (:obj:`float`, :obj:`float`, :obj:`int`): The x steps
   #[pyo3(get, set)]
   x: (f64, f64, usize),
 
+  /// (:obj:`float`, :obj:`float`, :obj:`int`): The x steps
   #[pyo3(get, set)]
   y: (f64, f64, usize),
 
