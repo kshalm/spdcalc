@@ -24,6 +24,7 @@ PyYAML = "*"
 Sphinx = "~=2.4"
 toml = "*"
 nbsphinx = "*"
+jupyter = "*"
 
 [requires]
 python_version = "3.7"

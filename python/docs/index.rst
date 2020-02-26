@@ -12,6 +12,7 @@ SPDCalc Python Documentation
 
    getting_started
    guide/index
+   examples/index
    api/index
 
 

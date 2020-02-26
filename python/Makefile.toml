@@ -9,7 +9,7 @@ install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help
 toolchain = "nightly"
 command = "pipenv"
 args = ["run", "maturin", "develop", "--release"]
-# dependencies = ["pip_install"]
+dependencies = ["pip_install"]
 
 [tasks.pip_install]
 command = "pipenv"
@@ -28,7 +28,7 @@ args = ["install", "--dev"]
 [tasks.docs]
 command = "pipenv"
 args = ["run", "sphinx-build", "-b", "html", "docs", "docs/_build"]
-# dependencies = ["pip_install"]
+dependencies = ["pip_install"]
 
 [tasks.docs-publish]
 install_crate = "cargo-sphinx"
