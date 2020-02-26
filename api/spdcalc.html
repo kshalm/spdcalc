@@ -1,0 +1,1356 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>spdcalc &mdash; SPDCalc 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="spdcalc.plotting" href="plotting.html" />
+    <link rel="prev" title="API" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> SPDCalc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/index.html">Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">spdcalc</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html">spdcalc.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jsa.html">spdcalc.jsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phasematch.html">spdcalc.phasematch</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPDCalc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API</a> &raquo;</li>
+        
+      <li>spdcalc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/spdcalc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="spdcalc">
+<h1>spdcalc<a class="headerlink" href="#spdcalc" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-spdcalc"></span><p>The top-level python module for spdcalc.</p>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">spdcalc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spdcalc</span> <span class="kn">import</span> <span class="n">phasematch</span><span class="p">,</span> <span class="n">jsa</span><span class="p">,</span> <span class="n">plotting</span>
+</pre></div>
+</div>
+</div>
+<dl class="class">
+<dt id="spdcalc.Steps2D">
+<em class="property">class </em><code class="sig-prename descclassname">spdcalc.</code><code class="sig-name descname">Steps2D</code><span class="sig-paren">(</span><em class="sig-param">x_steps</em>, <em class="sig-param">y_steps</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Steps2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>A handy iterator for 2D linspaces.</p>
+<p>Takes two tuples for x and y steps.
+Tuples are (start, stop, num_steps).
+Range is inclusive.</p>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># x goes from [0, 20] in 5 steps... (0, 5, 10, 15, 20)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># y goes from [0, 1] in 3 steps... (0, 0.5, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">square</span> <span class="o">=</span> <span class="n">Steps2D</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">square</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_steps</strong> ((<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>)) – The x steps</p></li>
+<li><p><strong>y_steps</strong> ((<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>)) – The y steps</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="spdcalc.Steps2D.get_x_values">
+<code class="sig-name descname">get_x_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Steps2D.get_x_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of x-axis values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Steps2D.get_y_values">
+<code class="sig-name descname">get_y_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Steps2D.get_y_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of y-axis values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.Steps2D.x">
+<code class="sig-name descname">x</code><a class="headerlink" href="#spdcalc.Steps2D.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>xy__new__get_x_valuesget_x_values($self)
+–</p>
+<p>Get a list of x-axis values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.Steps2D.y">
+<code class="sig-name descname">y</code><a class="headerlink" href="#spdcalc.Steps2D.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>y__new__get_x_valuesget_x_values($self)
+–</p>
+<p>Get a list of x-axis values</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spdcalc.Crystal">
+<em class="property">class </em><code class="sig-prename descclassname">spdcalc.</code><code class="sig-name descname">Crystal</code><a class="headerlink" href="#spdcalc.Crystal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crystal type</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To create a predefined crystal, use <a class="reference internal" href="#spdcalc.Crystal.from_id" title="spdcalc.Crystal.from_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_id()</span></code></a>.</p>
+</div>
+<dl class="method">
+<dt id="spdcalc.Crystal.from_id">
+<em class="property">static </em><code class="sig-name descname">from_id</code><span class="sig-paren">(</span><em class="sig-param">id</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Crystal.from_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a predefined crystal by id string (see get_all_meta() to get ids)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – The id of the crystal to load</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#spdcalc.Crystal" title="spdcalc.Crystal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Crystal</span></code></a> – The crystal singleton</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Crystal.get_all_meta">
+<em class="property">static </em><code class="sig-name descname">get_all_meta</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Crystal.get_all_meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get meta information for all predefined crystals</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a>) – list of dictionaries of crystal meta information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Crystal.get_effective_nonlinear_coefficient">
+<code class="sig-name descname">get_effective_nonlinear_coefficient</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Crystal.get_effective_nonlinear_coefficient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the <span class="math notranslate nohighlight">\(d_{\rm{eff}}\)</span> for this crystal</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>currently not fully implemented.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>float</em> – Effective nonlinear coefficient in units of picometers / Volt</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Crystal.get_indices">
+<code class="sig-name descname">get_indices</code><span class="sig-paren">(</span><em class="sig-param">wavelength_meters</em>, <em class="sig-param">temperature_kelvin</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Crystal.get_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the refractive indices for a certain wavelength and temperature</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavelength_meters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The wavelength in meters</p></li>
+<li><p><strong>temperature_kelvin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The temperature in kelvin</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – the refractive indices along x, y, z directions in that order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Crystal.get_meta">
+<code class="sig-name descname">get_meta</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Crystal.get_meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get meta information for this crystal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a> – Dictionary of crystal meta information</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spdcalc.CrystalSetup">
+<em class="property">class </em><code class="sig-prename descclassname">spdcalc.</code><code class="sig-name descname">CrystalSetup</code><span class="sig-paren">(</span><em class="sig-param">crystal</em>, <em class="sig-param">pm_type</em>, <em class="sig-param">phi_rad</em>, <em class="sig-param">theta_rad</em>, <em class="sig-param">length_meters</em>, <em class="sig-param">temperature_kelvin</em>, <em class="sig-param">/</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup" title="Permalink to this definition">¶</a></dt>
+<dd><p>The setup for a crystal.</p>
+<p>Information about its phasematch type, orientation, size, and temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>crystal</strong> (<a class="reference internal" href="#spdcalc.Crystal" title="spdcalc.Crystal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Crystal</span></code></a>) – The crystal</p></li>
+<li><p><strong>pm_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – <p>The phasematching type. Should be one of:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type0_o_oo&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type0_e_ee&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type1_e_oo&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type2_e_eo&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type2_e_oe&quot;</span></code></p></li>
+</ul>
+</p></li>
+<li><p><strong>phi_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The polar angle in radians</p></li>
+<li><p><strong>theta_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The azimuthal angle in radians</p></li>
+<li><p><strong>length_meters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The crystal length in meters</p></li>
+<li><p><strong>temperature_kelvin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The crystal temperature in kelvin</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="spdcalc.CrystalSetup.calc_optimal_waist_position">
+<code class="sig-name descname">calc_optimal_waist_position</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">photon</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup.calc_optimal_waist_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the optimal waist position, in meters, for a Photon</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The waist position is measured from the end of the crystal
+so the values will always be negative.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>photon</strong> (<a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a>) – The photon</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a> – The waist position in meters along the z direction measured from the end of the crystal</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.CrystalSetup.get_crystal">
+<code class="sig-name descname">get_crystal</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup.get_crystal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the crystal object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.Crystal" title="spdcalc.Crystal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Crystal</span></code></a> – A copy of the crystal</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.CrystalSetup.get_index_along">
+<code class="sig-name descname">get_index_along</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup.get_index_along" title="Permalink to this definition">¶</a></dt>
+<dd><p>CrystalSetup.get_index_for(self, photon)</p>
+<p>Get the index of refraction along a certain direction (direction in global coordinates)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavelength_meters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The wavelength in meters</p></li>
+<li><p><strong>direction</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>)) – The unit direction vector in global coordinates</p></li>
+<li><p><strong>photon_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – The type of photon (<code class="docutils literal notranslate"><span class="pre">Signal</span></code>, <code class="docutils literal notranslate"><span class="pre">Pump</span></code>, <code class="docutils literal notranslate"><span class="pre">Idler</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a> – The index of refraction through this crystal setup along the input direction</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.CrystalSetup.get_index_for">
+<code class="sig-name descname">get_index_for</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">photon</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup.get_index_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the index of refraction for a Photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>photon</strong> (<a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a>) – The photon</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a> – The index of refraction for the input photon through this crystal setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.CrystalSetup.get_local_direction">
+<code class="sig-name descname">get_local_direction</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">direction</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup.get_local_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a direction vector to crystal coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>direction</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>)) – The unit direction vector in global coordinates</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The unit direction vector in crystal coordinates</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.CrystalSetup.get_local_direction_for">
+<code class="sig-name descname">get_local_direction_for</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">photon</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup.get_local_direction_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the direction vector in crystal coordinates for a Photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>photon</strong> (<a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a>) – The photon</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The unit direction vector in crystal coordinates of the photon</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.CrystalSetup.get_pm_type">
+<code class="sig-name descname">get_pm_type</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup.get_pm_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the phasematch type string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> – The phasematch type string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.CrystalSetup.length">
+<code class="sig-name descname">length</code><a class="headerlink" href="#spdcalc.CrystalSetup.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>The length of the crystal in meters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.CrystalSetup.phi">
+<code class="sig-name descname">phi</code><a class="headerlink" href="#spdcalc.CrystalSetup.phi" title="Permalink to this definition">¶</a></dt>
+<dd><p>The polar angle in radians <span class="math notranslate nohighlight">\([0, 2\pi)\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.CrystalSetup.set_crystal">
+<code class="sig-name descname">set_crystal</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">crystal</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup.set_crystal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the crystal object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>crystal</strong> (<a class="reference internal" href="#spdcalc.Crystal" title="spdcalc.Crystal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Crystal</span></code></a>) – The crystal to assign to this setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.CrystalSetup.set_pm_type">
+<code class="sig-name descname">set_pm_type</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pm_type</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.CrystalSetup.set_pm_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the phasematch type string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pm_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – <p>The phasematching type. Should be one of:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type0_o_oo&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type0_e_ee&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type1_e_oo&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type2_e_eo&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Type2_e_oe&quot;</span></code></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.CrystalSetup.temperature">
+<code class="sig-name descname">temperature</code><a class="headerlink" href="#spdcalc.CrystalSetup.temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>The temperature in kelvin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.CrystalSetup.theta">
+<code class="sig-name descname">theta</code><a class="headerlink" href="#spdcalc.CrystalSetup.theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>The azimuthal angle in radians <span class="math notranslate nohighlight">\([0, \pi/2]\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spdcalc.Photon">
+<em class="property">class </em><code class="sig-prename descclassname">spdcalc.</code><code class="sig-name descname">Photon</code><span class="sig-paren">(</span><em class="sig-param">photon_type</em>, <em class="sig-param">phi_rad</em>, <em class="sig-param">theta_rad</em>, <em class="sig-param">wavelength_meters</em>, <em class="sig-param">waist_size_meters</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Photon involved in SPDC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>photon_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – The type of photon (<code class="docutils literal notranslate"><span class="pre">Signal</span></code>, <code class="docutils literal notranslate"><span class="pre">Pump</span></code>, <code class="docutils literal notranslate"><span class="pre">Idler</span></code>)</p></li>
+<li><p><strong>phi_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The polar angle in radians</p></li>
+<li><p><strong>theta_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The azimuthal angle in radians</p></li>
+<li><p><strong>wavelength_meters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The wavelength in meters</p></li>
+<li><p><strong>waist_size_meters</strong> ((<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>)) – Two element tuple <cite>(x_size, y_size)</cite> for the waist size in the x,y directions</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="spdcalc.Photon.get_direction">
+<code class="sig-name descname">get_direction</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.get_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the direction unit vector</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The unit direction vector in global coordinates for this photon</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.get_external_theta">
+<code class="sig-name descname">get_external_theta</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">crystal_setup</em>, <em class="sig-param">/</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.get_external_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the external theta relative to provided crystal setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>crystal_setup</strong> (<a class="reference internal" href="#spdcalc.CrystalSetup" title="spdcalc.CrystalSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrystalSetup</span></code></a>) – The crystal setup#[text_signature = “($self, crystal_setup)”]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a> – The external azimuthal angle in radians</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.get_index">
+<code class="sig-name descname">get_index</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">crystal_setup</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.get_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get index of refraction along the direction of propagation for a specified crystal setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>crystal_setup</strong> (<a class="reference internal" href="#spdcalc.CrystalSetup" title="spdcalc.CrystalSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrystalSetup</span></code></a>) – The crystal setup</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a> – The index of refraction</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.idler">
+<em class="property">static </em><code class="sig-name descname">idler</code><span class="sig-paren">(</span><em class="sig-param">phi_rad</em>, <em class="sig-param">theta_rad</em>, <em class="sig-param">wavelength_meters</em>, <em class="sig-param">waist_size_meters</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.idler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a idler photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phi_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The polar angle in radians</p></li>
+<li><p><strong>theta_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The azimuthal angle in radians</p></li>
+<li><p><strong>wavelength_meters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The wavelength in meters</p></li>
+<li><p><strong>waist_size_meters</strong> ((<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>)) – Two element tuple <cite>(x_size, y_size)</cite> for the waist size in the x,y directions</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.is_idler">
+<code class="sig-name descname">is_idler</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.is_idler" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.is_pump">
+<code class="sig-name descname">is_pump</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.is_pump" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.is_signal">
+<code class="sig-name descname">is_signal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.is_signal" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.Photon.phi">
+<code class="sig-name descname">phi</code><a class="headerlink" href="#spdcalc.Photon.phi" title="Permalink to this definition">¶</a></dt>
+<dd><p>The polar angle in radians <span class="math notranslate nohighlight">\([0, 2\pi)\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.pump">
+<em class="property">static </em><code class="sig-name descname">pump</code><span class="sig-paren">(</span><em class="sig-param">phi_rad</em>, <em class="sig-param">theta_rad</em>, <em class="sig-param">wavelength_meters</em>, <em class="sig-param">waist_size_meters</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.pump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a pump photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phi_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The polar angle in radians</p></li>
+<li><p><strong>theta_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The azimuthal angle in radians</p></li>
+<li><p><strong>wavelength_meters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The wavelength in meters</p></li>
+<li><p><strong>waist_size_meters</strong> ((<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>)) – Two element tuple <cite>(x_size, y_size)</cite> for the waist size in the x,y directions</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.set_angles">
+<code class="sig-name descname">set_angles</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">phi_rad</em>, <em class="sig-param">theta_rad</em>, <em class="sig-param">/</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.set_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set both internal angles in radians</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phi_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The polar angle in radians</p></li>
+<li><p><strong>theta_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The azimuthal angle in radians</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.set_from_external_theta">
+<code class="sig-name descname">set_from_external_theta</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">external_theta_rad</em>, <em class="sig-param">crystal_setup</em>, <em class="sig-param">/</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.set_from_external_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the theta from the external theta, provided a crystal setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>external_theta_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The azimuthal angle external to the crystal in radians</p></li>
+<li><p><strong>crystal_setup</strong> (<a class="reference internal" href="#spdcalc.CrystalSetup" title="spdcalc.CrystalSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrystalSetup</span></code></a>) – The crystal setup</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.signal">
+<em class="property">static </em><code class="sig-name descname">signal</code><span class="sig-paren">(</span><em class="sig-param">phi_rad</em>, <em class="sig-param">theta_rad</em>, <em class="sig-param">wavelength_meters</em>, <em class="sig-param">waist_size_meters</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a signal photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phi_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The polar angle in radians</p></li>
+<li><p><strong>theta_rad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The azimuthal angle in radians</p></li>
+<li><p><strong>wavelength_meters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The wavelength in meters</p></li>
+<li><p><strong>waist_size_meters</strong> ((<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>)) – Two element tuple <cite>(x_size, y_size)</cite> for the waist size in the x,y directions</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.Photon.theta">
+<code class="sig-name descname">theta</code><a class="headerlink" href="#spdcalc.Photon.theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>The azimuthal angle in radians <span class="math notranslate nohighlight">\([0, \pi/2]\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.Photon.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#spdcalc.Photon.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of this photon (<code class="docutils literal notranslate"><span class="pre">Signal</span></code>, <code class="docutils literal notranslate"><span class="pre">Pump</span></code>, <code class="docutils literal notranslate"><span class="pre">Idler</span></code>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.Photon.wavelength">
+<code class="sig-name descname">wavelength</code><a class="headerlink" href="#spdcalc.Photon.wavelength" title="Permalink to this definition">¶</a></dt>
+<dd><p>The wavelength in meters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.Photon.with_new_type">
+<code class="sig-name descname">with_new_type</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">photon_type</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Photon.with_new_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a copy of this photon with a new type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>photon_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – The type of photon (<code class="docutils literal notranslate"><span class="pre">Signal</span></code>, <code class="docutils literal notranslate"><span class="pre">Pump</span></code>, <code class="docutils literal notranslate"><span class="pre">Idler</span></code>)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a> – New instance of the photon with its type changed</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spdcalc.Apodization">
+<em class="property">class </em><code class="sig-prename descclassname">spdcalc.</code><code class="sig-name descname">Apodization</code><span class="sig-paren">(</span><em class="sig-param">fwhm_meters</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.Apodization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents apodization configuration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fwhm_meters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – full-width-half-max in meters</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="spdcalc.Apodization.fwhm">
+<code class="sig-name descname">fwhm</code><a class="headerlink" href="#spdcalc.Apodization.fwhm" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full-width-half-max in meters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spdcalc.PeriodicPoling">
+<em class="property">class </em><code class="sig-prename descclassname">spdcalc.</code><code class="sig-name descname">PeriodicPoling</code><span class="sig-paren">(</span><em class="sig-param">period_meters</em>, <em class="sig-param">apodization</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.PeriodicPoling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents configuration for periodic poling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>period_meters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The period in meters</p></li>
+<li><p><strong>apodization</strong> (<a class="reference internal" href="#spdcalc.Apodization" title="spdcalc.Apodization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Apodization</span></code></a>, optional) – The apodization. If unspecified, apodization is disabled.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="spdcalc.PeriodicPoling.compute_sign">
+<em class="property">static </em><code class="sig-name descname">compute_sign</code><span class="sig-paren">(</span><em class="sig-param">signal</em>, <em class="sig-param">pump</em>, <em class="sig-param">crystal_setup</em>, <em class="sig-param">/</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.PeriodicPoling.compute_sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the sign of the periodic poling based on the signal, pump, and crystal setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a>) – The signal photon</p></li>
+<li><p><strong>pump</strong> (<a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a>) – The pump photon</p></li>
+<li><p><strong>crystal_setup</strong> (<a class="reference internal" href="#spdcalc.CrystalSetup" title="spdcalc.CrystalSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrystalSetup</span></code></a>) – The crystal setup</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> – <code class="docutils literal notranslate"><span class="pre">+1</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.PeriodicPoling.get_apodization">
+<code class="sig-name descname">get_apodization</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.PeriodicPoling.get_apodization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the apodization configuration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.Apodization" title="spdcalc.Apodization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Apodization</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.PeriodicPoling.period">
+<code class="sig-name descname">period</code><a class="headerlink" href="#spdcalc.PeriodicPoling.period" title="Permalink to this definition">¶</a></dt>
+<dd><p>The poling period in meters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.PeriodicPoling.set_apodization">
+<code class="sig-name descname">set_apodization</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">apodization</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.PeriodicPoling.set_apodization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the apodization configuration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>apodization</strong> (<a class="reference internal" href="#spdcalc.Apodization" title="spdcalc.Apodization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Apodization</span></code></a>) – The apodization configuration. Set to <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> to disable</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spdcalc.SPDCSetup">
+<em class="property">class </em><code class="sig-prename descclassname">spdcalc.</code><code class="sig-name descname">SPDCSetup</code><a class="headerlink" href="#spdcalc.SPDCSetup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full SPDC setup configuration</p>
+<p>This is the main way to fully specify the experimental setup.
+There are a few ways to create this configuration. You can either
+start with a default configuration, and then change the properties
+manually, or you can load settings from a dictionary.</p>
+<p>Use <a class="reference internal" href="#spdcalc.SPDCSetup.default" title="spdcalc.SPDCSetup.default"><code class="xref py py-meth docutils literal notranslate"><span class="pre">default()</span></code></a> to create a default configuration.</p>
+<p>Use <a class="reference internal" href="#spdcalc.SPDCSetup.from_dict" title="spdcalc.SPDCSetup.from_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_dict()</span></code></a> to load settings from a dictionary.</p>
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.assign_optimum_idler">
+<code class="sig-name descname">assign_optimum_idler</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.assign_optimum_idler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate and assign the optimum idler to this setup</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.assign_optimum_periodic_poling">
+<code class="sig-name descname">assign_optimum_periodic_poling</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.assign_optimum_periodic_poling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate and assign the optimum periodic_poling to this setup (also autocomputes idler)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.assign_optimum_theta">
+<code class="sig-name descname">assign_optimum_theta</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.assign_optimum_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate and assign the optimum crystal theta to this setup (also autocomputes idler)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.auto_idler_waist_position">
+<code class="sig-name descname">auto_idler_waist_position</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.auto_idler_waist_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically use optimal waist position for idler</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.auto_signal_waist_position">
+<code class="sig-name descname">auto_signal_waist_position</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.auto_signal_waist_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically use optimal waist position for signal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.calc_delta_k">
+<code class="sig-name descname">calc_delta_k</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.calc_delta_k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate <span class="math notranslate nohighlight">\(\Delta k\)</span> vector in units of joule-seconds</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The <span class="math notranslate nohighlight">\(\Delta k\)</span> vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.calc_optimum_crystal_theta">
+<code class="sig-name descname">calc_optimum_crystal_theta</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.calc_optimum_crystal_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically calculate the optimal crystal theta
+by minimizing delta k and return the result.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To modify the current setup and use this theta, instead call <a class="reference internal" href="#spdcalc.SPDCSetup.assign_optimum_theta" title="spdcalc.SPDCSetup.assign_optimum_theta"><code class="xref py py-meth docutils literal notranslate"><span class="pre">assign_optimum_theta()</span></code></a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a> – The optimal crystal theta in radians</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.calc_optimum_periodic_poling">
+<code class="sig-name descname">calc_optimum_periodic_poling</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.calc_optimum_periodic_poling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically calculate the optimal poling period and sign and return the result</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To modify the current setup and use this periodic poling,
+instead call <a class="reference internal" href="#spdcalc.SPDCSetup.assign_optimum_periodic_poling" title="spdcalc.SPDCSetup.assign_optimum_periodic_poling"><code class="xref py py-meth docutils literal notranslate"><span class="pre">assign_optimum_periodic_poling()</span></code></a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.PeriodicPoling" title="spdcalc.PeriodicPoling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PeriodicPoling</span></code></a> – The optimal periodic poling setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.calc_pump_walkoff">
+<code class="sig-name descname">calc_pump_walkoff</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.calc_pump_walkoff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the pump walkoff angle in radians</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a> – The pump walkoff angle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.default">
+<em class="property">static </em><code class="sig-name descname">default</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a configuration with reasonable defaults</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.SPDCSetup" title="spdcalc.SPDCSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPDCSetup</span></code></a> – The configuration set to defaults</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.SPDCSetup.fiber_coupling">
+<code class="sig-name descname">fiber_coupling</code><a class="headerlink" href="#spdcalc.SPDCSetup.fiber_coupling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable/Disable fiber coupling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.from_dict">
+<em class="property">static </em><code class="sig-name descname">from_dict</code><span class="sig-paren">(</span><em class="sig-param">dict</em>, <em class="sig-param">with_defaults = False</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a configuration from a dictionary.</p>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<p>All values are in SI units, so beware that you set units
+correctly. (Perhaps use something like “pint” to help)</p>
+<p>If any manditory settings are unspecified, this will throw an error.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">with_defaults</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then any unsupplied settings
+will be set to their default value.</p>
+<p><strong>External thetas</strong></p>
+<p>The configuration stores the signal/idler theta angles
+internal to the crystal. You can specify the external
+values using <code class="docutils literal notranslate"><span class="pre">&quot;signal_theta_external&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;idler_theta_external&quot;</span></code>. The
+internal values will be calculated from this.
+Specification of external angles takes precedence
+if both are specified.</p>
+<p><strong>Idler</strong></p>
+<p>In either case, if idler settings are not specified
+the optimum idler values will be defaulted to
+(based on the rest of the settings you provide) and
+any idler settings that are specified will override
+the optimum idler values for the given settings.</p>
+<p><strong>Auto-calculation</strong></p>
+<p>If you want to auto-calculate optimum crystal angles, or
+periodic poling, you can set those values to zero (defaults)
+and then use the methods <a class="reference internal" href="#spdcalc.SPDCSetup.assign_optimum_theta" title="spdcalc.SPDCSetup.assign_optimum_theta"><code class="xref py py-meth docutils literal notranslate"><span class="pre">assign_optimum_theta()</span></code></a> and
+<a class="reference internal" href="#spdcalc.SPDCSetup.assign_optimum_periodic_poling" title="spdcalc.SPDCSetup.assign_optimum_periodic_poling"><code class="xref py py-meth docutils literal notranslate"><span class="pre">assign_optimum_periodic_poling()</span></code></a> afterwards.</p>
+<p><strong>Settings</strong></p>
+<p>To see all configuration values, look at the output of</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">SPDCSetup</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">setup</span> <span class="o">=</span> <span class="n">SPDCSetup</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span> <span class="s2">&quot;signal_wavelength&quot;</span><span class="p">:</span> <span class="mi">1440</span> <span class="o">*</span> <span class="mf">1e-9</span> <span class="p">},</span> <span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">setup</span><span class="o">.</span><span class="n">assign_optimum_theta</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a>) – A dictionary of configuration values.</p></li>
+<li><p><strong>with_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then any unsupplied settings will be set to their default value. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#spdcalc.SPDCSetup" title="spdcalc.SPDCSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPDCSetup</span></code></a> – The setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.get_crystal_setup">
+<code class="sig-name descname">get_crystal_setup</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.get_crystal_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the crystal setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.CrystalSetup" title="spdcalc.CrystalSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrystalSetup</span></code></a> – A copy of the crystal setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.get_idler">
+<code class="sig-name descname">get_idler</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.get_idler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the idler photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a> – A copy of the idler photon</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.get_periodic_poling">
+<code class="sig-name descname">get_periodic_poling</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.get_periodic_poling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the periodic poling setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.PeriodicPoling" title="spdcalc.PeriodicPoling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PeriodicPoling</span></code></a> – A copy of the periodic poling setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.get_pump">
+<code class="sig-name descname">get_pump</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.get_pump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the pump photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a> – A copy of the pump photon</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.get_signal">
+<code class="sig-name descname">get_signal</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.get_signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the signal photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a> – A copy of the signal photon</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.SPDCSetup.idler_fiber_theta_offset">
+<code class="sig-name descname">idler_fiber_theta_offset</code><a class="headerlink" href="#spdcalc.SPDCSetup.idler_fiber_theta_offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>The idler’s fiber collection theta offset</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This changes the angle of the idler’s fiber collection.
+This is a deviation, so <code class="docutils literal notranslate"><span class="pre">0.</span></code> means the fiber is aligned
+with the idler.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.SPDCSetup.idler_waist_position">
+<code class="sig-name descname">idler_waist_position</code><a class="headerlink" href="#spdcalc.SPDCSetup.idler_waist_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>The idler waist position relative to the end of the crystal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.SPDCSetup.pump_average_power">
+<code class="sig-name descname">pump_average_power</code><a class="headerlink" href="#spdcalc.SPDCSetup.pump_average_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pump’s average power in Watts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.SPDCSetup.pump_bandwidth">
+<code class="sig-name descname">pump_bandwidth</code><a class="headerlink" href="#spdcalc.SPDCSetup.pump_bandwidth" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pump bandwidth in Meters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.SPDCSetup.pump_spectrum_threshold">
+<code class="sig-name descname">pump_spectrum_threshold</code><a class="headerlink" href="#spdcalc.SPDCSetup.pump_spectrum_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cutoff amplitude below which the phasematching will be considered zero</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This helps optimize JSA calculations, especially with fiber coupling
+If the pump spectrum is below this value (dimensionless), then
+the full JSA calculation will not happen, and will be set to zero.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.set_crystal_setup">
+<code class="sig-name descname">set_crystal_setup</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">crystal_setup</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.set_crystal_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the crystal setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>crystal_setup</strong> (<a class="reference internal" href="#spdcalc.CrystalSetup" title="spdcalc.CrystalSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrystalSetup</span></code></a>) – The crystal setup  to assign to this setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.set_idler">
+<code class="sig-name descname">set_idler</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">idler</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.set_idler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the idler photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>idler</strong> (<a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a>) – The idler photon to assign to this setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.set_periodic_poling">
+<code class="sig-name descname">set_periodic_poling</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">periodic_poling</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.set_periodic_poling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the periodic poling setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>periodic_poling</strong> (<a class="reference internal" href="#spdcalc.PeriodicPoling" title="spdcalc.PeriodicPoling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PeriodicPoling</span></code></a>) – The periodic poling setup to assign to this setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.set_pump">
+<code class="sig-name descname">set_pump</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pump</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.set_pump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the pump photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pump</strong> (<a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a>) – The pump photon to assign to this setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.set_signal">
+<code class="sig-name descname">set_signal</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">signal</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.set_signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the signal photon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>signal</strong> (<a class="reference internal" href="#spdcalc.Photon" title="spdcalc.Photon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Photon</span></code></a>) – The signal photon to assign to this setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.SPDCSetup.signal_fiber_theta_offset">
+<code class="sig-name descname">signal_fiber_theta_offset</code><a class="headerlink" href="#spdcalc.SPDCSetup.signal_fiber_theta_offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>The signal’s fiber collection theta offset</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This changes the angle of the signal’s fiber collection.
+This is a deviation, so <code class="docutils literal notranslate"><span class="pre">0.</span></code> means the fiber is aligned
+with the signal.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spdcalc.SPDCSetup.signal_waist_position">
+<code class="sig-name descname">signal_waist_position</code><a class="headerlink" href="#spdcalc.SPDCSetup.signal_waist_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>The signal waist position relative to the end of the crystal in meters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.to_collinear">
+<code class="sig-name descname">to_collinear</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.to_collinear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a collinear setup with signal and idler aligned with pump.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.SPDCSetup" title="spdcalc.SPDCSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPDCSetup</span></code></a> – new setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.to_dict">
+<code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">with_idler = False</em>, <em class="sig-param">with_autocomputed = False</em>, <em class="sig-param">/</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export this configuration as a python dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>with_idler</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the idler values will be included. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>with_autocomputed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <cite>True</cite>, then the values which are normally autocomputed (namely, the signal
+and idler waist positions) will be included. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a> – The flat configuration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.with_fiber_theta_offsets_applied">
+<code class="sig-name descname">with_fiber_theta_offsets_applied</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.with_fiber_theta_offsets_applied" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of self which has both fiber angle offsets applied. (mainly used internally)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.SPDCSetup" title="spdcalc.SPDCSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPDCSetup</span></code></a> – new setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.with_idler_fiber_theta_offsets_applied">
+<code class="sig-name descname">with_idler_fiber_theta_offsets_applied</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.with_idler_fiber_theta_offsets_applied" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of self which has the idler fiber angle offset applied. (mainly used internally)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.SPDCSetup" title="spdcalc.SPDCSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPDCSetup</span></code></a> – new setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.with_phasematched_pump">
+<code class="sig-name descname">with_phasematched_pump</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.with_phasematched_pump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a copy with the pump wavelength set to phasematch
+with the signal and idler</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.SPDCSetup" title="spdcalc.SPDCSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPDCSetup</span></code></a> – new setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.with_signal_fiber_theta_offsets_applied">
+<code class="sig-name descname">with_signal_fiber_theta_offsets_applied</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.with_signal_fiber_theta_offsets_applied" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of self which has the signal fiber angle offset applied. (mainly used internally)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.SPDCSetup" title="spdcalc.SPDCSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPDCSetup</span></code></a> – new setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spdcalc.SPDCSetup.with_swapped_signal_idler">
+<code class="sig-name descname">with_swapped_signal_idler</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc.SPDCSetup.with_swapped_signal_idler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a copy of this config with the signal and idler swapped</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This changes the phasematch type if it’s Type 2
+swapping extraordinary and ordinary channels</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spdcalc.SPDCSetup" title="spdcalc.SPDCSetup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPDCSetup</span></code></a> – new setup</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plotting.html" class="btn btn-neutral float-right" title="spdcalc.plotting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Jasper Palfree, Krister Shalm
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
