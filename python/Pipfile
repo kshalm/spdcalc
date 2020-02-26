@@ -25,6 +25,8 @@ Sphinx = "~=2.4"
 toml = "*"
 nbsphinx = "*"
 jupyter = "*"
+psutil = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"
