@@ -28,6 +28,7 @@ jupyter = "*"
 psutil = "*"
 requests = "*"
 cffi = "*"
+nbconvert = "*"
 
 [requires]
 python_version = "3.7"

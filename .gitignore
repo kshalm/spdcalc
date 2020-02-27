@@ -13,3 +13,4 @@ web/pkg/
 spdcalc/src/main.rs
 
 python/docs/_build
+.ipynb_checkpoints
