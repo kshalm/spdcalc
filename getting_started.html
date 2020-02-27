@@ -183,7 +183,19 @@
 </style>
 <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>TODO</p>
+<p>SPDCalc is written using the RUST programming language. This library provides
+python bindings for the rust code. Binary wheels are available for
+some architectures but if one is not available you can try building it
+yourself.</p>
+<p>If a binary wheel is available, you can install SPDCalc using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install spdcalc
+</pre></div>
+</div>
+<p>If your architecture does not have a wheel, you will need to install
+rust nightly. And then try running pip install with the nightly rust toolchain.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ rustup run nightly pip install spdcalc
+</pre></div>
+</div>
 </div>
 
 
