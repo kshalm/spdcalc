@@ -10,6 +10,7 @@ SPDCalc Python Documentation
    :maxdepth: 2
    :caption: Contents:
 
+   what_is_spdcalc
    getting_started
    guide/index
    examples/index
