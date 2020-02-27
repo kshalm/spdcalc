@@ -27,6 +27,7 @@ nbsphinx = "*"
 jupyter = "*"
 psutil = "*"
 requests = "*"
+cffi = "*"
 
 [requires]
 python_version = "3.7"

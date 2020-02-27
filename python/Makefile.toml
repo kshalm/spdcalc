@@ -1,14 +1,29 @@
 [tasks.build]
 install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
-command = "maturin"
-args = ["build"]
+command = "pipenv"
+args = ["run", "maturin", "build", "--release"]
+dependencies = ["pip_install"]
+
+[tasks.build-cffi]
+install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
+toolchain = "nightly"
+command = "pipenv"
+args = ["run", "maturin", "build", "-b", "cffi", "--release"]
+dependencies = ["pip_install"]
+
+[tasks.publish]
+install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
+toolchain = "nightly"
+command = "pipenv"
+args = ["run", "maturin", "publish", "--release"]
+dependencies = ["pip_install"]
 
 [tasks.dev]
 install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
 command = "pipenv"
-args = ["run", "maturin", "develop", "--release"]
+args = ["run", "maturin", "develop"]
 dependencies = ["pip_install"]
 
 [tasks.pip_install]
@@ -28,7 +43,7 @@ args = ["install", "--dev"]
 [tasks.docs]
 command = "pipenv"
 args = ["run", "sphinx-build", "-b", "html", "docs", "docs/_build"]
-# dependencies = ["pip_install"]
+dependencies = ["pip_install"]
 
 [tasks.docs-publish]
 install_crate = "cargo-sphinx"
@@ -40,12 +55,6 @@ args = ["sphinx", "--push"]
 # command = "pipenv"
 # args = ["run", "maturin", "develop"]
 # dependencies = ["pip_install"]
-
-[tasks.publish]
-install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
-toolchain = "nightly"
-command = "maturin"
-args = ["publish", "-i", "python3"]
 
 [tasks.clean_pip]
 command = "pipenv"
