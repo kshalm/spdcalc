@@ -46,9 +46,8 @@ args = ["run", "sphinx-build", "-b", "html", "docs", "docs/_build"]
 dependencies = ["pip_install"]
 
 [tasks.docs-publish]
-install_crate = "cargo-sphinx"
-command = "cargo"
-args = ["sphinx", "--push"]
+command = "bash"
+args = ["docs/deploy.sh"]
 
 # [tasks.pip_dev]
 # toolchain = "nightly"

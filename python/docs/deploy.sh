@@ -4,7 +4,8 @@
 set -e
 
 # navigate into the build output directory
-cd _build
+DIRECTORY=$(cd `dirname $0` && pwd)
+cd $DIRECTORY/_build
 
 # if you are deploying to a custom domain
 # echo 'www.example.com' > CNAME
