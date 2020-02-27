@@ -22,12 +22,8 @@ version = "0.9.0-alpha.1"
 features = ["extension-module", "num-complex"]
 
 [dependencies.spdcalc]
-path = '../'
+# path = '../'
 version = "0.1"
 
-[package.metadata.sphinx]
-docs-path = "docs"
-commit-message = "(cargo-sphinx) Generate docs."
-sign-commit = false
-push-remote = "origin"
-push-branch = "gh-pages"
+[patch.crates-io]
+spdcalc = { git = "https://github.com/kshalm/spdcalc", branch = "v2.0" }
