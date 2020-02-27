@@ -48,6 +48,7 @@ dependencies = ["pip_install"]
 [tasks.docs-publish]
 command = "bash"
 args = ["docs/deploy.sh"]
+dependencies = ["docs"]
 
 # [tasks.pip_dev]
 # toolchain = "nightly"
