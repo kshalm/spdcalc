@@ -12,8 +12,11 @@ If a binary wheel is available, you can install SPDCalc using pip:
 
     $ pip install spdcalc
 
-If your architecture does not have a wheel, you will need to install
-rust nightly. And then try running pip install with the nightly rust toolchain.
+If your architecture does not have a wheel, you will need to
+
+1. `Install rust <https://www.rust-lang.org/tools/install>`_
+2. `Install the nightly toolchain for rust <https://github.com/rust-lang/rustup/blob/master/README.md#working-with-nightly-rust>`_
+3. Run the following command
 
 .. code-block:: bash
 

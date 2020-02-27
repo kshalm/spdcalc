@@ -40,10 +40,12 @@ args = ["install", "--dev"]
 # command = "cargo"
 # args = ["sphinx"]
 
-[tasks.docs]
+[tasks.sphinx]
 command = "pipenv"
 args = ["run", "sphinx-build", "-b", "html", "docs", "docs/_build"]
-dependencies = ["pip_install"]
+
+[tasks.docs]
+dependencies = ["pip_install", "sphinx"]
 
 [tasks.docs-publish]
 command = "bash"
