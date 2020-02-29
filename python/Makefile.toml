@@ -1,26 +1,33 @@
 [tasks.build]
-install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
+# install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
 command = "pipenv"
 args = ["run", "maturin", "build", "--release"]
 dependencies = ["pip_install"]
 
+[tasks.build-win]
+# install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
+toolchain = "nightly"
+command = "pipenv"
+args = ["run", "maturin", "build", "--release", "--target", "x86_64-pc-windows-gnu"]
+# dependencies = ["pip_install"]
+
 [tasks.build-cffi]
-install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
+# install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
 command = "pipenv"
 args = ["run", "maturin", "build", "-b", "cffi", "--release"]
 dependencies = ["pip_install"]
 
 [tasks.publish]
-install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
+# install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
 command = "pipenv"
 args = ["run", "maturin", "publish", "--release"]
 dependencies = ["pip_install"]
 
 [tasks.dev]
-install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
+# install_crate = { crate_name = "maturin", binary = "maturin", test_arg = "--help" }
 toolchain = "nightly"
 command = "pipenv"
 args = ["run", "maturin", "develop"]
