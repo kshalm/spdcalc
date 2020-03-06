@@ -45,6 +45,8 @@ command = "pipenv"
 args = ["run", "sphinx-build", "-b", "html", "docs", "docs/_build"]
 
 [tasks.docs]
+command = "pipenv"
+args = ["run", "sphinx-build", "-b", "html", "docs", "docs/_build"]
 dependencies = ["pip_install", "sphinx"]
 
 [tasks.docs-publish]
