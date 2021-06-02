@@ -22,7 +22,7 @@ version = "0.13.2"
 features = ["extension-module", "num-complex"]
 
 [dependencies.spdcalc]
-path = "../"
+# path = "../"
 version = "0.1"
 
 [patch.crates-io]
