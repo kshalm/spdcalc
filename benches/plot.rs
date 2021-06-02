@@ -7,6 +7,7 @@ extern crate spdcalc;
 use spdcalc::{
   plotting::*,
   spdc_setup::*,
+  utils::Steps2D,
   dim::{
     f64prefixes::*,
     ucum:: {
