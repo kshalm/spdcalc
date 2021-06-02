@@ -4,7 +4,6 @@ use spdcalc::{
   spdc_setup::{SPDCSetup, SPDCConfig},
 };
 use pyo3::{
-  ObjectProtocol,
   PyErr,
   types::{PyDict},
 };

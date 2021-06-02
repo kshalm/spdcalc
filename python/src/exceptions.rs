@@ -2,7 +2,7 @@ use std::fmt;
 use std::error::Error;
 use pyo3::{
   PyErr,
-  exceptions::{Exception},
+  exceptions::{PyException},
 };
 
 #[derive(Debug)]
@@ -34,6 +34,6 @@ impl From<serde_json::error::Error> for PySPDCError {
 
 impl From<PySPDCError> for PyErr {
   fn from( err : PySPDCError ) -> Self {
-    PyErr::new::<Exception, _>(err.0)
+    PyErr::new::<PyException, _>(err.0)
   }
 }

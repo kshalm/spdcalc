@@ -2,11 +2,11 @@ use pyo3::{
   prelude::*,
   PyErr,
   types::{PyDict},
-  exceptions::{Exception},
+  exceptions::{PyException},
 };
 
 pub fn serde_error_to_py( e : serde_json::error::Error ) -> PyErr {
-  PyErr::new::<Exception, _>(e.to_string())
+  PyErr::new::<PyException, _>(e.to_string())
 }
 
 pub fn json_to_dict( py : Python, str : String ) -> PyResult<PyObject> {

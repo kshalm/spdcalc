@@ -29,6 +29,7 @@ psutil = "*"
 requests = "*"
 cffi = "*"
 nbconvert = "*"
+maturin = "*"
 
 [requires]
 python_version = "3.7"

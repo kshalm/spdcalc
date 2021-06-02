@@ -8,7 +8,7 @@ use pyo3::{
   prelude::*,
   PyErr,
   PyObjectProtocol,
-  exceptions::{KeyError},
+  exceptions::{PyKeyError},
   // types::{PyType},
   // wrap_pyfunction
 };
@@ -72,7 +72,7 @@ impl Crystal {
   #[staticmethod]
   #[text_signature = "(id, /)"]
   fn from_id(id : String) -> PyResult<Self> {
-    let c = crystal::Crystal::from_string(&id).map_err(|e| PyErr::new::<KeyError, _>(e.0))?;
+    let c = crystal::Crystal::from_string(&id).map_err(|e| PyErr::new::<PyKeyError, _>(e.0))?;
     Ok(Self {
       crystal: c
     })

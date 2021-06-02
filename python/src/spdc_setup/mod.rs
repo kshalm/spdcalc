@@ -109,7 +109,7 @@ impl PeriodicPoling {
   /// Returns
   /// -------
   /// :obj:`Apodization`
-  pub fn get_apodization(self) -> Option<Apodization> {
+  pub fn get_apodization(&self) -> Option<Apodization> {
     self.periodic_poling.apodization.map(|apodization| Apodization { apodization })
   }
 
@@ -543,7 +543,7 @@ impl SPDCSetup {
   /// :obj:`SPDCSetup`
   ///   new setup
   #[text_signature = "($self)"]
-  pub fn with_swapped_signal_idler(self) -> Self {
+  pub fn with_swapped_signal_idler(&self) -> Self {
     Self { spdc_setup: self.spdc_setup.with_swapped_signal_idler() }
   }
 

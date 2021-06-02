@@ -49,7 +49,7 @@ pub fn calc_HOM_rate_series(
   time_shift.into_iter().map(|delta_t| {
     let integrator = SimpsonIntegration2D::new(|ls, li, index| {
       let delta_w = PI2 * C_ * (1./li - 1./ls) / M;
-      let shift = Complex::from_polar(&1., &*(delta_w * delta_t));
+      let shift = Complex::from_polar(1., *(delta_w * delta_t));
 
       // jsa values at index
       let f_si = jsa_si[index];

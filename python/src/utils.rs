@@ -2,7 +2,6 @@ use pyo3::{
   prelude::*,
   PyObjectProtocol,
   PyIterProtocol,
-  PyClassShell,
   // types::{PyTuple},
   // wrap_pyfunction
 };
@@ -57,14 +56,14 @@ impl Steps2D {
 
   /// Get a list of x-axis values
   #[text_signature = "($self)"]
-  pub fn get_x_values(self) -> Vec<f64> {
+  pub fn get_x_values(&self) -> Vec<f64> {
     let steps = spdcalc::utils::Steps(self.x.0, self.x.1, self.x.2);
     steps.into_iter().collect()
   }
 
   /// Get a list of y-axis values
   #[text_signature = "($self)"]
-  pub fn get_y_values(self) -> Vec<f64> {
+  pub fn get_y_values(&self) -> Vec<f64> {
     let steps = spdcalc::utils::Steps(self.y.0, self.y.1, self.y.2);
     steps.into_iter().collect()
   }
@@ -79,11 +78,11 @@ impl PyObjectProtocol for Steps2D {
 
 #[pyproto]
 impl PyIterProtocol for Steps2D {
-  fn __iter__(slf: &mut PyClassShell<Self>) -> PyResult<Py<Steps2D>> {
+  fn __iter__(slf: PyRefMut<Self>) -> PyResult<Py<Steps2D>> {
     Ok(slf.into())
   }
 
-  fn __next__(slf: &mut PyClassShell<Self>) -> PyResult<Option<(f64, f64)>> {
+  fn __next__(mut slf: PyRefMut<Self>) -> PyResult<Option<(f64, f64)>> {
     Ok(slf.iter.next())
   }
 }
