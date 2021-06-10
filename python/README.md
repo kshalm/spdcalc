@@ -14,7 +14,7 @@ from spdcalc import *
 # your code here...
 ```
 
-Running spdcalc on Windows
+### Running spdcalc on Windows
 
 Install Microsoft C++ build tools from https://visualstudio.microsoft.com/visual-cpp-build-tools/
 Install Rust from https://www.rust-lang.org/tools/install and then use the Rustup tool to install using default settings. 
