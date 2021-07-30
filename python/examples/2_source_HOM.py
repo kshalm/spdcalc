@@ -9,11 +9,7 @@ import spdcalc as spdc
 import numpy as np
 from math import pi
 import matplotlib.pyplot as plt
-import time
 from numba import jit
-
-ts1 = time.time()
-print(ts1)
 
 lambda_s = lambda_i = 1550e-9
 lambda_p = 775e-9
@@ -42,10 +38,6 @@ JSA = np.zeros((dim, dim), dtype = np.csingle)
 for i in range(dim):
     for j in range(dim):
         JSA[i][j] = spdc.jsa.calc_jsa(setup, signal[i], idler[j])
-
-# jsi_data = spdc.plotting.plot_jsi(setup, ranges)
-# z = np.reshape(jsi_data, (dim, dim))
-# JSA = np.sqrt(z)
 
 @jit
 def two_source_HOM(signal, idler, dt, JSA):
@@ -94,21 +86,31 @@ def two_source_HOM(signal, idler, dt, JSA):
     return {'ss': rate_ss, 'ii': rate_ii, 'si': rate_si}
 
 def two_source_HOM_norm(signal, idler, JSA):
-    dt = 1e6
-    norm = two_source_HOM(signal, idler, dt, JSA)
-    return norm
-
-norm = two_source_HOM_norm(signal, idler, JSA)
+    rate = 0
+    for j in range(len(signal)):
+        
+        for k in range(len(idler)):
+            A = JSA[j][k]
+            
+            for l in range(len(signal)):
+                
+                for m in range(len(idler)):
+                    B = JSA[l][m]
+                    
+                    arg1 = A*B 
+                    
+                    rate += np.absolute(arg1)**2
+    return rate
 
 def two_source_HOM_range(signal, idler, times, JSA):
-    # norm = two_source_HOM_norm(signal, idler)
+    norm = two_source_HOM_norm(signal, idler, JSA)
     rates = two_source_HOM(signal, idler, times, JSA)
     rate_ss = np.array(rates['ss'])
     rate_ii = np.array(rates['ii'])
     rate_si = np.array(rates['si'])
-    rate_ss = 0.5*rate_ss/norm['ss']
-    rate_ii = 0.5*rate_ii/norm['ii']
-    rate_si = 0.5*rate_si/norm['si']
+    rate_ss = rate_ss/norm
+    rate_ii = rate_ii/norm
+    rate_si = rate_si/norm
     return {"ss": rate_ss, "ii": rate_ii, "si": rate_si}
 
 dimt = 100
@@ -117,11 +119,8 @@ rates = two_source_HOM_range(signal, idler, times, JSA)
 ss = rates['ss']
 ii = rates['ii']
 
-
-plt.plot(times, ss)
-plt.plot(times, ii)
+plt.plot(times*1e15, ss)
+plt.plot(times*1e15, ii)
+plt.ylabel('Coincidence probability')
+plt.xlabel('Time delay (fs)')
 plt.show()
-
-ts2 = time.time()
-print(ts2)
-print(ts2-ts1)
