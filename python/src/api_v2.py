@@ -332,11 +332,7 @@ def steps2D_input_from_array(array):
 
 def is_valid_spacing(array):
     diff_vals = np.diff(array)
-    print(diff_vals)
     isValid = np.all(np.isclose(diff_vals, diff_vals[0]))
-    # valid_boolean = diff_vals==diff_vals[0]
-    # print(valid_boolean)
-    # isValid = np.any(valid_boolean)
     return isValid
 
 def two_source_HOM(signal, idler, dt, JSA):
