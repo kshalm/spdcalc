@@ -1,8 +1,0 @@
-{
-    "python.pythonPath": "C:\\ProgramData\\Anaconda3\\python.exe",
-    "python.pythonPath": "C:\\ProgramData\\Anaconda3\\python.exe",
-    "terminal.integrated.shell.windows": "C:\\WINDOWS\\System32\\cmd.exe",
-    "terminal.integrated.shellArgs.windows": ["/K", "C:\\ProgramData\\Anaconda3\\Scripts\\activate.bat C:\\ProgramData\\Anaconda3"],
-    "python.condaPath": "C:\\ProgramData\\Anaconda3\\Scripts\\conda.exe",
-    "python.terminal.activateEnvironment": true
-}
