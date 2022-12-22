@@ -49,5 +49,9 @@ verify lambda/n >> 20 ??
 
 
 -[ ] lock button copy spd parameters to local
-
 -[ ] plot legend selection forgets upon refresh
+
+Iterator for spdsetup to facilitate repeated computations.
+```
+iterator(spdsetup, { 'signal.wavelength': [values] })
+```
