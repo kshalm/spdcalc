@@ -1,12 +1,14 @@
 extern crate ndarray;
-extern crate optimize;
+// extern crate optimize;
 // use nelder_mead::{*, params::*, bounds::*};
 // use argmin::prelude::*;
 // use argmin::solver::neldermead::NelderMead;
 // use serde::{Deserialize, Serialize};
 
-use ndarray::{Array, ArrayView1};
-use optimize::*;
+use argmin::core::{CostFunction, Executor};
+// use ndarray::{Array, ArrayView1};
+use argmin::solver::neldermead::NelderMead;
+// use optimize::*;
 
 // #[derive(Clone, Default, Serialize, Deserialize)]
 // struct NelderMead1d<F: FnMut(f64) -> f64> {
@@ -32,6 +34,28 @@ use optimize::*;
 //   }
 // }
 
+struct Cost1d<F>
+  where F: Fn(f64) -> f64
+{
+  func : F,
+  min: f64,
+  max: f64,
+}
+impl<F> CostFunction for Cost1d<F>
+  where F: Fn(f64) -> f64
+{
+  type Param = f64;
+  type Output = f64;
+  fn cost(&self, x: &Self::Param) -> Result<Self::Output, argmin::core::Error> {
+    if x > &self.max || x < &self.min {
+      Ok(std::f64::INFINITY)
+    } else {
+      let f = &self.func;
+      Ok(f(*x))
+    }
+  }
+}
+
 /// nelder mead optimization. Returns x
 pub fn nelder_mead_1d(
   func : impl Fn(f64) -> f64,
@@ -41,27 +65,41 @@ pub fn nelder_mead_1d(
   max : f64,
   tolerance : f64,
 ) -> f64 {
-  let minimizer = NelderMeadBuilder::default()
-    .xtol(tolerance)
-    .ftol(tolerance)
-    .maxiter(max_iter as usize)
-    .build()
+
+  let cost = Cost1d { func, min, max };
+  let solver = NelderMead::new(vec![guess, max])
+    .with_sd_tolerance(tolerance)
     .unwrap();
 
-  let cost = |args : ArrayView1<f64>| {
-    let x = args[0];
-    if x > max || x < min {
-      std::f64::INFINITY
-    }
-    // high cost if x outside bounds
-    else {
-      func(x)
-    }
-  };
+  let res = Executor::new(cost, solver)
+    .configure(|state| state.max_iters(max_iter as u64))
+    .run()
+    .unwrap();
 
-  let ans = minimizer.minimize(&cost, Array::from_vec(vec![guess]).view());
+  use argmin::core::State;
+  *res.state().get_best_param().unwrap()
 
-  ans[0]
+  // let minimizer = NelderMeadBuilder::default()
+  //   .xtol(tolerance)
+  //   .ftol(tolerance)
+  //   .maxiter(max_iter as usize)
+  //   .build()
+  //   .unwrap();
+
+  // let cost = |args : ArrayView1<f64>| {
+  //   let x = args[0];
+  //   if x > max || x < min {
+  //     std::f64::INFINITY
+  //   }
+  //   // high cost if x outside bounds
+  //   else {
+  //     func(x)
+  //   }
+  // };
+
+  // let ans = minimizer.minimize(&cost, Array::from_vec(vec![guess]).view());
+
+  // ans[0]
 
   // let (x, _fx) = minimize(
   //   |args| func(args[0]),

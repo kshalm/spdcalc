@@ -8,6 +8,9 @@ pub use integration::*;
 mod nelder_mead;
 pub use self::nelder_mead::*;
 
+mod schmidt;
+pub use self::schmidt::*;
+
 // ensures that the Gaussian and sinc functions have the same widths.
 // ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
 const GAUSSIAN_SINC_GAMMA_FACTOR : f64 = 0.193;

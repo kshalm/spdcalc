@@ -11,15 +11,26 @@ license="MIT"
 crate-type = ["rlib"]
 
 [dependencies]
-num = "0.3"
-nalgebra = "0.18"
-dimensioned = "0.7"
-nelder_mead = { git = "https://github.com/JD557/nelder-mead.rs" }
-optimize = "0.1"
-ndarray = "0.11" # can't upgrade... needs 0.11
-serde = "^1.0.59"
-serde_derive = "^1.0.59"
-# argmin = "0.2"
+# num = "0.3"
+# nalgebra = "0.18"
+# dimensioned = "0.7"
+# argmin = "0.7"
+# ndarray = "0.11"
+# serde = "^1.0.59"
+# serde_derive = "^1.0.59"
+
+num = "0.4"
+nalgebra = "0.31"
+dimensioned = "0.8"
+# nelder_mead = { git = "https://github.com/JD557/nelder-mead.rs" }
+# optimize = "0.1" # ... needs ndarray 0.11
+argmin = "0.7"
+ndarray = "0.15"
+serde = "^1.0"
+serde_derive = "^1.0"
+
+[features]
+wasm-bindgen = ["argmin/wasm-bindgen"]
 
 [dev-dependencies]
 criterion = "0.2"
