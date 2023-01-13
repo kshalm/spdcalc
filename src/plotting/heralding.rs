@@ -221,8 +221,7 @@ pub fn calc_singles_rate_distributions(spdc_setup : &SPDCSetup, wavelength_range
   let theta_s_e = *(spdc_setup.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
   let PHI_s = 1. / f64::cos(theta_s_e);
 
-  // spd_swap.signal is idler
-  let theta_i_e = *(spd_swap.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
+  let theta_i_e = *(spdc_setup.idler.get_external_theta(&spdc_setup.crystal_setup) / RAD);
   let PHI_i = 1. / f64::cos(theta_i_e);
 
   let scale_s = Ws_SQ * PHI_s;
@@ -236,14 +235,14 @@ pub fn calc_singles_rate_distributions(spdc_setup : &SPDCSetup, wavelength_range
 
       let f = eta_s * d_omega_s * d_omega_i;
 
-      let lomega_s = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spdc_setup);
-      let factor_s = scale_s * lomega_s * f;
-
-      let lomega_i = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spd_swap);
-      let factor_i = scale_i * lomega_i * f;
+      // it's symmetric so no need to swap
+      let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spdc_setup);
+      let factor_s = scale_s * lomega * f;
+      let factor_i = scale_i * lomega * f;
 
       let amplitude_s = *(calc_jsa_singles(&spdc_setup, l_s, l_i) / jsa_units);
-      let amplitude_i = *(calc_jsa_singles(&spd_swap, l_s, l_i) / jsa_units);
+      // swap signal/idler wavelengths for spd_swap...
+      let amplitude_i = *(calc_jsa_singles(&spd_swap, l_i, l_s) / jsa_units);
       // technically this distribution has units of 1/(s m^2).. but we return 1/s
       (
         amplitude_s.norm() * factor_s * jsa_units / M / M,
