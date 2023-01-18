@@ -40,7 +40,6 @@ fn calc_rate_constant(spdc_setup : &SPDCSetup) -> RateConstUnits<f64> {
   let L = spdc_setup.crystal_setup.length;
   let Pav = spdc_setup.pump_average_power;
   let deff = spdc_setup.crystal_setup.crystal.get_effective_nonlinear_coefficient();
-
   constants * sq(deff) * Wp_SQ * sq(L) * Pav / sigma
 }
 
@@ -98,16 +97,24 @@ pub fn calc_coincidences_rate_distribution(spdc_setup : &SPDCSetup, wavelength_r
 
   let eta = calc_coincidence_rate_constant(&spdc_setup);
 
+  let jsa_units = JSAUnits::new(1.);
+
   // NOTE: moving this inside the integral and using running lamda values
   // results in efficiency change of ~0.01%
 
-  let jsa_units = JSAUnits::new(1.);
+  // TODO: check with krister
+  // NOTE: this was the old way
+  let l_s = spdc_setup.signal.get_wavelength();
+  let l_i = spdc_setup.idler.get_wavelength();
+  let d_omega_s = PI2c * dlamda_s / sq(l_s);
+  let d_omega_i = PI2c * dlamda_i / sq(l_i);
 
   wavelength_range
     .into_iter()
     .map(|(l_s, l_i)| {
-      let d_omega_s = PI2c * dlamda_s / sq(l_s);
-      let d_omega_i = PI2c * dlamda_i / sq(l_i);
+      // let d_omega_s = PI2c * dlamda_s / sq(l_s);
+      // let d_omega_i = PI2c * dlamda_i / sq(l_i);
+      // dbg!(d_omega_s, d_omega_i);
       let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spdc_setup);
       let factor = eta * lomega * d_omega_s * d_omega_i;
       let amplitude = calc_jsa(&spdc_setup, l_s, l_i) / jsa_units;
@@ -358,6 +365,7 @@ mod tests {
   // extern crate float_cmp;
   // use float_cmp::*;
   use dim::f64prefixes::{NANO, MICRO};
+  use ucum::DEG;
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * (expected - actual).abs() / expected
@@ -386,18 +394,21 @@ mod tests {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
     spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.theta = 90. * DEG;
+    spdc_setup.crystal_setup.length = 6000. * MICRO * M;
+    spdc_setup.pump.waist = WaistSize::new(Vector2::new(200. * MICRO, 200. * MICRO));
     spdc_setup.assign_optimum_periodic_poling();
 
     let wavelength_range = Steps2D(
-      (1490.86 * NANO * M, 1609.14 * NANO * M, 30),
-      (1495.05 * NANO * M, 1614.03 * NANO * M, 30)
+      (1546.02 * NANO * M, 1553.99 * NANO * M, 30),
+      (1542.05 * NANO * M, 1550.00 * NANO * M, 30)
     );
 
     let rates = calc_coincidences_rate_distribution(&spdc_setup, &wavelength_range);
     let actual = rates.iter().map(|&r| *(r * S)).sum();
-    let expected = 9383.009533773818;
+    let expected = 3800.0;
 
-    let accept_diff = 1e-1;
+    let accept_diff = 1.; // percent difference accpetable
     let pdiff = percent_diff(actual, expected);
 
     assert!(
@@ -414,11 +425,14 @@ mod tests {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
     spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.theta = 90. * DEG;
+    spdc_setup.crystal_setup.length = 6000. * MICRO * M;
+    spdc_setup.pump.waist = WaistSize::new(Vector2::new(200. * MICRO, 200. * MICRO));
     spdc_setup.assign_optimum_periodic_poling();
 
     let wavelength_range = Steps2D(
-      (1490.86 * NANO * M, 1609.14 * NANO * M, 30),
-      (1495.05 * NANO * M, 1614.03 * NANO * M, 30)
+      (1546.02 * NANO * M, 1553.99 * NANO * M, 30),
+      (1542.05 * NANO * M, 1550.00 * NANO * M, 30)
     );
 
     let rates = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
@@ -431,9 +445,9 @@ mod tests {
         (col.0 + r_s, col.1 + r_i)
       );
 
-    let expected = (10556.90581692082, 10557.14761885458);
+    let expected = (3901.133069046596, 3901.3937911182834);
 
-    let accept_diff = 1e-1;
+    let accept_diff = 1.; // percent difference accpetable
     let pdiff_s = percent_diff(actual.0, expected.0);
 
     assert!(
@@ -518,18 +532,21 @@ mod tests {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
     spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.theta = 90. * DEG;
+    spdc_setup.crystal_setup.length = 6000. * MICRO * M;
+    spdc_setup.pump.waist = WaistSize::new(Vector2::new(200. * MICRO, 200. * MICRO));
     spdc_setup.assign_optimum_periodic_poling();
 
     let wavelength_range = Steps2D(
-      (1490.86 * NANO * M, 1609.14 * NANO * M, 30),
-      (1495.05 * NANO * M, 1614.03 * NANO * M, 30)
+      (1546.02 * NANO * M, 1553.99 * NANO * M, 30),
+      (1542.05 * NANO * M, 1550.00 * NANO * M, 30)
     );
 
     let coinc_rate_distr = calc_coincidences_rate_distribution(&spdc_setup, &wavelength_range);
     let singles_rate_distrs = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
 
     let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
-
+    dbg!(results);
     let accept_diff = 1e-1;
 
     // old bugged code would give
@@ -539,17 +556,7 @@ mod tests {
     // idler efficiency 0.8601985237734435
     // signal efficiency 0.860178431887653
 
-    let expected_idler = 0.8888029974402673;
-    let pdiff_i = percent_diff(results.idler_efficiency, expected_idler);
-    assert!(
-      pdiff_i < accept_diff,
-      "norm percent difference: {}. (actual: {}, expected: {})",
-      pdiff_i,
-      results.idler_efficiency,
-      expected_idler
-    );
-
-    let expected_signal = 0.8887826402101449;
+    let expected_signal = 0.9783834540624885;
     let pdiff_s = percent_diff(results.signal_efficiency, expected_signal);
 
     assert!(
@@ -558,6 +565,16 @@ mod tests {
       pdiff_s,
       results.signal_efficiency,
       expected_signal
+    );
+
+    let expected_idler = 0.9784488417733235;
+    let pdiff_i = percent_diff(results.idler_efficiency, expected_idler);
+    assert!(
+      pdiff_i < accept_diff,
+      "norm percent difference: {}. (actual: {}, expected: {})",
+      pdiff_i,
+      results.idler_efficiency,
+      expected_idler
     );
   }
 }

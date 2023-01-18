@@ -238,6 +238,7 @@ fn calc_singles_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Complex<f
     return pmzcoeff * numerator / denominator;
   };
 
+  // TODO: increasing zslice leads to massive speedups with minimum error
   let zslice = 1e-4 * clamp((*(L/M) / 2.5e-3).sqrt(), 0., 5.);
   let mut divisions = (*(L/M) / zslice) as usize;
   divisions = max(divisions + divisions % 2, 4); // nearest even.. minimum 4

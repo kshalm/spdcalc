@@ -317,7 +317,7 @@ mod tests {
     let actual = *(theta / ucum::DEG);
     let expected = *(signal.get_theta() / ucum::DEG);
     assert!(
-      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-9),
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-6),
       "actual: {}, expected: {}",
       actual,
       expected

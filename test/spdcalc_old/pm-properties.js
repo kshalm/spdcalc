@@ -531,9 +531,14 @@ SPDCprop.prototype = {
         var N_num = Math.pow(2, 1.5) * Math.pow(this.deff, 2) * Math.pow(this.L,2) * this.Pav;
         var N_den = Math.pow(Math.PI, 0.5) * con.e0 * Math.pow(con.c,3) * bw_pump;
         var N = N_num/N_den;
-        console.log('bw_pump', bw_pump)
-        console.log('N_num', N_num)
-        console.log('N_den', N_den)
+        console.table({
+            ...con,
+            deff: this.deff,
+            bw_pump,
+            N_num,
+            N_den,
+            N
+        })
         // console.log(N, Math.pow(this.deff, 2) * Math.pow(this.L,2), this.Pav);
         return (N);
     },

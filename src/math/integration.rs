@@ -168,8 +168,9 @@ mod tests {
 
   #[test]
   fn integrator_2d_test() {
+    let divs = 1000;
     let integrator = SimpsonIntegration2D::new(|x, y, _index| x.sin() * y.powi(3));
-    let actual = integrator.integrate((0., PI), (0., 2.), 1000);
+    let actual = integrator.integrate((0., PI), (0., 2.), divs);
 
     let expected = (2_f64).powi(4) * 2. / 4.;
 

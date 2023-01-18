@@ -303,22 +303,33 @@ function integrator_test(){
 function rates_test(){
   let props = new spdc.SPDCprop({
     crystal: 'KTP-3'
+    , "lambda_p": 7.74e-7
     , enable_pp: true
+    , L: 6000 * 1e-6
+    , W: 200 * 1e-6
     , theta: 90 * Math.PI/180
+    , p_bw: 0.2 * 1e-9
+    , W_sx: 50e-6
+    , W_sy: 50e-6
+    , W_ix: 50e-6
+    , W_iy: 50e-6
   })
   props.calc_poling_period()
   props.update_all_angles()
-  // props.auto_calc_collection_focus()
+  props.auto_calc_collection_focus()
+  props.optimum_idler()
+  console.table(props.get())
+  console.table(Object.entries(props))
 
-  let dim = 30
+  let dim = 15
   let lamda_s = spdc.linspace(
-    1490.86 * 1e-9,
-    1609.14 * 1e-9,
+    1546.01 * 1e-9,
+    1553.99 * 1e-9,
     dim
   );
   let lamda_i = spdc.linspace(
-    1495.05 * 1e-9,
-    1614.03 * 1e-9,
+    1542.05 * 1e-9,
+    1550.00 * 1e-9,
     dim
   );
 
@@ -337,9 +348,11 @@ function rates_test(){
 
   let eff_i = sum / sum_s_s
   let eff_s = sum / sum_s_i
+  let eff_sym = sum / Math.sqrt(sum_s_i * sum_s_s)
 
-  console.log('idler efficiency', eff_i)
   console.log('signal efficiency', eff_s)
+  console.log('idler efficiency', eff_i)
+  console.log('symmetric efficiency', eff_sym)
   console.log('calcuation took', (Date.now() - start) + 'ms')
 }
 
@@ -466,9 +479,9 @@ function swap_test(){
 // singles()
 // singles_pp()
 // integrator_test()
-// rates_test()
+rates_test()
 // heralding_apodization_test()
 
 // test_for_krister()
 // waist_position()
-swap_test()
+// swap_test()
