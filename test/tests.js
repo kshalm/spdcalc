@@ -464,6 +464,34 @@ function swap_test(){
   console.log(props.theta_s, props.theta_i)
 }
 
+function test_2HOM(){
+  let props = new spdc.SPDCprop({
+    crystal: 'KDP-1'
+    , L: 2000 * 1e-6
+    , enable_pp: true
+    , theta: 90 * Math.PI / 180
+  })
+  props.update_all_angles()
+  props.calc_poling_period()
+  // props.auto_calc_collection_focus()
+
+  let start = Date.now()
+  let result = spdc.calc_2HOM_scan(
+    props,
+    -300e12,
+    300e12,
+    1468.83 * 1e-9,
+    1631.17 * 1e-9,
+    1476.53 * 1e-9,
+    1640.66 * 1e-9,
+    3
+  )
+
+  console.table(result)
+
+  console.log('calcuation took', (Date.now() - start) + 'ms')
+}
+
 // crystal_indices()
 // poling_period()
 // walkoff()
@@ -479,9 +507,10 @@ function swap_test(){
 // singles()
 // singles_pp()
 // integrator_test()
-rates_test()
+// rates_test()
 // heralding_apodization_test()
 
 // test_for_krister()
 // waist_position()
 // swap_test()
+test_2HOM()

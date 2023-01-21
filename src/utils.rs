@@ -163,6 +163,19 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
   }
 }
 
+/// get the 2d indices (column, row) from the linear index
+pub fn get_2d_indices( index : usize, cols : usize ) -> (usize, usize) {
+  (
+    (index % cols),
+    (index / cols)
+  )
+}
+
+/// get the 1d index corresponding to a (col, row) of a 2d lattice
+pub fn get_1d_index( col: usize, row: usize, cols: usize ) -> usize {
+  row * cols + col
+}
+
 /// An iterator that will iterate through rows and columns, giving you the
 /// coordinates at every iteration. Like a 2d linspace.
 ///
@@ -203,14 +216,6 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
     }
   }
 
-  /// get the 2d indices (row, column) from the linear index
-  pub fn get_2d_indices( index : usize, cols : usize ) -> (usize, usize) {
-    (
-      (index % cols),
-      (index / cols)
-    )
-  }
-
   /// Get the x step size
   pub fn get_dx(&self) -> T { self.x_steps.division_width() }
   pub fn get_dy(&self) -> T { self.y_steps.division_width() }
@@ -227,7 +232,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 
     let cols = self.x_steps.2;
     let rows = self.y_steps.2;
-    let (nx, ny) = Self::get_2d_indices(self.index, cols);
+    let (nx, ny) = get_2d_indices(self.index, cols);
     let xt = if cols > 1 { (nx as f64) / ((cols - 1) as f64) } else { 0. };
     let yt = if rows > 1 { (ny as f64) / ((rows - 1) as f64) } else { 0. };
     let x = lerp(self.x_steps.0, self.x_steps.1, xt);
@@ -244,5 +249,31 @@ impl<T> ExactSizeIterator for Iterator2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   fn len(&self) -> usize {
     self.total
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn iterator_2d_test() {
+    let it = Iterator2D::new(
+      Steps(0., 1., 2),
+      Steps(0., 1., 2)
+    );
+
+    let actual : Vec<(f64, f64)> = it.collect();
+    let expected = vec![
+      (0., 0.), (1., 0.),
+      (0., 1.), (1., 1.)
+    ];
+
+    assert!(
+      actual.iter().zip(expected.iter()).all(|(a, b)| a == b),
+      "assertion failed. actual: {:?}, expected: {:?}",
+      actual,
+      expected
+    );
   }
 }

@@ -18,6 +18,15 @@ update comlink-loader to expose worker so it can be terminated
 
 = optimization =
 
+Create a JIT_JSA structure that caches by wavelength.
+```rs
+let jsa = JSAjit::new(props, resolution);
+jsa.get(ls, li);
+// if exists, uses cache
+// if nearby values exist, interpolate from cache
+// otherwise compute
+```
+
 return heralding results as arrays
 
 try using complex.finv() in singles calc
