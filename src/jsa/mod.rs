@@ -8,17 +8,9 @@ use crate::phasematch::*;
 /// **NOTE**: These are not normalized.
 /// Units: 1 / Length^4
 pub fn calc_jsa( spdc_setup : &SPDCSetup, l_s : Wavelength, l_i : Wavelength ) -> JSAUnits<Complex<f64>> {
-  let mut signal = spdc_setup.signal.clone();
-  let mut idler = spdc_setup.idler.clone();
-
-  signal.set_wavelength(l_s);
-  idler.set_wavelength(l_i);
-
-  let spdc_setup = SPDCSetup {
-    signal,
-    idler,
-    ..*spdc_setup
-  };
+  let mut spdc_setup = spdc_setup.clone();
+  spdc_setup.signal.set_wavelength(l_s);
+  spdc_setup.idler.set_wavelength(l_i);
 
   phasematch_coincidences(&spdc_setup)
 }
@@ -35,17 +27,9 @@ pub fn calc_jsa_normalization(spdc_setup : &SPDCSetup) -> JSAUnits<f64> {
 /// **NOTE**: These are not normalized.
 /// Units: 1 / Length^4
 pub fn calc_jsa_singles( spdc_setup : &SPDCSetup, l_s : Wavelength, l_i : Wavelength ) -> JSAUnits<Complex<f64>> {
-  let mut signal = spdc_setup.signal.clone();
-  let mut idler = spdc_setup.idler.clone();
-
-  signal.set_wavelength(l_s);
-  idler.set_wavelength(l_i);
-
-  let spdc_setup = SPDCSetup {
-    signal,
-    idler,
-    ..*spdc_setup
-  };
+  let mut spdc_setup = spdc_setup.clone();
+  spdc_setup.signal.set_wavelength(l_s);
+  spdc_setup.idler.set_wavelength(l_i);
 
   phasematch_singles(&spdc_setup)
 }
@@ -70,12 +54,9 @@ pub fn calc_normalized_jsa( spdc_setup : &SPDCSetup, l_s : Wavelength, l_i : Wav
 /// Calculate the normalized JSI for given parameters at specified signal/idler wavelengths.
 /// Unitless.
 pub fn calc_normalized_jsi( spdc_setup : &SPDCSetup, l_s : Wavelength, l_i : Wavelength ) -> Unitless<f64> {
-  // calculate the collinear phasematch to normalize against
-  let norm_amp = phasematch_coincidences(&spdc_setup.to_collinear());
   let jsa = calc_jsa( &spdc_setup, l_s, l_i );
-
   use dim::Map;
-  (jsa / norm_amp).map(|z| z.norm_sqr())
+  (jsa / calc_jsa_normalization(&spdc_setup)).map(|z| z.norm_sqr())
 }
 
 #[cfg(test)]
