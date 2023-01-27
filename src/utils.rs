@@ -173,6 +173,7 @@ pub fn get_2d_indices( index : usize, cols : usize ) -> (usize, usize) {
 
 /// get the 1d index corresponding to a (col, row) of a 2d lattice
 pub fn get_1d_index( col: usize, row: usize, cols: usize ) -> usize {
+  assert!(col < cols);
   row * cols + col
 }
 
@@ -219,6 +220,14 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
   /// Get the x step size
   pub fn get_dx(&self) -> T { self.x_steps.division_width() }
   pub fn get_dy(&self) -> T { self.y_steps.division_width() }
+  pub fn swapped(self) -> Self {
+    Self {
+      x_steps: self.y_steps,
+      y_steps: self.x_steps,
+      total: self.total,
+      index: 0
+    }
+  }
 }
 
 impl<T> Iterator for Iterator2D<T>
