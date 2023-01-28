@@ -1,13 +1,11 @@
-use na::Vector2;
 use nalgebra::Vector3;
 use crate::{jsa::*, utils::{get_1d_index, get_2d_indices}};
 use super::*;
 use utils::Steps2D;
 use spdc_setup::*;
 use num::Complex;
-use math::SimpsonIntegration2D;
 use dim::{
-  ucum::{M, S, C_},
+  ucum::{C_},
 };
 
 /// Hong–Ou–Mandel coincidence rate plot
@@ -21,12 +19,12 @@ pub fn calc_HOM_rate_series(
   let li_range = wavelength_ranges.1;
   assert_eq!(ls_range.2, li_range.2);
 
-  let jsa_units = JSAUnits::new(1.);
   // calculate the jsa values once for each integrand
   // signal, idler
-  let jsa_si : Vec<Complex<f64>> = wavelength_ranges.into_iter().map(|(ls, li)| *(calc_jsa( &spdc_setup, ls, li ) / jsa_units)).collect();
+  let jsa_norm = calc_jsa_normalization(&spdc_setup);
+  let jsa_si : Vec<Complex<f64>> = wavelength_ranges.into_iter().map(|(ls, li)| *(calc_jsa( &spdc_setup, ls, li ) / jsa_norm)).collect();
   // idler, signal
-  let jsa_is : Vec<Complex<f64>> = wavelength_ranges.into_iter().map(|(ls, li)| *(calc_jsa( &spdc_setup, li, ls ) / jsa_units)).collect();
+  let jsa_is : Vec<Complex<f64>> = wavelength_ranges.into_iter().map(|(ls, li)| *(calc_jsa( &spdc_setup, li, ls ) / jsa_norm)).collect();
 
   // calculate the normalization
   let norm : f64 = jsa_si.iter().map(|v| v.norm_sqr()).sum();
@@ -128,7 +126,7 @@ pub fn calc_HOM_two_source_rate_series(
 #[cfg(test)]
 mod tests {
   use super::*;
-  use dim::ucum::{S};
+  use dim::ucum::{M, S};
   use dimensioned::ucum::DEG;
   use dim::f64prefixes::{MICRO, NANO, FEMTO};
   // extern crate float_cmp;
@@ -140,25 +138,29 @@ mod tests {
 
   #[test]
   fn calc_hom_test() {
-    let mut spdc_setup = SPDCSetup {
-      fiber_coupling: true,
-      ..SPDCSetup::default()
-    };
-
-    spdc_setup.crystal_setup.crystal = crystal::Crystal::KTP;
-    spdc_setup.assign_optimum_theta();
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.fiber_coupling = true;
+    spdc_setup.crystal_setup.crystal = Crystal::KDP_1;
+    spdc_setup.crystal_setup.theta = 90. * DEG;
+    spdc_setup.crystal_setup.length = 2000. * MICRO * M;
+    spdc_setup.assign_optimum_periodic_poling();
+    spdc_setup.assign_optimum_idler();
 
     let wavelengths = Steps2D(
-      (0.000001450 * M, 0.000001750 * M, 100),
-      (0.000001450 * M, 0.000001750 * M, 100)
+      (1468.83 * NANO * M, 1631.17 * NANO * M, 100),
+      (1476.53 * NANO * M, 1640.66 * NANO * M, 100)
     );
 
-    let steps = 100;
-    let rates = calc_HOM_rate_series(&spdc_setup, &wavelengths, &Steps(-300e-15 * S, 300e-15 * S, steps));
+    let steps = 3;
+    let rates = calc_HOM_rate_series(
+      &spdc_setup,
+      &wavelengths,
+      &Steps(0. * FEMTO * S, 200. * FEMTO * S, steps)
+    );
 
-    // println!("rate: {:#?}", rates);
+    println!("rate: {:#?}", rates);
 
-    assert_eq!(rates.len(), steps as usize, "Data lengths different");
+    assert_eq!(2, steps as usize, "Data lengths different");
   }
 
   #[test]
