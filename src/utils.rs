@@ -194,7 +194,7 @@ pub fn get_1d_index( col: usize, row: usize, cols: usize ) -> usize {
 /// ```
 #[derive(Debug, Copy, Clone)]
 pub struct Iterator2D<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   x_steps : Steps<T>,
   y_steps : Steps<T>,
   index : usize,
@@ -202,7 +202,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
 }
 
 impl<T> Iterator2D<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   /// Create a new 2d iterator
   pub fn new(
     x_steps : Steps<T>,
@@ -215,6 +215,17 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
       total,
       index: 0,
     }
+  }
+
+  pub fn get_xy(&self) -> (T, T) {
+    let cols = self.x_steps.2;
+    let rows = self.y_steps.2;
+    let (nx, ny) = get_2d_indices(self.index, cols);
+    let xt = if cols > 1 { (nx as f64) / ((cols - 1) as f64) } else { 0. };
+    let yt = if rows > 1 { (ny as f64) / ((rows - 1) as f64) } else { 0. };
+    let x = lerp(self.x_steps.0, self.x_steps.1, xt);
+    let y = lerp(self.y_steps.0, self.y_steps.1, yt);
+    (x, y)
   }
 
   /// Get the x step size
@@ -239,20 +250,24 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
       return None;
     }
 
-    let cols = self.x_steps.2;
-    let rows = self.y_steps.2;
-    let (nx, ny) = get_2d_indices(self.index, cols);
-    let xt = if cols > 1 { (nx as f64) / ((cols - 1) as f64) } else { 0. };
-    let yt = if rows > 1 { (ny as f64) / ((rows - 1) as f64) } else { 0. };
-    let x = lerp(self.x_steps.0, self.x_steps.1, xt);
-    let y = lerp(self.y_steps.0, self.y_steps.1, yt);
-
+    let item = self.get_xy();
     self.index += 1;
-
-    Some((x, y))
+    Some(item)
   }
 }
 
+impl<T> DoubleEndedIterator for Iterator2D<T>
+where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+  fn next_back(&mut self) -> Option<Self::Item> {
+    if self.index <= 0 {
+      return None;
+    }
+
+    let item = self.get_xy();
+    self.index -= 1;
+    Some(item)
+  }
+}
 
 impl<T> ExactSizeIterator for Iterator2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
@@ -276,6 +291,27 @@ mod tests {
     let expected = vec![
       (0., 0.), (1., 0.),
       (0., 1.), (1., 1.)
+    ];
+
+    assert!(
+      actual.iter().zip(expected.iter()).all(|(a, b)| a == b),
+      "assertion failed. actual: {:?}, expected: {:?}",
+      actual,
+      expected
+    );
+  }
+
+  #[test]
+  fn iterator_2d_rev_test() {
+    let it = Iterator2D::new(
+      Steps(0., 1., 2),
+      Steps(0., 1., 2)
+    );
+
+    let actual : Vec<(f64, f64)> = it.rev().collect();
+    let expected = vec![
+      (1., 1.), (0., 1.),
+      (1., 0.), (0., 0.)
     ];
 
     assert!(
