@@ -464,6 +464,34 @@ function swap_test(){
   console.log(props.theta_s, props.theta_i)
 }
 
+function test_HOM() {
+  let props = new spdc.SPDCprop({
+    crystal: 'KDP-1'
+    , L: 2000 * 1e-6
+    , enable_pp: true
+    , theta: 90 * Math.PI / 180
+    , fiber_coupling: true
+  })
+  // props.update_all_angles()
+  props.calc_poling_period()
+  // props.auto_calc_collection_focus()
+
+  console.time('hom')
+  let result = spdc.calc_HOM_scan(
+    props,
+    -200e-15,
+    0,
+    1468.83 * 1e-9,
+    1631.17 * 1e-9,
+    1476.53 * 1e-9,
+    1640.66 * 1e-9,
+    3,
+    true
+  )
+  console.timeEnd('hom')
+  console.table(result)
+}
+
 function test_2HOM(){
   let props = new spdc.SPDCprop({
     crystal: 'KDP-1'
@@ -478,8 +506,8 @@ function test_2HOM(){
   let start = Date.now()
   let result = spdc.calc_2HOM_scan(
     props,
-    -300e12,
-    300e12,
+    -300e-15,
+    300e-15,
     1468.83 * 1e-9,
     1631.17 * 1e-9,
     1476.53 * 1e-9,
@@ -499,7 +527,7 @@ function test_2HOM(){
 // derrivativeTest()
 
 // phasematch()
-// phasematch_pp()
+phasematch_pp()
 // pump_spectrum()
 // phasematch_norm()
 // autorange_lambda()
@@ -513,4 +541,5 @@ function test_2HOM(){
 // test_for_krister()
 // waist_position()
 // swap_test()
-test_2HOM()
+test_HOM()
+// test_2HOM()
