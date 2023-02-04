@@ -236,7 +236,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
       x_steps: self.y_steps,
       y_steps: self.x_steps,
       total: self.total,
-      index: 0
+      index: self.index
     }
   }
 }
