@@ -98,6 +98,17 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         k_i = twoPI*P.n_i / P.lambda_i  // * Math.cos(P.theta_i)
         ;
 
+    // console.table({
+    //     hs,
+    //     hi,
+    //     n_p: P.n_p,
+    //     n_s: P.n_s,
+    //     n_i: P.n_i,
+    //     k_p,
+    //     k_s,
+    //     k_i
+    // })
+
     //     var Ss = [ sinThetaS * Math.cos(P.phi_s),  sinThetaS * Math.sin(P.phi_s), Math.cos(P.theta_s)];
     var PHI_s = sq(1/Math.cos(P.theta_s_e)), // External angle for the signal???? Is PHI_s z component?
         PHI_i = sq(1/Math.cos(P.theta_i_e)), // External angle for the idler????
@@ -195,6 +206,27 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         ,hh_i = -(DEL4s + DEL4i)
         ;
 
+    // console.table({
+    //     As_r,
+    //     As_i,
+    //     Bs_r,
+    //     Bs_i,
+    //     Cs,
+    //     Ci,
+    //     Ds,
+    //     Di,
+    //     mx_real,
+    //     mx_imag,
+    //     my_real,
+    //     my_imag,
+    //     m,
+    //     n,
+    //     ee,
+    //     ff,
+    //     hh_r,
+    //     hh_i
+    // })
+
     // console.log("INSIDE COINCIDENCES");
     // console.log('zhs, zhi', zhs, zhi)
     // console.log("Wx_SQ", Wx_SQ);
@@ -249,6 +281,37 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         A10I = 0
         ;
 
+    // console.table({
+    //     A1R,
+    //     A1IO,
+    //     A1I,
+    //     A2R,
+    //     A2IO,
+    //     A2I,
+    //     A3R,
+    //     A3IO,
+    //     A3I,
+    //     A4R,
+    //     A4IO,
+    //     A4I,
+    //     A5R,
+    //     A5I,
+    //     A6R,
+    //     A6IO,
+    //     A6I,
+    //     A7R,
+    //     A7I,
+    //     A8R,
+    //     A8IO,
+    //     A8I,
+    //     A9R,
+    //     A9IO,
+    //     A9I,
+    //     A10R,
+    //     A10IO,
+    //     A10I,
+    // })
+
     // console.log('As', As_r, As_i)
     // console.log('Cs', Cs)
     // console.log('Ds', Ds)
@@ -294,16 +357,18 @@ module.exports.calc_PM_tz_k_coinc = function calc_PM_tz_k_coinc (P){
         A10I = A10IO + ff_z;
 
         // console.log("z", z)
-        // console.log(A1R, A1I)
-        // console.log(A2R, A2I)
-        // console.log(A3R, A3I)
-        // console.log(A4R, A4I)
-        // console.log(A5R, A5I)
-        // console.log(A6R, A6I)
-        // console.log(A7R, A7I)
-        // console.log(A8R, A8I)
-        // console.log(A9R, A9I)
-        // console.log(A10R, A10I)
+        // console.table({
+        //     A1R, A1I,
+        //     A2R, A2I,
+        //     A3R, A3I,
+        //     A4R, A4I,
+        //     A5R, A5I,
+        //     A6R, A6I,
+        //     A7R, A7I,
+        //     A8R, A8I,
+        //     A9R, A9I,
+        //     A10R, A10I
+        // })
 
         // (-4 A3 + A8^2/A1)
         // console.log("hello");
