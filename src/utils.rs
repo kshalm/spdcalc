@@ -218,6 +218,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
   }
 
   pub fn get_xy(&self) -> (T, T) {
+    // TODO: can optimize
     let cols = self.x_steps.2;
     let rows = self.y_steps.2;
     let (nx, ny) = get_2d_indices(self.index, cols);
@@ -274,6 +275,32 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
   fn len(&self) -> usize {
     self.total
   }
+}
+
+#[cfg(test)]
+pub mod testing {
+  fn percent_diff(actual : f64, expected : f64) -> f64 {
+    100. * ((expected - actual).abs() / expected)
+  }
+
+  macro_rules! assert_nearly_equal {
+    ($name:expr, $actual:expr, $expected:expr, $accept_percent_diff:expr) => {
+      let diff = percent_diff($actual, $expected);
+      assert!(
+        diff.abs() < $accept_percent_diff,
+        "{} percent difference: {}%\nactual: {}\nexpected: {}",
+        $name,
+        diff,
+        $actual,
+        $expected
+      );
+    };
+    ($name:expr, $actual:expr, $expected:expr) => {
+      assert_nearly_equal!($name, $actual, $expected, 1e-6);
+    };
+  }
+
+  pub(crate) use assert_nearly_equal;
 }
 
 #[cfg(test)]
