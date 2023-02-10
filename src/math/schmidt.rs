@@ -19,7 +19,7 @@ mod tests {
   use crate::{*, plotting::plot_jsi};
   use crate::utils::Steps2D;
   use dim::{
-    ucum::{M, DEG},
+    ucum::{M},
   };
   use dim::f64prefixes::{NANO};
   extern crate float_cmp;
