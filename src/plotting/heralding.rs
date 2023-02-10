@@ -368,7 +368,7 @@ mod tests {
   use ucum::DEG;
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
-    100. * (expected - actual).abs() / expected
+    100. * ((expected - actual) / expected).abs()
   }
 
   #[test]
