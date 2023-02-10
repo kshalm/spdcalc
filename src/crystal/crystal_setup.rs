@@ -170,3 +170,21 @@ impl CrystalSetup {
     )
   }
 }
+
+#[cfg(test)]
+mod test {
+  use super::*;
+
+  #[test]
+  fn index_along_test(){
+    let mut spdc_setup = SPDCSetup::default();
+    spdc_setup.signal.set_angles(0. * DEG, 53. * DEG);
+    let n = spdc_setup.crystal_setup.get_index_along(
+      spdc_setup.signal.get_wavelength(),
+      spdc_setup.signal.get_direction(),
+      &spdc_setup.signal.get_type()
+    );
+
+    assert_eq!(n, Unitless::new(1.6017685463810718));
+  }
+}
