@@ -4,9 +4,7 @@ use super::*;
 use utils::Steps2D;
 use spdc_setup::*;
 use num::Complex;
-use dim::{
-  ucum::{C_},
-};
+use dim::ucum::C_;
 
 /// Hong–Ou–Mandel coincidence rate plot
 #[allow(non_snake_case)]
@@ -32,6 +30,7 @@ pub fn calc_HOM_rate_series(
   time_delays.into_iter().map(|delta_t| {
     // https://arxiv.org/pdf/1711.00080.pdf
     // Equation (40)
+    // TODO: use integrator rather than block integration
     let result : f64 = wavelength_ranges.into_iter().enumerate().map(|(index, (ls, li))| {
       let delta_w = PI2 * C_ * (1./li - 1./ls);
       let shift = Complex::from_polar(1., *(delta_w * delta_t));
@@ -129,33 +128,32 @@ mod tests {
   use dim::ucum::{M, S};
   use dimensioned::ucum::DEG;
   use dim::f64prefixes::{MICRO, NANO, FEMTO};
-  // extern crate float_cmp;
-  // use float_cmp::*;
-
-  fn percent_diff(actual : f64, expected : f64) -> f64 {
-    100. * (expected - actual).abs() / expected
-  }
+  use crate::utils::testing::assert_nearly_equal;
 
   #[test]
   fn calc_hom_test() {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KDP_1;
+    spdc_setup.crystal_setup.crystal = Crystal::KTP;
     spdc_setup.crystal_setup.theta = 90. * DEG;
     spdc_setup.crystal_setup.length = 2000. * MICRO * M;
     spdc_setup.assign_optimum_periodic_poling();
     spdc_setup.assign_optimum_idler();
+    dbg!(spdc_setup.signal.get_index(&spdc_setup.crystal_setup), spdc_setup.idler.get_index(&spdc_setup.crystal_setup));
 
+    // dbg!(spdc_setup.to_config(true, true));
+    // dbg!(phasematch_coincidences(&spdc_setup).value_unsafe().to_polar());
+    // assert!(false);
     let wavelengths = Steps2D(
-      (1468.83 * NANO * M, 1631.17 * NANO * M, 100),
-      (1476.53 * NANO * M, 1640.66 * NANO * M, 100)
+      (1468.83 * NANO * M, 1631.17 * NANO * M, 4),
+      (1476.53 * NANO * M, 1640.66 * NANO * M, 4)
     );
 
-    let steps = 3;
+    let steps = 30;
     let rates = calc_HOM_rate_series(
       &spdc_setup,
       &wavelengths,
-      &Steps(0. * FEMTO * S, 200. * FEMTO * S, steps)
+      &Steps(-400. * FEMTO * S, 400. * FEMTO * S, steps)
     );
 
     println!("rate: {:#?}", rates);
@@ -187,54 +185,43 @@ mod tests {
       &Steps(-300. * FEMTO * S, 300. * FEMTO * S, steps)
     );
 
-    let accept_diff = 6.;
+    let accept_diff = 1e-9;
 
     let actual = rates.ss[0];
     let expected = 0.5223925964814141;
-    let pdiff = percent_diff(actual, expected);
 
-    assert!(
-      pdiff < accept_diff,
-      "percent difference: {}. (actual: {}, expected: {})",
-      pdiff,
+    assert_nearly_equal!(
+      "rates_ss[0]",
       actual,
-      expected
+      expected,
+      accept_diff
     );
 
     let actual = rates.ss[1];
     let expected = 0.1238681173826834;
-    let pdiff = percent_diff(actual, expected);
-
-    assert!(
-      pdiff < accept_diff,
-      "percent difference: {}. (actual: {}, expected: {})",
-      pdiff,
+    assert_nearly_equal!(
+      "rates_ss[1]",
       actual,
-      expected
+      expected,
+      accept_diff
     );
 
     let actual = rates.ii[0];
     let expected = 0.49656526964649816;
-    let pdiff = percent_diff(actual, expected);
-
-    assert!(
-      pdiff < accept_diff,
-      "percent difference: {}. (actual: {}, expected: {})",
-      pdiff,
+    assert_nearly_equal!(
+      "rates_ii[0]",
       actual,
-      expected
+      expected,
+      accept_diff
     );
 
     let actual = rates.ii[1];
     let expected = 0.1238681173826834;
-    let pdiff = percent_diff(actual, expected);
-
-    assert!(
-      pdiff < accept_diff,
-      "percent difference: {}. (actual: {}, expected: {})",
-      pdiff,
+    assert_nearly_equal!(
+      "rates_ii[1]",
       actual,
-      expected
+      expected,
+      accept_diff
     );
   }
 }
