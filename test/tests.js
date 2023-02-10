@@ -5,25 +5,39 @@ function print_nm( val ){
   return (val * 1e9).toFixed(2) + 'nm'
 }
 
+function toPolar(z){
+  return [Math.sqrt(z[0] * z[0] + z[1] * z[1]), Math.atan2(z[1], z[0])]
+}
+
 const deg = Math.PI/180
 
 function crystal_indices(){
-  let type = 'LiIO3-2'
-  let indices = spdc.Crystals(type).indicies(720e-9, 30)
+  let type = 'BBO-1'
+  let indices = spdc.Crystals(type).indicies(1550e-9, 20)
 
   console.log(`indices for ${type}:`, indices)
 }
 
 function defaultProps(){
-  const props = new spdc.SPDCprop({crystal: 'BBO-1', enable_pp: false, theta_s_e: 3 * Math.PI/180})
+  const props = new spdc.SPDCprop({crystal: 'BBO-1', enable_pp: false})
   //{crystal: 'BBO-1', enable_pp: false, theta_s_e: 3 * Math.PI/180}
 
 
   return props
 }
 
+function print_index_signal(){
+  const props = defaultProps()
+  const s = props.calc_Coordinate_Transform(props.theta, props.phi, props.theta_s, props.phi_s)
+  const n = props.calc_Index_PMType(props.lambda_s, props.type, s, 'signal')
+  console.table({
+    s,
+    n
+  })
+}
+
 function show( props ){
-  console.log(`Indices (${props.lambda_i})`, props.crystal.indicies(props.lambda_i, props.temp))
+  // console.log(`Indices (${props.lambda_i})`, props.crystal.indicies(props.lambda_i, props.temp))
 
   console.log(`Pump: φ(${props.phi}), θ(${props.theta}), λ(${print_nm(props.lambda_p)})`)
   console.log(`Signal: φ(${props.phi_s}), θ(${props.theta_s}), λ(${print_nm(props.lambda_s)})`)
@@ -33,6 +47,7 @@ function show( props ){
   console.log(`n_p: ${props.n_p}, n_s: ${props.n_s}, n_i: ${props.n_i}`)
   console.log(`pp: ${props.enable_pp}, period: ${props.poling_sign * props.poling_period}, apodization: ${props.calc_apodization}, fwhm: ${props.apodization_FWHM}`)
   console.log(`z0p: ${props.z0p}, z0s: ${props.z0s}, z0i: ${props.z0i}`)
+  console.table(props.get())
 }
 
 function poling_period(){
@@ -198,19 +213,24 @@ function phasematch_pp(){
   let props = defaultProps()
   props.set('enable_pp', true)
   props.calc_poling_period()
+  props.set('lambda_s', 1600e-9)
+  props.set('lambda_i', 1500e-9)
   props.auto_calc_collection_focus()
   // props.auto_calc_Theta()
   // props.calcfibercoupling = false
   // props.update_all_angles()
 
-  let delk = spdc.calc_delK( props )
+  // let delk = spdc.calc_delK( props )
+  console.log('START OF ACTUAL CALCULATION')
+  props.n_s = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
+  props.n_i = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
   let amp_pm_tz = spdc.calc_PM_tz_k_coinc( props )
   let amp = spdc.phasematch( props )
 
   show(props)
 
-  console.log('PMtz amp', amp_pm_tz)
-  console.log('PM amplitude', amp)
+  console.log('PMtz amp', amp_pm_tz, toPolar(amp_pm_tz))
+  console.log('PM amplitude', amp, toPolar(amp))
 }
 
 function phasematch_norm(){
@@ -466,28 +486,40 @@ function swap_test(){
 
 function test_HOM() {
   let props = new spdc.SPDCprop({
-    crystal: 'KDP-1'
+    crystal: 'KTP-3'
     , L: 2000 * 1e-6
     , enable_pp: true
     , theta: 90 * Math.PI / 180
-    , fiber_coupling: true
+    , calcfibercoupling: true
   })
   // props.update_all_angles()
   props.calc_poling_period()
-  // props.auto_calc_collection_focus()
+  props.auto_calc_collection_focus()
+  props.update_all_angles();
+  const ns = props.calc_Index_PMType(props.lambda_s, props.type, props.S_s, "signal");
+  const ni = props.calc_Index_PMType(props.lambda_i, props.type, props.S_i, "idler");
+  console.log(ns, ni)
+  // console.log('pm')
+  // const pm = spdc.phasematch(props)
+  // console.log('phasematch', toPolar(pm))
 
+  // show(props)
   console.time('hom')
   let result = spdc.calc_HOM_scan(
     props,
-    -200e-15,
-    0,
+    -400e-15,
+    400e-15,
     1468.83 * 1e-9,
     1631.17 * 1e-9,
     1476.53 * 1e-9,
     1640.66 * 1e-9,
-    3,
+    30,
     true
   )
+  console.log(spdc.calc_JSA(props, 1468.83 * 1e-9,
+    1631.17 * 1e-9,
+    1476.53 * 1e-9,
+    1640.66 * 1e-9, 4))
   console.timeEnd('hom')
   console.table(result)
 }
@@ -521,6 +553,7 @@ function test_2HOM(){
 }
 
 // crystal_indices()
+// print_index_signal()
 // poling_period()
 // walkoff()
 // walkoff_convergence()
@@ -541,5 +574,5 @@ phasematch_pp()
 // test_for_krister()
 // waist_position()
 // swap_test()
-test_HOM()
+// test_HOM()
 // test_2HOM()
