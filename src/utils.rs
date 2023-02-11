@@ -51,6 +51,9 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
     self.2 - 1
   }
 
+  pub fn len(&self) -> usize { self.2 }
+  pub fn range(&self) -> (T, T) { (self.0, self.1) }
+
   /// Get the width of the gap between each step.
   ///
   /// ## Example:
@@ -132,8 +135,16 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
     (Steps::from(self.0).divisions(), Steps::from(self.1).divisions())
   }
 
+  pub fn ranges(&self) -> ((T, T), (T, T)) {
+    ((self.0.0, self.0.1), (self.1.0, self.1.1))
+  }
+
   pub fn len(&self) -> usize {
     (self.0).2 * (self.1).2
+  }
+
+  pub fn is_square(&self) -> bool {
+    self.0.2 == self.1.2
   }
 
   /// Get the width of the gap between each step.

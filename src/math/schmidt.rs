@@ -1,10 +1,12 @@
-use crate::SPDCError;
+use crate::{SPDCError, plotting::JointSpectrum};
 use na::{DMatrix};
-use num::integer::Roots;
 
-pub fn schmidt_number(jsi : &Vec<f64>) -> Result<f64, SPDCError> {
-  let jsa_mag : Vec<f64> = jsi.iter().cloned().map(f64::sqrt).collect();
-  let dim = jsa_mag.len().sqrt();
+pub fn schmidt_number(spectrum : &JointSpectrum) -> Result<f64, SPDCError> {
+  let jsa_mag : Vec<f64> = spectrum.amplitudes.iter().map(|j| j.norm()).collect();
+  if !spectrum.ranges.is_square() {
+    return Err(SPDCError("Spectrum provided is not square".into()));
+  }
+  let dim = spectrum.ranges.0.2;
   let svd = DMatrix::from_row_slice(dim, dim, &jsa_mag)
     .try_svd(false, false, f64::EPSILON, 1000)
     .ok_or(SPDCError("SVD did not converge while calculating schmidt number".into()))?;
@@ -41,8 +43,8 @@ mod tests {
     // dbg!(wavelength_range);
     // dbg!(spdc_setup);
 
-    let jsi = plot_jsi(&spdc_setup, &wavelength_range, None);
-    let sn = schmidt_number(&jsi).expect("Could not calc schmidt number");
+    let spectrum = JointSpectrum::new_coincidences(spdc_setup, wavelength_range);
+    let sn = schmidt_number(&spectrum).expect("Could not calc schmidt number");
 
     let actual = sn;
     let expected = 1.151;

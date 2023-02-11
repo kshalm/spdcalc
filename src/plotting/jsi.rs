@@ -10,6 +10,7 @@ use dim::{
 
 /// Create a JSI plot
 /// if no normalization is provided, it will automatically calculate it
+#[deprecated]
 pub fn plot_jsi(spdc_setup : &SPDCSetup, cfg : &Steps2D<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
   let norm_amp = norm.unwrap_or_else(|| calc_jsa_normalization(&spdc_setup));
@@ -27,6 +28,7 @@ pub fn plot_jsi(spdc_setup : &SPDCSetup, cfg : &Steps2D<Wavelength>, norm : Opti
 
 /// Create a singles JSI plot for the signal (tip: swap signal/idler if you want idler jsi)
 /// if no normalization is provided, it will automatically calculate it
+#[deprecated]
 pub fn plot_jsi_singles(spdc_setup : &SPDCSetup, cfg : &Steps2D<Wavelength>, norm : Option<JSAUnits<f64>>) -> Vec<f64> {
   // calculate the collinear phasematch to normalize against
   let norm_amp = norm.unwrap_or_else(|| calc_jsa_singles_normalization(&spdc_setup));
@@ -108,37 +110,6 @@ mod tests {
   use dim::f64prefixes::{MICRO, NANO};
   extern crate float_cmp;
   use float_cmp::*;
-
-  #[test]
-  fn plot_jsi_test() {
-    let mut spdc_setup = SPDCSetup {
-      fiber_coupling: true,
-      pp: Some(PeriodicPoling {
-        sign: Sign::POSITIVE,
-        period: 52.56968559402202 * MICRO * ucum::M,
-        apodization: None,
-      }),
-      ..SPDCSetup::default()
-    };
-
-    spdc_setup.crystal_setup.crystal = Crystal::BBO_1;
-    spdc_setup.crystal_setup.theta = 0. * ucum::DEG;
-
-    spdc_setup.signal.set_angles(0. * ucum::RAD, 0. * ucum::RAD);
-    spdc_setup.idler.set_angles(PI * ucum::RAD, 0. * ucum::RAD);
-
-    let cfg = Steps2D(
-      (1500. * NANO * M, 1600. * NANO * M, 10),
-      (1500. * NANO * M, 1600. * NANO * M, 10),
-    );
-
-    let data = plot_jsi(&spdc_setup, &cfg, None);
-
-    assert_eq!(
-      data.len(),
-      100
-    );
-  }
 
   #[test]
   fn calc_plot_config_for_jsi_test(){

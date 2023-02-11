@@ -19,13 +19,15 @@ pub fn calc_HOM_rate_series(
 
   // calculate the jsa values once for each integrand
   // signal, idler
-  let jsa_norm = calc_jsa_normalization(&spdc_setup);
-  let jsa_si : Vec<Complex<f64>> = wavelength_ranges.into_iter().map(|(ls, li)| *(calc_jsa( &spdc_setup, ls, li ) / jsa_norm)).collect();
+  // let jsa_norm = calc_jsa_normalization(&spdc_setup);
+  // let jsa_si : Vec<Complex<f64>> = wavelength_ranges.into_iter().map(|(ls, li)| *(calc_jsa( &spdc_setup, ls, li ) / jsa_norm)).collect();
+  let spectrum = JointSpectrum::new_coincidences(spdc_setup.clone(), wavelength_ranges.clone());
+  let jsa_si = spectrum.amplitudes;
   // idler, signal
-  let jsa_is : Vec<Complex<f64>> = wavelength_ranges.into_iter().map(|(ls, li)| *(calc_jsa( &spdc_setup, li, ls ) / jsa_norm)).collect();
+  let jsa_is : Vec<Complex<f64>> = wavelength_ranges.into_iter().map(|(ls, li)| *(calc_jsa( &spdc_setup, li, ls ) / spectrum.norm)).collect();
 
   // calculate the normalization
-  let norm : f64 = jsa_si.iter().map(|v| v.norm_sqr()).sum();
+  // let norm : f64 = jsa_si.iter().map(|v| v.norm_sqr()).sum();
 
   time_delays.into_iter().map(|delta_t| {
     // https://arxiv.org/pdf/1711.00080.pdf
@@ -44,7 +46,7 @@ pub fn calc_HOM_rate_series(
     }).sum();
     // result / norm
     // rate
-    0.5 * (1. - result / norm)
+    0.5 * (1. - result)
   }).collect()
 }
 
@@ -64,16 +66,11 @@ pub fn calc_HOM_two_source_rate_series(
   let ls_range = wavelength_ranges.0;
   let li_range = wavelength_ranges.1;
   assert_eq!(ls_range.2, li_range.2);
-  // define the range of the jsa grid
-
-  let jsa_units = JSAUnits::new(1.);
-  // calculate the jsa values
-  let jsa_si : Vec<Complex<f64>> = wavelength_ranges.into_iter().map(|(ls, li)| *(calc_jsa( &spdc_setup, ls, li ) / jsa_units)).collect();
-
-  let norm = jsa_si.iter().map(|v| v.norm_sqr()).sum::<f64>().powi(2);
+  let cols = wavelength_ranges.0.2;
+  let spectrum = JointSpectrum::new_coincidences(spdc_setup.clone(), wavelength_ranges.clone());
+  let jsa_si = spectrum.amplitudes;
 
   let pi2c = PI2 * C_;
-  let cols = wavelength_ranges.0.2;
 
   let calc_rate = |delta_t : Time| -> Vector3<f64> {
     let x = pi2c * delta_t;
@@ -109,7 +106,7 @@ pub fn calc_HOM_two_source_rate_series(
     }).sum::<Vector3<f64>>();
 
     // rate
-    0.5 * (Vector3::new(1., 1., 1.) - result / norm)
+    0.5 * (Vector3::new(1., 1., 1.) - result)
   };
 
   let (ss, ii, si) = time_delays.into_iter().map(calc_rate).fold((vec![], vec![], vec![]), |mut acc, rate| {
