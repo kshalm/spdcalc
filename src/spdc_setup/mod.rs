@@ -140,6 +140,13 @@ impl SPDCSetup {
     spd_collinear
   }
 
+  pub fn with_optimal_waist_positions(&self) -> Self{
+    let mut copy = self.clone();
+    copy.z0s = Some(self.crystal_setup.calc_optimal_waist_position(&self.signal));
+    copy.z0i = Some(self.crystal_setup.calc_optimal_waist_position(&self.idler));
+    copy
+  }
+
   /// Automatically use optimal waist position for signal
   pub fn auto_signal_waist_position(&mut self){
     self.z0s = None;
