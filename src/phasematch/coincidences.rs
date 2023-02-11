@@ -72,8 +72,9 @@ fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Compl
   // TODO: ask krister. does this work to filter out lobes?
   // let delk = *(spdc_setup.calc_delta_k() / J / S);
   // let arg = *(L * 0.5 * delk.z / M);
-  //
-  // if arg > PI2 || arg < -PI2 {
+  // let limit = 10. * PI2;
+
+  // if arg > limit || arg < -limit {
   //   return (Complex::new(0., 0.), 1.);
   // }
 
@@ -89,6 +90,8 @@ fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Compl
   let phi_i = *(spdc_setup.idler.get_phi() / RAD);
   let theta_s_e = *(spdc_setup.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
   let theta_i_e = *(spdc_setup.idler.get_external_theta(&spdc_setup.crystal_setup) / RAD);
+
+  // dbg!(theta_s_e, theta_i_e);
 
   // Height of the collected spots from the axis.
   let hs = L * 0.5 * f64::tan(theta_s) * f64::cos(phi_s);
@@ -112,6 +115,15 @@ fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Compl
   let k_p = PI2 * n_p / spdc_setup.pump.get_wavelength();
   let k_s = PI2 * n_s / spdc_setup.signal.get_wavelength(); //  * f64::cos(theta_s),
   let k_i = PI2 * n_i / spdc_setup.idler.get_wavelength(); // * f64::cos(theta_i)
+
+  // dbg!(
+  //   n_p,
+  //   n_s,
+  //   n_i,
+  //   k_p,
+  //   k_s,
+  //   k_i
+  // );
 
   let PHI_s = f64::cos(theta_s_e).powi(-2); // External angle for the signal???? Is PHI_s z component?
   let PHI_i = f64::cos(theta_i_e).powi(-2); // External angle for the idler????
@@ -159,6 +171,28 @@ fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Compl
   let DEL3i = -hi - zhi * PHI_i * SIN_THETA_i_e * COS_PHI_i;
   let DEL4s = 0.5 * ks_f * zhs * TAN_THETA_s_e.powi(2) - ks_f * z0s;
   let DEL4i = 0.5 * ki_f * zhi * TAN_THETA_i_e.powi(2) - ki_f * z0i;
+
+  // dbg!(
+  //   zhs,
+  //   zhi,
+  //   Wx_SQ,
+  //   GAM1s,
+  //   GAM2s,
+  //   GAM3s,
+  //   GAM4s,
+  //   DEL1s,
+  //   DEL2s,
+  //   DEL3s,
+  //   DEL4s,
+  //   GAM1i,
+  //   GAM2i,
+  //   GAM3i,
+  //   GAM4i,
+  //   DEL1i,
+  //   DEL2i,
+  //   DEL3i,
+  //   DEL4i,
+  // );
 
   let M2 = M * M; // meters squared
   // let As_r = -0.25 * Wx_SQ + GAM1s;
@@ -221,6 +255,22 @@ fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Compl
   let dksi = k_s + k_i + PI2 * pp_factor / M;
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
+
+  // dbg!(
+  //   As,
+  //   Bs,
+  //   Cs,
+  //   Ci,
+  //   Ds,
+  //   Di,
+  //   mx,
+  //   my,
+  //   m,
+  //   n,
+  //   ee,
+  //   ff,
+  //   hh,
+  // );
 
   let fn_z = |z : f64| {
 
@@ -311,7 +361,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Compl
     //   "A1: {}\nA2: {}\nA3: {}\nA4: {}\nA5: {}\nA6: {}\nA7: {}\nA8: {}\nA9: {}\nA10: {}",
     //   A1, A2, A3, A4, A5, A6, A7, A8, A9, A10
     // );
-    // println!("num: {}, denom: {}", numerator, denominator);
+    // println!("z: {}, num: {}, denom: {}", z, numerator, denominator);
     // Now calculate the full term in the integral.
     return pmzcoeff * numerator / denominator;
   };
@@ -331,7 +381,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Compl
   // get introduced if there are too many steps, or too few.
   let zslice = 1e-4 * clamp((*(L/M) / 2.5e-3).sqrt(), 0., 5.);
   let mut slices = (*(L/M) / zslice) as usize;
-  slices = max(slices + slices % 2, 4); // nearest even.. minimum 4
+  slices = max(slices + slices % 2 - 2, 4); // nearest even.. minimum 4
 
   // if divisions > 1000 {
   //   println!("Would have run integrator with {} divisions", divisions);
@@ -346,9 +396,10 @@ mod tests {
   use super::*;
   extern crate float_cmp;
   use float_cmp::*;
+  use crate::utils::testing::assert_nearly_equal;
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
-    100. * (expected - actual).abs() / expected
+    100. * ((expected - actual) / expected).abs()
   }
 
   #[test]
@@ -454,49 +505,46 @@ mod tests {
       fiber_coupling: true,
       pp: Some(PeriodicPoling {
         sign: Sign::NEGATIVE,
-        period: 0.000018041674656364844 * M,
+        period: 0.00001771070360118249 * M,
         apodization: None,
       }),
       ..SPDCSetup::default()
     };
-    // spdc_setup.signal.set_from_external_theta(3. * DEG, &spdc_setup.crystal_setup);
-    spdc_setup.signal.set_angles(0. *RAD, 0.03418771664291853 * RAD);
+    // spdc_setup.signal.set_from_external_theta(3. * dim::ucum::DEG, &spdc_setup.crystal_setup);
+    spdc_setup.signal.set_angles(0. *RAD, 0. * RAD);
     // spdc_setup.assign_optimum_theta();
 
     // FIXME This isn't matching.
-    spdc_setup.idler.set_angles(PI * RAD, 0.031789820056487665 * RAD);
+    spdc_setup.idler.set_angles(PI * RAD, 0. * RAD);
     spdc_setup.crystal_setup.theta = 1.5707963267948966 * RAD;
     // spdc_setup.assign_optimum_idler();
     spdc_setup.set_signal_waist_position(-0.0006311635856188344 * M);
     spdc_setup.set_idler_waist_position(-0.0006311635856188344 * M);
+    spdc_setup.signal.set_wavelength(1600e-9 * M);
+    spdc_setup.idler.set_wavelength(1500e-9 * M);
+
+    dbg!(spdc_setup);
 
     let jsa_units = JSAUnits::new(1.);
     let amp = *(phasematch_coincidences( &spdc_setup ) / jsa_units);
 
     let actual = amp;
-    let expected = Complex::new(12188962614046546.0, 2293944114986065.5);
+    let expected = Complex::new(-243675412686457.94, 411264607672255.2);
 
-    let accept_diff = 1e-3;
+    let accept_diff = 1e-9;
 
-    let normdiff = percent_diff(actual.norm(), expected.norm());
-    assert!(
-      normdiff < accept_diff,
-      "norm percent difference: {}",
-      normdiff
+    assert_nearly_equal!(
+      "norm",
+      actual.norm(),
+      expected.norm(),
+      accept_diff
     );
 
-    let rediff = percent_diff(actual.re, expected.re);
-    assert!(
-      rediff < accept_diff,
-      "real part percent difference: {}",
-      rediff
-    );
-
-    let imdiff = percent_diff(actual.im, expected.im);
-    assert!(
-      imdiff < accept_diff,
-      "imag part percent difference: {}",
-      imdiff
+    assert_nearly_equal!(
+      "arg",
+      actual.arg(),
+      expected.arg(),
+      accept_diff
     );
   }
 
