@@ -312,7 +312,7 @@ impl SPDCSetup {
   ///   The signal photon to assign to this setup
   #[text_signature = "($self, signal)"]
   pub fn set_signal(&mut self, signal: &Photon) -> PyResult<()> {
-    if signal.photon.is_signal() {
+    if !signal.photon.is_signal() {
       return Err(PySPDCError("Photon must be of type signal".to_string()).into());
     }
 
@@ -344,7 +344,7 @@ impl SPDCSetup {
   ///   The idler photon to assign to this setup
   #[text_signature = "($self, idler)"]
   pub fn set_idler(&mut self, idler: &Photon) -> PyResult<()> {
-    if idler.photon.is_idler() {
+    if !idler.photon.is_idler() {
       return Err(PySPDCError("Photon must be of type idler".to_string()).into());
     }
 
@@ -376,7 +376,7 @@ impl SPDCSetup {
   ///   The pump photon to assign to this setup
   #[text_signature = "($self, pump)"]
   pub fn set_pump(&mut self, pump: &Photon) -> PyResult<()> {
-    if pump.photon.is_pump() {
+    if !pump.photon.is_pump() {
       return Err(PySPDCError("Photon must be of type pump".to_string()).into());
     }
 

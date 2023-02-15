@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to spdcalc_api’s documentation! &#8212; spdcalc_api  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-spdcalc_api.api_v2">
+<span id="welcome-to-spdcalc-api-s-documentation"></span><h1>Welcome to spdcalc_api’s documentation!<a class="headerlink" href="#module-spdcalc_api.api_v2" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_HOM_array">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_HOM_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_HOM_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the single-source Hong-Ou-Mandel for evenly-spaced arrays of times, signal wavelengths, and idler wavelengths.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_coinc">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_coinc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_coinc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the coincidence rates for evenly spaced signal and idler wavelength arrays.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_coinc_rate_distribution">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_coinc_rate_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_coinc_rate_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns signal and idler coincidence rate distributions for evenly spaced arrays of signal and idler values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_heralding">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_heralding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_heralding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a dictionary of heralding results for an evenly spaced array of signal and idler values and a Downconversion object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_jsa">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_jsa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_jsa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the JSA for an arbitrary array of signal and idler values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_jsa_normalization">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_jsa_normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_jsa_normalization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the JSA normalization value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_jsa_singles">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_jsa_singles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_jsa_singles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the singles JSA for an arbitrary input array of signal and idler values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_jsi">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_jsi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_jsi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the JSI for evenly spaced arrays of signal and idler values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_jsi_normalization">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_jsi_normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_jsi_normalization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the JSI normalization value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_phasematch_coincidences">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_phasematch_coincidences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_phasematch_coincidences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the phasematching function for the rust object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_phasematch_singles">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_phasematch_singles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_phasematch_singles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the phasematch singles function for the rust object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_singles">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_singles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_singles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates signal and idler singles rates for a Downconversion object and evenly spaced signal and idler input arrays.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.calc_singles_rate_distribution">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">calc_singles_rate_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.calc_singles_rate_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns signal and idler singles rate distributions for an evenly spaced array of signal and idler values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.gaussian_filter">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">gaussian_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central_signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central_idler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.gaussian_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a coefficient array based on a Gaussian filter centered at specific signal and idler values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.is_valid_spacing">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">is_valid_spacing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.is_valid_spacing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether or not the input array has even spacing between entries.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.random_filter">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">random_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.random_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a coefficient array based on random numbers between 0 and 1. Only the length of input arrays is used.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.random_notch_filter">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">random_notch_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.random_notch_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a coefficient array with entries randomly equal to either 0 or 1. Only the length of input arrays is used.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.step_function_filter">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">step_function_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_cutoff_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_cutoff_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_cutoff_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_cutoff_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.step_function_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a coefficient array with hard cutoffs at upper and lower boundaries for the signal and idler wavelengths.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.steps2D_input_from_array">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">steps2D_input_from_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.steps2D_input_from_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an arrays as input and outputs a three-element touple that can be used to construct a steps2D object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.two_source_HOM">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">two_source_HOM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JSA</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.two_source_HOM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the unnormalized coincidence rates for a two-source Hong-Ou-Mandel for a specific time delay.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.two_source_HOM_norm">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">two_source_HOM_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JSA</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.two_source_HOM_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the normalization value for the two-source Hong-Ou-Mandel.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spdcalc_api.api_v2.two_source_HOM_range">
+<span class="sig-prename descclassname"><span class="pre">spdcalc_api.api_v2.</span></span><span class="sig-name descname"><span class="pre">two_source_HOM_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JSA</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spdcalc_api.api_v2.two_source_HOM_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outputs two-source Hong-Ou-Mandel coincidences for an array of time delays. Takes an arbitrary signal array, idler array, and
+corresponding JSA as inputs.</p>
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">spdcalc_api</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Nora.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
