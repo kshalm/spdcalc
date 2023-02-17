@@ -47,12 +47,20 @@ impl<T> From<(T, T, usize)> for Steps<T> {
 
 impl<T> Steps<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
+  #[inline(always)]
+  pub fn start(&self) -> T { self.0 }
+  #[inline(always)]
+  pub fn end(&self) -> T { self.1 }
+  #[inline(always)]
+  pub fn steps(&self) -> usize { self.2 }
+  #[inline(always)]
+  pub fn len(&self) -> usize { self.steps() }
+  #[inline(always)]
+  pub fn range(&self) -> (T, T) { (self.start(), self.end()) }
+  #[inline(always)]
   pub fn divisions(&self) -> usize {
-    self.2 - 1
+    self.steps() - 1
   }
-
-  pub fn len(&self) -> usize { self.2 }
-  pub fn range(&self) -> (T, T) { (self.0, self.1) }
 
   /// Get the width of the gap between each step.
   ///
@@ -65,12 +73,18 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
   /// assert!((steps.division_width() - dx).abs() < 1e-12);
   /// ```
   pub fn division_width(&self) -> T {
-    (self.1 - self.0) / (self.divisions() as f64)
+    (self.end() - self.start()) / (self.divisions() as f64)
   }
 }
 
 impl<T> IntoIterator for Steps<T>
-where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where T:
+  std::ops::Mul<f64, Output=T> +
+  std::ops::Add<T, Output=T> +
+  std::ops::Div<f64, Output=T> +
+  std::ops::Sub<T, Output=T> +
+  Copy
+{
   type Item = T;
   type IntoIter = StepIterator<T>;
 
@@ -88,26 +102,38 @@ pub struct StepIterator<T> {
 }
 
 impl<T> Iterator for StepIterator<T>
-where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where T:
+  std::ops::Mul<f64, Output=T> +
+  std::ops::Add<T, Output=T> +
+  std::ops::Div<f64, Output=T> +
+  std::ops::Sub<T, Output=T> +
+  Copy
+{
   type Item = T;
 
   fn next(&mut self) -> Option<Self::Item> {
-    if self.index >= self.steps.2 {
+    if self.index >= self.steps.steps() {
       return None;
     }
 
     // if we have only one step... then just set progress to be zero
-    let progress = if self.steps.2 > 1 { (self.index as f64) / ((self.steps.2 - 1) as f64) } else { 0. };
+    let progress = if self.steps.steps() > 1 { (self.index as f64) / ((self.steps.divisions()) as f64) } else { 0. };
     self.index += 1;
 
-    Some(lerp(self.steps.0, self.steps.1, progress))
+    Some(lerp(self.steps.start(), self.steps.end(), progress))
   }
 }
 
 impl<T> ExactSizeIterator for StepIterator<T>
-where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where T:
+  std::ops::Mul<f64, Output=T> +
+  std::ops::Add<T, Output=T> +
+  std::ops::Div<f64, Output=T> +
+  std::ops::Sub<T, Output=T> +
+  Copy
+{
   fn len(&self) -> usize {
-    self.steps.2
+    self.steps.len()
   }
 }
 
@@ -128,6 +154,7 @@ where T: std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
 /// ```
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Steps2D<T>(pub (T, T, usize), pub (T, T, usize));
+// TODO: convert to use Steps
 
 impl<T> Steps2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
