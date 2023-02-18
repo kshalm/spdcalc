@@ -34,7 +34,7 @@ impl JointSpectrum {
   ) -> Self {
     let jsi_norm : f64 = raw_amplitudes.iter().fold(0., |n, j| n + j.norm_sqr());
     let jsa_norm = jsi_norm.sqrt();
-    let amplitudes = raw_amplitudes.iter().map(|j| j / jsa_norm).collect();
+    let amplitudes = if jsa_norm == 0. { raw_amplitudes } else { raw_amplitudes.iter().map(|j| j / jsa_norm).collect() };
     Self::new(spdc_setup, ranges, amplitudes, jsa_norm)
   }
 

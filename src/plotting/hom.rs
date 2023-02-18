@@ -59,54 +59,80 @@ pub struct HomTwoSourceResult<T> {
 
 #[allow(non_snake_case)]
 pub fn calc_HOM_two_source_rate_series(
-  spdc_setup : &SPDCSetup,
-  wavelength_ranges : &Steps2D<Wavelength>,
+  spdc_setup1 : &SPDCSetup,
+  spdc_setup2 : &SPDCSetup,
+  wavelength_region1 : &Steps2D<Wavelength>,
+  wavelength_region2 : &Steps2D<Wavelength>,
   time_delays : &Steps<Time>
 ) -> HomTwoSourceResult<Vec<f64>> {
-  let ls_range = wavelength_ranges.0;
-  let li_range = wavelength_ranges.1;
-  assert_eq!(ls_range.2, li_range.2);
-  let cols = wavelength_ranges.0.2;
-  let spectrum = JointSpectrum::new_coincidences(spdc_setup.clone(), wavelength_ranges.clone());
-  let jsa_si = spectrum.amplitudes;
+  let ls_range_1 = wavelength_region1.0;
+  let li_range_1 = wavelength_region1.1;
+  let ls_range_2 = wavelength_region2.0;
+  let li_range_2 = wavelength_region2.1;
+  // ensure wavelength ranges are square
+  assert_eq!(ls_range_1.2, li_range_1.2);
+  assert_eq!(ls_range_2.2, li_range_2.2);
+  // ensure wavelength ranges are equal size
+  assert_eq!(ls_range_1.2, ls_range_2.2);
+
+  let cols = wavelength_region1.0.2;
+
+  let get_jsa = |setup : &SPDCSetup, x_range, y_range| {
+    let region = Steps2D(x_range, y_range);
+    JointSpectrum::new_coincidences(
+      setup.clone(),
+      region
+    ).amplitudes
+  };
+  // calculate the needed JSAs
+  // these are 1d vectors
+  let first_s1_i1 = get_jsa(spdc_setup1, ls_range_1, li_range_1);
+  let second_s2_i2 = get_jsa(spdc_setup2, ls_range_2, li_range_2);
+  let first_s2_i1 = get_jsa(spdc_setup1, ls_range_2, li_range_1);
+  let second_s1_i2 = get_jsa(spdc_setup2, ls_range_1, li_range_2);
+  let first_s1_i2 = get_jsa(spdc_setup1, ls_range_1, li_range_2);
+  let second_s2_i1 = get_jsa(spdc_setup2, ls_range_2, li_range_1);
+  let first_i2_i1 = get_jsa(spdc_setup1, li_range_2, li_range_1);
+  let second_s2_s1 = get_jsa(spdc_setup2, ls_range_2, ls_range_1);
 
   let pi2c = PI2 * C_;
 
-  let calc_rate = |delta_t : Time| -> Vector3<f64> {
-    let x = pi2c * delta_t;
-    let phase_ranges = Steps2D(
-      (*(x / ls_range.0), *(x / ls_range.1), ls_range.2),
-      (*(x / li_range.0), *(x / li_range.1), li_range.2)
-    );
-    let result = phase_ranges.into_iter().enumerate().map(|(index1, (theta_s_1, theta_i_1))| {
-      let (x1, y1) = get_2d_indices(index1, cols);
-      let jsa_s1_i1 = jsa_si[index1];
-      phase_ranges.into_iter().enumerate().map(|(index2, (theta_s_2, theta_i_2))| {
-        let (x2, y2) = get_2d_indices(index2, cols);
-        let jsa_s2_i2 = jsa_si[index2];
-        let jsa_s1_i2 = jsa_si[get_1d_index(x1, y2, cols)];
-        let jsa_s2_i1 = jsa_si[get_1d_index(x2, y1, cols)];
-        let arg1 = jsa_s1_i1 * jsa_s2_i2;
-        let arg2 = jsa_s2_i1 * jsa_s1_i2;
-        let phase_ss = Complex::from_polar(1., theta_s_1 - theta_s_2);
-        let phase_ii = Complex::from_polar(1., theta_i_1 - theta_i_2);
-        let phase_si = Complex::from_polar(1., theta_s_1 - theta_i_2);
-        // Vector3::new(
-        //   ((arg1 - phase_ss * arg2) * 0.5).norm_sqr(),
-        //   ((arg1 - phase_ii * arg2) * 0.5).norm_sqr(),
-        //   ((arg1 - phase_si * arg2) * 0.5).norm_sqr()
-        // )
-        let a = arg2.conj() * arg1;
+  let calc_rate = |tau : Time| -> Vector3<f64> {
+    let two_pi_c_tau = pi2c * tau;
+    let result = wavelength_region1.into_iter().enumerate().map(|(index1, (lambda_s_1, lambda_i_1))| {
+      let (s1, i1) = get_2d_indices(index1, cols);
+      let phi_1_s1_i1 = first_s1_i1[index1];
+      wavelength_region2.into_iter().enumerate().map(|(index2, (lambda_s_2, lambda_i_2))| {
+        let (s2, i2) = get_2d_indices(index2, cols);
+        // get the jsa values at this point
+        let phi_2_s2_i2 = second_s2_i2[index2];
+        let phi_1_s2_i1 = first_s2_i1[get_1d_index(s2, i1, cols)];
+        let phi_2_s1_i2 = second_s1_i2[get_1d_index(s1, i2, cols)];
+        let phi_1_s1_i2 = first_s1_i2[get_1d_index(s1, i2, cols)];
+        let phi_2_s2_i1 = second_s2_i1[get_1d_index(s2, i1, cols)];
+        let phi_1_i2_i1 = first_i2_i1[get_1d_index(i2, i1, cols)];
+        let phi_2_s2_s1 = second_s2_s1[get_1d_index(s2, s1, cols)];
+        // first term in integral for all
+        let A = phi_1_s1_i1 * phi_2_s2_i2;
+        // second coefficient in integral for each
+        let B_ss = phi_1_s2_i1 * phi_2_s1_i2;
+        let B_ii = phi_1_s1_i2 * phi_2_s2_i1;
+        let B_si = phi_1_i2_i1 * phi_2_s2_s1;
+        // phases
+        let phase_ss = Complex::from_polar(1., *(two_pi_c_tau * (1. / lambda_s_2 - 1. / lambda_s_1)));
+        let phase_ii = Complex::from_polar(1., *(two_pi_c_tau * (1. / lambda_i_2 - 1. / lambda_i_1)));
+        let phase_si = Complex::from_polar(1., *(two_pi_c_tau * (1. / lambda_i_2 - 1. / lambda_s_1)));
+
         Vector3::new(
-          (a * phase_ss).re,
-          (a * phase_ii).re,
-          (a * phase_si).re
+          (A - B_ss * phase_ss).norm_sqr(),
+          (A - B_ii * phase_ii).norm_sqr(),
+          (A - B_si * phase_si).norm_sqr()
         )
       }).sum::<Vector3<f64>>()
     }).sum::<Vector3<f64>>();
 
     // rate
-    0.5 * (Vector3::new(1., 1., 1.) - result)
+    result / 4.
   };
 
   let (ss, ii, si) = time_delays.into_iter().map(calc_rate).fold((vec![], vec![], vec![]), |mut acc, rate| {
@@ -178,6 +204,8 @@ mod tests {
     let steps = 3;
     let rates = calc_HOM_two_source_rate_series(
       &spdc_setup,
+      &spdc_setup,
+      &wavelengths,
       &wavelengths,
       &Steps(-300. * FEMTO * S, 300. * FEMTO * S, steps)
     );
