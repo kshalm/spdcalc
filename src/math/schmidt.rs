@@ -8,7 +8,7 @@ pub fn schmidt_number(spectrum : &JointSpectrum) -> Result<f64, SPDCError> {
   }
   let dim = spectrum.ranges.0.2;
   let svd = DMatrix::from_row_slice(dim, dim, &jsa_mag)
-    .try_svd(false, false, f64::EPSILON, 1000)
+    .try_svd(false, false, f64::EPSILON, 10_000)
     .ok_or(SPDCError("SVD did not converge while calculating schmidt number".into()))?;
   let norm_sq = svd.singular_values.norm_squared();
   let kinv = svd.singular_values.fold(0., |acc, x| acc + x.powi(4));
@@ -18,7 +18,7 @@ pub fn schmidt_number(spectrum : &JointSpectrum) -> Result<f64, SPDCError> {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::{*, plotting::plot_jsi};
+  use crate::{*};
   use crate::utils::Steps2D;
   use dim::{
     ucum::{M},
