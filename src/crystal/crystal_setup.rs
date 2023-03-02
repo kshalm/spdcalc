@@ -85,13 +85,13 @@ fn solve_for_n(b : f64, c : f64, sign : Sign) -> f64 {
 }
 
 impl CrystalSetup {
-  pub fn get_local_direction(&self, direction : Direction) -> Direction {
+  pub fn to_crystal_frame(&self, direction : Direction) -> Direction {
     let crystal_rotation = Rotation3::from_euler_angles(0., *(self.theta / RAD), *(self.phi / RAD));
     crystal_rotation * direction
   }
 
-  pub fn get_local_direction_for(&self, photon : &Photon) -> Direction {
-    self.get_local_direction(photon.get_direction())
+  pub fn to_crystal_frame_for(&self, photon : &Photon) -> Direction {
+    self.to_crystal_frame(photon.get_direction())
   }
 
   pub fn get_index_for(&self, photon : &Photon) -> RIndex {
@@ -111,7 +111,7 @@ impl CrystalSetup {
     // Calculation follows https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
     let indices = *self.crystal.get_indices(wavelength, self.temperature);
     let n_inv2 = indices.map(|i| i.powi(-2));
-    let s = self.get_local_direction(direction);
+    let s = self.to_crystal_frame(direction);
     let s_squared = s.map(|i| i * i);
 
     let sum_recip = Vector3::new(
