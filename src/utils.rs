@@ -344,6 +344,12 @@ pub mod testing {
 #[cfg(test)]
 mod tests {
   use super::*;
+  #[test]
+  fn single_step_test(){
+    let actual : Vec<f64> = Steps(3.3, 4., 1).into_iter().collect();
+    let expected = vec![3.3];
+    assert_eq!(actual, expected);
+  }
 
   #[test]
   fn iterator_2d_test() {
