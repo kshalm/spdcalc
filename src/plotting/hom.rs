@@ -50,6 +50,22 @@ pub fn calc_HOM_rate_series(
   }).collect()
 }
 
+pub fn calc_hom_visibility(
+  spdc_setup : &SPDCSetup,
+  wavelength_ranges : &Steps2D<Wavelength>
+) -> (Time, f64) {
+  let signal_time = spdc_setup.get_average_transit_time(&spdc_setup.signal);
+  let idler_time = spdc_setup.get_average_transit_time(&spdc_setup.idler);
+  let delta_t = idler_time - signal_time;
+  let min_rate = calc_HOM_rate_series(
+    spdc_setup,
+    wavelength_ranges,
+    &Steps(delta_t, delta_t, 1)
+  );
+
+  (delta_t, (0.5 - min_rate[0]) / 0.5)
+}
+
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct HomTwoSourceResult<T> {
   ss: T,
@@ -143,6 +159,24 @@ pub fn calc_HOM_two_source_rate_series(
   });
 
   HomTwoSourceResult { ss, ii, si }
+}
+
+
+pub fn calc_hom_two_source_visibility(
+  spdc_setup1 : &SPDCSetup,
+  spdc_setup2 : &SPDCSetup,
+  wavelength_region1 : &Steps2D<Wavelength>,
+  wavelength_region2 : &Steps2D<Wavelength>,
+) -> (Time, f64, f64, f64) {
+  use dim::ucum::S;
+  let min_rate = calc_HOM_two_source_rate_series(
+    spdc_setup1,
+    spdc_setup2,
+    wavelength_region1,
+    wavelength_region2,
+    &Steps(0. * S, 0. * S, 1)
+  );
+  (0. * S, (0.5 - min_rate.ss[0]) / 0.5, (0.5 - min_rate.ii[0]) / 0.5, (0.5 - min_rate.si[0]) / 0.5)
 }
 
 #[cfg(test)]
