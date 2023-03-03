@@ -251,8 +251,8 @@ fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Compl
   // let A7I = -DEL3i;
   let A7 = Complex::new(*(GAM3i/M), -*(DEL3i/M));
 
-  let pp_factor = spdc_setup.pp.map_or(0., |p| p.pp_factor());
-  let dksi = k_s + k_i + PI2 * pp_factor / M;
+  let pp_factor = spdc_setup.pp.map_or(0./M, |p| p.pp_factor());
+  let dksi = k_s + k_i + PI2 * pp_factor;
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
 

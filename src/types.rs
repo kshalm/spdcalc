@@ -25,6 +25,9 @@ pub type Distance = ucum::Meter<f64>;
 /// Time
 pub type Time = ucum::Second<f64>;
 
+/// Speed
+pub type Speed = ucum::MeterPerSecond<f64>;
+
 /// 2D vector holding the x,y of the waist
 pub type WaistSize = ucum::Meter<Vector2<f64>>;
 

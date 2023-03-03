@@ -108,9 +108,9 @@ fn calc_singles_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Complex<f
   let DEL1s = DEL2s * PHI_s; // 1e-9
   let DEL3s = -hs - zhs * PHI_s * SIN_THETA_s_e * COS_PHI_s; // 1e-11
   let KpKs = *(k_p * k_s * M2); // exact
-  let pp_factor = spdc_setup.pp.map_or(0., |p| p.pp_factor());
+  let pp_factor = spdc_setup.pp.map_or(0. / M, |p| p.pp_factor());
 
-  let dksi = k_s + k_i + PI2 * pp_factor / M;
+  let dksi = k_s + k_i + PI2 * pp_factor;
   let C7 = k_p - dksi; // 1e-7
   let C3 = L * C7; // 1e-10
   let C4 = L * (1./k_i - 1./k_p); // 1e-13

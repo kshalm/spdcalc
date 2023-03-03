@@ -3,7 +3,7 @@ use crate::*;
 use crystal::CrystalSetup;
 use dim::{
   f64prefixes::{MILLI},
-  ucum::{self, RAD, M, K, MILLIW, MilliWatt},
+  ucum::{self, RAD, M, K, MILLIW, MilliWatt, C_},
 };
 use math::*;
 use photon::{Photon, PhotonType};
@@ -116,6 +116,22 @@ impl SPDCSetup {
     copy.idler_fiber_theta_offset = 0. * RAD;
 
     copy
+  }
+
+  /// Get the average transit time through the crystal for a signal/idler
+  pub fn get_average_transit_time(&self, photon: &Photon) -> Time {
+    let crystal_length = self.crystal_setup.length;
+    let delta_z = 0.5 * crystal_length;
+    // photon direction in lab frame
+    // so crystal length is along z axis
+    let direction = photon.get_direction().into_inner();
+    // take the direction vector and turn it into a displacement
+    // by scaling the vector so that z component becomes delta_z
+    let disp = (*(delta_z / M) / direction.z) * direction;
+    let distance = disp.norm() * M;
+
+    let vg = photon.group_velocity(&self.crystal_setup, self.pp);
+    distance / vg
   }
 
   // Create a collinear setup
@@ -393,7 +409,7 @@ pub fn get_optimum_idler(
   let np = pump.get_index(&crystal_setup);
 
   let del_k_pp = match pp {
-    Some(poling) => signal.get_wavelength() * poling.pp_factor() / ucum::M,
+    Some(poling) => signal.get_wavelength() * poling.pp_factor(),
     None => ucum::Unitless::new(0.0),
   };
 
@@ -442,9 +458,9 @@ pub fn calc_delta_k(
   let r_s = signal.get_direction();
   let r_i = idler.get_direction();
 
-  let ns_over_ls = *(ucum::M * signal.get_index(&crystal_setup) / signal.get_wavelength());
-  let ni_over_li = *(ucum::M * idler.get_index(&crystal_setup) / idler.get_wavelength());
-  let np_over_lp = *(ucum::M * pump.get_index(&crystal_setup) / pump.get_wavelength());
+  let ns_over_ls = *(M * signal.get_index(&crystal_setup) / signal.get_wavelength());
+  let ni_over_li = *(M * idler.get_index(&crystal_setup) / idler.get_wavelength());
+  let np_over_lp = *(M * pump.get_index(&crystal_setup) / pump.get_wavelength());
 
   // These are negative because we are subtracting signal and idler.
   // Pump is zero along x and y
@@ -457,7 +473,7 @@ pub fn calc_delta_k(
   (PI2 / MILLI)
     * match pp {
       Some(poling) => {
-        dk.z -= poling.pp_factor();
+        dk.z -= *(poling.pp_factor() * M);
         Momentum3::new(dk)
       }
       None => Momentum3::new(dk),

@@ -3,8 +3,8 @@
 //! Used for pump, signal, idler data
 use std::fmt;
 use std::str::FromStr;
-use crate::{crystal::CrystalSetup, *};
-use dim::ucum;
+use crate::{crystal::CrystalSetup, *, spdc_setup::PeriodicPoling, math::*};
+use dim::{ucum::{self, C_, M}};
 use na::*;
 use std::f64::{self, consts::FRAC_PI_2};
 
@@ -116,6 +116,31 @@ impl Photon {
       f64::sin(theta_rad) * f64::sin(phi_rad),
       f64::cos(theta_rad),
     ))
+  }
+
+  pub fn effective_index_of_refraction(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> RIndex {
+    let lambda = self.get_wavelength();
+    let n = crystal_setup.get_index_for(self);
+    let pp_factor = pp.map_or(0. / M, |p| p.pp_factor());
+    n + *(pp_factor * lambda)
+  }
+
+  /// Get the phase velocity of the photon through specified crystal setup
+  pub fn phase_velocity(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> Speed {
+    C_ / self.effective_index_of_refraction(crystal_setup, pp)
+  }
+
+  /// Get the group velocity of this photon through specified crystal setup
+  pub fn group_velocity(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> Speed {
+    let lambda = self.get_wavelength();
+    let n_eff = self.effective_index_of_refraction(crystal_setup, pp);
+    let vp = self.phase_velocity(crystal_setup, pp);
+    let n_of_lambda = Func(move |lambda : &[f64]| {
+      *crystal_setup.get_index_along(lambda[0] * M, self.get_direction(), &self.get_type())
+    });
+    let dn_by_dlambda = NumericalDifferentiation::new(n_of_lambda)
+      .gradient(&[*(lambda / M)])[0];
+    vp * (1. + (lambda / n_eff) * dn_by_dlambda / M)
   }
 
   pub fn calc_internal_theta_from_external(

@@ -1,5 +1,5 @@
 use super::*;
-use ucum::{J, S};
+use ucum::{J, S, PerMeter};
 
 /// Apodization for periodic poling
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -33,12 +33,12 @@ impl PeriodicPoling {
   }
 
   /// Get the factor 1 / (sign * poling_period)
-  pub fn pp_factor(&self) -> f64 {
+  pub fn pp_factor(&self) -> PerMeter<f64> {
     assert!(
       self.period.value_unsafe > 0.,
       "Periodic Poling Period must be greater than zero"
     );
 
-    *(ucum::M / (self.sign * self.period))
+    1. / (self.sign * self.period)
   }
 }
