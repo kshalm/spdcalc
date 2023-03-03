@@ -3,7 +3,7 @@ use crate::*;
 use crystal::CrystalSetup;
 use dim::{
   f64prefixes::{MILLI},
-  ucum::{self, RAD, M, K, MILLIW, MilliWatt, C_},
+  ucum::{self, RAD, M, K, MILLIW, MilliWatt},
 };
 use math::*;
 use photon::{Photon, PhotonType};

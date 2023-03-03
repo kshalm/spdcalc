@@ -106,8 +106,8 @@ pub fn calc_plot_config_for_jsi( spdc_setup : &SPDCSetup, size : usize, threshol
 #[cfg(test)]
 mod tests {
   use super::*;
-  use dim::ucum::{self, RAD};
-  use dim::f64prefixes::{MICRO, NANO};
+  use dim::ucum::RAD;
+  use dim::f64prefixes::NANO;
   extern crate float_cmp;
   use float_cmp::*;
 
