@@ -64,7 +64,7 @@ impl<F : Function> Function for NumericalDifferentiation<F> {
 
 impl<F : Function> Function1 for NumericalDifferentiation<F> {
   fn gradient(&self, position : &[f64]) -> Vec<f64> {
-    let mut x : Vec<_> = position.iter().cloned().collect();
+    let mut x : Vec<_> = position.to_vec();
 
     // let current = self.value(&x);
 
@@ -75,7 +75,7 @@ impl<F : Function> Function1 for NumericalDifferentiation<F> {
       .map(|(i, x_i)| {
         let h = if x_i == 0.0 {
           EPSILON.powf(1. / 3.)
-        // EPSILON * 1.0e10
+          // EPSILON * 1.0e10
         } else {
           EPSILON.powf(1. / 3.) * x_i.abs()
         };
