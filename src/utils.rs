@@ -315,6 +315,17 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
   }
 }
 
+// TODO: could probably make this better with smart use of splice
+pub fn transpose_vec<T : Clone>(vec: Vec<T>, num_cols : usize) -> Vec<T> {
+  let len = vec.len();
+  let num_rows = len / num_cols;
+  (0..len).into_iter().map(|index| {
+    let (c, r) = get_2d_indices(index, num_cols);
+    let other = get_1d_index(r, c, num_rows);
+    vec[other].clone()
+  }).collect()
+}
+
 #[cfg(test)]
 pub mod testing {
   pub fn percent_diff(actual : f64, expected : f64) -> f64 {
@@ -348,6 +359,13 @@ mod tests {
   fn single_step_test(){
     let actual : Vec<f64> = Steps(3.3, 4., 1).into_iter().collect();
     let expected = vec![3.3];
+    assert_eq!(actual, expected);
+  }
+
+  #[test]
+  fn transpose_test(){
+    let actual : Vec<f64> = transpose_vec(Steps(1., 4., 4).into_iter().collect(), 2);
+    let expected = vec![1., 3., 2., 4.];
     assert_eq!(actual, expected);
   }
 
