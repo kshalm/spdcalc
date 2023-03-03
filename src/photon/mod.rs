@@ -135,11 +135,10 @@ impl Photon {
     let lambda = self.get_wavelength();
     let n_eff = self.effective_index_of_refraction(crystal_setup, pp);
     let vp = self.phase_velocity(crystal_setup, pp);
-    let n_of_lambda = Func(move |lambda : &[f64]| {
+    let n_of_lambda = move |lambda : &[f64]| {
       *crystal_setup.get_index_along(lambda[0] * M, self.get_direction(), &self.get_type())
-    });
-    let dn_by_dlambda = NumericalDifferentiation::new(n_of_lambda)
-      .gradient(&[*(lambda / M)])[0];
+    };
+    let dn_by_dlambda = gradient_at(n_of_lambda, &[*(lambda / M)])[0];
     vp * (1. + (lambda / n_eff) * dn_by_dlambda / M)
   }
 
