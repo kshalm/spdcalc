@@ -1,4 +1,4 @@
-use crate::jsa::*;
+use crate::{jsa::*, utils::transpose_vec};
 use super::*;
 use spdc_setup::*;
 use utils::Steps2D;
@@ -184,7 +184,7 @@ pub fn calc_singles_rate_distribution_signal(spdc_setup : &SPDCSetup, wavelength
 /// Integrating over all wavelengths (all array items) will give total singles rate.
 /// technically this distribution has units of 1/(s m^2).. but we return 1/s
 #[allow(non_snake_case)]
-pub fn calc_singles_rate_distributions(spdc_setup : &SPDCSetup, wavelength_range : &Steps2D<Wavelength>) -> Vec<(Hertz<f64>, Hertz<f64>)> {
+pub fn calc_singles_rate_distributions(spdc_setup : &SPDCSetup, wavelength_range : &Steps2D<Wavelength>) -> (Vec<Hertz<f64>>, Vec<Hertz<f64>>) {
 
   let PI2c = PI2 * C_;
 
@@ -197,7 +197,7 @@ pub fn calc_singles_rate_distributions(spdc_setup : &SPDCSetup, wavelength_range
 
   // early out...
   if *(Ws_SQ / M / M) == 0. || *(Wi_SQ / M / M) == 0. {
-    return vec![(0. / S, 0. / S); wavelength_range.len()];
+    return (vec![0. / S; wavelength_range.len()], vec![0. / S; wavelength_range.len()]);
   }
 
   // spdc_setup copy with signal and idler swapped
@@ -234,7 +234,7 @@ pub fn calc_singles_rate_distributions(spdc_setup : &SPDCSetup, wavelength_range
   let scale_s = Ws_SQ * PHI_s;
   let scale_i = Wi_SQ * PHI_i;
 
-  wavelength_range
+  let (signal, idler) = wavelength_range
     .into_iter()
     .map(|(l_s, l_i)| {
       let d_omega_s = PI2c * dlamda_s / sq(l_s);
@@ -256,7 +256,9 @@ pub fn calc_singles_rate_distributions(spdc_setup : &SPDCSetup, wavelength_range
         amplitude_i.norm() * factor_i * jsa_units / M / M,
       )
     })
-    .collect()
+    .unzip();
+
+  (signal, idler)
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
@@ -272,30 +274,26 @@ pub struct HeraldingResults {
 impl HeraldingResults {
   pub fn from_distributions(
     coincidences_rate_distribution : Vec<Hertz<f64>>,
-    singles_rate_distributions : Vec<(Hertz<f64>, Hertz<f64>)>
+    signal_singles_rate_distribution : Vec<Hertz<f64>>,
+    idler_singles_rate_distribution: Vec<Hertz<f64>>
   ) -> Self {
 
     let coincidences_rate = coincidences_rate_distribution.iter()
       .map(|&r| *(r * S)).sum();
 
-    let (
-      signal_singles_rate,
-      idler_singles_rate
-    ) = singles_rate_distributions.iter()
-      .map(|&(r_s, r_i)|
-        ( *(r_s * S), *(r_i * S) )
-      )
-      // sum tuples
-      .fold((0., 0.), |col, (r_s, r_i)|
-        (col.0 + r_s, col.1 + r_i)
-      );
+    let signal_singles_rate = signal_singles_rate_distribution.iter()
+      .map(|&r| *(r * S)).sum();
+
+    let idler_singles_rate = idler_singles_rate_distribution.iter()
+      .map(|&r| *(r * S)).sum();
 
     let signal_efficiency = if idler_singles_rate == 0. { 0. } else { coincidences_rate / idler_singles_rate };
     let idler_efficiency = if signal_singles_rate == 0. { 0. } else { coincidences_rate / signal_singles_rate };
     let symmetric_efficiency = if signal_singles_rate == 0. || idler_singles_rate == 0. {
       0.
     } else {
-      coincidences_rate / (signal_singles_rate * idler_singles_rate).sqrt()
+      let denom : f64 = signal_singles_rate * idler_singles_rate;
+      coincidences_rate / denom.sqrt()
     };
 
     HeraldingResults {
@@ -312,11 +310,12 @@ impl HeraldingResults {
 /// Get the heralding results for a given spdc_setup setup and signal/idler wavelength range
 pub fn calc_heralding_results(spdc_setup : &SPDCSetup, wavelength_range : &Steps2D<Wavelength>) -> HeraldingResults {
   let coincidences_rate_distribution = calc_coincidences_rate_distribution(&spdc_setup, &wavelength_range);
-  let singles_rate_distributions = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
+  let (signal, idler) = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
 
   HeraldingResults::from_distributions(
     coincidences_rate_distribution,
-    singles_rate_distributions
+    signal,
+    idler
   )
 }
 
@@ -408,7 +407,7 @@ mod tests {
     let actual = rates.iter().map(|&r| *(r * S)).sum();
     let expected = 3800.0;
 
-    let accept_diff = 1.; // percent difference accpetable
+    let accept_diff = 1e-9; // percent difference accpetable
     let pdiff = percent_diff(actual, expected);
 
     assert!(
@@ -435,9 +434,9 @@ mod tests {
       (1542.05 * NANO * M, 1550.00 * NANO * M, 30)
     );
 
-    let rates = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
-    let actual = rates.iter()
-      .map(|&(r_s, r_i)|
+    let (signal, idler) = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
+    let actual = signal.iter().zip(idler.iter())
+      .map(|(&r_s, &r_i)|
         ( *(r_s * S), *(r_i * S) )
       )
       // sum tuples
@@ -447,7 +446,7 @@ mod tests {
 
     let expected = (3901.133069046596, 3901.3937911182834);
 
-    let accept_diff = 1.; // percent difference accpetable
+    let accept_diff = 1e-9; // percent difference accpetable
     let pdiff_s = percent_diff(actual.0, expected.0);
 
     assert!(
@@ -492,9 +491,9 @@ mod tests {
     );
 
     let coinc_rate_distr = calc_coincidences_rate_distribution(&spdc_setup, &wavelength_range);
-    let singles_rate_distrs = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
+    let (signal, idler) = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
 
-    let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
+    let results = HeraldingResults::from_distributions(coinc_rate_distr, signal, idler);
 
     let accept_diff = 1e-1;
 
@@ -543,9 +542,9 @@ mod tests {
     );
 
     let coinc_rate_distr = calc_coincidences_rate_distribution(&spdc_setup, &wavelength_range);
-    let singles_rate_distrs = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
+    let (signal, idler) = calc_singles_rate_distributions(&spdc_setup, &wavelength_range);
 
-    let results = HeraldingResults::from_distributions(coinc_rate_distr, singles_rate_distrs);
+    let results = HeraldingResults::from_distributions(coinc_rate_distr, signal, idler);
     dbg!(results);
     let accept_diff = 1e-1;
 
