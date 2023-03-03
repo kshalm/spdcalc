@@ -55,7 +55,14 @@ pub fn gradient_at<F, T>(func : F, position : T) -> Vec<f64>
       d_i
     })
     .collect()
-  }
+}
+
+pub fn derivative_at<F>(func : F, position : f64) -> f64
+  where
+    F : Fn(f64) -> f64
+{
+  gradient_at(|x : &[f64]| func(x[0]), &[position])[0]
+}
 
 #[cfg(test)]
 mod tests {
@@ -65,12 +72,12 @@ mod tests {
 
   #[test]
   fn derrivative_test() {
-    let func = |x : &[f64]| x[0].sin();
-    let func_prime = |x : &[f64]| x[0].cos();
+    let func = |x : f64| x.sin();
+    let func_prime = |x : f64| x.cos();
 
-    let x = [0.4];
-    let actual = gradient_at(func, &x)[0];
-    let expected = func_prime(&x);
+    let x = 0.4;
+    let actual = derivative_at(func, x);
+    let expected = func_prime(x);
 
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-8),

@@ -490,17 +490,15 @@ pub fn calc_pump_walkoff(pump : &Photon, crystal_setup : &CrystalSetup) -> Angle
   assert!(pump.get_type() == PhotonType::Pump);
 
   // n_{e}(\theta)
-  let np_of_theta = |x : &[f64]| {
-    let theta = x[0];
+  let np_of_theta = |theta| {
     let mut setup = crystal_setup.clone();
     setup.theta = theta * ucum::RAD;
-
     *pump.get_index(&setup)
   };
 
   // derrivative at theta
   let theta = *(crystal_setup.theta / ucum::RAD);
-  let np_prime = gradient_at(np_of_theta, &[theta])[0];
+  let np_prime = derivative_at(np_of_theta, theta);
   let np = *pump.get_index(&crystal_setup);
 
   // walkoff \rho = -\frac{1}{n_e} \frac{dn_e}{d\theta}
