@@ -17,6 +17,7 @@ pub fn calc_jsa( spdc_setup : &SPDCSetup, l_s : Wavelength, l_i : Wavelength ) -
 
 /// Calculation the normalization factor for the coincidences JSA
 /// Units: 1 / Length^4
+#[deprecated]
 pub fn calc_jsa_normalization(spdc_setup : &SPDCSetup) -> JSAUnits<f64> {
   let jsa_units = JSAUnits::new(1.);
   let amp = *(phasematch_coincidences(&spdc_setup.to_collinear()) / jsa_units);
@@ -36,6 +37,7 @@ pub fn calc_jsa_singles( spdc_setup : &SPDCSetup, l_s : Wavelength, l_i : Wavele
 
 /// Calculation the normalization factor for the singles JSA
 /// Units: 1 / Length^4
+#[deprecated]
 pub fn calc_jsa_singles_normalization(spdc_setup : &SPDCSetup) -> JSAUnits<f64> {
   let jsa_units = JSAUnits::new(1.);
   let amp = *(phasematch_singles(&spdc_setup.to_collinear()) / jsa_units);
@@ -44,6 +46,7 @@ pub fn calc_jsa_singles_normalization(spdc_setup : &SPDCSetup) -> JSAUnits<f64> 
 
 /// Calculate a normalized JSA amplitude.
 /// Unitless.
+#[deprecated]
 pub fn calc_normalized_jsa( spdc_setup : &SPDCSetup, l_s : Wavelength, l_i : Wavelength ) -> Unitless<Complex<f64>> {
   let jsa = calc_jsa(&spdc_setup, l_s, l_i);
   let norm = calc_jsa_normalization(&spdc_setup);
@@ -53,6 +56,7 @@ pub fn calc_normalized_jsa( spdc_setup : &SPDCSetup, l_s : Wavelength, l_i : Wav
 
 /// Calculate the normalized JSI for given parameters at specified signal/idler wavelengths.
 /// Unitless.
+#[deprecated]
 pub fn calc_normalized_jsi( spdc_setup : &SPDCSetup, l_s : Wavelength, l_i : Wavelength ) -> Unitless<f64> {
   let jsa = calc_jsa( &spdc_setup, l_s, l_i );
   use dim::Map;
