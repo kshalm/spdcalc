@@ -58,7 +58,7 @@ impl<'a> Default for SPDCConfig<'a> {
       pump_waist: Some(100. * MICRO),
       pump_bandwidth: Some(5.35 * NANO),
       pump_spectrum_threshold: Some(1e-9),
-      pump_average_power: Some(1. * MILLI), // W
+      pump_average_power: Some(1.), // mW
 
       signal_wavelength: Some(1550. * NANO),
       signal_phi: Some(0.),
@@ -241,7 +241,7 @@ impl TryFrom<SPDCConfig<'_>> for SPDCSetup {
       idler_fiber_theta_offset : 0. * RAD,
       pump_bandwidth : config.pump_bandwidth.ok_or_else(|| empty_err("pump_bandwidth"))? * M,
       pump_spectrum_threshold: config.pump_spectrum_threshold.ok_or_else(|| empty_err("pump_spectrum_threshold"))?,
-      pump_average_power: config.pump_average_power.ok_or_else(|| empty_err("pump_average_power"))? * MILLIW / MILLI,
+      pump_average_power: config.pump_average_power.ok_or_else(|| empty_err("pump_average_power"))? * MILLIW,
       z0s: config.signal_waist_position.map(|z| z * M),
       z0i: config.idler_waist_position.map(|z| z * M),
     };
