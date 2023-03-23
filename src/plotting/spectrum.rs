@@ -33,7 +33,7 @@ impl JointSpectrum {
     raw_amplitudes: Vec<Complex<f64>>
   ) -> Self {
     // TODO: disabling normalization
-    let jsi_norm : f64 = 1.; // raw_amplitudes.iter().fold(0., |n, j| n + j.norm_sqr());
+    let jsi_norm : f64 = raw_amplitudes.iter().fold(0., |n, j| n + j.norm_sqr());
     let jsa_norm = jsi_norm.sqrt();
     let amplitudes = if jsa_norm == 0. { raw_amplitudes } else { raw_amplitudes.iter().map(|j| j / jsa_norm).collect() };
     Self::new(spdc_setup, ranges, amplitudes, jsa_norm)
