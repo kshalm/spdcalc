@@ -1,62 +1,12 @@
 //! # Beam
 //!
 //! Used for pump, signal, idler beams
-use crate::{crystal::CrystalSetup, *, spdc_setup::PeriodicPoling, math::*};
-use dim::{ucum::{self, C_, M, Meter2}};
+use crate::{*, crystal::CrystalSetup, spdc_setup::PeriodicPoling, math::*};
+use dim::{ucum::{self, C_, M}};
 use na::*;
 use std::{f64::{self, consts::FRAC_PI_2}};
-
-/// Beam waist
-#[derive(Debug, Copy, Clone)]
-pub struct BeamWaist {
-  /// wx at 1/e^2
-  pub x: Wavelength,
-  /// wy at 1/e^2
-  pub y: Wavelength,
-}
-
-impl BeamWaist {
-  pub fn new(wx : Wavelength) -> Self {
-    Self {
-      x: wx,
-      y: wx
-    }
-  }
-
-  pub fn new_elliptic(wx : Wavelength, wy : Wavelength) -> Self {
-    Self {
-      x: wx,
-      y: wy
-    }
-  }
-
-  // pub fn from_fwhm() -> Self {
-
-  // }
-
-  pub fn ellipticity(&self) -> f64 {
-    if self.x == self.y {
-      1.
-    } else if self.y < self.x {
-      *(self.y / self.x)
-    } else {
-      *(self.x / self.y)
-    }
-  }
-
-  pub fn norm_sqr(&self) -> Meter2<f64> {
-    self.x * self.y
-  }
-}
-
-// pub impl std::ops::Deref for BeamWaist {
-//   type Target = Wavelength;
-
-//   fn deref(&self) -> &Self::Target {
-//     self.wo *
-//   }
-// }
-
+mod beam_waist;
+pub use beam_waist::*;
 
 pub fn direction_from_polar(phi : Angle, theta : Angle) -> Direction {
   let theta_rad = *(theta / ucum::RAD);
@@ -85,12 +35,12 @@ pub struct Beam {
 
 impl Beam {
   /// create a beam
-  pub fn new(
+  pub fn new<W: Into<BeamWaist>> (
     polarization : PolarizationType,
     phi : Angle,
     theta : Angle,
     wavelength : Wavelength,
-    waist : BeamWaist,
+    waist : W,
   ) -> Self {
     assert!(
       *(theta / ucum::RAD) <= PI && *(theta / ucum::RAD) >= 0.,
@@ -101,7 +51,7 @@ impl Beam {
     Self {
       polarization,
       wavelength,
-      waist,
+      waist: waist.into(),
       phi,
       theta,
       direction : direction_from_polar(phi, theta),
@@ -194,8 +144,8 @@ impl Beam {
     self.waist
   }
 
-  pub fn set_waist(&mut self, waist: BeamWaist) -> &mut Self {
-    self.waist = waist;
+  pub fn set_waist<W: Into<BeamWaist>>(&mut self, waist: W) -> &mut Self {
+    self.waist = waist.into();
     self
   }
 
