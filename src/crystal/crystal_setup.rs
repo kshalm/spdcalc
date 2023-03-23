@@ -1,59 +1,7 @@
-use std::fmt;
-use std::str::FromStr;
 use super::*;
 use dim::ucum::*;
 use na::{Rotation3, Vector3};
 use photon::{Photon, PhotonType};
-
-/// The phasematch type
-#[allow(non_camel_case_types)]
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum PMType {
-  /// Type 0:   o -> o + o
-  Type0_o_oo,
-  /// Type 0:   e -> e + e
-  Type0_e_ee,
-  /// Type 1:   e -> o + o
-  Type1_e_oo,
-
-  /// Type 2:   e -> e + o
-  Type2_e_eo,
-  /// Type 2:   e -> o + e
-  Type2_e_oe,
-}
-
-impl PMType {
-  pub fn to_str(&self) -> &'static str {
-    match self {
-      PMType::Type0_o_oo => "Type0_o_oo",
-      PMType::Type0_e_ee => "Type0_e_ee",
-      PMType::Type1_e_oo => "Type1_e_oo",
-      PMType::Type2_e_eo => "Type2_e_eo",
-      PMType::Type2_e_oe => "Type2_e_oe",
-    }
-  }
-}
-
-impl fmt::Display for PMType {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{:?}", self)
-  }
-}
-
-impl FromStr for PMType {
-  type Err = SPDCError;
-
-  fn from_str(s : &str) -> Result<Self, Self::Err> {
-    match s.as_ref() {
-      "Type0_o_oo" => Ok(PMType::Type0_o_oo),
-      "Type0_e_ee" => Ok(PMType::Type0_e_ee),
-      "Type1_e_oo" => Ok(PMType::Type1_e_oo),
-      "Type2_e_eo" => Ok(PMType::Type2_e_eo),
-      "Type2_e_oe" => Ok(PMType::Type2_e_oe),
-      _ => Err(SPDCError(format!("PMType {} is not defined", s))),
-    }
-  }
-}
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct CrystalSetup {
@@ -90,10 +38,12 @@ impl CrystalSetup {
     crystal_rotation * direction
   }
 
+  #[deprecated]
   pub fn to_crystal_frame_for(&self, photon : &Photon) -> Direction {
     self.to_crystal_frame(photon.get_direction())
   }
 
+  #[deprecated]
   pub fn get_index_for(&self, photon : &Photon) -> RIndex {
     self.get_index_along(
       photon.get_wavelength(),
@@ -102,6 +52,75 @@ impl CrystalSetup {
     )
   }
 
+  /// get the refractive index along specified direction, with wavelength and polarization type
+  pub fn index_along(
+    &self,
+    wavelength : Wavelength,
+    direction : Direction,
+    polarization : PolarizationType,
+  ) -> RIndex {
+    // Calculation follows https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
+    let indices = *self.crystal.get_indices(wavelength, self.temperature);
+    let n_inv2 = indices.map(|i| i.powi(-2));
+    let s = self.to_crystal_frame(direction);
+    let s_squared = s.map(|i| i * i);
+
+    let sum_recip = Vector3::new(
+      n_inv2.y + n_inv2.z,
+      n_inv2.x + n_inv2.z,
+      n_inv2.x + n_inv2.y,
+    );
+    let prod_recip = Vector3::new(
+      n_inv2.y * n_inv2.z,
+      n_inv2.x * n_inv2.z,
+      n_inv2.x * n_inv2.y,
+    );
+
+    let sign = match polarization {
+      // fast
+      PolarizationType::Ordinary => Sign::NEGATIVE,
+      // slow
+      PolarizationType::Extraordinary => Sign::POSITIVE,
+    };
+
+    // Equation (11)
+    // x² + bx + c = 0
+    let b = s_squared.dot(&sum_recip);
+    let c = s_squared.dot(&prod_recip);
+
+    let d = b * b - 4.0 * c;
+    let n = if d < 0. {
+      // this means the index is imaginary => decay
+      // return the real part of the index, which is zero
+      0.
+    } else {
+      // TODO: solving quadratic formula this way can have floating point errors
+      let denom = b + sign * d.sqrt();
+      if denom < 0. {
+        // again... imaginary solution
+        0.
+      } else {
+        (2.0 / denom).sqrt()
+      }
+    };
+
+    RIndex::new(n)
+  }
+
+  // z_{s,i} = -\frac{1}{2}\frac{L}{n_z(\lambda_{s,i})}
+  pub fn optimal_waist_position(
+    &self,
+    wavelength : Wavelength,
+    polarization : PolarizationType
+  ) -> Distance {
+    -0.5 * self.length / self.index_along(
+      wavelength,
+      na::Unit::new_normalize(na::Vector3::z()),
+      polarization
+    )
+  }
+
+  #[deprecated]
   pub fn get_index_along(
     &self,
     wavelength : Wavelength,
@@ -162,6 +181,7 @@ impl CrystalSetup {
   }
 
   // z_{s,i} = -\frac{1}{2}\frac{L}{n_z(\lambda_{s,i})}
+  #[deprecated]
   pub fn calc_optimal_waist_position(&self, photon : &Photon) -> Distance {
     -0.5 * self.length / self.get_index_along(
       photon.get_wavelength(),

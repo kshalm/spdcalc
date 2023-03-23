@@ -4,6 +4,7 @@ use std::str::FromStr;
 use super::*;
 use dim::f64prefixes::{PICO};
 use dim::ucum::{ M, V };
+use dim::ucum::Kelvin;
 
 /// The type of crystal
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -130,7 +131,7 @@ impl Crystal {
   ///
   pub fn get_effective_nonlinear_coefficient(&self) -> MetersPerMilliVolt<f64> {
     // TODO: enhance crystals to compute this
-    1. * PICO * M / V
+    7.6 * PICO * M / V
   }
 }
 

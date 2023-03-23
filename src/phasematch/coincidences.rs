@@ -2,15 +2,72 @@ use crate::math::fwhm_to_sigma;
 use crate::*;
 use math::*;
 use super::*;
-use dim::ucum::{RAD, M, J, S};
+use dim::ucum::{RAD, M, J, S, EPS_0, UCUM};
+use dim::ucum;
 use num::{Complex, clamp};
 use std::cmp::max;
+
+derived!(ucum, UCUM: JsiNorm = Second * Meter * Meter * Meter * Meter * Meter * Meter * Meter * Meter);
+
+fn jsi_normalization(spdc_setup : &SPDCSetup) -> JsiNorm<f64> {
+  let two_pi_c = PI2 * C_;
+  // K degeneracy factor (nonlinear polarization).
+  // K = 1 for non-degenerate emission frequencies.
+  // K = 1/2 for degenerate emission frequencies.
+  let degeneracy_factor = 1.0_f64;
+  // A_m = e^{i\frac{\pi}{2}m} \mathrm{sinc}\left ( {\frac{\pi}{2}m} \right ): periodic poling coefficient. Am = 1 for m = 0 (no periodic poling);
+  // and A_m = 2i/\pi for m = 1 (sinusoidal variation)
+  let periodic_poling_coeff = 1.0_f64;
+
+  let p_bw = spdc_setup.pump_bandwidth;
+  let lamda_p = spdc_setup.pump.get_wavelength();
+  // TODO: ask krister why there's a factor of 2 here again. and why we're doing this for sigma
+  let sigma = 2. * fwhm_to_sigma(two_pi_c * (
+    1. / (lamda_p - 0.5 * p_bw)
+    - 1. / (lamda_p + 0.5 * p_bw)
+  ));
+
+  let crystal_length = spdc_setup.crystal_setup.length;
+  let pump_power = spdc_setup.pump_average_power;
+  let deff = spdc_setup.crystal_setup.crystal.get_effective_nonlinear_coefficient();
+
+  let wp = *(spdc_setup.pump.waist / M);
+  let wp_sq = (wp.x * wp.y) * M * M;
+  let ws = *(spdc_setup.signal.waist / M);
+  let ws_sq = (ws.x * ws.y) * M * M;
+  let wi = *(spdc_setup.idler.waist / M);
+  let wi_sq = (wi.x * wi.y) * M * M;
+
+  let theta_i_e = *(spdc_setup.idler.get_external_theta(&spdc_setup.crystal_setup) / RAD);
+  let sec_i = 1. / f64::cos(theta_i_e);
+  let theta_s_e = *(spdc_setup.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
+  let sec_s = 1. / f64::cos(theta_s_e);
+
+  let l_s = spdc_setup.signal.get_wavelength();
+  let l_i = spdc_setup.idler.get_wavelength();
+  let n_s = spdc_setup.crystal_setup.get_index_along(l_s, spdc_setup.signal.get_direction(), &spdc_setup.signal.get_type());
+  let n_i = spdc_setup.crystal_setup.get_index_along(l_i, spdc_setup.idler.get_direction(), &spdc_setup.idler.get_type());
+
+  let constants = (8. / (2. * PI).sqrt())
+    * degeneracy_factor.powi(2)
+    * periodic_poling_coeff.powi(2) / (EPS_0 * C_);
+
+  let start = (constants / (l_s * l_i * sq(n_s * n_i))) * sec_s * sec_i;
+  start * sq(crystal_length * deff) * wp_sq * ws_sq * wi_sq * pump_power / sigma
+}
 
 /// calculate the phasematching
 pub fn phasematch_coincidences(spdc_setup : &SPDCSetup) -> JSAUnits<Complex<f64>> {
 
   // calculate pump spectrum with original pump
-  let alpha = *pump_spectrum(&spdc_setup);
+  // let alpha = *pump_spectrum(&spdc_setup);
+
+  let lambda_s = spdc_setup.signal.get_wavelength();
+  let lambda_i = spdc_setup.idler.get_wavelength();
+  let two_pi_c = PI2 * C_;
+  let omega_s = two_pi_c / lambda_s;
+  let omega_i = two_pi_c / lambda_i;
+  let alpha = *pump_spectral_amplitude(spdc_setup, omega_s + omega_i);
 
   if alpha < spdc_setup.pump_spectrum_threshold {
     return JSAUnits::new(Complex::new(0., 0.));
@@ -48,7 +105,9 @@ pub fn phasematch_coincidences_gaussian_approximation(spdc_setup : &SPDCSetup) -
 #[allow(non_snake_case)]
 fn calc_coincidence_phasematch(spdc_setup : &SPDCSetup) -> (Complex<f64>, f64) {
   if spdc_setup.fiber_coupling {
-    return calc_coincidence_phasematch_fiber_coupling(spdc_setup);
+    let jsa_norm = 1.; //(jsi_normalization(spdc_setup) / JsiNorm::new(1.)).sqrt();
+    let (pmz, pmt) = calc_coincidence_phasematch_fiber_coupling(spdc_setup);
+    return (pmz * jsa_norm, pmt);
   }
 
   // crystal length
@@ -515,7 +574,7 @@ mod tests {
     // spdc_setup.assign_optimum_theta();
 
     // FIXME This isn't matching.
-    spdc_setup.idler.set_angles(PI * RAD, 0. * RAD);
+    spdc_setup.idler.set_angles(0. * RAD, 0. * RAD);
     spdc_setup.crystal_setup.theta = 1.5707963267948966 * RAD;
     // spdc_setup.assign_optimum_idler();
     spdc_setup.set_signal_waist_position(-0.0006311635856188344 * M);
@@ -529,9 +588,12 @@ mod tests {
     let amp = *(phasematch_coincidences( &spdc_setup ) / jsa_units);
 
     let actual = amp;
-    let expected = Complex::new(-243675412686457.94, 411264607672255.2);
+    // let expected = Complex::new(-243675412686457.94, 411264607672255.2);
+    // Before refactor
+    let expected = Complex::new(-427998477203251.06, -212917668199356.06);
+    dbg!(actual);
 
-    let accept_diff = 1e-9;
+    let accept_diff = 1e-16;
 
     assert_nearly_equal!(
       "norm",

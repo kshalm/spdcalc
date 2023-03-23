@@ -19,6 +19,9 @@ pub type Indices = ucum::Unitless<Vector3<f64>>;
 /// Wavelength
 pub type Wavelength = ucum::Meter<f64>;
 
+/// Frequency
+pub type Frequency = ucum::Hertz<f64>;
+
 /// A 1d distance
 pub type Distance = ucum::Meter<f64>;
 

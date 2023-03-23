@@ -57,3 +57,11 @@ where
 {
   fwhm / (2. * f64::sqrt(2. * f64::ln(2.)))
 }
+
+pub fn fwhm_to_waist<T>(fwhm : T) -> <T as std::ops::Div<f64>>::Output
+where
+  T : std::ops::Div<f64>,
+{
+  fwhm / f64::sqrt(2. * f64::ln(2.))
+}
+

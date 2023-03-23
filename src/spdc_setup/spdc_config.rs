@@ -262,7 +262,7 @@ mod tests {
 
     let crystal_setup = CrystalSetup {
       crystal :     Crystal::BBO_1,
-      pm_type :     crystal::PMType::Type2_e_eo,
+      pm_type :     PMType::Type2_e_eo,
       theta :       90. * DEG,
       phi :         0. * DEG,
       length :      2_000.0 * MICRO * M,

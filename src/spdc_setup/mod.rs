@@ -65,8 +65,8 @@ impl SPDCSetup {
   pub fn with_swapped_signal_idler(self) -> Self {
     // if we have type 2, we need to swap the PM type
     let pm_type = match self.crystal_setup.pm_type {
-      crystal::PMType::Type2_e_eo => crystal::PMType::Type2_e_oe,
-      crystal::PMType::Type2_e_oe => crystal::PMType::Type2_e_eo,
+      PMType::Type2_e_eo => PMType::Type2_e_oe,
+      PMType::Type2_e_oe => PMType::Type2_e_eo,
       _ => self.crystal_setup.pm_type,
     };
 
@@ -520,7 +520,7 @@ mod tests {
     let waist = WaistSize::new(Vector2::new(100.0 * MICRO, 100.0 * MICRO));
     let crystal_setup = CrystalSetup {
       crystal :     Crystal::BBO_1,
-      pm_type :     crystal::PMType::Type2_e_eo,
+      pm_type :     PMType::Type2_e_eo,
       theta :       -3.0 * DEG,
       phi :         1.0 * DEG,
       length :      2_000.0 * MICRO * M,
@@ -605,7 +605,7 @@ mod tests {
     let waist = WaistSize::new(Vector2::new(100.0 * MICRO, 100.0 * MICRO));
     let crystal_setup = CrystalSetup {
       crystal :     Crystal::BBO_1,
-      pm_type :     crystal::PMType::Type2_e_eo,
+      pm_type :     PMType::Type2_e_eo,
       theta :       -3.0 * DEG,
       phi :         1.0 * DEG,
       length :      2_000.0 * MICRO * M,
@@ -756,7 +756,7 @@ mod tests {
     let waist = WaistSize::new(Vector2::new(100.0 * MICRO, 100.0 * MICRO));
     let crystal_setup = CrystalSetup {
       crystal :     Crystal::BBO_1,
-      pm_type :     crystal::PMType::Type2_e_eo,
+      pm_type :     PMType::Type2_e_eo,
       theta :       -3.0 * DEG,
       phi :         1.0 * DEG,
       length :      2_000.0 * MICRO * M,
@@ -848,7 +848,7 @@ mod tests {
   fn optimal_pp_test() {
     let crystal_setup = CrystalSetup {
       crystal :     Crystal::KTP,
-      pm_type :     crystal::PMType::Type2_e_eo,
+      pm_type :     PMType::Type2_e_eo,
       theta :       90.0 * DEG,
       phi :         0.0 * DEG,
       length :      2_000.0 * MICRO * M,

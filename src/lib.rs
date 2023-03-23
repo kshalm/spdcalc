@@ -16,8 +16,14 @@ pub use constants::*;
 pub mod utils;
 pub mod math;
 
+mod spdc;
+pub use spdc::*;
+
 pub mod crystal;
-pub use crystal::Crystal;
+pub use crystal::*;
+
+mod beam;
+pub use beam::*;
 
 pub mod photon;
 pub use photon::Photon;
