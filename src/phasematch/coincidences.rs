@@ -67,7 +67,8 @@ pub fn phasematch_coincidences(spdc_setup : &SPDCSetup) -> JSAUnits<Complex<f64>
   let two_pi_c = PI2 * C_;
   let omega_s = two_pi_c / lambda_s;
   let omega_i = two_pi_c / lambda_i;
-  let alpha = *pump_spectral_amplitude(spdc_setup, omega_s + omega_i);
+  let alpha = *pump_spectrum(spdc_setup);
+  // let alpha = *pump_spectral_amplitude(spdc_setup, omega_s + omega_i);
 
   if alpha < spdc_setup.pump_spectrum_threshold {
     return JSAUnits::new(Complex::new(0., 0.));

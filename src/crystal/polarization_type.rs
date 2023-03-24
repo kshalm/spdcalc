@@ -3,7 +3,7 @@ use std::str::FromStr;
 use crate::SPDCError;
 
 /// The polarization type
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
 pub enum PolarizationType {
   Ordinary,
   Extraordinary,

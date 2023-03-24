@@ -3,7 +3,7 @@
 //! Used for pump, signal, idler data
 use std::fmt;
 use std::str::FromStr;
-use crate::{crystal::CrystalSetup, *, spdc_setup::PeriodicPoling, math::*};
+use crate::{crystal::CrystalSetup, *, PeriodicPoling, math::*};
 use dim::{ucum::{self, C_, M}};
 use na::*;
 use std::f64::{self, consts::FRAC_PI_2};

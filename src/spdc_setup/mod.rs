@@ -433,7 +433,7 @@ pub fn get_optimum_idler(
 
   let theta = f64::asin(val) * ucum::RAD;
   let wavelength = ls * lp / (ls - lp);
-  let phi = normalize_angle(*(signal.get_phi()/ucum::RAD) + PI) * ucum::RAD;
+  let phi = normalize_angle(signal.get_phi() + PI * RAD);
 
   Photon::idler(
     phi,

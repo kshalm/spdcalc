@@ -191,11 +191,10 @@ impl TryFrom<SPDCConfig<'_>> for SPDCSetup {
         return Err(SPDCError::new("poling_period must be greater than zero".to_string()));
       }
 
-      Some(PeriodicPoling {
-        apodization,
-        period: period * M,
-        sign: PeriodicPoling::compute_sign(&signal, &pump, &crystal_setup),
-      })
+      Some(PeriodicPoling::new(
+        period * M,
+        apodization
+      ))
 
     } else {
       None

@@ -2,7 +2,7 @@
 //!
 //! Used for pump, signal, idler beams
 use crate::{*, crystal::CrystalSetup, PeriodicPoling, math::*};
-use dim::{ucum::{self, C_, M}};
+use dim::{ucum::{self, C_, M, RAD, PerMeter}};
 use na::*;
 use std::{f64::{self, consts::FRAC_PI_2}, ops::Deref};
 mod beam_waist;
@@ -18,7 +18,7 @@ pub fn direction_from_polar(phi : Angle, theta : Angle) -> Direction {
   ))
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct PumpBeam(Beam);
 impl PumpBeam {
   pub fn new(beam: Beam) -> Self { Self(beam) }
@@ -30,7 +30,9 @@ impl From<PumpBeam> for Beam {
 }
 impl From<Beam> for PumpBeam {
   fn from(value: Beam) -> Self {
-    Self::new(value)
+    let mut pump = Self::new(value);
+    pump.0.set_angles(0. * RAD, 0. * RAD);
+    pump
   }
 }
 impl Deref for PumpBeam {
@@ -41,7 +43,7 @@ impl Deref for PumpBeam {
   }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SignalBeam(Beam);
 impl SignalBeam {
   pub fn new(beam: Beam) -> Self { Self(beam) }
@@ -64,10 +66,71 @@ impl Deref for SignalBeam {
   }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct IdlerBeam(Beam);
 impl IdlerBeam {
   pub fn new(beam: Beam) -> Self { Self(beam) }
+  pub fn try_new_optimum(
+    pm_type: PMType,
+    signal : &SignalBeam,
+    pump : &PumpBeam,
+    crystal_setup : &CrystalSetup,
+    pp : Option<PeriodicPoling>,
+  ) -> Result<Self, SPDCError> {
+    let ls = signal.wavelength();
+    let lp = pump.wavelength();
+
+    if ls <= lp {
+      return Err(
+        SPDCError("Signal wavelength must be greater than Pump wavelength".into())
+      );
+    }
+
+    let ns = signal.refractive_index(&crystal_setup);
+    let np = pump.refractive_index(&crystal_setup);
+
+    let del_k_pp = match pp {
+      Some(poling) => signal.wavelength() * poling.pp_factor(),
+      None => ucum::Unitless::new(0.0),
+    };
+
+    let theta_s = *(signal.theta_internal() / ucum::RAD);
+    let ns_z = ns * f64::cos(theta_s);
+    let ls_over_lp = ls / lp;
+    let np_by_ls_over_lp = np * ls_over_lp;
+
+    // old code...
+    // let arg = (ns * ns)
+    //   + np_by_ls_over_lp.powi(2)
+    //   + 2. * (del_k_pp * ns_z - np_by_ls_over_lp * ns_z - del_k_pp * np_by_ls_over_lp)
+    //   + del_k_pp * del_k_pp;
+
+    // simplified calculation
+    let numerator = ns * f64::sin(theta_s);
+    let arg =
+      (ns_z - np_by_ls_over_lp + del_k_pp).powi(2)
+      + numerator.powi(2);
+
+    let val = (*numerator) / arg.sqrt();
+
+    if val > 1.0 || val < 0. {
+      return Err(SPDCError("Invalid solution for optimal idler theta".into()));
+    }
+
+    let theta = f64::asin(val) * ucum::RAD;
+    let wavelength = ls * lp / (ls - lp);
+    let phi = normalize_angle(signal.phi() + PI * RAD);
+
+    Ok(
+      Beam::new(
+        pm_type.idler_polarization(),
+        phi,
+        theta,
+        wavelength,
+        signal.waist(), // FIXME is this right??
+      ).into()
+    )
+  }
 }
 impl From<IdlerBeam> for Beam {
   fn from(value: IdlerBeam) -> Self {
@@ -88,7 +151,7 @@ impl Deref for IdlerBeam {
 }
 
 /// The beam
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Beam {
   waist : BeamWaist,
   wavelength : Wavelength,
@@ -229,6 +292,11 @@ impl Beam {
   pub fn theta_external(&self, crystal_setup : &CrystalSetup) -> Angle {
     // snells law
     Self::calc_external_theta_from_internal(&self, self.theta, crystal_setup)
+  }
+
+  pub fn wave_vector(&self, crystal_setup : &CrystalSetup) -> Wavevector {
+    let k = *(M * PI2 * self.refractive_index(crystal_setup) / self.wavelength);
+    PerMeter::new(self.direction.into_inner() * k)
   }
 
   pub fn wavelength(&self) -> Wavelength {

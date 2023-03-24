@@ -1,9 +1,9 @@
 use dim::{ucum::{Meter2, M}};
 
-use crate::{Wavelength, Beam};
+use crate::{Wavelength, math::{fwhm_to_waist, waist_to_fwhm}};
 
 /// Beam waist
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct BeamWaist {
   /// wx at 1/e^2
   pub x: Wavelength,
@@ -27,7 +27,11 @@ impl BeamWaist {
   }
 
   pub fn from_fwhm(fwhm: Wavelength) -> Self {
-    unimplemented!()
+    Self::new(fwhm_to_waist(fwhm))
+  }
+
+  pub fn fwhm(&self) -> (Wavelength, Wavelength) {
+    (waist_to_fwhm(self.x), waist_to_fwhm(self.y))
   }
 
   pub fn ellipticity(&self) -> f64 {
@@ -41,7 +45,11 @@ impl BeamWaist {
   }
 
   pub fn norm(&self) -> Wavelength {
-    (self.norm_sqr() / Meter2::new(1.)).sqrt() * M
+    if self.x == self.y {
+      self.x
+    } else {
+      (self.norm_sqr() / Meter2::new(1.)).sqrt() * M
+    }
   }
 
   pub fn norm_sqr(&self) -> Meter2<f64> {

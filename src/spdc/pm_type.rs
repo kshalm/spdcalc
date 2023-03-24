@@ -70,14 +70,39 @@ impl fmt::Display for PMType {
 impl FromStr for PMType {
   type Err = crate::SPDCError;
 
+  /// Parse a string into a PMType
+  ///
+  /// Examples:
+  /// "ooo" -> Type0_o_oo
+  /// "o-oo" -> Type0_o_oo
+  /// "Type2 e eo" -> Type2_e_eo
+  /// "type 2 e->eo" -> Type2_e_eo
+  /// # Examples
+  /// ```
+  /// use spdcalc::{PMType};
+  /// use std::str::FromStr;
+  /// assert_eq!(PMType::from_str("ooo").unwrap(), PMType::Type0_o_oo);
+  /// assert_eq!(PMType::from_str("o-oo").unwrap(), PMType::Type0_o_oo);
+  /// assert_eq!(PMType::from_str("Type2 e eo").unwrap(), PMType::Type2_e_eo);
+  /// assert_eq!(PMType::from_str("type 2 e->eo").unwrap(), PMType::Type2_e_eo);
+  /// ```
+  #[allow(non_upper_case_globals)]
   fn from_str(s : &str) -> Result<Self, Self::Err> {
-    match s.as_ref() {
-      "Type0_o_oo" => Ok(PMType::Type0_o_oo),
-      "Type0_e_ee" => Ok(PMType::Type0_e_ee),
-      "Type1_e_oo" => Ok(PMType::Type1_e_oo),
-      "Type2_e_eo" => Ok(PMType::Type2_e_eo),
-      "Type2_e_oe" => Ok(PMType::Type2_e_oe),
-      _ => Err(crate::SPDCError(format!("PMType {} is not defined", s))),
+    use regex::Regex;
+    use lazy_static::lazy_static;
+    lazy_static! {
+      static ref type0_o_oo : Regex = Regex::new(r"(?i)^(type\s*0)?\s*(o).{0,2}(o)(o)$").unwrap();
+      static ref type0_e_ee : Regex = Regex::new(r"(?i)^(type\s*0)?\s*(e).{0,2}(e)(e)$").unwrap();
+      static ref type1_e_oo : Regex = Regex::new(r"(?i)^(type\s*1)?\s*(e).{0,2}(o)(o)$").unwrap();
+      static ref type2_e_eo : Regex = Regex::new(r"(?i)^(type\s*2)?\s*(e).{0,2}(e)(o)$").unwrap();
+      static ref type2_e_oe : Regex = Regex::new(r"(?i)^(type\s*2)?\s*(e).{0,2}(o)(e)$").unwrap();
     }
+    if type0_o_oo.is_match(s) { return Ok(PMType::Type0_o_oo); }
+    if type0_e_ee.is_match(s) { return Ok(PMType::Type0_e_ee); }
+    if type1_e_oo.is_match(s) { return Ok(PMType::Type1_e_oo); }
+    if type2_e_eo.is_match(s) { return Ok(PMType::Type2_e_eo); }
+    if type2_e_oe.is_match(s) { return Ok(PMType::Type2_e_oe); }
+
+    Err(crate::SPDCError(format!("PMType {} is not defined", s)))
   }
 }

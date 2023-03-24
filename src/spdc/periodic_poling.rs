@@ -1,6 +1,6 @@
+use crate::{IdlerBeam, PMType};
 use crate::{
-  calc_delta_k,
-  get_optimum_idler,
+  delta_k,
   Sign,
   CrystalSetup,
   SignalBeam,
@@ -31,14 +31,40 @@ pub struct PeriodicPoling {
 
 impl PeriodicPoling {
 
+  /// Create a new instance of periodic poling. Sign of specified period will be used.
+  pub fn new(period: PolingPeriod, apodization: Option<Apodization>) -> Self {
+    Self {
+      period: if period > 0. * M { period } else { -period },
+      sign: if period > 0. * M { Sign::POSITIVE } else { Sign::NEGATIVE },
+      apodization,
+    }
+  }
+
+  pub fn try_new_optimal(
+    pm_type: PMType,
+    signal: &SignalBeam,
+    pump: &PumpBeam,
+    crystal_setup: &CrystalSetup,
+    apodization: Option<Apodization>
+  ) -> Result<Self, SPDCError> {
+    let period = optimum_poling_period(pm_type, signal, pump, crystal_setup, apodization)?;
+    Ok(
+      Self::new(
+        period,
+        apodization
+      )
+    )
+  }
+
   /// calculate the sign needed by this periodic poling
   pub fn compute_sign(
+    pm_type: PMType,
     signal: &SignalBeam,
     pump: &PumpBeam,
     crystal_setup: &CrystalSetup
   ) -> Sign {
-    let idler = get_optimum_idler(&signal, &pump, &crystal_setup, None);
-    let delkz = (calc_delta_k(&signal, &idler, &pump, &crystal_setup, None)/J/S).z;
+    let idler = IdlerBeam::try_new_optimum(pm_type, &signal, &pump, &crystal_setup, None).unwrap();
+    let delkz = (delta_k(&signal, &idler, &pump, &crystal_setup, None) * M).z;
 
     // converts to sign
     delkz.into()
@@ -55,14 +81,20 @@ impl PeriodicPoling {
   }
 }
 
-pub fn optimum_poling_period(signal: &SignalBeam, pump: &PumpBeam, crystal_setup: &CrystalSetup, apodization: Option<Apodization>) -> Result<PolingPeriod, SPDCError> {
+pub fn optimum_poling_period(
+  pm_type: PMType,
+  signal: &SignalBeam,
+  pump: &PumpBeam,
+  crystal_setup: &CrystalSetup,
+  apodization: Option<Apodization>
+) -> Result<PolingPeriod, SPDCError> {
 
   // z component of delta k, based on periodic poling
   let delta_kz = |pp| {
-    let idler = get_optimum_idler(signal, pump, crystal_setup, pp);
-    let del_k = calc_delta_k(signal, &idler, pump, crystal_setup, pp);
+    let idler = IdlerBeam::try_new_optimum(pm_type, signal, pump, crystal_setup, pp).unwrap();
+    let del_k = delta_k(signal, &idler, pump, crystal_setup, pp);
 
-    let del_k_vec = *(del_k / J / S);
+    let del_k_vec = *(del_k * M);
 
     del_k_vec.z
   };

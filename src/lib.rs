@@ -32,6 +32,7 @@ pub mod spdc_setup;
 pub use spdc_setup::*;
 
 pub mod phasematch;
+pub use phasematch::*;
 pub mod jsa;
 pub mod plotting;
 

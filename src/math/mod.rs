@@ -1,4 +1,5 @@
 mod differentiation;
+use crate::{Angle, dim::ucum::RAD};
 use crate::constants::PI2;
 pub use differentiation::*;
 
@@ -14,6 +15,10 @@ pub use self::schmidt::*;
 // ensures that the Gaussian and sinc functions have the same widths.
 // ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
 const GAUSSIAN_SINC_GAMMA_FACTOR : f64 = 0.193;
+
+lazy_static::lazy_static! {
+  static ref FWHM_OVER_WAIST :f64 = f64::sqrt(2. * f64::ln(2.));
+}
 
 /// Standard sinc function `sinc(x) = sin(x) / x`
 pub fn sinc( x : f64 ) -> f64 {
@@ -32,8 +37,8 @@ where T : std::ops::Mul + Copy {
 }
 
 /// Normalize an angle to [0, 2π)
-pub fn normalize_angle(ang : f64) -> f64 {
-  (ang % PI2 + PI2) % PI2
+pub fn normalize_angle(ang : Angle) -> Angle {
+  (ang % PI2 + PI2 * RAD) % PI2
 }
 
 /// Simple implementation of linear interpolation
@@ -55,13 +60,22 @@ pub fn fwhm_to_sigma<T>(fwhm : T) -> <T as std::ops::Div<f64>>::Output
 where
   T : std::ops::Div<f64>,
 {
-  fwhm / (2. * f64::sqrt(2. * f64::ln(2.)))
+  fwhm / (2. * *FWHM_OVER_WAIST)
 }
 
+/// FWHM to 1/e^2 width
 pub fn fwhm_to_waist<T>(fwhm : T) -> <T as std::ops::Div<f64>>::Output
 where
   T : std::ops::Div<f64>,
 {
-  fwhm / f64::sqrt(2. * f64::ln(2.))
+  fwhm / *FWHM_OVER_WAIST
+}
+
+/// FWHM to 1/e^2 width
+pub fn waist_to_fwhm<T>(w : T) -> <T as std::ops::Mul<f64>>::Output
+where
+  T : std::ops::Mul<f64>,
+{
+  w * *FWHM_OVER_WAIST
 }
 
