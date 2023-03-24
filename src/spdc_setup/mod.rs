@@ -12,9 +12,6 @@ use std::f64::consts::FRAC_PI_2;
 mod spdc_config;
 pub use spdc_config::*;
 
-mod periodic_poling;
-pub use periodic_poling::*;
-
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 
 #[derive(Debug, Copy, Clone, PartialEq)]

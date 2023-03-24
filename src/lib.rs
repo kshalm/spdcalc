@@ -29,7 +29,7 @@ pub mod photon;
 pub use photon::Photon;
 
 pub mod spdc_setup;
-pub use spdc_setup::SPDCSetup;
+pub use spdc_setup::*;
 
 pub mod phasematch;
 pub mod jsa;

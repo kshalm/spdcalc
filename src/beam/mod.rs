@@ -1,10 +1,10 @@
 //! # Beam
 //!
 //! Used for pump, signal, idler beams
-use crate::{*, crystal::CrystalSetup, spdc_setup::PeriodicPoling, math::*};
+use crate::{*, crystal::CrystalSetup, PeriodicPoling, math::*};
 use dim::{ucum::{self, C_, M}};
 use na::*;
-use std::{f64::{self, consts::FRAC_PI_2}};
+use std::{f64::{self, consts::FRAC_PI_2}, ops::Deref};
 mod beam_waist;
 pub use beam_waist::*;
 
@@ -16,6 +16,75 @@ pub fn direction_from_polar(phi : Angle, theta : Angle) -> Direction {
     f64::sin(theta_rad) * f64::sin(phi_rad),
     f64::cos(theta_rad),
   ))
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct PumpBeam(Beam);
+impl PumpBeam {
+  pub fn new(beam: Beam) -> Self { Self(beam) }
+}
+impl From<PumpBeam> for Beam {
+  fn from(value: PumpBeam) -> Self {
+    value.0
+  }
+}
+impl From<Beam> for PumpBeam {
+  fn from(value: Beam) -> Self {
+    Self::new(value)
+  }
+}
+impl Deref for PumpBeam {
+  type Target = Beam;
+
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct SignalBeam(Beam);
+impl SignalBeam {
+  pub fn new(beam: Beam) -> Self { Self(beam) }
+}
+impl From<SignalBeam> for Beam {
+  fn from(value: SignalBeam) -> Self {
+    value.0
+  }
+}
+impl From<Beam> for SignalBeam {
+  fn from(value: Beam) -> Self {
+    Self::new(value)
+  }
+}
+impl Deref for SignalBeam {
+  type Target = Beam;
+
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct IdlerBeam(Beam);
+impl IdlerBeam {
+  pub fn new(beam: Beam) -> Self { Self(beam) }
+}
+impl From<IdlerBeam> for Beam {
+  fn from(value: IdlerBeam) -> Self {
+    value.0
+  }
+}
+impl From<Beam> for IdlerBeam {
+  fn from(value: Beam) -> Self {
+    Self::new(value)
+  }
+}
+impl Deref for IdlerBeam {
+  type Target = Beam;
+
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
 }
 
 /// The beam

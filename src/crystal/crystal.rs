@@ -5,9 +5,10 @@ use super::*;
 use dim::f64prefixes::{PICO};
 use dim::ucum::{ M, V };
 use dim::ucum::Kelvin;
+use serde::{Serialize, Deserialize};
 
 /// The type of crystal
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 #[allow(non_camel_case_types)]
 pub enum Crystal {
   BBO_1,

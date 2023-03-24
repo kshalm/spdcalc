@@ -26,9 +26,9 @@ impl BeamWaist {
     }
   }
 
-  // pub fn from_fwhm() -> Self {
-
-  // }
+  pub fn from_fwhm(fwhm: Wavelength) -> Self {
+    unimplemented!()
+  }
 
   pub fn ellipticity(&self) -> f64 {
     if self.x == self.y {
