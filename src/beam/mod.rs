@@ -4,7 +4,7 @@
 use crate::{*, crystal::CrystalSetup, PeriodicPoling, math::*};
 use dim::{ucum::{self, C_, M, RAD, PerMeter}};
 use na::*;
-use std::{f64::{self, consts::FRAC_PI_2}, ops::Deref};
+use std::{f64::{self, consts::FRAC_PI_2}, ops::{Deref, DerefMut}};
 mod beam_waist;
 pub use beam_waist::*;
 
@@ -42,6 +42,11 @@ impl Deref for PumpBeam {
     &self.0
   }
 }
+impl DerefMut for PumpBeam {
+  fn deref_mut(&mut self) -> &mut Beam {
+    &mut self.0
+  }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SignalBeam(Beam);
@@ -65,13 +70,17 @@ impl Deref for SignalBeam {
     &self.0
   }
 }
+impl DerefMut for SignalBeam {
+  fn deref_mut(&mut self) -> &mut Beam {
+    &mut self.0
+  }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct IdlerBeam(Beam);
 impl IdlerBeam {
   pub fn new(beam: Beam) -> Self { Self(beam) }
   pub fn try_new_optimum(
-    pm_type: PMType,
     signal : &SignalBeam,
     pump : &PumpBeam,
     crystal_setup : &CrystalSetup,
@@ -123,7 +132,7 @@ impl IdlerBeam {
 
     Ok(
       Beam::new(
-        pm_type.idler_polarization(),
+        crystal_setup.pm_type.idler_polarization(),
         phi,
         theta,
         wavelength,
@@ -147,6 +156,11 @@ impl Deref for IdlerBeam {
 
   fn deref(&self) -> &Self::Target {
     &self.0
+  }
+}
+impl DerefMut for IdlerBeam {
+  fn deref_mut(&mut self) -> &mut Beam {
+    &mut self.0
   }
 }
 
@@ -317,7 +331,7 @@ impl Beam {
     self
   }
 
-  pub fn set_external_theta(&mut self, external : Angle, crystal_setup : &CrystalSetup) -> &mut Self {
+  pub fn set_theta_external(&mut self, external : Angle, crystal_setup : &CrystalSetup) -> &mut Self {
     use dim::Abs;
     let theta = Self::calc_internal_theta_from_external(self, external.abs(), crystal_setup);
     // if angle is negative then turn by 180 deg along phi

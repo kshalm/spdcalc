@@ -16,6 +16,15 @@ pub enum AutoCalcParam<T> where T : 'static {
   Param(T),
 }
 
+impl<T> AutoCalcParam<T> {
+  pub fn is_auto(&self) -> bool {
+    match self {
+      Self::Auto(_) => true,
+      _ => false,
+    }
+  }
+}
+
 impl<T> Default for AutoCalcParam<T> {
   fn default() -> Self {
     Self::Auto("auto".into())
@@ -23,22 +32,32 @@ impl<T> Default for AutoCalcParam<T> {
 }
 
 /// Flat configuration object for ease of import/export
+#[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CrystalConfig {
   pub name: Crystal,
+  #[serde_as(as = "DisplayFromStr")]
+  pub pm_type: PMType,
   pub phi_deg: f64,
-  pub theta_deg: f64,
+  #[serde(default)]
+  pub theta_deg: AutoCalcParam<f64>,
   pub length_um: f64,
   pub temperature_c: f64,
 }
 
+/// Converts without autocalculating theta
 impl From<CrystalConfig> for CrystalSetup {
   fn from(cfg: CrystalConfig) -> Self {
+    let theta = if let AutoCalcParam::Param(theta_deg) = cfg.theta_deg {
+      theta_deg * DEG
+    } else {
+      0. * DEG
+    };
     CrystalSetup {
       crystal: cfg.name,
-      pm_type: PMType::Type0_e_ee, // TODO: will remove
+      pm_type: cfg.pm_type,
       phi: cfg.phi_deg * DEG,
-      theta: cfg.theta_deg * DEG,
+      theta,
       length: cfg.length_um * MICRO * M,
       temperature: utils::from_celsius_to_kelvin(cfg.temperature_c),
     }
@@ -54,9 +73,9 @@ pub struct PumpConfig {
 }
 
 impl PumpConfig {
-  pub fn as_beam(self, pm_type : PMType) -> PumpBeam {
+  pub fn as_beam(self, crystal_setup: &CrystalSetup) -> PumpBeam {
     Beam::new(
-      pm_type.pump_polarization(),
+      crystal_setup.pm_type.pump_polarization(),
       0. * RAD,
       0. * RAD,
       self.wavelength_nm * NANO * M,
@@ -79,10 +98,10 @@ pub struct SignalConfig {
 }
 
 impl SignalConfig {
-  pub fn try_as_beam(self, pm_type : PMType, crystal_setup: &CrystalSetup) -> Result<SignalBeam, SPDCError> {
+  pub fn try_as_beam(self, crystal_setup: &CrystalSetup) -> Result<SignalBeam, SPDCError> {
     let phi = self.phi_deg * DEG;
     let mut beam = Beam::new(
-      pm_type.signal_polarization(),
+      crystal_setup.pm_type.signal_polarization(),
       phi,
       0. * RAD,
       self.wavelength_nm * NANO * M,
@@ -90,7 +109,7 @@ impl SignalConfig {
     );
     match (self.theta_deg, self.theta_external_deg) {
       (Some(theta), None) => beam.set_angles(phi, theta * DEG),
-      (None, Some(theta_e)) => beam.set_external_theta(theta_e * DEG, crystal_setup),
+      (None, Some(theta_e)) => beam.set_theta_external(theta_e * DEG, crystal_setup),
       _ => return Err(SPDCError("Must specify one of theta_deg or theta_external_deg".into())),
     };
 
@@ -112,10 +131,10 @@ pub struct IdlerConfig {
 }
 
 impl IdlerConfig {
-  pub fn try_as_beam(self, pm_type : PMType, crystal_setup: &CrystalSetup) -> Result<IdlerBeam, SPDCError> {
+  pub fn try_as_beam(self, crystal_setup: &CrystalSetup) -> Result<IdlerBeam, SPDCError> {
     let phi = self.phi_deg * DEG;
     let mut beam = Beam::new(
-      pm_type.idler_polarization(),
+      crystal_setup.pm_type.idler_polarization(),
       phi,
       0. * RAD,
       self.wavelength_nm * NANO * M,
@@ -123,7 +142,7 @@ impl IdlerConfig {
     );
     match (self.theta_deg, self.theta_external_deg) {
       (Some(theta), None) => beam.set_angles(phi, theta * DEG),
-      (None, Some(theta_e)) => beam.set_external_theta(theta_e * DEG, crystal_setup),
+      (None, Some(theta_e)) => beam.set_theta_external(theta_e * DEG, crystal_setup),
       _ => return Err(SPDCError("Must specify one of theta_deg or theta_external_deg".into())),
     };
 
@@ -131,11 +150,8 @@ impl IdlerConfig {
   }
 }
 
-#[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-struct SPDCConfig {
-  #[serde_as(as = "DisplayFromStr")]
-  pm_type: PMType,
+pub struct SPDCConfig {
   crystal: CrystalConfig,
   pump: PumpConfig,
   signal: SignalConfig,
@@ -147,12 +163,22 @@ struct SPDCConfig {
 
 impl SPDCConfig {
   pub fn try_as_spdc(self) -> Result<SPDC, SPDCError> {
+    let crystal_theta_autocalc = self.crystal.theta_deg.is_auto();
     let signal_waist_position_um = self.signal.waist_position_um.clone();
     let pump_average_power = self.pump.average_power_mw * MILLIW;
-    let crystal_setup : CrystalSetup = self.crystal.into();
-    let pump = self.pump.as_beam(self.pm_type);
-    let signal = self.signal.try_as_beam(self.pm_type, &crystal_setup)?;
-    let periodic_poling = self.periodic_poling.try_as_periodic_poling(self.pm_type, &signal, &pump, &crystal_setup)?;
+    let mut crystal_setup : CrystalSetup = self.crystal.into();
+    let pump = self.pump.as_beam(&crystal_setup);
+    let signal = self.signal.try_as_beam(&crystal_setup)?;
+    let periodic_poling = self.periodic_poling.try_as_periodic_poling(&signal, &pump, &crystal_setup)?;
+
+    if crystal_theta_autocalc {
+      if periodic_poling.is_none() {
+        crystal_setup.assign_optimum_theta(&signal, &pump);
+      } else {
+        return Err(SPDCError("Can not autocalc theta when periodic poling is enabled. Provide an explicit value for crystal theta.".into()))
+      }
+    }
+
     let idler_waist_position = {
       let auto = AutoCalcParam::default();
       let autocalc_idler_waist = match &self.idler {
@@ -160,21 +186,20 @@ impl SPDCConfig {
         AutoCalcParam::Auto(_) => &auto,
       };
       match autocalc_idler_waist {
-        AutoCalcParam::Param(focus_um) => focus_um * MICRO * M,
+        AutoCalcParam::Param(focus_um) => -focus_um.abs() * MICRO * M,
         AutoCalcParam::Auto(_) => crystal_setup.optimal_waist_position(signal.wavelength(), signal.polarization()),
       }
     };
     let idler = match self.idler {
-      AutoCalcParam::Param(idler_cfg) => idler_cfg.try_as_beam(self.pm_type, &crystal_setup)?,
-      AutoCalcParam::Auto(_) => IdlerBeam::try_new_optimum(self.pm_type, &signal, &pump, &crystal_setup, periodic_poling)?,
+      AutoCalcParam::Param(idler_cfg) => idler_cfg.try_as_beam(&crystal_setup)?,
+      AutoCalcParam::Auto(_) => IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, periodic_poling)?,
     };
     let signal_waist_position = match signal_waist_position_um {
-      AutoCalcParam::Param(focus_um) => focus_um * MICRO * M,
+      AutoCalcParam::Param(focus_um) => -focus_um.abs() * MICRO * M,
       AutoCalcParam::Auto(_) => crystal_setup.optimal_waist_position(signal.wavelength(), signal.polarization()),
     };
 
     Ok(SPDC::new(
-      self.pm_type,
       crystal_setup,
       signal,
       idler,
@@ -198,9 +223,9 @@ mod test {
   #[test]
   fn from_json_test(){
     let json = json!({
-      "pm_type": "e->eo",
       "crystal": {
         "name": "BBO_1",
+        "pm_type": "e->eo",
         "phi_deg": 0,
         "theta_deg": 0,
         "length_um": 2000,
@@ -228,7 +253,7 @@ mod test {
     let expected = {
       let crystal_setup = CrystalSetup {
         crystal: Crystal::BBO_1,
-        pm_type: PMType::Type0_e_ee,
+        pm_type: PMType::Type2_e_eo,
         phi: 0. * RAD,
         theta: 0. * RAD,
         length: 2000. * MICRO * M,
@@ -260,7 +285,6 @@ mod test {
       let signal_waist_position = -0.0006073170564963904 * M;
       let idler_waist_position = -0.0006073170564963904 * M;
       SPDC::new(
-        PMType::Type2_e_eo,
         crystal_setup,
         signal,
         idler,

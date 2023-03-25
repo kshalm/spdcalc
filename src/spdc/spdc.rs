@@ -4,7 +4,6 @@ use crate::{SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Dista
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SPDC {
-  pm_type:             PMType,
   pub signal :         SignalBeam,
   pub idler :          IdlerBeam,
   pub pump :           PumpBeam,
@@ -28,7 +27,6 @@ pub struct SPDC {
 
 impl SPDC {
   pub fn new(
-    pm_type: PMType,
     crystal_setup: CrystalSetup,
     signal: SignalBeam,
     idler: IdlerBeam,
@@ -38,8 +36,7 @@ impl SPDC {
     signal_waist_position: Distance,
     idler_waist_position: Distance,
   ) -> Self {
-    let mut spdc = Self {
-      pm_type,
+    Self {
       crystal_setup,
       signal,
       idler,
@@ -48,15 +45,6 @@ impl SPDC {
       pp,
       signal_waist_position,
       idler_waist_position,
-    };
-
-    spdc.set_pm_type(pm_type);
-    spdc
-  }
-
-  pub fn pm_type(&self) -> PMType { self.pm_type }
-  pub fn set_pm_type(&mut self, pm_type: PMType) -> &mut Self {
-    self.pm_type = pm_type;
-    self
+    }
   }
 }

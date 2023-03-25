@@ -16,7 +16,7 @@ pub fn delta_k(
   let kp = pump.wave_vector(crystal_setup);
 
   // \vec{\Delta k} = \vec{k_{pulse}} - \vec{k_{signal}} - \vec{k_{idler}} - k_pp * \hat{z}
-  let mut delta_k = kp - ks - ki;
+  let delta_k = kp - ks - ki;
   // periodic poling
   match pp {
     Some(pp) => {

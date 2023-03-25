@@ -41,7 +41,7 @@ pub struct SPDCSetup {
 
 impl Default for SPDCSetup {
   fn default() -> Self {
-    SPDCConfig::default().try_into().unwrap()
+    spdc_config::SPDCConfig::default().try_into().unwrap()
   }
 }
 
@@ -327,9 +327,9 @@ impl SPDCSetup {
   /// Convert this setup to a flat configuration.
   /// if `all` is `true`, every parameter (including autocomputed ones)
   /// will be specified
-  pub fn to_config(&self, with_idler: bool, all: bool) -> SPDCConfig<'static> {
+  pub fn to_config(&self, with_idler: bool, all: bool) -> spdc_config::SPDCConfig<'static> {
     let setup = self;
-    let mut config = SPDCConfig {
+    let mut config = spdc_config::SPDCConfig {
       crystal: Some(setup.crystal_setup.crystal.get_meta().id),
       pm_type: Some(setup.crystal_setup.pm_type.to_str()),
       crystal_phi: Some(*(setup.crystal_setup.phi / RAD)),
@@ -383,8 +383,8 @@ impl SPDCSetup {
   }
 }
 
-impl From<SPDCSetup> for SPDCConfig<'_> {
-  fn from(setup : SPDCSetup) -> SPDCConfig<'static> {
+impl From<SPDCSetup> for spdc_config::SPDCConfig<'_> {
+  fn from(setup : SPDCSetup) -> spdc_config::SPDCConfig<'static> {
     setup.to_config(false, false)
   }
 }

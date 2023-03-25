@@ -256,7 +256,7 @@ mod tests {
 
   #[test]
   fn test_config_parse() {
-    let config = SPDCConfig::default();
+    let config = spdc_config::SPDCConfig::default();
     let setup : SPDCSetup = config.try_into().unwrap();
 
     let crystal_setup = CrystalSetup {

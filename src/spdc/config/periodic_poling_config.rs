@@ -29,11 +29,11 @@ impl Default for MaybePeriodicPolingConfig {
 }
 
 impl MaybePeriodicPolingConfig {
-  pub fn try_as_periodic_poling(self, pm_type: PMType, signal: &SignalBeam, pump: &PumpBeam, crystal_setup: &CrystalSetup) -> Result<Option<PeriodicPoling>, SPDCError> {
+  pub fn try_as_periodic_poling(self, signal: &SignalBeam, pump: &PumpBeam, crystal_setup: &CrystalSetup) -> Result<Option<PeriodicPoling>, SPDCError> {
     if let Self::Config(cfg) = self {
       let apodization = cfg.apodization_fwhm_um.map(|fwhm| Apodization { fwhm: fwhm * MICRO * M });
       let poling_period = match cfg.poling_period_um {
-        PolingPeriodConfig::Auto => optimum_poling_period(pm_type, signal, pump, crystal_setup, apodization)?,
+        PolingPeriodConfig::Auto => optimum_poling_period(signal, pump, crystal_setup, apodization)?,
         PolingPeriodConfig::Value(period_um) => period_um * MICRO * M,
       };
 

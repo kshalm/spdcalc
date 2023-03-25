@@ -9,7 +9,7 @@ use crate::{
   SPDCError,
   math::nelder_mead_1d
 };
-use crate::dim::ucum::{J, S, M, PerMeter, Meter};
+use crate::dim::ucum::{M, PerMeter, Meter};
 
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 
@@ -41,13 +41,12 @@ impl PeriodicPoling {
   }
 
   pub fn try_new_optimal(
-    pm_type: PMType,
     signal: &SignalBeam,
     pump: &PumpBeam,
     crystal_setup: &CrystalSetup,
     apodization: Option<Apodization>
   ) -> Result<Self, SPDCError> {
-    let period = optimum_poling_period(pm_type, signal, pump, crystal_setup, apodization)?;
+    let period = optimum_poling_period(signal, pump, crystal_setup, apodization)?;
     Ok(
       Self::new(
         period,
@@ -58,12 +57,11 @@ impl PeriodicPoling {
 
   /// calculate the sign needed by this periodic poling
   pub fn compute_sign(
-    pm_type: PMType,
     signal: &SignalBeam,
     pump: &PumpBeam,
     crystal_setup: &CrystalSetup
   ) -> Sign {
-    let idler = IdlerBeam::try_new_optimum(pm_type, &signal, &pump, &crystal_setup, None).unwrap();
+    let idler = IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, None).unwrap();
     let delkz = (delta_k(&signal, &idler, &pump, &crystal_setup, None) * M).z;
 
     // converts to sign
@@ -82,7 +80,6 @@ impl PeriodicPoling {
 }
 
 pub fn optimum_poling_period(
-  pm_type: PMType,
   signal: &SignalBeam,
   pump: &PumpBeam,
   crystal_setup: &CrystalSetup,
@@ -91,7 +88,7 @@ pub fn optimum_poling_period(
 
   // z component of delta k, based on periodic poling
   let delta_kz = |pp| {
-    let idler = IdlerBeam::try_new_optimum(pm_type, signal, pump, crystal_setup, pp).unwrap();
+    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, pp).unwrap();
     let del_k = delta_k(signal, &idler, pump, crystal_setup, pp);
 
     let del_k_vec = *(del_k * M);

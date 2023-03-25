@@ -1,4 +1,6 @@
 use super::*;
+use std::f64::consts::FRAC_PI_2;
+use crate::math::nelder_mead_1d;
 use dim::ucum::*;
 use na::{Rotation3, Vector3};
 use photon::{Photon, PhotonType};
@@ -105,6 +107,35 @@ impl CrystalSetup {
     };
 
     RIndex::new(n)
+  }
+
+  /// automatically calculate the optimal crystal theta
+  /// by minimizing delta k
+  pub fn optimum_theta(&self, signal: &SignalBeam, pump: &PumpBeam) -> Angle {
+    let theta_s_e = signal.theta_external(&self);
+
+    let delta_k = move |theta| {
+      let mut crystal_setup = self.clone();
+      let mut signal = signal.clone();
+
+      crystal_setup.theta = theta * RAD;
+      signal.set_theta_external(theta_s_e, &crystal_setup);
+
+      let idler = IdlerBeam::try_new_optimum(&signal, pump, &crystal_setup, None).unwrap();
+      let del_k = delta_k(&signal, &idler, pump, &crystal_setup, None);
+
+      (del_k * M).z.abs()
+    };
+
+    let guess = PI / 6.;
+    let theta = nelder_mead_1d(delta_k, guess, 1000, 0., FRAC_PI_2, 1e-12);
+
+    theta * RAD
+  }
+
+  /// Assign the optimum crystal theta
+  pub fn assign_optimum_theta(&mut self, signal: &SignalBeam, pump: &PumpBeam) {
+    self.theta = self.optimum_theta(signal, pump);
   }
 
   // z_{s,i} = -\frac{1}{2}\frac{L}{n_z(\lambda_{s,i})}
