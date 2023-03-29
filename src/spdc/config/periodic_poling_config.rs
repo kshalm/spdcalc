@@ -1,16 +1,8 @@
 use super::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(untagged)]
-pub enum PolingPeriodConfig {
-  #[serde(alias = "auto")]
-  Auto,
-  Value(f64),
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct PeriodicPolingConfig {
-  poling_period_um: PolingPeriodConfig,
+  poling_period_um: AutoCalcParam<f64>,
   apodization_fwhm_um: Option<f64>,
 }
 
@@ -33,8 +25,8 @@ impl MaybePeriodicPolingConfig {
     if let Self::Config(cfg) = self {
       let apodization = cfg.apodization_fwhm_um.map(|fwhm| Apodization { fwhm: fwhm * MICRO * M });
       let poling_period = match cfg.poling_period_um {
-        PolingPeriodConfig::Auto => optimum_poling_period(signal, pump, crystal_setup, apodization)?,
-        PolingPeriodConfig::Value(period_um) => period_um * MICRO * M,
+        AutoCalcParam::Auto(_) => optimum_poling_period(signal, pump, crystal_setup, apodization)?,
+        AutoCalcParam::Param(period_um) => period_um * MICRO * M,
       };
 
       Ok(

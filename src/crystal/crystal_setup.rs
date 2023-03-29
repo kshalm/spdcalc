@@ -124,7 +124,7 @@ impl CrystalSetup {
       let idler = IdlerBeam::try_new_optimum(&signal, pump, &crystal_setup, None).unwrap();
       let del_k = delta_k(&signal, &idler, pump, &crystal_setup, None);
 
-      (del_k * M).z.abs()
+      (del_k * M / RAD).z.abs()
     };
 
     let guess = PI / 6.;

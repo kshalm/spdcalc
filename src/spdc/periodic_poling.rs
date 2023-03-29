@@ -9,7 +9,7 @@ use crate::{
   SPDCError,
   math::nelder_mead_1d
 };
-use crate::dim::ucum::{M, PerMeter, Meter};
+use crate::dim::ucum::{M, RAD, PerMeter, Meter};
 
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 
@@ -62,7 +62,7 @@ impl PeriodicPoling {
     crystal_setup: &CrystalSetup
   ) -> Sign {
     let idler = IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, None).unwrap();
-    let delkz = (delta_k(&signal, &idler, &pump, &crystal_setup, None) * M).z;
+    let delkz = (delta_k(&signal, &idler, &pump, &crystal_setup, None) * M / RAD).z;
 
     // converts to sign
     delkz.into()
@@ -91,7 +91,7 @@ pub fn optimum_poling_period(
     let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, pp).unwrap();
     let del_k = delta_k(signal, &idler, pump, crystal_setup, pp);
 
-    let del_k_vec = *(del_k * M);
+    let del_k_vec = *(del_k * M / RAD);
 
     del_k_vec.z
   };

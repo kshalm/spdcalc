@@ -221,7 +221,7 @@ mod test {
   use crate::PolarizationType;
 
   #[test]
-  fn from_json_test(){
+  fn auto_idler_auto_focus_test(){
     let json = json!({
       "crystal": {
         "name": "BBO_1",
@@ -296,6 +296,79 @@ mod test {
       )
     };
     dbg!(&actual);
+    assert_eq!(actual, expected);
+  }
+
+  #[test]
+  fn autocalc_crystal_theta_test(){
+    let json = json!({
+      "crystal": {
+        "name": "KTP",
+        "pm_type": "e->eo",
+        "phi_deg": 0,
+        "theta_deg": "auto",
+        "length_um": 2000,
+        "temperature_c": 20
+      },
+      "pump": {
+        "wavelength_nm": 775,
+        "bandwidth_nm": 5.35,
+        "waist_um": 100,
+        "average_power_mw": 1
+      },
+      "signal": {
+        "wavelength_nm": 1550,
+        "phi_deg": 0,
+        "theta_external_deg": 0,
+        "waist_um": 100,
+        "waist_position_um": "auto"
+      },
+      "idler": "auto",
+    });
+
+    let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+
+    let actual = spdc.crystal_setup.theta;
+    let expected = 52.7289457218103 * DEG;
+    assert_eq!(actual, expected);
+  }
+
+  #[test]
+  fn auto_pp_test(){
+    let json = json!({
+      "crystal": {
+        "name": "KTP",
+        "pm_type": "e->eo",
+        "phi_deg": 0,
+        "theta_deg": 90,
+        "length_um": 2000,
+        "temperature_c": 20
+      },
+      "pump": {
+        "wavelength_nm": 775,
+        "bandwidth_nm": 5.35,
+        "waist_um": 100,
+        "average_power_mw": 1
+      },
+      "signal": {
+        "wavelength_nm": 1550,
+        "phi_deg": 0,
+        "theta_external_deg": 0,
+        "waist_um": 100,
+        "waist_position_um": "auto"
+      },
+      "idler": "auto",
+      "periodic_poling": {
+        "poling_period_um": "auto"
+      }
+    });
+
+    let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+
+    let actual = spdc.pp.unwrap().period;
+    let expected = 46.5203285006243 * MICRO * M;
     assert_eq!(actual, expected);
   }
 }
