@@ -84,18 +84,18 @@ impl FromStr for PMType {
   /// assert_eq!(PMType::from_str("ooo").unwrap(), PMType::Type0_o_oo);
   /// assert_eq!(PMType::from_str("o-oo").unwrap(), PMType::Type0_o_oo);
   /// assert_eq!(PMType::from_str("Type2 e eo").unwrap(), PMType::Type2_e_eo);
-  /// assert_eq!(PMType::from_str("type 2 e->eo").unwrap(), PMType::Type2_e_eo);
+  /// assert_eq!(PMType::from_str("Type_2_e_eo").unwrap(), PMType::Type2_e_eo);
   /// ```
   #[allow(non_upper_case_globals)]
   fn from_str(s : &str) -> Result<Self, Self::Err> {
     use regex::Regex;
     use lazy_static::lazy_static;
     lazy_static! {
-      static ref type0_o_oo : Regex = Regex::new(r"(?i)^(type\s*0)?\s*(o).{0,2}(o)(o)$").unwrap();
-      static ref type0_e_ee : Regex = Regex::new(r"(?i)^(type\s*0)?\s*(e).{0,2}(e)(e)$").unwrap();
-      static ref type1_e_oo : Regex = Regex::new(r"(?i)^(type\s*1)?\s*(e).{0,2}(o)(o)$").unwrap();
-      static ref type2_e_eo : Regex = Regex::new(r"(?i)^(type\s*2)?\s*(e).{0,2}(e)(o)$").unwrap();
-      static ref type2_e_oe : Regex = Regex::new(r"(?i)^(type\s*2)?\s*(e).{0,2}(o)(e)$").unwrap();
+      static ref type0_o_oo : Regex = Regex::new(r"(?i)^(type\s*0)?[\s_]*(o).{0,2}(o)(o)$").unwrap();
+      static ref type0_e_ee : Regex = Regex::new(r"(?i)^(type\s*0)?[\s_]*(e).{0,2}(e)(e)$").unwrap();
+      static ref type1_e_oo : Regex = Regex::new(r"(?i)^(type\s*1)?[\s_]*(e).{0,2}(o)(o)$").unwrap();
+      static ref type2_e_eo : Regex = Regex::new(r"(?i)^(type\s*2)?[\s_]*(e).{0,2}(e)(o)$").unwrap();
+      static ref type2_e_oe : Regex = Regex::new(r"(?i)^(type\s*2)?[\s_]*(e).{0,2}(o)(e)$").unwrap();
     }
     if type0_o_oo.is_match(s) { return Ok(PMType::Type0_o_oo); }
     if type0_e_ee.is_match(s) { return Ok(PMType::Type0_e_ee); }
