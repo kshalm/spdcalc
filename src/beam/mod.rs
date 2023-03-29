@@ -348,6 +348,30 @@ impl Beam {
     self
   }
 
+  /// Calculate the spatial walk-off
+  /// [See equation (37) of Couteau, Christophe. "Spontaneous parametric down-conversion"](https://arxiv.org/pdf/1809.00127.pdf)
+  pub fn walkoff_angle(&self, crystal_setup : &CrystalSetup) -> Angle {
+    // ***
+    // NOTE: in the original version of the program this was TOTALLY bugged
+    // and gave the wrong values completely
+    // ***
+
+    // n_{e}(\theta)
+    let ne_of_theta = |theta| {
+      let mut setup = crystal_setup.clone();
+      setup.theta = theta * ucum::RAD;
+      *self.refractive_index(&setup)
+    };
+
+    // derrivative at theta
+    let theta = *(crystal_setup.theta / ucum::RAD);
+    let np_prime = derivative_at(ne_of_theta, theta);
+    let np = *self.refractive_index(&crystal_setup);
+
+    // walkoff \tan(\rho) = -\frac{1}{n_e} \frac{dn_e}{d\theta}
+    (-np_prime / np).atan() * ucum::RAD
+  }
+
   fn update_direction(&mut self) {
     self.direction = direction_from_polar(self.phi, self.theta);
   }
@@ -513,6 +537,24 @@ mod tests {
       "actual: {}, expected: {}",
       theta_i,
       theta_i_expected
+    );
+  }
+
+  #[test]
+  fn walkoff_test() {
+    let mut crystal_setup = SPDCSetup::default().crystal_setup;
+    crystal_setup.theta = 31.603728550521122 * ucum::DEG;
+
+    let pump = Beam::new(PolarizationType::Extraordinary, 0. * DEG, 0. * DEG, 775. * NANO * M, 100. * MICRO * M);
+
+    let expected = 0.06674608819804856;
+    let actual = *(pump.walkoff_angle(&crystal_setup) / ucum::RAD);
+
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-8),
+      "actual: {}, expected: {}",
+      actual,
+      expected
     );
   }
 }
