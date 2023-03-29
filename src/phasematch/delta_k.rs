@@ -20,7 +20,8 @@ pub fn delta_k(
   // periodic poling
   match pp {
     Some(pp) => {
-      delta_k - Wavevector::new(Vector3::<f64>::z_axis().as_ref() * *(PI2 * pp.pp_factor() * M))
+      let zhat = Vector3::<f64>::z_axis();
+      delta_k - Wavevector::new(zhat.as_ref() * *(PI2 * pp.pp_factor() * M))
     },
     None => delta_k
   }
