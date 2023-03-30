@@ -1,5 +1,6 @@
-use dim::ucum;
+use dim::{ucum::{self, C_, RAD, ONE}};
 use crate::math::{lerp};
+use crate::{Frequency, Wavenumber, RIndex, Wavelength, PI2, Speed};
 
 /// Create a dimensioned vector3
 pub fn dim_vector3<L, R>(unit_const : L, arr : &[R; 3]) -> na::Vector3<dim::typenum::Prod<L, R>>
@@ -23,6 +24,36 @@ pub fn from_celsius_to_kelvin(c : f64) -> ucum::Kelvin<f64> {
 /// convert from kelvin to celsius
 pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
   *(k / ucum::K) - 273.15
+}
+
+/// Get the wavenumber of light at frequency in a medium with refractive index
+pub fn frequency_to_wavenumber(omega: Frequency, n: RIndex) -> Wavenumber {
+  n * omega / C_
+}
+
+/// Get the frequency of light at wavelength in a medium with refractive index
+pub fn wavelength_to_frequency(lambda: Wavelength, n: RIndex) -> Frequency {
+  PI2 * RAD * C_ / (lambda * n)
+}
+
+/// Get the wavelength of light at frequency in a medium with refractive index
+pub fn frequency_to_wavelength(omega: Frequency, n: RIndex) -> Wavelength {
+  PI2 * RAD * C_ / (omega * n)
+}
+
+/// Get the phase velocity of light from frequency and wavenumber
+pub fn phase_velocity(omega: Frequency, k: Wavenumber) -> Speed {
+  omega / k
+}
+
+/// Get the frequency of light from its vacuum wavelength
+pub fn vacuum_wavelength_to_frequency(lambda : Wavelength) -> Frequency {
+  wavelength_to_frequency(lambda, ONE)
+}
+
+/// Get the vacuum wavelength of light from its frequency
+pub fn frequency_to_vacuum_wavelength(omega: Frequency) -> Wavelength {
+  frequency_to_wavelength(omega, ONE)
 }
 
 /// Utility for creating evenly spaced steps between two endpoints

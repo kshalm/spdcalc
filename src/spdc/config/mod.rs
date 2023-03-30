@@ -187,7 +187,7 @@ impl SPDCConfig {
       };
       match autocalc_idler_waist {
         AutoCalcParam::Param(focus_um) => -focus_um.abs() * MICRO * M,
-        AutoCalcParam::Auto(_) => crystal_setup.optimal_waist_position(signal.wavelength(), signal.polarization()),
+        AutoCalcParam::Auto(_) => crystal_setup.optimal_waist_position(signal.vacuum_wavelength(), signal.polarization()),
       }
     };
     let idler = match self.idler {
@@ -196,7 +196,7 @@ impl SPDCConfig {
     };
     let signal_waist_position = match signal_waist_position_um {
       AutoCalcParam::Param(focus_um) => -focus_um.abs() * MICRO * M,
-      AutoCalcParam::Auto(_) => crystal_setup.optimal_waist_position(signal.wavelength(), signal.polarization()),
+      AutoCalcParam::Auto(_) => crystal_setup.optimal_waist_position(signal.vacuum_wavelength(), signal.polarization()),
     };
 
     Ok(SPDC::new(

@@ -5,15 +5,17 @@ use dim::{ucum::{M}};
 /// Calculate the difference in momentum.
 /// Equation (15) of https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
 pub fn delta_k(
+  omega_s : Frequency,
+  omega_i : Frequency,
   signal : &SignalBeam,
   idler : &IdlerBeam,
   pump : &PumpBeam,
   crystal_setup : &CrystalSetup,
   pp : Option<PeriodicPoling>,
 ) -> Wavevector {
-  let ks = signal.wavevector(crystal_setup);
-  let ki = idler.wavevector(crystal_setup);
-  let kp = pump.wavevector(crystal_setup);
+  let ks = signal.wavevector(omega_s, crystal_setup);
+  let ki = idler.wavevector(omega_i, crystal_setup);
+  let kp = pump.wavevector(pump.frequency(), crystal_setup);
 
   // \vec{\Delta k} = \vec{k_{pulse}} - \vec{k_{signal}} - \vec{k_{idler}} - k_pp * \hat{z}
   let delta_k = kp - ks - ki;
@@ -60,7 +62,7 @@ mod test {
     // signal.get_index(&crystal_setup), idler.get_index(&crystal_setup),
     // pump.get_index(&crystal_setup));
 
-    let del_k = delta_k(&signal, &idler, &pump, &crystal_setup, Some(pp)) / Wavenumber::new(1.);
+    let del_k = delta_k(signal.frequency(), idler.frequency(), &signal, &idler, &pump, &crystal_setup, Some(pp)) / Wavenumber::new(1.);
     let expected = na::Vector3::new(-30851.482867892322, -8266.62991975434, 186669.0085568884);
     // println!("{}", del_k);
     assert!(

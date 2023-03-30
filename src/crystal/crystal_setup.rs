@@ -57,12 +57,12 @@ impl CrystalSetup {
   /// get the refractive index along specified direction, with wavelength and polarization type
   pub fn index_along(
     &self,
-    wavelength : Wavelength,
+    vacuum_wavelength : Wavelength,
     direction : Direction,
     polarization : PolarizationType,
   ) -> RIndex {
     // Calculation follows https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
-    let indices = *self.crystal.get_indices(wavelength, self.temperature);
+    let indices = *self.crystal.get_indices(vacuum_wavelength, self.temperature);
     let n_inv2 = indices.map(|i| i.powi(-2));
     let s = self.to_crystal_frame(direction);
     let s_squared = s.map(|i| i * i);
@@ -122,7 +122,7 @@ impl CrystalSetup {
       signal.set_theta_external(theta_s_e, &crystal_setup);
 
       let idler = IdlerBeam::try_new_optimum(&signal, pump, &crystal_setup, None).unwrap();
-      let del_k = delta_k(&signal, &idler, pump, &crystal_setup, None);
+      let del_k = delta_k(signal.frequency(), idler.frequency(), &signal, &idler, pump, &crystal_setup, None);
 
       (del_k * M / RAD).z.abs()
     };

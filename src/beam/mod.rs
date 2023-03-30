@@ -1,8 +1,8 @@
 //! # Beam
 //!
 //! Used for pump, signal, idler beams
-use crate::{*, crystal::CrystalSetup, PeriodicPoling, math::*};
-use dim::{ucum::{self, C_, M, RAD, PerMeter}};
+use crate::{*, crystal::CrystalSetup, PeriodicPoling, math::*, utils::{vacuum_wavelength_to_frequency, frequency_to_vacuum_wavelength, frequency_to_wavenumber}};
+use dim::{ucum::{self, C_, M, RAD}};
 use na::*;
 use std::{f64::{self, consts::FRAC_PI_2}, ops::{Deref, DerefMut}};
 mod beam_waist;
@@ -86,8 +86,8 @@ impl IdlerBeam {
     crystal_setup : &CrystalSetup,
     pp : Option<PeriodicPoling>,
   ) -> Result<Self, SPDCError> {
-    let ls = signal.wavelength();
-    let lp = pump.wavelength();
+    let ls = signal.vacuum_wavelength();
+    let lp = pump.vacuum_wavelength();
 
     if ls <= lp {
       return Err(
@@ -95,16 +95,16 @@ impl IdlerBeam {
       );
     }
 
-    let ns = signal.refractive_index(&crystal_setup);
-    let np = pump.refractive_index(&crystal_setup);
+    let ns = signal.refractive_index(signal.frequency(), &crystal_setup);
+    let np = pump.refractive_index(signal.frequency(), &crystal_setup);
 
     let del_k_pp = match pp {
-      Some(poling) => signal.wavelength() * poling.pp_factor(),
+      Some(poling) => signal.vacuum_wavelength() * poling.pp_factor(),
       None => ucum::Unitless::new(0.0),
     };
 
-    let theta_s = *(signal.theta_internal() / ucum::RAD);
-    let ns_z = ns * f64::cos(theta_s);
+    let theta_s = signal.theta_internal();
+    let ns_z = ns * cos(theta_s);
     let ls_over_lp = ls / lp;
     let np_by_ls_over_lp = np * ls_over_lp;
 
@@ -115,7 +115,7 @@ impl IdlerBeam {
     //   + del_k_pp * del_k_pp;
 
     // simplified calculation
-    let numerator = ns * f64::sin(theta_s);
+    let numerator = ns * sin(theta_s);
     let arg =
       (ns_z - np_by_ls_over_lp + del_k_pp).powi(2)
       + numerator.powi(2);
@@ -136,7 +136,7 @@ impl IdlerBeam {
         phi,
         theta,
         wavelength,
-        signal.waist(), // FIXME is this right??
+        signal.waist(),
       ).into()
     )
   }
@@ -168,7 +168,7 @@ impl DerefMut for IdlerBeam {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Beam {
   waist : BeamWaist,
-  wavelength : Wavelength,
+  frequency : Frequency,
   // the polarization
   polarization : PolarizationType,
   /// (internal) azimuthal angle [0, π]
@@ -185,7 +185,7 @@ impl Beam {
     polarization : PolarizationType,
     phi : Angle,
     theta : Angle,
-    wavelength : Wavelength,
+    vacuum_wavelength : Wavelength,
     waist : W,
   ) -> Self {
     assert!(
@@ -196,7 +196,7 @@ impl Beam {
 
     Self {
       polarization,
-      wavelength,
+      frequency: vacuum_wavelength_to_frequency(vacuum_wavelength),
       waist: waist.into(),
       phi,
       theta,
@@ -206,27 +206,27 @@ impl Beam {
 
   // TODO: double check this...
   pub fn effective_index_of_refraction(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> RIndex {
-    let lambda = self.wavelength();
-    let n = self.refractive_index(&crystal_setup);
+    let lambda_o = self.vacuum_wavelength();
+    let n = self.refractive_index(self.frequency, &crystal_setup);
     let pp_factor = pp.map_or(0. / M, |p| p.pp_factor());
-    n + *(pp_factor * lambda)
+    n + *(pp_factor * lambda_o)
   }
 
-  /// Get the phase velocity of the photon through specified crystal setup
+  /// Get the phase velocity of the beam through specified crystal setup
   pub fn phase_velocity(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> Speed {
     C_ / self.effective_index_of_refraction(crystal_setup, pp)
   }
 
-  /// Get the group velocity of this photon through specified crystal setup
+  /// Get the group velocity of the beam through specified crystal setup
   pub fn group_velocity(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> Speed {
-    let lambda = self.wavelength();
+    let lambda_o = self.vacuum_wavelength();
     let n_eff = self.effective_index_of_refraction(crystal_setup, pp);
     let vp = C_ / n_eff;
     let n_of_lambda = move |lambda : f64| {
       *crystal_setup.index_along(lambda * M, self.direction(), self.polarization())
     };
-    let dn_by_dlambda = derivative_at(n_of_lambda, *(lambda / M));
-    vp * (1. + (lambda / n_eff) * dn_by_dlambda / M)
+    let dn_by_dlambda = derivative_at(n_of_lambda, *(lambda_o / M));
+    vp * (1. + (lambda_o / n_eff) * dn_by_dlambda / M)
   }
 
   pub fn calc_internal_theta_from_external(
@@ -242,7 +242,7 @@ impl Beam {
 
     let curve = |internal| {
       let direction = direction_from_polar(phi, internal * ucum::RAD);
-      let n = crystal_setup.index_along(beam.wavelength(), direction, beam.polarization());
+      let n = crystal_setup.index_along(beam.vacuum_wavelength(), direction, beam.polarization());
 
       num::abs(snell_external - (*n) * f64::sin(internal))
     };
@@ -258,7 +258,7 @@ impl Beam {
     crystal_setup : &CrystalSetup,
   ) -> Angle {
     let direction = Photon::calc_direction(beam.phi(), internal);
-    let n = crystal_setup.index_along(beam.wavelength(), direction, beam.polarization());
+    let n = crystal_setup.index_along(beam.vacuum_wavelength(), direction, beam.polarization());
     // snells law
     f64::asin(*n * f64::sin(*(internal / ucum::RAD))) * ucum::RAD
   }
@@ -277,9 +277,10 @@ impl Beam {
     self
   }
 
-  /// Get index of refraction along direction of propagation
-  pub fn refractive_index(&self, crystal_setup : &CrystalSetup) -> RIndex {
-    crystal_setup.index_along(self.wavelength(), self.direction(), self.polarization())
+  /// Get index of refraction along direction of propagation at specified freuency
+  pub fn refractive_index(&self, omega: Frequency, crystal_setup : &CrystalSetup) -> RIndex {
+    let lambda_o = frequency_to_vacuum_wavelength(omega);
+    crystal_setup.index_along(lambda_o, self.direction(), self.polarization())
   }
 
   pub fn direction(&self) -> Direction {
@@ -308,26 +309,28 @@ impl Beam {
     Self::calc_external_theta_from_internal(&self, self.theta, crystal_setup)
   }
 
-  pub fn wavevector(&self, crystal_setup : &CrystalSetup) -> Wavevector {
-    let k = *(M * PI2 * self.refractive_index(crystal_setup) / self.wavelength);
-    Wavevector::new(self.direction.into_inner() * k)
+  pub fn wavevector(&self, omega: Frequency, crystal_setup : &CrystalSetup) -> Wavevector {
+    let n = self.refractive_index(omega, crystal_setup);
+    let k = frequency_to_wavenumber(omega, n);
+    Wavevector::new(self.direction.into_inner() * *(k * M / RAD))
   }
 
-  pub fn wavelength(&self) -> Wavelength {
-    self.wavelength
-  }
-
-  pub fn set_wavelength(&mut self, w : Wavelength) -> &mut Self {
-    self.wavelength = w;
+  /// The center frequency of the beam
+  pub fn frequency(&self) -> Frequency { self.frequency }
+  /// Set the center frequency of the beam
+  pub fn set_frequency(&mut self, omega: Frequency) -> &mut Self {
+    self.frequency = omega;
     self
   }
 
-  pub fn frequency(&self) -> Frequency {
-    PI2 * C_ / self.wavelength
+  /// Vacuum wavelength at the center
+  pub fn vacuum_wavelength(&self) -> Wavelength {
+    frequency_to_vacuum_wavelength(self.frequency)
   }
 
-  pub fn set_frequency(&mut self, omega : Frequency) -> &mut Self {
-    self.wavelength = PI2 * C_ / omega;
+  /// Set the vacuum wavelength at the center
+  pub fn set_vacuum_wavelength(&mut self, lambda_o : Wavelength) -> &mut Self {
+    self.frequency = vacuum_wavelength_to_frequency(lambda_o);
     self
   }
 
@@ -360,13 +363,13 @@ impl Beam {
     let ne_of_theta = |theta| {
       let mut setup = crystal_setup.clone();
       setup.theta = theta * ucum::RAD;
-      *self.refractive_index(&setup)
+      *self.refractive_index(self.frequency, &setup)
     };
 
     // derrivative at theta
     let theta = *(crystal_setup.theta / ucum::RAD);
     let np_prime = derivative_at(ne_of_theta, theta);
-    let np = *self.refractive_index(&crystal_setup);
+    let np = *self.refractive_index(self.frequency, &crystal_setup);
 
     // walkoff \tan(\rho) = -\frac{1}{n_e} \frac{dn_e}{d\theta}
     (-np_prime / np).atan() * ucum::RAD
@@ -443,7 +446,7 @@ mod tests {
   #[test]
   fn beam_refractive_index_test() {
     let (crystal_setup, signal) = init();
-    let n = signal.refractive_index(&crystal_setup);
+    let n = signal.refractive_index(signal.frequency(), &crystal_setup);
     let expected = 1.6465859604517012;
     assert!(
       approx_eq!(f64, *n, expected, ulps = 2),
@@ -512,7 +515,7 @@ mod tests {
 
     let idler = IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, Some(pp)).unwrap();
 
-    let li = *(idler.wavelength() / ucum::M);
+    let li = *(idler.vacuum_wavelength() / ucum::M);
     let li_expected = 1550. * NANO;
     assert!(
       approx_eq!(f64, li, li_expected, ulps = 2),

@@ -20,6 +20,13 @@ lazy_static::lazy_static! {
   static ref FWHM_OVER_WAIST :f64 = f64::sqrt(2. * f64::ln(2.));
 }
 
+pub fn sin(a: Angle) -> f64 { (a / RAD).sin() }
+pub fn cos(a: Angle) -> f64 { (a / RAD).cos() }
+pub fn tan(a: Angle) -> f64 { (a / RAD).tan() }
+pub fn sec(a: Angle) -> f64 { 1. / cos(a) }
+pub fn csc(a: Angle) -> f64 { 1. / sin(a) }
+pub fn cot(a: Angle) -> f64 { 1. / tan(a) }
+
 /// Standard sinc function `sinc(x) = sin(x) / x`
 pub fn sinc( x : f64 ) -> f64 {
   if x == 0. { 1. } else { f64::sin(x) / x }

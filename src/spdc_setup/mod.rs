@@ -466,6 +466,8 @@ pub fn calc_delta_k(
 
   dk.z = np_over_lp + dk.z;
 
+  dbg!(PI2 * dk);
+
   // put into milliJoule seconds
   (PI2 / MILLI)
     * match pp {
@@ -629,6 +631,7 @@ mod tests {
       *(calc_delta_k(&signal, &idler, &pump, &crystal_setup, Some(pp)) / ucum::J / ucum::S);
     let expected = na::Vector3::new(-30851.482867892322, -8266.62991975434, 186669.00855689016);
     // println!("{}", del_k);
+    assert!(false);
     assert!(
       approx_eq!(f64, del_k.x, expected.x, ulps = 2, epsilon = 1e-9),
       "actual: {}, expected: {}",
@@ -894,4 +897,5 @@ mod tests {
       period_expected
     );
   }
+
 }

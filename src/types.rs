@@ -26,8 +26,9 @@ pub type Wavenumber = RadPerMeter<f64>;
 /// Wave vector
 pub type Wavevector = RadPerMeter<Vector3<f64>>;
 
+derived!(ucum, UCUM: RadPerSecond = Radian * Hertz);
 /// Frequency
-pub type Frequency = ucum::Hertz<f64>;
+pub type Frequency = RadPerSecond<f64>;
 
 /// A 1d distance
 pub type Distance = ucum::Meter<f64>;

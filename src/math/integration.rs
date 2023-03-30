@@ -85,8 +85,8 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
 
   /// Numerically integrate from `a` to `b`, in `divs` divisions
   pub fn integrate(&self, a : f64, b : f64, divs : usize) -> T {
-    assert!( divs.is_even() );
-    assert!( divs >= 4 );
+    let divs = divs + divs % 2 - 2; // nearest even
+    assert!( divs >= 4, "Steps too low" );
 
     let dx = (b - a) / (divs as f64);
 

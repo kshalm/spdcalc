@@ -93,20 +93,20 @@ impl Crystal {
   /// ));
   /// assert_eq!(indices, expected)
   /// ```
-  pub fn get_indices(&self, wavelength : Wavelength, temperature : Kelvin<f64>) -> Indices {
+  pub fn get_indices(&self, vacuum_wavelength : Wavelength, temperature : Kelvin<f64>) -> Indices {
     match &self {
-      Crystal::BBO_1 => bbo_1::get_indices(wavelength, temperature),
-      Crystal::KTP => ktp::get_indices(wavelength, temperature),
-      Crystal::LiNbO3_1 => linbo3_1::get_indices(wavelength, temperature),
-      Crystal::LiNb_MgO => linb_mgo::get_indices(wavelength, temperature),
-      Crystal::BiBO_1 => bibo_1::get_indices(wavelength, temperature),
-      Crystal::KDP_1 => kdp_1::get_indices(wavelength, temperature),
-      Crystal::AgGaSe2_1 => aggase2_1::get_indices(wavelength, temperature),
-      Crystal::AgGaSe2_2 => aggase2_2::get_indices(wavelength, temperature),
-      Crystal::LiIO3_2 => liio3_2::get_indices(wavelength, temperature),
-      Crystal::LiIO3_1 => liio3_1::LiIO3_1.get_indices(wavelength, temperature),
-      Crystal::AgGaS2_1 => aggas2_1::AgGaS2_1.get_indices(wavelength, temperature),
-      // Crystal::Sellmeier(crystal) => crystal.get_indices(wavelength, temperature),
+      Crystal::BBO_1 => bbo_1::get_indices(vacuum_wavelength, temperature),
+      Crystal::KTP => ktp::get_indices(vacuum_wavelength, temperature),
+      Crystal::LiNbO3_1 => linbo3_1::get_indices(vacuum_wavelength, temperature),
+      Crystal::LiNb_MgO => linb_mgo::get_indices(vacuum_wavelength, temperature),
+      Crystal::BiBO_1 => bibo_1::get_indices(vacuum_wavelength, temperature),
+      Crystal::KDP_1 => kdp_1::get_indices(vacuum_wavelength, temperature),
+      Crystal::AgGaSe2_1 => aggase2_1::get_indices(vacuum_wavelength, temperature),
+      Crystal::AgGaSe2_2 => aggase2_2::get_indices(vacuum_wavelength, temperature),
+      Crystal::LiIO3_2 => liio3_2::get_indices(vacuum_wavelength, temperature),
+      Crystal::LiIO3_1 => liio3_1::LiIO3_1.get_indices(vacuum_wavelength, temperature),
+      Crystal::AgGaS2_1 => aggas2_1::AgGaS2_1.get_indices(vacuum_wavelength, temperature),
+      // Crystal::Sellmeier(crystal) => crystal.get_indices(vacuum_wavelength, temperature),
     }
   }
 

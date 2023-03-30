@@ -62,7 +62,7 @@ impl PeriodicPoling {
     crystal_setup: &CrystalSetup
   ) -> Sign {
     let idler = IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, None).unwrap();
-    let delkz = (delta_k(&signal, &idler, &pump, &crystal_setup, None) * M / RAD).z;
+    let delkz = (delta_k(signal.frequency(), idler.frequency(), &signal, &idler, &pump, &crystal_setup, None) * M / RAD).z;
 
     // converts to sign
     delkz.into()
@@ -89,7 +89,7 @@ pub fn optimum_poling_period(
   // z component of delta k, based on periodic poling
   let delta_kz = |pp| {
     let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, pp).unwrap();
-    let del_k = delta_k(signal, &idler, pump, crystal_setup, pp);
+    let del_k = delta_k(signal.frequency(), idler.frequency(), signal, &idler, pump, crystal_setup, pp);
 
     let del_k_vec = *(del_k * M / RAD);
 

@@ -1,22 +1,20 @@
-use crate::*;
+use crate::{*, utils::vacuum_wavelength_to_frequency};
 use math::*;
-use dim::{ucum::{C_, ONE, RAD, Unitless, Hertz}};
+use dim::{ucum::{C_, ONE, M, Unitless}};
 
-pub fn pump_waist_bandwidth_frequency(pump_wavelength: Wavelength, fwhm: Wavelength) -> Hertz<f64> {
-  let two_pi_c = PI2 * C_;
+pub fn pump_waist_bandwidth_frequency(pump_wavelength: Wavelength, fwhm: Wavelength) -> Frequency {
   let diff = pump_wavelength - 0.5 * fwhm;
   let sum = pump_wavelength + 0.5 * fwhm;
-  let omega_high = two_pi_c / diff;
-  let omega_low = two_pi_c / sum;
+  let omega_high = vacuum_wavelength_to_frequency(diff);
+  let omega_low = vacuum_wavelength_to_frequency(sum);
   fwhm_to_waist(
     omega_high - omega_low
   )
 }
 
 pub fn pump_spectral_amplitude(spdc : &SPDC, omega : Frequency) -> Unitless<f64> {
-  let two_pi_c = PI2 * C_;
-  let lambda_p = spdc.pump.wavelength();
-  let omega_0 = two_pi_c / lambda_p;
+  let lambda_p = spdc.pump.vacuum_wavelength();
+  let omega_0 = spdc.pump.frequency();
   let delta_omega = omega - omega_0;
 
   // convert from wavelength to \omega
@@ -48,28 +46,16 @@ pub fn pump_spectrum(setup : &SPDCSetup) -> Unitless<f64> {
   (-0.25 * x * x).exp() * ONE
 }
 
-/// Calculate the spatial walk-off for the pump
-/// [See equation (37) of Couteau, Christophe. "Spontaneous parametric down-conversion"](https://arxiv.org/pdf/1809.00127.pdf)
-pub fn pump_walkoff(pump : &PumpBeam, crystal_setup : &CrystalSetup) -> Angle {
-  // ***
-  // NOTE: in the original version of the program this was TOTALLY bugged
-  // and gave the wrong values completely
-  // ***
-
-  // n_{e}(\theta)
-  let np_of_theta = |theta| {
-    let mut setup = crystal_setup.clone();
-    setup.theta = theta * RAD;
-    *pump.refractive_index(&setup)
-  };
-
-  // derrivative at theta
-  let theta = *(crystal_setup.theta / RAD);
-  let np_prime = derivative_at(np_of_theta, theta);
-  let np = *pump.refractive_index(&crystal_setup);
-
-  // walkoff \rho = -\frac{1}{n_e} \frac{dn_e}{d\theta}
-  -(np_prime / np) * RAD
+pub fn integration_steps_best_guess(crystal_length: Distance) -> usize {
+  use num::clamp;
+  use std::cmp::max;
+  // TODO: Improve this determination of integration steps
+  // this tries to set reasonable defaults for the number
+  // of steps based on the length of the crystal. Errors
+  // get introduced if there are too many steps, or too few.
+  let zslice = 1e-4 * clamp((*(crystal_length/M) / 2.5e-3).sqrt(), 0., 5.);
+  let mut slices = (*(crystal_length/M) / zslice) as usize;
+  max(slices + slices % 2 - 2, 4) // nearest even.. minimum 4
 }
 
 mod delta_k;
