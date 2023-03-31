@@ -1,8 +1,9 @@
 use num::Complex;
-use crate::spdc_setup::*;
 use dim::ucum::Unitless;
 use crate::*;
-use crate::phasematch::*;
+
+mod joint_spectrum;
+pub use joint_spectrum::*;
 
 /// Calculate the Joint Spectral Amplitude of Coincidences for given parameters at specified signal/idler wavelengths.
 /// **NOTE**: These are not normalized.

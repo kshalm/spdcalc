@@ -26,14 +26,6 @@ impl BeamWaist {
     }
   }
 
-  pub fn from_fwhm(fwhm: Wavelength) -> Self {
-    Self::new(fwhm_to_waist(fwhm))
-  }
-
-  pub fn fwhm(&self) -> (Wavelength, Wavelength) {
-    (waist_to_fwhm(self.x), waist_to_fwhm(self.y))
-  }
-
   pub fn ellipticity(&self) -> f64 {
     if self.x == self.y {
       1.

@@ -5,6 +5,7 @@ use utils::Steps2D;
 use spdc_setup::*;
 use num::Complex;
 use dim::ucum::C_;
+use plotting::JointSpectrum;
 
 /// Hong–Ou–Mandel coincidence rate plot
 #[allow(non_snake_case)]

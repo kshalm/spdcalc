@@ -19,7 +19,7 @@ pub type Indices = ucum::Unitless<Vector3<f64>>;
 /// Wavelength
 pub type Wavelength = ucum::Meter<f64>;
 
-derived!(ucum, UCUM: RadPerMeter = Radian / Meter );
+derived!(ucum, UCUM: RadPerMeter = Radian / Meter);
 /// Wave number
 pub type Wavenumber = RadPerMeter<f64>;
 

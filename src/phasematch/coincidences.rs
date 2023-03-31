@@ -5,53 +5,53 @@ use math::*;
 use super::*;
 use dim::ucum::{self, RAD, M, J, S, EPS_0, UCUM};
 
-derived!(ucum, UCUM: JsiNorm = Second * Meter * Meter * Meter * Meter * Meter * Meter * Meter * Meter);
+derived!(ucum, UCUM: JsiNorm = Second * Meter * Meter * Meter * Meter * Meter * Meter * Meter * Meter / Radian / Radian);
+derived!(ucum, UCUM: Meter4 = Meter * Meter * Meter * Meter);
 
-fn jsi_normalization(spdc_setup : &SPDCSetup) -> JsiNorm<f64> {
-  let two_pi_c = PI2 * C_;
+/// The units are M^8/s/(radians/s)^2
+pub fn jsi_normalization(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> JsiNorm<f64> {
   // K degeneracy factor (nonlinear polarization).
   // K = 1 for non-degenerate emission frequencies.
   // K = 1/2 for degenerate emission frequencies.
   let degeneracy_factor = 1.0_f64;
   // A_m = e^{i\frac{\pi}{2}m} \mathrm{sinc}\left ( {\frac{\pi}{2}m} \right ): periodic poling coefficient. Am = 1 for m = 0 (no periodic poling);
   // and A_m = 2i/\pi for m = 1 (sinusoidal variation)
-  let periodic_poling_coeff = 1.0_f64;
+  let periodic_poling_coeff = if spdc.pp.is_none() { 1. } else { 2. / PI };
 
-  let p_bw = spdc_setup.pump_bandwidth;
-  let lamda_p = spdc_setup.pump.get_wavelength();
-  // TODO: ask krister why there's a factor of 2 here again. and why we're doing this for sigma
-  let sigma = 2. * fwhm_to_sigma(two_pi_c * (
-    1. / (lamda_p - 0.5 * p_bw)
-    - 1. / (lamda_p + 0.5 * p_bw)
-  ));
+  let lambda_p = spdc.pump.vacuum_wavelength();
+  let fwhm = spdc.pump_bandwidth;
+  let sigma = fwhm_to_spectral_width(lambda_p, fwhm);
 
-  let crystal_length = spdc_setup.crystal_setup.length;
-  let pump_power = spdc_setup.pump_average_power;
-  let deff = spdc_setup.crystal_setup.crystal.get_effective_nonlinear_coefficient();
+  let crystal_length = spdc.crystal_setup.length;
+  let pump_power = spdc.pump_average_power;
+  let deff = spdc.crystal_setup.crystal.get_effective_nonlinear_coefficient();
 
-  let wp = *(spdc_setup.pump.waist / M);
-  let wp_sq = (wp.x * wp.y) * M * M;
-  let ws = *(spdc_setup.signal.waist / M);
-  let ws_sq = (ws.x * ws.y) * M * M;
-  let wi = *(spdc_setup.idler.waist / M);
-  let wi_sq = (wi.x * wi.y) * M * M;
+  let wp_sq = spdc.pump.waist().norm_sqr();
+  let ws_sq = spdc.signal.waist().norm_sqr();
+  let wi_sq = spdc.idler.waist().norm_sqr();
 
-  let theta_i_e = *(spdc_setup.idler.get_external_theta(&spdc_setup.crystal_setup) / RAD);
-  let sec_i = 1. / f64::cos(theta_i_e);
-  let theta_s_e = *(spdc_setup.signal.get_external_theta(&spdc_setup.crystal_setup) / RAD);
-  let sec_s = 1. / f64::cos(theta_s_e);
+  let theta_i_e = spdc.idler.theta_external(&spdc.crystal_setup);
+  let sec_i = sec(theta_i_e);
+  let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
+  let sec_s = sec(theta_s_e);
 
-  let l_s = spdc_setup.signal.get_wavelength();
-  let l_i = spdc_setup.idler.get_wavelength();
-  let n_s = spdc_setup.crystal_setup.get_index_along(l_s, spdc_setup.signal.get_direction(), &spdc_setup.signal.get_type());
-  let n_i = spdc_setup.crystal_setup.get_index_along(l_i, spdc_setup.idler.get_direction(), &spdc_setup.idler.get_type());
+  let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
+  let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
 
-  let constants = (8. / (2. * PI).sqrt())
-    * degeneracy_factor.powi(2)
-    * periodic_poling_coeff.powi(2) / (EPS_0 * C_);
+  // let constants = (8. / (2. * PI).sqrt())
+  //   * degeneracy_factor.powi(2)
+  //   * periodic_poling_coeff.powi(2) / (EPS_0 * C_);
 
-  let start = (constants / (l_s * l_i * sq(n_s * n_i))) * sec_s * sec_i;
-  start * sq(crystal_length * deff) * wp_sq * ws_sq * wi_sq * pump_power / sigma
+  // let start = (constants / (l_s * l_i * sq(n_s * n_i))) * sec_s * sec_i;
+  // start * sq(crystal_length * deff) * wp_sq * ws_sq * wi_sq * pump_power / sigma
+
+  let lomega = omega_s * omega_i / sq(n_s * n_i) / RAD / RAD;
+  let constants = (degeneracy_factor * periodic_poling_coeff).powi(2)
+    / (8. * PI.powi(6) * PI2.sqrt() * C_ * C_ * C_ * EPS_0);
+  let eta = constants * sec_s * sec_i
+    * sq(deff * crystal_length)
+    * wp_sq * ws_sq * wi_sq * pump_power / sigma;
+  PI2.powi(4) * lomega * eta / RAD
 }
 
 /// calculate the phasematching
@@ -443,7 +443,7 @@ fn calc_coincidence_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Compl
 }
 
 #[allow(non_snake_case)]
-fn phasematch_function_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> Complex<f64> {
+pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> Meter4<Complex<f64>> {
   // crystal length
   let L = spdc.crystal_setup.length;
 
@@ -690,7 +690,8 @@ fn phasematch_function_fiber_coupling(omega_s: Frequency, omega_i: Frequency, sp
   // if divisions > 1000 {
   //   println!("Would have run integrator with {} divisions", divisions);
   // }
-  0.5 * integrator.integrate(-1., 1., steps.unwrap_or_else(|| integration_steps_best_guess(L)))
+  let result = 0.5 * integrator.integrate(-1., 1., steps.unwrap_or_else(|| integration_steps_best_guess(L)));
+  Meter4::new(result)
 }
 
 #[cfg(test)]

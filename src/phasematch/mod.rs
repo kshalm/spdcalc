@@ -2,7 +2,7 @@ use crate::{*, utils::vacuum_wavelength_to_frequency};
 use math::*;
 use dim::{ucum::{C_, ONE, M, Unitless}};
 
-pub fn pump_waist_bandwidth_frequency(pump_wavelength: Wavelength, fwhm: Wavelength) -> Frequency {
+pub fn fwhm_to_spectral_width(pump_wavelength: Wavelength, fwhm: Wavelength) -> Frequency {
   let diff = pump_wavelength - 0.5 * fwhm;
   let sum = pump_wavelength + 0.5 * fwhm;
   let omega_high = vacuum_wavelength_to_frequency(diff);
@@ -12,19 +12,21 @@ pub fn pump_waist_bandwidth_frequency(pump_wavelength: Wavelength, fwhm: Wavelen
   )
 }
 
-pub fn pump_spectral_amplitude(spdc : &SPDC, omega : Frequency) -> Unitless<f64> {
+pub fn pump_spectral_amplitude(omega : Frequency, spdc : &SPDC) -> f64 {
   let lambda_p = spdc.pump.vacuum_wavelength();
   let omega_0 = spdc.pump.frequency();
   let delta_omega = omega - omega_0;
 
   // convert from wavelength to \omega
-  let waist = pump_waist_bandwidth_frequency(lambda_p, spdc.pump.waist().fwhm().0);
+  let fwhm = spdc.pump_bandwidth;
+  let waist = fwhm_to_spectral_width(lambda_p, fwhm);
   let x = delta_omega / waist;
 
   // TODO: what is Ao
   // I = Io exp(-2 delta_omega / waist)
+  //
   // so amplitude is: Ao exp(- delta_omega / waist)
-  (-x * x).exp() * ONE
+  (-x * x).exp()
 }
 
 /// Calculate the pump spectrum

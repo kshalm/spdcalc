@@ -66,6 +66,6 @@ impl JointSpectrum {
   }
 
   pub fn schmidt_number(&self) -> Result<f64, SPDCError> {
-    schmidt_number(self)
+    schmidt_number(&self.amplitudes)
   }
 }

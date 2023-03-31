@@ -79,7 +79,7 @@ impl PumpConfig {
       0. * RAD,
       0. * RAD,
       self.wavelength_nm * NANO * M,
-      BeamWaist::from_fwhm(self.bandwidth_nm * NANO * M)
+      self.waist_um * MICRO * M
     ).into()
   }
 }
@@ -165,6 +165,7 @@ impl SPDCConfig {
   pub fn try_as_spdc(self) -> Result<SPDC, SPDCError> {
     let crystal_theta_autocalc = self.crystal.theta_deg.is_auto();
     let signal_waist_position_um = self.signal.waist_position_um.clone();
+    let pump_bandwidth = self.pump.bandwidth_nm * NANO * M;
     let pump_average_power = self.pump.average_power_mw * MILLIW;
     let mut crystal_setup : CrystalSetup = self.crystal.into();
     let pump = self.pump.as_beam(&crystal_setup);
@@ -204,6 +205,7 @@ impl SPDCConfig {
       signal,
       idler,
       pump,
+      pump_bandwidth,
       pump_average_power,
       periodic_poling,
       signal_waist_position,
@@ -278,9 +280,10 @@ mod test {
         0. * DEG,
         0. * DEG,
         775. * NANO * M,
-        4.543871631540902e-9 * M
+        100. * MICRO * M
       ).into();
       let pump_average_power = 1. * MILLIW;
+      let pump_bandwidth = 5.35 * NANO * M;
       let periodic_poling = None;
       let signal_waist_position = -0.0006073170564963904 * M;
       let idler_waist_position = -0.0006073170564963904 * M;
@@ -289,6 +292,7 @@ mod test {
         signal,
         idler,
         pump,
+        pump_bandwidth,
         pump_average_power,
         periodic_poling,
         signal_waist_position,
@@ -330,7 +334,7 @@ mod test {
     let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
 
     let actual = spdc.crystal_setup.theta;
-    let expected = 52.7289457218103 * DEG;
+    let expected = 0.920293713950949 * RAD;
     assert_eq!(actual, expected);
   }
 
@@ -368,7 +372,7 @@ mod test {
     let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
 
     let actual = spdc.pp.unwrap().period;
-    let expected = 46.5203285006243 * MICRO * M;
+    let expected = 46.52032850062398 * MICRO * M;
     assert_eq!(actual, expected);
   }
 }
