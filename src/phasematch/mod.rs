@@ -56,9 +56,12 @@ pub fn integration_steps_best_guess(crystal_length: Distance) -> usize {
   // of steps based on the length of the crystal. Errors
   // get introduced if there are too many steps, or too few.
   let zslice = 1e-4 * clamp((*(crystal_length/M) / 2.5e-3).sqrt(), 0., 5.);
-  let mut slices = (*(crystal_length/M) / zslice) as usize;
+  let slices = (*(crystal_length/M) / zslice) as usize;
   max(slices + slices % 2 - 2, 4) // nearest even.. minimum 4
 }
+
+mod normalization;
+pub use normalization::*;
 
 mod delta_k;
 pub use delta_k::*;

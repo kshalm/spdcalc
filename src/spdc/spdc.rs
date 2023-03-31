@@ -73,6 +73,32 @@ impl SPDC {
     )
   }
 
+  pub fn with_swapped_signal_idler(self) -> Self {
+    let Self {
+      mut crystal_setup,
+      signal,
+      idler,
+      pump,
+      pump_bandwidth,
+      pump_average_power,
+      pp,
+      signal_waist_position,
+      idler_waist_position,
+    } = self;
+    crystal_setup.pm_type = crystal_setup.pm_type.inverse();
+    Self {
+      crystal_setup,
+      signal: idler.as_beam().into(),
+      idler: signal.as_beam().into(),
+      pump,
+      pump_bandwidth,
+      pump_average_power,
+      pp,
+      signal_waist_position: idler_waist_position,
+      idler_waist_position: signal_waist_position,
+    }
+  }
+
   pub fn joint_spectrum(&self, integration_steps : Option<usize>) -> JointSpectrum {
     JointSpectrum::new(self.clone(), integration_steps)
   }

@@ -1,4 +1,4 @@
-use crate::math::*;
+use crate::{math::*, utils::frequency_to_wavenumber};
 use crate::*;
 use super::*;
 use dim::ucum::{RAD, M, J, S};
@@ -47,7 +47,7 @@ fn calc_singles_phasematch(spdc_setup : &SPDCSetup) -> (Complex<f64>, f64) {
 }
 
 #[allow(non_snake_case)]
-fn calc_singles_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Complex<f64>, f64) {
+pub fn calc_singles_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Complex<f64>, f64) {
   // crystal length
   let M2 = M * M; // meters squared
   let L = spdc_setup.crystal_setup.length;
@@ -254,6 +254,192 @@ fn calc_singles_phasematch_fiber_coupling(spdc_setup : &SPDCSetup) -> (Complex<f
   (result, 1.)
 }
 
+#[allow(non_snake_case)]
+pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> PerMeter3<f64> {
+  let M2 = M * M; // meters squared
+  // crystal length
+  let L = spdc.crystal_setup.length;
+
+  let theta_s = spdc.signal.theta_internal();
+  let phi_s = spdc.signal.phi();
+  let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
+
+  // Height of the collected spots from the axis.
+  let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
+
+  let Ws_SQ = spdc.signal.waist().x_by_y_sqr();
+
+  let Wx_SQ = sq(spdc.pump.waist().x);
+  let Wy_SQ = sq(spdc.pump.waist().y);
+
+  // TODO: should i be doing this?
+  let omega_p = omega_s + omega_i; // spdc.pump.frequency();
+  let n_p = spdc.pump.refractive_index(omega_p, &spdc.crystal_setup);
+  let k_p = frequency_to_wavenumber(omega_p, n_p);
+  let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
+  let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
+  let k_s = frequency_to_wavenumber(omega_s, n_s);
+  let k_i = frequency_to_wavenumber(omega_i, n_i);
+
+  let PHI_s = cos(theta_s_e).powi(-2);
+
+  let z0 = 0. * M; //put pump in middle of the crystal
+  let z0s = spdc.signal_waist_position;
+
+  let RHOpx = tan(spdc.pump.walkoff_angle(&spdc.crystal_setup));
+
+  // Now calculate the the coeficients that get repeatedly used. This is from
+  // Karina's code. Assume a symmetric pump waist (Wx = Wy)
+  let ks_f = k_s / n_s; // exact
+  let SIN_THETA_s_e = sin(theta_s_e); // 1e-9
+  let COS_PHI_s = cos(phi_s);
+  let GAM2s = -0.25 * Ws_SQ; // exact
+  let GAM1s = GAM2s * PHI_s; // 1e-10
+  let GAM3s = -2. * ks_f * GAM1s * SIN_THETA_s_e * COS_PHI_s; // 1e-10
+  let GAM4s = -0.5 * ks_f * SIN_THETA_s_e * COS_PHI_s * GAM3s; // 1e-5
+  let zhs = z0s + hs * SIN_THETA_s_e * COS_PHI_s; // 1e-13
+  let DEL2s = (0.5 / ks_f) * zhs; // 1e-9
+  let DEL1s = DEL2s * PHI_s; // 1e-9
+  let DEL3s = -hs - zhs * PHI_s * SIN_THETA_s_e * COS_PHI_s; // 1e-11
+  let KpKs = *(k_p * k_s*M2/RAD/RAD); // exact
+  let pp_factor = spdc.pp.map_or(0./M, |p| p.pp_factor());
+
+  let dksi = k_s + k_i + PI2 * RAD * pp_factor;
+  let C7 = k_p - dksi; // 1e-7
+  let C3 = L * C7; // 1e-10
+  let C4 = L * (1./k_i - 1./k_p); // 1e-13
+  let C5 = k_s/k_p; // exact
+  let C9 = Complex::new(*(k_p * Wx_SQ / M / RAD), 0.); // exact
+  let C10 = Complex::new(*(k_p * Wy_SQ / M / RAD), 0.); // exact
+  let LRho = L * RHOpx; // DIFFERENT SIGN and 1e-5
+  let LRho_sq = LRho * LRho;
+
+  let alpha1 = 4. * KpKs * Complex::new(*(GAM1s/M2), -*(DEL1s/M2*RAD));
+  let alpha2 = 4. * KpKs * Complex::new(*(GAM2s/M2), -*(DEL2s/M2*RAD));
+  let alpha3 = Complex::new(*(GAM3s/RAD/M), -*(DEL3s/M));
+
+  let k_p_L = k_p * L;
+  let KpKs4inv = 1. / (4. * KpKs);
+  let imag = Complex::i();
+
+  let fn_z = |z1 : f64, z2 : f64, _index| {
+
+    let B0 = z1 - z2;
+
+    // TODO: krister broke this out of the integral so that repeat calculations didn't happen
+    // over z1. Might not be necessary though.
+    let A1 = 2. * z0 - L * z1;
+    let B1 = 1. - z1;
+    let B3 = 1. + z1;
+
+    let A2 = 2. * z0 - L * z2;
+    let B2 = 1. - z2;
+    let B4 = 1. + z2;
+
+    let B6a = *(C4 * B0 * RAD / M2);
+    let gamma1 = *(-k_p_L * B1 / RAD + k_s * A1 / RAD) * imag; // exact
+    let gamma2 = *(-k_p_L * B2 / RAD + k_s * A2 / RAD) * imag; // exact
+    let Ha = alpha1 + gamma1;
+    let Hb = alpha2 + gamma1;
+    let Hc = alpha1.conj() - gamma2;
+    let Hd = alpha2.conj() - gamma2;
+
+    let ks = *(k_s * M / RAD);
+
+    let AA1 = (Ha - C9 * ks) * KpKs4inv;
+    let AA2 = (Hc - C9 * ks) * KpKs4inv;
+    let BB1 = (Hb - C10 * ks) * KpKs4inv;
+    let BB2 = (Hd - C10 * ks) * KpKs4inv;
+
+    // TODO: verify with krister that this is correct in the original version
+    let X11 = C9 * ks - Ha;
+    let X12 = (Hc - C9 * ks) * imag;
+    let Y21 = C10 * ks - Hb;
+    let Y22 = (Hd - C10 * ks) * imag;
+
+    // Now to calculate the term EE
+    // EE = 1/4*(-  2*Wx^2 + I B6a + C5/X11*(C9 - I A1)^2 - I C5/X12*(C9 + I A2)^2  )
+    let EE = 0.25 * (
+      - Complex::new(2. * (*(Wx_SQ / M2)), 0.)
+      + imag * B6a
+      + (*C5) / X11 * sq(C9 - imag * (*(A1/M)))
+      - imag * (*C5) / X12 * sq(C9 + imag * (*(A2/M)))
+    );
+
+    // Now to calculate the term FF
+    // FF = 1/4*(-2*Wy^2 + I B6a - C5/Y21 *(I C10 + A1)^2 + I C5/Y22 *(-I C10 + A2)^2)
+    let FF = 0.25 * (
+      - Complex::new(2. * (*(Wy_SQ / M2)), 0.)
+      + imag * B6a
+      - (*C5) / Y21 * sq(imag * C10 + (*(A1/M)))
+      + imag * (*C5) / Y22 * sq(-imag * C10 + (*(A2/M)))
+    );
+
+    // Now to calculate the term GG
+    // GG = ks*( \[Alpha]3c/X12 *(I C9 - A2)  +  \[Alpha]3/X11 *(-C9 + I A1));
+    let GG = ks * (
+      alpha3.conj() / X12 * (imag * C9 - (*(A2/M)))
+      + alpha3 / X11 * (-C9 + imag * (*(A1/M)))
+    );
+
+    // Now to calculate the term HH
+    // HH = L * \[Rho]/2 *(I B0 + ks*(B3/Y21 *(-I C10 - A1)  +  B4/Y22 *(C10 + I A2)));
+    let HH = 0.5 * (*(LRho / M)) * (
+      imag * B0
+      + ks * (
+        B3 / Y21 * (-imag * C10 - (*(A1/M)))
+        + B4 / Y22 * (C10 + imag * (*(A2/M)))
+      )
+    );
+
+    // Now to calculate the term II
+    // IIrho = 1/4* ks*kp*L^2*\[Rho]^2 ( -B3^2/Y21 +I B4^2/Y22)
+    // IIgam = kp*ks*(\[Alpha]3^2/X11 - I \[Alpha]3c^2/X12)
+    // IIdelk = 2 \[CapitalGamma]4s + 0.5 I (C3*B0)
+    // II = IIrho + IIgam + IIdelk
+    let IIrho = 0.25 * KpKs * (*(LRho_sq / M2)) * (-B3.powi(2) / Y21 + imag * B4.powi(2) / Y22);
+    let IIgam = KpKs * (sq(alpha3) / X11 - imag * sq(alpha3.conj()) / X12);
+    let IIdelk = 2. * *(GAM4s/RAD/RAD) + 0.5 * imag * *(C3/RAD) * B0;
+    let II = IIrho + IIgam + IIdelk;
+
+    // Now calculate terms in the numerator
+    // Exp(-(GG^2/(4 EE)) - HH^2/(4 FF) + II)
+    let numerator = (-sq(GG) / (4. * EE) - sq(HH) / (4. * FF) + II).exp();
+
+    // Now calculate terms in the Denominator
+    // 8 * Sqrt[AA1 BB1 AA2 BB2 EE FF]
+    let denominator = 8. * (AA1 * BB1 * AA2 * BB2 * EE * FF).sqrt();
+
+    // Take into account apodized crystals
+    // Apodization 1/e^2
+    // @TODO: From krister: Not sure how to correctly handle the apodization in the double length integral
+    let pmzcoeff = spdc.pp.map_or(
+      // if no periodic poling return 1.
+      1.,
+      // otherwise check apodization
+      |poling| poling.apodization.map_or(
+        // again if no apodization...
+        1.,
+        // convert from 0->L to -1 -> 1 for the integral over z
+        |ap| {
+          let bw = 2. * fwhm_to_sigma(ap.fwhm) / L;
+          f64::exp(-0.5 * ((z1/bw).powi(2) + (z2/bw).powi(2)))
+        }
+      )
+    );
+
+    // Now calculate the full term in the integral.
+    return pmzcoeff * numerator / denominator;
+  };
+
+  let integrator = SimpsonIntegration2D::new(fn_z);
+
+  // h(\omega_s, \omega_i) = \frac{1}{4} \int_{-1}^{1} d\xi_1 \int_{-1}^{1} d\xi_2 \psi(\xi_1, \xi_2).
+  let result = 0.25 * integrator.integrate((-1., 1.), (-1., 1.), steps.unwrap_or_else(|| integration_steps_best_guess(L))).norm();
+
+  PerMeter3::new(result)
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -262,6 +448,51 @@ mod tests {
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * ((expected - actual) / expected).abs()
+  }
+
+  #[test]
+  fn phasematch_singles_refactor_test(){
+    let json = serde_json::json!({
+      "crystal": {
+        "name": "BBO_1",
+        "pm_type": "e->eo",
+        "phi_deg": 0,
+        "theta_deg": 0,
+        "length_um": 2000,
+        "temperature_c": 20
+      },
+      "pump": {
+        "wavelength_nm": 775,
+        "waist_um": 100,
+        "bandwidth_nm": 5.35,
+        "average_power_mw": 1
+      },
+      "signal": {
+        "wavelength_nm": 1550,
+        "phi_deg": 0,
+        "theta_external_deg": 0,
+        "waist_um": 100,
+        "waist_position_um": "auto"
+      },
+      "idler": "auto",
+    });
+
+    let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+    let spdc_setup = spdc.clone().into();
+
+    let expected = calc_singles_phasematch_fiber_coupling(&spdc_setup);
+    // dbg!("--------------BREAK-------------");
+    let actual = phasematch_singles_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, Some(200))/PerMeter3::new(1.);
+    dbg!(actual);
+    let actual2 = phasematch_singles_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, Some(300))/PerMeter3::new(1.);
+    dbg!(percent_diff(*actual2, *actual));
+
+    // for steps in (300..400).step_by(2) {
+    //   dbg!(steps, (phasematch_singles_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, Some(steps))/PerMeter3::new(1.)).to_polar());
+    // }
+
+    assert_eq!(*actual, expected.0.norm());
   }
 
   #[test]

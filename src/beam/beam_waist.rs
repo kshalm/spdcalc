@@ -1,6 +1,6 @@
 use dim::{ucum::{Meter2, M}};
 
-use crate::{Wavelength, math::{fwhm_to_waist, waist_to_fwhm}};
+use crate::{Wavelength};
 
 /// Beam waist
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -36,15 +36,15 @@ impl BeamWaist {
     }
   }
 
-  pub fn norm(&self) -> Wavelength {
+  pub fn x_by_y(&self) -> Wavelength {
     if self.x == self.y {
       self.x
     } else {
-      (self.norm_sqr() / Meter2::new(1.)).sqrt() * M
+      (self.x_by_y_sqr() / Meter2::new(1.)).sqrt() * M
     }
   }
 
-  pub fn norm_sqr(&self) -> Meter2<f64> {
+  pub fn x_by_y_sqr(&self) -> Meter2<f64> {
     self.x * self.y
   }
 }

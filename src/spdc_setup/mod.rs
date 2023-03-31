@@ -11,6 +11,8 @@ use std::f64::consts::FRAC_PI_2;
 
 mod spdc_config;
 pub use spdc_config::*;
+mod convert;
+pub use convert::*;
 
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 

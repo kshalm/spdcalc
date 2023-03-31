@@ -22,6 +22,7 @@ pub fn direction_from_polar(phi : Angle, theta : Angle) -> Direction {
 pub struct PumpBeam(Beam);
 impl PumpBeam {
   pub fn new(beam: Beam) -> Self { Self(beam) }
+  pub fn as_beam(self) -> Beam { self.0 }
 }
 impl From<PumpBeam> for Beam {
   fn from(value: PumpBeam) -> Self {
@@ -52,6 +53,7 @@ impl DerefMut for PumpBeam {
 pub struct SignalBeam(Beam);
 impl SignalBeam {
   pub fn new(beam: Beam) -> Self { Self(beam) }
+  pub fn as_beam(self) -> Beam { self.0 }
 }
 impl From<SignalBeam> for Beam {
   fn from(value: SignalBeam) -> Self {
@@ -80,6 +82,7 @@ impl DerefMut for SignalBeam {
 pub struct IdlerBeam(Beam);
 impl IdlerBeam {
   pub fn new(beam: Beam) -> Self { Self(beam) }
+  pub fn as_beam(self) -> Beam { self.0 }
   pub fn try_new_optimum(
     signal : &SignalBeam,
     pump : &PumpBeam,

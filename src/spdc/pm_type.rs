@@ -22,6 +22,15 @@ pub enum PMType {
 }
 
 impl PMType {
+  /// Inverse the polarization of the products
+  pub fn inverse(&self) -> Self {
+    match self {
+      PMType::Type2_e_eo => PMType::Type2_e_oe,
+      PMType::Type2_e_oe => PMType::Type2_e_eo,
+      _ => *self
+    }
+  }
+
   pub fn to_str(&self) -> &'static str {
     match self {
       PMType::Type0_o_oo => "Type0_o_oo",

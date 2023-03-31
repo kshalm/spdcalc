@@ -7,6 +7,11 @@ use na::*;
 
 pub use num::Complex;
 
+derived!(ucum, UCUM: JsiNorm = Second * Meter * Meter * Meter * Meter * Meter * Meter * Meter * Meter / Radian / Radian);
+derived!(ucum, UCUM: JsiSinglesNorm = Second * Meter * Meter * Meter * Meter * Meter * Meter / Radian / Radian);
+derived!(ucum, UCUM: PerMeter3 = PerMeter * PerMeter * PerMeter);
+derived!(ucum, UCUM: PerMeter4 = PerMeter * PerMeter * PerMeter * PerMeter);
+
 /// Angles all in radians
 pub type Angle = ucum::Radian<f64>;
 
