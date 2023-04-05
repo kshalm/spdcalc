@@ -45,6 +45,19 @@ pub struct CrystalConfig {
   pub temperature_c: f64,
 }
 
+impl Default for CrystalConfig {
+  fn default() -> Self {
+    Self {
+      name: Crystal::KTP,
+      pm_type: PMType::Type2_e_eo,
+      phi_deg: 0.,
+      theta_deg: AutoCalcParam::Param(90.),
+      length_um: 2_000.,
+      temperature_c: 20.,
+    }
+  }
+}
+
 /// Converts without autocalculating theta
 impl From<CrystalConfig> for CrystalSetup {
   fn from(cfg: CrystalConfig) -> Self {
@@ -74,6 +87,18 @@ pub struct PumpConfig {
   pub spectrum_threshold: Option<f64>,
 }
 
+impl Default for PumpConfig {
+  fn default() -> Self {
+    Self {
+      wavelength_nm: 775.,
+      waist_um: 100.,
+      bandwidth_nm: 5.53,
+      average_power_mw: 1.,
+      spectrum_threshold: Some(1e-2),
+    }
+  }
+}
+
 impl PumpConfig {
   pub fn as_beam(self, crystal_setup: &CrystalSetup) -> PumpBeam {
     Beam::new(
@@ -97,6 +122,19 @@ pub struct SignalConfig {
   pub waist_um: f64,
   #[serde(default)]
   pub waist_position_um: AutoCalcParam<f64>,
+}
+
+impl Default for SignalConfig {
+  fn default() -> Self {
+    Self {
+      wavelength_nm: 1550.,
+      phi_deg: 0.,
+      theta_deg: Some(0.),
+      theta_external_deg: None,
+      waist_um: 100.,
+      waist_position_um: AutoCalcParam::default(),
+    }
+  }
 }
 
 impl SignalConfig {
@@ -221,6 +259,18 @@ impl SPDCConfig {
   }
 }
 
+impl Default for SPDCConfig {
+  fn default() -> Self {
+    Self {
+      crystal: CrystalConfig::default(),
+      pump: PumpConfig::default(),
+      signal: SignalConfig::default(),
+      idler: AutoCalcParam::default(),
+      periodic_poling: MaybePeriodicPolingConfig::default(),
+      deff_pm_per_volt: 0.0,
+    }
+  }
+}
 
 #[cfg(test)]
 mod test {

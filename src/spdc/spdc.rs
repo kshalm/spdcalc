@@ -27,6 +27,12 @@ pub struct SPDC {
   pub deff: crate::MetersPerMilliVolt<f64>,
 }
 
+impl Default for SPDC {
+  fn default() -> Self {
+    super::SPDCConfig::default().try_as_spdc().unwrap()
+  }
+}
+
 impl SPDC {
   pub fn new(
     crystal_setup: CrystalSetup,
