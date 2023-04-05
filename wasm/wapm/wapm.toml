@@ -1,0 +1,14 @@
+[package]
+name = "wellcaffeinated/spdcalc"
+version = "0.1.0"
+description = "WASM package of SPDCalc"
+readme = "README.md"
+
+[[module]]
+name = "spdcalc"
+source = "spdcalc.wasm"
+abi = "wasi"
+
+[module.bindings]
+wit-bindgen = "0.2.0"
+wit-exports = "spdcalc.wai"

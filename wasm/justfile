@@ -1,0 +1,12 @@
+default: test-js
+
+build-wapm:
+  echo "Building locally"
+  cargo wapm -d --out-dir ./wapm
+
+build-js: build-wapm
+  wasmer-pack js ./wapm --out-dir ./js
+
+test-js: build-js
+  pnpm --dir {{justfile_directory()}}/js/package install
+  node js/index.mjs
