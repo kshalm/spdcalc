@@ -1,7 +1,7 @@
 use super::*;
 use crate::{CrystalSetup, Crystal, dim::{
-  f64prefixes::{MICRO, NANO},
-  ucum::{DEG, RAD, M, MILLIW}
+  f64prefixes::{MICRO, NANO, PICO},
+  ucum::{DEG, RAD, M, MILLIW, V}
 }, utils, Beam, BeamWaist, PumpBeam, SignalBeam, IdlerBeam, PMType, SPDCError};
 use serde::{Serialize, Deserialize};
 
@@ -70,6 +70,8 @@ pub struct PumpConfig {
   pub waist_um: f64,
   pub bandwidth_nm: f64,
   pub average_power_mw: f64,
+  /// If unset, defaults to 1e-2
+  pub spectrum_threshold: Option<f64>,
 }
 
 impl PumpConfig {
@@ -159,10 +161,13 @@ pub struct SPDCConfig {
   idler: AutoCalcParam<IdlerConfig>,
   #[serde(default)]
   periodic_poling: MaybePeriodicPolingConfig,
+  deff_pm_per_volt: f64,
 }
 
 impl SPDCConfig {
   pub fn try_as_spdc(self) -> Result<SPDC, SPDCError> {
+    let deff = self.deff_pm_per_volt * PICO * M / V;
+    let pump_spectrum_threshold = self.pump.spectrum_threshold.unwrap_or(1e-2);
     let crystal_theta_autocalc = self.crystal.theta_deg.is_auto();
     let signal_waist_position_um = self.signal.waist_position_um.clone();
     let pump_bandwidth = self.pump.bandwidth_nm * NANO * M;
@@ -207,9 +212,11 @@ impl SPDCConfig {
       pump,
       pump_bandwidth,
       pump_average_power,
+      pump_spectrum_threshold,
       periodic_poling,
       signal_waist_position,
       idler_waist_position,
+      deff
     ))
   }
 }
@@ -247,6 +254,7 @@ mod test {
         "waist_position_um": "auto"
       },
       "idler": "auto",
+      "deff_pm_per_volt": 1
     });
 
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
@@ -287,6 +295,8 @@ mod test {
       let periodic_poling = None;
       let signal_waist_position = -0.0006073170564963904 * M;
       let idler_waist_position = -0.0006073170564963904 * M;
+      let deff = 1. * PICO * M / V;
+      let pump_spectrum_threshold = 1e-2;
       SPDC::new(
         crystal_setup,
         signal,
@@ -294,9 +304,11 @@ mod test {
         pump,
         pump_bandwidth,
         pump_average_power,
+        pump_spectrum_threshold,
         periodic_poling,
         signal_waist_position,
         idler_waist_position,
+        deff
       )
     };
     dbg!(&actual);
@@ -328,6 +340,7 @@ mod test {
         "waist_position_um": "auto"
       },
       "idler": "auto",
+      "deff": 7.6,
     });
 
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
@@ -365,7 +378,8 @@ mod test {
       "idler": "auto",
       "periodic_poling": {
         "poling_period_um": "auto"
-      }
+      },
+      "deff": 7.6,
     });
 
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");

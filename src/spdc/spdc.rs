@@ -16,13 +16,15 @@ pub struct SPDC {
 
   pub pump_average_power : MilliWatt<f64>,
   pub pump_bandwidth: Wavelength,
-  /// Cutoff amplitude below which the phasematching will be considered zero
-  // pub pump_spectrum_threshold: f64,
+  /// Cutoff amplitude for the pump below which the phasematching will be considered zero
+  pub pump_spectrum_threshold: f64,
 
-  // Signal collection focus location on z axis. If None... autocalc
+  // Signal collection focus location on z axis.
   pub signal_waist_position : Distance,
-  // Idler collection focus location on z axis. If None... autocalc
+  // Idler collection focus location on z axis.
   pub idler_waist_position : Distance,
+  // effective nonlinear coefficient in m / mV
+  pub deff: crate::MetersPerMilliVolt<f64>,
 }
 
 impl SPDC {
@@ -33,9 +35,11 @@ impl SPDC {
     pump: PumpBeam,
     pump_bandwidth: Wavelength,
     pump_average_power: MilliWatt<f64>,
+    pump_spectrum_threshold: f64,
     pp: Option<PeriodicPoling>,
     signal_waist_position: Distance,
     idler_waist_position: Distance,
+    deff: crate::MetersPerMilliVolt<f64>,
   ) -> Self {
     Self {
       crystal_setup,
@@ -44,9 +48,11 @@ impl SPDC {
       pump,
       pump_bandwidth,
       pump_average_power,
+      pump_spectrum_threshold,
       pp,
       signal_waist_position,
       idler_waist_position,
+      deff
     }
   }
 
@@ -81,9 +87,11 @@ impl SPDC {
       pump,
       pump_bandwidth,
       pump_average_power,
+      pump_spectrum_threshold,
       pp,
       signal_waist_position,
       idler_waist_position,
+      deff,
     } = self;
     crystal_setup.pm_type = crystal_setup.pm_type.inverse();
     Self {
@@ -93,9 +101,11 @@ impl SPDC {
       pump,
       pump_bandwidth,
       pump_average_power,
+      pump_spectrum_threshold,
       pp,
       signal_waist_position: idler_waist_position,
       idler_waist_position: signal_waist_position,
+      deff,
     }
   }
 

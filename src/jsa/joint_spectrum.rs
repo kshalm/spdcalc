@@ -2,19 +2,29 @@ use super::*;
 
 pub fn jsa_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_steps: Option<usize>) -> Complex<f64> {
   let alpha = pump_spectral_amplitude(omega_s + omega_i, &spdc);
-  let f = phasematch_fiber_coupling(omega_s, omega_i, &spdc, integration_steps) / PerMeter4::new(1.);
-  *(alpha * f)
+  // check the threshold
+  if alpha < spdc.pump_spectrum_threshold {
+    Complex::new(0., 0.)
+  } else {
+    let f = phasematch_fiber_coupling(omega_s, omega_i, &spdc, integration_steps) / PerMeter4::new(1.);
+    *(alpha * f)
+  }
 }
 
 pub fn jsi_singles_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_steps: Option<usize>) -> f64 {
   let alpha = pump_spectral_amplitude(omega_s + omega_i, &spdc);
-  let fs = phasematch_singles_fiber_coupling(omega_s, omega_i, &spdc, integration_steps) / PerMeter3::new(1.);
-  // use crate::utils::frequency_to_vacuum_wavelength;
-  // let mut setup : SPDCSetup = spdc.clone().into();
-  // setup.signal.set_wavelength(frequency_to_vacuum_wavelength(omega_s));
-  // setup.idler.set_wavelength(frequency_to_vacuum_wavelength(omega_s));
-  // let fs = calc_singles_phasematch_fiber_coupling(&setup).0;
-  *(alpha.powi(2) * fs)
+  // check the threshold
+  if alpha < spdc.pump_spectrum_threshold {
+    0.
+  } else {
+    let fs = phasematch_singles_fiber_coupling(omega_s, omega_i, &spdc, integration_steps) / PerMeter3::new(1.);
+    // use crate::utils::frequency_to_vacuum_wavelength;
+    // let mut setup : SPDCSetup = spdc.clone().into();
+    // setup.signal.set_wavelength(frequency_to_vacuum_wavelength(omega_s));
+    // setup.idler.set_wavelength(frequency_to_vacuum_wavelength(omega_s));
+    // let fs = calc_singles_phasematch_fiber_coupling(&setup).0;
+    *(alpha.powi(2) * fs)
+  }
 }
 
 pub struct JointSpectrum {
@@ -40,8 +50,14 @@ impl JointSpectrum {
   ///
   /// Technically the units should be 1/sqrt(s)/(rad/s)
   pub fn jsa(&self, omega_s: Frequency, omega_i: Frequency) -> Complex<f64> {
-    let n = jsi_normalization(omega_s, omega_i, &self.spdc) / JsiNorm::new(1.);
-    n.sqrt() * jsa_raw(omega_s, omega_i, &self.spdc, self.integration_steps)
+    let jsa = jsa_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
+    use num::Zero;
+    if jsa == Complex::zero() {
+      Complex::zero()
+    } else {
+      let n = jsi_normalization(omega_s, omega_i, &self.spdc) / JsiNorm::new(1.);
+      n.sqrt() * jsa
+    }
   }
 
   /// Get the normalized value of the JSA at specified signal/idler frequencies
@@ -56,8 +72,14 @@ impl JointSpectrum {
   /// Units are: per second per (rad/s)^2, which when integrated over
   /// gives a value proportional to the count rate (counts/s)
   pub fn jsi(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
-    let n = jsi_normalization(omega_s, omega_i, &self.spdc) / JsiNorm::new(1.);
-    *n * jsa_raw(omega_s, omega_i, &self.spdc, self.integration_steps).norm_sqr()
+    let jsa = jsa_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
+    use num::Zero;
+    if jsa == Complex::zero() {
+      0.
+    } else {
+      let n = jsi_normalization(omega_s, omega_i, &self.spdc) / JsiNorm::new(1.);
+      *n * jsa.norm_sqr()
+    }
   }
 
   /// Get the normalized value of the JSI at specified signal/idler frequencies
@@ -71,8 +93,13 @@ impl JointSpectrum {
   ///
   /// Technically the units should be 1/sqrt(s)/(rad/s)
   pub fn jsa_singles(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
-    let n = jsi_singles_normalization(omega_s, omega_i, &self.spdc) / JsiSinglesNorm::new(1.);
-    n.sqrt() * jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integration_steps).sqrt()
+    let jsi = jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
+    if jsi == 0. {
+      0.
+    } else {
+      let n = jsi_singles_normalization(omega_s, omega_i, &self.spdc) / JsiSinglesNorm::new(1.);
+      (n * jsi).sqrt()
+    }
   }
 
   /// Get the normalized value of the JSA Singles at specified signal/idler frequencies
@@ -87,8 +114,13 @@ impl JointSpectrum {
   /// Units are: per second per (rad/s)^2, which when integrated over
   /// gives a value proportional to the count rate (counts/s)
   pub fn jsi_singles(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
-    let n = jsi_singles_normalization(omega_s, omega_i, &self.spdc) / JsiSinglesNorm::new(1.);
-    *n * jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integration_steps)
+    let jsi = jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
+    if jsi == 0. {
+      0.
+    } else {
+      let n = jsi_singles_normalization(omega_s, omega_i, &self.spdc) / JsiSinglesNorm::new(1.);
+      *n * jsi
+    }
   }
 
   /// Get the normalized value of the JSI Singles at specified signal/idler frequencies
@@ -126,7 +158,7 @@ mod tests {
       "pump": {
         "wavelength_nm": 775,
         "waist_um": 200,
-        "bandwidth_nm": 5.35,
+        "bandwidth_nm": 0.5,
         "average_power_mw": 300
       },
       "signal": {
@@ -139,8 +171,37 @@ mod tests {
       "idler": "auto",
       "periodic_poling": {
         "poling_period_um": "auto"
-      }
+      },
+      "deff_pm_per_volt": 7.6
     });
+
+    // let json = serde_json::json!({
+    //   "crystal": {
+    //     "name": "KTP",
+    //     "pm_type": "e->eo",
+    //     "phi_deg": 0,
+    //     "theta_deg": 0,
+    //     "length_um": 30_000,
+    //     "temperature_c": 20
+    //   },
+    //   "pump": {
+    //     "wavelength_nm": 775,
+    //     "waist_um": 50,
+    //     "bandwidth_nm": 5.35,
+    //     "average_power_mw": 500
+    //   },
+    //   "signal": {
+    //     "wavelength_nm": 1550,
+    //     "phi_deg": 0,
+    //     "theta_external_deg": 0,
+    //     "waist_um": 50,
+    //     "waist_position_um": "auto"
+    //   },
+    //   "idler": "auto",
+    //   "periodic_poling": {
+    //     "poling_period_um": "auto"
+    //   }
+    // });
 
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
     let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");

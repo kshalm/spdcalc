@@ -28,17 +28,17 @@ argmin = "0.7"
 ndarray = "0.15"
 serde = "^1.0"
 serde_derive = "^1.0"
-serde_json = "1.0"
 serde_with = "2.3"
 regex = "1.7"
 lazy_static = "1.4"
 
-[features]
-wasm-bindgen = ["argmin/wasm-bindgen"]
+# [features]
+# wasm-bindgen = ["argmin/wasm-bindgen"]
 
 [dev-dependencies]
 criterion = "0.2"
 float-cmp = "0.5"
+serde_json = "1.0"
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.

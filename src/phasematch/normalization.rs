@@ -18,7 +18,7 @@ fn common_norm(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> CommonNo
 
   let crystal_length = spdc.crystal_setup.length;
   let pump_power = spdc.pump_average_power;
-  let deff = spdc.crystal_setup.crystal.get_effective_nonlinear_coefficient();
+  let deff = spdc.deff;
 
   let wp_sq = spdc.pump.waist().x_by_y_sqr();
 
