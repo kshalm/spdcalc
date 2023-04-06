@@ -1,5 +1,5 @@
-use dim::ucum::{MilliWatt, DEG};
-use crate::{SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Wavelength, Distance, optimum_poling_period, SPDCError, jsa::JointSpectrum};
+use dim::ucum::{MilliWatt, DEG, Hertz};
+use crate::{SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Wavelength, Distance, optimum_poling_period, SPDCError, jsa::{JointSpectrum, FrequencySpace}};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SPDC {
@@ -8,11 +8,6 @@ pub struct SPDC {
   pub pump :           PumpBeam,
   pub crystal_setup :  CrystalSetup,
   pub pp :             Option<PeriodicPoling>,
-
-  /// The amount the fiber is offset from the beam
-  // pub signal_fiber_theta_offset : Angle,
-  /// The amount the fiber is offset from the beam
-  // pub idler_fiber_theta_offset : Angle,
 
   pub pump_average_power : MilliWatt<f64>,
   pub pump_bandwidth: Wavelength,
@@ -117,5 +112,25 @@ impl SPDC {
 
   pub fn joint_spectrum(&self, integration_steps : Option<usize>) -> JointSpectrum {
     JointSpectrum::new(self.clone(), integration_steps)
+  }
+
+  /// Get the coincidence counts over specified frequency ranges
+  pub fn counts_coincidences<T: Into<FrequencySpace>>(&self, ranges: T, integration_steps : Option<usize>) -> Hertz<f64> {
+    super::counts_coincidences(self, ranges.into(), integration_steps)
+  }
+
+  /// Get the singles counts for the signal over specified frequency ranges
+  pub fn counts_singles_signal<T: Into<FrequencySpace>>(&self, ranges: T, integration_steps : Option<usize>) -> Hertz<f64> {
+    super::counts_singles_signal(self, ranges.into(), integration_steps)
+  }
+
+  /// Get the singles counts for the idler over specified frequency ranges
+  pub fn counts_singles_idler<T: Into<FrequencySpace>>(&self, ranges: T, integration_steps : Option<usize>) -> Hertz<f64> {
+    super::counts_singles_idler(self, ranges.into(), integration_steps)
+  }
+
+  /// Get the symmetric, signal, and idler efficiencies over specified frequency ranges
+  pub fn efficiencies<T: Into<FrequencySpace>>(&self, ranges: T, integration_steps : Option<usize>) -> super::Efficiencies {
+    super::efficiencies(self, ranges.into(), integration_steps)
   }
 }

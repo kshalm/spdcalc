@@ -31,6 +31,11 @@ pub fn frequency_to_wavenumber(omega: Frequency, n: RIndex) -> Wavenumber {
   n * omega / C_
 }
 
+/// Get the frequency of light with wavenumber in a medium with refractive index
+pub fn wavenumber_to_frequency(k: Wavenumber, n: RIndex) -> Frequency {
+  k * C_ / n
+}
+
 /// Get the frequency of light at wavelength in a medium with refractive index
 pub fn wavelength_to_frequency(lambda: Wavelength, n: RIndex) -> Frequency {
   PI2 * RAD * C_ / (lambda * n)

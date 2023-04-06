@@ -11,6 +11,7 @@ derived!(ucum, UCUM: JsiNorm = Second * Meter * Meter * Meter * Meter * Meter * 
 derived!(ucum, UCUM: JsiSinglesNorm = Second * Meter * Meter * Meter * Meter * Meter * Meter / Radian / Radian);
 derived!(ucum, UCUM: PerMeter3 = PerMeter * PerMeter * PerMeter);
 derived!(ucum, UCUM: PerMeter4 = PerMeter * PerMeter * PerMeter * PerMeter);
+derived!(ucum, UCUM: JSIUnits = Second / Radian / Radian);
 
 /// Angles all in radians
 pub type Angle = ucum::Radian<f64>;

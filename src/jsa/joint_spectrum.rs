@@ -60,6 +60,11 @@ impl JointSpectrum {
     }
   }
 
+  /// Get the JSA over a specified range of signal/idler frequencies
+  pub fn jsa_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<Complex<f64>> {
+    range.into_signal_idler_iterator().map(|(ws, wi)| self.jsa(ws, wi)).collect()
+  }
+
   /// Get the normalized value of the JSA at specified signal/idler frequencies
   ///
   /// This is unitless and normalized to the optimal setup
@@ -67,19 +72,29 @@ impl JointSpectrum {
     jsa_raw(omega_s, omega_i, &self.spdc, self.integration_steps) / self.jsa_center
   }
 
+  /// Get the normalized value of the JSA at specified signal/idler frequencies
+  pub fn jsa_normalized_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<Complex<f64>> {
+    range.into_signal_idler_iterator().map(|(ws, wi)| self.jsa_normalized(ws, wi)).collect()
+  }
+
   /// Get the value of the JSI at specified signal/idler frequencies
   ///
   /// Units are: per second per (rad/s)^2, which when integrated over
   /// gives a value proportional to the count rate (counts/s)
-  pub fn jsi(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
+  pub fn jsi(&self, omega_s: Frequency, omega_i: Frequency) -> JSIUnits<f64> {
     let jsa = jsa_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
     use num::Zero;
     if jsa == Complex::zero() {
-      0.
+      JSIUnits::new(0.)
     } else {
       let n = jsi_normalization(omega_s, omega_i, &self.spdc) / JsiNorm::new(1.);
-      *n * jsa.norm_sqr()
+      JSIUnits::new(*(n * jsa.norm_sqr()))
     }
+  }
+
+  /// Get the JSI over a specified range of signal/idler frequencies
+  pub fn jsi_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<JSIUnits<f64>> {
+    range.into_signal_idler_iterator().map(|(ws, wi)| self.jsi(ws, wi)).collect()
   }
 
   /// Get the normalized value of the JSI at specified signal/idler frequencies
@@ -87,6 +102,11 @@ impl JointSpectrum {
   /// This is unitless and normalized to the optimal setup
   pub fn jsi_normalized(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
     self.jsa(omega_s, omega_i).norm_sqr()
+  }
+
+  /// Get the normalized value of the JSI at specified signal/idler frequencies
+  pub fn jsi_normalized_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<f64> {
+    range.into_signal_idler_iterator().map(|(ws, wi)| self.jsi_normalized(ws, wi)).collect()
   }
 
   /// Get the value of the JSA Singles at specified signal/idler frequencies
@@ -102,6 +122,11 @@ impl JointSpectrum {
     }
   }
 
+  /// Get the JSA Singles over a specified range of signal/idler frequencies
+  pub fn jsa_singles_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<f64> {
+    range.into_signal_idler_iterator().map(|(ws, wi)| self.jsa_singles(ws, wi)).collect()
+  }
+
   /// Get the normalized value of the JSA Singles at specified signal/idler frequencies
   ///
   /// This is unitless and normalized to the optimal setup
@@ -109,18 +134,28 @@ impl JointSpectrum {
     self.jsi_singles_normalized(omega_s, omega_i).sqrt()
   }
 
+  /// Get the normalized value of the JSA Singles at specified signal/idler frequencies
+  pub fn jsa_singles_normalized_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<f64> {
+    range.into_signal_idler_iterator().map(|(ws, wi)| self.jsa_singles_normalized(ws, wi)).collect()
+  }
+
   /// Get the value of the JSI Singles at specified signal/idler frequencies
   ///
   /// Units are: per second per (rad/s)^2, which when integrated over
   /// gives a value proportional to the count rate (counts/s)
-  pub fn jsi_singles(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
+  pub fn jsi_singles(&self, omega_s: Frequency, omega_i: Frequency) -> JSIUnits<f64> {
     let jsi = jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
     if jsi == 0. {
-      0.
+      JSIUnits::new(0.)
     } else {
       let n = jsi_singles_normalization(omega_s, omega_i, &self.spdc) / JsiSinglesNorm::new(1.);
-      *n * jsi
+      JSIUnits::new(*n * jsi)
     }
+  }
+
+  /// Get the JSI Singles over a specified range of signal/idler frequencies
+  pub fn jsi_singles_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<JSIUnits<f64>> {
+    range.into_signal_idler_iterator().map(|(ws, wi)| self.jsi_singles(ws, wi)).collect()
   }
 
   /// Get the normalized value of the JSI Singles at specified signal/idler frequencies
@@ -128,6 +163,11 @@ impl JointSpectrum {
   /// This is unitless and normalized to the optimal setup
   pub fn jsi_singles_normalized(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
     jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integration_steps) / self.jsi_singles_center
+  }
+
+  /// Get the normalized value of the JSI Singles at specified signal/idler frequencies
+  pub fn jsi_singles_normalized_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<f64> {
+    range.into_signal_idler_iterator().map(|(ws, wi)| self.jsi_singles_normalized(ws, wi)).collect()
   }
 }
 
@@ -138,7 +178,7 @@ mod tests {
   use super::*;
   extern crate float_cmp;
   use float_cmp::*;
-  use dim::{f64prefixes::NANO, ucum::{M, S, RAD}};
+  use dim::{f64prefixes::NANO, ucum::{M, S, RAD, Hertz}};
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * ((expected - actual) / expected).abs()
@@ -213,19 +253,19 @@ mod tests {
     );
 
     let dxdy = Steps::from(frequencies.0).division_width() * Steps::from(frequencies.1).division_width();
-    let coinc_rate : f64 = frequencies.into_iter().map(|(ws, wi)|
-      *(jsa.jsi(ws, wi) * dxdy * S * S / RAD / RAD)
+    let coinc_rate : Hertz<f64> = frequencies.into_iter().map(|(ws, wi)|
+      jsa.jsi(ws, wi) * dxdy
     ).sum();
-    let singles_signal_rate : f64 = frequencies.into_iter().map(|(ws, wi)|
-      *(jsa.jsi_singles(ws, wi) * dxdy * S * S / RAD / RAD)
+    let singles_signal_rate : Hertz<f64> = frequencies.into_iter().map(|(ws, wi)|
+      jsa.jsi_singles(ws, wi) * dxdy
     ).sum();
 
     let jsa_swap = spdc.with_swapped_signal_idler().joint_spectrum(None);
-    let singles_idler_rate : f64 = frequencies.into_iter().map(|(ws, wi)|
-      *(jsa_swap.jsi_singles(wi, ws) * dxdy * S * S / RAD / RAD)
+    let singles_idler_rate : Hertz<f64> = frequencies.into_iter().map(|(ws, wi)|
+      jsa_swap.jsi_singles(wi, ws) * dxdy
     ).sum();
 
-    dbg!(coinc_rate, singles_signal_rate, singles_idler_rate, coinc_rate / (singles_signal_rate * singles_idler_rate).sqrt());
+    dbg!(coinc_rate, singles_signal_rate, singles_idler_rate, (coinc_rate * coinc_rate / (singles_signal_rate * singles_idler_rate)).sqrt());
     assert!(false)
   }
 }

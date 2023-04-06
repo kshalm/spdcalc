@@ -11,3 +11,8 @@ pub use config::*;
 mod spdc;
 pub use spdc::*;
 
+mod counts;
+pub use counts::*;
+
+mod efficiencies;
+pub use efficiencies::*;

@@ -232,6 +232,12 @@ impl Beam {
     vp * (1. + (lambda_o / n_eff) * dn_by_dlambda / M)
   }
 
+  /// Get the group index of the beam through specified crystal setup
+  pub fn group_index(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> RIndex {
+    let vg = self.group_velocity(crystal_setup, pp);
+    C_ / vg
+  }
+
   pub fn calc_internal_theta_from_external(
     beam : &Self,
     external : Angle,

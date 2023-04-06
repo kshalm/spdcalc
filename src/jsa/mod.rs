@@ -2,6 +2,9 @@ use num::Complex;
 use dim::ucum::Unitless;
 use crate::*;
 
+mod si_iterator;
+pub use si_iterator::*;
+
 mod joint_spectrum;
 pub use joint_spectrum::*;
 
