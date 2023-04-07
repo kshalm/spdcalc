@@ -1,3 +1,74 @@
-/// Add two numbers
-add: func(a: u32, b: u32) -> u32
-test: func() -> float32
+type error = string
+
+union auto-num {
+  string,
+  float32,
+}
+type maybe-auto-num = option<auto-num>
+
+union auto-idler {
+  string,
+  idler-config,
+}
+type maybe-auto-idler = option<auto-idler>
+
+record crystal-config {
+  name: string,
+  pm-type: string,
+  phi-deg: float32,
+  theta-deg: maybe-auto-num,
+  length-um: float32,
+  temperature-c: float32,
+}
+
+record pump-config {
+  wavelength-nm: float32,
+  waist-um: float32,
+  bandwidth-nm: float32,
+  average-power-mw: float32,
+  spectrum-threshold: option<float32>,
+}
+
+record signal-config {
+  wavelength-nm: float32,
+  phi-deg: float32,
+  // one of...
+  theta-deg: option<float32>,
+  theta-external-deg: option<float32>,
+  //
+  waist-um: float32,
+  waist-position-um: maybe-auto-num,
+}
+
+record idler-config {
+  wavelength-nm: float32,
+  phi-deg: float32,
+  // one of...
+  theta-deg: option<float32>,
+  theta-external-deg: option<float32>,
+  //
+  waist-um: float32,
+  waist-position-um: maybe-auto-num,
+}
+
+record periodic-poling-config {
+  poling-period-um: auto-num,
+  apodization-fwhm-um: option<float32>,
+}
+union periodic-poling-or-off {
+  string,
+  periodic-poling-config
+}
+
+record spdc-config {
+  crystal: crystal-config,
+  pump: pump-config,
+  signal: signal-config,
+  idler: maybe-auto-idler,
+  periodic-poling: option<periodic-poling-or-off>,
+  deff-pm-per-volt: float32,
+}
+
+resource spdc {
+  static from-config: func(config: spdc-config) -> expected<spdc, error>
+}
