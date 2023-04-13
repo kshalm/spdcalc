@@ -32,8 +32,8 @@ serde_with = "2.3"
 regex = "1.7"
 lazy_static = "1.4"
 
-# [features]
-# wasm-bindgen = ["argmin/wasm-bindgen"]
+[features]
+wasm-bindgen = ["argmin/wasm-bindgen"]
 
 [dev-dependencies]
 criterion = "0.2"
