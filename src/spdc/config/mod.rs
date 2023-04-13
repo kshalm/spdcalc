@@ -222,21 +222,20 @@ impl SPDCConfig {
         return Err(SPDCError("Can not autocalc theta when periodic poling is enabled. Provide an explicit value for crystal theta.".into()))
       }
     }
-
+    let idler = match &self.idler {
+      AutoCalcParam::Param(idler_cfg) => idler_cfg.clone().try_as_beam(&crystal_setup)?,
+      AutoCalcParam::Auto(_) => IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, periodic_poling)?,
+    };
     let idler_waist_position = {
       let auto = AutoCalcParam::default();
-      let autocalc_idler_waist = match &self.idler {
-        AutoCalcParam::Param(cfg) => &cfg.waist_position_um,
-        AutoCalcParam::Auto(_) => &auto,
+      let autocalc_idler_waist = match self.idler {
+        AutoCalcParam::Param(cfg) => cfg.waist_position_um,
+        AutoCalcParam::Auto(_) => auto,
       };
       match autocalc_idler_waist {
         AutoCalcParam::Param(focus_um) => -focus_um.abs() * MICRO * M,
-        AutoCalcParam::Auto(_) => crystal_setup.optimal_waist_position(signal.vacuum_wavelength(), signal.polarization()),
+        AutoCalcParam::Auto(_) => crystal_setup.optimal_waist_position(idler.vacuum_wavelength(), idler.polarization()),
       }
-    };
-    let idler = match self.idler {
-      AutoCalcParam::Param(idler_cfg) => idler_cfg.try_as_beam(&crystal_setup)?,
-      AutoCalcParam::Auto(_) => IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, periodic_poling)?,
     };
     let signal_waist_position = match signal_waist_position_um {
       AutoCalcParam::Param(focus_um) => -focus_um.abs() * MICRO * M,
