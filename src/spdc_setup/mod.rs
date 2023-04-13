@@ -468,7 +468,7 @@ pub fn calc_delta_k(
 
   dk.z = np_over_lp + dk.z;
 
-  dbg!(PI2 * dk);
+  // dbg!(PI2 * dk);
 
   // put into milliJoule seconds
   (PI2 / MILLI)
