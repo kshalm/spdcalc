@@ -10,5 +10,5 @@ source = "spdcalc.wasm"
 abi = "wasi"
 
 [module.bindings]
-wit-bindgen = "0.2.0"
-wit-exports = "spdcalc.wai"
+wai-version = "0.2.3"
+exports = "spdcalc.wai"

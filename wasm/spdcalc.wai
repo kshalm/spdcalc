@@ -71,4 +71,8 @@ record spdc-config {
 
 resource spdc {
   static from-config: func(config: spdc-config) -> expected<spdc, error>
+  static get-config: func() -> crystal-config
+  test: func() -> float32
 }
+
+get-spdc: func() -> expected<spdc, error>
