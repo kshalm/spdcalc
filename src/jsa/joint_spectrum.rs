@@ -205,7 +205,7 @@ mod tests {
         "name": "KTP",
         "pm_type": "e->eo",
         "phi_deg": 0,
-        "theta_deg": 0,
+        "theta_deg": 90,
         "length_um": 14_000,
         "temperature_c": 20
       },
@@ -224,7 +224,7 @@ mod tests {
       },
       "idler": "auto",
       "periodic_poling": {
-        "poling_period_um": 46.52
+        "poling_period_um": "auto"
       },
       "deff_pm_per_volt": 7.6
     });
@@ -278,8 +278,7 @@ mod tests {
     dbg!(&spdc, coinc_rate, singles_signal_rate, singles_idler_rate, (coinc_rate * coinc_rate / (singles_signal_rate * singles_idler_rate)).sqrt());
 
     // old way
-    let mut spdc_setup : SPDCSetup = spdc.into();
-    spdc_setup.assign_optimum_periodic_poling();
+    let spdc_setup : SPDCSetup = spdc.into();
     let wavelength_range = Steps2D(
       (frequency_to_vacuum_wavelength(frequencies.0.0), frequency_to_vacuum_wavelength(frequencies.0.1), frequencies.0.2),
       (frequency_to_vacuum_wavelength(frequencies.1.0), frequency_to_vacuum_wavelength(frequencies.1.1), frequencies.1.2),
@@ -288,6 +287,6 @@ mod tests {
 
     dbg!(spdc_setup, wavelength_range, results);
 
-    assert!(false)
+    assert!(coinc_rate < singles_signal_rate);
   }
 }
