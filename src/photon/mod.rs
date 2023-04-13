@@ -54,6 +54,45 @@ pub struct Photon {
   direction : Direction,
 }
 
+impl From<PumpBeam> for Photon {
+  fn from(beam : PumpBeam) -> Self {
+    let w = WaistSize::new(Vector2::new(*(beam.waist().x/M), *(beam.waist().y/M)));
+    Self::new(
+      PhotonType::Pump,
+      0. * ucum::RAD,
+      0. * ucum::RAD,
+      beam.vacuum_wavelength(),
+      w,
+    )
+  }
+}
+
+impl From<SignalBeam> for Photon {
+  fn from(beam : SignalBeam) -> Self {
+    let w = WaistSize::new(Vector2::new(*(beam.waist().x/M), *(beam.waist().y/M)));
+    Self::new(
+      PhotonType::Signal,
+      beam.theta_internal(),
+      beam.phi(),
+      beam.vacuum_wavelength(),
+      w,
+    )
+  }
+}
+
+impl From<IdlerBeam> for Photon {
+  fn from(beam : IdlerBeam) -> Self {
+    let w = WaistSize::new(Vector2::new(*(beam.waist().x/M), *(beam.waist().y/M)));
+    Self::new(
+      PhotonType::Idler,
+      beam.theta_internal(),
+      beam.phi(),
+      beam.vacuum_wavelength(),
+      w,
+    )
+  }
+}
+
 impl Photon {
   /// create a photon
   pub fn new(
