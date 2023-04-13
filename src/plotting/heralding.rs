@@ -109,35 +109,35 @@ pub fn calc_coincidences_rate_distribution(spdc_setup : &SPDCSetup, wavelength_r
   let d_omega_s = PI2c * dlamda_s / sq(l_s);
   let d_omega_i = PI2c * dlamda_i / sq(l_i);
 
-  // wavelength_range
-  //   .into_iter()
-  //   .map(|(l_s, l_i)| {
-  //     // let d_omega_s = PI2c * dlamda_s / sq(l_s);
-  //     // let d_omega_i = PI2c * dlamda_i / sq(l_i);
-  //     // dbg!(d_omega_s, d_omega_i);
-  //     let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spdc_setup);
-  //     let factor = eta * lomega * d_omega_s * d_omega_i;
-  //     let amplitude = calc_jsa(&spdc_setup, l_s, l_i) / jsa_units;
-
-  //     amplitude.norm_sqr() * sq(jsa_units) * factor
-  //   })
-  //   .collect()
-
-  let frequency_range = Steps2D(
-    (PI2c / wavelength_range.0.1, PI2c / wavelength_range.0.0, wavelength_range.0.2),
-    (PI2c / wavelength_range.1.1, PI2c / wavelength_range.1.0, wavelength_range.1.2)
-  );
-
-  let (domega_s, domega_i) = frequency_range.division_widths();
-  frequency_range
+  wavelength_range
     .into_iter()
-    .map(|(omega_s, omega_i)| {
-      let l_s = PI2c / omega_s;
-      let l_i = PI2c / omega_i;
+    .map(|(l_s, l_i)| {
+      // let d_omega_s = PI2c * dlamda_s / sq(l_s);
+      // let d_omega_i = PI2c * dlamda_i / sq(l_i);
+      // dbg!(d_omega_s, d_omega_i);
+      let lomega = calc_jacobian_det_lambda_to_omega(l_s, l_i, &spdc_setup);
+      let factor = eta * lomega * d_omega_s * d_omega_i;
       let amplitude = calc_jsa(&spdc_setup, l_s, l_i) / jsa_units;
-      amplitude.norm_sqr() * domega_s * domega_i * S
+
+      amplitude.norm_sqr() * sq(jsa_units) * factor
     })
     .collect()
+
+  // let frequency_range = Steps2D(
+  //   (PI2c / wavelength_range.0.1, PI2c / wavelength_range.0.0, wavelength_range.0.2),
+  //   (PI2c / wavelength_range.1.1, PI2c / wavelength_range.1.0, wavelength_range.1.2)
+  // );
+
+  // let (domega_s, domega_i) = frequency_range.division_widths();
+  // frequency_range
+  //   .into_iter()
+  //   .map(|(omega_s, omega_i)| {
+  //     let l_s = PI2c / omega_s;
+  //     let l_i = PI2c / omega_i;
+  //     let amplitude = calc_jsa(&spdc_setup, l_s, l_i) / jsa_units;
+  //     amplitude.norm_sqr() * domega_s * domega_i * S
+  //   })
+  //   .collect()
 }
 
 /// Calculate the singles rate per unit wavelength^2.
