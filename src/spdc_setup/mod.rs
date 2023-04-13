@@ -193,7 +193,7 @@ impl SPDCSetup {
 
   /// Get the idler waist position relative to the end of the crystal
   pub fn get_idler_waist_position(&self) -> Distance {
-    self.z0s.unwrap_or_else(||
+    self.z0i.unwrap_or_else(||
       self.crystal_setup.calc_optimal_waist_position(&self.idler)
     )
   }
