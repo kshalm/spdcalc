@@ -158,6 +158,13 @@ impl JointSpectrum {
     range.into_signal_idler_iterator().map(|(ws, wi)| self.jsi_singles(ws, wi)).collect()
   }
 
+  /// Get the JSI Singles for the idler over a specified range of signal/idler frequencies
+  pub fn jsi_singles_idler_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<JSIUnits<f64>> {
+    let swapped = self.spdc.clone().with_swapped_signal_idler();
+    let idler_spectrum = Self::new(swapped, self.integration_steps);
+    range.into_signal_idler_iterator().map(|(ws, wi)| idler_spectrum.jsi_singles(wi, ws)).collect()
+  }
+
   /// Get the normalized value of the JSI Singles at specified signal/idler frequencies
   ///
   /// This is unitless and normalized to the optimal setup
@@ -169,12 +176,19 @@ impl JointSpectrum {
   pub fn jsi_singles_normalized_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<f64> {
     range.into_signal_idler_iterator().map(|(ws, wi)| self.jsi_singles_normalized(ws, wi)).collect()
   }
+
+  /// Get the normalized value of the JSI Singles for the idler at specified signal/idler frequencies
+  pub fn jsi_singles_idler_normalized_range<T: IntoSignalIdlerIterator>(&self, range : T) -> Vec<f64> {
+    let swapped = self.spdc.clone().with_swapped_signal_idler();
+    let idler_spectrum = Self::new(swapped, self.integration_steps);
+    range.into_signal_idler_iterator().map(|(ws, wi)| idler_spectrum.jsi_singles_normalized(wi, ws)).collect()
+  }
 }
 
 
 #[cfg(test)]
 mod tests {
-  use crate::utils::{vacuum_wavelength_to_frequency, Steps2D, Steps};
+  use crate::{utils::{vacuum_wavelength_to_frequency, Steps2D, Steps, frequency_to_vacuum_wavelength}, plotting::calc_heralding_results};
   use super::*;
   extern crate float_cmp;
   use float_cmp::*;
@@ -210,7 +224,7 @@ mod tests {
       },
       "idler": "auto",
       "periodic_poling": {
-        "poling_period_um": "auto"
+        "poling_period_um": 46.52
       },
       "deff_pm_per_volt": 7.6
     });
@@ -246,26 +260,34 @@ mod tests {
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
     let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
 
-    let jsa = JointSpectrum::new(spdc.clone(), None);
+    let spectrum = JointSpectrum::new(spdc.clone(), None);
     let frequencies = Steps2D(
-      (vacuum_wavelength_to_frequency(1473. * NANO * M), vacuum_wavelength_to_frequency(1626. * NANO * M), 20),
-      (vacuum_wavelength_to_frequency(1480. * NANO * M), vacuum_wavelength_to_frequency(1635. * NANO * M), 20),
+      (vacuum_wavelength_to_frequency(1541.54 * NANO * M), vacuum_wavelength_to_frequency(1558.46 * NANO * M), 20),
+      (vacuum_wavelength_to_frequency(1541.63 * NANO * M), vacuum_wavelength_to_frequency(1558.56 * NANO * M), 20),
     );
 
+    let jsi = spectrum.jsi_range(frequencies);
+    let jsi_singles = spectrum.jsi_singles_range(frequencies);
+    let jsi_singles_idler = spectrum.jsi_singles_idler_range(frequencies);
+
     let dxdy = Steps::from(frequencies.0).division_width() * Steps::from(frequencies.1).division_width();
-    let coinc_rate : Hertz<f64> = frequencies.into_iter().map(|(ws, wi)|
-      jsa.jsi(ws, wi) * dxdy
-    ).sum();
-    let singles_signal_rate : Hertz<f64> = frequencies.into_iter().map(|(ws, wi)|
-      jsa.jsi_singles(ws, wi) * dxdy
-    ).sum();
+    let coinc_rate : Hertz<f64> = jsi.into_iter().sum::<JSIUnits<f64>>() * dxdy;
+    let singles_signal_rate : Hertz<f64> = jsi_singles.into_iter().sum::<JSIUnits<f64>>() * dxdy;
+    let singles_idler_rate : Hertz<f64> = jsi_singles_idler.into_iter().sum::<JSIUnits<f64>>() * dxdy;
 
-    let jsa_swap = spdc.with_swapped_signal_idler().joint_spectrum(None);
-    let singles_idler_rate : Hertz<f64> = frequencies.into_iter().map(|(ws, wi)|
-      jsa_swap.jsi_singles(wi, ws) * dxdy
-    ).sum();
+    dbg!(&spdc, coinc_rate, singles_signal_rate, singles_idler_rate, (coinc_rate * coinc_rate / (singles_signal_rate * singles_idler_rate)).sqrt());
 
-    dbg!(coinc_rate, singles_signal_rate, singles_idler_rate, (coinc_rate * coinc_rate / (singles_signal_rate * singles_idler_rate)).sqrt());
+    // old way
+    let mut spdc_setup : SPDCSetup = spdc.into();
+    spdc_setup.assign_optimum_periodic_poling();
+    let wavelength_range = Steps2D(
+      (frequency_to_vacuum_wavelength(frequencies.0.0), frequency_to_vacuum_wavelength(frequencies.0.1), frequencies.0.2),
+      (frequency_to_vacuum_wavelength(frequencies.1.0), frequency_to_vacuum_wavelength(frequencies.1.1), frequencies.1.2),
+    );
+    let results = calc_heralding_results(&spdc_setup, &wavelength_range);
+
+    dbg!(spdc_setup, wavelength_range, results);
+
     assert!(false)
   }
 }
