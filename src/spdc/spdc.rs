@@ -1,4 +1,5 @@
 use dim::ucum::{MilliWatt, DEG, Hertz};
+use crate::types::Time;
 use crate::{SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Wavelength, Distance, optimum_poling_period, SPDCError, jsa::{JointSpectrum, FrequencySpace}};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -132,6 +133,44 @@ impl SPDC {
   /// Get the symmetric, signal, and idler efficiencies over specified frequency ranges
   pub fn efficiencies<T: Into<FrequencySpace>>(&self, ranges: T, integration_steps : Option<usize>) -> super::Efficiencies {
     super::efficiencies(self, ranges.into(), integration_steps)
+  }
+
+  /// get the HOM time delay, and visibility
+  pub fn hom_visibility<T: Into<FrequencySpace>>(&self, ranges: T) -> (Time, f64) {
+    super::hom_visibility(self, ranges.into())
+  }
+
+  /// get the HOM rate for specified time delays
+  pub fn hom_rate_series<R: Into<FrequencySpace>, T: IntoIterator<Item = Time>>(&self, ranges: R, time_delays: T, integration_steps : Option<usize>) -> Vec<f64> {
+    let sp = self.joint_spectrum(integration_steps);
+    let ranges = ranges.into();
+    let jsa_values = sp.jsa_range(ranges);
+    let jsa_values_swapped = ranges.into_iter().map(|(ws, wi)| {
+      sp.jsa(wi, ws)
+    }).collect();
+    super::hom_rate_series(
+      ranges,
+      &jsa_values,
+      &jsa_values_swapped,
+      time_delays
+    )
+  }
+
+  /// get the two source HOM visibilities of this setup against itself
+  pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(&self, ranges: T) -> ((Time, f64), (Time, f64), (Time, f64)) {
+    super::hom_two_source_visibilities(self, self, ranges, ranges)
+  }
+
+  /// get the two source HOM rate over specified times
+  pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Time>>(&self, ranges: R, time_delays: T, integration_steps : Option<usize>) -> super::HomTwoSourceResult<Vec<f64>> {
+    let sp = self.joint_spectrum(integration_steps);
+    super::hom_two_source_rate_series(
+      &sp,
+      &sp,
+      ranges,
+      ranges,
+      time_delays
+    )
   }
 }
 

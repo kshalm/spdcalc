@@ -57,7 +57,9 @@ pub fn calc_hom_visibility(
 ) -> (Time, f64) {
   let signal_time = spdc_setup.get_average_transit_time(&spdc_setup.signal);
   let idler_time = spdc_setup.get_average_transit_time(&spdc_setup.idler);
-  let delta_t = idler_time - signal_time;
+  // TODO: why.....
+  let fudge = (spdc_setup.get_idler_waist_position() - spdc_setup.get_signal_waist_position()) / C_;
+  let delta_t = idler_time - signal_time + fudge;
   let min_rate = calc_HOM_rate_series(
     spdc_setup,
     wavelength_ranges,
