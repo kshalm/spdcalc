@@ -18,6 +18,7 @@ impl IntoSignalIdlerIterator for FrequencySpace {
 ///
 /// X-axis is the sum of the signal and idler frequencies,
 /// and the Y-axis is the difference.
+#[derive(Debug, Clone, Copy)]
 pub struct RotatedFrequencySpace(FrequencySpace);
 
 impl RotatedFrequencySpace {
@@ -88,6 +89,7 @@ impl Iterator for WavelengthSIIterator {
   }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct WavelengthSpace(Steps2D<Wavelength>);
 
 impl From<Steps2D<Wavelength>> for WavelengthSpace {
