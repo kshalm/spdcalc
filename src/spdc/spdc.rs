@@ -134,3 +134,92 @@ impl SPDC {
     super::efficiencies(self, ranges.into(), integration_steps)
   }
 }
+
+#[cfg(test)]
+mod test {
+  use super::*;
+  use dim::{f64prefixes::{NANO}, ucum::{DEG, HZ, M}};
+  use crate::{jsa::{FrequencySpace, WavelengthSpace}, utils::{Steps2D, vacuum_wavelength_to_frequency}};
+
+  fn default_spdc() -> SPDC {
+    let json = serde_json::json!({
+      "crystal": {
+        "name": "KTP",
+        "pm_type": "e->eo",
+        "phi_deg": 0,
+        "theta_deg": 90,
+        "length_um": 14_000,
+        "temperature_c": 20
+      },
+      "pump": {
+        "wavelength_nm": 775,
+        "waist_um": 200,
+        "bandwidth_nm": 0.5,
+        "average_power_mw": 300
+      },
+      "signal": {
+        "wavelength_nm": 1550,
+        "phi_deg": 0,
+        "theta_external_deg": 0,
+        "waist_um": 100,
+        "waist_position_um": "auto"
+      },
+      "idler": "auto",
+      "periodic_poling": {
+        "poling_period_um": "auto"
+      },
+      "deff_pm_per_volt": 7.6
+    });
+
+    let config : crate::SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+    dbg!(&spdc);
+    spdc
+  }
+
+  #[test]
+  fn test_counts_coincidences() {
+    let spdc = default_spdc();
+    let range : WavelengthSpace = Steps2D(
+      (1541.54 * NANO * M, 1558.46 * NANO * M, 20),
+      (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
+    ).into();
+    let counts = spdc.counts_coincidences(range, None);
+    assert_eq!(counts, 0.0 * HZ);
+  }
+
+  #[test]
+  fn test_counts_singles_signal() {
+    let spdc = default_spdc();
+    let range : WavelengthSpace = Steps2D(
+      (1541.54 * NANO * M, 1558.46 * NANO * M, 20),
+      (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
+    ).into();
+    let counts = spdc.counts_singles_signal(range, None);
+    assert_eq!(counts, 0.0 * HZ);
+  }
+
+  #[test]
+  fn test_counts_singles_idler() {
+    let spdc = default_spdc();
+    let range : WavelengthSpace = Steps2D(
+      (1541.54 * NANO * M, 1558.46 * NANO * M, 20),
+      (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
+    ).into();
+    let counts = spdc.counts_singles_idler(range, None);
+    assert_eq!(counts, 0.0 * HZ);
+  }
+
+  #[test]
+  fn test_efficiencies() {
+    let spdc = default_spdc();
+    let range : WavelengthSpace = Steps2D(
+      (1541.54 * NANO * M, 1558.46 * NANO * M, 20),
+      (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
+    ).into();
+    let efficiencies = spdc.efficiencies(range, None);
+    assert_eq!(efficiencies.symmetric, 0.0);
+    assert_eq!(efficiencies.signal, 0.0);
+    assert_eq!(efficiencies.idler, 0.0);
+  }
+}
