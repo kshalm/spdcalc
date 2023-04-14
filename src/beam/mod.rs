@@ -384,6 +384,21 @@ impl Beam {
     (-np_prime / np).atan() * ucum::RAD
   }
 
+  pub fn average_transit_time(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> Time {
+    let crystal_length = crystal_setup.length;
+    let delta_z = 0.5 * crystal_length;
+    // beam direction in lab frame
+    // so crystal length is along z axis
+    let direction = self.direction().into_inner();
+    // take the direction vector and turn it into a displacement
+    // by scaling the vector so that z component becomes delta_z
+    let disp = (*(delta_z / M) / direction.z) * direction;
+    let distance = disp.norm() * M;
+
+    let vg = self.group_velocity(&crystal_setup, pp);
+    distance / vg
+  }
+
   fn update_direction(&mut self) {
     self.direction = direction_from_polar(self.phi, self.theta);
   }
