@@ -192,14 +192,14 @@ impl IdlerConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SPDCConfig {
-  crystal: CrystalConfig,
-  pump: PumpConfig,
-  signal: SignalConfig,
+  pub crystal: CrystalConfig,
+  pub pump: PumpConfig,
+  pub signal: SignalConfig,
   #[serde(default)]
-  idler: AutoCalcParam<IdlerConfig>,
+  pub idler: AutoCalcParam<IdlerConfig>,
   #[serde(default)]
-  periodic_poling: MaybePeriodicPolingConfig,
-  deff_pm_per_volt: f64,
+  pub periodic_poling: MaybePeriodicPolingConfig,
+  pub deff_pm_per_volt: f64,
 }
 
 impl SPDCConfig {

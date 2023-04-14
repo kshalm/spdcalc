@@ -2,8 +2,8 @@ use super::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct PeriodicPolingConfig {
-  poling_period_um: AutoCalcParam<f64>,
-  apodization_fwhm_um: Option<f64>,
+  pub poling_period_um: AutoCalcParam<f64>,
+  pub apodization_fwhm_um: Option<f64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

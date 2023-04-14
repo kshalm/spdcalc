@@ -130,7 +130,7 @@ impl SPDC {
     super::counts_singles_idler(self, ranges.into(), integration_steps)
   }
 
-  /// Get the symmetric, signal, and idler efficiencies over specified frequency ranges
+  /// Get the symmetric, signal, and idler efficiencies (and counts) over specified frequency ranges
   pub fn efficiencies<T: Into<FrequencySpace>>(&self, ranges: T, integration_steps : Option<usize>) -> super::Efficiencies {
     super::efficiencies(self, ranges.into(), integration_steps)
   }
