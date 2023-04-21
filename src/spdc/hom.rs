@@ -189,7 +189,7 @@ pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterato
 pub fn hom_two_source_time_delays(
   spdc1: &SPDC,
   spdc2: &SPDC,
-) -> (Time, Time, Time) {
+) -> HomTwoSourceResult<Time> {
   let ss = {
     let fudge = (spdc2.signal_waist_position - spdc1.signal_waist_position) / dim::ucum::C_;
     let signal2_time = spdc2.signal.average_transit_time(&spdc2.crystal_setup, spdc2.pp);
@@ -211,7 +211,7 @@ pub fn hom_two_source_time_delays(
     idler2_time - signal1_time + fudge
   };
 
-  (ss, ii, si)
+  HomTwoSourceResult { ss, ii, si }
 }
 
 pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
@@ -219,7 +219,7 @@ pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
   spdc2 : &SPDC,
   region1 : T,
   region2 : T,
-) -> ((Time, f64), (Time, f64), (Time, f64)) {
+) -> HomTwoSourceResult<(Time, f64)> {
   use dim::ucum::S;
   if spdc1 == spdc2 {
     let min_rate = hom_two_source_rate_series(
@@ -229,11 +229,11 @@ pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
       region2,
       Steps(0. * S, 0. * S, 1)
     );
-    (
-      (0. * S, (0.5 - min_rate.ss[0]) / 0.5),
-      (0. * S, (0.5 - min_rate.ii[0]) / 0.5),
-      (0. * S, (0.5 - min_rate.si[0]) / 0.5)
-    )
+    HomTwoSourceResult {
+      ss: (0. * S, (0.5 - min_rate.ss[0]) / 0.5),
+      ii: (0. * S, (0.5 - min_rate.ii[0]) / 0.5),
+      si: (0. * S, (0.5 - min_rate.si[0]) / 0.5)
+    }
   } else {
     let time_delays = hom_two_source_time_delays(spdc1, spdc2);
     let min_ss = hom_two_source_rate_series(
@@ -241,27 +241,27 @@ pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
       &spdc2.joint_spectrum(None),
       region1,
       region2,
-      Steps(time_delays.0, time_delays.0, 1)
+      Steps(time_delays.ss, time_delays.ss, 1)
     ).ss[0];
     let min_ii = hom_two_source_rate_series(
       &spdc1.joint_spectrum(None),
       &spdc2.joint_spectrum(None),
       region1,
       region2,
-      Steps(time_delays.1, time_delays.1, 1)
+      Steps(time_delays.ii, time_delays.ii, 1)
     ).ii[0];
     let min_si = hom_two_source_rate_series(
       &spdc1.joint_spectrum(None),
       &spdc2.joint_spectrum(None),
       region1,
       region2,
-      Steps(time_delays.2, time_delays.2, 1)
+      Steps(time_delays.si, time_delays.si, 1)
     ).si[0];
-    (
-      (time_delays.0, (0.5 - min_ss) / 0.5),
-      (time_delays.1, (0.5 - min_ii) / 0.5),
-      (time_delays.2, (0.5 - min_si) / 0.5)
-    )
+    HomTwoSourceResult {
+      ss: (time_delays.ss, (0.5 - min_ss) / 0.5),
+      ii: (time_delays.ii, (0.5 - min_ii) / 0.5),
+      si: (time_delays.si, (0.5 - min_si) / 0.5)
+    }
   }
 }
 

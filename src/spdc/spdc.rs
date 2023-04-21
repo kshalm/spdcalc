@@ -174,7 +174,7 @@ impl SPDC {
   }
 
   /// get the two source HOM visibilities of this setup against itself
-  pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(&self, ranges: T) -> ((Time, f64), (Time, f64), (Time, f64)) {
+  pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(&self, ranges: T) -> super::HomTwoSourceResult<(Time, f64)> {
     super::hom_two_source_visibilities(self, self, ranges, ranges)
   }
 

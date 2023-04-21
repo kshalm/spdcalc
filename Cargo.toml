@@ -21,10 +21,10 @@ crate-type = ["rlib"]
 
 num = "0.4"
 nalgebra = "0.31"
-dimensioned = "0.8"
+dimensioned = { version = "0.8", features = ["serde"] }
 # nelder_mead = { git = "https://github.com/JD557/nelder-mead.rs" }
 # optimize = "0.1" # ... needs ndarray 0.11
-argmin = "0.7"
+argmin = { version = "0.7", default-features = false }
 ndarray = "0.15"
 serde = "^1.0"
 serde_derive = "^1.0"
@@ -33,6 +33,7 @@ regex = "1.7"
 lazy_static = "1.4"
 
 [features]
+default = []
 wasm-bindgen = ["argmin/wasm-bindgen"]
 
 [dev-dependencies]
