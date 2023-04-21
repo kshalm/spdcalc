@@ -183,6 +183,10 @@ impl JointSpectrum {
     let idler_spectrum = Self::new(swapped, self.integration_steps);
     range.into_signal_idler_iterator().map(|(ws, wi)| idler_spectrum.jsi_singles_normalized(wi, ws)).collect()
   }
+
+  pub fn schmidt_number<T: IntoSignalIdlerIterator>(&self, range: T) -> Result<f64, SPDCError> {
+    crate::math::schmidt_number(&self.jsa_range(range))
+  }
 }
 
 
