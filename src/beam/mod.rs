@@ -99,7 +99,7 @@ impl IdlerBeam {
     }
 
     let ns = signal.refractive_index(signal.frequency(), &crystal_setup);
-    let np = pump.refractive_index(signal.frequency(), &crystal_setup);
+    let np = pump.refractive_index(pump.frequency(), &crystal_setup);
 
     let del_k_pp = match pp {
       Some(poling) => signal.vacuum_wavelength() * poling.pp_factor(),
