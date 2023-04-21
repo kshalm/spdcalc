@@ -2,7 +2,7 @@ use super::*;
 use crate::{CrystalSetup, Crystal, dim::{
   f64prefixes::{MICRO, NANO, PICO},
   ucum::{DEG, RAD, M, MILLIW, V}
-}, utils, Beam, BeamWaist, PumpBeam, SignalBeam, IdlerBeam, PMType, SPDCError};
+}, utils::{self, from_kelvin_to_celsius}, Beam, BeamWaist, PumpBeam, SignalBeam, IdlerBeam, PMType, SPDCError};
 use serde::{Serialize, Deserialize};
 
 mod periodic_poling_config;
@@ -267,6 +267,62 @@ impl Default for SPDCConfig {
       idler: AutoCalcParam::default(),
       periodic_poling: MaybePeriodicPolingConfig::default(),
       deff_pm_per_volt: 0.0,
+    }
+  }
+}
+
+impl From<SPDC> for SPDCConfig {
+  fn from(spdc: SPDC) -> Self {
+    let crystal = CrystalConfig {
+      name: spdc.crystal_setup.crystal,
+      pm_type: spdc.crystal_setup.pm_type,
+      theta_deg: AutoCalcParam::Param(*(spdc.crystal_setup.theta / DEG)),
+      phi_deg: *(spdc.crystal_setup.phi / DEG),
+      length_um: *(spdc.crystal_setup.length / (MICRO * M)),
+      temperature_c: from_kelvin_to_celsius(spdc.crystal_setup.temperature),
+    };
+    let pump = PumpConfig {
+      wavelength_nm: *(spdc.pump.vacuum_wavelength() / (NANO * M)),
+      bandwidth_nm: *(spdc.pump_bandwidth / (NANO * M)),
+      waist_um: *(spdc.pump.waist().x / (MICRO * M)),
+      average_power_mw: *(spdc.pump_average_power / MILLIW),
+      spectrum_threshold: Some(spdc.pump_spectrum_threshold),
+    };
+    let signal = SignalConfig {
+      wavelength_nm: *(spdc.signal.vacuum_wavelength() / (NANO * M)),
+      theta_deg: Some(*(spdc.signal.theta_internal() / DEG)),
+      theta_external_deg: None,
+      phi_deg: *(spdc.signal.phi() / DEG),
+      waist_um: *(spdc.signal.waist().x / (MICRO * M)),
+      waist_position_um: AutoCalcParam::Param(*(spdc.signal_waist_position / (MICRO * M))),
+    };
+
+    let idler = AutoCalcParam::Param(IdlerConfig {
+      wavelength_nm: *(spdc.idler.vacuum_wavelength() / (NANO * M)),
+      theta_deg: Some(*(spdc.idler.theta_internal() / DEG)),
+      theta_external_deg: None,
+      phi_deg: *(spdc.idler.phi() / DEG),
+      waist_um: *(spdc.idler.waist().x / (MICRO * M)),
+      waist_position_um: AutoCalcParam::Param(*(spdc.idler_waist_position / (MICRO * M))),
+    });
+
+    let periodic_poling = match spdc.pp {
+      Some(pp) => MaybePeriodicPolingConfig::Config(PeriodicPolingConfig {
+        poling_period_um: AutoCalcParam::Param(*(pp.period / (MICRO * M))),
+        apodization_fwhm_um: pp.apodization.map(|ap| *(ap.fwhm / (MICRO * M))),
+      }),
+      None => MaybePeriodicPolingConfig::Off
+    };
+
+    let deff_pm_per_volt = *(spdc.deff / (PICO * M / V));
+
+    Self {
+      crystal,
+      pump,
+      signal,
+      idler,
+      periodic_poling,
+      deff_pm_per_volt,
     }
   }
 }
