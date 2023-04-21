@@ -40,13 +40,20 @@ impl PeriodicPoling {
     }
   }
 
-  pub fn try_new_optimal(
+  /// Set the poling period and sign
+  pub fn set_period(&mut self, period: PolingPeriod) -> &mut Self {
+    self.period = if period > 0. * M { period } else { -period };
+    self.sign = if period > 0. * M { Sign::POSITIVE } else { Sign::NEGATIVE };
+    self
+  }
+
+  pub fn try_new_optimum(
     signal: &SignalBeam,
     pump: &PumpBeam,
     crystal_setup: &CrystalSetup,
     apodization: Option<Apodization>
   ) -> Result<Self, SPDCError> {
-    let period = optimum_poling_period(signal, pump, crystal_setup, apodization)?;
+    let period = optimum_poling_period(signal, pump, crystal_setup)?;
     Ok(
       Self::new(
         period,
@@ -82,8 +89,7 @@ impl PeriodicPoling {
 pub fn optimum_poling_period(
   signal: &SignalBeam,
   pump: &PumpBeam,
-  crystal_setup: &CrystalSetup,
-  apodization: Option<Apodization>
+  crystal_setup: &CrystalSetup
 ) -> Result<PolingPeriod, SPDCError> {
 
   // z component of delta k, based on periodic poling
@@ -119,7 +125,7 @@ pub fn optimum_poling_period(
     let pp = Some(PeriodicPoling {
       period : period * M,
       sign,
-      apodization,
+      apodization: None,
     });
 
     delta_kz(pp).abs()

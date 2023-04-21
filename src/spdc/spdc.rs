@@ -58,16 +58,15 @@ impl SPDC {
     }
   }
 
-  /// Convert it into an optimal setup
-  pub fn try_as_optimal(mut self) -> Result<Self, SPDCError> {
-    let phi_s = self.signal.phi();
-    self.signal.set_angles(0. * DEG, phi_s);
+  /// Convert it into an optimum setup
+  pub fn try_as_optimum(mut self) -> Result<Self, SPDCError> {
+    self.signal.set_angles(0. * DEG, 0. * DEG);
     match self.pp {
       None => self.crystal_setup.assign_optimum_theta(&self.signal, &self.pump),
       Some(mut pp) => {
         // TODO: this could be 90 or 0??
-        self.crystal_setup.theta = 90. * DEG;
-        pp.period = optimum_poling_period(&self.signal, &self.pump, &self.crystal_setup, pp.apodization)?;
+        // self.crystal_setup.theta = 90. * DEG;
+        pp.set_period(optimum_poling_period(&self.signal, &self.pump, &self.crystal_setup)?);
       }
     }
     let idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)?;
@@ -79,6 +78,20 @@ impl SPDC {
         ..self
       }
     )
+  }
+
+  /// Assign the optimum idler to this SPDC
+  pub fn assign_optimum_idler(&mut self) -> Result<(), SPDCError> {
+    let idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)?;
+    self.idler = idler;
+    Ok(())
+  }
+
+  /// Assign the optimum periodic poling to this SPDC
+  pub fn assign_optimum_periodic_poling(&mut self) -> Result<(), SPDCError> {
+    let pp = PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp.map_or(None, |pp| pp.apodization))?;
+    self.pp = Some(pp);
+    Ok(())
   }
 
   pub fn with_swapped_signal_idler(self) -> Self {
