@@ -25,8 +25,11 @@ impl MaybePeriodicPolingConfig {
     if let Self::Config(cfg) = self {
       let apodization = cfg.apodization_fwhm_um.map(|fwhm| Apodization { fwhm: fwhm * MICRO * M });
       let poling_period = match cfg.poling_period_um {
-        AutoCalcParam::Auto(_) => optimum_poling_period(signal, pump, crystal_setup, apodization)?,
-        AutoCalcParam::Param(period_um) => period_um * MICRO * M,
+        AutoCalcParam::Auto(_) => optimum_poling_period(signal, pump, crystal_setup)?,
+        AutoCalcParam::Param(period_um) => {
+          let sign = PeriodicPoling::compute_sign(signal, pump, crystal_setup);
+          sign * period_um.abs() * MICRO * M
+        },
       };
 
       Ok(
