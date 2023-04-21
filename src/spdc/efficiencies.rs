@@ -1,6 +1,7 @@
 use crate::{SPDC, jsa::FrequencySpace};
 use dim::ucum::{S, Hertz};
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Efficiencies {
   pub symmetric: f64,
   pub signal: f64,
