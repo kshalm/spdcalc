@@ -101,7 +101,7 @@ impl JointSpectrum {
   ///
   /// This is unitless and normalized to the optimal setup
   pub fn jsi_normalized(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
-    self.jsa(omega_s, omega_i).norm_sqr()
+    self.jsa_normalized(omega_s, omega_i).norm_sqr()
   }
 
   /// Get the normalized value of the JSI at specified signal/idler frequencies
