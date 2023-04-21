@@ -19,19 +19,19 @@ impl IntoSignalIdlerIterator for FrequencySpace {
 /// X-axis is the sum of the signal and idler frequencies,
 /// and the Y-axis is the difference.
 #[derive(Debug, Clone, Copy)]
-pub struct RotatedFrequencySpace(FrequencySpace);
+pub struct SumDiffFrequencySpace(FrequencySpace);
 
-impl RotatedFrequencySpace {
+impl SumDiffFrequencySpace {
   pub fn new(xsteps : (Frequency, Frequency, usize), ysteps: (Frequency, Frequency, usize)) -> Self {
     Self (
       Steps2D(xsteps, ysteps)
     )
   }
   pub fn from_frequency_steps(frequencies : FrequencySpace) -> Self {
-    let ws_min = frequencies.0.1;
-    let ws_max = frequencies.0.0;
-    let wi_min = frequencies.1.1;
-    let wi_max = frequencies.1.0;
+    let ws_min = frequencies.0.0;
+    let ws_max = frequencies.0.1;
+    let wi_min = frequencies.1.0;
+    let wi_max = frequencies.1.1;
     //x: s = (wi + ws) / 2
     //y: d = (wi - ws) / 2
     let s_min = (wi_min + ws_min) / 2.;
@@ -48,15 +48,28 @@ impl RotatedFrequencySpace {
   }
 }
 
-impl From<RotatedFrequencySpace> for FrequencySpace {
-  fn from(rfs : RotatedFrequencySpace) -> Self {
+impl From<WavelengthSpace> for SumDiffFrequencySpace {
+  fn from(ws : WavelengthSpace) -> Self {
+    let ws_min = vacuum_wavelength_to_frequency(ws.0.0.1);
+    let ws_max = vacuum_wavelength_to_frequency(ws.0.0.0);
+    let wi_min = vacuum_wavelength_to_frequency(ws.0.1.1);
+    let wi_max = vacuum_wavelength_to_frequency(ws.0.1.0);
+    Self::from_frequency_steps(Steps2D(
+      (ws_min, ws_max, ws.0.0.2),
+      (wi_min, wi_max, ws.0.1.2)
+    ))
+  }
+}
+
+impl From<SumDiffFrequencySpace> for FrequencySpace {
+  fn from(rfs : SumDiffFrequencySpace) -> Self {
     rfs.0
   }
 }
 
-pub struct RotatedSIIterator(Iterator2D<Frequency>);
+pub struct SumDiffSIIterator(Iterator2D<Frequency>);
 
-impl Iterator for RotatedSIIterator {
+impl Iterator for SumDiffSIIterator {
   type Item = (Frequency, Frequency);
   fn next(&mut self) -> Option<Self::Item> {
     self.0.next().map(|(s, d)| {
@@ -67,10 +80,10 @@ impl Iterator for RotatedSIIterator {
   }
 }
 
-impl IntoSignalIdlerIterator for RotatedFrequencySpace {
-  type IntoIter = RotatedSIIterator;
+impl IntoSignalIdlerIterator for SumDiffFrequencySpace {
+  type IntoIter = SumDiffSIIterator;
   fn into_signal_idler_iterator(self) -> Self::IntoIter {
-    RotatedSIIterator(self.0.into_iter())
+    SumDiffSIIterator(self.0.into_iter())
   }
 }
 
