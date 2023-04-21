@@ -197,14 +197,13 @@ mod tests {
   use super::*;
   extern crate float_cmp;
   use float_cmp::*;
-  use dim::{f64prefixes::NANO, ucum::{M, S, RAD, Hertz}};
+  use dim::{f64prefixes::*, ucum::*};
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * ((expected - actual) / expected).abs()
   }
 
-  #[test]
-  fn test_efficiency() {
+  fn get_spdc() -> SPDC {
     let json = serde_json::json!({
       "crystal": {
         "name": "KTP",
@@ -264,6 +263,12 @@ mod tests {
 
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
     let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+    spdc
+  }
+
+  #[test]
+  fn test_efficiency() {
+    let spdc = get_spdc();
 
     let spectrum = JointSpectrum::new(spdc.clone(), None);
     let frequencies = Steps2D(
@@ -293,5 +298,66 @@ mod tests {
     dbg!(spdc_setup, wavelength_range, results);
 
     assert!(coinc_rate < singles_signal_rate);
+  }
+
+  #[test]
+  fn test_normalized_jsa(){
+    let spdc = get_spdc();
+    let optimal = spdc.clone().try_as_optimum().unwrap();
+    let sp = optimal.joint_spectrum(None);
+    let jsa = sp.jsa_normalized(optimal.signal.frequency(), optimal.idler.frequency());
+
+    approx_eq!(f64, jsa.norm(), 1.0, ulps = 2);
+
+    let json = serde_json::json!({
+      "crystal": {
+        "name": "KTP",
+        "pm_type": "Type2_e_eo",
+        "phi_deg": 0.0,
+        "theta_deg": 90.0,
+        "length_um": 2000.0000000000002,
+        "temperature_c": 20.0
+      },
+      "pump": {
+        "wavelength_nm": 774.9999999999999,
+        "waist_um": 100.0,
+        "bandwidth_nm": 5.35,
+        "average_power_mw": 300.0,
+        "spectrum_threshold": 0.01
+      },
+      "signal": {
+        "wavelength_nm": 1549.9999999999998,
+        "phi_deg": 0.0,
+        "theta_deg": 5.7471313465066505,
+        "theta_external_deg": null,
+        "waist_um": 100.0,
+        "waist_position_um": -576.6731750218877
+      },
+      "idler": {
+        "wavelength_nm": 1549.9999999999998,
+        "phi_deg": 180.0,
+        "theta_deg": 5.640436081002587,
+        "theta_external_deg": null,
+        "waist_um": 100.0,
+        "waist_position_um": -550.6780644729153
+      },
+      "periodic_poling": {
+        "poling_period_um": 100.50207043225802,
+        "apodization_fwhm_um": null
+      },
+      "deff_pm_per_volt": 7.299999999999999
+    });
+    let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+    let optimal = spdc.clone().try_as_optimum().unwrap();
+    dbg!(&spdc);
+    dbg!(&optimal);
+    dbg!(spdc.joint_spectrum(None).jsa(spdc.signal.frequency(), spdc.idler.frequency()));
+    dbg!(optimal.joint_spectrum(None).jsa(optimal.signal.frequency(), optimal.idler.frequency()));
+    let sp = spdc.joint_spectrum(None);
+    let jsa = sp.jsa_normalized(spdc.signal.frequency(), spdc.idler.frequency());
+    dbg!(jsa.norm());
+
+    assert!(jsa.norm() < 1.0);
   }
 }
