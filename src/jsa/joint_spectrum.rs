@@ -30,7 +30,7 @@ pub fn jsi_singles_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, inte
 pub struct JointSpectrum {
   spdc: SPDC,
   integration_steps: Option<usize>,
-  jsa_center: Complex<f64>,
+  jsa_center: f64,
   jsi_singles_center: f64,
 }
 
@@ -40,7 +40,7 @@ impl JointSpectrum {
     integration_steps: Option<usize>
   ) -> Self {
     let spdc_optimal = spdc.clone().try_as_optimal().unwrap();
-    let jsa_center = jsa_raw(spdc_optimal.signal.frequency(), spdc_optimal.idler.frequency(), &spdc_optimal, integration_steps);
+    let jsa_center = jsa_raw(spdc_optimal.signal.frequency(), spdc_optimal.idler.frequency(), &spdc_optimal, integration_steps).norm();
     let jsi_singles_center = jsi_singles_raw(spdc_optimal.signal.frequency(), spdc_optimal.idler.frequency(), &spdc_optimal, integration_steps);
 
     Self { spdc, integration_steps, jsa_center, jsi_singles_center }
