@@ -75,4 +75,5 @@ record spdc-config {
 //  test: func() -> float32
 //}
 
-get-config: func() -> crystal-config
+default-config: func() -> spdc-config
+jsi-range: func(config: spdc-config) -> list<float32>

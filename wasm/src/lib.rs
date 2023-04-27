@@ -1,34 +1,37 @@
-use ::spdcalc::*;
+use ::spdcalc::{*, utils::*, jsa::*};
+use ::spdcalc::dim::{f64prefixes::*, ucum::*};
 // use wai_bindgen_rust::Handle;
 
 wai_bindgen_rust::export!("spdcalc.wai");
 
-impl From<::spdcalc::AutoCalcParam<f64>> for crate::spdcalc::AutoNum {
-  fn from(param: ::spdcalc::AutoCalcParam<f64>) -> Self {
-    match param {
-      ::spdcalc::AutoCalcParam::Auto(_) => crate::spdcalc::AutoNum::String("auto".to_string()),
-      ::spdcalc::AutoCalcParam::Param(x) => crate::spdcalc::AutoNum::F32(x as f32),
-    }
-  }
-}
-
-impl From<::spdcalc::CrystalConfig> for crate::spdcalc::CrystalConfig {
-  fn from(config: ::spdcalc::CrystalConfig) -> Self {
-    spdcalc::CrystalConfig {
-      name: config.name.to_string(),
-      pm_type: config.pm_type.to_string(),
-      phi_deg: config.phi_deg as f32,
-      theta_deg: Some(config.theta_deg.into()),
-      length_um: config.length_um as f32,
-      temperature_c: config.temperature_c as f32
-    }
-  }
-}
+mod config;
+pub use config::*;
 
 pub struct Spdcalc;
 
 impl crate::spdcalc::Spdcalc for Spdcalc {
-  fn get_config() -> spdcalc::CrystalConfig {
-    ::spdcalc::CrystalConfig::default().into()
+  fn default_config() -> crate::spdcalc::SpdcConfig {
+    ::spdcalc::SPDCConfig::default().into()
   }
+
+  fn jsi_range(cfg: spdcalc::SpdcConfig) -> Vec<f32> {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    let spectrum = spdc.joint_spectrum(None);
+    let range : WavelengthSpace = Steps2D(
+      (1500. * NANO * M, 1600. * NANO * M, 20),
+      (1500. * NANO * M, 1600. * NANO * M, 20),
+    ).into();
+    jsi_out(spectrum.jsi_range(range))
+  }
+}
+
+fn jsi_out(v : Vec<JSIUnits<f64>>) -> Vec<f32> {
+  let units = JSIUnits::new(1.);
+  v.iter().map(|x| *(*x / units) as f32).collect()
+}
+
+fn jsa_out(v : Vec<JSAUnits<f64>>) -> Vec<f32> {
+  let units = JSAUnits::new(1.);
+  v.iter().map(|x| *(*x / units) as f32).collect()
 }
