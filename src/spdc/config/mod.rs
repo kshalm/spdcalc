@@ -51,7 +51,7 @@ impl Default for CrystalConfig {
       name: Crystal::KTP,
       pm_type: PMType::Type2_e_eo,
       phi_deg: 0.,
-      theta_deg: AutoCalcParam::Param(90.),
+      theta_deg: AutoCalcParam::Auto("auto".into()),
       length_um: 2_000.,
       temperature_c: 20.,
     }
@@ -266,7 +266,7 @@ impl Default for SPDCConfig {
       signal: SignalConfig::default(),
       idler: AutoCalcParam::default(),
       periodic_poling: MaybePeriodicPolingConfig::default(),
-      deff_pm_per_volt: 0.0,
+      deff_pm_per_volt: 7.3,
     }
   }
 }
