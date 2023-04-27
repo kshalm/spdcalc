@@ -2,7 +2,12 @@ default: test-js
 
 build-wapm:
   echo "Building locally"
-  cargo wapm -d --out-dir ./wapm
+  # cargo wapm -d --out-dir ./wapm
+  # cargo build --target wasm32-unknown-unknown
+  # cp target/wasm32-unknown-unknown/release/spdcalc.wasm wapm/
+  cargo build --target wasm32-wasi --release
+  cp target/wasm32-wasi/release/spdcalc.wasm wapm/
+  cp spdcalc.wai wapm/
 
 build-js: build-wapm
   wasmer-pack js ./wapm --out-dir ./js

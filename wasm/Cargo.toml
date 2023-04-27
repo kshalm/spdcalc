@@ -13,6 +13,7 @@ wai-bindgen-rust = "0.2.3"
 spdcalc = { path = "../" }
 serde_json = "1.0"
 # getrandom = { version = "0.2", features = ["js"] }
+# getrandom = { features = ["custom"] }
 
 [package.metadata.wapm]
 namespace = "wellcaffeinated"  # Replace this with your WAPM username

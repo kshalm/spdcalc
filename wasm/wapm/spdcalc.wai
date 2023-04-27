@@ -69,10 +69,10 @@ record spdc-config {
   deff-pm-per-volt: float32,
 }
 
-resource spdc {
-  static from-config: func(config: spdc-config) -> expected<spdc, error>
-  static get-config: func() -> crystal-config
-  test: func() -> float32
-}
+//resource spdc {
+//  static from-config: func(config: spdc-config) -> expected<spdc, error>
+//  static get-config: func() -> crystal-config
+//  test: func() -> float32
+//}
 
-get-spdc: func() -> expected<spdc, error>
+get-config: func() -> crystal-config
