@@ -1,4 +1,4 @@
-use crate::{utils::{vacuum_wavelength_to_frequency, Steps2D, Iterator2D}, Frequency, Wavelength};
+use crate::{utils::{vacuum_wavelength_to_frequency, Steps2D, Iterator2D, frequency_to_vacuum_wavelength}, Frequency, Wavelength};
 
 pub type FrequencySpace = Steps2D<Frequency>;
 
@@ -27,7 +27,12 @@ impl SumDiffFrequencySpace {
       Steps2D(xsteps, ysteps)
     )
   }
-  pub fn from_frequency_steps(frequencies : FrequencySpace) -> Self {
+
+  pub fn as_steps(self) -> Steps2D<Frequency> {
+    self.0
+  }
+
+  pub fn from_frequency_space(frequencies : FrequencySpace) -> Self {
     let ws_min = frequencies.0.0;
     let ws_max = frequencies.0.1;
     let wi_min = frequencies.1.0;
@@ -46,24 +51,53 @@ impl SumDiffFrequencySpace {
       )
     )
   }
-}
 
-impl From<WavelengthSpace> for SumDiffFrequencySpace {
-  fn from(ws : WavelengthSpace) -> Self {
+  pub fn from_wavelength_space(ws : WavelengthSpace) -> Self {
     let ws_min = vacuum_wavelength_to_frequency(ws.0.0.1);
     let ws_max = vacuum_wavelength_to_frequency(ws.0.0.0);
     let wi_min = vacuum_wavelength_to_frequency(ws.0.1.1);
     let wi_max = vacuum_wavelength_to_frequency(ws.0.1.0);
-    Self::from_frequency_steps(Steps2D(
+    Self::from_frequency_space(Steps2D(
       (ws_min, ws_max, ws.0.0.2),
       (wi_min, wi_max, ws.0.1.2)
     ))
   }
+
+  pub fn as_frequency_space(self) -> FrequencySpace {
+    let s_min = self.0.0.0;
+    let s_max = self.0.0.1;
+    let d_min = self.0.1.0;
+    let d_max = self.0.1.1;
+    let ws_min = 0.25 * (3. * s_min + s_max - d_min - 3. * d_max);
+    let ws_max = 0.25 * (s_min + 3. * s_max - 3. * d_min - d_max);
+    let wi_min = 0.25 * (3. * s_min + s_max + 3. * d_min + d_max);
+    let wi_max = 0.25 * (s_min + 3. * s_max + d_min + 3. * d_max);
+    FrequencySpace::new(
+      (ws_min, ws_max, self.0.0.2),
+      (wi_min, wi_max, self.0.1.2)
+    )
+  }
+
+  pub fn as_wavelength_space(self) -> WavelengthSpace {
+    WavelengthSpace::from_frequency_space(self.as_frequency_space())
+  }
+}
+
+impl From<WavelengthSpace> for SumDiffFrequencySpace {
+  fn from(ws : WavelengthSpace) -> Self {
+    Self::from_wavelength_space(ws)
+  }
+}
+
+impl From<FrequencySpace> for SumDiffFrequencySpace {
+  fn from(fs : FrequencySpace) -> Self {
+    Self::from_frequency_space(fs)
+  }
 }
 
 impl From<SumDiffFrequencySpace> for FrequencySpace {
-  fn from(rfs : SumDiffFrequencySpace) -> Self {
-    rfs.0
+  fn from(sd : SumDiffFrequencySpace) -> Self {
+    sd.as_frequency_space()
   }
 }
 
@@ -104,6 +138,31 @@ impl Iterator for WavelengthSIIterator {
 
 #[derive(Debug, Clone, Copy)]
 pub struct WavelengthSpace(Steps2D<Wavelength>);
+
+impl WavelengthSpace {
+  pub fn new(xsteps : (Wavelength, Wavelength, usize), ysteps: (Wavelength, Wavelength, usize)) -> Self {
+    Self (
+      Steps2D(xsteps, ysteps)
+    )
+  }
+
+  pub fn from_frequency_space(fs: FrequencySpace) -> Self {
+    let ls_min = frequency_to_vacuum_wavelength(fs.0.1);
+    let ls_max = frequency_to_vacuum_wavelength(fs.0.0);
+    let li_min = frequency_to_vacuum_wavelength(fs.1.1);
+    let li_max = frequency_to_vacuum_wavelength(fs.1.0);
+    Self (
+      Steps2D(
+        (ls_min, ls_max, fs.0.2),
+        (li_min, li_max, fs.1.2)
+      )
+    )
+  }
+
+  pub fn as_steps(self) -> Steps2D<Wavelength> {
+    self.0
+  }
+}
 
 impl From<Steps2D<Wavelength>> for WavelengthSpace {
   fn from(steps : Steps2D<Wavelength>) -> Self {

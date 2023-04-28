@@ -13,8 +13,11 @@ build-js: build-wapm
   wasmer-pack js ./wapm --out-dir ./js
 
 build-py: build-wapm
-  wasmer-pack python ./wapm --out-dir ./py
+  wasmer-pack python ./wapm --out-dir ./py/package
 
 test-js: build-js
   pnpm --dir {{justfile_directory()}}/js/package install
   node js/index.mjs
+
+test-py: build-py
+  python3 py/test.py

@@ -194,6 +194,10 @@ pub struct Steps2D<T>(pub (T, T, usize), pub (T, T, usize));
 
 impl<T> Steps2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
+  pub fn new(x: (T, T, usize), y: (T, T, usize)) -> Self {
+    Self(x, y)
+  }
+
   pub fn divisions(&self) -> (usize, usize) {
     (Steps::from(self.0).divisions(), Steps::from(self.1).divisions())
   }
