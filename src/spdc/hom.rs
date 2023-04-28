@@ -72,8 +72,9 @@ pub fn hom_time_delay(
 pub fn hom_visibility<T: Into<FrequencySpace> + Copy>(
   spdc : &SPDC,
   ranges: T,
+  integration_steps : Option<usize>
 ) -> (Time, f64) {
-  let sp = spdc.joint_spectrum(None);
+  let sp = spdc.joint_spectrum(integration_steps);
   let ranges = ranges.into();
   let jsa_values = sp.jsa_range(ranges);
   let jsa_values_swapped = ranges.into_iter().map(|(ws, wi)| {
@@ -95,9 +96,9 @@ pub fn hom_visibility<T: Into<FrequencySpace> + Copy>(
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct HomTwoSourceResult<T> {
-  ss: T,
-  ii: T,
-  si: T,
+  pub ss: T,
+  pub ii: T,
+  pub si: T,
 }
 
 pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Time>>(
@@ -219,12 +220,13 @@ pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
   spdc2 : &SPDC,
   region1 : T,
   region2 : T,
+  integration_steps : Option<usize>
 ) -> HomTwoSourceResult<(Time, f64)> {
   use dim::ucum::S;
   if spdc1 == spdc2 {
     let min_rate = hom_two_source_rate_series(
-      &spdc1.joint_spectrum(None),
-      &spdc2.joint_spectrum(None),
+      &spdc1.joint_spectrum(integration_steps),
+      &spdc2.joint_spectrum(integration_steps),
       region1,
       region2,
       Steps(0. * S, 0. * S, 1)
@@ -237,22 +239,22 @@ pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
   } else {
     let time_delays = hom_two_source_time_delays(spdc1, spdc2);
     let min_ss = hom_two_source_rate_series(
-      &spdc1.joint_spectrum(None),
-      &spdc2.joint_spectrum(None),
+      &spdc1.joint_spectrum(integration_steps),
+      &spdc2.joint_spectrum(integration_steps),
       region1,
       region2,
       Steps(time_delays.ss, time_delays.ss, 1)
     ).ss[0];
     let min_ii = hom_two_source_rate_series(
-      &spdc1.joint_spectrum(None),
-      &spdc2.joint_spectrum(None),
+      &spdc1.joint_spectrum(integration_steps),
+      &spdc2.joint_spectrum(integration_steps),
       region1,
       region2,
       Steps(time_delays.ii, time_delays.ii, 1)
     ).ii[0];
     let min_si = hom_two_source_rate_series(
-      &spdc1.joint_spectrum(None),
-      &spdc2.joint_spectrum(None),
+      &spdc1.joint_spectrum(integration_steps),
+      &spdc2.joint_spectrum(integration_steps),
       region1,
       region2,
       Steps(time_delays.si, time_delays.si, 1)
@@ -316,7 +318,7 @@ mod test {
     );
     let range : WavelengthSpace = steps.into();
 
-    let result = hom_visibility(&spdc, range);
+    let result = hom_visibility(&spdc, range, None);
 
     let spdc_setup = spdc.into();
     let old_result = calc_hom_visibility(&spdc_setup, &steps);
@@ -333,7 +335,7 @@ mod test {
     );
     let range : WavelengthSpace = steps.into();
 
-    let result = hom_two_source_visibilities(&spdc, &spdc, range, range);
+    let result = hom_two_source_visibilities(&spdc, &spdc, range, range, None);
 
     let spdc_setup = spdc.into();
     let old_result = calc_hom_two_source_visibility(&spdc_setup, &spdc_setup, &steps, &steps);

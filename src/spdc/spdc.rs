@@ -1,4 +1,5 @@
 use dim::ucum::{MilliWatt, DEG, Hertz};
+use crate::math::nelder_mead_1d;
 use crate::types::Time;
 use crate::{SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Wavelength, Distance, optimum_poling_period, SPDCError, jsa::{JointSpectrum, FrequencySpace}};
 
@@ -58,6 +59,55 @@ impl SPDC {
     }
   }
 
+  pub fn auto_range(&self, size: usize, threshold: Option<f64>) -> FrequencySpace {
+    use dim::{f64prefixes::*, ucum::{RAD, S}};
+    let wp = self.pump.frequency();
+    let ws = self.signal.frequency();
+
+    let mut spdc = self.clone();
+    spdc.assign_optimum_idler().unwrap();
+    let spectrum = spdc.joint_spectrum(None);
+    let peak = spectrum.jsi_normalized(ws, spdc.idler.frequency());
+    let target = threshold.unwrap_or(0.5) * peak;
+
+    let pm_diff = |ws| {
+      let local = spectrum.jsi_normalized(ws * (RAD / S), spdc.idler.frequency());
+      if local < std::f64::EPSILON {
+        std::f64::MAX
+      } else {
+        let diff = target - local;
+        diff.abs()
+      }
+    };
+
+    let ws = *(ws / (RAD / S));
+    let guess = ws - 1. * TERA;
+    let ans = nelder_mead_1d(pm_diff, guess, 1000, std::f64::MIN, ws, 1e-12);
+
+    // FIXME WHAT ARE THESE NUMBERS
+    // let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spdc_setup.pump_bandwidth / (NANO * M))).min(35e-9);
+    let diff = (ans - ws).abs(); //.min(diff_max);
+    // println!("l_s {}, diff {}", l_s, diff);
+    // println!("target {}, jsi(ans) {}", target, pm_diff(ans));
+
+    let x_steps = (
+      (ws - 10. * diff) * (RAD / S),
+      (ws + 10. * diff) * (RAD / S),
+      size
+    );
+
+    let y_steps = (
+      wp - x_steps.1,
+      wp - x_steps.0,
+      size
+    );
+
+    FrequencySpace::new(
+      x_steps,
+      y_steps,
+    )
+  }
+
   /// Convert it into an optimum setup
   pub fn try_as_optimum(mut self) -> Result<Self, SPDCError> {
     self.signal.set_angles(0. * DEG, 0. * DEG);
@@ -85,17 +135,17 @@ impl SPDC {
   }
 
   /// Assign the optimum idler to this SPDC
-  pub fn assign_optimum_idler(&mut self) -> Result<(), SPDCError> {
+  pub fn assign_optimum_idler(&mut self) -> Result<&mut Self, SPDCError> {
     let idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)?;
     self.idler = idler;
-    Ok(())
+    Ok(self)
   }
 
   /// Assign the optimum periodic poling to this SPDC
-  pub fn assign_optimum_periodic_poling(&mut self) -> Result<(), SPDCError> {
+  pub fn assign_optimum_periodic_poling(&mut self) -> Result<&mut Self, SPDCError> {
     let pp = PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp.map_or(None, |pp| pp.apodization))?;
     self.pp = Some(pp);
-    Ok(())
+    Ok(self)
   }
 
   pub fn with_swapped_signal_idler(self) -> Self {
@@ -153,12 +203,12 @@ impl SPDC {
   }
 
   /// get the HOM time delay, and visibility
-  pub fn hom_visibility<T: Into<FrequencySpace>>(&self, ranges: T) -> (Time, f64) {
-    super::hom_visibility(self, ranges.into())
+  pub fn hom_visibility<T: Into<FrequencySpace>>(&self, ranges: T, integration_steps : Option<usize>) -> (Time, f64) {
+    super::hom_visibility(self, ranges.into(), integration_steps)
   }
 
   /// get the HOM rate for specified time delays
-  pub fn hom_rate_series<R: Into<FrequencySpace>, T: IntoIterator<Item = Time>>(&self, ranges: R, time_delays: T, integration_steps : Option<usize>) -> Vec<f64> {
+  pub fn hom_rate_series<R: Into<FrequencySpace>, T: IntoIterator<Item = Time>>(&self, time_delays: T, ranges: R, integration_steps : Option<usize>) -> Vec<f64> {
     let sp = self.joint_spectrum(integration_steps);
     let ranges = ranges.into();
     let jsa_values = sp.jsa_range(ranges);
@@ -174,12 +224,12 @@ impl SPDC {
   }
 
   /// get the two source HOM visibilities of this setup against itself
-  pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(&self, ranges: T) -> super::HomTwoSourceResult<(Time, f64)> {
-    super::hom_two_source_visibilities(self, self, ranges, ranges)
+  pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(&self, ranges: T, integration_steps : Option<usize>) -> super::HomTwoSourceResult<(Time, f64)> {
+    super::hom_two_source_visibilities(self, self, ranges, ranges, integration_steps)
   }
 
   /// get the two source HOM rate over specified times
-  pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Time>>(&self, ranges: R, time_delays: T, integration_steps : Option<usize>) -> super::HomTwoSourceResult<Vec<f64>> {
+  pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Time>>(&self, time_delays: T, ranges: R, integration_steps : Option<usize>) -> super::HomTwoSourceResult<Vec<f64>> {
     let sp = self.joint_spectrum(integration_steps);
     super::hom_two_source_rate_series(
       &sp,

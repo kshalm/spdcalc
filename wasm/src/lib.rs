@@ -7,6 +7,47 @@ wai_bindgen_rust::export!("spdcalc.wai");
 mod config;
 pub use config::*;
 
+impl From<SPDCError> for crate::spdcalc::Error {
+  fn from(err: SPDCError) -> Self {
+    Self {
+      message: err.to_string(),
+    }
+  }
+}
+
+impl From<Efficiencies> for crate::spdcalc::Efficiencies {
+  fn from(efficiencies: Efficiencies) -> Self {
+    Self {
+      symmetric: efficiencies.symmetric,
+      signal: efficiencies.signal,
+      idler: efficiencies.idler,
+      coincidences: *(efficiencies.coincidences / HZ),
+      signal_singles: *(efficiencies.signal_singles / HZ),
+      idler_singles: *(efficiencies.idler_singles / HZ),
+    }
+  }
+}
+
+impl From<HomTwoSourceResult<(Time, f64)>> for crate::spdcalc::HomTwoSourceVisibilities {
+  fn from(result: HomTwoSourceResult<(Time, f64)>) -> Self {
+    Self {
+      ss: (*(result.ss.0 / S), result.ss.1),
+      ii: (*(result.ii.0 / S), result.ii.1),
+      si: (*(result.si.0 / S), result.si.1),
+    }
+  }
+}
+
+impl From<HomTwoSourceResult<Vec<f64>>> for crate::spdcalc::HomTwoSourceRateSeries {
+  fn from(result: HomTwoSourceResult<Vec<f64>>) -> Self {
+    Self {
+      ss: result.ss,
+      ii: result.ii,
+      si: result.si,
+    }
+  }
+}
+
 pub struct SiIterator(Box<dyn Iterator<Item = (Frequency, Frequency)>>);
 
 impl Iterator for SiIterator {
@@ -42,11 +83,90 @@ impl IntoSignalIdlerIterator for crate::spdcalc::SiRange {
   }
 }
 
+impl From<crate::spdcalc::SiRange> for FrequencySpace {
+  fn from(si_range: crate::spdcalc::SiRange) -> Self {
+    match si_range {
+      crate::spdcalc::SiRange::WavelengthRange(range) => {
+        WavelengthSpace::new(
+          (range.x.0 * M, range.x.1 * M, range.x.2 as usize),
+          (range.y.0 * M, range.y.1 * M, range.y.2 as usize),
+        ).into()
+      },
+      crate::spdcalc::SiRange::FrequencyRange(range) => {
+        FrequencySpace::new(
+          (range.x.0 * (RAD / S), range.x.1 * (RAD / S), range.x.2 as usize),
+          (range.y.0 * (RAD / S), range.y.1 * (RAD / S), range.y.2 as usize),
+        )
+      },
+      crate::spdcalc::SiRange::SumDiffRange(range) => {
+        SumDiffFrequencySpace::new(
+          (range.x.0 * (RAD / S), range.x.1 * (RAD / S), range.x.2 as usize),
+          (range.y.0 * (RAD / S), range.y.1 * (RAD / S), range.y.2 as usize),
+        ).into()
+      },
+    }
+  }
+}
+
 pub struct Spdcalc;
 
 impl crate::spdcalc::Spdcalc for Spdcalc {
-  fn default_config() -> crate::spdcalc::SpdcConfig {
+  // config-default: func() -> spdc-config
+  // config-as-optimum: func(config: spdc-config) -> spdc-config
+  // config-with-optimum-idler: func(config: spdc-config) -> spdc-config
+  // config-with-optimum-periodic-poling: func(config: spdc-config) -> spdc-config
+  // config-with-swapped-signal-idler: func(config: spdc-config) -> spdc-config
+
+  fn config_default() -> crate::spdcalc::SpdcConfig {
     SPDCConfig::default().into()
+  }
+
+  fn config_from_json(str: String) -> crate::spdcalc::SpdcConfig {
+    let config: SPDCConfig = serde_json::from_str(&str).unwrap();
+    config.into()
+  }
+
+  fn config_to_json(config: crate::spdcalc::SpdcConfig) -> String {
+    let config: SPDCConfig = config.into();
+    serde_json::to_string(&config).unwrap()
+  }
+
+  fn config_as_optimum(config: crate::spdcalc::SpdcConfig) -> crate::spdcalc::SpdcConfig {
+    let config: SPDCConfig = config.into();
+    let spdc = config.try_as_spdc().unwrap();
+    let config = spdc.try_as_optimum().unwrap();
+    SPDCConfig::from(config).into()
+  }
+
+  fn config_with_optimum_idler(config: crate::spdcalc::SpdcConfig) -> crate::spdcalc::SpdcConfig {
+    let config: SPDCConfig = config.into();
+    let mut spdc = config.try_as_spdc().unwrap();
+    spdc.assign_optimum_idler().unwrap();
+    SPDCConfig::from(spdc).into()
+  }
+
+  fn config_with_optimum_periodic_poling(config: crate::spdcalc::SpdcConfig) -> crate::spdcalc::SpdcConfig {
+    let config: SPDCConfig = config.into();
+    let mut spdc = config.try_as_spdc().unwrap();
+    spdc.assign_optimum_periodic_poling().unwrap();
+    SPDCConfig::from(spdc).into()
+  }
+
+  fn config_with_swapped_signal_idler(config: crate::spdcalc::SpdcConfig) -> crate::spdcalc::SpdcConfig {
+    let config: SPDCConfig = config.into();
+    let spdc = config.try_as_spdc().unwrap();
+    let config = spdc.with_swapped_signal_idler();
+    SPDCConfig::from(config).into()
+  }
+
+  fn auto_range(config: crate::spdcalc::SpdcConfig, steps: u64, threshold: Option<f64>) -> crate::spdcalc::SiRange {
+    let config: SPDCConfig = config.into();
+    let spdc = config.try_as_spdc().unwrap();
+    let range = spdc.auto_range(steps as usize, threshold);
+    Self::frequency_range(
+      (*(range.0.0 / (RAD / S)), *(range.0.1 / (RAD / S)), range.0.2 as u64),
+      (*(range.1.0 / (RAD / S)), *(range.1.1 / (RAD / S)), range.1.2 as u64),
+    )
   }
 
   fn wavelength_range(x_range: (f64, f64, u64), y_range: (f64, f64, u64)) -> crate::spdcalc::SiRange {
@@ -288,6 +408,74 @@ impl crate::spdcalc::Spdcalc for Spdcalc {
     let spdc = config.try_as_spdc().unwrap();
     let spectrum = spdc.joint_spectrum(integration_steps.map(|x| x as usize));
     spectrum.jsi_singles_idler_normalized_range(range)
+  }
+
+  fn schmidt_number(cfg: spdcalc::SpdcConfig, range: crate::spdcalc::SiRange, integration_steps: Option<u32>) -> Result<f64, crate::spdcalc::Error> {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    let spectrum = spdc.joint_spectrum(integration_steps.map(|x| x as usize));
+
+    Ok(spectrum.schmidt_number(range)?)
+  }
+
+  fn counts_coincidences(cfg: spdcalc::SpdcConfig, range: crate::spdcalc::SiRange, integration_steps: Option<u32>) -> f64 {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    *(spdc.counts_coincidences(range, integration_steps.map(|x| x as usize)) / HZ)
+  }
+
+  fn counts_singles_signal(cfg: spdcalc::SpdcConfig, range: crate::spdcalc::SiRange, integration_steps: Option<u32>) -> f64 {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    *(spdc.counts_singles_signal(range, integration_steps.map(|x| x as usize)) / HZ)
+  }
+
+  fn counts_singles_idler(cfg: spdcalc::SpdcConfig, range: crate::spdcalc::SiRange, integration_steps: Option<u32>) -> f64 {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    *(spdc.counts_singles_idler(range, integration_steps.map(|x| x as usize)) / HZ)
+  }
+
+  fn efficiencies(cfg: spdcalc::SpdcConfig, range: crate::spdcalc::SiRange, integration_steps: Option<u32>) -> crate::spdcalc::Efficiencies {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    spdc.efficiencies(range, integration_steps.map(|x| x as usize)).into()
+  }
+
+  fn hom_visibility(cfg: spdcalc::SpdcConfig, range: crate::spdcalc::SiRange, integration_steps: Option<u32>) -> (f64, f64) {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    let vis = spdc.hom_visibility(range, integration_steps.map(|x| x as usize));
+    (*(vis.0 / S), vis.1)
+  }
+
+  fn hom_rate_series(cfg: spdcalc::SpdcConfig, time_delays: Vec<f64>, range: crate::spdcalc::SiRange, integration_steps: Option<u32>) -> Vec<f64> {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    spdc.hom_rate_series(
+      time_delays.iter().map(|dt| *dt * S),
+      range,
+      integration_steps.map(|x| x as usize)
+    )
+  }
+
+  fn hom_two_source_visibilities(cfg: spdcalc::SpdcConfig, range: crate::spdcalc::SiRange, integration_steps: Option<u32>) -> crate::spdcalc::HomTwoSourceVisibilities {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    spdc.hom_two_source_visibilities(
+      range,
+      integration_steps.map(|x| x as usize)
+    ).into()
+  }
+
+  fn hom_two_source_rate_series(cfg: spdcalc::SpdcConfig, time_delays: Vec<f64>, range: crate::spdcalc::SiRange, integration_steps: Option<u32>) -> crate::spdcalc::HomTwoSourceRateSeries {
+    let config : SPDCConfig = cfg.into();
+    let spdc = config.try_as_spdc().unwrap();
+    spdc.hom_two_source_rate_series(
+      time_delays.iter().map(|dt| *dt * S),
+      range,
+      integration_steps.map(|x| x as usize)
+    ).into()
   }
 }
 

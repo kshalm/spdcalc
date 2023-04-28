@@ -1,4 +1,6 @@
-type error = string
+record error {
+  message: string,
+}
 
 union auto-num {
   string,
@@ -96,10 +98,40 @@ union si-range {
   sum-diff-range,
 }
 
+record efficiencies {
+  signal: float64,
+  idler: float64,
+  symmetric: float64,
+  coincidences: float64,
+  signal-singles: float64,
+  idler-singles: float64,
+}
+
+record hom-two-source-visibilities {
+  ss: tuple<float64, float64>,
+  ii: tuple<float64, float64>,
+  si: tuple<float64, float64>,
+}
+
+record hom-two-source-rate-series {
+  ss: list<float64>,
+  ii: list<float64>,
+  si: list<float64>,
+}
+
 type complex = tuple<float64, float64>
 
-default-config: func() -> spdc-config
+config-default: func() -> spdc-config
+config-from-json: func(str: string) -> spdc-config
+config-to-json: func(config: spdc-config) -> string
+config-as-optimum: func(config: spdc-config) -> spdc-config
+config-with-optimum-idler: func(config: spdc-config) -> spdc-config
+config-with-optimum-periodic-poling: func(config: spdc-config) -> spdc-config
+config-with-swapped-signal-idler: func(config: spdc-config) -> spdc-config
+
+
 // ranges
+auto-range: func(config: spdc-config, steps: u64, threshold: option<float64>) -> si-range
 wavelength-range: func(x-range: tuple<float64, float64, u64>, y-range: tuple<float64, float64, u64>) -> si-range
 frequency-range: func(x-range: tuple<float64, float64, u64>, y-range: tuple<float64, float64, u64>) -> si-range
 sum-diff-range: func(x-range: tuple<float64, float64, u64>, y-range: tuple<float64, float64, u64>) -> si-range
@@ -125,5 +157,19 @@ jsa-singles-range: func(config: spdc-config, range: si-range, integration-steps:
 jsa-singles-normalized-range: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> list<float64>
 jsi-singles-range: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> list<float64>
 jsi-singles-normalized-range: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> list<float64>
+// idler singles
 jsi-singles-idler-range: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> list<float64>
 jsi-singles-idler-normalized-range: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> list<float64>
+// schmidt number
+schmidt-number: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> expected<float64, error>
+// counts
+counts-coincidences: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> float64
+counts-singles-signal: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> float64
+counts-singles-idler: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> float64
+// efficiencies
+efficiencies: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> efficiencies
+// hom visibility
+hom-visibility: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> tuple<float64, float64>
+hom-rate-series: func(config: spdc-config, time-delays: list<float64>, range: si-range, integration-steps: option<u32>) -> list<float64>
+hom-two-source-visibilities: func(config: spdc-config, range: si-range, integration-steps: option<u32>) -> hom-two-source-visibilities
+hom-two-source-rate-series: func(config: spdc-config, time-delays: list<float64>, range: si-range, integration-steps: option<u32>) -> hom-two-source-rate-series
