@@ -266,7 +266,7 @@ impl Default for SPDCConfig {
       signal: SignalConfig::default(),
       idler: AutoCalcParam::default(),
       periodic_poling: MaybePeriodicPolingConfig::default(),
-      deff_pm_per_volt: 7.3,
+      deff_pm_per_volt: 1.,
     }
   }
 }
@@ -445,7 +445,7 @@ mod test {
         "waist_position_um": "auto"
       },
       "idler": "auto",
-      "deff": 7.6,
+      "deff_pm_per_volt": 7.6,
     });
 
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
@@ -484,7 +484,7 @@ mod test {
       "periodic_poling": {
         "poling_period_um": "auto"
       },
-      "deff": 7.6,
+      "deff_pm_per_volt": 7.6,
     });
 
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
