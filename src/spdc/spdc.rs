@@ -122,7 +122,9 @@ impl SPDC {
         Some(PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, pp.apodization)?)
       }
     };
-    let idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)?;
+    let mut idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)?;
+    // keep the same idler waist size
+    idler.set_waist(self.idler.waist());
     Ok(
       Self {
         idler,
@@ -136,7 +138,9 @@ impl SPDC {
 
   /// Assign the optimum idler to this SPDC
   pub fn assign_optimum_idler(&mut self) -> Result<&mut Self, SPDCError> {
-    let idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)?;
+    let mut idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)?;
+    // keep the same idler waist size
+    idler.set_waist(self.idler.waist());
     self.idler = idler;
     Ok(self)
   }
