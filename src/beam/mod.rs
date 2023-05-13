@@ -102,7 +102,7 @@ impl IdlerBeam {
     let np = pump.refractive_index(pump.frequency(), &crystal_setup);
 
     let del_k_pp = match pp {
-      Some(poling) => signal.vacuum_wavelength() * poling.pp_factor(),
+      Some(poling) => ls * poling.pp_factor(),
       None => ucum::Unitless::new(0.0),
     };
 
@@ -121,13 +121,13 @@ impl IdlerBeam {
     let numerator = ns * sin(theta_s);
     let arg =
       (ns_z - np_by_ls_over_lp + del_k_pp).powi(2)
-      + numerator.powi(2);
+      + ns.powi(2);
 
     let val = (*numerator) / arg.sqrt();
 
-    if val > 1.0 || val < 0. {
-      return Err(SPDCError("Invalid solution for optimal idler theta".into()));
-    }
+    // if val > 1.0 || val < 0. {
+    //   return Err(SPDCError("Invalid solution for optimal idler theta".into()));
+    // }
 
     let theta = f64::asin(val) * ucum::RAD;
     let wavelength = ls * lp / (ls - lp);
