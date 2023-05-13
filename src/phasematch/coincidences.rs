@@ -668,6 +668,7 @@ mod tests {
         "waist_position_um": "auto"
       },
       "idler": "auto",
+      "deff_pm_per_volt": 1,
     });
 
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
