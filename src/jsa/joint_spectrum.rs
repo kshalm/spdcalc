@@ -41,8 +41,10 @@ impl JointSpectrum {
     integration_steps: Option<usize>
   ) -> Self {
     let spdc_optimal = spdc.clone().try_as_optimum().unwrap();
-    let jsa_center = jsa_raw(spdc_optimal.signal.frequency(), spdc_optimal.idler.frequency(), &spdc_optimal, integration_steps).norm();
-    let jsi_singles_center = jsi_singles_raw(spdc_optimal.signal.frequency(), spdc_optimal.idler.frequency(), &spdc_optimal, integration_steps);
+    let jsa_center_norm = jsi_normalization(spdc_optimal.signal.frequency(), spdc_optimal.idler.frequency(), &spdc_optimal) / JsiNorm::new(1.);
+    let jsa_center = jsa_center_norm.sqrt() * jsa_raw(spdc_optimal.signal.frequency(), spdc_optimal.idler.frequency(), &spdc_optimal, integration_steps).norm();
+    let jsi_singles_center_norm = *(jsi_singles_normalization(spdc_optimal.signal.frequency(), spdc_optimal.idler.frequency(), &spdc_optimal) / JsiSinglesNorm::new(1.));
+    let jsi_singles_center = jsi_singles_center_norm * jsi_singles_raw(spdc_optimal.signal.frequency(), spdc_optimal.idler.frequency(), &spdc_optimal, integration_steps);
 
     Self { spdc, integration_steps, jsa_center, jsi_singles_center }
   }
@@ -70,7 +72,7 @@ impl JointSpectrum {
   ///
   /// This is unitless and normalized to the optimal setup
   pub fn jsa_normalized(&self, omega_s: Frequency, omega_i: Frequency) -> Complex<f64> {
-    jsa_raw(omega_s, omega_i, &self.spdc, self.integration_steps) / self.jsa_center
+    self.jsa(omega_s, omega_i) / self.jsa_center
   }
 
   /// Get the normalized value of the JSA at specified signal/idler frequencies
@@ -102,7 +104,7 @@ impl JointSpectrum {
   ///
   /// This is unitless and normalized to the optimal setup
   pub fn jsi_normalized(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
-    self.jsa_normalized(omega_s, omega_i).norm_sqr()
+    *(self.jsi(omega_s, omega_i) / JSIUnits::new(1.)) / self.jsa_center.powi(2)
   }
 
   /// Get the normalized value of the JSI at specified signal/idler frequencies
@@ -170,7 +172,7 @@ impl JointSpectrum {
   ///
   /// This is unitless and normalized to the optimal setup
   pub fn jsi_singles_normalized(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
-    jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integration_steps) / self.jsi_singles_center
+    *(self.jsi_singles(omega_s, omega_i) / JSIUnits::new(1.)) / self.jsi_singles_center
   }
 
   /// Get the normalized value of the JSI Singles at specified signal/idler frequencies
@@ -195,8 +197,6 @@ impl JointSpectrum {
 mod tests {
   use crate::{utils::{vacuum_wavelength_to_frequency, Steps2D, Steps, frequency_to_vacuum_wavelength}, plotting::calc_heralding_results};
   use super::*;
-  extern crate float_cmp;
-  use float_cmp::*;
   use dim::{f64prefixes::*, ucum::*};
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
@@ -302,62 +302,70 @@ mod tests {
 
   #[test]
   fn test_normalized_jsa(){
-    let spdc = get_spdc();
-    let optimal = spdc.clone().try_as_optimum().unwrap();
-    let sp = optimal.joint_spectrum(None);
-    let jsa = sp.jsa_normalized(optimal.signal.frequency(), optimal.idler.frequency());
-
-    approx_eq!(f64, jsa.norm(), 1.0, ulps = 2);
-
     let json = serde_json::json!({
       "crystal": {
         "name": "KTP",
-        "pm_type": "Type2_e_eo",
+        "pm_type": "e oo",
         "phi_deg": 0.0,
-        "theta_deg": 90.0,
-        "length_um": 2000.0000000000002,
+        "theta_deg": "auto",
+        "length_um": 20000.0,
         "temperature_c": 20.0
       },
       "pump": {
-        "wavelength_nm": 774.9999999999999,
+        "wavelength_nm": 775,
         "waist_um": 100.0,
         "bandwidth_nm": 5.35,
-        "average_power_mw": 300.0,
+        "average_power_mw": 1.0,
         "spectrum_threshold": 0.01
       },
       "signal": {
-        "wavelength_nm": 1549.9999999999998,
+        "wavelength_nm": 1550,
         "phi_deg": 0.0,
-        "theta_deg": 5.7471313465066505,
+        "theta_deg": 0.0,
         "theta_external_deg": null,
         "waist_um": 100.0,
-        "waist_position_um": -576.6731750218877
+        "waist_position_um": -5766.731750218876
       },
       "idler": {
-        "wavelength_nm": 1549.9999999999998,
+        "wavelength_nm": 1550,
         "phi_deg": 180.0,
-        "theta_deg": 5.640436081002587,
+        "theta_deg": 0.0,
         "theta_external_deg": null,
         "waist_um": 100.0,
-        "waist_position_um": -550.6780644729153
+        "waist_position_um": -5506.780644729153
       },
-      "periodic_poling": {
-        "poling_period_um": 100.50207043225802,
-        "apodization_fwhm_um": null
-      },
-      "deff_pm_per_volt": 7.299999999999999
+      // "periodic_poling": {
+      //   "poling_period_um": 46.52032850062398,
+      //   "apodization_fwhm_um": null
+      // },
+      "deff_pm_per_volt": 1.0
     });
+    let steps = None; //Some(10);
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
     let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
     let optimal = spdc.clone().try_as_optimum().unwrap();
     dbg!(&spdc);
     dbg!(&optimal);
-    dbg!(spdc.joint_spectrum(None).jsa(spdc.signal.frequency(), spdc.idler.frequency()));
-    dbg!(optimal.joint_spectrum(None).jsa(optimal.signal.frequency(), optimal.idler.frequency()));
-    let sp = spdc.joint_spectrum(None);
+    dbg!(spdc.joint_spectrum(steps).jsa(spdc.signal.frequency(), spdc.idler.frequency()));
+    dbg!(optimal.joint_spectrum(steps).jsa(optimal.signal.frequency(), optimal.idler.frequency()));
+    let sp = optimal.joint_spectrum(steps);
     let jsa = sp.jsa_normalized(spdc.signal.frequency(), spdc.idler.frequency());
     dbg!(jsa.norm());
-
-    assert!(jsa.norm() < 1.0);
+    // assert!(float_cmp::approx_eq!(f64, jsa.norm(), 1.0));
+    dbg!(delta_k(optimal.signal.frequency(), optimal.idler.frequency(), &optimal.signal, &optimal.idler, &optimal.pump, &optimal.crystal_setup, None));
+    let range = optimal.auto_range(100, None);
+    let jsi = optimal.joint_spectrum(steps).jsi_normalized_range(range);
+    // dbg!(&jsi);
+    // check the max value isn't > 1
+    let max = jsi.iter().enumerate().fold((0.0_f64, 0. * RAD / S, 0. * RAD / S), |a, (i, &b)| {
+      let (x, y) = range.value(i);
+      if b > a.0 {
+        (b, x, y)
+      } else {
+        a
+      }
+    });
+    dbg!(max.0, frequency_to_vacuum_wavelength(max.1), frequency_to_vacuum_wavelength(max.2));
+    assert!(max.0 <= 1.0);
   }
 }
