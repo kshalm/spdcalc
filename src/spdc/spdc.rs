@@ -182,6 +182,10 @@ impl SPDC {
     }
   }
 
+  pub fn delta_k(&self, omega_s : Frequency, omega_i : Frequency) -> Wavevector {
+    crate::delta_k(omega_s, omega_i, &self.signal, &self.idler, &self.pump, &self.crystal_setup, self.pp)
+  }
+
   pub fn joint_spectrum(&self, integration_steps : Option<usize>) -> JointSpectrum {
     JointSpectrum::new(self.clone(), integration_steps)
   }
