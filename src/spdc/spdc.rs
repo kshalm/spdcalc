@@ -82,7 +82,7 @@ impl SPDC {
 
     let ws = *(ws / (RAD / S));
     let guess = ws - 1. * TERA;
-    let ans = nelder_mead_1d(pm_diff, guess, 1000, std::f64::MIN, ws, 1e-12);
+    let ans = nelder_mead_1d(pm_diff, (guess, guess + 1e-9), 1000, 1., ws, 1e-12);
 
     // FIXME WHAT ARE THESE NUMBERS
     // let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spdc_setup.pump_bandwidth / (NANO * M))).min(35e-9);
@@ -134,6 +134,17 @@ impl SPDC {
         ..self
       }
     )
+  }
+
+  pub fn with_optimal_waist_positions(mut self) -> Self {
+    self.assign_optimal_waist_positions();
+    self
+  }
+
+  pub fn assign_optimal_waist_positions(&mut self) -> &mut Self {
+    self.signal_waist_position = self.crystal_setup.optimal_waist_position(self.signal.vacuum_wavelength(), self.signal.polarization());
+    self.idler_waist_position = self.crystal_setup.optimal_waist_position(self.idler.vacuum_wavelength(), self.idler.polarization());
+    self
   }
 
   /// Assign the optimum idler to this SPDC

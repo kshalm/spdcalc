@@ -1,4 +1,6 @@
-use crate::{IdlerBeam, PMType};
+use std::sync::Mutex;
+
+use crate::{IdlerBeam, SPDC, PerMeter4, phasematch_fiber_coupling};
 use crate::{
   delta_k,
   Sign,
@@ -9,7 +11,7 @@ use crate::{
   SPDCError,
   math::nelder_mead_1d
 };
-use crate::dim::ucum::{M, RAD, PerMeter, Meter};
+use crate::dim::ucum::{M, W, V, RAD, PerMeter, Meter};
 
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 
@@ -102,11 +104,6 @@ pub fn optimum_poling_period(
     del_k_vec.z
   };
 
-  // maximum period is the length of the crystal
-  let max_period = *(crystal_setup.length / M);
-  // minimum period... typical poling periods are on the order of microns
-  let min_period = std::f64::MIN_POSITIVE;
-
   let z = delta_kz(None);
 
   if z == 0. {
@@ -120,21 +117,52 @@ pub fn optimum_poling_period(
   // the sign of the z component of delta k gives the sign of pp
   let sign = z.into();
 
+  let spdc = Mutex::new(SPDC::new(
+    crystal_setup.clone(),
+    signal.clone(),
+    IdlerBeam::try_new_optimum(signal, pump, crystal_setup, None).unwrap(),
+    pump.clone(),
+    5e-9 * M,
+    1e-3 * W,
+    1e-2,
+    None,
+    0. * M,
+    0. * M,
+    1e-12 * M / V,
+  ).with_optimal_waist_positions());
+
   // minimizable delta k function based on period (using predetermined sign)
-  let delta_kz_of_p = |period| {
+  let pm = |period| {
     let pp = Some(PeriodicPoling {
       period : period * M,
       sign,
       apodization: None,
     });
 
-    delta_kz(pp).abs()
+    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, pp).unwrap();
+    let wi = idler.frequency();
+
+    let mut spdc = spdc.lock().unwrap();
+    spdc.idler = idler;
+    spdc.pp = pp;
+
+    -(phasematch_fiber_coupling(
+      signal.frequency(),
+      wi,
+      &spdc,
+      None
+    ) / PerMeter4::new(1.)).norm_sqr()
   };
+
+  // maximum period is the length of the crystal
+  let max_period = *(crystal_setup.length / M);
+  // minimum period... typical poling periods are on the order of microns
+  let min_period = std::f64::MIN_POSITIVE;
 
   // minimize...
   let period = nelder_mead_1d(
-    delta_kz_of_p,
-    guess.abs(),
+    pm,
+    (guess.abs(), guess.abs() + 1e-6),
     1000,
     min_period,
     max_period,
@@ -149,5 +177,39 @@ pub fn optimum_poling_period(
     Ok(
       sign * period * M
     )
+  }
+}
+
+
+#[cfg(test)]
+mod test {
+  use crate::{*, dim::ucum::*};
+
+  #[test]
+  fn test_poling_period(){
+    let signal = Beam::new(
+      PolarizationType::Extraordinary,
+      0. * RAD,
+      0. * RAD,
+      1550e-9 * M,
+      30e-6 * M,
+    ).into();
+
+    let pump = Beam::new(
+      PolarizationType::Extraordinary,
+      0. * RAD,
+      0. * RAD,
+      775e-9 * M,
+      100e-6 * M,
+    ).into();
+
+    let mut crystal_setup : CrystalSetup = CrystalConfig::default().try_into().unwrap();
+    crystal_setup.theta = 90. * DEG;
+    crystal_setup.length = 20_000e-6 * M;
+
+    let period = optimum_poling_period(&signal, &pump, &crystal_setup).unwrap();
+
+    assert!( approx_eq!(f64, *(period / M), -46.578592559e-6, ulps = 2, epsilon = 1e-12) );
+
   }
 }

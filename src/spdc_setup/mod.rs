@@ -220,7 +220,7 @@ impl SPDCSetup {
     };
 
     let guess = PI / 6.;
-    let theta = nelder_mead_1d(delta_k, guess, 1000, 0., FRAC_PI_2, 1e-12);
+    let theta = nelder_mead_1d(delta_k, (guess, guess + 1.), 1000, 0., FRAC_PI_2, 1e-12);
 
     theta * ucum::RAD
   }
@@ -273,7 +273,7 @@ impl SPDCSetup {
     // minimize...
     let period = nelder_mead_1d(
       delta_kz_of_p,
-      guess.abs(),
+      (guess.abs(), guess.abs() + 1e-6),
       1000,
       min_period,
       max_period,

@@ -76,7 +76,7 @@ pub fn calc_plot_config_for_jsi( spdc_setup : &SPDCSetup, size : usize, threshol
   };
 
   let guess = l_s - 1e-9;
-  let ans = nelder_mead_1d(pm_diff, guess, 1000, std::f64::MIN, l_s, 1e-12);
+  let ans = nelder_mead_1d(pm_diff, (guess, guess + 1e-9), 1000, std::f64::MIN, l_s, 1e-12);
 
   // FIXME WHAT ARE THESE NUMBERS
   // let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spdc_setup.pump_bandwidth / (NANO * M))).min(35e-9);

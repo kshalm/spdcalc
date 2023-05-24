@@ -199,7 +199,7 @@ impl Photon {
       num::abs(snell_external - (*n) * f64::sin(internal))
     };
 
-    let theta = math::nelder_mead_1d(curve, guess, 100, 0., FRAC_PI_2, 1e-12);
+    let theta = math::nelder_mead_1d(curve, (guess, guess + 1.), 100, 0., FRAC_PI_2, 1e-12);
 
     theta * ucum::RAD
   }

@@ -59,7 +59,7 @@ impl<F> CostFunction for Cost1d<F>
 /// nelder mead optimization. Returns x
 pub fn nelder_mead_1d<F> (
   func : F,
-  guess : f64,
+  guess : (f64, f64),
   max_iter : u64,
   min : f64,
   max : f64,
@@ -67,7 +67,7 @@ pub fn nelder_mead_1d<F> (
 ) -> f64 where F: Fn(f64) -> f64 {
 
   let cost = Cost1d { func, min, max };
-  let solver = NelderMead::new(vec![guess, (max + guess) * 0.5])
+  let solver = NelderMead::new(vec![guess.0, guess.1])
     .with_sd_tolerance(tolerance)
     .unwrap();
 

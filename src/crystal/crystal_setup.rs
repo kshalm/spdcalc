@@ -122,13 +122,31 @@ impl CrystalSetup {
       signal.set_theta_external(theta_s_e, &crystal_setup);
 
       let idler = IdlerBeam::try_new_optimum(&signal, pump, &crystal_setup, None).unwrap();
-      let del_k = delta_k(signal.frequency(), idler.frequency(), &signal, &idler, pump, &crystal_setup, None);
+      // let del_k = delta_k(signal.frequency(), idler.frequency(), &signal, &idler, pump, &crystal_setup, None);
 
-      (del_k * M / RAD).z.abs()
+      // (del_k * M / RAD).z.abs()
+      let (ws, wi) = (signal.frequency(), idler.frequency());
+      let zs = self.optimal_waist_position(signal.vacuum_wavelength(), signal.polarization());
+      let zi = self.optimal_waist_position(idler.vacuum_wavelength(), idler.polarization());
+
+      let spdc = SPDC::new(
+        crystal_setup,
+        signal,
+        idler,
+        pump.clone(),
+        1. * M,
+        1. * dim::ucum::W,
+        0.1,
+        None,
+        zs,
+        zi,
+        MetersPerMilliVolt::new(1.)
+      );
+      - crate::jsa::jsa_raw(ws, wi, &spdc, None).norm_sqr()
     };
 
     let guess = PI / 6.;
-    let theta = nelder_mead_1d(delta_k, guess, 1000, 0., FRAC_PI_2, 1e-12);
+    let theta = nelder_mead_1d(delta_k, (guess, guess + 1.), 1000, 0., FRAC_PI_2, 1e-6);
 
     theta * RAD
   }
