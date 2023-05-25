@@ -351,7 +351,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 impl<T> DoubleEndedIterator for Iterator2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   fn next_back(&mut self) -> Option<Self::Item> {
-    if self.index <= 0 {
+    if self.index == 0 {
       return None;
     }
 
