@@ -306,7 +306,9 @@ mod test {
       (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
     ).into();
     let counts = spdc.counts_coincidences(range, None);
-    assert_eq!(counts, 0.0 * HZ);
+    let expected = 1883732. * HZ;
+
+    assert!(approx_eq!(f64, counts.value_unsafe, expected.value_unsafe, epsilon = 1.));
   }
 
   #[test]
@@ -317,7 +319,9 @@ mod test {
       (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
     ).into();
     let counts = spdc.counts_singles_signal(range, None);
-    assert_eq!(counts, 0.0 * HZ);
+    let expected = 1924917. * HZ;
+
+    assert!(approx_eq!(f64, counts.value_unsafe, expected.value_unsafe, epsilon = 1.));
   }
 
   #[test]
@@ -328,7 +332,8 @@ mod test {
       (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
     ).into();
     let counts = spdc.counts_singles_idler(range, None);
-    assert_eq!(counts, 0.0 * HZ);
+    let expected = 1925352. * HZ;
+    assert!(approx_eq!(f64, counts.value_unsafe, expected.value_unsafe, epsilon = 1.));
   }
 
   #[test]
@@ -339,57 +344,8 @@ mod test {
       (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
     ).into();
     let efficiencies = spdc.efficiencies(range, None);
-    assert_eq!(efficiencies.symmetric, 0.0);
-    assert_eq!(efficiencies.signal, 0.0);
-    assert_eq!(efficiencies.idler, 0.0);
-  }
-
-  #[test]
-  fn test_auto_range() {
-    let json = serde_json::json!({
-      "crystal": {
-        "kind": "KTP",
-        "pm_type": "Type2_e_eo",
-        "phi_deg": 0.0,
-        "theta_deg": 90.,
-        "length_um": 200.0000000000002,
-        "temperature_c": 20.0
-      },
-      "pump": {
-        "wavelength_nm": 774.9999999999999,
-        "waist_um": 100.0,
-        "bandwidth_nm": 2.35,
-        "average_power_mw": 1.0,
-        "spectrum_threshold": 0.01
-      },
-      "signal": {
-        "wavelength_nm": 1549.9999999999998,
-        "phi_deg": 0.0,
-        "theta_deg": 0.0,
-        "theta_external_deg": null,
-        "waist_um": 100.0,
-        "waist_position_um": -576.6731750218875
-      },
-      "idler": {
-        "wavelength_nm": 1549.9999999999998,
-        "phi_deg": 180.0,
-        "theta_deg": 0.0,
-        "theta_external_deg": null,
-        "waist_um": 100.0,
-        "waist_position_um": -560.9842490831526
-      },
-      "periodic_poling": {
-        "poling_period_um": "auto"
-      },
-      "deff_pm_per_volt": 1.0
-    });
-
-    let config : crate::SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
-    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
-    let range = WavelengthSpace::from_frequency_space(spdc.optimal_range(10));
-    dbg!(range);
-
-    assert!(false);
-
+    assert!(approx_eq!(f64, efficiencies.symmetric, 0.978, epsilon = 1e-2));
+    assert!(approx_eq!(f64, efficiencies.signal, 0.978, epsilon = 1e-2));
+    assert!(approx_eq!(f64, efficiencies.idler, 0.978, epsilon = 1e-2));
   }
 }

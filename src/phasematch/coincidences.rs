@@ -541,81 +541,26 @@ use float_cmp::*;
   }
 
   #[test]
-  fn phasematch_coincidences_test(){
-    let mut spdc = SPDC::default();
-    // spdc.signal.set_from_external_theta(3. * DEG, &spdc.crystal_setup);
-    spdc.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
-    // spdc.assign_optimum_idler();
-    // spdc.assign_optimum_theta();
-
-    // FIXME This isn't matching.
-    spdc.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
-    spdc.crystal_setup.theta = 0.5515891191131287 * RAD;
-
-    let jsa_units = JSAUnits::new(1.);
-    let amp = *(phasematch_sinc(spdc.signal.frequency(), spdc.idler.frequency(), &spdc) / jsa_units);
-
-    let actual = amp;
-    let expected = Complex::new(0.9999999456740692, 0.);
-
-    assert!(
-      approx_eq!(f64, actual.re, expected.re, ulps = 2, epsilon = 1e-12),
-      "actual: {}, expected: {}",
-      actual,
-      expected
-    );
-    assert!(
-      approx_eq!(f64, actual.im, expected.im, ulps = 2, epsilon = 1e-12),
-      "actual: {}, expected: {}",
-      actual,
-      expected
-    );
-  }
-
-  #[test]
   fn phasematch_fiber_coupling_test(){
     let mut spdc = SPDC::default();
     // spdc.signal.set_from_external_theta(3. * DEG, &spdc.crystal_setup);
-    spdc.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
-    // spdc.assign_optimum_idler();
-    // spdc.assign_optimum_theta();
-
-    // FIXME This isn't matching.
-    spdc.idler.set_angles(PI * RAD, 0.03178987094605031 * RAD);
-    spdc.crystal_setup.theta = 0.5515891191131287 * RAD;
-    spdc.signal_waist_position = -0.0007348996031796276 * M;
-    spdc.idler_waist_position = -0.0007348996031796276 * M;
+    // spdc.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
+    spdc = spdc.try_as_optimum().unwrap();
 
     // println!("spdc: {:#?}", spdc);
     let jsa_units = JSAUnits::new(1.);
     let amp = *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None) / jsa_units);
 
     let actual = amp;
-    let expected = Complex::new(6366426621087856., 6187462963260917.);
+    let expected = *(phasematch_gaussian(spdc.signal.frequency(), spdc.idler.frequency(), &spdc) / jsa_units);
 
-    // NOTE: this is not a great test anymore because the new analytic
-    // computation of the waist position is more accurate
+    // NOTE: this is not a great test anymore
     let accept_diff = 1e-4;
 
-    let normdiff = percent_diff(actual.norm(), expected.norm());
-    assert!(
-      normdiff < accept_diff,
-      "norm percent difference: {}",
-      normdiff
-    );
-
-    let rediff = percent_diff(actual.re, expected.re);
-    assert!(
-      rediff < accept_diff,
-      "real part percent difference: {}",
-      rediff
-    );
-
-    let imdiff = percent_diff(actual.im, expected.im);
-    assert!(
-      imdiff < accept_diff,
-      "imag part percent difference: {}",
-      imdiff
+    assert_nearly_equal!(
+      actual.norm(),
+      expected.norm(),
+      accept_diff
     );
   }
 

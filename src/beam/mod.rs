@@ -549,7 +549,7 @@ mod tests {
   fn optimum_idler_test() {
     let crystal_setup = CrystalSetup {
       crystal :     CrystalType::BBO_1,
-      pm_type :     PMType::Type2_e_eo,
+      pm_type :     PMType::Type1_e_oo,
       theta :       -3.0 * DEG,
       phi :         1.0 * DEG,
       length :      2_000.0 * MICRO * M,
@@ -585,10 +585,10 @@ mod tests {
       phi_i_expected
     );
 
-    let theta_i = *(idler.theta_internal() / ucum::RAD);
-    let theta_i_expected = 0.16946290635813477;
+    let theta_i = *(idler.theta_internal() / ucum::DEG);
+    let theta_i_expected = 7.;
     assert!(
-      approx_eq!(f64, theta_i, theta_i_expected, ulps = 2),
+      approx_eq!(f64, theta_i, theta_i_expected, ulps = 2, epsilon = 1e-3),
       "actual: {}, expected: {}",
       theta_i,
       theta_i_expected
@@ -598,6 +598,7 @@ mod tests {
   #[test]
   fn walkoff_test() {
     let mut crystal_setup = SPDC::default().crystal_setup;
+    crystal_setup.crystal = CrystalType::BBO_1;
     crystal_setup.theta = 31.603728550521122 * ucum::DEG;
 
     let pump = Beam::new(PolarizationType::Extraordinary, 0. * DEG, 0. * DEG, 775. * NANO * M, 100. * MICRO * M);

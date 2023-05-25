@@ -172,7 +172,7 @@ pub fn optimum_poling_period(
     1e-12,
   );
 
-  if max_period > period || period < min_period {
+  if max_period < period || period < min_period {
     Err(SPDCError::new(IMPOSSIBLE_POLING_PERIOD.to_string()))
   } else {
     Ok(

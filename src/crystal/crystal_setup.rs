@@ -156,6 +156,9 @@ mod test {
   #[test]
   fn index_along_test(){
     let mut spdc = SPDC::default();
+    spdc.crystal_setup.phi = Angle::new(0.);
+    spdc.crystal_setup.theta = Angle::new(PI / 2.);
+    spdc.crystal_setup.crystal = CrystalType::BBO_1;
     spdc.signal.set_angles(0. * DEG, 53. * DEG);
     let n = spdc.crystal_setup.index_along(
       spdc.signal.vacuum_wavelength(),

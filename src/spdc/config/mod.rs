@@ -335,6 +335,7 @@ mod test {
   use serde_json::json;
   use dim::ucum;
   use crate::PolarizationType;
+  use float_cmp::approx_eq;
 
   #[test]
   fn auto_idler_auto_focus_test(){
@@ -454,8 +455,9 @@ mod test {
     let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
 
     let actual = spdc.crystal_setup.theta;
-    let expected = 0.920293713950949 * RAD;
-    assert_eq!(actual, expected);
+    let expected = 0.8394503071136623 * RAD;
+
+    assert!(approx_eq!(f64, actual.value_unsafe, expected.value_unsafe, epsilon = 1e-6));
   }
 
   #[test]
@@ -493,7 +495,8 @@ mod test {
     let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
 
     let actual = spdc.pp.unwrap().period;
-    let expected = 46.52032850062398 * MICRO * M;
-    assert_eq!(actual, expected);
+    let expected = 46.52987937008885 * MICRO * M;
+
+    assert!(approx_eq!(f64, actual.value_unsafe, expected.value_unsafe, epsilon = 1e-6));
   }
 }

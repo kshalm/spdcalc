@@ -33,6 +33,8 @@ mod tests {
   fn shmidt_number_test() {
     let mut spdc = SPDC::default();
     spdc.crystal_setup.crystal = CrystalType::KTP;
+    spdc.crystal_setup.phi = Angle::new(0.);
+    spdc.crystal_setup.theta = Angle::new(PI / 2.);
     spdc.assign_optimum_idler().unwrap();
     spdc.assign_optimum_periodic_poling().unwrap();
 
@@ -49,7 +51,7 @@ mod tests {
     let sn = schmidt_number(amplitudes).expect("Could not calc schmidt number");
 
     let actual = sn;
-    let expected = 1.151;
+    let expected = 1.149;
 
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-3),
