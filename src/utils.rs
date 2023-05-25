@@ -98,6 +98,8 @@ where T:
   #[inline(always)]
   pub fn len(&self) -> usize { self.steps() }
   #[inline(always)]
+  pub fn is_empty(&self) -> bool { self.steps() == 0 }
+  #[inline(always)]
   pub fn range(&self) -> (T, T) { (self.start(), self.end()) }
   #[inline(always)]
   pub fn divisions(&self) -> usize {
@@ -221,6 +223,8 @@ impl<T> Steps2D<T>
   pub fn len(&self) -> usize {
     (self.0).2 * (self.1).2
   }
+
+  pub fn is_empty(&self) -> bool { self.len() == 0 }
 
   pub fn is_square(&self) -> bool {
     self.0.2 == self.1.2

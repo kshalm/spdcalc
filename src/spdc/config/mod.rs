@@ -18,10 +18,7 @@ pub enum AutoCalcParam<T> where T : 'static {
 
 impl<T> AutoCalcParam<T> {
   pub fn is_auto(&self) -> bool {
-    match self {
-      Self::Auto(_) => true,
-      _ => false,
-    }
+    matches!(self, Self::Auto(_))
   }
 }
 

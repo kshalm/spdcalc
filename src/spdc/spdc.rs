@@ -1,4 +1,5 @@
 use dim::ucum::{MilliWatt, DEG, Hertz};
+use na::Complex;
 use crate::{fwhm_to_spectral_width};
 use crate::jsa::SumDiffFrequencySpace;
 use crate::math::nelder_mead_1d;
@@ -216,7 +217,7 @@ impl SPDC {
     let sp = self.joint_spectrum(integration_steps);
     let ranges = ranges.into();
     let jsa_values = sp.jsa_range(ranges);
-    let jsa_values_swapped = ranges.as_steps().into_iter().map(|(ws, wi)| {
+    let jsa_values_swapped : Vec<Complex<f64>> = ranges.as_steps().into_iter().map(|(ws, wi)| {
       sp.jsa(wi, ws)
     }).collect();
     super::hom_rate_series(

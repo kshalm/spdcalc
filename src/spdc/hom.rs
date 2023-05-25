@@ -5,14 +5,14 @@ use crate::types::{Time, Complex};
 use crate::utils::{Steps, get_1d_index, get_2d_indices};
 use dim::ucum::RAD;
 
-pub fn jsa_norm(jsa_values: &Vec<Complex<f64>>) -> f64 {
+pub fn jsa_norm(jsa_values: &[Complex<f64>]) -> f64 {
   jsa_values.iter().map(|f| f.norm_sqr()).sum()
 }
 
 pub fn hom_rate<T: Into<FrequencySpace>>(
   ranges: T,
-  jsa_values: &Vec<Complex<f64>>,
-  jsa_values_swapped: &Vec<Complex<f64>>,
+  jsa_values: &[Complex<f64>],
+  jsa_values_swapped: &[Complex<f64>],
   time_delay: Time,
   norm: Option<f64>
 ) -> f64 {
@@ -44,8 +44,8 @@ pub fn hom_rate<T: Into<FrequencySpace>>(
 /// Hong–Ou–Mandel coincidence rate
 pub fn hom_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Time>>(
   ranges: R,
-  jsa_values: &Vec<Complex<f64>>,
-  jsa_values_swapped: &Vec<Complex<f64>>,
+  jsa_values: &[Complex<f64>],
+  jsa_values_swapped: &[Complex<f64>],
   time_delays : T
 ) -> Vec<f64> {
   let norm = jsa_norm(jsa_values);
@@ -77,7 +77,7 @@ pub fn hom_visibility<T: Into<FrequencySpace> + Copy>(
   let sp = spdc.joint_spectrum(integration_steps);
   let ranges = ranges.into();
   let jsa_values = sp.jsa_range(ranges);
-  let jsa_values_swapped = ranges.as_steps().into_iter().map(|(ws, wi)| {
+  let jsa_values_swapped : Vec<Complex<f64>> = ranges.as_steps().into_iter().map(|(ws, wi)| {
     sp.jsa(wi, ws)
   }).collect();
 
@@ -266,48 +266,3 @@ pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
     }
   }
 }
-
-#[cfg(test)]
-mod test {
-  use super::*;
-  use dim::{f64prefixes::{NANO}, ucum::{M}};
-  use crate::{jsa::{WavelengthSpace}, utils::{Steps2D}};
-
-  fn get_spdc() -> SPDC {
-    let json = serde_json::json!({
-      "crystal": {
-        "name": "KTP",
-        "pm_type": "e->eo",
-        "phi_deg": 0,
-        "theta_deg": 90,
-        "length_um": 14_000,
-        "temperature_c": 20
-      },
-      "pump": {
-        "wavelength_nm": 775,
-        "waist_um": 200,
-        "bandwidth_nm": 0.5,
-        "average_power_mw": 300
-      },
-      "signal": {
-        "wavelength_nm": 1550,
-        "phi_deg": 0,
-        "theta_external_deg": 0,
-        "waist_um": 100,
-        "waist_position_um": "auto"
-      },
-      "idler": "auto",
-      "periodic_poling": {
-        "poling_period_um": "auto"
-      },
-      "deff_pm_per_volt": 7.6
-    });
-
-    let config : crate::SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
-    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
-    dbg!(&spdc);
-    spdc
-  }
-
-}
-
