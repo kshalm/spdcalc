@@ -1,5 +1,6 @@
 use crate::{utils::{vacuum_wavelength_to_frequency, Steps2D, Iterator2D, frequency_to_vacuum_wavelength}, Frequency, Wavelength};
 
+/// A range of signal and idler frequencies
 #[derive(Debug, Clone, Copy)]
 pub struct FrequencySpace(Steps2D<Frequency>);
 
@@ -83,8 +84,8 @@ impl IntoSignalIdlerIterator for FrequencySpace {
 
 /// A 45 degree rotation in frequency space.
 ///
-/// X-axis is the sum of the signal and idler frequencies,
-/// and the Y-axis is the difference.
+/// X-axis is half the sum of the signal and idler frequencies,
+/// and the Y-axis is half the difference.
 #[derive(Debug, Clone, Copy)]
 pub struct SumDiffFrequencySpace(Steps2D<Frequency>);
 
@@ -203,6 +204,7 @@ impl Iterator for WavelengthSIIterator {
   }
 }
 
+/// A range of signal and idler wavelengths
 #[derive(Debug, Clone, Copy)]
 pub struct WavelengthSpace(Steps2D<Wavelength>);
 
@@ -262,3 +264,55 @@ impl IntoSignalIdlerIterator for WavelengthSpace {
     WavelengthSIIterator(self.0.into_iter())
   }
 }
+
+/// A flat array holding signal and idler wavelengths
+#[derive(Debug, Clone)]
+pub struct SignalIdlerWavelengthArray(pub Vec<Wavelength>);
+
+pub struct SignalIdlerWavelengthArrayIterator(<Vec<Wavelength> as IntoIterator>::IntoIter);
+
+impl<'a> Iterator for SignalIdlerWavelengthArrayIterator {
+  type Item = (Frequency, Frequency);
+  fn next(&mut self) -> Option<Self::Item> {
+    if let (Some(ls), Some(li)) = (self.0.next(), self.0.next()) {
+      Some((
+        vacuum_wavelength_to_frequency(ls),
+        vacuum_wavelength_to_frequency(li)
+      ))
+    } else {
+      None
+    }
+  }
+}
+
+impl IntoSignalIdlerIterator for SignalIdlerWavelengthArray {
+  type IntoIter = SignalIdlerWavelengthArrayIterator;
+  fn into_signal_idler_iterator(self) -> Self::IntoIter {
+    SignalIdlerWavelengthArrayIterator(self.0.into_iter())
+  }
+}
+
+/// A flat array holding signal and idler frequencies
+#[derive(Debug, Clone)]
+pub struct SignalIdlerFrequencyArray(pub Vec<Frequency>);
+
+pub struct SignalIdlerFrequencyArrayIterator(<Vec<Frequency> as IntoIterator>::IntoIter);
+
+impl<'a> Iterator for SignalIdlerFrequencyArrayIterator {
+  type Item = (Frequency, Frequency);
+  fn next(&mut self) -> Option<Self::Item> {
+    if let (Some(ws), Some(wi)) = (self.0.next(), self.0.next()) {
+      Some((ws, wi))
+    } else {
+      None
+    }
+  }
+}
+
+impl IntoSignalIdlerIterator for SignalIdlerFrequencyArray {
+  type IntoIter = SignalIdlerFrequencyArrayIterator;
+  fn into_signal_idler_iterator(self) -> Self::IntoIter {
+    SignalIdlerFrequencyArrayIterator(self.0.into_iter())
+  }
+}
+
