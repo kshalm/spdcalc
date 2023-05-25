@@ -2,8 +2,6 @@ use crate::SPDCError;
 use std::fmt;
 use std::str::FromStr;
 use super::*;
-use dim::f64prefixes::{PICO};
-use dim::ucum::{ M, V };
 use dim::ucum::Kelvin;
 use serde::{Serialize, Deserialize};
 
@@ -58,7 +56,7 @@ impl CrystalType {
       "AgGaS2_1" => Ok(CrystalType::AgGaS2_1),
       "AgGaSe2_1" => Ok(CrystalType::AgGaSe2_1),
       "AgGaSe2_2" => Ok(CrystalType::AgGaSe2_2),
-      _ => Err(SPDCError::new(format!("CrystalType {} is not defined", id))),
+      _ => Err(SPDCError::new(format!("Crystal Type {} is not defined", id))),
     }
   }
 
@@ -126,13 +124,6 @@ impl CrystalType {
       CrystalType::AgGaS2_1 => aggas2_1::AgGaS2_1.get_meta(),
       // CrystalType::Sellmeier(crystal) => crystal.get_meta(),
     }
-  }
-
-  /// Get the crystal's effective nonlinear coefficient (d_{eff})
-  ///
-  pub fn get_effective_nonlinear_coefficient(&self) -> MetersPerMilliVolt<f64> {
-    // TODO: enhance crystals to compute this
-    7.6 * PICO * M / V
   }
 }
 
