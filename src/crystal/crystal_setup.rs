@@ -6,7 +6,7 @@ use na::{Rotation3, Vector3};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CrystalSetup {
-  pub crystal :     Crystal,
+  pub crystal :     CrystalType,
   pub pm_type :     PMType,
   pub phi :         Angle,
   pub theta :       Angle,

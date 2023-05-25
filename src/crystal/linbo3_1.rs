@@ -34,7 +34,7 @@ const DNZ : f64 = 39.073e-6;
 /// ```
 /// use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::from_celsius_to_kelvin};
 /// let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-/// let indices = Crystal::LiNbO3_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
+/// let indices = CrystalType::LiNbO3_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 /// let expected = ucum::Unitless::new(Vector3::new(
 ///   2.267284807097424,
 ///   2.267284807097424,

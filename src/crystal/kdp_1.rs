@@ -34,7 +34,7 @@ pub const META : CrystalMeta = CrystalMeta {
 /// ```
 /// use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::from_celsius_to_kelvin};
 /// let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-/// let indices = Crystal::KDP_1.get_indices(1064.0 * nm, 0. * ucum::K);
+/// let indices = CrystalType::KDP_1.get_indices(1064.0 * nm, 0. * ucum::K);
 /// let expected = ucum::Unitless::new(Vector3::new(
 ///   1.4937798126538884,
 ///   1.4937798126538884,

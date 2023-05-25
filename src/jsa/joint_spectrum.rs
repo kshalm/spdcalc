@@ -206,7 +206,7 @@ mod tests {
   fn get_spdc() -> SPDC {
     let json = serde_json::json!({
       "crystal": {
-        "name": "KTP",
+        "kind": "KTP",
         "pm_type": "e->eo",
         "phi_deg": 0,
         "theta_deg": 90,
@@ -235,7 +235,7 @@ mod tests {
 
     // let json = serde_json::json!({
     //   "crystal": {
-    //     "name": "KTP",
+    //     "kind": "KTP",
     //     "pm_type": "e->eo",
     //     "phi_deg": 0,
     //     "theta_deg": 0,
@@ -293,7 +293,7 @@ mod tests {
   fn test_normalized_jsa(){
     let json = serde_json::json!({
       "crystal": {
-        "name": "KTP",
+        "kind": "KTP",
         "pm_type": "e oo",
         "phi_deg": 0.0,
         "theta_deg": "auto",

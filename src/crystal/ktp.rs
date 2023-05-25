@@ -1,4 +1,4 @@
-//! # KTP Crystal
+//! # KTP CrystalType
 //!
 //! [Reference](http://dx.doi.org/10.1063/1.1668320)
 //! [More Information](http://www.redoptronics.com/KTP-crystal.html)
@@ -7,7 +7,7 @@
 //! ```
 //! use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::*};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystal::KTP.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
+//! let indices = CrystalType::KTP.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 //! let expected = ucum::Unitless::new(Vector3::new(
 //!   1.7540699746332105,
 //!   1.7625839942396933,

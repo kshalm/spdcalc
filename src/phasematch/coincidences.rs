@@ -503,7 +503,7 @@ use float_cmp::*;
   fn phasematch_test(){
     let json = serde_json::json!({
       "crystal": {
-        "name": "BBO_1",
+        "kind": "BBO_1",
         "pm_type": "e->eo",
         "phi_deg": 0,
         "theta_deg": 0,
@@ -668,7 +668,7 @@ use float_cmp::*;
   fn compare_version1_version2() {
     let json = serde_json::json!({
       "crystal": {
-        "name": "KTP",
+        "kind": "KTP",
         "pm_type": "e->eo",
         "phi_deg": 9,
         "theta_deg": 1,

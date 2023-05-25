@@ -1,5 +1,5 @@
 use super::*;
-use crate::{CrystalSetup, Crystal, dim::{
+use crate::{CrystalSetup, CrystalType, dim::{
   f64prefixes::{MICRO, NANO, PICO},
   ucum::{DEG, RAD, M, MILLIW, V}
 }, utils::{self, from_kelvin_to_celsius}, Beam, PumpBeam, SignalBeam, IdlerBeam, PMType, SPDCError};
@@ -32,7 +32,7 @@ impl<T> Default for AutoCalcParam<T> {
 #[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CrystalConfig {
-  pub name: Crystal,
+  pub kind: CrystalType,
   #[serde_as(as = "DisplayFromStr")]
   pub pm_type: PMType,
   pub phi_deg: f64,
@@ -45,7 +45,7 @@ pub struct CrystalConfig {
 impl Default for CrystalConfig {
   fn default() -> Self {
     Self {
-      name: Crystal::KTP,
+      kind: CrystalType::KTP,
       pm_type: PMType::Type2_e_eo,
       phi_deg: 0.,
       theta_deg: AutoCalcParam::Auto("auto".into()),
@@ -64,7 +64,7 @@ impl From<CrystalConfig> for CrystalSetup {
       0. * DEG
     };
     CrystalSetup {
-      crystal: cfg.name,
+      crystal: cfg.kind,
       pm_type: cfg.pm_type,
       phi: cfg.phi_deg * DEG,
       theta,
@@ -271,7 +271,7 @@ impl Default for SPDCConfig {
 impl From<SPDC> for SPDCConfig {
   fn from(spdc: SPDC) -> Self {
     let crystal = CrystalConfig {
-      name: spdc.crystal_setup.crystal,
+      kind: spdc.crystal_setup.crystal,
       pm_type: spdc.crystal_setup.pm_type,
       theta_deg: AutoCalcParam::Param(*(spdc.crystal_setup.theta / DEG)),
       phi_deg: *(spdc.crystal_setup.phi / DEG),
@@ -335,7 +335,7 @@ mod test {
   fn auto_idler_auto_focus_test(){
     let json = json!({
       "crystal": {
-        "name": "BBO_1",
+        "kind": "BBO_1",
         "pm_type": "e->eo",
         "phi_deg": 0,
         "theta_deg": 0,
@@ -364,7 +364,7 @@ mod test {
 
     let expected = {
       let crystal_setup = CrystalSetup {
-        crystal: Crystal::BBO_1,
+        crystal: CrystalType::BBO_1,
         pm_type: PMType::Type2_e_eo,
         phi: 0. * RAD,
         theta: 0. * RAD,
@@ -421,7 +421,7 @@ mod test {
   fn autocalc_crystal_theta_test(){
     let json = json!({
       "crystal": {
-        "name": "KTP",
+        "kind": "KTP",
         "pm_type": "e->eo",
         "phi_deg": 0,
         "theta_deg": "auto",
@@ -457,7 +457,7 @@ mod test {
   fn auto_pp_test(){
     let json = json!({
       "crystal": {
-        "name": "KTP",
+        "kind": "KTP",
         "pm_type": "e->eo",
         "phi_deg": 0,
         "theta_deg": 90,

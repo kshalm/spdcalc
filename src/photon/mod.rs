@@ -289,7 +289,7 @@ mod tests {
     let wavelength = 1550. * NANO * M;
     let waist = WaistSize::new(Vector2::new(100.0 * MICRO, 100.0 * MICRO));
     let crystal_setup = CrystalSetup {
-      crystal :     Crystal::BBO_1,
+      crystal :     CrystalType::BBO_1,
       pm_type :     PMType::Type2_e_eo,
       theta :       -3.0 * DEG,
       phi :         1.0 * DEG,

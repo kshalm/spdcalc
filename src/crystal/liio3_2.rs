@@ -1,4 +1,4 @@
-//! # LiIO3-2 Crystal
+//! # LiIO3-2 CrystalType
 //!
 //! K. Takizawa, M. Okada, S. Leiri, Opt. Commun., 23, 279 (1977)
 //!
@@ -6,7 +6,7 @@
 //! ```
 //! use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::*};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystal::LiIO3_2.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
+//! let indices = CrystalType::LiIO3_2.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 //! let expected = ucum::Unitless::new(Vector3::new(
 //!   1.872937850009036,
 //!   1.872937850009036,

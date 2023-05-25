@@ -38,7 +38,7 @@ mod test {
   #[test]
   fn delta_k_test() {
     let crystal_setup = CrystalSetup {
-      crystal :     Crystal::BBO_1,
+      crystal :     CrystalType::BBO_1,
       pm_type :     PMType::Type2_e_eo,
       theta :       -3.0 * DEG,
       phi :         1.0 * DEG,

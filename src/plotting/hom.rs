@@ -194,7 +194,7 @@ mod tests {
   fn calc_hom_test() {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.crystal = CrystalType::KTP;
     spdc_setup.crystal_setup.theta = 90. * DEG;
     spdc_setup.crystal_setup.length = 2000. * MICRO * M;
     spdc_setup.assign_optimum_periodic_poling();
@@ -225,7 +225,7 @@ mod tests {
   fn calc_hom2_test() {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KDP_1;
+    spdc_setup.crystal_setup.crystal = CrystalType::KDP_1;
     spdc_setup.crystal_setup.theta = 90. * DEG;
     spdc_setup.crystal_setup.length = 2000. * MICRO * M;
     spdc_setup.assign_optimum_periodic_poling();

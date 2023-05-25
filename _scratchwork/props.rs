@@ -20,7 +20,7 @@ enum PMType {
 }
 
 struct CrystalSetup {
-  crystal :Crystal,
+  crystal :CrystalType,
   pm_type: PMType,
   theta :Angle,
   phi :Angle,

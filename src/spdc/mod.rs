@@ -8,8 +8,8 @@ pub use periodic_poling::*;
 mod config;
 pub use config::*;
 
-mod spdc;
-pub use spdc::*;
+mod spdc_obj;
+pub use spdc_obj::*;
 
 mod counts;
 pub use counts::*;

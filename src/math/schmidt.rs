@@ -31,7 +31,7 @@ mod tests {
   #[test]
   fn shmidt_number_test() {
     let mut spdc = SPDC::default();
-    spdc.crystal_setup.crystal = Crystal::KTP;
+    spdc.crystal_setup.crystal = CrystalType::KTP;
     spdc.assign_optimum_idler();
     spdc.assign_optimum_periodic_poling();
 

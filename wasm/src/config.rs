@@ -38,7 +38,7 @@ impl From<crate::spdcalc::AutoIdler> for ::spdcalc::AutoCalcParam<::spdcalc::Idl
 impl From<::spdcalc::CrystalConfig> for crate::spdcalc::CrystalConfig {
   fn from(config: ::spdcalc::CrystalConfig) -> Self {
     crate::spdcalc::CrystalConfig {
-      name: config.name.to_string(),
+      kind: config.kind.to_string(),
       pm_type: config.pm_type.to_string(),
       phi_deg: config.phi_deg,
       theta_deg: Some(config.theta_deg.into()),
@@ -52,7 +52,7 @@ impl From<crate::spdcalc::CrystalConfig> for ::spdcalc::CrystalConfig {
   fn from(config: crate::spdcalc::CrystalConfig) -> Self {
     use std::str::FromStr;
     Self {
-      name: ::spdcalc::Crystal::from_str(&config.name).expect("Unknown crystal type"),
+      kind: ::spdcalc::CrystalType::from_str(&config.kind).expect("Unknown crystal type"),
       pm_type: ::spdcalc::PMType::from_str(&config.pm_type).expect("Unknown PM Type type"),
       phi_deg: config.phi_deg,
       theta_deg: config.theta_deg.map(|x| x.into()).unwrap_or_default(),

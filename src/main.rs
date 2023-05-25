@@ -21,7 +21,7 @@
 //
 //   let mut params = SPDCSetup::default();
 //
-//   params.crystal_setup.crystal = Crystal::KTP;
+//   params.crystal_setup.crystal = CrystalType::KTP;
 //   params.assign_optimum_periodic_poling();
 //   params.assign_optimum_idler();
 //   params.fiber_coupling = fiber_coupling;

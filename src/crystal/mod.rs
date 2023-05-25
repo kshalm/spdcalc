@@ -22,8 +22,8 @@ pub mod sellmeier;
 // use sellmeier::equations::SellmeierEquation;
 // use sellmeier::temperature_dependence::TemperatureDependence;
 
-mod crystal;
-pub use crystal::*;
+mod crystal_type;
+pub use crystal_type::*;
 
 mod crystal_setup;
 pub use crystal_setup::*;

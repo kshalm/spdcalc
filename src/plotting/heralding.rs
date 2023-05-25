@@ -392,7 +392,7 @@ use super::*;
   fn zero_rates_test() {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.crystal = CrystalType::KTP;
     spdc_setup.signal.waist = Meter::new(Vector2::new(0., 0.));
     spdc_setup.idler.waist = Meter::new(Vector2::new(0., 0.));
     spdc_setup.assign_optimum_periodic_poling();
@@ -410,7 +410,7 @@ use super::*;
   fn coincidence_rates_test() {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.crystal = CrystalType::KTP;
     spdc_setup.crystal_setup.theta = 90. * DEG;
     spdc_setup.crystal_setup.length = 6000. * MICRO * M;
     spdc_setup.pump.waist = WaistSize::new(Vector2::new(200. * MICRO, 200. * MICRO));
@@ -441,7 +441,7 @@ use super::*;
   fn singles_rates_test() {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.crystal = CrystalType::KTP;
     spdc_setup.crystal_setup.theta = 90. * DEG;
     spdc_setup.crystal_setup.length = 6000. * MICRO * M;
     spdc_setup.pump.waist = WaistSize::new(Vector2::new(200. * MICRO, 200. * MICRO));
@@ -490,7 +490,7 @@ use super::*;
   fn efficiency_apodization_test() {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.crystal = CrystalType::KTP;
     spdc_setup.crystal_setup.length = 1000. * MICRO * M;
     spdc_setup.assign_optimum_periodic_poling();
     spdc_setup.pp = spdc_setup.pp.map(|pp| {
@@ -548,7 +548,7 @@ use super::*;
   fn efficiency_test() {
     let mut spdc_setup = SPDCSetup::default();
     spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KTP;
+    spdc_setup.crystal_setup.crystal = CrystalType::KTP;
     spdc_setup.crystal_setup.theta = 90. * DEG;
     spdc_setup.crystal_setup.length = 6000. * MICRO * M;
     spdc_setup.pump.waist = WaistSize::new(Vector2::new(200. * MICRO, 200. * MICRO));
@@ -599,7 +599,7 @@ use super::*;
   fn test_normalizations(){
     let json = serde_json::json!({
       "crystal": {
-        "name": "KTP",
+        "kind": "KTP",
         "pm_type": "e->eo",
         "phi_deg": 0,
         "theta_deg": 90,
