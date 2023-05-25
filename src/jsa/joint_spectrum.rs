@@ -1,5 +1,8 @@
 use crate::{SPDC, Frequency, PerMeter4, PerMeter3, Complex, phasematch::*, JsiNorm, JSIUnits, FrequencySpace, IntoSignalIdlerIterator, JsiSinglesNorm, SPDCError};
 
+/// The raw joint spectrum amplitude
+///
+/// This is the JSA for coincidences that does not include count rate constants.
 pub fn jsa_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_steps: Option<usize>) -> Complex<f64> {
   let alpha = pump_spectral_amplitude(omega_s + omega_i, spdc);
   // check the threshold
@@ -11,6 +14,9 @@ pub fn jsa_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_
   }
 }
 
+/// The raw joint spectrum intensity
+///
+/// This is the JSI for singles that does not include count rate constants.
 pub fn jsi_singles_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_steps: Option<usize>) -> f64 {
   let alpha = pump_spectral_amplitude(omega_s + omega_i, spdc);
   // check the threshold
@@ -27,6 +33,10 @@ pub fn jsi_singles_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, inte
   }
 }
 
+/// Joint Spectrum Calculation Helper
+///
+/// This is the primary way of calculating aspects of the joint spectrum for a given setup.
+/// It provides some optimization by caching the JSA and JSI at the center frequency used to calculate normalized values.
 #[derive(Clone, Debug)]
 pub struct JointSpectrum {
   spdc: SPDC,
@@ -36,6 +46,9 @@ pub struct JointSpectrum {
 }
 
 impl JointSpectrum {
+  /// Create a new instance
+  ///
+  /// If `integration_steps` is `None` then the appropriate number of steps is auto-calculated.
   pub fn new(
     spdc: SPDC,
     integration_steps: Option<usize>
@@ -187,6 +200,7 @@ impl JointSpectrum {
     range.into_signal_idler_iterator().map(|(ws, wi)| idler_spectrum.jsi_singles_normalized(wi, ws)).collect()
   }
 
+  /// Calculate the schmidt number for this SPDC configuration over a specified range of signal/idler frequencies
   pub fn schmidt_number<R: Into<FrequencySpace>>(&self, range: R) -> Result<f64, SPDCError> {
     crate::math::schmidt_number(self.jsa_range(range.into()))
   }

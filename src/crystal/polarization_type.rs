@@ -2,7 +2,7 @@ use std::fmt;
 use std::str::FromStr;
 use crate::SPDCError;
 
-/// The polarization type
+/// The polarization type (ordinary or extraordinary)
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
 pub enum PolarizationType {
   Ordinary,

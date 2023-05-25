@@ -3,6 +3,16 @@ use dim::{ucum::{Meter2, M}};
 use crate::{Wavelength};
 
 /// Beam waist
+///
+/// Can be circular or elliptic.
+///
+/// ## Example
+/// ```
+/// use spdcalc::{dim::{f64prefixes::*, ucum::{M}}, BeamWaist};
+/// let w = BeamWaist::new(100.0 * MICRO * M);
+/// assert_eq!(w.ellipticity(), 1.0);
+/// assert_eq!(w, (100.0 * MICRO * M).into());
+/// ```
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct BeamWaist {
   /// wx at 1/e^2

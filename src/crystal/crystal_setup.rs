@@ -4,17 +4,27 @@ use crate::math::nelder_mead_1d;
 use dim::ucum::*;
 use na::{Rotation3, Vector3};
 
+/// Crystal setup
+///
+/// This struct contains all the information about the crystal.
 #[derive(Debug, Clone, PartialEq)]
 pub struct CrystalSetup {
+  /// The type of the crystal that influences the refractive indices
   pub crystal :     CrystalType,
+  /// The phasematching type through the crystal
   pub pm_type :     PMType,
+  /// The polar angle of the crystal optic axis
   pub phi :         Angle,
+  /// The azimuthal angle of the crystal optic axis
   pub theta :       Angle,
+  /// The length of the crystal
   pub length :      Meter<f64>,
+  /// The temperature of the crystal
   pub temperature : Kelvin<f64>,
 }
 
 impl CrystalSetup {
+  /// Convert a direction relative to the pump beam to a direction relative to the crystal optic axes
   pub fn to_crystal_frame(&self, direction : Direction) -> Direction {
     let crystal_rotation = Rotation3::from_euler_angles(0., *(self.theta / RAD), *(self.phi / RAD));
     crystal_rotation * direction
@@ -75,7 +85,7 @@ impl CrystalSetup {
     RIndex::new(n)
   }
 
-  /// automatically calculate the optimal crystal theta
+  /// calculate the optimal crystal theta
   /// by minimizing delta k
   pub fn optimum_theta(&self, signal: &SignalBeam, pump: &PumpBeam) -> Angle {
     let theta_s_e = signal.theta_external(self);
@@ -122,7 +132,10 @@ impl CrystalSetup {
     self.theta = self.optimum_theta(signal, pump);
   }
 
-  // z_{s,i} = -\frac{1}{2}\frac{L}{n_z(\lambda_{s,i})}
+  /// Calculate the optimal waist position inside the crystal.
+  ///
+  /// The position is the distance from the crystal exit surface along the z-axis.
+  /// z_{s,i} = -\frac{1}{2}\frac{L}{n_z(\lambda_{s,i})}
   pub fn optimal_waist_position(
     &self,
     wavelength : Wavelength,

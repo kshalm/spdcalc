@@ -8,6 +8,7 @@ use std::{f64::{self, consts::FRAC_PI_2}, ops::{Deref, DerefMut}};
 mod beam_waist;
 pub use beam_waist::*;
 
+/// Create a unit direction vector from polar coordinates
 pub fn direction_from_polar(phi : Angle, theta : Angle) -> Direction {
   let theta_rad = *(theta / ucum::RAD);
   let phi_rad = *(phi / ucum::RAD);
@@ -18,6 +19,9 @@ pub fn direction_from_polar(phi : Angle, theta : Angle) -> Direction {
   ))
 }
 
+/// PumpBeam wraps the Beam type.
+///
+/// Ensures we don't get confused about which beam is which.
 #[derive(Debug, Clone, PartialEq)]
 pub struct PumpBeam(Beam);
 impl PumpBeam {
@@ -49,6 +53,9 @@ impl DerefMut for PumpBeam {
   }
 }
 
+/// SignalBeam wraps the Beam type.
+///
+/// Ensures we don't get confused about which beam is which.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SignalBeam(Beam);
 impl SignalBeam {
@@ -78,11 +85,15 @@ impl DerefMut for SignalBeam {
   }
 }
 
+/// IdlerBeam wraps the Beam type.
+///
+/// Ensures we don't get confused about which beam is which.
 #[derive(Debug, Clone, PartialEq)]
 pub struct IdlerBeam(Beam);
 impl IdlerBeam {
   pub fn new(beam: Beam) -> Self { Self(beam) }
   pub fn as_beam(self) -> Beam { self.0 }
+  /// Calculate the optimal idler beam for the given signal and pump beams.
   pub fn try_new_optimum(
     signal : &SignalBeam,
     pump : &PumpBeam,
@@ -167,7 +178,9 @@ impl DerefMut for IdlerBeam {
   }
 }
 
-/// The beam
+/// The Beam type represents pump/signal/idler properties.
+///
+/// Use with PumpBeam, SignalBeam, IdlerBeam
 #[derive(Debug, Clone, PartialEq)]
 pub struct Beam {
   waist : BeamWaist,
@@ -207,6 +220,7 @@ impl Beam {
     }
   }
 
+  /// Effective index of refraction induced by periodic poling
   // TODO: double check this...
   pub fn effective_index_of_refraction(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> RIndex {
     let lambda_o = self.vacuum_wavelength();
@@ -238,6 +252,7 @@ impl Beam {
     C_ / vg
   }
 
+  /// Use snell's law to calculate the internal theta from external
   pub fn calc_internal_theta_from_external(
     beam : &Self,
     external : Angle,
@@ -261,6 +276,7 @@ impl Beam {
     theta * ucum::RAD
   }
 
+  /// Use snell's law to calculate the external theta from internal
   pub fn calc_external_theta_from_internal(
     beam : &Self,
     internal : Angle,
@@ -277,10 +293,12 @@ impl Beam {
     Self { polarization, ..self }
   }
 
+  /// Get the polarization type (ordinary or extraordinary)
   pub fn polarization(&self) -> PolarizationType {
     self.polarization
   }
 
+  /// Set the polarization type (ordinary or extraordinary)
   pub fn set_polarization(&mut self, polarization : PolarizationType) -> &mut Self {
     self.polarization = polarization;
     self
@@ -292,32 +310,39 @@ impl Beam {
     crystal_setup.index_along(lambda_o, self.direction(), self.polarization())
   }
 
+  /// Get the direction of propagation with respect to the pump
   pub fn direction(&self) -> Direction {
     self.direction
   }
 
+  /// Get the beam waist
   pub fn waist(&self) -> BeamWaist {
     self.waist
   }
 
+  /// Set the beam waist
   pub fn set_waist<W: Into<BeamWaist>>(&mut self, waist: W) -> &mut Self {
     self.waist = waist.into();
     self
   }
 
+  /// Get the polar angle relative to the x-axis
   pub fn phi(&self) -> Angle {
     self.phi
   }
 
+  /// Get the azimuthal angle relative to the z-axis (pump direction) internal to the crystal
   pub fn theta_internal(&self) -> Angle {
     self.theta
   }
 
+  /// Get the azimuthal angle relative to the z-axis (pump direction) external to the crystal
   pub fn theta_external(&self, crystal_setup : &CrystalSetup) -> Angle {
     // snells law
     Self::calc_external_theta_from_internal(self, self.theta, crystal_setup)
   }
 
+  /// Get the wavevector of the beam
   pub fn wavevector(&self, omega: Frequency, crystal_setup : &CrystalSetup) -> Wavevector {
     let n = self.refractive_index(omega, crystal_setup);
     let k = frequency_to_wavenumber(omega, n);
@@ -343,6 +368,7 @@ impl Beam {
     self
   }
 
+  /// Set the external azimuthal angle
   pub fn set_theta_external(&mut self, external : Angle, crystal_setup : &CrystalSetup) -> &mut Self {
     use dim::Abs;
     let theta = Self::calc_internal_theta_from_external(self, external.abs(), crystal_setup);
@@ -352,6 +378,7 @@ impl Beam {
     self
   }
 
+  /// Set both internal angles
   pub fn set_angles(&mut self, phi : Angle, theta : Angle) -> &mut Self {
     assert!(*(theta / ucum::RAD) <= PI && *(theta / ucum::RAD) >= 0.);
     self.phi = phi;
@@ -384,6 +411,7 @@ impl Beam {
     (-np_prime / np).atan() * ucum::RAD
   }
 
+  /// Get the average transit time through the crystal
   pub fn average_transit_time(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> Time {
     let crystal_length = crystal_setup.length;
     let delta_z = 0.5 * crystal_length;
