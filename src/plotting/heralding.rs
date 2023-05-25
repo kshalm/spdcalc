@@ -376,7 +376,9 @@ pub fn plot_heralding_results_by_pump_signal_idler_waist(
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+  use crate::utils::vacuum_wavelength_to_frequency;
+
+use super::*;
   // extern crate float_cmp;
   // use float_cmp::*;
   use dim::f64prefixes::{NANO, MICRO};
@@ -591,5 +593,54 @@ mod tests {
       results.idler_efficiency,
       expected_idler
     );
+  }
+
+  #[test]
+  fn test_normalizations(){
+    let json = serde_json::json!({
+      "crystal": {
+        "name": "KTP",
+        "pm_type": "e->eo",
+        "phi_deg": 0,
+        "theta_deg": 90,
+        "length_um": 14_000,
+        "temperature_c": 20
+      },
+      "pump": {
+        "wavelength_nm": 775,
+        "waist_um": 200,
+        "bandwidth_nm": 0.5,
+        "average_power_mw": 300
+      },
+      "signal": {
+        "wavelength_nm": 1550,
+        "phi_deg": 0,
+        "theta_external_deg": 0,
+        "waist_um": 100,
+        "waist_position_um": "auto"
+      },
+      "idler": "auto",
+      "periodic_poling": {
+        "poling_period_um": "auto"
+      },
+      "deff_pm_per_volt": 7.6
+    });
+
+    let config : crate::SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+    let spdc_setup : SPDCSetup = spdc.clone().into();
+    let l_s = spdc_setup.signal.get_wavelength();
+    let l_i = spdc_setup.idler.get_wavelength();
+    let old = calc_coincidence_rate_constant(&spdc_setup) * calc_jacobian_det_lambda_to_omega(l_s, l_i, &spdc_setup);
+
+    let new = jsi_normalization(
+      vacuum_wavelength_to_frequency(l_s),
+      vacuum_wavelength_to_frequency(l_i),
+      &spdc
+    );
+
+    dbg!(old / new);
+
+    assert!(false);
   }
 }
