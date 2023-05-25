@@ -111,11 +111,6 @@ impl From<crate::spdcalc::SiRange> for FrequencySpace {
 pub struct Spdcalc;
 
 impl crate::spdcalc::Spdcalc for Spdcalc {
-  // config-default: func() -> spdc-config
-  // config-as-optimum: func(config: spdc-config) -> spdc-config
-  // config-with-optimum-idler: func(config: spdc-config) -> spdc-config
-  // config-with-optimum-periodic-poling: func(config: spdc-config) -> spdc-config
-  // config-with-swapped-signal-idler: func(config: spdc-config) -> spdc-config
 
   fn config_default() -> crate::spdcalc::SpdcConfig {
     SPDCConfig::default().into()
