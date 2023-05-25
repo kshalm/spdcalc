@@ -372,7 +372,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 pub fn transpose_vec<T : Clone>(vec: Vec<T>, num_cols : usize) -> Vec<T> {
   let len = vec.len();
   let num_rows = len / num_cols;
-  (0..len).into_iter().map(|index| {
+  (0..len).map(|index| {
     let (c, r) = get_2d_indices(index, num_cols);
     let other = get_1d_index(r, c, num_rows);
     vec[other].clone()

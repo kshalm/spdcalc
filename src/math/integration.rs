@@ -7,12 +7,10 @@ fn get_simpson_weight( n : usize, divs : usize ) -> f64 {
   // 1, 4, 2, 4, 2, ..., 4, 1
   if n == 0 || n == divs {
     1.
+  } else if n.is_odd() {
+    4.
   } else {
-    if n.is_odd() {
-      4.
-    } else {
-      2.
-    }
+    2.
   }
 }
 

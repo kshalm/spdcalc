@@ -58,7 +58,7 @@ pub fn gradient_at<T>(func : impl Fn(&[f64]) -> f64, position : T) -> Vec<f64>
 
 pub fn derivative_at(func : impl Fn(f64) -> f64, position : f64) -> f64
 {
-  gradient_at(|x : &[f64]| func(x[0]), &[position])[0]
+  gradient_at(|x : &[f64]| func(x[0]), [position])[0]
 }
 
 #[cfg(test)]

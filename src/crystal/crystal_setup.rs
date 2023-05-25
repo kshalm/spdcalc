@@ -78,7 +78,7 @@ impl CrystalSetup {
   /// automatically calculate the optimal crystal theta
   /// by minimizing delta k
   pub fn optimum_theta(&self, signal: &SignalBeam, pump: &PumpBeam) -> Angle {
-    let theta_s_e = signal.theta_external(&self);
+    let theta_s_e = signal.theta_external(self);
 
     let delta_k = move |theta| {
       let mut crystal_setup = self.clone();

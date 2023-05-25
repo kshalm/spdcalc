@@ -20,7 +20,7 @@ pub fn hom_rate<T: Into<FrequencySpace>>(
   // we'd only need 1 jsa and could just flip it over diff axis
   // and do half of the convolution since the other half is
   // the complex conjugate (and we take the real part)
-  let norm = norm.unwrap_or_else(|| jsa_norm(&jsa_values));
+  let norm = norm.unwrap_or_else(|| jsa_norm(jsa_values));
   let ranges = ranges.into();
   // TODO: use integrator rather than block integration
   let result : f64 = ranges.as_steps().into_iter().enumerate().map(|(index, (ws, wi))| {
@@ -48,12 +48,12 @@ pub fn hom_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Ti
   jsa_values_swapped: &Vec<Complex<f64>>,
   time_delays : T
 ) -> Vec<f64> {
-  let norm = jsa_norm(&jsa_values);
+  let norm = jsa_norm(jsa_values);
   time_delays.into_iter().map(|time_delay| {
     hom_rate(
       ranges,
-      &jsa_values,
-      &jsa_values_swapped,
+      jsa_values,
+      jsa_values_swapped,
       time_delay,
       Some(norm)
     )

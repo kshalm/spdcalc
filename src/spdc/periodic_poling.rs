@@ -70,8 +70,8 @@ impl PeriodicPoling {
     pump: &PumpBeam,
     crystal_setup: &CrystalSetup
   ) -> Sign {
-    let idler = IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, None).unwrap();
-    let delkz = (delta_k(signal.frequency(), idler.frequency(), &signal, &idler, &pump, &crystal_setup, None) * M / RAD).z;
+    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, None).unwrap();
+    let delkz = (delta_k(signal.frequency(), idler.frequency(), signal, &idler, pump, crystal_setup, None) * M / RAD).z;
 
     // converts to sign
     delkz.into()

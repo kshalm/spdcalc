@@ -143,7 +143,7 @@ impl SPDC {
 
   /// Assign the optimum periodic poling to this SPDC
   pub fn assign_optimum_periodic_poling(&mut self) -> Result<&mut Self, SPDCError> {
-    let pp = PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp.map_or(None, |pp| pp.apodization))?;
+    let pp = PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp.and_then(|pp| pp.apodization))?;
     self.pp = Some(pp);
     Ok(self)
   }
