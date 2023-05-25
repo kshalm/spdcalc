@@ -1,3 +1,5 @@
+//! Core functions for evaluating the phasematching function
+
 use crate::{*, utils::vacuum_wavelength_to_frequency};
 use math::*;
 use dim::{ucum::{C_, M}};

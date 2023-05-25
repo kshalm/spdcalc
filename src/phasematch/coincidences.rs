@@ -44,7 +44,7 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
   // TODO: ask krister. does this work to filter out lobes?
   // let delk = *(spdc_setup.calc_delta_k() / J / S);
   // let arg = *(L * 0.5 * delk.z / M);
-  // let limit = 10. * PI2;
+  // let limit = 10. * TWO_PI;
 
   // if arg > limit || arg < -limit {
   //   return (Complex::new(0., 0.), 1.);
@@ -174,7 +174,7 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
   let A7 = Complex::new(*(GAM3i/RAD/M), -*(DEL3i/M));
 
   let pp_factor = spdc.pp.map_or(0./M, |p| p.pp_factor());
-  let dksi = k_s + k_i + PI2 * RAD * pp_factor;
+  let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
 
@@ -278,14 +278,14 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
 }
 
 #[allow(non_snake_case)]
-pub fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> PerMeter4<Complex<f64>> {
+fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> PerMeter4<Complex<f64>> {
   // crystal length
   let L = spdc.crystal_setup.length;
 
   // TODO: ask krister. does this work to filter out lobes?
   // let delk = *(spdc_setup.calc_delta_k() / J / S);
   // let arg = *(L * 0.5 * delk.z / M);
-  // let limit = 10. * PI2;
+  // let limit = 10. * TWO_PI;
 
   // if arg > limit || arg < -limit {
   //   return (Complex::new(0., 0.), 1.);
@@ -383,7 +383,7 @@ pub fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc :
   let n = 0.5 * L * rho;
 
   let pp_factor = spdc.pp.map_or(0./M, |p| p.pp_factor());
-  let dksi = k_s + k_i + PI2 * RAD * pp_factor;
+  let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
   let hh = -0.25 * (Wfi_SQ * PHI_i * sq(PSI_i) + Wfs_SQ * PHI_s * sq(PSI_s));

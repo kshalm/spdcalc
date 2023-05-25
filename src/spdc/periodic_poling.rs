@@ -7,7 +7,7 @@ use crate::{
   CrystalSetup,
   SignalBeam,
   PumpBeam,
-  PI2,
+  TWO_PI,
   SPDCError,
   math::nelder_mead_1d
 };
@@ -116,7 +116,7 @@ pub fn optimum_poling_period(
   }
 
   // base our guess on the delta k calculation without periodic poling
-  let guess = PI2 / z;
+  let guess = TWO_PI / z;
   // the sign of the z component of delta k gives the sign of pp
   let sign = z.into();
 

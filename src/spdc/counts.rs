@@ -5,7 +5,7 @@ use dim::ucum::Hertz;
 
 /// Get the correction factor for the counts
 ///
-/// ref: https://iopscience.iop.org/article/10.1088/2040-8986/ab05a8/pdf
+/// ref: <https://iopscience.iop.org/article/10.1088/2040-8986/ab05a8/pdf>
 pub fn get_counts_correction(spdc: &SPDC) -> f64 {
   let lp = spdc.pump.vacuum_wavelength();
   let ls = spdc.signal.vacuum_wavelength();

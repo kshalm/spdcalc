@@ -1,4 +1,4 @@
-//! Modified from https://github.com/b52/optimization-rust/
+//! Modified from <https://github.com/b52/optimization-rust/>
 
 use std::f64::EPSILON;
 

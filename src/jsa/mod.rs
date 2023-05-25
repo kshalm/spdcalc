@@ -1,3 +1,5 @@
+//! Helpers for evaluating the joint spectrum
+
 mod si_iterator;
 pub use si_iterator::*;
 

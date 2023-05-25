@@ -16,7 +16,7 @@ pub use constants::*;
 pub mod utils;
 pub mod math;
 
-mod spdc;
+pub mod spdc;
 pub use spdc::*;
 
 pub mod crystal;

@@ -1,6 +1,7 @@
+//! General utilities
 use dim::{ucum::{self, C_, RAD, ONE}};
 use crate::math::{lerp};
-use crate::{Frequency, Wavenumber, RIndex, Wavelength, PI2, Speed};
+use crate::{Frequency, Wavenumber, RIndex, Wavelength, TWO_PI, Speed};
 
 /// Create a dimensioned vector3
 pub fn dim_vector3<L, R>(unit_const : L, arr : &[R; 3]) -> na::Vector3<dim::typenum::Prod<L, R>>
@@ -38,12 +39,12 @@ pub fn wavenumber_to_frequency(k: Wavenumber, n: RIndex) -> Frequency {
 
 /// Get the frequency of light at wavelength in a medium with refractive index
 pub fn wavelength_to_frequency(lambda: Wavelength, n: RIndex) -> Frequency {
-  PI2 * RAD * C_ / (lambda * n)
+  TWO_PI * RAD * C_ / (lambda * n)
 }
 
 /// Get the wavelength of light at frequency in a medium with refractive index
 pub fn frequency_to_wavelength(omega: Frequency, n: RIndex) -> Wavelength {
-  PI2 * RAD * C_ / (omega * n)
+  TWO_PI * RAD * C_ / (omega * n)
 }
 
 /// Get the phase velocity of light from frequency and wavenumber
@@ -61,7 +62,7 @@ pub fn frequency_to_vacuum_wavelength(omega: Frequency) -> Wavelength {
   frequency_to_wavelength(omega, ONE)
 }
 
-/// Utility for creating evenly spaced steps between two endpoints
+/// Utility for creating evenly spaced steps between two endpoints over floating point numbers
 ///
 /// ## Example:
 /// ```
@@ -89,23 +90,31 @@ where T:
   std::ops::Sub<T, Output=T> +
   Copy
 {
+  /// Starting value
   #[inline(always)]
   pub fn start(&self) -> T { self.0 }
+  /// Ending value
   #[inline(always)]
   pub fn end(&self) -> T { self.1 }
+  /// Number of steps
   #[inline(always)]
   pub fn steps(&self) -> usize { self.2 }
+  /// Number of steps
   #[inline(always)]
   pub fn len(&self) -> usize { self.steps() }
+  /// Is this empty?
   #[inline(always)]
   pub fn is_empty(&self) -> bool { self.steps() == 0 }
+  /// Get the range as a tuple
   #[inline(always)]
   pub fn range(&self) -> (T, T) { (self.start(), self.end()) }
+  /// Get the number of divisions (steps - 1)
   #[inline(always)]
   pub fn divisions(&self) -> usize {
     self.steps() - 1
   }
 
+  /// Get the value at a given index
   pub fn value(&self, index : usize) -> T {
     let (start, end) = self.range();
     // if we have only one step... then just set progress to be zero
@@ -137,22 +146,23 @@ where T:
   Copy
 {
   type Item = T;
-  type IntoIter = StepIterator<T>;
+  type IntoIter = Iterator1D<T>;
 
   fn into_iter(self) -> Self::IntoIter {
-    StepIterator {
+    Iterator1D {
       steps: self,
       index: 0,
     }
   }
 }
 
-pub struct StepIterator<T> {
+/// Iterator for 1D steps
+pub struct Iterator1D<T> {
   steps: Steps<T>,
   index: usize,
 }
 
-impl<T> Iterator for StepIterator<T>
+impl<T> Iterator for Iterator1D<T>
 where T:
   std::ops::Mul<f64, Output=T> +
   std::ops::Add<T, Output=T> +
@@ -174,7 +184,7 @@ where T:
   }
 }
 
-impl<T> ExactSizeIterator for StepIterator<T>
+impl<T> ExactSizeIterator for Iterator1D<T>
 where T:
   std::ops::Mul<f64, Output=T> +
   std::ops::Add<T, Output=T> +
@@ -212,25 +222,30 @@ impl<T> Steps2D<T>
     Self(x, y)
   }
 
+  /// Number of divisions for each axis
   pub fn divisions(&self) -> (usize, usize) {
     (Steps::from(self.0).divisions(), Steps::from(self.1).divisions())
   }
 
+  /// Range of each axis
   pub fn ranges(&self) -> ((T, T), (T, T)) {
     ((self.0.0, self.0.1), (self.1.0, self.1.1))
   }
 
+  /// Total number of steps
   pub fn len(&self) -> usize {
     (self.0).2 * (self.1).2
   }
 
+  /// Is it empty?
   pub fn is_empty(&self) -> bool { self.len() == 0 }
 
+  /// Same number of steps for each axis?
   pub fn is_square(&self) -> bool {
     self.0.2 == self.1.2
   }
 
-  // get the value at the given index
+  /// Get the value at the given index
   pub fn value(&self, index: usize) -> (T, T) {
     // TODO: can optimize
     let cols = self.0.2;
@@ -243,6 +258,7 @@ impl<T> Steps2D<T>
     (x, y)
   }
 
+  /// Swap x and y
   pub fn swapped(self) -> Steps2D<T> {
     Steps2D(self.1, self.0)
   }

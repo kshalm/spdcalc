@@ -1,3 +1,5 @@
+//! Various iterators over the signal and idler in frequency/wavelength space
+//!
 use crate::{utils::{vacuum_wavelength_to_frequency, Steps2D, Iterator2D, frequency_to_vacuum_wavelength}, Frequency, Wavelength};
 
 /// A range of signal and idler frequencies

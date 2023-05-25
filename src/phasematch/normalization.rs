@@ -34,8 +34,8 @@ fn common_norm(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> CommonNo
 
   let lomega = omega_s * omega_i / sq(n_s * n_i) / RAD / RAD;
   let constants = (degeneracy_factor * periodic_poling_coeff).powi(2)
-    / (4. * PI.powi(5) * PI2.sqrt() * C_ * C_ * C_ * EPS_0);
-  PI2.powi(3) * constants
+    / (4. * PI.powi(5) * TWO_PI.sqrt() * C_ * C_ * C_ * EPS_0);
+  TWO_PI.powi(3) * constants
     * wp_sq
     * sq(deff * crystal_length)
     * lomega / RAD

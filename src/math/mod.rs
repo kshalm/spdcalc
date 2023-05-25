@@ -1,6 +1,8 @@
+//! Mathematical helpers
+
 mod differentiation;
 use crate::{Angle, dim::ucum::{RAD}};
-use crate::constants::PI2;
+use crate::constants::TWO_PI;
 pub use differentiation::*;
 
 mod integration;
@@ -36,7 +38,7 @@ where T : std::ops::Mul + Copy {
 
 /// Normalize an angle to [0, 2π)
 pub fn normalize_angle(ang : Angle) -> Angle {
-  (ang % PI2 + PI2 * RAD) % PI2
+  (ang % TWO_PI + TWO_PI * RAD) % TWO_PI
 }
 
 /// Simple implementation of linear interpolation

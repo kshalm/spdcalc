@@ -1,6 +1,7 @@
 use crate::{SPDC, jsa::FrequencySpace};
 use dim::ucum::{S, Hertz};
 
+/// The efficiencies (and counts) result object
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Efficiencies {
   pub symmetric: f64,

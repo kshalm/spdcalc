@@ -3,7 +3,8 @@ use na::Vector3;
 use dim::{ucum::{M}};
 
 /// Calculate the difference in momentum for pump -> signal idler.
-/// Equation (15) of https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
+///
+/// Equation (15) of <https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf>
 pub fn delta_k(
   omega_s : Frequency,
   omega_i : Frequency,
@@ -23,7 +24,7 @@ pub fn delta_k(
   match pp {
     Some(pp) => {
       let zhat = Vector3::<f64>::z_axis();
-      delta_k - Wavevector::new(zhat.as_ref() * *(PI2 * pp.pp_factor() * M))
+      delta_k - Wavevector::new(zhat.as_ref() * *(TWO_PI * pp.pp_factor() * M))
     },
     None => delta_k
   }

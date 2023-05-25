@@ -1,3 +1,5 @@
+//! SPDC setup configuration helpers
+//!
 
 mod pm_type;
 pub use pm_type::*;

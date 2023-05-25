@@ -56,7 +56,7 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
   let KpKs = *(k_p * k_s*M2/RAD/RAD); // exact
   let pp_factor = spdc.pp.map_or(0./M, |p| p.pp_factor());
 
-  let dksi = k_s + k_i + PI2 * RAD * pp_factor;
+  let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
   let C7 = k_p - dksi; // 1e-7
   let C3 = L * C7; // 1e-10
   let C4 = L * (1./k_i - 1./k_p); // 1e-13
