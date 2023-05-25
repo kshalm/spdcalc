@@ -1,7 +1,9 @@
 use dim::ucum::{MilliWatt, DEG, Hertz};
+use crate::{JSIUnits, fwhm_to_spectral_width};
+use crate::jsa::SumDiffFrequencySpace;
 use crate::math::nelder_mead_1d;
 use crate::types::Time;
-use crate::{SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Wavelength, Distance, optimum_poling_period, SPDCError, jsa::{JointSpectrum, FrequencySpace}};
+use crate::{SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Wavevector, Frequency, Wavelength, Distance, SPDCError, jsa::{JointSpectrum, FrequencySpace}};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SPDC {
@@ -59,53 +61,36 @@ impl SPDC {
     }
   }
 
-  pub fn auto_range(&self, size: usize, threshold: Option<f64>) -> FrequencySpace {
-    use dim::{f64prefixes::*, ucum::{RAD, S}};
+  pub fn optimal_range(&self, resolution: usize) -> FrequencySpace {
+    use dim::ucum::{RAD, S};
     let wp = self.pump.frequency();
-    let ws = self.signal.frequency();
+    let lambda_p = self.pump.vacuum_wavelength();
 
-    let mut spdc = self.clone();
-    spdc.assign_optimum_idler().unwrap();
-    let spectrum = spdc.joint_spectrum(None);
-    let peak = spectrum.jsi_normalized(ws, spdc.idler.frequency());
-    let target = threshold.unwrap_or(0.5) * peak;
+    // find radius of pump spectrum in frequency
+    let fwhm = self.pump_bandwidth;
+    let waist = fwhm_to_spectral_width(lambda_p, fwhm);
+    let dw_to_spectrum_edge = (- f64::ln(0.02)).sqrt() * waist;
+    let d_sum = *(0.5 * dw_to_spectrum_edge / (RAD / S));
 
-    let pm_diff = |ws| {
-      let local = spectrum.jsi_normalized(ws * (RAD / S), spdc.idler.frequency());
-      if local < std::f64::EPSILON {
-        std::f64::MAX
-      } else {
-        let diff = target - local;
-        diff.abs()
-      }
+    // find delta of jsi from peak to zero-ish
+    let spectrum = self.joint_spectrum(None);
+    let jsi = |d_diff| {
+      let ws = 0.5 * wp - d_diff * (RAD / S);
+      let wi = 0.5 * wp + d_diff * (RAD / S);
+      spectrum.jsi_normalized(ws, wi)
     };
 
-    let ws = *(ws / (RAD / S));
-    let guess = ws - 1. * TERA;
-    let ans = nelder_mead_1d(pm_diff, (guess, guess + 1e-9), 1000, 1., ws, 1e-12);
+    let max = 64. * d_sum;
+    let guess = d_sum;
+    let d_diff = nelder_mead_1d(jsi, (0., guess), 1000, 0., max, 1e-3);
 
-    // FIXME WHAT ARE THESE NUMBERS
-    // let diff_max = (2e-9 * (l_p / (775. * NANO)) * (spdc_setup.pump_bandwidth / (NANO * M))).min(35e-9);
-    let diff = (ans - ws).abs(); //.min(diff_max);
-    // println!("l_s {}, diff {}", l_s, diff);
-    // println!("target {}, jsi(ans) {}", target, pm_diff(ans));
+    let buffer = 1.;
+    let dxy = buffer * d_diff.max(d_sum) * (RAD / S);
 
-    let x_steps = (
-      (ws - 10. * diff) * (RAD / S),
-      (ws + 10. * diff) * (RAD / S),
-      size
-    );
-
-    let y_steps = (
-      wp - x_steps.1,
-      wp - x_steps.0,
-      size
-    );
-
-    FrequencySpace::new(
-      x_steps,
-      y_steps,
-    )
+    SumDiffFrequencySpace::new(
+      (0.5 * wp - dxy, 0.5 * wp + dxy, resolution),
+      (-dxy, dxy, resolution)
+    ).as_frequency_space()
   }
 
   /// Convert it into an optimum setup
@@ -263,8 +248,8 @@ impl SPDC {
 #[cfg(test)]
 mod test {
   use super::*;
-  use dim::{f64prefixes::{NANO}, ucum::{DEG, HZ, M}};
-  use crate::{jsa::{FrequencySpace, WavelengthSpace}, utils::{Steps2D, vacuum_wavelength_to_frequency}};
+  use dim::{f64prefixes::{NANO}, ucum::{HZ, M}};
+  use crate::{jsa::{WavelengthSpace}, utils::{Steps2D}};
 
   fn default_spdc() -> SPDC {
     let json = serde_json::json!({
@@ -346,5 +331,54 @@ mod test {
     assert_eq!(efficiencies.symmetric, 0.0);
     assert_eq!(efficiencies.signal, 0.0);
     assert_eq!(efficiencies.idler, 0.0);
+  }
+
+  #[test]
+  fn test_auto_range() {
+    let json = serde_json::json!({
+      "crystal": {
+        "name": "KTP",
+        "pm_type": "Type2_e_eo",
+        "phi_deg": 0.0,
+        "theta_deg": 90.,
+        "length_um": 200.0000000000002,
+        "temperature_c": 20.0
+      },
+      "pump": {
+        "wavelength_nm": 774.9999999999999,
+        "waist_um": 100.0,
+        "bandwidth_nm": 2.35,
+        "average_power_mw": 1.0,
+        "spectrum_threshold": 0.01
+      },
+      "signal": {
+        "wavelength_nm": 1549.9999999999998,
+        "phi_deg": 0.0,
+        "theta_deg": 0.0,
+        "theta_external_deg": null,
+        "waist_um": 100.0,
+        "waist_position_um": -576.6731750218875
+      },
+      "idler": {
+        "wavelength_nm": 1549.9999999999998,
+        "phi_deg": 180.0,
+        "theta_deg": 0.0,
+        "theta_external_deg": null,
+        "waist_um": 100.0,
+        "waist_position_um": -560.9842490831526
+      },
+      "periodic_poling": {
+        "poling_period_um": "auto"
+      },
+      "deff_pm_per_volt": 1.0
+    });
+
+    let config : crate::SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+    let range = WavelengthSpace::from_frequency_space(spdc.optimal_range(10));
+    dbg!(range);
+
+    assert!(false);
+
   }
 }
