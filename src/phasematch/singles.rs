@@ -193,8 +193,6 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
 #[cfg(test)]
 mod tests {
   use super::*;
-  extern crate float_cmp;
-  use float_cmp::*;
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
     100. * ((expected - actual) / expected).abs()
@@ -213,7 +211,6 @@ mod tests {
     spdc.signal_waist_position = -0.0007348996031796276 * M;
     spdc.idler_waist_position = -0.0007348996031796276 * M;
 
-    let jsa_units = JSAUnits::new(1.);
     let amp = *(phasematch_singles_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None) / PerMeter3::new(1.));
 
     let actual = amp;
@@ -248,7 +245,6 @@ mod tests {
     spdc.signal_waist_position = -0.0006311635856188344 * M;
     spdc.idler_waist_position = -0.0006311635856188344 * M;
 
-    let jsa_units = JSAUnits::new(1.);
     let amp = *(phasematch_singles_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None) / PerMeter3::new(1.));
 
     let actual = amp;

@@ -32,8 +32,8 @@ mod tests {
   fn shmidt_number_test() {
     let mut spdc = SPDC::default();
     spdc.crystal_setup.crystal = CrystalType::KTP;
-    spdc.assign_optimum_idler();
-    spdc.assign_optimum_periodic_poling();
+    spdc.assign_optimum_idler().unwrap();
+    spdc.assign_optimum_periodic_poling().unwrap();
 
     let wavelength_range = WavelengthSpace::new(
       (1490.86 * NANO * M, 1609.14 * NANO * M, 100),

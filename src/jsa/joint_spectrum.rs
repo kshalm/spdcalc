@@ -199,10 +199,6 @@ mod tests {
   use super::*;
   use dim::{f64prefixes::*, ucum::*};
 
-  fn percent_diff(actual : f64, expected : f64) -> f64 {
-    100. * ((expected - actual) / expected).abs()
-  }
-
   fn get_spdc() -> SPDC {
     let json = serde_json::json!({
       "crystal": {
@@ -287,6 +283,7 @@ mod tests {
     let singles_idler_rate : Hertz<f64> = jsi_singles_idler.into_iter().sum::<JSIUnits<f64>>() * dxdy;
 
     assert!(coinc_rate < singles_signal_rate);
+    assert!(coinc_rate < singles_idler_rate);
   }
 
   #[test]
