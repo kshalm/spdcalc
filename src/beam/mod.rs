@@ -98,8 +98,8 @@ impl IdlerBeam {
       );
     }
 
-    let ns = signal.refractive_index(signal.frequency(), &crystal_setup);
-    let np = pump.refractive_index(pump.frequency(), &crystal_setup);
+    let ns = signal.refractive_index(signal.frequency(), crystal_setup);
+    let np = pump.refractive_index(pump.frequency(), crystal_setup);
 
     let del_k_pp = match pp {
       Some(poling) => ls * poling.pp_factor(),
@@ -210,7 +210,7 @@ impl Beam {
   // TODO: double check this...
   pub fn effective_index_of_refraction(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> RIndex {
     let lambda_o = self.vacuum_wavelength();
-    let n = self.refractive_index(self.frequency, &crystal_setup);
+    let n = self.refractive_index(self.frequency, crystal_setup);
     let pp_factor = pp.map_or(0. / M, |p| p.pp_factor());
     n + *(pp_factor * lambda_o)
   }
@@ -315,7 +315,7 @@ impl Beam {
 
   pub fn theta_external(&self, crystal_setup : &CrystalSetup) -> Angle {
     // snells law
-    Self::calc_external_theta_from_internal(&self, self.theta, crystal_setup)
+    Self::calc_external_theta_from_internal(self, self.theta, crystal_setup)
   }
 
   pub fn wavevector(&self, omega: Frequency, crystal_setup : &CrystalSetup) -> Wavevector {
@@ -378,7 +378,7 @@ impl Beam {
     // derrivative at theta
     let theta = *(crystal_setup.theta / ucum::RAD);
     let np_prime = derivative_at(ne_of_theta, theta);
-    let np = *self.refractive_index(self.frequency, &crystal_setup);
+    let np = *self.refractive_index(self.frequency, crystal_setup);
 
     // walkoff \tan(\rho) = -\frac{1}{n_e} \frac{dn_e}{d\theta}
     (-np_prime / np).atan() * ucum::RAD
@@ -395,7 +395,7 @@ impl Beam {
     let disp = (*(delta_z / M) / direction.z) * direction;
     let distance = disp.norm() * M;
 
-    let vg = self.group_velocity(&crystal_setup, pp);
+    let vg = self.group_velocity(crystal_setup, pp);
     distance / vg
   }
 

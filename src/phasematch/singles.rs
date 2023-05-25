@@ -179,7 +179,7 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
     );
 
     // Now calculate the full term in the integral.
-    return pmzcoeff * numerator / denominator;
+    pmzcoeff * numerator / denominator
   };
 
   let integrator = SimpsonIntegration2D::new(fn_z);

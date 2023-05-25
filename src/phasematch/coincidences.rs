@@ -265,7 +265,7 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
 
     // dbg!(pmzcoeff, z, numerator, denominator);
     // Now calculate the full term in the integral.
-    return pmzcoeff * numerator / denominator;
+    pmzcoeff * numerator / denominator
   };
 
   let integrator = SimpsonIntegration::new(fn_z);
@@ -479,7 +479,7 @@ pub fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc :
 
     // dbg!(pmzcoeff, z, numerator, denominator);
     // Now calculate the full term in the integral.
-    return pmzcoeff * numerator / denominator;
+    pmzcoeff * numerator / denominator
   };
 
   let integrator = SimpsonIntegration::new(fn_z);

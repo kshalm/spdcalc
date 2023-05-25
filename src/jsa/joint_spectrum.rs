@@ -1,23 +1,23 @@
 use crate::{SPDC, Frequency, PerMeter4, PerMeter3, Complex, phasematch::*, JsiNorm, JSIUnits, FrequencySpace, IntoSignalIdlerIterator, JsiSinglesNorm, SPDCError};
 
 pub fn jsa_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_steps: Option<usize>) -> Complex<f64> {
-  let alpha = pump_spectral_amplitude(omega_s + omega_i, &spdc);
+  let alpha = pump_spectral_amplitude(omega_s + omega_i, spdc);
   // check the threshold
   if alpha < spdc.pump_spectrum_threshold {
     Complex::new(0., 0.)
   } else {
-    let f = phasematch_fiber_coupling(omega_s, omega_i, &spdc, integration_steps) / PerMeter4::new(1.);
+    let f = phasematch_fiber_coupling(omega_s, omega_i, spdc, integration_steps) / PerMeter4::new(1.);
     *(alpha * f)
   }
 }
 
 pub fn jsi_singles_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_steps: Option<usize>) -> f64 {
-  let alpha = pump_spectral_amplitude(omega_s + omega_i, &spdc);
+  let alpha = pump_spectral_amplitude(omega_s + omega_i, spdc);
   // check the threshold
   if alpha < spdc.pump_spectrum_threshold {
     0.
   } else {
-    let fs = phasematch_singles_fiber_coupling(omega_s, omega_i, &spdc, integration_steps) / PerMeter3::new(1.);
+    let fs = phasematch_singles_fiber_coupling(omega_s, omega_i, spdc, integration_steps) / PerMeter3::new(1.);
     // use crate::utils::frequency_to_vacuum_wavelength;
     // let mut setup : SPDCSetup = spdc.clone().into();
     // setup.signal.set_wavelength(frequency_to_vacuum_wavelength(omega_s));
@@ -188,7 +188,7 @@ impl JointSpectrum {
   }
 
   pub fn schmidt_number<R: Into<FrequencySpace>>(&self, range: R) -> Result<f64, SPDCError> {
-    crate::math::schmidt_number(&self.jsa_range(range.into()))
+    crate::math::schmidt_number(self.jsa_range(range.into()))
   }
 }
 

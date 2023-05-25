@@ -46,7 +46,7 @@ impl Crystal {
   ///
   /// useful for external language bindings and serialization
   pub fn from_string( id : &str ) -> Result<Self, SPDCError> {
-    match id.as_ref() {
+    match id {
       "BBO_1" => Ok(Crystal::BBO_1),
       "KTP" => Ok(Crystal::KTP),
       "BiBO_1" => Ok(Crystal::BiBO_1),

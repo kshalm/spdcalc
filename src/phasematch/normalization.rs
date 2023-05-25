@@ -53,10 +53,9 @@ pub fn jsi_normalization(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -
   let wi_sq = spdc.idler.waist().x_by_y_sqr();
 
   let chi = common_norm(omega_s, omega_i, spdc);
-  let eta = chi * sec_s * sec_i
-     * ws_sq * wi_sq;
 
-  eta
+  chi * sec_s * sec_i
+     * ws_sq * wi_sq
 }
 
 /// The units are M^6/s/(radians/s)^2
@@ -66,8 +65,7 @@ pub fn jsi_singles_normalization(omega_s: Frequency, omega_i: Frequency, spdc : 
   let ws_sq = spdc.signal.waist().x_by_y_sqr();
 
   let chi = common_norm(omega_s, omega_i, spdc);
-  let eta_s = chi * sec_s
-     * ws_sq;
 
-  eta_s
+  chi * sec_s
+     * ws_sq
 }

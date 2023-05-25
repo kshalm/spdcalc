@@ -4,7 +4,7 @@ use crate::math::nelder_mead_1d;
 use dim::ucum::*;
 use na::{Rotation3, Vector3};
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CrystalSetup {
   pub crystal :     Crystal,
   pub pm_type :     PMType,
