@@ -11,6 +11,7 @@ pub struct Efficiencies {
   pub idler_singles: Hertz<f64>,
 }
 
+/// Calculate the efficiencies from the raw counts.
 pub fn efficiencies_from_counts(coincidences_rate: Hertz<f64>, signal_singles_rate: Hertz<f64>, idler_singles_rate: Hertz<f64>) -> Efficiencies {
   let signal_efficiency = if idler_singles_rate == Hertz::new(0.) { 0. } else { *(coincidences_rate / idler_singles_rate) };
   let idler_efficiency = if signal_singles_rate == Hertz::new(0.) { 0. } else { *(coincidences_rate / signal_singles_rate) };
@@ -30,6 +31,7 @@ pub fn efficiencies_from_counts(coincidences_rate: Hertz<f64>, signal_singles_ra
   }
 }
 
+/// Calculate the efficiencies from the SPDC object over the given ranges.
 pub fn efficiencies(spdc : &SPDC, ranges: FrequencySpace, integration_steps: Option<usize>) -> Efficiencies {
   let coincidences_rate = spdc.counts_coincidences(ranges, integration_steps);
   let signal_singles_rate = spdc.counts_singles_signal(ranges, integration_steps);

@@ -6,6 +6,10 @@ use crate::math::nelder_mead_1d;
 use crate::types::Time;
 use crate::{SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Wavevector, Frequency, Wavelength, Distance, SPDCError, jsa::{JointSpectrum, FrequencySpace}};
 
+/// SPDC setup
+///
+/// This is the core of the api. This holds all information about the experimental setup.
+/// Interact with this object to calculate joint spectrum, rates, efficiencies, schmidt number, etc.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SPDC {
   pub signal :         SignalBeam,
@@ -62,6 +66,7 @@ impl SPDC {
     }
   }
 
+  /// Optimal range to use for evaluating the joint spectrum
   pub fn optimal_range(&self, resolution: usize) -> FrequencySpace {
     use dim::ucum::{RAD, S};
     let wp = self.pump.frequency();
@@ -122,11 +127,13 @@ impl SPDC {
     )
   }
 
+  /// New setup with optimal waist positions for signal and idler
   pub fn with_optimal_waist_positions(mut self) -> Self {
     self.assign_optimal_waist_positions();
     self
   }
 
+  /// Assign this setup with the optimal waist positions for signal and idler
   pub fn assign_optimal_waist_positions(&mut self) -> &mut Self {
     self.signal_waist_position = self.crystal_setup.optimal_waist_position(self.signal.vacuum_wavelength(), self.signal.polarization());
     self.idler_waist_position = self.crystal_setup.optimal_waist_position(self.idler.vacuum_wavelength(), self.idler.polarization());
@@ -149,6 +156,7 @@ impl SPDC {
     Ok(self)
   }
 
+  /// Swap the signal and idler beams
   pub fn with_swapped_signal_idler(self) -> Self {
     let Self {
       mut crystal_setup,
@@ -179,10 +187,12 @@ impl SPDC {
     }
   }
 
+  /// Calculate the wavevector mismatch for the given frequencies
   pub fn delta_k(&self, omega_s : Frequency, omega_i : Frequency) -> Wavevector {
     crate::delta_k(omega_s, omega_i, &self.signal, &self.idler, &self.pump, &self.crystal_setup, self.pp)
   }
 
+  /// Get a new joint spectrum object for this SPDC
   pub fn joint_spectrum(&self, integration_steps : Option<usize>) -> JointSpectrum {
     JointSpectrum::new(self.clone(), integration_steps)
   }

@@ -42,6 +42,8 @@ fn common_norm(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> CommonNo
     * pump_power / sigma
 }
 
+/// Normalization for the coincidence JSI to make it a count rate
+///
 /// The units are M^8/s/(radians/s)^2
 pub fn jsi_normalization(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> JsiNorm<f64> {
   // this is different from the old normalization by a factor of pi^4/2
@@ -58,6 +60,8 @@ pub fn jsi_normalization(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -
      * ws_sq * wi_sq
 }
 
+/// Normalization for the singles JSI to make it a count rate
+///
 /// The units are M^6/s/(radians/s)^2
 pub fn jsi_singles_normalization(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> JsiSinglesNorm<f64> {
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);

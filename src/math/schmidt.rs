@@ -1,6 +1,7 @@
 use crate::{SPDCError, Complex};
 use na::{DMatrix};
 
+/// Calculate the schmidt number of a flat vector joint spectral amplitude values (square matrix)
 pub fn schmidt_number<T: AsRef<[Complex<f64>]>>(amplitudes : T) -> Result<f64, SPDCError> {
   use num::integer::Roots;
   let len = amplitudes.as_ref().len();

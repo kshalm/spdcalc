@@ -9,6 +9,7 @@ mod periodic_poling_config;
 pub use periodic_poling_config::{PeriodicPolingConfig, MaybePeriodicPolingConfig};
 use serde_with::{serde_as, DisplayFromStr};
 
+/// A config parameter the could be signaled to be automatically calculated
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum AutoCalcParam<T> where T : 'static {
@@ -28,7 +29,7 @@ impl<T> Default for AutoCalcParam<T> {
   }
 }
 
-/// Flat configuration object for ease of import/export
+/// Flat configuration of crystal for ease of import/export
 #[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CrystalConfig {
@@ -74,6 +75,7 @@ impl From<CrystalConfig> for CrystalSetup {
   }
 }
 
+/// Flat configuration of pump for ease of import/export
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct PumpConfig {
   pub wavelength_nm: f64,
@@ -108,6 +110,7 @@ impl PumpConfig {
   }
 }
 
+/// Flat configuration of signal for ease of import/export
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SignalConfig {
   pub wavelength_nm: f64,
@@ -154,6 +157,7 @@ impl SignalConfig {
   }
 }
 
+/// Flat configuration of idler for ease of import/export
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct IdlerConfig {
   pub wavelength_nm: f64,
@@ -187,6 +191,7 @@ impl IdlerConfig {
   }
 }
 
+/// Flat configuration of SPDC for ease of import/export
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SPDCConfig {
   pub crystal: CrystalConfig,

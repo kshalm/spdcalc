@@ -4,6 +4,9 @@ use super::*;
 use dim::ucum::{RAD, M};
 use num::{Complex};
 
+/// Evaluate the fiber coupled singles phasematching function for a given set of frequencies
+///
+/// This places a "bucket collector" at the idler
 #[allow(non_snake_case)]
 pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> PerMeter3<f64> {
   let M2 = M * M; // meters squared
@@ -22,7 +25,6 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
   let Wx_SQ = sq(spdc.pump.waist().x);
   let Wy_SQ = sq(spdc.pump.waist().y);
 
-  // TODO: should i be doing this?
   let omega_p = omega_s + omega_i; // spdc.pump.frequency();
   let n_p = spdc.pump.refractive_index(omega_p, &spdc.crystal_setup);
   let k_p = frequency_to_wavenumber(omega_p, n_p);

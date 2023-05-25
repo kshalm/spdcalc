@@ -316,3 +316,26 @@ impl IntoSignalIdlerIterator for SignalIdlerFrequencyArray {
   }
 }
 
+#[cfg(test)]
+mod test {
+  use super::*;
+  use crate::spdc::SPDC;
+  use crate::dim::ucum::*;
+
+  #[test]
+  fn test_si_arrays() {
+    let spdc = SPDC::default();
+    let spectrum = spdc.joint_spectrum(None);
+    let range = WavelengthSpace::new(
+      (1400e-9 * M, 1600e-9 * M, 10),
+      (1400e-9 * M, 1600e-9 * M, 10)
+    );
+
+    let jsi = spectrum.jsi_range(range);
+
+    let values : Vec<Wavelength> = range.as_steps().into_iter().flat_map(|(s, i)| [s, i]).collect();
+    let jsi2 = spectrum.jsi_range(SignalIdlerWavelengthArray(values));
+
+    assert_eq!(jsi, jsi2);
+  }
+}

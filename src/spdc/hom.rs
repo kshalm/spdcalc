@@ -5,10 +5,12 @@ use crate::types::{Time, Complex};
 use crate::utils::{Steps, get_1d_index, get_2d_indices};
 use dim::ucum::RAD;
 
+/// The "integral" of the JSI
 pub fn jsa_norm(jsa_values: &[Complex<f64>]) -> f64 {
   jsa_values.iter().map(|f| f.norm_sqr()).sum()
 }
 
+/// Hong–Ou–Mandel coincidence rate
 pub fn hom_rate<T: Into<FrequencySpace>>(
   ranges: T,
   jsa_values: &[Complex<f64>],
@@ -41,7 +43,7 @@ pub fn hom_rate<T: Into<FrequencySpace>>(
   0.5 * (1. - result / norm)
 }
 
-/// Hong–Ou–Mandel coincidence rate
+/// Hong–Ou–Mandel coincidence rate for a series of time delays
 pub fn hom_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Time>>(
   ranges: R,
   jsa_values: &[Complex<f64>],
@@ -60,6 +62,7 @@ pub fn hom_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Ti
   }).collect()
 }
 
+/// Time delay corresponding to the Hong–Ou–Mandel dip
 pub fn hom_time_delay(
   spdc: &SPDC,
 ) -> Time {
@@ -69,6 +72,7 @@ pub fn hom_time_delay(
   idler_time - signal_time + fudge
 }
 
+/// Hong–Ou–Mandel visibility (and corresponding time delay)
 pub fn hom_visibility<T: Into<FrequencySpace> + Copy>(
   spdc : &SPDC,
   ranges: T,
@@ -94,6 +98,7 @@ pub fn hom_visibility<T: Into<FrequencySpace> + Copy>(
   (delta_t, (0.5 - min_rate) / 0.5)
 }
 
+/// A result from a hom calculation (signal-signal, idler-idler, signal-idler)
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct HomTwoSourceResult<T> {
   pub ss: T,
@@ -101,6 +106,7 @@ pub struct HomTwoSourceResult<T> {
   pub si: T,
 }
 
+/// Hong–Ou–Mandel coincidence rate for two sources for a series of time delays
 pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Time>>(
   js1 : &JointSpectrum,
   js2 : &JointSpectrum,
@@ -187,6 +193,7 @@ pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterato
   HomTwoSourceResult { ss, ii, si }
 }
 
+/// Time delays for each channel permutation corresponding to two source Hong-Ou-Mandel interference.
 pub fn hom_two_source_time_delays(
   spdc1: &SPDC,
   spdc2: &SPDC,
@@ -215,6 +222,7 @@ pub fn hom_two_source_time_delays(
   HomTwoSourceResult { ss, ii, si }
 }
 
+/// Visibility for each channel permutation corresponding to two source Hong-Ou-Mandel interference.
 pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
   spdc1 : &SPDC,
   spdc2 : &SPDC,

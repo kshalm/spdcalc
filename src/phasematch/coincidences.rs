@@ -5,7 +5,7 @@ use math::*;
 use super::*;
 use dim::ucum::{RAD, M};
 
-/// calculate the phasematching using a gaussian approximation
+/// Evaluate the phasematching function using a gaussian approximation
 #[allow(non_snake_case)]
 pub fn phasematch_gaussian(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> PerMeter4<Complex<f64>> {
   let L = spdc.crystal_setup.length;
@@ -17,6 +17,7 @@ pub fn phasematch_gaussian(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC)
   PerMeter4::new(pmz)
 }
 
+/// Evaluate the phasematching function using a sinc approximation
 #[allow(non_snake_case)]
 pub fn phasematch_sinc(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> PerMeter4<Complex<f64>> {
   let L = spdc.crystal_setup.length;
@@ -31,6 +32,9 @@ pub fn phasematch_sinc(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> 
   PerMeter4::new(pmz * pmt)
 }
 
+/// Evaluate the phasematching function for fiber coupling
+///
+/// This is the secret sauce of spdcalc.
 #[allow(non_snake_case)]
 pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> PerMeter4<Complex<f64>> {
   // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, steps);

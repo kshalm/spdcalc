@@ -16,6 +16,7 @@ use crate::dim::ucum::{M, W, V, RAD, PerMeter, Meter};
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 
 pub type PolingPeriod = Meter<f64>;
+
 /// Apodization for periodic poling
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Apodization {
@@ -49,6 +50,7 @@ impl PeriodicPoling {
     self
   }
 
+  /// Get the optimal periodic poling for the given signal and pump beams
   pub fn try_new_optimum(
     signal: &SignalBeam,
     pump: &PumpBeam,
@@ -64,7 +66,7 @@ impl PeriodicPoling {
     )
   }
 
-  /// calculate the sign needed by this periodic poling
+  /// calculate the sign of periodic poling
   pub fn compute_sign(
     signal: &SignalBeam,
     pump: &PumpBeam,
@@ -88,6 +90,7 @@ impl PeriodicPoling {
   }
 }
 
+/// Get the optimum poling period for the given signal and pump beams
 pub fn optimum_poling_period(
   signal: &SignalBeam,
   pump: &PumpBeam,

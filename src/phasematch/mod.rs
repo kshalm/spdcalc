@@ -11,6 +11,7 @@ pub fn gaussian_pm( x : f64 ) -> f64 {
   f64::exp(-GAUSSIAN_SINC_GAMMA_FACTOR * x.powi(2))
 }
 
+/// Convert the pump spectrum FWHM (wavelength) to spectral width (frequency)
 pub fn fwhm_to_spectral_width(pump_wavelength: Wavelength, fwhm: Wavelength) -> Frequency {
   let diff = pump_wavelength - 0.5 * fwhm;
   let sum = pump_wavelength + 0.5 * fwhm;
@@ -21,6 +22,9 @@ pub fn fwhm_to_spectral_width(pump_wavelength: Wavelength, fwhm: Wavelength) -> 
   )
 }
 
+/// The pump spectrum amplitude at a given frequency
+///
+/// This assumes a gaussian pump
 pub fn pump_spectral_amplitude(omega : Frequency, spdc : &SPDC) -> f64 {
   let lambda_p = spdc.pump.vacuum_wavelength();
   let omega_0 = spdc.pump.frequency();
@@ -38,6 +42,7 @@ pub fn pump_spectral_amplitude(omega : Frequency, spdc : &SPDC) -> f64 {
   (-x * x).exp()
 }
 
+/// Get the best guess of the number of integration steps for a specific crystal length
 pub fn integration_steps_best_guess(crystal_length: Distance) -> usize {
   use num::clamp;
   use std::cmp::max;

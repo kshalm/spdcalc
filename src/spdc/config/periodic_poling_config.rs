@@ -1,5 +1,6 @@
 use super::*;
 
+/// Flat config for periodic poling
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct PeriodicPolingConfig {
   pub poling_period_um: AutoCalcParam<f64>,

@@ -22,6 +22,7 @@ pub fn get_counts_correction(spdc: &SPDC) -> f64 {
   )
 }
 
+/// Get the counts over the given frequency ranges
 pub fn counts_coincidences(spdc: &SPDC, ranges: FrequencySpace, integration_steps : Option<usize>) -> Hertz<f64> {
   let s = spdc.joint_spectrum(integration_steps);
   let (dws, dwi) = ranges.steps().division_widths();
@@ -32,6 +33,7 @@ pub fn counts_coincidences(spdc: &SPDC, ranges: FrequencySpace, integration_step
   ).sum::<Hertz<f64>>()
 }
 
+/// Get the singles counts for the signal over the given frequency ranges
 pub fn counts_singles_signal(spdc: &SPDC, ranges: FrequencySpace, integration_steps : Option<usize>) -> Hertz<f64> {
   let s = spdc.joint_spectrum(integration_steps);
   let (dws, dwi) = ranges.steps().division_widths();
@@ -42,6 +44,7 @@ pub fn counts_singles_signal(spdc: &SPDC, ranges: FrequencySpace, integration_st
   ).sum::<Hertz<f64>>()
 }
 
+/// Get the singles counts for the idler over the given frequency ranges
 pub fn counts_singles_idler(spdc: &SPDC, ranges: FrequencySpace, integration_steps : Option<usize>) -> Hertz<f64> {
   let s = JointSpectrum::new(spdc.clone().with_swapped_signal_idler(), integration_steps);
   let (dws, dwi) = ranges.steps().division_widths();

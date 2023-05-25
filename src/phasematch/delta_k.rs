@@ -2,7 +2,7 @@ use super::*;
 use na::Vector3;
 use dim::{ucum::{M}};
 
-/// Calculate the difference in momentum.
+/// Calculate the difference in momentum for pump -> signal idler.
 /// Equation (15) of https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
 pub fn delta_k(
   omega_s : Frequency,
