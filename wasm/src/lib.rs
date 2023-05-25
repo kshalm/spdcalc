@@ -159,10 +159,10 @@ impl crate::spdcalc::Spdcalc for Spdcalc {
     SPDCConfig::from(config).into()
   }
 
-  fn auto_range(config: crate::spdcalc::SpdcConfig, steps: u64, threshold: Option<f64>) -> crate::spdcalc::SiRange {
+  fn optimal_range(config: crate::spdcalc::SpdcConfig, steps: u64) -> crate::spdcalc::SiRange {
     let config: SPDCConfig = config.into();
     let spdc = config.try_as_spdc().unwrap();
-    let range = spdc.auto_range(steps as usize, threshold);
+    let range = spdc.optimal_range(steps as usize).as_steps();
     Self::frequency_range(
       (*(range.0.0 / (RAD / S)), *(range.0.1 / (RAD / S)), range.0.2 as u64),
       (*(range.1.0 / (RAD / S)), *(range.1.1 / (RAD / S)), range.1.2 as u64),
@@ -232,7 +232,7 @@ impl crate::spdcalc::Spdcalc for Spdcalc {
           (range.x.0 * M, range.x.1 * M, range.x.2 as usize),
           (range.y.0 * M, range.y.1 * M, range.y.2 as usize),
         );
-        let fq = FrequencySpace::from(wl);
+        let fq = FrequencySpace::from(wl).as_steps();
         Self::frequency_range(
           (*(fq.0.0 / (RAD / S)), *(fq.0.1 / (RAD / S)), fq.0.2 as u64),
           (*(fq.1.0 / (RAD / S)), *(fq.1.1 / (RAD / S)), fq.1.2 as u64),
@@ -245,7 +245,7 @@ impl crate::spdcalc::Spdcalc for Spdcalc {
         let fq = SumDiffFrequencySpace::new(
           (range.x.0 * (RAD / S), range.x.1 * (RAD / S), range.x.2 as usize),
           (range.y.0 * (RAD / S), range.y.1 * (RAD / S), range.y.2 as usize),
-        ).as_frequency_space();
+        ).as_frequency_space().as_steps();
         Self::frequency_range(
           (*(fq.0.0 / (RAD / S)), *(fq.0.1 / (RAD / S)), fq.0.2 as u64),
           (*(fq.1.0 / (RAD / S)), *(fq.1.1 / (RAD / S)), fq.1.2 as u64),

@@ -24,30 +24,30 @@ pub fn get_counts_correction(spdc: &SPDC) -> f64 {
 
 pub fn counts_coincidences(spdc: &SPDC, ranges: FrequencySpace, integration_steps : Option<usize>) -> Hertz<f64> {
   let s = spdc.joint_spectrum(integration_steps);
-  let (dws, dwi) = ranges.division_widths();
+  let (dws, dwi) = ranges.steps().division_widths();
   let dw2 = dws * dwi;
   let correction_factor = get_counts_correction(spdc);
-  correction_factor * ranges.into_iter().map(|(ws, wi)|
+  correction_factor * ranges.as_steps().into_iter().map(|(ws, wi)|
     s.jsi(ws, wi) * dw2
   ).sum::<Hertz<f64>>()
 }
 
 pub fn counts_singles_signal(spdc: &SPDC, ranges: FrequencySpace, integration_steps : Option<usize>) -> Hertz<f64> {
   let s = spdc.joint_spectrum(integration_steps);
-  let (dws, dwi) = ranges.division_widths();
+  let (dws, dwi) = ranges.steps().division_widths();
   let dw2 = dws * dwi;
   let correction_factor = get_counts_correction(spdc);
-  correction_factor * ranges.into_iter().map(|(ws, wi)|
+  correction_factor * ranges.as_steps().into_iter().map(|(ws, wi)|
     s.jsi_singles(ws, wi) * dw2
   ).sum::<Hertz<f64>>()
 }
 
 pub fn counts_singles_idler(spdc: &SPDC, ranges: FrequencySpace, integration_steps : Option<usize>) -> Hertz<f64> {
   let s = JointSpectrum::new(spdc.clone().with_swapped_signal_idler(), integration_steps);
-  let (dws, dwi) = ranges.division_widths();
+  let (dws, dwi) = ranges.steps().division_widths();
   let dw2 = dws * dwi;
   let correction_factor = get_counts_correction(spdc);
-  correction_factor * ranges.into_iter().map(|(ws, wi)|
+  correction_factor * ranges.as_steps().into_iter().map(|(ws, wi)|
     s.jsi_singles(wi, ws) * dw2
   ).sum::<Hertz<f64>>()
 }

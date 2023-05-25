@@ -131,7 +131,7 @@ config-with-swapped-signal-idler: func(config: spdc-config) -> spdc-config
 
 
 // ranges
-auto-range: func(config: spdc-config, steps: u64, threshold: option<float64>) -> si-range
+optimal-range: func(config: spdc-config, steps: u64) -> si-range
 wavelength-range: func(x-range: tuple<float64, float64, u64>, y-range: tuple<float64, float64, u64>) -> si-range
 frequency-range: func(x-range: tuple<float64, float64, u64>, y-range: tuple<float64, float64, u64>) -> si-range
 sum-diff-range: func(x-range: tuple<float64, float64, u64>, y-range: tuple<float64, float64, u64>) -> si-range

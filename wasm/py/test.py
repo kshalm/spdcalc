@@ -17,7 +17,7 @@ cfg = spdc.config_from_json(config)
 # cfg = spdc.config_as_optimum(cfg)
 print(cfg)
 # cfg.crystal.theta_deg = 90
-range = spdc.auto_range(cfg, 50, None)
+range = spdc.optimal_range(cfg, 50)
 # range = spdc.wavelength_range(
 #     (1450e-9, 1650e-9, 50),
 #     (1450e-9, 1650e-9, 50)
@@ -31,7 +31,7 @@ print("hom visibility: {}".format(spdc.hom_visibility(cfg, range, None)))
 print("hom two source visibilities: {}".format(spdc.hom_two_source_visibilities(cfg, range, None)))
 print("efficiencies: {}".format(spdc.efficiencies(cfg, range, None)))
 
-range = spdc.auto_range(cfg, 500, None)
+range = spdc.optimal_range(cfg, 500)
 # range = spdc.wavelength_range(
 #     (1450e-9, 1650e-9, 500),
 #     (1450e-9, 1650e-9, 500)

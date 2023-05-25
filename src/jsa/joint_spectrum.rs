@@ -271,7 +271,7 @@ mod tests {
     let spdc = get_spdc();
 
     let spectrum = JointSpectrum::new(spdc.clone(), None);
-    let frequencies = Steps2D(
+    let frequencies = FrequencySpace::new(
       (vacuum_wavelength_to_frequency(1541.54 * NANO * M), vacuum_wavelength_to_frequency(1558.46 * NANO * M), 20),
       (vacuum_wavelength_to_frequency(1541.63 * NANO * M), vacuum_wavelength_to_frequency(1558.56 * NANO * M), 20),
     );
@@ -280,7 +280,8 @@ mod tests {
     let jsi_singles = spectrum.jsi_singles_range(frequencies);
     let jsi_singles_idler = spectrum.jsi_singles_idler_range(frequencies);
 
-    let dxdy = Steps::from(frequencies.0).division_width() * Steps::from(frequencies.1).division_width();
+    let steps = frequencies.as_steps();
+    let dxdy = Steps::from(steps.0).division_width() * Steps::from(steps.1).division_width();
     let coinc_rate : Hertz<f64> = jsi.into_iter().sum::<JSIUnits<f64>>() * dxdy;
     let singles_signal_rate : Hertz<f64> = jsi_singles.into_iter().sum::<JSIUnits<f64>>() * dxdy;
     let singles_idler_rate : Hertz<f64> = jsi_singles_idler.into_iter().sum::<JSIUnits<f64>>() * dxdy;
@@ -290,8 +291,8 @@ mod tests {
     // old way
     let spdc_setup : SPDCSetup = spdc.into();
     let wavelength_range = Steps2D(
-      (frequency_to_vacuum_wavelength(frequencies.0.0), frequency_to_vacuum_wavelength(frequencies.0.1), frequencies.0.2),
-      (frequency_to_vacuum_wavelength(frequencies.1.0), frequency_to_vacuum_wavelength(frequencies.1.1), frequencies.1.2),
+      (frequency_to_vacuum_wavelength(steps.0.0), frequency_to_vacuum_wavelength(steps.0.1), steps.0.2),
+      (frequency_to_vacuum_wavelength(steps.1.0), frequency_to_vacuum_wavelength(steps.1.1), steps.1.2),
     );
     let results = calc_heralding_results(&spdc_setup, &wavelength_range);
 
@@ -357,8 +358,9 @@ mod tests {
     let jsi = optimal.joint_spectrum(steps).jsi_normalized_range(range);
     // dbg!(&jsi);
     // check the max value isn't > 1
+    let steps = range.as_steps();
     let max = jsi.iter().enumerate().fold((0.0_f64, 0. * RAD / S, 0. * RAD / S), |a, (i, &b)| {
-      let (x, y) = range.value(i);
+      let (x, y) = steps.value(i);
       if b > a.0 {
         (b, x, y)
       } else {

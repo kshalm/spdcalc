@@ -23,7 +23,7 @@ pub fn hom_rate<T: Into<FrequencySpace>>(
   let norm = norm.unwrap_or_else(|| jsa_norm(&jsa_values));
   let ranges = ranges.into();
   // TODO: use integrator rather than block integration
-  let result : f64 = ranges.into_iter().enumerate().map(|(index, (ws, wi))| {
+  let result : f64 = ranges.as_steps().into_iter().enumerate().map(|(index, (ws, wi))| {
     let delta_w = wi - ws;
     let shift = Complex::from_polar(1., *(delta_w * time_delay / RAD));
 
@@ -77,7 +77,7 @@ pub fn hom_visibility<T: Into<FrequencySpace> + Copy>(
   let sp = spdc.joint_spectrum(integration_steps);
   let ranges = ranges.into();
   let jsa_values = sp.jsa_range(ranges);
-  let jsa_values_swapped = ranges.into_iter().map(|(ws, wi)| {
+  let jsa_values_swapped = ranges.as_steps().into_iter().map(|(ws, wi)| {
     sp.jsa(wi, ws)
   }).collect();
 
@@ -108,8 +108,8 @@ pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterato
   range2 : R,
   time_delays : T
 ) -> HomTwoSourceResult<Vec<f64>> {
-  let range1 = range1.into();
-  let range2 = range2.into();
+  let range1 = range1.into().as_steps();
+  let range2 = range2.into().as_steps();
   let ls_range_1 = range1.0;
   let li_range_1 = range1.1;
   let ls_range_2 = range2.0;
@@ -123,7 +123,7 @@ pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterato
   let cols = range1.0.2;
 
   let get_jsa = |s : &JointSpectrum, x_range, y_range| {
-    let region = Steps2D(x_range, y_range);
+    let region = FrequencySpace::new(x_range, y_range);
     s.jsa_range(region)
   };
   // calculate the needed JSAs
