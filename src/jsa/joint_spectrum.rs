@@ -1,4 +1,4 @@
-use super::*;
+use crate::{SPDC, Frequency, PerMeter4, PerMeter3, Complex, phasematch::*, JsiNorm, JSIUnits, FrequencySpace, IntoSignalIdlerIterator, JsiSinglesNorm, SPDCError};
 
 pub fn jsa_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_steps: Option<usize>) -> Complex<f64> {
   let alpha = pump_spectral_amplitude(omega_s + omega_i, &spdc);
@@ -195,7 +195,7 @@ impl JointSpectrum {
 
 #[cfg(test)]
 mod tests {
-  use crate::{utils::{vacuum_wavelength_to_frequency, Steps2D, Steps, frequency_to_vacuum_wavelength}, plotting::calc_heralding_results};
+  use crate::{utils::{vacuum_wavelength_to_frequency, Steps, frequency_to_vacuum_wavelength}, SPDCConfig};
   use super::*;
   use dim::{f64prefixes::*, ucum::*};
 
@@ -285,18 +285,6 @@ mod tests {
     let coinc_rate : Hertz<f64> = jsi.into_iter().sum::<JSIUnits<f64>>() * dxdy;
     let singles_signal_rate : Hertz<f64> = jsi_singles.into_iter().sum::<JSIUnits<f64>>() * dxdy;
     let singles_idler_rate : Hertz<f64> = jsi_singles_idler.into_iter().sum::<JSIUnits<f64>>() * dxdy;
-
-    dbg!(&spdc, coinc_rate, singles_signal_rate, singles_idler_rate, (coinc_rate * coinc_rate / (singles_signal_rate * singles_idler_rate)).sqrt());
-
-    // old way
-    let spdc_setup : SPDCSetup = spdc.into();
-    let wavelength_range = Steps2D(
-      (frequency_to_vacuum_wavelength(steps.0.0), frequency_to_vacuum_wavelength(steps.0.1), steps.0.2),
-      (frequency_to_vacuum_wavelength(steps.1.0), frequency_to_vacuum_wavelength(steps.1.1), steps.1.2),
-    );
-    let results = calc_heralding_results(&spdc_setup, &wavelength_range);
-
-    dbg!(spdc_setup, wavelength_range, results);
 
     assert!(coinc_rate < singles_signal_rate);
   }

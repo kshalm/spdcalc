@@ -2,7 +2,7 @@ use super::*;
 use crate::{CrystalSetup, Crystal, dim::{
   f64prefixes::{MICRO, NANO, PICO},
   ucum::{DEG, RAD, M, MILLIW, V}
-}, utils::{self, from_kelvin_to_celsius}, Beam, BeamWaist, PumpBeam, SignalBeam, IdlerBeam, PMType, SPDCError};
+}, utils::{self, from_kelvin_to_celsius}, Beam, PumpBeam, SignalBeam, IdlerBeam, PMType, SPDCError};
 use serde::{Serialize, Deserialize};
 
 mod periodic_poling_config;

@@ -1,6 +1,15 @@
 use crate::{*, utils::vacuum_wavelength_to_frequency};
 use math::*;
-use dim::{ucum::{C_, ONE, M, Unitless}};
+use dim::{ucum::{C_, M}};
+
+// ensures that the Gaussian and sinc functions have the same widths.
+// ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
+const GAUSSIAN_SINC_GAMMA_FACTOR : f64 = 0.193;
+
+/// Gaussian for phasematching
+pub fn gaussian_pm( x : f64 ) -> f64 {
+  f64::exp(-GAUSSIAN_SINC_GAMMA_FACTOR * x.powi(2))
+}
 
 pub fn fwhm_to_spectral_width(pump_wavelength: Wavelength, fwhm: Wavelength) -> Frequency {
   let diff = pump_wavelength - 0.5 * fwhm;
@@ -27,25 +36,6 @@ pub fn pump_spectral_amplitude(omega : Frequency, spdc : &SPDC) -> f64 {
   //
   // so amplitude is: Ao exp(- delta_omega / waist)
   (-x * x).exp()
-}
-
-/// Calculate the pump spectrum
-pub fn pump_spectrum(setup : &SPDCSetup) -> Unitless<f64> {
-  let two_pi_c = PI2 * C_;
-  let lamda_s = setup.signal.get_wavelength();
-  let lamda_i = setup.idler.get_wavelength();
-  let lamda_p = setup.pump.get_wavelength();
-
-  let delta_omega = two_pi_c * (1. / lamda_s + 1. / lamda_i - 1. / lamda_p);
-
-  // convert from wavelength to \omega
-  let fwhm = two_pi_c / (lamda_p * lamda_p) * setup.pump_bandwidth;
-  let sigma_i = fwhm_to_sigma(fwhm);
-  let x = delta_omega / sigma_i;
-
-  // Convert from intensity to Amplitude
-  // A^2 ~ I ... so extra factor of two here making this 1/4
-  (-0.25 * x * x).exp() * ONE
 }
 
 pub fn integration_steps_best_guess(crystal_length: Distance) -> usize {
@@ -82,12 +72,10 @@ mod tests {
 
   #[test]
   fn pump_spectrum_test() {
-    let mut spdc_setup = SPDCSetup::default();
-    spdc_setup.fiber_coupling = false;
+    let mut spdc = SPDC::default();
 
-    spdc_setup.signal.set_wavelength(1500. * NANO * M);
-    let actual = *pump_spectrum(&spdc_setup);
-
+    spdc.signal.set_vacuum_wavelength(1500. * NANO * M);
+    let actual = pump_spectral_amplitude(spdc.signal.frequency() + spdc.idler.frequency(), &spdc);
     let expected = 0.0003094554168558373;
 
     assert!(

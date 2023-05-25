@@ -1,5 +1,5 @@
 mod differentiation;
-use crate::{Angle, dim::ucum::RAD};
+use crate::{Angle, dim::ucum::{RAD}};
 use crate::constants::PI2;
 pub use differentiation::*;
 
@@ -11,10 +11,6 @@ pub use self::nelder_mead::*;
 
 mod schmidt;
 pub use self::schmidt::*;
-
-// ensures that the Gaussian and sinc functions have the same widths.
-// ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
-const GAUSSIAN_SINC_GAMMA_FACTOR : f64 = 0.193;
 
 lazy_static::lazy_static! {
   static ref FWHM_OVER_WAIST :f64 = f64::sqrt(2. * f64::ln(2.));
@@ -28,13 +24,8 @@ pub fn csc(a: Angle) -> f64 { 1. / sin(a) }
 pub fn cot(a: Angle) -> f64 { 1. / tan(a) }
 
 /// Standard sinc function `sinc(x) = sin(x) / x`
-pub fn sinc( x : f64 ) -> f64 {
-  if x == 0. { 1. } else { f64::sin(x) / x }
-}
-
-/// Gaussian for phasematching
-pub fn gaussian_pm( x : f64 ) -> f64 {
-  f64::exp(-GAUSSIAN_SINC_GAMMA_FACTOR * x.powi(2))
+pub fn sinc( x : Angle ) -> f64 {
+  if x == 0. * RAD { 1. } else { sin(x) / *(x / RAD) }
 }
 
 /// Square a value

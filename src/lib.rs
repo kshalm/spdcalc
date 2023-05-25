@@ -25,16 +25,11 @@ pub use crystal::*;
 mod beam;
 pub use beam::*;
 
-pub mod photon;
-pub use photon::Photon;
-
-pub mod spdc_setup;
-pub use spdc_setup::*;
-
 pub mod phasematch;
 pub use phasematch::*;
+
 pub mod jsa;
-pub mod plotting;
+pub use jsa::*;
 
 #[allow(unused_imports)]
 #[cfg(test)]

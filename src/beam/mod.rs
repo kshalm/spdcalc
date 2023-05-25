@@ -266,7 +266,7 @@ impl Beam {
     internal : Angle,
     crystal_setup : &CrystalSetup,
   ) -> Angle {
-    let direction = Photon::calc_direction(beam.phi(), internal);
+    let direction = direction_from_polar(beam.phi(), internal);
     let n = crystal_setup.index_along(beam.vacuum_wavelength(), direction, beam.polarization());
     // snells law
     f64::asin(*n * f64::sin(*(internal / ucum::RAD))) * ucum::RAD
@@ -569,7 +569,7 @@ mod tests {
 
   #[test]
   fn walkoff_test() {
-    let mut crystal_setup = SPDCSetup::default().crystal_setup;
+    let mut crystal_setup = SPDC::default().crystal_setup;
     crystal_setup.theta = 31.603728550521122 * ucum::DEG;
 
     let pump = Beam::new(PolarizationType::Extraordinary, 0. * DEG, 0. * DEG, 775. * NANO * M, 100. * MICRO * M);

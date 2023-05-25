@@ -21,24 +21,21 @@ pub fn schmidt_number<T: AsRef<[Complex<f64>]>>(amplitudes : T) -> Result<f64, S
 mod tests {
   use super::*;
   use crate::{*};
-  use crate::utils::Steps2D;
   use dim::{
     ucum::{M},
   };
   use dim::f64prefixes::{NANO};
-  use plotting::JointSpectrum;
   extern crate float_cmp;
   use float_cmp::*;
 
   #[test]
   fn shmidt_number_test() {
-    let mut spdc_setup = SPDCSetup::default();
-    spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KTP;
-    spdc_setup.assign_optimum_idler();
-    spdc_setup.assign_optimum_periodic_poling();
+    let mut spdc = SPDC::default();
+    spdc.crystal_setup.crystal = Crystal::KTP;
+    spdc.assign_optimum_idler();
+    spdc.assign_optimum_periodic_poling();
 
-    let wavelength_range = Steps2D(
+    let wavelength_range = WavelengthSpace::new(
       (1490.86 * NANO * M, 1609.14 * NANO * M, 100),
       (1495.05 * NANO * M, 1614.03 * NANO * M, 100)
     );
@@ -46,8 +43,8 @@ mod tests {
     // dbg!(wavelength_range);
     // dbg!(spdc_setup);
 
-    let spectrum = JointSpectrum::new_coincidences(spdc_setup, wavelength_range);
-    let amplitudes = spectrum.amplitudes;
+    let spectrum = spdc.joint_spectrum(None);
+    let amplitudes = spectrum.jsa_range(wavelength_range);
     let sn = schmidt_number(amplitudes).expect("Could not calc schmidt number");
 
     let actual = sn;

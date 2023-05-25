@@ -1,5 +1,5 @@
 use dim::ucum::{MilliWatt, DEG, Hertz};
-use crate::{JSIUnits, fwhm_to_spectral_width};
+use crate::{fwhm_to_spectral_width};
 use crate::jsa::SumDiffFrequencySpace;
 use crate::math::nelder_mead_1d;
 use crate::types::Time;

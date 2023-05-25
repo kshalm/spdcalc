@@ -2,7 +2,7 @@ use crate::SPDC;
 use crate::jsa::{FrequencySpace, JointSpectrum};
 use na::Vector3;
 use crate::types::{Time, Complex};
-use crate::utils::{Steps, Steps2D, get_1d_index, get_2d_indices};
+use crate::utils::{Steps, get_1d_index, get_2d_indices};
 use dim::ucum::RAD;
 
 pub fn jsa_norm(jsa_values: &Vec<Complex<f64>>) -> f64 {
@@ -271,7 +271,7 @@ pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
 mod test {
   use super::*;
   use dim::{f64prefixes::{NANO}, ucum::{M}};
-  use crate::{jsa::{WavelengthSpace}, utils::{Steps2D}, plotting::{calc_hom_visibility, calc_hom_two_source_visibility}};
+  use crate::{jsa::{WavelengthSpace}, utils::{Steps2D}};
 
   fn get_spdc() -> SPDC {
     let json = serde_json::json!({
@@ -309,39 +309,5 @@ mod test {
     spdc
   }
 
-  #[test]
-  fn test_hom_visibility(){
-    let spdc = get_spdc();
-    let steps = Steps2D(
-      (1541.54 * NANO * M, 1558.46 * NANO * M, 20),
-      (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
-    );
-    let range : WavelengthSpace = steps.into();
-
-    let result = hom_visibility(&spdc, range, None);
-
-    let spdc_setup = spdc.into();
-    let old_result = calc_hom_visibility(&spdc_setup, &steps);
-
-    assert_eq!(result, old_result);
-  }
-
-  #[test]
-  fn test_hom_two_source_visibility(){
-    let spdc = get_spdc();
-    let steps = Steps2D(
-      (1541.54 * NANO * M, 1558.46 * NANO * M, 20),
-      (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
-    );
-    let range : WavelengthSpace = steps.into();
-
-    let result = hom_two_source_visibilities(&spdc, &spdc, range, range, None);
-
-    let spdc_setup = spdc.into();
-    let old_result = calc_hom_two_source_visibility(&spdc_setup, &spdc_setup, &steps, &steps);
-
-    dbg!(result, old_result);
-    assert!(false);
-  }
 }
 

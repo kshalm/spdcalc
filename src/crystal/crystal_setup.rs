@@ -3,7 +3,6 @@ use std::f64::consts::FRAC_PI_2;
 use crate::math::nelder_mead_1d;
 use dim::ucum::*;
 use na::{Rotation3, Vector3};
-use photon::{Photon, PhotonType};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct CrystalSetup {
@@ -15,43 +14,10 @@ pub struct CrystalSetup {
   pub temperature : Kelvin<f64>,
 }
 
-// internal helper to solve Equation (11)
-// sign = (slow: positive, fast: negative)
-fn solve_for_n(b : f64, c : f64, sign : Sign) -> f64 {
-  let d = b * b - 4.0 * c;
-  if d < 0. {
-    // this means the index is imaginary => decay
-    // return the real part of the index, which is zero
-    0.
-  } else {
-    let denom = b + sign * d.sqrt();
-    if denom < 0. {
-      // again... imaginary solution
-      0.
-    } else {
-      (2.0 / denom).sqrt()
-    }
-  }
-}
-
 impl CrystalSetup {
   pub fn to_crystal_frame(&self, direction : Direction) -> Direction {
     let crystal_rotation = Rotation3::from_euler_angles(0., *(self.theta / RAD), *(self.phi / RAD));
     crystal_rotation * direction
-  }
-
-  #[deprecated]
-  pub fn to_crystal_frame_for(&self, photon : &Photon) -> Direction {
-    self.to_crystal_frame(photon.get_direction())
-  }
-
-  #[deprecated]
-  pub fn get_index_for(&self, photon : &Photon) -> RIndex {
-    self.get_index_along(
-      photon.get_wavelength(),
-      photon.get_direction(),
-      &photon.get_type(),
-    )
   }
 
   /// get the refractive index along specified direction, with wavelength and polarization type
@@ -168,76 +134,6 @@ impl CrystalSetup {
       polarization
     )
   }
-
-  #[deprecated]
-  pub fn get_index_along(
-    &self,
-    wavelength : Wavelength,
-    direction : Direction,
-    photon_type : &PhotonType,
-  ) -> RIndex {
-    // Calculation follows https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
-    let indices = *self.crystal.get_indices(wavelength, self.temperature);
-    let n_inv2 = indices.map(|i| i.powi(-2));
-    let s = self.to_crystal_frame(direction);
-    let s_squared = s.map(|i| i * i);
-
-    let sum_recip = Vector3::new(
-      n_inv2.y + n_inv2.z,
-      n_inv2.x + n_inv2.z,
-      n_inv2.x + n_inv2.y,
-    );
-    let prod_recip = Vector3::new(
-      n_inv2.y * n_inv2.z,
-      n_inv2.x * n_inv2.z,
-      n_inv2.x * n_inv2.y,
-    );
-
-    // Equation (11)
-    // x² + bx + c = 0
-    let b = s_squared.dot(&sum_recip);
-    let c = s_squared.dot(&prod_recip);
-
-    let slow = Sign::POSITIVE;
-    let fast = Sign::NEGATIVE;
-
-    ONE
-      * match &self.pm_type {
-        PMType::Type0_o_oo => solve_for_n(b, c, fast),
-        PMType::Type0_e_ee => solve_for_n(b, c, slow),
-        PMType::Type1_e_oo => {
-          let sign = match photon_type {
-            PhotonType::Pump => slow,
-            _ => fast,
-          };
-          solve_for_n(b, c, sign)
-        }
-        PMType::Type2_e_eo => {
-          let sign = match photon_type {
-            PhotonType::Idler => fast,
-            _ => slow,
-          };
-          solve_for_n(b, c, sign)
-        }
-        PMType::Type2_e_oe => {
-          let sign = match photon_type {
-            PhotonType::Signal => fast,
-            _ => slow,
-          };
-          solve_for_n(b, c, sign)
-        }
-      }
-  }
-
-  // z_{s,i} = -\frac{1}{2}\frac{L}{n_z(\lambda_{s,i})}
-  #[deprecated]
-  pub fn calc_optimal_waist_position(&self, photon : &Photon) -> Distance {
-    -0.5 * self.length / self.get_index_along(
-      photon.get_wavelength(),
-      na::Unit::new_normalize(na::Vector3::z()),
-      &photon.get_type()
-    )
-  }
 }
 
 #[cfg(test)]
@@ -246,12 +142,12 @@ mod test {
 
   #[test]
   fn index_along_test(){
-    let mut spdc_setup = SPDCSetup::default();
-    spdc_setup.signal.set_angles(0. * DEG, 53. * DEG);
-    let n = spdc_setup.crystal_setup.get_index_along(
-      spdc_setup.signal.get_wavelength(),
-      spdc_setup.signal.get_direction(),
-      &spdc_setup.signal.get_type()
+    let mut spdc = SPDC::default();
+    spdc.signal.set_angles(0. * DEG, 53. * DEG);
+    let n = spdc.crystal_setup.index_along(
+      spdc.signal.vacuum_wavelength(),
+      spdc.signal.direction(),
+      spdc.signal.polarization()
     );
 
     assert_eq!(n, Unitless::new(1.6017685463810718));
