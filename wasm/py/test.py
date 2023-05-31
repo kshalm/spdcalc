@@ -8,12 +8,12 @@ import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
 
-with open(str(path_root) + "/spdc.json", 'r') as f:
+with open(str(path_root) + "/settings.yaml", 'r') as f:
     config = f.read()
 
 spdc = bindings.spdcalc()
 # cfg = spdc.config_default()
-cfg = spdc.config_from_json(config)
+cfg = spdc.config_from_yaml(config)
 # cfg = spdc.config_with_optimum_periodic_poling(cfg)
 # cfg = spdc.config_as_optimum(cfg)
 # cfg.periodic_poling = None

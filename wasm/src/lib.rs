@@ -87,6 +87,16 @@ impl crate::spdcalc::Spdcalc for Spdcalc {
     serde_json::to_string(&config).unwrap()
   }
 
+  fn config_from_yaml(str: String) -> crate::spdcalc::SpdcConfig {
+    let config: SPDCConfig = serde_yaml::from_str(&str).unwrap();
+    config.into()
+  }
+
+  fn config_to_yaml(config: crate::spdcalc::SpdcConfig) -> String {
+    let config: SPDCConfig = config.into();
+    serde_yaml::to_string(&config).unwrap()
+  }
+
   fn config_as_optimum(config: crate::spdcalc::SpdcConfig) -> crate::spdcalc::SpdcConfig {
     let config: SPDCConfig = config.into();
     let spdc = config.try_as_spdc().unwrap();

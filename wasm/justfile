@@ -10,7 +10,7 @@ build-wapm:
   #   rustup run nightly-2023-05-31 \
   #   cargo build --target wasm32-wasi --release
   cargo build --target wasm32-wasi --release
-  cp target/wasm32-wasi/release/spdcalc.wasm wapm/
+  cp target/wasm32-wasi/release/spdcalc_wasm.wasm wapm/spdcalc.wasm
   cp spdcalc.wai wapm/
 
 build-js: build-wapm
@@ -21,6 +21,7 @@ build-py: build-wapm
   #   rustup run nightly-2023-05-31 \
   #   wasmer-pack python ./wapm --out-dir ./py/package
   wasmer-pack python ./wapm --out-dir ./py/package
+  cp py/README.md py/package/
 
 publish-py-test: build-py
   cd {{justfile_directory()}}/py/package && \

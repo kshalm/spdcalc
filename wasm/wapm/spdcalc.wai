@@ -112,6 +112,8 @@ type complex = tuple<float64, float64>
 config-default: func() -> spdc-config
 config-from-json: func(str: string) -> spdc-config
 config-to-json: func(config: spdc-config) -> string
+config-from-yaml: func(str: string) -> spdc-config
+config-to-yaml: func(config: spdc-config) -> string
 config-as-optimum: func(config: spdc-config) -> spdc-config
 config-with-optimum-idler: func(config: spdc-config) -> spdc-config
 config-with-optimum-crystal-theta: func(config: spdc-config) -> spdc-config
