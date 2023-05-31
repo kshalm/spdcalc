@@ -7,6 +7,15 @@ pub struct PeriodicPolingConfig {
   pub apodization_fwhm_um: Option<f64>,
 }
 
+impl From<PeriodicPoling> for PeriodicPolingConfig {
+  fn from(pp: PeriodicPoling) -> Self {
+    Self {
+      poling_period_um: AutoCalcParam::Param(*(pp.period / (MICRO * M))),
+      apodization_fwhm_um: pp.apodization.map(|apod| *(apod.fwhm / (MICRO * M))),
+    }
+  }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum MaybePeriodicPolingConfig {

@@ -23,6 +23,12 @@ pub struct CrystalSetup {
   pub temperature : Kelvin<f64>,
 }
 
+impl AsRef<CrystalSetup> for CrystalSetup {
+  fn as_ref(&self) -> &Self {
+    self
+  }
+}
+
 impl CrystalSetup {
   /// Convert a direction relative to the pump beam to a direction relative to the crystal optic axes
   pub fn to_crystal_frame(&self, direction : Direction) -> Direction {
