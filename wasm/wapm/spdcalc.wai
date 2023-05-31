@@ -1,9 +1,13 @@
+/// An error type for the spdc module.
 record error {
   message: string,
 }
 
+/// The crystal configuration
 record crystal-config {
+  /// The crystal type
   kind: string,
+  /// The phasematching type
   pm-type: string,
   phi-deg: float64,
   theta-deg: float64,

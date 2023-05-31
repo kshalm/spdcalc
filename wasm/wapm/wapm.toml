@@ -1,7 +1,7 @@
 [package]
 name = "wellcaffeinated/spdcalc"
 version = "0.1.0"
-description = "WASM package of SPDCalc"
+description = "WASM package for the SPDCalc library"
 readme = "README.md"
 
 [[module]]
