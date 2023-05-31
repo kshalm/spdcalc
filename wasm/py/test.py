@@ -15,42 +15,42 @@ spdc = bindings.spdcalc()
 cfg = spdc.config_from_json(config)
 # cfg = spdc.config_with_optimum_periodic_poling(cfg)
 # cfg = spdc.config_as_optimum(cfg)
+cfg.periodic_poling = None
 print(cfg)
-# cfg.crystal.theta_deg = 90
-range = spdc.optimal_range(cfg, 50)
-# range = spdc.wavelength_range(
+wavelengths = spdc.optimum_range(cfg, 50)
+# wavelengths = spdc.wavelength_range(
 #     (1450e-9, 1650e-9, 50),
 #     (1450e-9, 1650e-9, 50)
 # )
 
-print("schmidt number: {}".format(spdc.schmidt_number(cfg, range, None)))
-# print("counts: {}".format(spdc.counts_coincidences(cfg, range, None)))
-# print("counts singles signal: {}".format(spdc.counts_singles_signal(cfg, range, None)))
-# print("counts singles idler: {}".format(spdc.counts_singles_idler(cfg, range, None)))
-print("hom visibility: {}".format(spdc.hom_visibility(cfg, range, None)))
-print("hom two source visibilities: {}".format(spdc.hom_two_source_visibilities(cfg, range, None)))
-print("efficiencies: {}".format(spdc.efficiencies(cfg, range, None)))
+print("schmidt number: {}".format(spdc.schmidt_number(cfg, wavelengths, None)))
+# print("counts: {}".format(spdc.counts_coincidences(cfg, wavelengths, None)))
+# print("counts singles signal: {}".format(spdc.counts_singles_signal(cfg, wavelengths, None)))
+# print("counts singles idler: {}".format(spdc.counts_singles_idler(cfg, wavelengths, None)))
+print("hom visibility: {}".format(spdc.hom_visibility(cfg, wavelengths, None)))
+print("hom two source visibilities: {}".format(spdc.hom_two_source_visibilities(cfg, wavelengths, None)))
+print("efficiencies: {}".format(spdc.efficiencies(cfg, wavelengths, None)))
 
-range = spdc.optimal_range(cfg, 500)
-# range = spdc.wavelength_range(
+wavelengths = spdc.optimum_range(cfg, 100)
+# wavelengths = spdc.wavelength_range(
 #     (1450e-9, 1650e-9, 500),
 #     (1450e-9, 1650e-9, 500)
 # )
-x = np.linspace(range.value.x[0], range.value.x[1], range.value.x[2])
-y = np.linspace(range.value.y[0], range.value.y[1], range.value.y[2])
-jsi = spdc.jsi_normalized_range(cfg, range, None)
-jsi = np.reshape(np.array(jsi), (range.value.x[2], range.value.y[2]))
+x = np.linspace(wavelengths.value.x[0], wavelengths.value.x[1], wavelengths.value.x[2])
+y = np.linspace(wavelengths.value.y[0], wavelengths.value.y[1], wavelengths.value.y[2])
+jsi = spdc.jsi_normalized_range(cfg, wavelengths, None)
+jsi = np.reshape(np.array(jsi), (wavelengths.value.x[2], wavelengths.value.y[2]))
 
 # Plot the JSI with plotly
-fig = go.Figure(data=go.Heatmap(
-    z=jsi,
-    x=x,
-    y=y
-    )
-)
+# fig = go.Figure(data=go.Heatmap(
+#     z=jsi,
+#     x=x,
+#     y=y
+#     )
+# )
 
-fig.update_layout(
-    title='JSI Plot'
-)
+# fig.update_layout(
+#     title='JSI Plot'
+# )
 
-fig.show()
+# fig.show()

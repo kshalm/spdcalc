@@ -1,24 +1,16 @@
+/// An error type for the spdc module.
 record error {
   message: string,
 }
 
-union auto-num {
-  string,
-  float64,
-}
-type maybe-auto-num = option<auto-num>
-
-union auto-idler {
-  string,
-  idler-config,
-}
-type maybe-auto-idler = option<auto-idler>
-
+/// The crystal configuration
 record crystal-config {
-  name: string,
+  /// The crystal type
+  kind: string,
+  /// The phasematching type
   pm-type: string,
   phi-deg: float64,
-  theta-deg: maybe-auto-num,
+  theta-deg: float64,
   length-um: float64,
   temperature-c: float64,
 }
@@ -39,7 +31,7 @@ record signal-config {
   theta-external-deg: option<float64>,
   //
   waist-um: float64,
-  waist-position-um: maybe-auto-num,
+  waist-position-um: float64,
 }
 
 record idler-config {
@@ -50,24 +42,20 @@ record idler-config {
   theta-external-deg: option<float64>,
   //
   waist-um: float64,
-  waist-position-um: maybe-auto-num,
+  waist-position-um: float64,
 }
 
 record periodic-poling-config {
-  poling-period-um: auto-num,
+  poling-period-um: float64,
   apodization-fwhm-um: option<float64>,
-}
-union periodic-poling-or-off {
-  string,
-  periodic-poling-config
 }
 
 record spdc-config {
   crystal: crystal-config,
   pump: pump-config,
   signal: signal-config,
-  idler: maybe-auto-idler,
-  periodic-poling: option<periodic-poling-or-off>,
+  idler: idler-config,
+  periodic-poling: option<periodic-poling-config>,
   deff-pm-per-volt: float64,
 }
 
@@ -126,12 +114,16 @@ config-from-json: func(str: string) -> spdc-config
 config-to-json: func(config: spdc-config) -> string
 config-as-optimum: func(config: spdc-config) -> spdc-config
 config-with-optimum-idler: func(config: spdc-config) -> spdc-config
+config-with-optimum-crystal-theta: func(config: spdc-config) -> spdc-config
 config-with-optimum-periodic-poling: func(config: spdc-config) -> spdc-config
 config-with-swapped-signal-idler: func(config: spdc-config) -> spdc-config
 
+// optimums
+optimum-crystal-theta: func(config: spdc-config) -> float64
+optimum-periodic-poling: func(config: spdc-config) -> periodic-poling-config
 
 // ranges
-optimal-range: func(config: spdc-config, steps: u64) -> si-range
+optimum-range: func(config: spdc-config, steps: u64) -> si-range
 wavelength-range: func(x-range: tuple<float64, float64, u64>, y-range: tuple<float64, float64, u64>) -> si-range
 frequency-range: func(x-range: tuple<float64, float64, u64>, y-range: tuple<float64, float64, u64>) -> si-range
 sum-diff-range: func(x-range: tuple<float64, float64, u64>, y-range: tuple<float64, float64, u64>) -> si-range

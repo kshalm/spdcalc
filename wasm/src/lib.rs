@@ -101,6 +101,13 @@ impl crate::spdcalc::Spdcalc for Spdcalc {
     SPDCConfig::from(spdc).into()
   }
 
+  fn config_with_optimum_crystal_theta(config: crate::spdcalc::SpdcConfig) -> crate::spdcalc::SpdcConfig {
+    let config: SPDCConfig = config.into();
+    let mut spdc = config.try_as_spdc().unwrap();
+    spdc.assign_optimum_crystal_theta();
+    SPDCConfig::from(spdc).into()
+  }
+
   fn config_with_optimum_periodic_poling(config: crate::spdcalc::SpdcConfig) -> crate::spdcalc::SpdcConfig {
     let config: SPDCConfig = config.into();
     let mut spdc = config.try_as_spdc().unwrap();
@@ -115,10 +122,23 @@ impl crate::spdcalc::Spdcalc for Spdcalc {
     SPDCConfig::from(config).into()
   }
 
-  fn optimal_range(config: crate::spdcalc::SpdcConfig, steps: u64) -> crate::spdcalc::SiRange {
+  fn optimum_crystal_theta(config: crate::spdcalc::SpdcConfig) -> f64 {
     let config: SPDCConfig = config.into();
     let spdc = config.try_as_spdc().unwrap();
-    let range = spdc.optimal_range(steps as usize).as_steps();
+    *(spdc.optimum_crystal_theta() / DEG)
+  }
+
+  fn optimum_periodic_poling(config: crate::spdcalc::SpdcConfig) -> crate::spdcalc::PeriodicPolingConfig {
+    let config: SPDCConfig = config.into();
+    let spdc = config.try_as_spdc().unwrap();
+    let periodic_poling = spdc.optimum_periodic_poling().unwrap();
+    ::spdcalc::PeriodicPolingConfig::from(periodic_poling).into()
+  }
+
+  fn optimum_range(config: crate::spdcalc::SpdcConfig, steps: u64) -> crate::spdcalc::SiRange {
+    let config: SPDCConfig = config.into();
+    let spdc = config.try_as_spdc().unwrap();
+    let range = spdc.optimum_range(steps as usize).as_steps();
     Self::frequency_range(
       (*(range.0.0 / (RAD / S)), *(range.0.1 / (RAD / S)), range.0.2 as u64),
       (*(range.1.0 / (RAD / S)), *(range.1.1 / (RAD / S)), range.1.2 as u64),
