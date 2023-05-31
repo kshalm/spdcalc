@@ -6,7 +6,7 @@ use crate::utils::{Steps, get_1d_index, get_2d_indices};
 use dim::ucum::RAD;
 
 /// The "integral" of the JSI
-pub fn jsa_norm(jsa_values: &[Complex<f64>]) -> f64 {
+pub fn jsi_norm(jsa_values: &[Complex<f64>]) -> f64 {
   jsa_values.iter().map(|f| f.norm_sqr()).sum()
 }
 
@@ -22,7 +22,7 @@ pub fn hom_rate<T: Into<FrequencySpace>>(
   // we'd only need 1 jsa and could just flip it over diff axis
   // and do half of the convolution since the other half is
   // the complex conjugate (and we take the real part)
-  let norm = norm.unwrap_or_else(|| jsa_norm(jsa_values));
+  let norm = norm.unwrap_or_else(|| jsi_norm(jsa_values));
   let ranges = ranges.into();
   // TODO: use integrator rather than block integration
   let result : f64 = ranges.as_steps().into_iter().enumerate().map(|(index, (ws, wi))| {
@@ -50,7 +50,7 @@ pub fn hom_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterator<Item = Ti
   jsa_values_swapped: &[Complex<f64>],
   time_delays : T
 ) -> Vec<f64> {
-  let norm = jsa_norm(jsa_values);
+  let norm = jsi_norm(jsa_values);
   time_delays.into_iter().map(|time_delay| {
     hom_rate(
       ranges,
@@ -143,8 +143,8 @@ pub fn hom_two_source_rate_series<R: Into<FrequencySpace> + Copy, T: IntoIterato
   let first_i2_i1 = get_jsa(js1, li_range_2, li_range_1);
   let second_s2_s1 = get_jsa(js2, ls_range_2, ls_range_1);
 
-  let norm1 = jsa_norm(&first_s1_i1);
-  let norm2 = jsa_norm(&second_s2_i2);
+  let norm1 = jsi_norm(&first_s1_i1);
+  let norm2 = jsi_norm(&second_s2_i2);
 
   let calc_rate = |delta_t : Time| -> Vector3<f64> {
     let result = range1.into_iter().enumerate().map(|(index1, (ws1, wi1))| {
