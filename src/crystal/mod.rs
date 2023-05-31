@@ -1,7 +1,5 @@
 //! Defines types of crystals used in spdc.
-extern crate nalgebra as na;
 use crate::*;
-use dim::ucum::Kelvin;
 
 mod meta;
 pub use self::meta::*;
@@ -24,8 +22,11 @@ pub mod sellmeier;
 // use sellmeier::equations::SellmeierEquation;
 // use sellmeier::temperature_dependence::TemperatureDependence;
 
-mod crystal;
-pub use crystal::*;
+mod crystal_type;
+pub use crystal_type::*;
 
 mod crystal_setup;
 pub use crystal_setup::*;
+
+mod polarization_type;
+pub use polarization_type::*;

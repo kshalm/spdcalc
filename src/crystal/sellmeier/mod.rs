@@ -1,7 +1,6 @@
 use super::*;
 
-// extern crate nalgebra as na;
-// use na::*;
+use dim::ucum::Kelvin;
 
 pub mod equations;
 use equations::*;
@@ -9,7 +8,7 @@ use equations::*;
 pub mod temperature_dependence;
 use temperature_dependence::*;
 
-/// Generalized Crystal that implements
+/// Generalized CrystalType that implements
 /// Sellmeier Equation of specified form with specified temperature dependence
 #[derive(Debug)]
 pub struct SellmeierCrystal<Q, T>

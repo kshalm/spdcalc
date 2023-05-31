@@ -1,5 +1,7 @@
-use dim::ucum;
+//! General utilities
+use dim::{ucum::{self, C_, RAD, ONE}};
 use crate::math::{lerp};
+use crate::{Frequency, Wavenumber, RIndex, Wavelength, TWO_PI, Speed};
 
 /// Create a dimensioned vector3
 pub fn dim_vector3<L, R>(unit_const : L, arr : &[R; 3]) -> na::Vector3<dim::typenum::Prod<L, R>>
@@ -25,7 +27,42 @@ pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
   *(k / ucum::K) - 273.15
 }
 
-/// Utility for creating evenly spaced steps between two endpoints
+/// Get the wavenumber of light at frequency in a medium with refractive index
+pub fn frequency_to_wavenumber(omega: Frequency, n: RIndex) -> Wavenumber {
+  n * omega / C_
+}
+
+/// Get the frequency of light with wavenumber in a medium with refractive index
+pub fn wavenumber_to_frequency(k: Wavenumber, n: RIndex) -> Frequency {
+  k * C_ / n
+}
+
+/// Get the frequency of light at wavelength in a medium with refractive index
+pub fn wavelength_to_frequency(lambda: Wavelength, n: RIndex) -> Frequency {
+  TWO_PI * RAD * C_ / (lambda * n)
+}
+
+/// Get the wavelength of light at frequency in a medium with refractive index
+pub fn frequency_to_wavelength(omega: Frequency, n: RIndex) -> Wavelength {
+  TWO_PI * RAD * C_ / (omega * n)
+}
+
+/// Get the phase velocity of light from frequency and wavenumber
+pub fn phase_velocity(omega: Frequency, k: Wavenumber) -> Speed {
+  omega / k
+}
+
+/// Get the frequency of light from its vacuum wavelength
+pub fn vacuum_wavelength_to_frequency(lambda : Wavelength) -> Frequency {
+  wavelength_to_frequency(lambda, ONE)
+}
+
+/// Get the vacuum wavelength of light from its frequency
+pub fn frequency_to_vacuum_wavelength(omega: Frequency) -> Wavelength {
+  frequency_to_wavelength(omega, ONE)
+}
+
+/// Utility for creating evenly spaced steps between two endpoints over floating point numbers
 ///
 /// ## Example:
 /// ```
@@ -46,20 +83,43 @@ impl<T> From<(T, T, usize)> for Steps<T> {
 }
 
 impl<T> Steps<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
+where T:
+  std::ops::Mul<f64, Output=T> +
+  std::ops::Add<T, Output=T> +
+  std::ops::Div<f64, Output=T> +
+  std::ops::Sub<T, Output=T> +
+  Copy
+{
+  /// Starting value
   #[inline(always)]
   pub fn start(&self) -> T { self.0 }
+  /// Ending value
   #[inline(always)]
   pub fn end(&self) -> T { self.1 }
+  /// Number of steps
   #[inline(always)]
   pub fn steps(&self) -> usize { self.2 }
+  /// Number of steps
   #[inline(always)]
   pub fn len(&self) -> usize { self.steps() }
+  /// Is this empty?
+  #[inline(always)]
+  pub fn is_empty(&self) -> bool { self.steps() == 0 }
+  /// Get the range as a tuple
   #[inline(always)]
   pub fn range(&self) -> (T, T) { (self.start(), self.end()) }
+  /// Get the number of divisions (steps - 1)
   #[inline(always)]
   pub fn divisions(&self) -> usize {
     self.steps() - 1
+  }
+
+  /// Get the value at a given index
+  pub fn value(&self, index : usize) -> T {
+    let (start, end) = self.range();
+    // if we have only one step... then just set progress to be zero
+    let progress = if self.steps() > 1 { (index as f64) / ((self.divisions()) as f64) } else { 0. };
+    lerp(start, end, progress)
   }
 
   /// Get the width of the gap between each step.
@@ -86,22 +146,23 @@ where T:
   Copy
 {
   type Item = T;
-  type IntoIter = StepIterator<T>;
+  type IntoIter = Iterator1D<T>;
 
   fn into_iter(self) -> Self::IntoIter {
-    StepIterator {
+    Iterator1D {
       steps: self,
       index: 0,
     }
   }
 }
 
-pub struct StepIterator<T> {
+/// Iterator for 1D steps
+pub struct Iterator1D<T> {
   steps: Steps<T>,
   index: usize,
 }
 
-impl<T> Iterator for StepIterator<T>
+impl<T> Iterator for Iterator1D<T>
 where T:
   std::ops::Mul<f64, Output=T> +
   std::ops::Add<T, Output=T> +
@@ -116,15 +177,14 @@ where T:
       return None;
     }
 
-    // if we have only one step... then just set progress to be zero
-    let progress = if self.steps.steps() > 1 { (self.index as f64) / ((self.steps.divisions()) as f64) } else { 0. };
+    let value = self.steps.value(self.index);
     self.index += 1;
 
-    Some(lerp(self.steps.start(), self.steps.end(), progress))
+    Some(value)
   }
 }
 
-impl<T> ExactSizeIterator for StepIterator<T>
+impl<T> ExactSizeIterator for Iterator1D<T>
 where T:
   std::ops::Mul<f64, Output=T> +
   std::ops::Add<T, Output=T> +
@@ -157,21 +217,50 @@ pub struct Steps2D<T>(pub (T, T, usize), pub (T, T, usize));
 // TODO: convert to use Steps
 
 impl<T> Steps2D<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + Copy {
+  where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+  pub fn new(x: (T, T, usize), y: (T, T, usize)) -> Self {
+    Self(x, y)
+  }
+
+  /// Number of divisions for each axis
   pub fn divisions(&self) -> (usize, usize) {
     (Steps::from(self.0).divisions(), Steps::from(self.1).divisions())
   }
 
+  /// Range of each axis
   pub fn ranges(&self) -> ((T, T), (T, T)) {
     ((self.0.0, self.0.1), (self.1.0, self.1.1))
   }
 
+  /// Total number of steps
   pub fn len(&self) -> usize {
     (self.0).2 * (self.1).2
   }
 
+  /// Is it empty?
+  pub fn is_empty(&self) -> bool { self.len() == 0 }
+
+  /// Same number of steps for each axis?
   pub fn is_square(&self) -> bool {
     self.0.2 == self.1.2
+  }
+
+  /// Get the value at the given index
+  pub fn value(&self, index: usize) -> (T, T) {
+    // TODO: can optimize
+    let cols = self.0.2;
+    let rows = self.1.2;
+    let (nx, ny) = get_2d_indices(index, cols);
+    let xt = if cols > 1 { (nx as f64) / ((cols - 1) as f64) } else { 0. };
+    let yt = if rows > 1 { (ny as f64) / ((rows - 1) as f64) } else { 0. };
+    let x = lerp(self.0.0, self.0.1, xt);
+    let y = lerp(self.1.0, self.1.1, yt);
+    (x, y)
+  }
+
+  /// Swap x and y
+  pub fn swapped(self) -> Steps2D<T> {
+    Steps2D(self.1, self.0)
   }
 
   /// Get the width of the gap between each step.
@@ -197,7 +286,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
   type IntoIter = Iterator2D<T>;
 
   fn into_iter(self) -> Self::IntoIter {
-    Iterator2D::new(self.0.into(), self.1.into())
+    Iterator2D::new(self)
   }
 }
 
@@ -233,48 +322,32 @@ pub fn get_1d_index( col: usize, row: usize, cols: usize ) -> usize {
 #[derive(Debug, Copy, Clone)]
 pub struct Iterator2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
-  x_steps : Steps<T>,
-  y_steps : Steps<T>,
+  steps: Steps2D<T>,
   index : usize,
-  total : usize,
 }
 
 impl<T> Iterator2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   /// Create a new 2d iterator
   pub fn new(
-    x_steps : Steps<T>,
-    y_steps : Steps<T>
+    steps : Steps2D<T>
   ) -> Self {
-    let total = x_steps.2 * y_steps.2;
     Iterator2D {
-      x_steps,
-      y_steps,
-      total,
+      steps,
       index: 0,
     }
   }
 
   pub fn get_xy(&self) -> (T, T) {
-    // TODO: can optimize
-    let cols = self.x_steps.2;
-    let rows = self.y_steps.2;
-    let (nx, ny) = get_2d_indices(self.index, cols);
-    let xt = if cols > 1 { (nx as f64) / ((cols - 1) as f64) } else { 0. };
-    let yt = if rows > 1 { (ny as f64) / ((rows - 1) as f64) } else { 0. };
-    let x = lerp(self.x_steps.0, self.x_steps.1, xt);
-    let y = lerp(self.y_steps.0, self.y_steps.1, yt);
-    (x, y)
+    self.steps.value(self.index)
   }
 
   /// Get the x step size
-  pub fn get_dx(&self) -> T { self.x_steps.division_width() }
-  pub fn get_dy(&self) -> T { self.y_steps.division_width() }
+  pub fn get_dx(&self) -> T { self.steps.division_widths().0 }
+  pub fn get_dy(&self) -> T { self.steps.division_widths().1 }
   pub fn swapped(self) -> Self {
     Self {
-      x_steps: self.y_steps,
-      y_steps: self.x_steps,
-      total: self.total,
+      steps: self.steps.swapped(),
       index: self.index
     }
   }
@@ -285,7 +358,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
   type Item = (T, T); // x, y
 
   fn next(&mut self) -> Option<Self::Item> {
-    if self.index >= self.total {
+    if self.index >= self.steps.len() {
       return None;
     }
 
@@ -298,7 +371,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 impl<T> DoubleEndedIterator for Iterator2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   fn next_back(&mut self) -> Option<Self::Item> {
-    if self.index <= 0 {
+    if self.index == 0 {
       return None;
     }
 
@@ -311,7 +384,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 impl<T> ExactSizeIterator for Iterator2D<T>
 where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
   fn len(&self) -> usize {
-    self.total
+    self.steps.len()
   }
 }
 
@@ -319,7 +392,7 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 pub fn transpose_vec<T : Clone>(vec: Vec<T>, num_cols : usize) -> Vec<T> {
   let len = vec.len();
   let num_rows = len / num_cols;
-  (0..len).into_iter().map(|index| {
+  (0..len).map(|index| {
     let (c, r) = get_2d_indices(index, num_cols);
     let other = get_1d_index(r, c, num_rows);
     vec[other].clone()
@@ -372,8 +445,10 @@ mod tests {
   #[test]
   fn iterator_2d_test() {
     let it = Iterator2D::new(
-      Steps(0., 1., 2),
-      Steps(0., 1., 2)
+      Steps2D::new(
+        (0., 1., 2),
+        (0., 1., 2)
+      )
     );
 
     let actual : Vec<(f64, f64)> = it.collect();
@@ -393,8 +468,10 @@ mod tests {
   #[test]
   fn iterator_2d_rev_test() {
     let it = Iterator2D::new(
-      Steps(0., 1., 2),
-      Steps(0., 1., 2)
+      Steps2D::new(
+        (0., 1., 2),
+        (0., 1., 2)
+      )
     );
 
     let actual : Vec<(f64, f64)> = it.rev().collect();

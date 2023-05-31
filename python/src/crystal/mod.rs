@@ -16,28 +16,28 @@ use pyo3::{
 mod crystal_setup;
 pub use crystal_setup::*;
 
-/// Crystal type
+/// CrystalType type
 ///
 /// Note
 /// ----
-/// To create a predefined crystal, use :py:meth:`~spdcalc.Crystal.from_id`.
+/// To create a predefined crystal, use :py:meth:`~spdcalc.CrystalType.from_id`.
 #[pyclass]
 #[derive(Copy, Clone)]
-pub struct Crystal {
-  crystal : crystal::Crystal,
+pub struct CrystalType {
+  crystal : crystal::CrystalType,
 }
 
 #[pyproto]
-impl PyObjectProtocol for Crystal {
+impl PyObjectProtocol for CrystalType {
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("{:?}", self.crystal))
   }
 }
 
 #[pymethods]
-impl Crystal {
+impl CrystalType {
 
-  /// Crystal.get_all_meta()
+  /// CrystalType.get_all_meta()
   ///
   /// Get meta information for all predefined crystals
   ///
@@ -47,7 +47,7 @@ impl Crystal {
   ///   list of dictionaries of crystal meta information
   #[staticmethod]
   fn get_all_meta(py : Python) -> PyResult<PyObject> {
-    let str = serde_json::to_string(&crystal::Crystal::get_all_meta()).map_err(serde_error_to_py)?;
+    let str = serde_json::to_string(&crystal::CrystalType::get_all_meta()).map_err(serde_error_to_py)?;
     json_to_dict(py, str)
   }
 
@@ -56,7 +56,7 @@ impl Crystal {
     unimplemented!("TODO: implement creation of crystal from sellemeir coefficients")
   }
 
-  /// Crystal.from_id(id)
+  /// CrystalType.from_id(id)
   ///
   /// Load a predefined crystal by id string (see get_all_meta() to get ids)
   ///
@@ -67,18 +67,18 @@ impl Crystal {
   ///
   /// Returns
   /// -------
-  /// :obj:`Crystal`
+  /// :obj:`CrystalType`
   ///   The crystal singleton
   #[staticmethod]
   #[text_signature = "(id, /)"]
   fn from_id(id : String) -> PyResult<Self> {
-    let c = crystal::Crystal::from_string(&id).map_err(|e| PyErr::new::<PyKeyError, _>(e.0))?;
+    let c = crystal::CrystalType::from_string(&id).map_err(|e| PyErr::new::<PyKeyError, _>(e.0))?;
     Ok(Self {
       crystal: c
     })
   }
 
-  /// Crystal.get_indices(wavelength_meters, temperature_kelvin)
+  /// CrystalType.get_indices(wavelength_meters, temperature_kelvin)
   ///
   /// Get the refractive indices for a certain wavelength and temperature
   ///
@@ -101,7 +101,7 @@ impl Crystal {
     self.crystal.get_indices(w, temp).as_slice().to_vec()
   }
 
-  /// Crystal.get_effective_nonlinear_coefficient(self)
+  /// CrystalType.get_effective_nonlinear_coefficient(self)
   ///
   /// Get the :math:`d_{\rm{eff}}` for this crystal
   ///
@@ -116,7 +116,7 @@ impl Crystal {
     *(self.crystal.get_effective_nonlinear_coefficient() / (PICO * M / V))
   }
 
-  /// Crystal.get_meta(self)
+  /// CrystalType.get_meta(self)
   ///
   /// Get meta information for this crystal
   ///
@@ -133,7 +133,7 @@ impl Crystal {
 
 // #[pymodule]
 // pub fn crystal(_py : Python, m : &PyModule) -> PyResult<()> {
-//   m.add_class::<Crystal>()?;
+//   m.add_class::<CrystalType>()?;
 //
 //   Ok(())
 // }

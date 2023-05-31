@@ -1,4 +1,4 @@
-//! Modified from https://github.com/b52/optimization-rust/
+//! Modified from <https://github.com/b52/optimization-rust/>
 
 use std::f64::EPSILON;
 
@@ -16,9 +16,8 @@ use std::f64::EPSILON;
 /// assert!(gradient_at(square, &[1.0])[0] > 1.0);
 /// assert!(gradient_at(square, &[-1.0])[0] < 1.0);
 /// ```
-pub fn gradient_at<F, T>(func : F, position : T) -> Vec<f64>
+pub fn gradient_at<T>(func : impl Fn(&[f64]) -> f64, position : T) -> Vec<f64>
   where
-    F : Fn(&[f64]) -> f64,
     T : AsRef<[f64]>
 {
   let mut x : Vec<_> = position.as_ref().to_vec();
@@ -57,11 +56,9 @@ pub fn gradient_at<F, T>(func : F, position : T) -> Vec<f64>
     .collect()
 }
 
-pub fn derivative_at<F>(func : F, position : f64) -> f64
-  where
-    F : Fn(f64) -> f64
+pub fn derivative_at(func : impl Fn(f64) -> f64, position : f64) -> f64
 {
-  gradient_at(|x : &[f64]| func(x[0]), &[position])[0]
+  gradient_at(|x : &[f64]| func(x[0]), [position])[0]
 }
 
 #[cfg(test)]

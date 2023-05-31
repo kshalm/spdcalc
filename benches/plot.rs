@@ -21,7 +21,7 @@ fn jsi(size : usize, fiber_coupling : bool) -> Vec<f64> {
 
   let mut params = SPDCSetup::default();
 
-  params.crystal_setup.crystal = Crystal::KTP;
+  params.crystal_setup.crystal = CrystalType::KTP;
   params.assign_optimum_periodic_poling();
   params.assign_optimum_idler();
   params.fiber_coupling = fiber_coupling;
@@ -37,7 +37,7 @@ fn jsi(size : usize, fiber_coupling : bool) -> Vec<f64> {
 fn heralding_histogram_si(size: usize) -> Vec<HeraldingResults> {
   let mut params = SPDCSetup::default();
 
-  params.crystal_setup.crystal = Crystal::KTP;
+  params.crystal_setup.crystal = CrystalType::KTP;
   params.assign_optimum_periodic_poling();
   params.assign_optimum_idler();
 

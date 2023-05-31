@@ -1,4 +1,4 @@
-//! # AgGaS2_1 Crystal
+//! # AgGaS2_1 CrystalType
 //!
 //! [Reference](http://www.redoptronics.com/AgGaS2-AgGaSe2.html)
 //!
@@ -6,7 +6,7 @@
 //! ```
 //! use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::*};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystal::AgGaS2_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
+//! let indices = CrystalType::AgGaS2_1.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 //! let expected = ucum::Unitless::new(Vector3::new(
 //!   2.5146353236904937,
 //!   2.5146353236904937,

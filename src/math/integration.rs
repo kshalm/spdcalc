@@ -1,5 +1,5 @@
 use num::{Integer, Zero};
-use crate::utils::{Iterator2D, get_2d_indices, Steps};
+use crate::utils::{Steps, get_1d_index};
 
 /// Get simpson weight for index
 fn get_simpson_weight( n : usize, divs : usize ) -> f64 {
@@ -7,12 +7,10 @@ fn get_simpson_weight( n : usize, divs : usize ) -> f64 {
   // 1, 4, 2, 4, 2, ..., 4, 1
   if n == 0 || n == divs {
     1.
+  } else if n.is_odd() {
+    4.
   } else {
-    if n.is_odd() {
-      4.
-    } else {
-      2.
-    }
+    2.
   }
 }
 
@@ -85,8 +83,8 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
 
   /// Numerically integrate from `a` to `b`, in `divs` divisions
   pub fn integrate(&self, a : f64, b : f64, divs : usize) -> T {
-    assert!( divs.is_even() );
-    assert!( divs >= 4 );
+    let divs = divs + divs % 2 - 2; // nearest even
+    assert!( divs >= 4, "Steps too low" );
 
     let dx = (b - a) / (divs as f64);
 
@@ -125,18 +123,33 @@ where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
     let steps = divs + 1;
     let dx = (x_range.1 - x_range.0) / (divs as f64);
     let dy = (y_range.1 - y_range.0) / (divs as f64);
-    let result = Iterator2D::new(
-      Steps(x_range.0, x_range.1, steps),
-      Steps(y_range.0, y_range.1, steps)
-    )
-    .enumerate()
-    .fold(T::zero(), |acc, (index, coords)| {
-      let (nx, ny) = get_2d_indices(index as usize, steps);
-      let a_n = Self::get_weight(nx, ny, divs);
-      let (x, y) = coords;
+    let result = Steps(y_range.0, y_range.1, steps).into_iter()
+      .enumerate()
+      .fold(T::zero(), |acc, (ny, y)| {
+        let sy = Steps(x_range.0, x_range.1, steps).into_iter()
+          .enumerate()
+          .fold(T::zero(), |acc, (nx, x)| {
+            let a_n = get_simpson_weight(nx, divs);
+            acc + (self.function)(x, y, get_1d_index(ny, nx, steps)) * a_n
+          });
 
-      acc + (self.function)( x, y, index ) * a_n
-    });
+        let a_n = get_simpson_weight(ny, divs);
+        acc + sy * a_n
+      });
+    // Alternate implementation
+    // Seems to be slower
+    // let result = Iterator2D::new(
+    //   Steps(x_range.0, x_range.1, steps),
+    //   Steps(y_range.0, y_range.1, steps)
+    // )
+    // .enumerate()
+    // .fold(T::zero(), |acc, (index, coords)| {
+    //   let (nx, ny) = get_2d_indices(index as usize, steps);
+    //   let a_n = Self::get_weight(nx, ny, divs);
+    //   let (x, y) = coords;
+
+    //   acc + (self.function)( x, y, index ) * a_n
+    // });
 
     result * (dx * dy / 9.)
   }
@@ -171,6 +184,10 @@ mod tests {
     let divs = 1000;
     let integrator = SimpsonIntegration2D::new(|x, y, _index| x.sin() * y.powi(3));
     let actual = integrator.integrate((0., PI), (0., 2.), divs);
+    // let actual = SimpsonIntegration2D::new(|x, y, _| {
+    //   let zd = f64::cos(PI * f64::cos(x) / 2.0) * f64::cos(PI * (1.0 - f64::sin(x) * f64::cos(y)) / 4.0);
+	  //   (zd.powi(2)/f64::sin(x)).abs()
+    // }).integrate((0.1e-8, PI), (0.1e-8, 2. * PI), divs);
 
     let expected = (2_f64).powi(4) * 2. / 4.;
 

@@ -22,7 +22,7 @@ use pyo3::{
 ///
 /// Parameters
 /// ----------
-/// crystal : :obj:`Crystal`
+/// crystal : :obj:`CrystalType`
 ///   The crystal
 /// pm_type : :obj:`str`
 ///   The phasematching type. Should be one of:
@@ -58,7 +58,7 @@ impl PyObjectProtocol for CrystalSetup {
 impl CrystalSetup {
   #[new]
   fn new(
-    crystal : &Crystal,
+    crystal : &CrystalType,
     pm_type : String,
     phi_rad : f64,
     theta_rad : f64,
@@ -83,11 +83,11 @@ impl CrystalSetup {
   ///
   /// Returns
   /// -------
-  /// :obj:`Crystal`
+  /// :obj:`CrystalType`
   ///   A copy of the crystal
   #[text_signature = "($self)"]
-  pub fn get_crystal(&self) -> Crystal {
-    Crystal { crystal: self.crystal_setup.crystal }
+  pub fn get_crystal(&self) -> CrystalType {
+    CrystalType { crystal: self.crystal_setup.crystal }
   }
 
   /// CrystalSetup.set_crystal(self, crystal)
@@ -96,10 +96,10 @@ impl CrystalSetup {
   ///
   /// Parameters
   /// ----------
-  /// crystal : :obj:`Crystal`
+  /// crystal : :obj:`CrystalType`
   ///   The crystal to assign to this setup
   #[text_signature = "($self, crystal, /)"]
-  pub fn set_crystal(&mut self, crystal : &Crystal) {
+  pub fn set_crystal(&mut self, crystal : &CrystalType) {
     self.crystal_setup.crystal = crystal.crystal;
   }
 

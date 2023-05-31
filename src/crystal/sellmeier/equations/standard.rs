@@ -5,7 +5,8 @@ use dim::{
 };
 
 /// Standard form:
-/// > n² = A + b1 * λ² / (λ² - c1) + b2 * λ² / (λ² - c2) + b3 * λ² / (λ² - c3)
+/// > n² = a + b1 * λ² / (λ² - c1) + b2 * λ² / (λ² - c2) + b3 * λ² / (λ² - c3)
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct SellmeierStandard {
   pub a :  [f64; 3],
   pub b1 : [f64; 3],

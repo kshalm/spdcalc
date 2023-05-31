@@ -1,10 +1,10 @@
-//! LiIO3_1 Crystal
+//! LiIO3_1 CrystalType
 //!
 //! ## Example
 //! ```
 //! use spdcalc::{crystal::*, dim::ucum, na::Vector3};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystal::LiIO3_1.get_indices(720.0 * nm, 0. * ucum::K); // no temperature dependence
+//! let indices = CrystalType::LiIO3_1.get_indices(720.0 * nm, 0. * ucum::K); // no temperature dependence
 //! let expected = ucum::Unitless::new(Vector3::new(
 //!   1.8719412177557622,
 //!   1.8719412177557622,

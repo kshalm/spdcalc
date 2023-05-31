@@ -33,7 +33,7 @@ const DNZ : f64 = 15e-5;
 /// ```
 /// use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::from_celsius_to_kelvin};
 /// let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-/// let indices = Crystal::AgGaSe2_2.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
+/// let indices = CrystalType::AgGaSe2_2.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 /// let expected = ucum::Unitless::new(Vector3::new(
 ///   2.8483187922000632,
 ///   2.8483187922000632,

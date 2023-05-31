@@ -1,5 +1,8 @@
+//! Mathematical helpers
+
 mod differentiation;
-use crate::constants::PI2;
+use crate::{Angle, dim::ucum::{RAD}};
+use crate::constants::TWO_PI;
 pub use differentiation::*;
 
 mod integration;
@@ -11,18 +14,20 @@ pub use self::nelder_mead::*;
 mod schmidt;
 pub use self::schmidt::*;
 
-// ensures that the Gaussian and sinc functions have the same widths.
-// ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
-const GAUSSIAN_SINC_GAMMA_FACTOR : f64 = 0.193;
-
-/// Standard sinc function `sinc(x) = sin(x) / x`
-pub fn sinc( x : f64 ) -> f64 {
-  if x == 0. { 1. } else { f64::sin(x) / x }
+lazy_static::lazy_static! {
+  static ref FWHM_OVER_WAIST :f64 = f64::sqrt(2. * f64::ln(2.));
 }
 
-/// Gaussian for phasematching
-pub fn gaussian_pm( x : f64 ) -> f64 {
-  f64::exp(-GAUSSIAN_SINC_GAMMA_FACTOR * x.powi(2))
+pub fn sin(a: Angle) -> f64 { (a / RAD).sin() }
+pub fn cos(a: Angle) -> f64 { (a / RAD).cos() }
+pub fn tan(a: Angle) -> f64 { (a / RAD).tan() }
+pub fn sec(a: Angle) -> f64 { 1. / cos(a) }
+pub fn csc(a: Angle) -> f64 { 1. / sin(a) }
+pub fn cot(a: Angle) -> f64 { 1. / tan(a) }
+
+/// Standard sinc function `sinc(x) = sin(x) / x`
+pub fn sinc( x : Angle ) -> f64 {
+  if x == 0. * RAD { 1. } else { sin(x) / *(x / RAD) }
 }
 
 /// Square a value
@@ -32,8 +37,8 @@ where T : std::ops::Mul + Copy {
 }
 
 /// Normalize an angle to [0, 2π)
-pub fn normalize_angle(ang : f64) -> f64 {
-  (ang % PI2 + PI2) % PI2
+pub fn normalize_angle(ang : Angle) -> Angle {
+  (ang % TWO_PI + TWO_PI * RAD) % TWO_PI
 }
 
 /// Simple implementation of linear interpolation
@@ -55,5 +60,22 @@ pub fn fwhm_to_sigma<T>(fwhm : T) -> <T as std::ops::Div<f64>>::Output
 where
   T : std::ops::Div<f64>,
 {
-  fwhm / (2. * f64::sqrt(2. * f64::ln(2.)))
+  fwhm / (2. * *FWHM_OVER_WAIST)
 }
+
+/// FWHM to 1/e^2 width
+pub fn fwhm_to_waist<T>(fwhm : T) -> <T as std::ops::Div<f64>>::Output
+where
+  T : std::ops::Div<f64>,
+{
+  fwhm / *FWHM_OVER_WAIST
+}
+
+/// FWHM to 1/e^2 width
+pub fn waist_to_fwhm<T>(w : T) -> <T as std::ops::Mul<f64>>::Output
+where
+  T : std::ops::Mul<f64>,
+{
+  w * *FWHM_OVER_WAIST
+}
+

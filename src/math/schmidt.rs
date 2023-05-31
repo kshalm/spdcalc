@@ -1,12 +1,15 @@
-use crate::{SPDCError, plotting::JointSpectrum};
+use crate::{SPDCError, Complex};
 use na::{DMatrix};
 
-pub fn schmidt_number(spectrum : &JointSpectrum) -> Result<f64, SPDCError> {
-  let jsa_mag : Vec<f64> = spectrum.amplitudes.iter().map(|j| j.norm()).collect();
-  if !spectrum.ranges.is_square() {
+/// Calculate the schmidt number of a flat vector joint spectral amplitude values (square matrix)
+pub fn schmidt_number<T: AsRef<[Complex<f64>]>>(amplitudes : T) -> Result<f64, SPDCError> {
+  use num::integer::Roots;
+  let len = amplitudes.as_ref().len();
+  let dim = len.sqrt();
+  if len != dim * dim {
     return Err(SPDCError("Spectrum provided is not square".into()));
   }
-  let dim = spectrum.ranges.0.2;
+  let jsa_mag : Vec<f64> = amplitudes.as_ref().iter().map(|j| j.norm()).collect();
   let svd = DMatrix::from_row_slice(dim, dim, &jsa_mag)
     .try_svd(false, false, f64::EPSILON, 10_000)
     .ok_or(SPDCError("SVD did not converge while calculating schmidt number".into()))?;
@@ -19,7 +22,6 @@ pub fn schmidt_number(spectrum : &JointSpectrum) -> Result<f64, SPDCError> {
 mod tests {
   use super::*;
   use crate::{*};
-  use crate::utils::Steps2D;
   use dim::{
     ucum::{M},
   };
@@ -29,13 +31,14 @@ mod tests {
 
   #[test]
   fn shmidt_number_test() {
-    let mut spdc_setup = SPDCSetup::default();
-    spdc_setup.fiber_coupling = true;
-    spdc_setup.crystal_setup.crystal = Crystal::KTP;
-    spdc_setup.assign_optimum_idler();
-    spdc_setup.assign_optimum_periodic_poling();
+    let mut spdc = SPDC::default();
+    spdc.crystal_setup.crystal = CrystalType::KTP;
+    spdc.crystal_setup.phi = Angle::new(0.);
+    spdc.crystal_setup.theta = Angle::new(PI / 2.);
+    spdc.assign_optimum_idler().unwrap();
+    spdc.assign_optimum_periodic_poling().unwrap();
 
-    let wavelength_range = Steps2D(
+    let wavelength_range = WavelengthSpace::new(
       (1490.86 * NANO * M, 1609.14 * NANO * M, 100),
       (1495.05 * NANO * M, 1614.03 * NANO * M, 100)
     );
@@ -43,11 +46,12 @@ mod tests {
     // dbg!(wavelength_range);
     // dbg!(spdc_setup);
 
-    let spectrum = JointSpectrum::new_coincidences(spdc_setup, wavelength_range);
-    let sn = schmidt_number(&spectrum).expect("Could not calc schmidt number");
+    let spectrum = spdc.joint_spectrum(None);
+    let amplitudes = spectrum.jsa_range(wavelength_range);
+    let sn = schmidt_number(amplitudes).expect("Could not calc schmidt number");
 
     let actual = sn;
-    let expected = 1.151;
+    let expected = 1.149;
 
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-3),

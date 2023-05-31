@@ -7,6 +7,12 @@ use na::*;
 
 pub use num::Complex;
 
+derived!(ucum, UCUM: JsiNorm = Second * Meter * Meter * Meter * Meter * Meter * Meter * Meter * Meter / Radian / Radian);
+derived!(ucum, UCUM: JsiSinglesNorm = Second * Meter * Meter * Meter * Meter * Meter * Meter / Radian / Radian);
+derived!(ucum, UCUM: PerMeter3 = PerMeter * PerMeter * PerMeter);
+derived!(ucum, UCUM: PerMeter4 = PerMeter * PerMeter * PerMeter * PerMeter);
+derived!(ucum, UCUM: JSIUnits = Second / Radian / Radian);
+
 /// Angles all in radians
 pub type Angle = ucum::Radian<f64>;
 
@@ -19,6 +25,17 @@ pub type Indices = ucum::Unitless<Vector3<f64>>;
 /// Wavelength
 pub type Wavelength = ucum::Meter<f64>;
 
+derived!(ucum, UCUM: RadPerMeter = Radian / Meter);
+/// Wave number
+pub type Wavenumber = RadPerMeter<f64>;
+
+/// Wave vector
+pub type Wavevector = RadPerMeter<Vector3<f64>>;
+
+derived!(ucum, UCUM: RadPerSecond = Radian * Hertz);
+/// Frequency
+pub type Frequency = RadPerSecond<f64>;
+
 /// A 1d distance
 pub type Distance = ucum::Meter<f64>;
 
@@ -27,9 +44,6 @@ pub type Time = ucum::Second<f64>;
 
 /// Speed
 pub type Speed = ucum::MeterPerSecond<f64>;
-
-/// 2D vector holding the x,y of the waist
-pub type WaistSize = ucum::Meter<Vector2<f64>>;
 
 /// A 3d unit vector for directions
 pub type Direction = Unit<Vector3<f64>>;

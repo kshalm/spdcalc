@@ -1,4 +1,4 @@
-//! # BBO1 Crystal
+//! # BBO1 CrystalType
 //!
 //! [More Information](http://www.newlightphotonics.com/v1/bbo-properties.html)
 //!
@@ -6,7 +6,7 @@
 //! ```
 //! use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::*};
 //! let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-//! let indices = Crystal::BBO_1.get_indices(1550.0 * nm, from_celsius_to_kelvin(20.));
+//! let indices = CrystalType::BBO_1.get_indices(1550.0 * nm, from_celsius_to_kelvin(20.));
 //! let expected = ucum::Unitless::new(Vector3::new(
 //!   1.6465863905897784,
 //!   1.6465863905897784,

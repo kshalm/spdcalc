@@ -39,7 +39,7 @@ use jsa::*;
 #[pymodule]
 fn spdcalc(_py : Python, m : &PyModule) -> PyResult<()> {
   m.add_class::<Steps2D>()?;
-  m.add_class::<Crystal>()?;
+  m.add_class::<CrystalType>()?;
   m.add_class::<CrystalSetup>()?;
   m.add_class::<Photon>()?;
   m.add_class::<Apodization>()?;

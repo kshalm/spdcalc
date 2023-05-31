@@ -49,7 +49,7 @@ const BO4 : f64 = -2.188e-6;
 /// ```
 /// use spdcalc::{crystal::*, dim::ucum, na::Vector3, utils::from_celsius_to_kelvin};
 /// let nm = spdcalc::dim::f64prefixes::NANO * ucum::M;
-/// let indices = Crystal::LiNb_MgO.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
+/// let indices = CrystalType::LiNb_MgO.get_indices(720.0 * nm, from_celsius_to_kelvin(30.));
 /// let expected = ucum::Unitless::new(Vector3::new(
 ///   2.2651198127878427,
 ///   2.2651198127878427,

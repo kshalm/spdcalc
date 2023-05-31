@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt;
 
+/// Generic error type for the SPDCalc library
 #[derive(Debug, Clone)]
 pub struct SPDCError(pub String);
 
