@@ -19,13 +19,13 @@ fn LiIO3_1(n : Wavelength) -> Indices {
 }
 
 fn criterion_benchmark(c : &mut Criterion) {
-  const lamda : f64 = 720e-9;
-  c.bench_function("BBO Indices", |b| b.iter(|| bbo(black_box(lamda * M))));
+  const lambda : f64 = 720e-9;
+  c.bench_function("BBO Indices", |b| b.iter(|| bbo(black_box(lambda * M))));
   c.bench_function("LiIO3_1 Indices (no T dep)", |b| {
-    b.iter(|| AgGaS2(black_box(lamda * M)))
+    b.iter(|| AgGaS2(black_box(lambda * M)))
   });
   c.bench_function("AgGaS2 Indices", |b| {
-    b.iter(|| AgGaS2(black_box(lamda * M)))
+    b.iter(|| AgGaS2(black_box(lambda * M)))
   });
 }
 
