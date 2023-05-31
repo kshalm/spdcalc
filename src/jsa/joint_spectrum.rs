@@ -353,7 +353,7 @@ mod tests {
     dbg!(jsa.norm());
     // assert!(float_cmp::approx_eq!(f64, jsa.norm(), 1.0));
     dbg!(delta_k(optimal.signal.frequency(), optimal.idler.frequency(), &optimal.signal, &optimal.idler, &optimal.pump, &optimal.crystal_setup, None));
-    let range = optimal.optimal_range(100);
+    let range = optimal.optimum_range(100);
     let jsi = optimal.joint_spectrum(steps).jsi_normalized_range(range);
     // dbg!(&jsi);
     // check the max value isn't > 1
