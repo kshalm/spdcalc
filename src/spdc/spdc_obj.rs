@@ -4,7 +4,7 @@ use crate::{fwhm_to_spectral_width};
 use crate::jsa::SumDiffFrequencySpace;
 use crate::math::nelder_mead_1d;
 use crate::types::Time;
-use crate::{SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Wavevector, Frequency, Wavelength, Distance, SPDCError, jsa::{JointSpectrum, FrequencySpace}};
+use crate::{Angle, SignalBeam, IdlerBeam, PumpBeam, CrystalSetup, PeriodicPoling, Wavevector, Frequency, Wavelength, Distance, SPDCError, jsa::{JointSpectrum, FrequencySpace}};
 
 /// SPDC setup
 ///
@@ -34,6 +34,12 @@ pub struct SPDC {
 impl Default for SPDC {
   fn default() -> Self {
     super::SPDCConfig::default().try_as_spdc().unwrap()
+  }
+}
+
+impl AsRef<SPDC> for SPDC {
+  fn as_ref(&self) -> &Self {
+    self
   }
 }
 
@@ -67,7 +73,7 @@ impl SPDC {
   }
 
   /// Optimal range to use for evaluating the joint spectrum
-  pub fn optimal_range(&self, resolution: usize) -> FrequencySpace {
+  pub fn optimum_range(&self, resolution: usize) -> FrequencySpace {
     use dim::ucum::{RAD, S};
     let wp = self.pump.frequency();
     let lambda_p = self.pump.vacuum_wavelength();
@@ -127,17 +133,23 @@ impl SPDC {
     )
   }
 
-  /// New setup with optimal waist positions for signal and idler
+  /// New setup with optimum waist positions for signal and idler
   pub fn with_optimal_waist_positions(mut self) -> Self {
     self.assign_optimal_waist_positions();
     self
   }
 
-  /// Assign this setup with the optimal waist positions for signal and idler
+  /// Assign this setup with the optimum waist positions for signal and idler
   pub fn assign_optimal_waist_positions(&mut self) -> &mut Self {
     self.signal_waist_position = self.crystal_setup.optimal_waist_position(self.signal.vacuum_wavelength(), self.signal.polarization());
     self.idler_waist_position = self.crystal_setup.optimal_waist_position(self.idler.vacuum_wavelength(), self.idler.polarization());
     self
+  }
+
+  /// New setup wtih optimum idler
+  pub fn with_optimum_idler(mut self) -> Result<Self, SPDCError> {
+    self.assign_optimum_idler()?;
+    Ok(self)
   }
 
   /// Assign the optimum idler to this SPDC
@@ -154,6 +166,26 @@ impl SPDC {
     let pp = PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp.and_then(|pp| pp.apodization))?;
     self.pp = Some(pp);
     Ok(self)
+  }
+
+  /// New setup with optimum periodic poling
+  pub fn with_optimum_periodic_poling(mut self) -> Result<Self, SPDCError> {
+    self.assign_optimum_periodic_poling()?;
+    Ok(self)
+  }
+
+  /// Assign the optimum crystal theta to this SPDC
+  pub fn assign_optimum_crystal_theta(&mut self) -> &mut Self {
+    self.pp = None;
+    self.crystal_setup.assign_optimum_theta(&self.signal, &self.pump);
+    self
+  }
+
+  /// New setup with optimum crystal theta
+  pub fn with_optimum_crystal_theta(mut self) -> Self {
+    self.pp = None;
+    self.assign_optimum_crystal_theta();
+    self
   }
 
   /// Swap the signal and idler beams
@@ -185,6 +217,21 @@ impl SPDC {
       idler_waist_position: signal_waist_position,
       deff,
     }
+  }
+
+  /// Optimum crystal theta
+  pub fn optimum_crystal_theta(&self) -> Angle {
+    self.crystal_setup.optimum_theta(&self.signal, &self.pump)
+  }
+
+  /// Optimum periodic poling
+  pub fn optimum_periodic_poling(&self) -> Result<PeriodicPoling, SPDCError> {
+    PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp.and_then(|pp| pp.apodization))
+  }
+
+  /// Optimum idler
+  pub fn optimum_idler(&self) -> Result<IdlerBeam, SPDCError> {
+    IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)
   }
 
   /// Calculate the wavevector mismatch for the given frequencies
