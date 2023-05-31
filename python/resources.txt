@@ -1,5 +1,0 @@
-https://pyo3.rs/master/building_and_distribution.html
-https://blog.filippo.io/easy-windows-and-linux-cross-compilers-for-macos/
-https://github.com/rust-embedded/cross
-
-https://www.benfrederickson.com/writing-python-extensions-in-rust-using-pyo3/
