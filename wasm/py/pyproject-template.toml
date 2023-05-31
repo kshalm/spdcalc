@@ -1,0 +1,11 @@
+[project]
+name = "spdcalc"
+version = "0.1.3"
+keywords = []
+readme = "README.md"
+dependencies = ["wasmer", "wasmer_compiler_cranelift"]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+

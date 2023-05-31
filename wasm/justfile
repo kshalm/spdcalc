@@ -22,6 +22,7 @@ build-py: build-wapm
   #   wasmer-pack python ./wapm --out-dir ./py/package
   wasmer-pack python ./wapm --out-dir ./py/package
   cp py/README.md py/package/
+  cp py/pyproject-template.toml py/package/pyproject.toml
 
 publish-py-test: build-py
   cd {{justfile_directory()}}/py/package && \
