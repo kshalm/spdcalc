@@ -5,6 +5,7 @@ sys.path.append(str(path_root) + "/package")
 
 from spdcalc import bindings
 import plotly.graph_objects as go
+import plotly.express as px
 import numpy as np
 
 with open(str(path_root) + "/spdc.json", 'r') as f:
@@ -15,7 +16,7 @@ spdc = bindings.spdcalc()
 cfg = spdc.config_from_json(config)
 # cfg = spdc.config_with_optimum_periodic_poling(cfg)
 # cfg = spdc.config_as_optimum(cfg)
-cfg.periodic_poling = None
+# cfg.periodic_poling = None
 print(cfg)
 wavelengths = spdc.optimum_range(cfg, 50)
 # wavelengths = spdc.wavelength_range(
@@ -54,3 +55,15 @@ jsi = np.reshape(np.array(jsi), (wavelengths.value.x[2], wavelengths.value.y[2])
 # )
 
 # fig.show()
+
+# plot the efficiency vs pump waist size
+waist_sizes = np.linspace(100., 1000., 10)
+efficiencies = []
+for waist_size in waist_sizes:
+    cfg.pump.waist_um = waist_size
+    efficiencies.append(spdc.efficiencies(cfg, wavelengths, None).symmetric)
+
+fig = px.line(x=waist_sizes, y=efficiencies, title='Efficiency vs Pump Waist Size')
+fig.update_xaxes(title_text='Pump Waist Size (um)')
+fig.update_yaxes(title_text='Efficiency')
+fig.show()
