@@ -22,6 +22,12 @@ build-py: build-wapm
   #   wasmer-pack python ./wapm --out-dir ./py/package
   wasmer-pack python ./wapm --out-dir ./py/package
 
+publish-py-test: build-py
+  cd {{justfile_directory()}}/py/package && \
+    rm dist/* && \
+    python3 -m build && \
+    python3 -m twine upload --repository testpypi dist/*
+
 test-js: build-js
   pnpm --dir {{justfile_directory()}}/js/package install
   node js/index.mjs
