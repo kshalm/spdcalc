@@ -67,8 +67,8 @@ pub fn hom_time_delay(
   spdc: &SPDC,
 ) -> Time {
   let fudge = (spdc.idler_waist_position - spdc.signal_waist_position) / dim::ucum::C_;
-  let signal_time = spdc.signal.average_transit_time(&spdc.crystal_setup, spdc.pp);
-  let idler_time = spdc.idler.average_transit_time(&spdc.crystal_setup, spdc.pp);
+  let signal_time = spdc.signal.average_transit_time(&spdc.crystal_setup, &spdc.pp);
+  let idler_time = spdc.idler.average_transit_time(&spdc.crystal_setup, &spdc.pp);
   idler_time - signal_time + fudge
 }
 
@@ -200,22 +200,22 @@ pub fn hom_two_source_time_delays(
 ) -> HomTwoSourceResult<Time> {
   let ss = {
     let fudge = (spdc2.signal_waist_position - spdc1.signal_waist_position) / dim::ucum::C_;
-    let signal2_time = spdc2.signal.average_transit_time(&spdc2.crystal_setup, spdc2.pp);
-    let signal1_time = spdc1.signal.average_transit_time(&spdc1.crystal_setup, spdc1.pp);
+    let signal2_time = spdc2.signal.average_transit_time(&spdc2.crystal_setup, &spdc2.pp);
+    let signal1_time = spdc1.signal.average_transit_time(&spdc1.crystal_setup, &spdc1.pp);
     signal2_time - signal1_time + fudge
   };
 
   let ii = {
     let fudge = (spdc2.idler_waist_position - spdc1.idler_waist_position) / dim::ucum::C_;
-    let idler2_time = spdc2.idler.average_transit_time(&spdc2.crystal_setup, spdc2.pp);
-    let idler1_time = spdc1.idler.average_transit_time(&spdc1.crystal_setup, spdc1.pp);
+    let idler2_time = spdc2.idler.average_transit_time(&spdc2.crystal_setup, &spdc2.pp);
+    let idler1_time = spdc1.idler.average_transit_time(&spdc1.crystal_setup, &spdc1.pp);
     idler2_time - idler1_time + fudge
   };
 
   let si = {
     let fudge = (spdc2.idler_waist_position - spdc1.signal_waist_position) / dim::ucum::C_;
-    let idler2_time = spdc2.idler.average_transit_time(&spdc2.crystal_setup, spdc2.pp);
-    let signal1_time = spdc1.signal.average_transit_time(&spdc1.crystal_setup, spdc1.pp);
+    let idler2_time = spdc2.idler.average_transit_time(&spdc2.crystal_setup, &spdc2.pp);
+    let signal1_time = spdc1.signal.average_transit_time(&spdc1.crystal_setup, &spdc1.pp);
     idler2_time - signal1_time + fudge
   };
 

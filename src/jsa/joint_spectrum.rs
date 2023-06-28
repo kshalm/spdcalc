@@ -209,7 +209,7 @@ impl JointSpectrum {
 
 #[cfg(test)]
 mod tests {
-  use crate::{utils::{vacuum_wavelength_to_frequency, Steps, frequency_to_vacuum_wavelength}, SPDCConfig};
+  use crate::{utils::{vacuum_wavelength_to_frequency, Steps, frequency_to_vacuum_wavelength}, SPDCConfig, PeriodicPoling};
   use super::*;
   use dim::{f64prefixes::*, ucum::*};
 
@@ -336,7 +336,7 @@ mod tests {
       },
       // "periodic_poling": {
       //   "poling_period_um": 46.52032850062398,
-      //   "apodization_fwhm_um": null
+      //   "apodization": null
       // },
       "deff_pm_per_volt": 1.0
     });
@@ -352,7 +352,7 @@ mod tests {
     let jsa = sp.jsa_normalized(spdc.signal.frequency(), spdc.idler.frequency());
     dbg!(jsa.norm());
     // assert!(float_cmp::approx_eq!(f64, jsa.norm(), 1.0));
-    dbg!(delta_k(optimal.signal.frequency(), optimal.idler.frequency(), &optimal.signal, &optimal.idler, &optimal.pump, &optimal.crystal_setup, None));
+    dbg!(delta_k(optimal.signal.frequency(), optimal.idler.frequency(), &optimal.signal, &optimal.idler, &optimal.pump, &optimal.crystal_setup, PeriodicPoling::Off));
     let range = optimal.optimum_range(100);
     let jsi = optimal.joint_spectrum(steps).jsi_normalized_range(range);
     // dbg!(&jsi);

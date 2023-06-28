@@ -1,4 +1,4 @@
-use crate::math::sq;
+use crate::{math::sq, PeriodicPoling};
 use super::{SPDC};
 use crate::jsa::{FrequencySpace, JointSpectrum};
 use dim::ucum::Hertz;
@@ -13,8 +13,8 @@ pub fn get_counts_correction(spdc: &SPDC) -> f64 {
   let ns = spdc.signal.refractive_index(spdc.signal.frequency(), &spdc.crystal_setup);
   let ni = spdc.idler.refractive_index(spdc.idler.frequency(), &spdc.crystal_setup);
   let np = spdc.pump.refractive_index(spdc.pump.frequency(), &spdc.crystal_setup);
-  let ngs = spdc.signal.group_index(&spdc.crystal_setup, None);
-  let ngp = spdc.pump.group_index(&spdc.crystal_setup, None);
+  let ngs = spdc.signal.group_index(&spdc.crystal_setup, PeriodicPoling::Off);
+  let ngp = spdc.pump.group_index(&spdc.crystal_setup, PeriodicPoling::Off);
 
   *(
     (li * ls * ngs * ngp) /

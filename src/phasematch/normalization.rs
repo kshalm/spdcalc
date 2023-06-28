@@ -10,7 +10,7 @@ fn common_norm(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> CommonNo
   let degeneracy_factor = 1.0_f64;
   // A_m = e^{i\frac{\pi}{2}m} \mathrm{sinc}\left ( {\frac{\pi}{2}m} \right ): periodic poling coefficient. Am = 1 for m = 0 (no periodic poling);
   // and A_m = 2i/\pi for m = 1 (sinusoidal variation)
-  let periodic_poling_coeff = if spdc.pp.is_none() { 1. } else { 2. / PI };
+  let periodic_poling_coeff = if spdc.pp == PeriodicPoling::Off { 1. } else { 2. / PI };
 
   let lambda_p = spdc.pump.vacuum_wavelength();
   let fwhm = spdc.pump_bandwidth;

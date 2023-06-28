@@ -13,6 +13,9 @@ build-wapm:
   cp target/wasm32-wasi/release/spdcalc_wasm.wasm wapm/spdcalc.wasm
   cp spdcalc.wai wapm/
 
+docs: build-wapm
+  wasmer run wasmer/wai-bindgen-cli --dir=. -- markdown --export spdcalc.wai --out-dir ./docs
+
 build-js: build-wapm
   wasmer-pack js ./wapm --out-dir ./js
 

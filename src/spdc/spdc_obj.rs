@@ -16,7 +16,7 @@ pub struct SPDC {
   pub idler :          IdlerBeam,
   pub pump :           PumpBeam,
   pub crystal_setup :  CrystalSetup,
-  pub pp :             Option<PeriodicPoling>,
+  pub pp :             PeriodicPoling,
 
   pub pump_average_power : MilliWatt<f64>,
   pub pump_bandwidth: Wavelength,
@@ -52,7 +52,7 @@ impl SPDC {
     pump_bandwidth: Wavelength,
     pump_average_power: MilliWatt<f64>,
     pump_spectrum_threshold: f64,
-    pp: Option<PeriodicPoling>,
+    pp: PeriodicPoling,
     signal_waist_position: Distance,
     idler_waist_position: Distance,
     deff: crate::MetersPerMilliVolt<f64>,
@@ -108,18 +108,18 @@ impl SPDC {
   /// Convert it into an optimum setup
   pub fn try_as_optimum(mut self) -> Result<Self, SPDCError> {
     self.signal.set_angles(0. * DEG, 0. * DEG);
-    let pp = match self.pp {
-      None => {
+    let pp = match &self.pp {
+      PeriodicPoling::Off => {
         self.crystal_setup.assign_optimum_theta(&self.signal, &self.pump);
-        None
+        PeriodicPoling::Off
       },
-      Some(pp) => {
+      PeriodicPoling::On { apodization, ..} => {
         // TODO: this could be 90 or 0??
         // self.crystal_setup.theta = 90. * DEG;
-        Some(PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, pp.apodization)?)
+        PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, apodization.clone())?
       }
     };
-    let mut idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)?;
+    let mut idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, &self.pp)?;
     // keep the same idler waist size
     idler.set_waist(self.idler.waist());
     Ok(
@@ -154,7 +154,7 @@ impl SPDC {
 
   /// Assign the optimum idler to this SPDC
   pub fn assign_optimum_idler(&mut self) -> Result<&mut Self, SPDCError> {
-    let mut idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)?;
+    let mut idler = IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, &self.pp)?;
     // keep the same idler waist size
     idler.set_waist(self.idler.waist());
     self.idler = idler;
@@ -163,8 +163,7 @@ impl SPDC {
 
   /// Assign the optimum periodic poling to this SPDC
   pub fn assign_optimum_periodic_poling(&mut self) -> Result<&mut Self, SPDCError> {
-    let pp = PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp.and_then(|pp| pp.apodization))?;
-    self.pp = Some(pp);
+    self.pp = self.pp.to_owned().try_as_optimum(&self.signal, &self.pump, &self.crystal_setup)?;
     Ok(self)
   }
 
@@ -176,14 +175,14 @@ impl SPDC {
 
   /// Assign the optimum crystal theta to this SPDC
   pub fn assign_optimum_crystal_theta(&mut self) -> &mut Self {
-    self.pp = None;
+    self.pp = PeriodicPoling::Off;
     self.crystal_setup.assign_optimum_theta(&self.signal, &self.pump);
     self
   }
 
   /// New setup with optimum crystal theta
   pub fn with_optimum_crystal_theta(mut self) -> Self {
-    self.pp = None;
+    self.pp = PeriodicPoling::Off;
     self.assign_optimum_crystal_theta();
     self
   }
@@ -226,17 +225,17 @@ impl SPDC {
 
   /// Optimum periodic poling
   pub fn optimum_periodic_poling(&self) -> Result<PeriodicPoling, SPDCError> {
-    PeriodicPoling::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp.and_then(|pp| pp.apodization))
+    self.pp.clone().try_as_optimum(&self.signal, &self.pump, &self.crystal_setup)
   }
 
   /// Optimum idler
   pub fn optimum_idler(&self) -> Result<IdlerBeam, SPDCError> {
-    IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, self.pp)
+    IdlerBeam::try_new_optimum(&self.signal, &self.pump, &self.crystal_setup, &self.pp)
   }
 
   /// Calculate the wavevector mismatch for the given frequencies
   pub fn delta_k(&self, omega_s : Frequency, omega_i : Frequency) -> Wavevector {
-    crate::delta_k(omega_s, omega_i, &self.signal, &self.idler, &self.pump, &self.crystal_setup, self.pp)
+    crate::delta_k(omega_s, omega_i, &self.signal, &self.idler, &self.pump, &self.crystal_setup, &self.pp)
   }
 
   /// Get a new joint spectrum object for this SPDC

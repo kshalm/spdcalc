@@ -94,11 +94,11 @@ impl IdlerBeam {
   pub fn new(beam: Beam) -> Self { Self(beam) }
   pub fn as_beam(self) -> Beam { self.0 }
   /// Calculate the optimal idler beam for the given signal and pump beams.
-  pub fn try_new_optimum(
+  pub fn try_new_optimum<P: AsRef<PeriodicPoling>>(
     signal : &SignalBeam,
     pump : &PumpBeam,
     crystal_setup : &CrystalSetup,
-    pp : Option<PeriodicPoling>,
+    pp : P,
   ) -> Result<Self, SPDCError> {
     let ls = signal.vacuum_wavelength();
     let lp = pump.vacuum_wavelength();
@@ -111,12 +111,7 @@ impl IdlerBeam {
 
     let ns = signal.refractive_index(signal.frequency(), crystal_setup);
     let np = pump.refractive_index(pump.frequency(), crystal_setup);
-
-    let del_k_pp = match pp {
-      Some(poling) => ls * poling.pp_factor(),
-      None => ucum::Unitless::new(0.0),
-    };
-
+    let del_k_pp = ls * pp.as_ref().pp_factor();
     let theta_s = signal.theta_internal();
     let ns_z = ns * cos(theta_s);
     let ls_over_lp = ls / lp;
@@ -222,20 +217,20 @@ impl Beam {
 
   /// Effective index of refraction induced by periodic poling
   // TODO: double check this...
-  pub fn effective_index_of_refraction(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> RIndex {
+  pub fn effective_index_of_refraction<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> RIndex {
     let lambda_o = self.vacuum_wavelength();
     let n = self.refractive_index(self.frequency, crystal_setup);
-    let pp_factor = pp.map_or(0. / M, |p| p.pp_factor());
+    let pp_factor = pp.as_ref().pp_factor();
     n + *(pp_factor * lambda_o)
   }
 
   /// Get the phase velocity of the beam through specified crystal setup
-  pub fn phase_velocity(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> Speed {
+  pub fn phase_velocity<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> Speed {
     C_ / self.effective_index_of_refraction(crystal_setup, pp)
   }
 
   /// Get the group velocity of the beam through specified crystal setup
-  pub fn group_velocity(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> Speed {
+  pub fn group_velocity<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> Speed {
     let lambda_o = self.vacuum_wavelength();
     let n_eff = self.effective_index_of_refraction(crystal_setup, pp);
     let vp = C_ / n_eff;
@@ -247,7 +242,7 @@ impl Beam {
   }
 
   /// Get the group index of the beam through specified crystal setup
-  pub fn group_index(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> RIndex {
+  pub fn group_index<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> RIndex {
     let vg = self.group_velocity(crystal_setup, pp);
     C_ / vg
   }
@@ -412,7 +407,7 @@ impl Beam {
   }
 
   /// Get the average transit time through the crystal
-  pub fn average_transit_time(&self, crystal_setup : &CrystalSetup, pp : Option<PeriodicPoling>) -> Time {
+  pub fn average_transit_time<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> Time {
     let crystal_length = crystal_setup.length;
     let delta_z = 0.5 * crystal_length;
     // beam direction in lab frame
@@ -559,13 +554,13 @@ mod tests {
     let signal = Beam::new(PolarizationType::Extraordinary, 15. * DEG, 10. * DEG, 1550. * NANO * M, 100. * MICRO * M).into();
     let pump = Beam::new(PolarizationType::Extraordinary, 0. * DEG, 0. * DEG, 775. * NANO * M, 100. * MICRO * M).into();
 
-    let pp = PeriodicPoling {
+    let pp = PeriodicPoling::On {
       period : 0.00004656366863331685 * ucum::M,
       sign :   Sign::POSITIVE,
-      apodization: None,
+      apodization: Apodization::Off,
     };
 
-    let idler = IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, Some(pp)).unwrap();
+    let idler = IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, pp).unwrap();
 
     let li = *(idler.vacuum_wavelength() / ucum::M);
     let li_expected = 1550. * NANO;

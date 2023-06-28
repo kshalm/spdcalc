@@ -103,7 +103,7 @@ impl CrystalSetup {
       crystal_setup.theta = theta * RAD;
       signal.set_theta_external(theta_s_e, &crystal_setup);
 
-      let idler = IdlerBeam::try_new_optimum(&signal, pump, &crystal_setup, None).unwrap();
+      let idler = IdlerBeam::try_new_optimum(&signal, pump, &crystal_setup, PeriodicPoling::Off).unwrap();
       // let del_k = delta_k(signal.frequency(), idler.frequency(), &signal, &idler, pump, &crystal_setup, None);
 
       // (del_k * M / RAD).z.abs()
@@ -119,7 +119,7 @@ impl CrystalSetup {
         1. * M,
         1. * dim::ucum::W,
         0.1,
-        None,
+        PeriodicPoling::Off,
         zs,
         zi,
         MetersPerMilliVolt::new(1.)

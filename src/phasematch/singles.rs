@@ -54,7 +54,7 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
   let DEL1s = DEL2s * PHI_s; // 1e-9
   let DEL3s = -hs - zhs * PHI_s * SIN_THETA_s_e * COS_PHI_s; // 1e-11
   let KpKs = *(k_p * k_s*M2/RAD/RAD); // exact
-  let pp_factor = spdc.pp.map_or(0./M, |p| p.pp_factor());
+  let pp_factor = spdc.pp.pp_factor();
 
   let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
   let C7 = k_p - dksi; // 1e-7
@@ -165,20 +165,7 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
     // Take into account apodized crystals
     // Apodization 1/e^2
     // @TODO: From krister: Not sure how to correctly handle the apodization in the double length integral
-    let pmzcoeff = spdc.pp.map_or(
-      // if no periodic poling return 1.
-      1.,
-      // otherwise check apodization
-      |poling| poling.apodization.map_or(
-        // again if no apodization...
-        1.,
-        // convert from 0->L to -1 -> 1 for the integral over z
-        |ap| {
-          let bw = 2. * fwhm_to_sigma(ap.fwhm) / L;
-          f64::exp(-0.5 * ((z1/bw).powi(2) + (z2/bw).powi(2)))
-        }
-      )
-    );
+    let pmzcoeff = spdc.pp.integration_constant(z1, L) * spdc.pp.integration_constant(z2, L);
 
     // Now calculate the full term in the integral.
     pmzcoeff * numerator / denominator
@@ -231,11 +218,11 @@ mod tests {
   #[test]
   fn phasematch_singles_pp_test(){
     let mut spdc = SPDC::default();
-    spdc.pp = Some(PeriodicPoling {
+    spdc.pp = PeriodicPoling::On {
       sign: Sign::NEGATIVE,
       period: 0.000018041674656364844 * M,
-      apodization: None,
-    });
+      apodization: Apodization::Off,
+    };
     // spdc.signal.set_from_external_theta(3. * DEG, &spdc.crystal_setup);
     spdc.signal.set_angles(0. *RAD, 0.0341877166429185 * RAD);
     // spdc.assign_optimum_idler();

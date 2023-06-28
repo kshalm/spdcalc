@@ -117,24 +117,52 @@ impl From<crate::spdcalc::IdlerConfig> for ::spdcalc::IdlerConfig {
 }
 
 // periodic poling
-impl From<::spdcalc::PeriodicPolingConfig> for crate::spdcalc::PeriodicPolingConfig {
-  fn from(config: ::spdcalc::PeriodicPolingConfig) -> Self {
-    let poling_period_um = match config.poling_period_um {
-      ::spdcalc::AutoCalcParam::Param(x) => x,
-      ::spdcalc::AutoCalcParam::Auto(_) => unreachable!(),
-    };
-    Self {
-      poling_period_um,
-      apodization_fwhm_um: config.apodization_fwhm_um.map(|x| x),
+impl From<crate::spdcalc::PeriodicPolingConfig> for ::spdcalc::PeriodicPolingConfig {
+  fn from(config: crate::spdcalc::PeriodicPolingConfig) -> Self {
+    Self::Config {
+      poling_period_um: ::spdcalc::AutoCalcParam::Param(config.poling_period_um),
+      apodization: config.apodization.map(|a| a.into()).unwrap_or_default(),
     }
   }
 }
 
-impl From<crate::spdcalc::PeriodicPolingConfig> for ::spdcalc::PeriodicPolingConfig {
-  fn from(config: crate::spdcalc::PeriodicPolingConfig) -> Self {
-    Self {
-      poling_period_um:  ::spdcalc::AutoCalcParam::Param(config.poling_period_um),
-      apodization_fwhm_um: config.apodization_fwhm_um.map(|x| x),
+impl From<::spdcalc::PeriodicPolingConfig> for crate::spdcalc::PeriodicPolingConfig {
+  fn from(config: ::spdcalc::PeriodicPolingConfig) -> Self {
+    match config {
+      ::spdcalc::PeriodicPolingConfig::Off => panic!("Can not convert periodic poling off to periodic poling config"),
+      ::spdcalc::PeriodicPolingConfig::Config { poling_period_um, apodization } => {
+        let poling_period_um = match poling_period_um {
+          ::spdcalc::AutoCalcParam::Param(x) => x,
+          ::spdcalc::AutoCalcParam::Auto(_) => unreachable!(),
+        };
+        crate::spdcalc::PeriodicPolingConfig {
+          poling_period_um,
+          apodization: match apodization {
+            ::spdcalc::ApodizationConfig::Off => None,
+            _ => Some(apodization.into()),
+          },
+        }
+      }
+    }
+  }
+}
+
+// apodization
+impl From<::spdcalc::ApodizationConfig> for crate::spdcalc::ApodizationConfig {
+  fn from(config: ::spdcalc::ApodizationConfig) -> Self {
+    match config {
+      ::spdcalc::ApodizationConfig::Off => panic!("Can not convert apodization off to apodization config"),
+      ::spdcalc::ApodizationConfig::Gaussian { fwhm_um } => Self::F64(fwhm_um),
+      ::spdcalc::ApodizationConfig::Interpolate(values) => Self::F64List(values),
+    }
+  }
+}
+
+impl From<crate::spdcalc::ApodizationConfig> for ::spdcalc::ApodizationConfig {
+  fn from(config: crate::spdcalc::ApodizationConfig) -> Self {
+    match config {
+      crate::spdcalc::ApodizationConfig::F64(fwhm_um) => Self::Gaussian { fwhm_um },
+      crate::spdcalc::ApodizationConfig::F64List(values) => Self::Interpolate(values),
     }
   }
 }
@@ -149,8 +177,8 @@ impl From<::spdcalc::SPDCConfig> for crate::spdcalc::SpdcConfig {
       ::spdcalc::AutoCalcParam::Auto(_) => unreachable!(),
     };
     let periodic_poling = match config.periodic_poling {
-      ::spdcalc::MaybePeriodicPolingConfig::Config(x) => Some(x.into()),
-      ::spdcalc::MaybePeriodicPolingConfig::Off => None,
+      ::spdcalc::PeriodicPolingConfig::Off => None,
+      _ => Some(config.periodic_poling.into()),
     };
     Self {
       crystal: config.crystal.into(),
@@ -166,8 +194,8 @@ impl From<::spdcalc::SPDCConfig> for crate::spdcalc::SpdcConfig {
 impl From<crate::spdcalc::SpdcConfig> for ::spdcalc::SPDCConfig {
   fn from(config: crate::spdcalc::SpdcConfig) -> Self {
     let periodic_poling = match config.periodic_poling {
-      Some(x) => ::spdcalc::MaybePeriodicPolingConfig::Config(x.into()),
-      None => ::spdcalc::MaybePeriodicPolingConfig::Off,
+      Some(x) => x.into(),
+      None => ::spdcalc::PeriodicPolingConfig::Off,
     };
     Self {
       crystal: config.crystal.into(),

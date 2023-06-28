@@ -45,9 +45,18 @@ record idler-config {
   waist-position-um: float64,
 }
 
+/// apodization config
+/// can be a gaussian by specifying the fwhm or
+/// a custom profile by specifying a list of values
+union apodization-config {
+  /// The fwhm in um
+  float64,
+  list<float64>,
+}
+
 record periodic-poling-config {
   poling-period-um: float64,
-  apodization-fwhm-um: option<float64>,
+  apodization: option<apodization-config>,
 }
 
 record spdc-config {

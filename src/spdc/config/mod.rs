@@ -6,7 +6,9 @@ use crate::{CrystalSetup, CrystalType, dim::{
 use serde::{Serialize, Deserialize};
 
 mod periodic_poling_config;
-pub use periodic_poling_config::{PeriodicPolingConfig, MaybePeriodicPolingConfig};
+pub use periodic_poling_config::{PeriodicPolingConfig};
+mod apodization;
+pub use apodization::ApodizationConfig;
 use serde_with::{serde_as, DisplayFromStr};
 
 /// A config parameter the could be signaled to be automatically calculated
@@ -231,7 +233,7 @@ pub struct SPDCConfig {
   #[serde(default)]
   pub idler: AutoCalcParam<IdlerConfig>,
   #[serde(default)]
-  pub periodic_poling: MaybePeriodicPolingConfig,
+  pub periodic_poling: PeriodicPolingConfig,
   pub deff_pm_per_volt: f64,
 }
 
@@ -249,7 +251,7 @@ impl SPDCConfig {
     let periodic_poling = self.periodic_poling.try_as_periodic_poling(&signal, &pump, &crystal_setup)?;
 
     if crystal_theta_autocalc {
-      if periodic_poling.is_none() {
+      if periodic_poling == PeriodicPoling::Off {
         crystal_setup.assign_optimum_theta(&signal, &pump);
       } else {
         return Err(SPDCError("Can not autocalc theta when periodic poling is enabled. Provide an explicit value for crystal theta.".into()))
@@ -257,7 +259,7 @@ impl SPDCConfig {
     }
     let idler = match &self.idler {
       AutoCalcParam::Param(idler_cfg) => idler_cfg.clone().try_as_beam(&crystal_setup)?,
-      AutoCalcParam::Auto(_) => IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, periodic_poling)?,
+      AutoCalcParam::Auto(_) => IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, &periodic_poling)?,
     };
     let idler_waist_position = {
       let auto = AutoCalcParam::default();
@@ -298,7 +300,7 @@ impl Default for SPDCConfig {
       pump: PumpConfig::default(),
       signal: SignalConfig::default(),
       idler: AutoCalcParam::default(),
-      periodic_poling: MaybePeriodicPolingConfig::default(),
+      periodic_poling: PeriodicPolingConfig::default(),
       deff_pm_per_volt: 1.,
     }
   }
@@ -370,14 +372,7 @@ impl From<SPDC> for SPDCConfig {
       waist_position_um: AutoCalcParam::Param(*(spdc.idler_waist_position / (MICRO * M))),
     });
 
-    let periodic_poling = match spdc.pp {
-      Some(pp) => MaybePeriodicPolingConfig::Config(PeriodicPolingConfig {
-        poling_period_um: AutoCalcParam::Param(*(pp.period / (MICRO * M))),
-        apodization_fwhm_um: pp.apodization.map(|ap| *(ap.fwhm / (MICRO * M))),
-      }),
-      None => MaybePeriodicPolingConfig::Off
-    };
-
+    let periodic_poling = spdc.pp.into();
     let deff_pm_per_volt = *(spdc.deff / (PICO * M / V));
 
     Self {
@@ -462,7 +457,7 @@ mod test {
       ).into();
       let pump_average_power = 1. * MILLIW;
       let pump_bandwidth = 5.35 * NANO * M;
-      let periodic_poling = None;
+      let periodic_poling = PeriodicPoling::Off;
       let signal_waist_position = -0.0006073170564963904 * M;
       let idler_waist_position = -0.0006073170564963904 * M;
       let deff = 1. * PICO * M / V;
@@ -548,7 +543,10 @@ mod test {
       },
       "idler": "auto",
       "periodic_poling": {
-        "poling_period_um": "auto"
+        "poling_period_um": "auto",
+        "apodization": {
+          "fwhm_um": 1600
+        }
       },
       "deff_pm_per_volt": 7.6,
     });
@@ -556,7 +554,10 @@ mod test {
     let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
     let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
 
-    let actual = spdc.pp.unwrap().period;
+    let actual = match spdc.pp {
+      PeriodicPoling::Off => panic!("Periodic poling should be on"),
+      PeriodicPoling::On { period, .. } => period,
+    };
     let expected = 46.52987937008885 * MICRO * M;
 
     assert!(approx_eq!(f64, actual.value_unsafe, expected.value_unsafe, epsilon = 1e-6));

@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use crate::{IdlerBeam, SPDC, PerMeter4, phasematch_fiber_coupling};
+use crate::{IdlerBeam, SPDC, PerMeter4, phasematch_fiber_coupling, Distance};
 use crate::{
   delta_k,
   Sign,
@@ -9,7 +9,7 @@ use crate::{
   PumpBeam,
   TWO_PI,
   SPDCError,
-  math::nelder_mead_1d
+  math::{nelder_mead_1d, fwhm_to_sigma}
 };
 use crate::dim::ucum::{M, W, V, RAD, PerMeter, Meter};
 
@@ -18,25 +18,61 @@ const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from 
 pub type PolingPeriod = Meter<f64>;
 
 /// Apodization for periodic poling
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub struct Apodization {
-  /// Full-width half-max
-  pub fwhm : Meter<f64>,
+#[derive(Debug, Clone, PartialEq, Default)]
+pub enum Apodization {
+  /// None
+  #[default]
+  Off,
+  /// Gaussian
+  Gaussian {
+    /// Full-width half-max
+    fwhm : Distance,
+  },
+  /// Custom apodization by specifying profile values directly
+  Interpolate(Vec<f64>),
+}
+
+impl Apodization {
+  pub fn integration_constant(&self, z: f64, crystal_length: Distance) -> f64 {
+    assert!(z >= -1. && z <= 1., "z must be between -1 and 1");
+    match self {
+      Apodization::Off => 1.,
+      &Apodization::Gaussian { fwhm } => {
+        let bw = 2. * fwhm_to_sigma(fwhm) / crystal_length;
+        f64::exp(-0.5 * (z/bw).powi(2))
+      },
+      Apodization::Interpolate(values) => {
+        todo!("Interpolation not implemented yet")
+        // let n = values.len();
+        // let i = (z * (n - 1) as f64).round() as usize;
+        // values[i]
+      },
+    }
+  }
 }
 
 /// Periodic Poling settings
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub struct PeriodicPoling {
-  pub period : PolingPeriod,
-  pub sign :   Sign,
-  pub apodization : Option<Apodization>,
+#[derive(Debug, Clone, PartialEq, Default)]
+pub enum PeriodicPoling {
+  #[default]
+  Off,
+  On {
+    period : PolingPeriod,
+    sign :   Sign,
+    apodization : Apodization,
+  },
+}
+
+impl AsRef<PeriodicPoling> for PeriodicPoling {
+  fn as_ref(&self) -> &Self {
+    self
+  }
 }
 
 impl PeriodicPoling {
-
   /// Create a new instance of periodic poling. Sign of specified period will be used.
-  pub fn new(period: PolingPeriod, apodization: Option<Apodization>) -> Self {
-    Self {
+  pub fn new(period: PolingPeriod, apodization: Apodization) -> Self {
+    Self::On {
       period: if period > 0. * M { period } else { -period },
       sign: if period > 0. * M { Sign::POSITIVE } else { Sign::NEGATIVE },
       apodization,
@@ -44,10 +80,11 @@ impl PeriodicPoling {
   }
 
   /// Set the poling period and sign
-  pub fn set_period(&mut self, period: PolingPeriod) -> &mut Self {
-    self.period = if period > 0. * M { period } else { -period };
-    self.sign = if period > 0. * M { Sign::POSITIVE } else { Sign::NEGATIVE };
-    self
+  pub fn with_period(self, period: PolingPeriod) -> Self {
+    match self {
+      Self::Off => Self::new(period, Apodization::Off),
+      Self::On { apodization, .. } => Self::new(period, apodization),
+    }
   }
 
   /// Get the optimal periodic poling for the given signal and pump beams
@@ -55,7 +92,7 @@ impl PeriodicPoling {
     signal: &SignalBeam,
     pump: &PumpBeam,
     crystal_setup: &CrystalSetup,
-    apodization: Option<Apodization>
+    apodization: Apodization
   ) -> Result<Self, SPDCError> {
     let period = optimum_poling_period(signal, pump, crystal_setup)?;
     Ok(
@@ -66,14 +103,27 @@ impl PeriodicPoling {
     )
   }
 
+  /// Get the optimal periodic poling for the given signal and pump beams
+  pub fn try_as_optimum(
+    self,
+    signal: &SignalBeam,
+    pump: &PumpBeam,
+    crystal_setup: &CrystalSetup
+  ) -> Result<Self, SPDCError> {
+    match self {
+      Self::Off => Self::try_new_optimum(signal, pump, crystal_setup, Apodization::Off),
+      Self::On { apodization, .. } => Self::try_new_optimum(signal, pump, crystal_setup, apodization),
+    }
+  }
+
   /// calculate the sign of periodic poling
   pub fn compute_sign(
     signal: &SignalBeam,
     pump: &PumpBeam,
     crystal_setup: &CrystalSetup
   ) -> Sign {
-    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, None).unwrap();
-    let delkz = (delta_k(signal.frequency(), idler.frequency(), signal, &idler, pump, crystal_setup, None) * M / RAD).z;
+    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, PeriodicPoling::Off).unwrap();
+    let delkz = (delta_k(signal.frequency(), idler.frequency(), signal, &idler, pump, crystal_setup, PeriodicPoling::Off) * M / RAD).z;
 
     // converts to sign
     delkz.into()
@@ -81,12 +131,24 @@ impl PeriodicPoling {
 
   /// Get the factor 1 / (sign * poling_period)
   pub fn pp_factor(&self) -> PerMeter<f64> {
-    assert!(
-      self.period.value_unsafe > 0.,
-      "Periodic Poling Period must be greater than zero"
-    );
+    match self {
+      Self::Off => 0. / M,
+      &Self::On { period, sign, .. } => {
+        assert!(
+          period.value_unsafe > 0.,
+          "Periodic Poling Period must be greater than zero"
+        );
+        1. / (sign * period)
+      },
+    }
+  }
 
-    1. / (self.sign * self.period)
+  /// Get the apodization integration constant for the given z position
+  pub fn integration_constant(&self, z: f64, crystal_length: Distance) -> f64 {
+    match &self {
+      Self::Off => 1.,
+      &Self::On { apodization, .. } => apodization.integration_constant(z, crystal_length),
+    }
   }
 }
 
@@ -99,15 +161,15 @@ pub fn optimum_poling_period(
 
   // z component of delta k, based on periodic poling
   let delta_kz = |pp| {
-    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, pp).unwrap();
-    let del_k = delta_k(signal.frequency(), idler.frequency(), signal, &idler, pump, crystal_setup, pp);
+    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, &pp).unwrap();
+    let del_k = delta_k(signal.frequency(), idler.frequency(), signal, &idler, pump, crystal_setup, &pp);
 
     let del_k_vec = *(del_k * M / RAD);
 
     del_k_vec.z
   };
 
-  let z = delta_kz(None);
+  let z = delta_kz(PeriodicPoling::Off);
 
   if z == 0. {
     // z is already zero, that means there is already perfect phasematching
@@ -123,12 +185,12 @@ pub fn optimum_poling_period(
   let spdc = Mutex::new(SPDC::new(
     crystal_setup.clone(),
     signal.clone(),
-    IdlerBeam::try_new_optimum(signal, pump, crystal_setup, None).unwrap(),
+    IdlerBeam::try_new_optimum(signal, pump, crystal_setup, PeriodicPoling::Off).unwrap(),
     pump.clone(),
     5e-9 * M,
     1e-3 * W,
     1e-2,
-    None,
+    PeriodicPoling::Off,
     0. * M,
     0. * M,
     1e-12 * M / V,
@@ -136,13 +198,13 @@ pub fn optimum_poling_period(
 
   // minimizable delta k function based on period (using predetermined sign)
   let pm = |period| {
-    let pp = Some(PeriodicPoling {
+    let pp = PeriodicPoling::On{
       period : period * M,
       sign,
-      apodization: None,
-    });
+      apodization: Apodization::Off,
+    };
 
-    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, pp).unwrap();
+    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, &pp).unwrap();
     let wi = idler.frequency();
 
     let mut spdc = spdc.lock().unwrap();

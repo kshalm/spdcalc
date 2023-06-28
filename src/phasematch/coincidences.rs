@@ -1,4 +1,3 @@
-use crate::math::fwhm_to_sigma;
 use crate::*;
 use crate::utils::frequency_to_wavenumber;
 use math::*;
@@ -173,7 +172,7 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
   // let A7I = -DEL3i;
   let A7 = Complex::new(*(GAM3i/RAD/M), -*(DEL3i/M));
 
-  let pp_factor = spdc.pp.map_or(0./M, |p| p.pp_factor());
+  let pp_factor = spdc.pp.pp_factor();
   let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
@@ -251,21 +250,7 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
     // dbg!(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10);
 
     // Take into account apodized crystals
-    // Apodization 1/e^2
-    let pmzcoeff = spdc.pp.map_or(
-      // if no periodic poling return 1.
-      1.,
-      // otherwise check apodization
-      |poling| poling.apodization.map_or(
-        // again if no apodization...
-        1.,
-        // convert from 0->L to -1 -> 1 for the integral over z
-        |ap| {
-          let bw = 2. * fwhm_to_sigma(ap.fwhm) / L;
-          f64::exp(-0.5 * (z/bw).powi(2))
-        }
-      )
-    );
+    let pmzcoeff = spdc.pp.integration_constant(z, L);
 
     // dbg!(pmzcoeff, z, numerator, denominator);
     // Now calculate the full term in the integral.
@@ -382,7 +367,7 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
   let m = L / (2. * k_p);
   let n = 0.5 * L * rho;
 
-  let pp_factor = spdc.pp.map_or(0./M, |p| p.pp_factor());
+  let pp_factor = spdc.pp.pp_factor();
   let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
@@ -465,21 +450,7 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
     // dbg!(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10);
 
     // Take into account apodized crystals
-    // Apodization 1/e^2
-    let pmzcoeff = spdc.pp.map_or(
-      // if no periodic poling return 1.
-      1.,
-      // otherwise check apodization
-      |poling| poling.apodization.map_or(
-        // again if no apodization...
-        1.,
-        // convert from 0->L to -1 -> 1 for the integral over z
-        |ap| {
-          let bw = 2. * fwhm_to_sigma(ap.fwhm) / L;
-          f64::exp(-0.5 * (z/bw).powi(2))
-        }
-      )
-    );
+    let pmzcoeff = spdc.pp.integration_constant(z, L);
 
     // dbg!(pmzcoeff, z, numerator, denominator);
     // Now calculate the full term in the integral.
@@ -496,7 +467,6 @@ mod tests {
   use super::*;
   extern crate float_cmp;
   use dim::Dimensioned;
-use float_cmp::*;
   use crate::utils::testing::assert_nearly_equal;
 
   fn percent_diff(actual : f64, expected : f64) -> f64 {
@@ -567,11 +537,11 @@ use float_cmp::*;
   #[test]
   fn phasematch_fiber_coupling_pp_test(){
     let mut spdc = SPDC::default();
-    spdc.pp = Some(PeriodicPoling {
+    spdc.pp = PeriodicPoling::On {
       sign: Sign::NEGATIVE,
       period: 0.00001771070360118249 * M,
-      apodization: None,
-    });
+      apodization: Apodization::Off,
+    };
     // spdc.signal.set_from_external_theta(3. * dim::ucum::DEG, &spdc.crystal_setup);
     spdc.signal.set_angles(0. *RAD, 0. * RAD);
     // spdc.assign_optimum_theta();
