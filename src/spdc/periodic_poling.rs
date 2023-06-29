@@ -1,5 +1,7 @@
 use std::sync::Mutex;
 
+use core::f64::consts::PI;
+use crate::math::lerp;
 use crate::{IdlerBeam, SPDC, PerMeter4, phasematch_fiber_coupling, Distance};
 use crate::{
   delta_k,
@@ -28,6 +30,12 @@ pub enum Apodization {
     /// Full-width half-max
     fwhm : Distance,
   },
+  Bartlett(f64),
+  Blackman(f64),
+  Connes(f64),
+  Cosine(f64),
+  Hamming(f64),
+  Welch(f64),
   /// Custom apodization by specifying profile values directly
   Interpolate(Vec<f64>),
 }
@@ -36,16 +44,41 @@ impl Apodization {
   pub fn integration_constant(&self, z: f64, crystal_length: Distance) -> f64 {
     assert!(z >= -1. && z <= 1., "z must be between -1 and 1");
     match self {
+      // https://mathworld.wolfram.com/ApodizationFunction.html
       Apodization::Off => 1.,
       &Apodization::Gaussian { fwhm } => {
         let bw = 2. * fwhm_to_sigma(fwhm) / crystal_length;
         f64::exp(-0.5 * (z/bw).powi(2))
       },
+      Apodization::Bartlett(a) => {
+        1. - z.abs() / a
+      },
+      Apodization::Blackman(a) => {
+        21. / 50. + 0.5 * (PI * z / a).cos() + (2. / 25.) * (TWO_PI * z / a).cos()
+      },
+      Apodization::Connes(a) => {
+        (1. - (z / a).powi(2)).powi(2)
+      },
+      Apodization::Cosine(a) => {
+        (0.5 * PI * z / a).cos()
+      },
+      Apodization::Hamming(a) => {
+        (27. + 23. * (PI * z / a).cos()) / 50.
+      },
+      Apodization::Welch(a) => {
+        1. - (z / a).powi(2)
+      },
       Apodization::Interpolate(values) => {
-        todo!("Interpolation not implemented yet")
-        // let n = values.len();
-        // let i = (z * (n - 1) as f64).round() as usize;
-        // values[i]
+        // todo!("Interpolation not implemented yet")
+        let n = values.len();
+        if n == 0 {
+          return 1.;
+        }
+        let i = 0.5 * (z + 1.) * (n - 1) as f64;
+        let above = i.ceil() as usize;
+        let below = i.floor() as usize;
+        let t = i - below as f64;
+        lerp(values[below], values[above], t)
       },
     }
   }
