@@ -43,27 +43,27 @@ jsi = spdc.jsi_normalized_range(cfg, wavelengths, None)
 jsi = np.reshape(np.array(jsi), (wavelengths.value.x[2], wavelengths.value.y[2]))
 
 # Plot the JSI with plotly
-# fig = go.Figure(data=go.Heatmap(
-#     z=jsi,
-#     x=x,
-#     y=y
-#     )
-# )
+fig = go.Figure(data=go.Heatmap(
+    z=jsi,
+    x=x,
+    y=y
+    )
+)
 
-# fig.update_layout(
-#     title='JSI Plot'
-# )
+fig.update_layout(
+    title='JSI Plot'
+)
 
-# fig.show()
+fig.show()
 
 # plot the efficiency vs pump waist size
-waist_sizes = np.linspace(100., 1000., 10)
-efficiencies = []
-for waist_size in waist_sizes:
-    cfg.pump.waist_um = waist_size
-    efficiencies.append(spdc.efficiencies(cfg, wavelengths, None).symmetric)
+# waist_sizes = np.linspace(100., 1000., 10)
+# efficiencies = []
+# for waist_size in waist_sizes:
+#     cfg.pump.waist_um = waist_size
+#     efficiencies.append(spdc.efficiencies(cfg, wavelengths, None).symmetric)
 
-fig = px.line(x=waist_sizes, y=efficiencies, title='Efficiency vs Pump Waist Size')
-fig.update_xaxes(title_text='Pump Waist Size (um)')
-fig.update_yaxes(title_text='Efficiency')
-fig.show()
+# fig = px.line(x=waist_sizes, y=efficiencies, title='Efficiency vs Pump Waist Size')
+# fig.update_xaxes(title_text='Pump Waist Size (um)')
+# fig.update_yaxes(title_text='Efficiency')
+# fig.show()

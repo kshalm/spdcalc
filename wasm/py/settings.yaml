@@ -20,5 +20,7 @@ signal:
 idler: auto
 periodic_poling:
   poling_period_um: auto
-  appodization_fwhm_um: None
+  apodization:
+    kind: hamming
+    parameter: 1
 deff_pm_per_volt: 7.6

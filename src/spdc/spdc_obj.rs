@@ -72,6 +72,10 @@ impl SPDC {
     }
   }
 
+  pub fn as_config(self) -> crate::SPDCConfig {
+    crate::SPDCConfig::from(self)
+  }
+
   /// Optimal range to use for evaluating the joint spectrum
   pub fn optimum_range(&self, resolution: usize) -> FrequencySpace {
     use dim::ucum::{RAD, S};

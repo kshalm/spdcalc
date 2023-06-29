@@ -22,7 +22,11 @@
   },
   "idler": "auto",
   "periodic_poling": {
-    "poling_period_um": "auto"
+    "poling_period_um": "auto",
+    "apodization": {
+      "kind": "hamming",
+      "parameter": 1
+    }
   },
   "deff_pm_per_volt": 7.6
 }

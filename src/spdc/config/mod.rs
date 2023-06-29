@@ -544,9 +544,6 @@ mod test {
       "idler": "auto",
       "periodic_poling": {
         "poling_period_um": "auto",
-        "apodization": {
-          "fwhm_um": 1600
-        }
       },
       "deff_pm_per_volt": 7.6,
     });

@@ -162,6 +162,26 @@ impl PeriodicPoling {
     delkz.into()
   }
 
+  /// Set the apodization
+  ///
+  /// Does nothing if off
+  pub fn set_apodization(&mut self, apodization: Apodization) {
+    match self {
+      Self::Off => {},
+      Self::On { period, sign, .. } => *self = Self::new(*sign * *period, apodization),
+    }
+  }
+
+  /// Set the apodization
+  ///
+  /// Does nothing if off
+  pub fn with_apodization(self, apodization: Apodization) -> Self {
+    match self {
+      Self::Off => Self::Off,
+      Self::On { period, sign, .. } => Self::new(sign * period, apodization),
+    }
+  }
+
   /// Get the factor 1 / (sign * poling_period)
   pub fn pp_factor(&self) -> PerMeter<f64> {
     match self {

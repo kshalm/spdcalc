@@ -148,21 +148,73 @@ impl From<::spdcalc::PeriodicPolingConfig> for crate::spdcalc::PeriodicPolingCon
 }
 
 // apodization
-impl From<::spdcalc::ApodizationConfig> for crate::spdcalc::ApodizationConfig {
+impl From<::spdcalc::ApodizationConfig> for crate::spdcalc::ApodizationParameter {
   fn from(config: ::spdcalc::ApodizationConfig) -> Self {
     match config {
-      ::spdcalc::ApodizationConfig::Off => panic!("Can not convert apodization off to apodization config"),
+      ::spdcalc::ApodizationConfig::Off => Self::F64(1.0),
       ::spdcalc::ApodizationConfig::Gaussian { fwhm_um } => Self::F64(fwhm_um),
+      ::spdcalc::ApodizationConfig::Bartlett(a) => Self::F64(a),
+      ::spdcalc::ApodizationConfig::Blackman(a) => Self::F64(a),
+      ::spdcalc::ApodizationConfig::Connes(a) => Self::F64(a),
+      ::spdcalc::ApodizationConfig::Cosine(a) => Self::F64(a),
+      ::spdcalc::ApodizationConfig::Hamming(a) => Self::F64(a),
+      ::spdcalc::ApodizationConfig::Welch(a) => Self::F64(a),
       ::spdcalc::ApodizationConfig::Interpolate(values) => Self::F64List(values),
+    }
+  }
+}
+
+impl From<::spdcalc::ApodizationConfig> for crate::spdcalc::ApodizationConfig {
+  fn from(config: ::spdcalc::ApodizationConfig) -> Self {
+    let kind = match config {
+      ::spdcalc::ApodizationConfig::Off => "off",
+      ::spdcalc::ApodizationConfig::Gaussian { .. } => "gaussian",
+      ::spdcalc::ApodizationConfig::Bartlett(_) => "bartlett",
+      ::spdcalc::ApodizationConfig::Blackman(_) => "blackman",
+      ::spdcalc::ApodizationConfig::Connes(_) => "connes",
+      ::spdcalc::ApodizationConfig::Cosine(_) => "cosine",
+      ::spdcalc::ApodizationConfig::Hamming(_) => "hamming",
+      ::spdcalc::ApodizationConfig::Welch(_) => "welch",
+      ::spdcalc::ApodizationConfig::Interpolate(_) => "interpolate",
+    }.to_string();
+    Self {
+      kind,
+      parameter: config.into(),
+    }
+  }
+}
+
+impl From<crate::spdcalc::ApodizationParameter> for f64 {
+  fn from(config: crate::spdcalc::ApodizationParameter) -> Self {
+    match config {
+      crate::spdcalc::ApodizationParameter::F64(x) => x,
+      crate::spdcalc::ApodizationParameter::F64List(_) => panic!("Can not convert f64 list to f64"),
+    }
+  }
+}
+
+impl From<crate::spdcalc::ApodizationParameter> for Vec<f64> {
+  fn from(config: crate::spdcalc::ApodizationParameter) -> Self {
+    match config {
+      crate::spdcalc::ApodizationParameter::F64(_) => panic!("Can not convert f64 to f64 list"),
+      crate::spdcalc::ApodizationParameter::F64List(x) => x,
     }
   }
 }
 
 impl From<crate::spdcalc::ApodizationConfig> for ::spdcalc::ApodizationConfig {
   fn from(config: crate::spdcalc::ApodizationConfig) -> Self {
-    match config {
-      crate::spdcalc::ApodizationConfig::F64(fwhm_um) => Self::Gaussian { fwhm_um },
-      crate::spdcalc::ApodizationConfig::F64List(values) => Self::Interpolate(values),
+    match config.kind.to_lowercase().as_str() {
+      "off" | "none" => Self::Off,
+      "gaussian" => Self::Gaussian { fwhm_um: config.parameter.into() },
+      "bartlett" => Self::Bartlett(config.parameter.into()),
+      "blackman" => Self::Blackman(config.parameter.into()),
+      "connes" => Self::Connes(config.parameter.into()),
+      "cosine" => Self::Cosine(config.parameter.into()),
+      "hamming" => Self::Hamming(config.parameter.into()),
+      "welch" => Self::Welch(config.parameter.into()),
+      "interpolate" | "custom" => Self::Interpolate(config.parameter.into()),
+      _ => panic!("Unknown apodization kind: {}", config.kind),
     }
   }
 }
