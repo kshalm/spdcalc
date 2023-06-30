@@ -79,3 +79,8 @@ where
   w * *FWHM_OVER_WAIST
 }
 
+/// Round a number to a certain number of significant figures
+pub fn sigfigs(x: f64, decimals: u8) -> f64 {
+  let y = 10u32.pow(decimals as u32) as f64;
+  (x * y).round() / y
+}

@@ -18,7 +18,7 @@ impl From<PeriodicPoling> for PeriodicPolingConfig {
     match pp {
       PeriodicPoling::Off => Self::Off,
       PeriodicPoling::On { period, apodization, .. } => Self::Config {
-        poling_period_um: AutoCalcParam::Param(*(period / (MICRO * M))),
+        poling_period_um: AutoCalcParam::Param(sigfigs(*(period / (MICRO * M)), SIG_FIGS_IN_CONFIG)),
         apodization: apodization.into(),
       },
     }

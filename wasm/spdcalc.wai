@@ -46,7 +46,7 @@ record idler-config {
 }
 
 union apodization-parameter {
-  /// The fwhm in um
+  /// The fwhm in um, or "a" parameter
   float64,
   list<float64>,
 }

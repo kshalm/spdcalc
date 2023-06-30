@@ -2,7 +2,7 @@ use super::*;
 use crate::{CrystalSetup, CrystalType, dim::{
   f64prefixes::{MICRO, NANO, PICO},
   ucum::{DEG, RAD, M, MILLIW, V}
-}, utils::{self, from_kelvin_to_celsius}, Beam, PumpBeam, SignalBeam, IdlerBeam, PMType, SPDCError};
+}, utils::{self, from_kelvin_to_celsius}, Beam, PumpBeam, SignalBeam, IdlerBeam, PMType, SPDCError, math::sigfigs};
 use serde::{Serialize, Deserialize};
 
 mod periodic_poling_config;
@@ -10,6 +10,8 @@ pub use periodic_poling_config::{PeriodicPolingConfig};
 mod apodization;
 pub use apodization::ApodizationConfig;
 use serde_with::{serde_as, DisplayFromStr};
+
+const SIG_FIGS_IN_CONFIG: u8 = 4;
 
 /// A config parameter the could be signaled to be automatically calculated
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -100,10 +102,10 @@ impl From<CrystalSetup> for CrystalConfig {
     Self {
       kind: setup.crystal,
       pm_type: setup.pm_type,
-      theta_deg: AutoCalcParam::Param(*(setup.theta / DEG)),
-      phi_deg: *(setup.phi / DEG),
-      length_um: *(setup.length / (MICRO * M)),
-      temperature_c: from_kelvin_to_celsius(setup.temperature),
+      theta_deg: AutoCalcParam::Param(sigfigs(*(setup.theta / DEG), SIG_FIGS_IN_CONFIG)),
+      phi_deg: sigfigs(*(setup.phi / DEG), SIG_FIGS_IN_CONFIG),
+      length_um: sigfigs(*(setup.length / (MICRO * M)), SIG_FIGS_IN_CONFIG),
+      temperature_c: sigfigs(from_kelvin_to_celsius(setup.temperature), SIG_FIGS_IN_CONFIG),
     }
   }
 }
@@ -309,10 +311,10 @@ impl Default for SPDCConfig {
 impl From<SPDC> for PumpConfig {
   fn from(spdc: SPDC) -> Self {
     Self {
-      wavelength_nm: *(spdc.pump.vacuum_wavelength() / (NANO * M)),
-      bandwidth_nm: *(spdc.pump_bandwidth / (NANO * M)),
-      waist_um: *(spdc.pump.waist().x / (MICRO * M)),
-      average_power_mw: *(spdc.pump_average_power / MILLIW),
+      wavelength_nm: sigfigs(*(spdc.pump.vacuum_wavelength() / (NANO * M)), SIG_FIGS_IN_CONFIG),
+      bandwidth_nm: sigfigs(*(spdc.pump_bandwidth / (NANO * M)), SIG_FIGS_IN_CONFIG),
+      waist_um: sigfigs(*(spdc.pump.waist().x / (MICRO * M)), SIG_FIGS_IN_CONFIG),
+      average_power_mw: sigfigs(*(spdc.pump_average_power / MILLIW), SIG_FIGS_IN_CONFIG),
       spectrum_threshold: Some(spdc.pump_spectrum_threshold),
     }
   }
@@ -321,12 +323,12 @@ impl From<SPDC> for PumpConfig {
 impl From<SPDC> for SignalConfig {
   fn from(spdc: SPDC) -> Self {
     Self {
-      wavelength_nm: *(spdc.signal.vacuum_wavelength() / (NANO * M)),
-      theta_deg: Some(*(spdc.signal.theta_internal() / DEG)),
+      wavelength_nm: sigfigs(*(spdc.signal.vacuum_wavelength() / (NANO * M)), SIG_FIGS_IN_CONFIG),
+      theta_deg: Some(sigfigs(*(spdc.signal.theta_internal() / DEG), SIG_FIGS_IN_CONFIG)),
       theta_external_deg: None,
-      phi_deg: *(spdc.signal.phi() / DEG),
-      waist_um: *(spdc.signal.waist().x / (MICRO * M)),
-      waist_position_um: AutoCalcParam::Param(*(spdc.signal_waist_position / (MICRO * M))),
+      phi_deg: sigfigs(*(spdc.signal.phi() / DEG), SIG_FIGS_IN_CONFIG),
+      waist_um: sigfigs(*(spdc.signal.waist().x / (MICRO * M)), SIG_FIGS_IN_CONFIG),
+      waist_position_um: AutoCalcParam::Param(sigfigs(*(spdc.signal_waist_position / (MICRO * M)), SIG_FIGS_IN_CONFIG)),
     }
   }
 }
@@ -334,11 +336,11 @@ impl From<SPDC> for SignalConfig {
 impl From<SPDC> for IdlerConfig {
   fn from(spdc: SPDC) -> Self {
     Self {
-      wavelength_nm: *(spdc.idler.vacuum_wavelength() / (NANO * M)),
-      theta_deg: Some(*(spdc.idler.theta_internal() / DEG)),
+      wavelength_nm: sigfigs(*(spdc.idler.vacuum_wavelength() / (NANO * M)), SIG_FIGS_IN_CONFIG),
+      theta_deg: Some(sigfigs(*(spdc.idler.theta_internal() / DEG), SIG_FIGS_IN_CONFIG)),
       theta_external_deg: None,
-      phi_deg: *(spdc.idler.phi() / DEG),
-      waist_um: *(spdc.idler.waist().x / (MICRO * M)),
+      phi_deg: sigfigs(*(spdc.idler.phi() / DEG), SIG_FIGS_IN_CONFIG),
+      waist_um: sigfigs(*(spdc.idler.waist().x / (MICRO * M)), SIG_FIGS_IN_CONFIG),
       waist_position_um: AutoCalcParam::Param(*(spdc.idler_waist_position / (MICRO * M))),
     }
   }
@@ -348,32 +350,32 @@ impl From<SPDC> for SPDCConfig {
   fn from(spdc: SPDC) -> Self {
     let crystal = spdc.crystal_setup.into();
     let pump = PumpConfig {
-      wavelength_nm: *(spdc.pump.vacuum_wavelength() / (NANO * M)),
-      bandwidth_nm: *(spdc.pump_bandwidth / (NANO * M)),
-      waist_um: *(spdc.pump.waist().x / (MICRO * M)),
-      average_power_mw: *(spdc.pump_average_power / MILLIW),
+      wavelength_nm: sigfigs(*(spdc.pump.vacuum_wavelength() / (NANO * M)), SIG_FIGS_IN_CONFIG),
+      bandwidth_nm: sigfigs(*(spdc.pump_bandwidth / (NANO * M)), SIG_FIGS_IN_CONFIG),
+      waist_um: sigfigs(*(spdc.pump.waist().x / (MICRO * M)), SIG_FIGS_IN_CONFIG),
+      average_power_mw: sigfigs(*(spdc.pump_average_power / MILLIW), SIG_FIGS_IN_CONFIG),
       spectrum_threshold: Some(spdc.pump_spectrum_threshold),
     };
     let signal = SignalConfig {
-      wavelength_nm: *(spdc.signal.vacuum_wavelength() / (NANO * M)),
-      theta_deg: Some(*(spdc.signal.theta_internal() / DEG)),
+      wavelength_nm: sigfigs(*(spdc.signal.vacuum_wavelength() / (NANO * M)), SIG_FIGS_IN_CONFIG),
+      theta_deg: Some(sigfigs(*(spdc.signal.theta_internal() / DEG), SIG_FIGS_IN_CONFIG)),
       theta_external_deg: None,
-      phi_deg: *(spdc.signal.phi() / DEG),
-      waist_um: *(spdc.signal.waist().x / (MICRO * M)),
-      waist_position_um: AutoCalcParam::Param(*(spdc.signal_waist_position / (MICRO * M))),
+      phi_deg: sigfigs(*(spdc.signal.phi() / DEG), SIG_FIGS_IN_CONFIG),
+      waist_um: sigfigs(*(spdc.signal.waist().x / (MICRO * M)), SIG_FIGS_IN_CONFIG),
+      waist_position_um: AutoCalcParam::Param(sigfigs(*(spdc.signal_waist_position / (MICRO * M)), SIG_FIGS_IN_CONFIG)),
     };
 
     let idler = AutoCalcParam::Param(IdlerConfig {
-      wavelength_nm: *(spdc.idler.vacuum_wavelength() / (NANO * M)),
-      theta_deg: Some(*(spdc.idler.theta_internal() / DEG)),
+      wavelength_nm: sigfigs(*(spdc.idler.vacuum_wavelength() / (NANO * M)), SIG_FIGS_IN_CONFIG),
+      theta_deg: Some(sigfigs(*(spdc.idler.theta_internal() / DEG), SIG_FIGS_IN_CONFIG)),
       theta_external_deg: None,
-      phi_deg: *(spdc.idler.phi() / DEG),
-      waist_um: *(spdc.idler.waist().x / (MICRO * M)),
+      phi_deg: sigfigs(*(spdc.idler.phi() / DEG), SIG_FIGS_IN_CONFIG),
+      waist_um: sigfigs(*(spdc.idler.waist().x / (MICRO * M)), SIG_FIGS_IN_CONFIG),
       waist_position_um: AutoCalcParam::Param(*(spdc.idler_waist_position / (MICRO * M))),
     });
 
     let periodic_poling = spdc.pp.into();
-    let deff_pm_per_volt = *(spdc.deff / (PICO * M / V));
+    let deff_pm_per_volt = sigfigs(*(spdc.deff / (PICO * M / V)), SIG_FIGS_IN_CONFIG);
 
     Self {
       crystal,
