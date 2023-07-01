@@ -120,6 +120,46 @@ impl PeriodicPoling {
     }
   }
 
+  /// Get the number of domains for a given crystal length
+  pub fn num_domains(&self, crystal_length: Distance) -> usize {
+    if let Self::On { period, .. } = self {
+      let num_domains = (crystal_length / *period).ceil();
+      num_domains as usize
+    } else {
+      0
+    }
+  }
+
+  /// Get the poling domains
+  ///
+  /// They are a list of fractions of polilng period
+  pub fn poling_domains(&self, crystal_length: Distance) -> Vec<f64> {
+    if let Self::On { apodization, .. } = self {
+      let num_domains = self.num_domains(crystal_length);
+      // for each domain
+      (0..num_domains).map(|i| {
+        // 0.5 to get value in middle of domain
+        let z = lerp(-1., 1., (i as f64 + 0.5) / num_domains as f64);
+        let a = apodization.integration_constant(z, crystal_length);
+        let x = (1. - 2. * a).acos() / TWO_PI;
+        if z > 0. {
+          1. - x
+        } else {
+          x
+        }
+      }).collect()
+    } else {
+      Vec::new()
+    }
+  }
+
+  /// Get the poling domains as lengths
+  pub fn poling_domain_lengths(&self, crystal_length: Distance) -> Vec<Distance> {
+    self.poling_domains(crystal_length).iter().map(|&z| {
+      z * crystal_length
+    }).collect()
+  }
+
   /// Get the optimal periodic poling for the given signal and pump beams
   pub fn try_new_optimum(
     signal: &SignalBeam,
@@ -327,5 +367,50 @@ mod test {
 
     assert!( approx_eq!(f64, *(period / M), -46.578592559e-6, ulps = 2, epsilon = 1e-12) );
 
+  }
+
+  #[test]
+  fn test_poling_domains(){
+    let crystal_length = 1000e-6 * M;
+    let pp = PeriodicPoling::new(10e-6 * M, Apodization::Off);
+    let domains = pp.poling_domains(crystal_length);
+    assert_eq!(domains, vec![0.5; 100]);
+  }
+
+  #[test]
+  fn test_poling_domains_bartlett(){
+    let crystal_length = 1000e-6 * M;
+    let pp = PeriodicPoling::new(10e-6 * M, Apodization::Bartlett(1.));
+    let domains = pp.poling_domains(crystal_length);
+    assert_eq!(domains, vec![0.5; 100]);
+  }
+
+  #[test]
+  fn test_poling_domains_gaussian(){
+    let crystal_length = 1000e-6 * M;
+    let pp = PeriodicPoling::new(10e-6 * M, Apodization::Gaussian{ fwhm: 800e-6 * M });
+    let domains = pp.poling_domains(crystal_length);
+    assert_eq!(domains, vec![0.5; 100]);
+  }
+
+  #[test]
+  fn test_poling_domains_step(){
+    let crystal_length = 100e-6 * M;
+    let step_function = vec![
+      0., 0., 0., 0., 0., 0.,
+      1., 1., 1., 1., 1., 1.
+    ];
+    let pp = PeriodicPoling::new(
+      10e-6 * M,
+      Apodization::Interpolate(step_function)
+    );
+    let domains = pp.poling_domains(crystal_length);
+    assert_eq!(
+      domains,
+      vec![
+        0.,  0.,  0.,  0.,  0.,
+        0.5, 0.5, 0.5, 0.5, 0.5
+      ]
+    );
   }
 }
