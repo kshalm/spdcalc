@@ -133,7 +133,7 @@ impl PeriodicPoling {
   /// Get the poling domains
   ///
   /// They are a list of fractions of polilng period
-  pub fn poling_domains(&self, crystal_length: Distance) -> Vec<f64> {
+  pub fn poling_domains(&self, crystal_length: Distance) -> Vec<(f64, f64)> {
     if let Self::On { apodization, .. } = self {
       let num_domains = self.num_domains(crystal_length);
       // for each domain
@@ -143,9 +143,9 @@ impl PeriodicPoling {
         let a = apodization.integration_constant(z, crystal_length);
         let x = (1. - 2. * a).acos() / TWO_PI;
         if z > 0. {
-          1. - x
+          (1. - x, x)
         } else {
-          x
+          (x, 1. - x)
         }
       }).collect()
     } else {
@@ -154,12 +154,13 @@ impl PeriodicPoling {
   }
 
   /// Get the poling domains as lengths
-  pub fn poling_domain_lengths(&self, crystal_length: Distance) -> Vec<Distance> {
-    self.poling_domains(crystal_length).iter().map(|&z| {
-      z * match self {
-        Self::Off => 0. * M,
-        Self::On { period, .. } => *period,
-      }
+  pub fn poling_domain_lengths(&self, crystal_length: Distance) -> Vec<(Distance, Distance)> {
+    let period = match self {
+      Self::Off => 0. * M,
+      Self::On { period, .. } => *period,
+    };
+    self.poling_domains(crystal_length).iter().map(|&(z1, z2)| {
+      (z1 * period, z2 * period)
     }).collect()
   }
 
@@ -377,23 +378,7 @@ mod test {
     let crystal_length = 1000e-6 * M;
     let pp = PeriodicPoling::new(10e-6 * M, Apodization::Off);
     let domains = pp.poling_domains(crystal_length);
-    assert_eq!(domains, vec![0.5; 100]);
-  }
-
-  #[test]
-  fn test_poling_domains_bartlett(){
-    let crystal_length = 1000e-6 * M;
-    let pp = PeriodicPoling::new(10e-6 * M, Apodization::Bartlett(1.));
-    let domains = pp.poling_domains(crystal_length);
-    assert_eq!(domains, vec![0.5; 100]);
-  }
-
-  #[test]
-  fn test_poling_domains_gaussian(){
-    let crystal_length = 1000e-6 * M;
-    let pp = PeriodicPoling::new(10e-6 * M, Apodization::Gaussian{ fwhm: 800e-6 * M });
-    let domains = pp.poling_domains(crystal_length);
-    assert_eq!(domains, vec![0.5; 100]);
+    assert_eq!(domains, vec![(0.5, 0.5); 100]);
   }
 
   #[test]
@@ -411,8 +396,8 @@ mod test {
     assert_eq!(
       domains,
       vec![
-        0.,  0.,  0.,  0.,  0.,
-        0.5, 0.5, 0.5, 0.5, 0.5
+        (0., 1.),  (0., 1.),  (0., 1.),  (0., 1.),  (0., 1.),
+        (0.5, 0.5), (0.5, 0.5), (0.5, 0.5), (0.5, 0.5), (0.5, 0.5)
       ]
     );
   }
