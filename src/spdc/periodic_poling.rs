@@ -156,7 +156,10 @@ impl PeriodicPoling {
   /// Get the poling domains as lengths
   pub fn poling_domain_lengths(&self, crystal_length: Distance) -> Vec<Distance> {
     self.poling_domains(crystal_length).iter().map(|&z| {
-      z * crystal_length
+      z * match self {
+        Self::Off => 0. * M,
+        Self::On { period, .. } => *period,
+      }
     }).collect()
   }
 
