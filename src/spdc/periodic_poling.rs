@@ -141,7 +141,7 @@ impl PeriodicPoling {
         // 0.5 to get value in middle of domain
         let z = lerp(-1., 1., (i as f64 + 0.5) / num_domains as f64);
         let a = apodization.integration_constant(z, crystal_length);
-        let x = (1. - 2. * a).acos() / TWO_PI;
+        let x = (1. - 2. * a.powi(2)).acos() / TWO_PI;
         if z > 0. {
           (1. - x, x)
         } else {
