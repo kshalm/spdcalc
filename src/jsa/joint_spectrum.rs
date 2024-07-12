@@ -1,9 +1,17 @@
 use crate::{SPDC, Frequency, PerMeter4, PerMeter3, Complex, phasematch::*, JsiNorm, JSIUnits, FrequencySpace, IntoSignalIdlerIterator, JsiSinglesNorm, SPDCError};
 
+fn invalid_frequencies(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC) -> bool {
+  let omega_p = spdc.pump.frequency();
+  omega_s <= Frequency::new(0.) || omega_i <= Frequency::new(0.) || omega_s > omega_p || omega_i > omega_p
+}
+
 /// The raw joint spectrum amplitude
 ///
 /// This is the JSA for coincidences that does not include count rate constants.
 pub fn jsa_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_steps: Option<usize>) -> Complex<f64> {
+  if invalid_frequencies(omega_s, omega_i, spdc) {
+    return Complex::new(0., 0.);
+  }
   let alpha = pump_spectral_amplitude(omega_s + omega_i, spdc);
   // check the threshold
   if alpha < spdc.pump_spectrum_threshold {
@@ -18,6 +26,9 @@ pub fn jsa_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_
 ///
 /// This is the JSI for singles that does not include count rate constants.
 pub fn jsi_singles_raw(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC, integration_steps: Option<usize>) -> f64 {
+  if invalid_frequencies(omega_s, omega_i, spdc) {
+    return 0.;
+  }
   let alpha = pump_spectral_amplitude(omega_s + omega_i, spdc);
   // check the threshold
   if alpha < spdc.pump_spectrum_threshold {
