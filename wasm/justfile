@@ -4,7 +4,7 @@ build-wapm:
   echo "Building locally"
   # cargo wapm -d --out-dir ./wapm
   # cargo build --target wasm32-unknown-unknown
-  # cp target/wasm32-unknown-unknown/release/spdcalc.wasm wapm/
+  # cp target/wasm32-unknown-unknown/release/spdcalc_wasm.wasm wapm/spdcalc.wasm
 
   # RUSTFLAGS='-C target-feature=+atomics,+bulk-memory,+mutable-globals' \
   #   rustup run nightly-2023-05-31 \
@@ -28,8 +28,9 @@ build-py: build-wapm
   cp py/pyproject-template.toml py/package/pyproject.toml
 
 publish-py-test: build-py
+  pip install --upgrade build twine
   cd {{justfile_directory()}}/py/package && \
-    rm dist/* && \
+    rm -rf dist/* && \
     python3 -m build && \
     python3 -m twine upload --repository testpypi dist/*
 
@@ -38,4 +39,7 @@ test-js: build-js
   node js/index.mjs
 
 test-py: build-py
+  python3 -m venv .pyenv
+  source .pyenv/bin/activate
+  pip install wasmer==1.0.0 wasmer_compiler_cranelift==1.0.0
   python3 py/test.py

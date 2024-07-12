@@ -1,3 +1,4 @@
 js/package
 wapm/*
 py/package
+.pyenv

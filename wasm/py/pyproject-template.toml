@@ -1,6 +1,6 @@
 [project]
 name = "spdcalc"
-version = "0.1.3"
+version = "0.1.4"
 keywords = []
 readme = "README.md"
 dependencies = ["wasmer", "wasmer_compiler_cranelift"]
