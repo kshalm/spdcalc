@@ -37,6 +37,7 @@ pub fn phasematch_sinc(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> 
 #[allow(non_snake_case)]
 pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> PerMeter4<Complex<f64>> {
   // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, steps);
+  // return phasematch_sinc(omega_s, omega_i, spdc);
   // crystal length
   let L = spdc.crystal_setup.length;
 
@@ -56,22 +57,25 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
   let theta_i_e = spdc.idler.theta_external(&spdc.crystal_setup);
 
-  // Height of the collected spots from the z axis.
-  let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
-  let hi = L * 0.5 * tan(theta_i) * cos(phi_i);
-
   let Ws_SQ = spdc.signal.waist().x_by_y_sqr();
   let Wi_SQ = spdc.idler.waist().x_by_y_sqr();
 
   let Wx_SQ = sq(spdc.pump.waist().x);
   let Wy_SQ = sq(spdc.pump.waist().y);
 
-  let PHI_s = cos(theta_s_e).powi(-2);
-  let PHI_i = cos(theta_i_e).powi(-2);
+  let SEC_2_THETA_s = cos(theta_s_e).powi(-2);
+  let SEC_2_THETA_i = cos(theta_i_e).powi(-2);
 
   let z0 = 0. * M; //put pump in middle of the crystal
   let z0s = spdc.signal_waist_position;
   let z0i = spdc.idler_waist_position;
+
+  // Height of the collected spots from the z axis.
+  // TODO: check
+  // let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
+  // let hi = L * 0.5 * tan(theta_i) * cos(phi_i);
+  let hs = spot_height(L, z0s, theta_s, phi_s);
+  let hi = spot_height(L, z0i, theta_i, phi_i);
 
   let SIN_THETA_s_e = sin(theta_s_e);
   let SIN_THETA_i_e = sin(theta_i_e);
@@ -87,8 +91,10 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
   let k_p = frequency_to_wavenumber(omega_p, n_p);
   let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
   let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
-  let k_s = frequency_to_wavenumber(omega_s, n_s);
-  let k_i = frequency_to_wavenumber(omega_i, n_i);
+  // let k_s = frequency_to_wavenumber(omega_s, n_s);
+  // let k_i = frequency_to_wavenumber(omega_i, n_i);
+  let k_s = (spdc.signal.wavevector(omega_s, &spdc.crystal_setup) * M / RAD).z * RAD / M;
+  let k_i = (spdc.idler.wavevector(omega_i, &spdc.crystal_setup) * M / RAD).z * RAD / M;
 
   // Now calculate the the coeficients that get repeatedly used.
   // This is from Karina's code.
@@ -97,8 +103,8 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
 
   let GAM2s = -0.25 * Ws_SQ;
   let GAM2i = -0.25 * Wi_SQ;
-  let GAM1s = GAM2s * PHI_s;
-  let GAM1i = GAM2i * PHI_i;
+  let GAM1s = GAM2s * SEC_2_THETA_s;
+  let GAM1i = GAM2i * SEC_2_THETA_i;
 
   let GAM3s = -2. * ks_f * GAM1s * SIN_THETA_s_e * COS_PHI_s;
   let GAM3i = -2. * ki_f * GAM1i * SIN_THETA_i_e * COS_PHI_i;
@@ -108,10 +114,12 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
   let zhi = z0i + hi * SIN_THETA_i_e * COS_PHI_i;
   let DEL2s = (0.5 / ks_f) * zhs * RAD;
   let DEL2i = (0.5 / ki_f) * zhi * RAD;
-  let DEL1s = DEL2s * PHI_s;
-  let DEL1i = DEL2i * PHI_i;
-  let DEL3s = -hs - zhs * PHI_s * SIN_THETA_s_e * COS_PHI_s;
-  let DEL3i = -hi - zhi * PHI_i * SIN_THETA_i_e * COS_PHI_i;
+  let DEL1s = DEL2s * SEC_2_THETA_s;
+  let DEL1i = DEL2i * SEC_2_THETA_i;
+  let DEL3s = -hs - zhs * SEC_2_THETA_s * SIN_THETA_s_e * COS_PHI_s;
+  let DEL3i = -hi - zhi * SEC_2_THETA_i * SIN_THETA_i_e * COS_PHI_i;
+  // TODO: when z0s and z0i are used we're assuming they exit the crystal at z0,
+  // but with counterpropagation what happens here?
   let DEL4s = 0.5 * ks_f * zhs * TAN_THETA_s_e.powi(2) - ks_f * z0s;
   let DEL4i = 0.5 * ki_f * zhi * TAN_THETA_i_e.powi(2) - ki_f * z0i;
 
@@ -307,8 +315,8 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
   let Wx_SQ = sq(spdc.pump.waist().x);
   let Wy_SQ = sq(spdc.pump.waist().y);
 
-  let PHI_s = sec(theta_s_e).powi(2);
-  let PHI_i = sec(theta_i_e).powi(2);
+  let SEC_2_THETA_s = sec(theta_s_e).powi(2);
+  let SEC_2_THETA_i = sec(theta_i_e).powi(2);
 
   // TODO: Should i be doing this?
   let omega_p = omega_s + omega_i; // spdc.pump.frequency();
@@ -352,16 +360,16 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
   let Wfs_SQ = complex!(Ws_SQ, -2. * zhs / ks_f * RAD, M2);
   let Wfi_SQ = complex!(Wi_SQ, -2. * zhi / ki_f * RAD, M2);
 
-  let As = -0.25 * (real!(Wx_SQ, M2) + Wfs_SQ * PHI_s);
-  let Ai = -0.25 * (real!(Wx_SQ, M2) + Wfi_SQ * PHI_i);
+  let As = -0.25 * (real!(Wx_SQ, M2) + Wfs_SQ * SEC_2_THETA_s);
+  let Ai = -0.25 * (real!(Wx_SQ, M2) + Wfi_SQ * SEC_2_THETA_i);
   let Bs = -0.25 * (Wfs_SQ + real!(Wy_SQ, M2));
   let Bi = -0.25 * (Wfi_SQ + real!(Wy_SQ, M2));
   let Cs = -0.25 * (k_p * L - 2. * k_s * z0) / (k_s * k_p);
   let Ci = -0.25 * (k_p * L - 2. * k_i * z0) / (k_i * k_p);
   let Ds = 0.25 * L * (k_p - k_s) / (k_p * k_s);
   let Di = 0.25 * L * (k_p - k_i) / (k_p * k_i);
-  let Es = 0.5 * Wfs_SQ * PHI_s * PSI_s;
-  let Ei = 0.5 * Wfi_SQ * PHI_i * PSI_i;
+  let Es = 0.5 * Wfs_SQ * SEC_2_THETA_s * PSI_s;
+  let Ei = 0.5 * Wfi_SQ * SEC_2_THETA_i * PSI_i;
   let mx = complex!(-0.5 * Wx_SQ, z0 / k_p * RAD, M2);
   let my = complex!(-0.5 * Wy_SQ, z0 / k_p * RAD, M2);
   let m = L / (2. * k_p);
@@ -371,7 +379,7 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
   let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
-  let hh = -0.25 * (Wfi_SQ * PHI_i * sq(PSI_i) + Wfs_SQ * PHI_s * sq(PSI_s));
+  let hh = -0.25 * (Wfi_SQ * SEC_2_THETA_i * sq(PSI_i) + Wfs_SQ * SEC_2_THETA_s * sq(PSI_s));
 
   let A5 = Es + im!(hs, M);
   let A5sq = A5 * A5;

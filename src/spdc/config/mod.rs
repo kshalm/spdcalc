@@ -6,7 +6,7 @@ use crate::{CrystalSetup, CrystalType, dim::{
 use serde::{Serialize, Deserialize};
 
 mod periodic_poling_config;
-pub use periodic_poling_config::{PeriodicPolingConfig};
+pub use periodic_poling_config::PeriodicPolingConfig;
 mod apodization;
 pub use apodization::ApodizationConfig;
 use serde_with::{serde_as, DisplayFromStr};
@@ -63,6 +63,7 @@ pub struct CrystalConfig {
   pub theta_deg: AutoCalcParam<f64>,
   pub length_um: f64,
   pub temperature_c: f64,
+  pub counter_propagation: bool,
 }
 
 impl Default for CrystalConfig {
@@ -74,6 +75,7 @@ impl Default for CrystalConfig {
       theta_deg: AutoCalcParam::Auto("auto".into()),
       length_um: 2_000.,
       temperature_c: 20.,
+      counter_propagation: false,
     }
   }
 }
@@ -93,6 +95,7 @@ impl From<CrystalConfig> for CrystalSetup {
       theta,
       length: cfg.length_um * MICRO * M,
       temperature: utils::from_celsius_to_kelvin(cfg.temperature_c),
+      counter_propagation: cfg.counter_propagation,
     }
   }
 }
@@ -106,6 +109,7 @@ impl From<CrystalSetup> for CrystalConfig {
       phi_deg: sigfigs(*(setup.phi / DEG), SIG_FIGS_IN_CONFIG),
       length_um: sigfigs(*(setup.length / (MICRO * M)), SIG_FIGS_IN_CONFIG),
       temperature_c: sigfigs(from_kelvin_to_celsius(setup.temperature), SIG_FIGS_IN_CONFIG),
+      counter_propagation: setup.counter_propagation,
     }
   }
 }
@@ -434,7 +438,8 @@ mod test {
         phi: 0. * RAD,
         theta: 0. * RAD,
         length: 2000. * MICRO * M,
-        temperature: 293.15 * ucum::K
+        temperature: 293.15 * ucum::K,
+        counter_propagation: false,
       };
       let signal = Beam::new(
         PolarizationType::Extraordinary,

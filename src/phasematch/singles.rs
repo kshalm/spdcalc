@@ -2,7 +2,7 @@ use crate::{math::*, utils::frequency_to_wavenumber};
 use crate::*;
 use super::*;
 use dim::ucum::{RAD, M};
-use num::{Complex};
+use num::Complex;
 
 /// Evaluate the fiber coupled singles phasematching function for a given set of frequencies
 ///
@@ -17,9 +17,6 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
   let phi_s = spdc.signal.phi();
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
 
-  // Height of the collected spots from the axis.
-  let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
-
   let Ws_SQ = spdc.signal.waist().x_by_y_sqr();
 
   let Wx_SQ = sq(spdc.pump.waist().x);
@@ -29,14 +26,22 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
   let n_p = spdc.pump.refractive_index(omega_p, &spdc.crystal_setup);
   let k_p = frequency_to_wavenumber(omega_p, n_p);
   let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
-  let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
-  let k_s = frequency_to_wavenumber(omega_s, n_s);
-  let k_i = frequency_to_wavenumber(omega_i, n_i);
+  // let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
+  // let k_s = frequency_to_wavenumber(omega_s, n_s);
+  // let k_i = frequency_to_wavenumber(omega_i, n_i);
+  let k_s = (spdc.signal.wavevector(omega_s, &spdc.crystal_setup) * M / RAD).z * RAD / M;
+  let k_i = (spdc.idler.wavevector(omega_i, &spdc.crystal_setup) * M / RAD).z * RAD / M;
 
   let PHI_s = cos(theta_s_e).powi(-2);
 
   let z0 = 0. * M; //put pump in middle of the crystal
   let z0s = spdc.signal_waist_position;
+
+  // Height of the collected spots from the z axis.
+  // TODO: check
+  // let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
+  // let hi = L * 0.5 * tan(theta_i) * cos(phi_i);
+  let hs = spot_height(L, z0s, theta_s, phi_s);
 
   let RHOpx = tan(spdc.pump.walkoff_angle(&spdc.crystal_setup));
 

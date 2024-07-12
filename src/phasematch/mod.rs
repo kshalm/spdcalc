@@ -2,7 +2,7 @@
 
 use crate::{*, utils::vacuum_wavelength_to_frequency};
 use math::*;
-use dim::{ucum::{C_, M}};
+use dim::ucum::{C_, M};
 
 // ensures that the Gaussian and sinc functions have the same widths.
 // ref: https://arxiv.org/pdf/1711.00080.pdf (page 9)
@@ -55,6 +55,20 @@ pub fn integration_steps_best_guess(crystal_length: Distance) -> usize {
   let zslice = 1e-4 * clamp((*(crystal_length/M) / 2.5e-3).sqrt(), 0., 5.);
   let slices = (*(crystal_length/M) / zslice) as usize;
   max(slices + slices % 2 - 2, 4) // nearest even.. minimum 4
+}
+
+// Height of the collected spots from the z axis.
+fn spot_height(crystal_length: Distance, _focus_z: Distance, theta: Angle, phi: Angle) -> Distance {
+  // TODO: for now revert to old implementation
+  crystal_length * 0.5 * tan(theta) * cos(phi)
+  // let tn = tan(theta);
+  // // focus is always from end of crystal and is negative
+  // // if tan(theta) is negative, then the focus is on the other side of the crystal
+  // if tn > 0. {
+  //   -focus_z * tn * cos(phi)
+  // } else {
+  //   (crystal_length + focus_z) * tn * cos(phi)
+  // }
 }
 
 mod normalization;

@@ -2,7 +2,7 @@
 //!
 //! Used for pump, signal, idler beams
 use crate::{*, crystal::CrystalSetup, PeriodicPoling, math::*, utils::{vacuum_wavelength_to_frequency, frequency_to_vacuum_wavelength, frequency_to_wavenumber}};
-use dim::{ucum::{self, C_, M, RAD}};
+use dim::ucum::{self, C_, M, RAD};
 use na::*;
 use std::{f64::{self, consts::FRAC_PI_2}, ops::{Deref, DerefMut}};
 mod beam_waist;
@@ -111,7 +111,7 @@ impl IdlerBeam {
 
     let ns = signal.refractive_index(signal.frequency(), crystal_setup);
     let np = pump.refractive_index(pump.frequency(), crystal_setup);
-    let del_k_pp = ls * pp.as_ref().pp_factor();
+    let k_pp = ls * pp.as_ref().pp_factor(); // ls / period
     let theta_s = signal.theta_internal();
     let ns_z = ns * cos(theta_s);
     let ls_over_lp = ls / lp;
@@ -120,13 +120,13 @@ impl IdlerBeam {
     // old code...
     // let arg = (ns * ns)
     //   + np_by_ls_over_lp.powi(2)
-    //   + 2. * (del_k_pp * ns_z - np_by_ls_over_lp * ns_z - del_k_pp * np_by_ls_over_lp)
-    //   + del_k_pp * del_k_pp;
+    //   + 2. * (k_pp * ns_z - np_by_ls_over_lp * ns_z - k_pp * np_by_ls_over_lp)
+    //   + k_pp * k_pp;
 
     // simplified calculation
     let numerator = ns * sin(theta_s);
     let arg =
-      (ns_z - np_by_ls_over_lp + del_k_pp).powi(2)
+      (ns_z - np_by_ls_over_lp + k_pp).powi(2)
       + ns.powi(2);
 
     let val = (*numerator) / arg.sqrt();
@@ -135,7 +135,11 @@ impl IdlerBeam {
     //   return Err(SPDCError("Invalid solution for optimal idler theta".into()));
     // }
 
-    let theta = f64::asin(val) * ucum::RAD;
+    let theta = if (theta_s > PI / 2. * RAD) ^ crystal_setup.counter_propagation {
+      PI - f64::asin(val)
+    } else {
+      f64::asin(val)
+    } * ucum::RAD;
     let wavelength = ls * lp / (ls - lp);
     let phi = normalize_angle(signal.phi() + PI * RAD);
 
@@ -448,6 +452,7 @@ mod tests {
       phi :         1.0 * DEG,
       length :      2_000.0 * MICRO * M,
       temperature : from_celsius_to_kelvin(20.0),
+      counter_propagation : false,
     };
 
     let signal = Beam::new(PolarizationType::Extraordinary, phi, theta, wavelength, waist);
@@ -549,6 +554,7 @@ mod tests {
       phi :         1.0 * DEG,
       length :      2_000.0 * MICRO * M,
       temperature : from_celsius_to_kelvin(20.0),
+      counter_propagation : false,
     };
 
     let signal = Beam::new(PolarizationType::Extraordinary, 15. * DEG, 10. * DEG, 1550. * NANO * M, 100. * MICRO * M).into();

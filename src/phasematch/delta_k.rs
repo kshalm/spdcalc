@@ -1,6 +1,6 @@
 use super::*;
 use na::Vector3;
-use dim::{ucum::{M}};
+use dim::ucum::M;
 
 /// Calculate the difference in momentum for pump -> signal idler.
 ///
@@ -24,7 +24,11 @@ pub fn delta_k<P: AsRef<PeriodicPoling>>(
   match pp.as_ref() {
     PeriodicPoling::On { .. } => {
       let zhat = Vector3::<f64>::z_axis();
-      delta_k - Wavevector::new(zhat.as_ref() * *(TWO_PI * pp.as_ref().pp_factor() * M))
+      // 2PI / period
+      delta_k - Wavevector::new(
+        zhat.as_ref() *
+        *(TWO_PI * pp.as_ref().pp_factor() * M)
+      )
     },
     PeriodicPoling::Off => delta_k
   }
@@ -45,6 +49,7 @@ mod test {
       phi :         1.0 * DEG,
       length :      2_000.0 * MICRO * M,
       temperature : from_celsius_to_kelvin(20.0),
+      counter_propagation : false,
     };
 
     let signal = Beam::new(PolarizationType::Extraordinary, 15. * DEG, 10. * DEG, 1550. * NANO * M, 100.0 * MICRO * M).into();

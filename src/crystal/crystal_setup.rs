@@ -21,6 +21,8 @@ pub struct CrystalSetup {
   pub length :      Meter<f64>,
   /// The temperature of the crystal
   pub temperature : Kelvin<f64>,
+  /// Whether the signal beam is traveling in the opposite z direction as the idler
+  pub counter_propagation : bool,
 }
 
 impl AsRef<CrystalSetup> for CrystalSetup {

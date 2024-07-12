@@ -111,7 +111,16 @@ impl SPDC {
 
   /// Convert it into an optimum setup
   pub fn try_as_optimum(mut self) -> Result<Self, SPDCError> {
-    self.signal.set_angles(0. * DEG, 0. * DEG);
+    if self.crystal_setup.counter_propagation {
+      // if counter-prop then set signal theta to front or back
+      if self.signal.theta_internal() < 90. * DEG {
+        self.signal.set_angles(0. * DEG, 0. * DEG);
+      } else {
+        self.signal.set_angles(0. * DEG, 180. * DEG);
+      }
+    } else {
+      self.signal.set_angles(0. * DEG, 0. * DEG);
+    }
     let pp = match &self.pp {
       PeriodicPoling::Off => {
         self.crystal_setup.assign_optimum_theta(&self.signal, &self.pump);
