@@ -279,19 +279,19 @@ pub fn optimum_poling_period(
   // the sign of the z component of delta k gives the sign of pp
   let sign = z.into();
 
-  let spdc = Mutex::new(SPDC::new(
-    crystal_setup.clone(),
-    signal.clone(),
-    IdlerBeam::try_new_optimum(signal, pump, crystal_setup, PeriodicPoling::Off).unwrap(),
-    pump.clone(),
-    5e-9 * M,
-    1e-3 * W,
-    1e-2,
-    PeriodicPoling::Off,
-    0. * M,
-    0. * M,
-    1e-12 * M / V,
-  ).with_optimal_waist_positions());
+  // let spdc = Mutex::new(SPDC::new(
+  //   crystal_setup.clone(),
+  //   signal.clone(),
+  //   IdlerBeam::try_new_optimum(signal, pump, crystal_setup, PeriodicPoling::Off).unwrap(),
+  //   pump.clone(),
+  //   5e-9 * M,
+  //   1e-3 * W,
+  //   1e-2,
+  //   PeriodicPoling::Off,
+  //   0. * M,
+  //   0. * M,
+  //   1e-12 * M / V,
+  // ).with_optimal_waist_positions());
 
   // minimizable delta k function based on period (using predetermined sign)
   let pm = |period| {
@@ -301,19 +301,24 @@ pub fn optimum_poling_period(
       apodization: Apodization::Off,
     };
 
-    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, &pp).unwrap();
-    let wi = idler.frequency();
+    delta_kz(pp).abs()
 
-    let mut spdc = spdc.lock().unwrap();
-    spdc.idler = idler;
-    spdc.pp = pp;
+    // THIS was an attempt to use JSI at middle to optimize
+    // the periodic poling. Since the min deltakz wasn't
+    // lining up with maximum JSI.
+    // let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, &pp).unwrap();
+    // let wi = idler.frequency();
 
-    -(phasematch_fiber_coupling(
-      signal.frequency(),
-      wi,
-      &spdc,
-      None
-    ) / PerMeter4::new(1.)).norm_sqr()
+    // let mut spdc = spdc.lock().unwrap();
+    // spdc.idler = idler;
+    // spdc.pp = pp;
+
+    // -(phasematch_fiber_coupling(
+    //   signal.frequency(),
+    //   wi,
+    //   &spdc,
+    //   None
+    // ) / PerMeter4::new(1.)).norm_sqr()
   };
 
   // maximum period is the length of the crystal
