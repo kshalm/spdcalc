@@ -81,32 +81,57 @@ impl SPDC {
     use dim::ucum::{RAD, S};
     let wp = self.pump.frequency();
     let lambda_p = self.pump.vacuum_wavelength();
-
     // find radius of pump spectrum in frequency
     let fwhm = self.pump_bandwidth;
     let waist = fwhm_to_spectral_width(lambda_p, fwhm);
     let dw_to_spectrum_edge = (- f64::ln(0.02)).sqrt() * waist;
     let d_sum = *(0.5 * dw_to_spectrum_edge / (RAD / S));
 
-    // find delta of jsi from peak to zero-ish
-    let spectrum = self.joint_spectrum(None);
-    let jsi = |d_diff| {
-      let ws = 0.5 * wp - d_diff * (RAD / S);
-      let wi = 0.5 * wp + d_diff * (RAD / S);
-      spectrum.jsi_normalized(ws, wi)
-    };
+    if self.crystal_setup.counter_propagation {
+      // find radius of signal and idler range independently
+      let spectrum = self.joint_spectrum(None);
 
-    let max = 64. * d_sum;
-    let guess = d_sum;
-    let d_diff = nelder_mead_1d(jsi, (0., guess), 1000, 0., max, 1e-3);
+      let ws = self.signal.frequency();
+      let wi = self.idler.frequency();
 
-    let buffer = 1.;
-    let dxy = buffer * d_diff.max(d_sum) * (RAD / S);
+      let max = 64. * d_sum;
+      let guess = 5e11;
+      let s_diff = nelder_mead_1d(|d| {
+        spectrum.jsi_normalized(ws + d * (RAD / S), wi)
+      }, (0., guess), 1000, 0., max, 1e-3);
+      let s_diff = s_diff * (RAD / S);
 
-    SumDiffFrequencySpace::new(
-      (0.5 * wp - dxy, 0.5 * wp + dxy, resolution),
-      (-dxy, dxy, resolution)
-    ).as_frequency_space()
+      let i_diff = nelder_mead_1d(|d| {
+        spectrum.jsi_normalized(ws, wi + d * (RAD / S))
+      }, (0., guess), 1000, 0., max, 1e-3);
+      let i_diff = i_diff * (RAD / S);
+
+      FrequencySpace::new(
+        (ws - s_diff, ws + s_diff, resolution),
+        (wi - i_diff, wi + i_diff, resolution)
+      )
+    } else {
+      // find delta of jsi from peak to zero-ish
+      let spectrum = self.joint_spectrum(None);
+      let jsi = |d_diff| {
+        let ws = 0.5 * wp - d_diff * (RAD / S);
+        let wi = 0.5 * wp + d_diff * (RAD / S);
+        spectrum.jsi_normalized(ws, wi)
+      };
+
+      let max = 64. * d_sum;
+      let guess = d_sum;
+      let d_diff = nelder_mead_1d(jsi, (0., guess), 1000, 0., max, 1e-3);
+
+      let buffer = 1.;
+      let dxy = buffer * d_diff.max(d_sum) * (RAD / S);
+      let y0 = 0.5 * (self.idler.frequency() - self.signal.frequency());
+
+      SumDiffFrequencySpace::new(
+        (0.5 * wp - dxy, 0.5 * wp + dxy, resolution),
+        (y0 - dxy, y0 + dxy, resolution)
+      ).as_frequency_space()
+    }
   }
 
   /// Convert it into an optimum setup
