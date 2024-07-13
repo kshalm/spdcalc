@@ -31,6 +31,11 @@ pub fn phasematch_sinc(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> 
   PerMeter4::new(pmz * pmt)
 }
 
+// lazy_static::lazy_static! {
+//   static ref GAUSS_KONROD: quad_rs::GaussKronrod<f64> = quad_rs::GaussKronrod::new(5)
+//     .with_maximum_function_evaluations(1_000_000);
+// }
+
 /// Evaluate the phasematching function for fiber coupling
 ///
 /// This is the secret sauce of spdcalc.
@@ -236,23 +241,24 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
     let invA2 = A2.inv();
     let term4 = -2. * A1 * A7 + A5 * A8;
     let term5 = -2. * A2 + A9;
+    let denom1 = 4. * A1 * A3 - A8sq;
+    let denom2 = 4. * A2 * A4 - A9sq;
+
     let numerator = ((
       4. * A10
       - invA1 * (
         A5sq
-        + (term4 * term4) / (4. * A1 * A3 - A8sq)
+        + (term4 * term4) / denom1
       )
       - invA2 * A6sq * (
-        1. + (term5 * term5) / (4. * A2 * A4 - A9sq)
+        1. + (term5 * term5) / denom2
       )
     ) / 4.).exp();
 
     // Now deal with the denominator in the integral:
     // Sqrt[A1 A2 (-4 A3 + A8^2/A1) (-4 A4 + A9^2/A2)]
     let denominator = (
-      A1 * A2
-      * (-4. * A3 + A8sq * invA1)
-      * (-4. * A4 + A9sq * invA2)
+      denom1 * denom2
     ).sqrt();
 
     // dbg!(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10);
@@ -267,6 +273,19 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
 
   let integrator = SimpsonIntegration::new(fn_z);
   let result = 0.5 * integrator.integrate(-1., 1., steps.unwrap_or_else(|| integration_steps_best_guess(L)));
+
+  // use quad_rs::Integrate;
+  // let integrator = GAUSS_KONROD.clone()
+  //   .with_absolute_tolerance(1e-18)
+  //   .with_relative_tolerance(1e2);
+  // let result = 0.5 * integrator.integrate(
+  //   &|f: Complex<f64>| fn_z(f.re),
+  //   std::ops::Range {
+  //     start: Complex::new(-1., 0.),
+  //     end: Complex::new(1., 0.)
+  //   },
+  //   None
+  // ).unwrap().result.unwrap();
   PerMeter4::new(result)
 }
 
