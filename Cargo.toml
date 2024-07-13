@@ -12,25 +12,26 @@ crate-type = ["rlib"]
 
 [dependencies]
 num = "0.4"
-nalgebra = "0.31"
+nalgebra = "0.33"
 dimensioned = { version = "0.8", features = ["serde"] }
 # nelder_mead = { git = "https://github.com/JD557/nelder-mead.rs" }
 # optimize = "0.1" # ... needs ndarray 0.11
-argmin = { version = "0.7", default-features = false }
+argmin = { version = "0.10", default-features = false }
 ndarray = "0.15"
 serde = "^1.0"
 serde_derive = "^1.0"
-serde_with = "2.3"
+serde_with = "3.8"
 regex = "1.7"
 lazy_static = "1.4"
+# quad-rs = { git = "https://github.com/wellcaffeinated/quad-rs", rev = "9d3d8618e39c499d92786d62af75804387af183a" }
 
 [features]
 default = []
 wasm-bindgen = ["argmin/wasm-bindgen"]
 
 [dev-dependencies]
-criterion = "0.2"
-float-cmp = "0.5"
+criterion = "0.5"
+float-cmp = "0.9"
 serde_json = "1.0"
 
 [profile.release]
