@@ -1,8 +1,12 @@
 use crate::{SPDC, Frequency, PerMeter4, PerMeter3, Complex, phasematch::*, JsiNorm, JSIUnits, FrequencySpace, IntoSignalIdlerIterator, JsiSinglesNorm, SPDCError};
 
+// This defines a more than reasonable box around frequency ranges to...
+// 1. speed up calculations
+// 2. avoid non-sensical values
 fn invalid_frequencies(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC) -> bool {
   let omega_p = spdc.pump.frequency();
-  omega_s <= Frequency::new(0.) || omega_i <= Frequency::new(0.) || omega_s > omega_p || omega_i > omega_p
+  use crate::dim::Abs;
+  omega_s <= Frequency::new(0.) || omega_i <= Frequency::new(0.) || omega_s > omega_p || omega_i > omega_p || (omega_s - omega_i).abs() > 0.75 * omega_p
 }
 
 /// The raw joint spectrum amplitude
