@@ -367,6 +367,21 @@ impl Beam {
     self
   }
 
+  /// Set phi
+  pub fn set_phi(&mut self, phi : Angle) -> &mut Self {
+    self.phi = phi;
+    self.update_direction();
+    self
+  }
+
+  /// Set theta internal
+  pub fn set_theta_internal(&mut self, theta : Angle) -> &mut Self {
+    assert!(*(theta / ucum::RAD) <= PI && *(theta / ucum::RAD) >= 0.);
+    self.theta = theta;
+    self.update_direction();
+    self
+  }
+
   /// Set the external azimuthal angle
   pub fn set_theta_external(&mut self, external : Angle, crystal_setup : &CrystalSetup) -> &mut Self {
     use dim::Abs;
