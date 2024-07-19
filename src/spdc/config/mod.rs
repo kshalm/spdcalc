@@ -58,11 +58,13 @@ pub struct CrystalConfig {
   pub kind: CrystalType,
   #[serde_as(as = "DisplayFromStr")]
   pub pm_type: PMType,
+  #[serde(default)]
   pub phi_deg: f64,
   #[serde(default)]
   pub theta_deg: AutoCalcParam<f64>,
   pub length_um: f64,
   pub temperature_c: f64,
+  #[serde(default)]
   pub counter_propagation: bool,
 }
 
@@ -153,6 +155,7 @@ impl PumpConfig {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SignalConfig {
   pub wavelength_nm: f64,
+  #[serde(default)]
   pub phi_deg: f64,
   // one of...
   pub theta_deg: Option<f64>,
@@ -200,6 +203,7 @@ impl SignalConfig {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct IdlerConfig {
   pub wavelength_nm: f64,
+  #[serde(default)]
   pub phi_deg: f64,
   // one of...
   pub theta_deg: Option<f64>,
@@ -241,6 +245,14 @@ pub struct SPDCConfig {
   #[serde(default)]
   pub periodic_poling: PeriodicPolingConfig,
   pub deff_pm_per_volt: f64,
+}
+
+impl TryFrom<SPDCConfig> for SPDC {
+  type Error = SPDCError;
+
+  fn try_from(config: SPDCConfig) -> Result<Self, Self::Error> {
+    config.try_as_spdc()
+  }
 }
 
 impl SPDCConfig {
