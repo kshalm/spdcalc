@@ -73,13 +73,11 @@ impl From<SumDiffFrequencySpace> for FrequencySpace {
 
 
 pub trait IntoSignalIdlerIterator {
-  type IntoIter: Iterator<Item = (Frequency, Frequency)>;
-  fn into_signal_idler_iterator(self) -> Self::IntoIter;
+  fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)>;
 }
 
 impl IntoSignalIdlerIterator for FrequencySpace {
-  type IntoIter = Iterator2D<Frequency>;
-  fn into_signal_idler_iterator(self) -> Self::IntoIter {
+  fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
     self.0.into_iter()
   }
 }
@@ -185,8 +183,7 @@ impl Iterator for SumDiffSIIterator {
 }
 
 impl IntoSignalIdlerIterator for SumDiffFrequencySpace {
-  type IntoIter = SumDiffSIIterator;
-  fn into_signal_idler_iterator(self) -> Self::IntoIter {
+  fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
     SumDiffSIIterator(self.0.into_iter())
   }
 }
@@ -261,8 +258,7 @@ impl From<SumDiffFrequencySpace> for WavelengthSpace {
 }
 
 impl IntoSignalIdlerIterator for WavelengthSpace {
-  type IntoIter = WavelengthSIIterator;
-  fn into_signal_idler_iterator(self) -> Self::IntoIter {
+  fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
     WavelengthSIIterator(self.0.into_iter())
   }
 }
@@ -288,8 +284,7 @@ impl<'a> Iterator for SignalIdlerWavelengthArrayIterator {
 }
 
 impl IntoSignalIdlerIterator for SignalIdlerWavelengthArray {
-  type IntoIter = SignalIdlerWavelengthArrayIterator;
-  fn into_signal_idler_iterator(self) -> Self::IntoIter {
+  fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
     SignalIdlerWavelengthArrayIterator(self.0.into_iter())
   }
 }
@@ -312,8 +307,7 @@ impl<'a> Iterator for SignalIdlerFrequencyArrayIterator {
 }
 
 impl IntoSignalIdlerIterator for SignalIdlerFrequencyArray {
-  type IntoIter = SignalIdlerFrequencyArrayIterator;
-  fn into_signal_idler_iterator(self) -> Self::IntoIter {
+  fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
     SignalIdlerFrequencyArrayIterator(self.0.into_iter())
   }
 }
