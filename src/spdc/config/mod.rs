@@ -8,7 +8,6 @@ use crate::{
   utils::{self, from_kelvin_to_celsius},
   Beam, CrystalSetup, CrystalType, IdlerBeam, PMType, PumpBeam, SPDCError, SignalBeam,
 };
-use serde::{Deserialize, Serialize};
 
 mod periodic_poling_config;
 pub use periodic_poling_config::PeriodicPolingConfig;

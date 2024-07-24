@@ -1,6 +1,5 @@
 use super::*;
-use crate::*;
-use crate::{math::*, utils::frequency_to_wavenumber};
+use crate::utils::frequency_to_wavenumber;
 use dim::ucum::{M, RAD};
 use num::Complex;
 
@@ -64,9 +63,8 @@ pub fn phasematch_singles_fiber_coupling(
   let DEL1s = DEL2s * PHI_s; // 1e-9
   let DEL3s = -hs - zhs * PHI_s * SIN_THETA_s_e * COS_PHI_s; // 1e-11
   let KpKs = *(k_p * k_s * M2 / RAD / RAD); // exact
-  let pp_factor = spdc.pp.pp_factor();
 
-  let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
+  let dksi = k_s + k_i + spdc.pp.k_eff();
   let C7 = k_p - dksi; // 1e-7
   let C3 = L * C7; // 1e-10
   let C4 = L * (1. / k_i - 1. / k_p); // 1e-13

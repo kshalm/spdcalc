@@ -133,7 +133,7 @@ impl IdlerBeam {
 
     let ns = signal.refractive_index(signal.frequency(), crystal_setup);
     let np = pump.refractive_index(pump.frequency(), crystal_setup);
-    let k_pp = ls * pp.as_ref().pp_factor(); // ls / period
+    let k_pp = ls / pp.as_ref().signed_period(); // ls / period
     let theta_s = signal.theta_internal();
     let ns_z = ns * cos(theta_s);
     let ls_over_lp = ls / lp;
@@ -249,8 +249,7 @@ impl Beam {
   ) -> RIndex {
     let lambda_o = self.vacuum_wavelength();
     let n = self.refractive_index(self.frequency, crystal_setup);
-    let pp_factor = pp.as_ref().pp_factor();
-    n + *(pp_factor * lambda_o)
+    n + *(lambda_o / pp.as_ref().signed_period())
   }
 
   /// Get the phase velocity of the beam through specified crystal setup

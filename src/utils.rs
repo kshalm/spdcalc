@@ -2,19 +2,12 @@
 use crate::math::lerp;
 use crate::{Frequency, RIndex, Speed, Wavelength, Wavenumber, TWO_PI};
 use dim::ucum::{self, C_, ONE, RAD};
+use dim::{ucum::UCUM, Dimensioned};
+use na::{Unit, Vector3};
 
-/// Create a dimensioned vector3
-pub fn dim_vector3<L, R>(unit_const: L, arr: &[R; 3]) -> na::Vector3<dim::typenum::Prod<L, R>>
-where
-  L: std::ops::Mul<R> + Copy,
-  R: Copy,
-  dim::typenum::Prod<L, R>: na::Scalar,
-{
-  na::Vector3::new(
-    unit_const * arr[0],
-    unit_const * arr[1],
-    unit_const * arr[2],
-  )
+/// Get the dimensioned vector from a scalar value and a direction.
+pub fn dim_vector<U>(val: UCUM<f64, U>, dir: Unit<Vector3<f64>>) -> UCUM<Vector3<f64>, U> {
+  UCUM::<Vector3<f64>, U>::new(*val.value_unsafe() * *dir)
 }
 
 /// convert from celsius to kelvin

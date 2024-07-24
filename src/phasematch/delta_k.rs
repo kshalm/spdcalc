@@ -1,6 +1,6 @@
 use super::*;
-use dim::ucum::M;
 use na::Vector3;
+use utils::dim_vector;
 
 /// Calculate the difference in momentum for pump -> signal idler.
 ///
@@ -18,17 +18,10 @@ pub fn delta_k<P: AsRef<PeriodicPoling>>(
   let ki = idler.wavevector(omega_i, crystal_setup);
   let kp = pump.wavevector(pump.frequency(), crystal_setup);
 
+  // k_eff is zero when no periodic poling is used
+
   // \vec{\Delta k} = \vec{k_{pulse}} - \vec{k_{signal}} - \vec{k_{idler}} - k_pp * \hat{z}
-  let delta_k = kp - ks - ki;
-  // periodic poling
-  match pp.as_ref() {
-    PeriodicPoling::On { .. } => {
-      let zhat = Vector3::<f64>::z_axis();
-      // 2PI / period
-      delta_k - Wavevector::new(zhat.as_ref() * *(TWO_PI * pp.as_ref().pp_factor() * M))
-    }
-    PeriodicPoling::Off => delta_k,
-  }
+  kp - ks - ki - dim_vector(pp.as_ref().k_eff(), Vector3::<f64>::z_axis())
 }
 
 #[cfg(test)]

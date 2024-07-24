@@ -1,11 +1,11 @@
-use crate::dim::ucum::{Meter, PerMeter, M, RAD};
+use crate::dim::ucum::{Meter, M, RAD};
 use crate::math::lerp;
 use crate::{
   delta_k,
   math::{fwhm_to_sigma, nelder_mead_1d},
   CrystalSetup, PumpBeam, SPDCError, Sign, SignalBeam, TWO_PI,
 };
-use crate::{Distance, IdlerBeam};
+use crate::{Distance, IdlerBeam, Wavenumber};
 use core::f64::consts::PI;
 
 const IMPOSSIBLE_POLING_PERIOD: &str = "Could not determine poling period from specified values";
@@ -221,16 +221,24 @@ impl PeriodicPoling {
     }
   }
 
-  /// Get the factor 1 / (sign * poling_period)
-  pub fn pp_factor(&self) -> PerMeter<f64> {
+  pub fn signed_period(&self) -> PolingPeriod {
     match self {
-      Self::Off => 0. / M,
+      Self::Off => 0. * M,
+      Self::On { period, sign, .. } => *sign * *period,
+    }
+  }
+
+  /// Get the contribution of periodic poling to to delta_k
+  pub fn k_eff(&self) -> Wavenumber {
+    let m = 1.; // QPM order
+    match self {
+      Self::Off => 0. * RAD / M,
       &Self::On { period, sign, .. } => {
         assert!(
           period.value_unsafe > 0.,
           "Periodic Poling Period must be greater than zero"
         );
-        1. / (sign * period)
+        TWO_PI * RAD * m / (sign * period)
       }
     }
   }

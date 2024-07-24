@@ -1,8 +1,6 @@
 use super::*;
 use crate::utils::frequency_to_wavenumber;
-use crate::*;
 use dim::ucum::{M, RAD};
-use math::*;
 
 /// Evaluate the phasematching function using a gaussian approximation
 #[allow(non_snake_case)]
@@ -180,8 +178,7 @@ pub fn phasematch_fiber_coupling(
   // let A7I = -DEL3i;
   let A7 = Complex::new(*(GAM3i / RAD / M), -*(DEL3i / M));
 
-  let pp_factor = spdc.pp.pp_factor();
-  let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
+  let dksi = k_s + k_i + spdc.pp.k_eff();
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
 
@@ -280,7 +277,7 @@ pub fn phasematch_fiber_coupling(
   // ).unwrap().result.unwrap();
   PerMeter4::new(result)
 }
-
+#[allow(dead_code)]
 #[allow(non_snake_case)]
 fn phasematch_fiber_coupling2(
   omega_s: Frequency,
@@ -391,8 +388,7 @@ fn phasematch_fiber_coupling2(
   let m = L / (2. * k_p);
   let n = 0.5 * L * rho;
 
-  let pp_factor = spdc.pp.pp_factor();
-  let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
+  let dksi = k_s + k_i + spdc.pp.k_eff();
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
   let hh = -0.25 * (Wfi_SQ * SEC_2_THETA_i * sq(PSI_i) + Wfs_SQ * SEC_2_THETA_s * sq(PSI_s));
@@ -488,6 +484,7 @@ mod tests {
   use crate::utils::testing::assert_nearly_equal;
   use dim::Dimensioned;
 
+  #[allow(dead_code)]
   fn percent_diff(actual: f64, expected: f64) -> f64 {
     100. * ((expected - actual) / expected).abs()
   }
