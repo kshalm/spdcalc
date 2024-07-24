@@ -106,27 +106,27 @@ impl CrystalSetup {
       signal.set_theta_external(theta_s_e, &crystal_setup);
 
       let idler = IdlerBeam::try_new_optimum(&signal, pump, &crystal_setup, PeriodicPoling::Off).unwrap();
-      // let del_k = delta_k(signal.frequency(), idler.frequency(), &signal, &idler, pump, &crystal_setup, None);
+      let del_k = delta_k(signal.frequency(), idler.frequency(), &signal, &idler, pump, &crystal_setup, PeriodicPoling::Off);
 
-      // (del_k * M / RAD).z.abs()
-      let (ws, wi) = (signal.frequency(), idler.frequency());
-      let zs = self.optimal_waist_position(signal.vacuum_wavelength(), signal.polarization());
-      let zi = self.optimal_waist_position(idler.vacuum_wavelength(), idler.polarization());
+      (del_k * M / RAD).z.abs()
+      // let (ws, wi) = (signal.frequency(), idler.frequency());
+      // let zs = self.optimal_waist_position(signal.vacuum_wavelength(), signal.polarization());
+      // let zi = self.optimal_waist_position(idler.vacuum_wavelength(), idler.polarization());
 
-      let spdc = SPDC::new(
-        crystal_setup,
-        signal,
-        idler,
-        pump.clone(),
-        1. * M,
-        1. * dim::ucum::W,
-        0.1,
-        PeriodicPoling::Off,
-        zs,
-        zi,
-        MetersPerMilliVolt::new(1.)
-      );
-      - crate::jsa::jsa_raw(ws, wi, &spdc, None).norm_sqr()
+      // let spdc = SPDC::new(
+      //   crystal_setup,
+      //   signal,
+      //   idler,
+      //   pump.clone(),
+      //   1. * M,
+      //   1. * dim::ucum::W,
+      //   0.1,
+      //   PeriodicPoling::Off,
+      //   zs,
+      //   zi,
+      //   MetersPerMilliVolt::new(1.)
+      // );
+      // - crate::jsa::jsa_raw(ws, wi, &spdc, None).norm_sqr()
     };
 
     let guess = PI / 6.;
