@@ -120,7 +120,7 @@ impl SPDC {
       };
 
       let max = 64. * d_sum;
-      let guess = d_sum;
+      let guess = 5e11;
       let d_diff = nelder_mead_1d(jsi, (0., guess), 1000, 0., max, 1e-3);
 
       let buffer = 1.;
