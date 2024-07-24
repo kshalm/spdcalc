@@ -1,11 +1,14 @@
 [package]
 name = "spdcalc"
 version = "0.1.1"
-authors = ["Jasper Palfree <jasper.palfree@colorado.edu>", "Krister Shalm <lynden.shalm@nist.gov>"]
+authors = [
+  "Jasper Palfree <jasper.palfree@colorado.edu>",
+  "Krister Shalm <lynden.shalm@nist.gov>",
+]
 edition = "2021"
-description="SPDCalc, the Spontaneous Parametric Downconversion Calculator"
+description = "SPDCalc, the Spontaneous Parametric Downconversion Calculator"
 keywords = ["physics", "spdc", "photonics"]
-license="MIT"
+license = "MIT"
 
 [lib]
 crate-type = ["rlib"]
@@ -35,7 +38,6 @@ float-cmp = "0.9"
 serde_json = "1.0"
 
 [profile.release]
-# Tell `rustc` to optimize for small code size.
 opt-level = 3
 
 # Benchmarks
