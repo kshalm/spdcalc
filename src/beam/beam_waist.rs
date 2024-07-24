@@ -1,6 +1,6 @@
-use dim::{ucum::{Meter2, M}};
+use dim::ucum::{Meter2, M};
 
-use crate::{Wavelength};
+use crate::Wavelength;
 
 /// Beam waist
 ///
@@ -22,18 +22,12 @@ pub struct BeamWaist {
 }
 
 impl BeamWaist {
-  pub fn new(wx : Wavelength) -> Self {
-    Self {
-      x: wx,
-      y: wx
-    }
+  pub fn new(wx: Wavelength) -> Self {
+    Self { x: wx, y: wx }
   }
 
-  pub fn new_elliptic(wx : Wavelength, wy : Wavelength) -> Self {
-    Self {
-      x: wx,
-      y: wy
-    }
+  pub fn new_elliptic(wx: Wavelength, wy: Wavelength) -> Self {
+    Self { x: wx, y: wy }
   }
 
   pub fn ellipticity(&self) -> f64 {

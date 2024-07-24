@@ -1,12 +1,16 @@
-use crate::*;
-use crate::utils::frequency_to_wavenumber;
-use math::*;
 use super::*;
-use dim::ucum::{RAD, M};
+use crate::utils::frequency_to_wavenumber;
+use crate::*;
+use dim::ucum::{M, RAD};
+use math::*;
 
 /// Evaluate the phasematching function using a gaussian approximation
 #[allow(non_snake_case)]
-pub fn phasematch_gaussian(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> PerMeter4<Complex<f64>> {
+pub fn phasematch_gaussian(
+  omega_s: Frequency,
+  omega_i: Frequency,
+  spdc: &SPDC,
+) -> PerMeter4<Complex<f64>> {
   let L = spdc.crystal_setup.length;
   let delk = *(spdc.delta_k(omega_s, omega_i) / Wavenumber::new(1.));
   let delta_k_z = Wavenumber::new(1.) * delk.z;
@@ -18,7 +22,11 @@ pub fn phasematch_gaussian(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC)
 
 /// Evaluate the phasematching function using a sinc approximation
 #[allow(non_snake_case)]
-pub fn phasematch_sinc(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> PerMeter4<Complex<f64>> {
+pub fn phasematch_sinc(
+  omega_s: Frequency,
+  omega_i: Frequency,
+  spdc: &SPDC,
+) -> PerMeter4<Complex<f64>> {
   let L = spdc.crystal_setup.length;
   let delk = *(spdc.delta_k(omega_s, omega_i) / Wavenumber::new(1.));
   let delta_k_z = Wavenumber::new(1.) * delk.z;
@@ -40,7 +48,12 @@ pub fn phasematch_sinc(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC) -> 
 ///
 /// This is the secret sauce of spdcalc.
 #[allow(non_snake_case)]
-pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> PerMeter4<Complex<f64>> {
+pub fn phasematch_fiber_coupling(
+  omega_s: Frequency,
+  omega_i: Frequency,
+  spdc: &SPDC,
+  steps: Option<usize>,
+) -> PerMeter4<Complex<f64>> {
   // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, steps);
   // return phasematch_sinc(omega_s, omega_i, spdc);
   // crystal length
@@ -129,61 +142,43 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
   let DEL4i = 0.5 * ki_f * zhi * TAN_THETA_i_e.powi(2) - ki_f * z0i;
 
   let M2 = M * M; // meters squared
-  // let As_r = -0.25 * Wx_SQ + GAM1s;
-  // let As_i = -DEL1s;
-  let As = Complex::new(
-    *((-0.25 * Wx_SQ + GAM1s)/M2),
-    *(-DEL1s/M2)
-  );
+                  // let As_r = -0.25 * Wx_SQ + GAM1s;
+                  // let As_i = -DEL1s;
+  let As = Complex::new(*((-0.25 * Wx_SQ + GAM1s) / M2), *(-DEL1s / M2));
   // let Ai_r = -0.25 * Wx_SQ + GAM1i;
   // let Ai_i = -DEL1i;
-  let Ai = Complex::new(
-    *((-0.25 * Wx_SQ + GAM1i)/M2),
-    *(-DEL1i/M2)
-  );
+  let Ai = Complex::new(*((-0.25 * Wx_SQ + GAM1i) / M2), *(-DEL1i / M2));
   // let Bs_r = -0.25 * Wy_SQ + GAM2s;
   // let Bs_i = -DEL2s;
-  let Bs = Complex::new(
-    *((-0.25 * Wy_SQ + GAM2s)/M2),
-    *(-DEL2s/M2)
-  );
+  let Bs = Complex::new(*((-0.25 * Wy_SQ + GAM2s) / M2), *(-DEL2s / M2));
   // let Bi_r = -0.25 * Wy_SQ + GAM2i;
   // let Bi_i = -DEL2i;
-  let Bi = Complex::new(
-    *((-0.25 * Wy_SQ + GAM2i)/M2),
-    *(-DEL2i/M2)
-  );
-  let Cs = -0.25 * (L / k_s - 2. * z0/k_p);
-  let Ci = -0.25 * (L / k_i - 2. * z0/k_p);
-  let Ds =  0.25 * L * (1./k_s - 1./k_p);
-  let Di =  0.25 * L * (1./k_i - 1./k_p);
+  let Bi = Complex::new(*((-0.25 * Wy_SQ + GAM2i) / M2), *(-DEL2i / M2));
+  let Cs = -0.25 * (L / k_s - 2. * z0 / k_p);
+  let Ci = -0.25 * (L / k_i - 2. * z0 / k_p);
+  let Ds = 0.25 * L * (1. / k_s - 1. / k_p);
+  let Di = 0.25 * L * (1. / k_i - 1. / k_p);
   // let mx_real = -0.50 * Wx_SQ;
   // let mx_imag = z0/k_p;
-  let mx = Complex::new(
-    *((-0.50 * Wx_SQ)/M2),
-    *((z0/k_p)*RAD/M2)
-  );
+  let mx = Complex::new(*((-0.50 * Wx_SQ) / M2), *((z0 / k_p) * RAD / M2));
   // let my_real = -0.50 * Wy_SQ;
   // let my_imag = mx_imag;
-  let my = Complex::new(
-    *((-0.50 * Wy_SQ)/M2),
-    *((z0/k_p)*RAD/M2)
-  );
+  let my = Complex::new(*((-0.50 * Wy_SQ) / M2), *((z0 / k_p) * RAD / M2));
   let m = L / (2. * k_p);
   let n = 0.5 * L * tan(spdc.pump.walkoff_angle(&spdc.crystal_setup));
 
   let hh = Complex::new(
-    *(GAM4s/RAD/RAD + GAM4i/RAD/RAD),
-    -*(DEL4s/RAD + DEL4i/RAD)
+    *(GAM4s / RAD / RAD + GAM4i / RAD / RAD),
+    -*(DEL4s / RAD + DEL4i / RAD),
   );
 
   // let A5R = GAM3s;
   // let A5I = -DEL3s;
-  let A5 = Complex::new(*(GAM3s/RAD/M), -*(DEL3s/M));
+  let A5 = Complex::new(*(GAM3s / RAD / M), -*(DEL3s / M));
   let A5sq = A5 * A5;
   // let A7R = GAM3i;
   // let A7I = -DEL3i;
-  let A7 = Complex::new(*(GAM3i/RAD/M), -*(DEL3i/M));
+  let A7 = Complex::new(*(GAM3i / RAD / M), -*(DEL3i / M));
 
   let pp_factor = spdc.pp.pp_factor();
   let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
@@ -192,12 +187,11 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
 
   // dbg!(As, Ai, Bs, Bi, Cs, Ci, Ds, Di, mx, my, m, n, hh, A5, A7, pp_factor, dksi, ee, ff);
 
-  let fn_z = |z : f64| {
-
+  let fn_z = |z: f64| {
     let Ds_z = Ds * z;
     let Di_z = Di * z;
-    let CsDs = Complex::new( 0., *((Cs + Ds_z)*RAD/M2) );
-    let CiDi = Complex::new( 0., *((Ci + Di_z)*RAD/M2) );
+    let CsDs = Complex::new(0., *((Cs + Ds_z) * RAD / M2));
+    let CiDi = Complex::new(0., *((Ci + Di_z) * RAD / M2));
 
     // let A1R = As_r;
     // let A1I = As_i + Cs + Ds_z;
@@ -217,7 +211,7 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
 
     // let A6R = 0.;
     // let A6I = n * (1 + z);
-    let A6 = Complex::new(0., *(n/M) * (1. + z));
+    let A6 = Complex::new(0., *(n / M) * (1. + z));
 
     // let A8R = mx_real;
     // let A8I = mx_imag - m * z;
@@ -244,22 +238,15 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
     let denom1 = 4. * A1 * A3 - A8sq;
     let denom2 = 4. * A2 * A4 - A9sq;
 
-    let numerator = ((
-      4. * A10
-      - invA1 * (
-        A5sq
-        + (term4 * term4) / denom1
-      )
-      - invA2 * A6sq * (
-        1. + (term5 * term5) / denom2
-      )
-    ) / 4.).exp();
+    let numerator = ((4. * A10
+      - invA1 * (A5sq + (term4 * term4) / denom1)
+      - invA2 * A6sq * (1. + (term5 * term5) / denom2))
+      / 4.)
+      .exp();
 
     // Now deal with the denominator in the integral:
     // Sqrt[A1 A2 (-4 A3 + A8^2/A1) (-4 A4 + A9^2/A2)]
-    let denominator = (
-      denom1 * denom2
-    ).sqrt();
+    let denominator = (denom1 * denom2).sqrt();
 
     // dbg!(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10);
 
@@ -272,7 +259,12 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
   };
 
   let integrator = SimpsonIntegration::new(fn_z);
-  let result = 0.5 * integrator.integrate(-1., 1., steps.unwrap_or_else(|| integration_steps_best_guess(L)));
+  let result = 0.5
+    * integrator.integrate(
+      -1.,
+      1.,
+      steps.unwrap_or_else(|| integration_steps_best_guess(L)),
+    );
 
   // use quad_rs::Integrate;
   // let integrator = GAUSS_KONROD.clone()
@@ -290,7 +282,12 @@ pub fn phasematch_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : 
 }
 
 #[allow(non_snake_case)]
-fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> PerMeter4<Complex<f64>> {
+fn phasematch_fiber_coupling2(
+  omega_s: Frequency,
+  omega_i: Frequency,
+  spdc: &SPDC,
+  steps: Option<usize>,
+) -> PerMeter4<Complex<f64>> {
   // crystal length
   let L = spdc.crystal_setup.length;
 
@@ -406,12 +403,11 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
 
   // dbg!(As, Ai, Bs, Bi, Cs, Ci, Ds, Di, mx, my, m, n, hh, A5, A7, pp_factor, dksi, ee, ff);
 
-  let fn_z = |z : f64| {
-
+  let fn_z = |z: f64| {
     let Ds_z = Ds * z;
     let Di_z = Di * z;
-    let CsDs = Complex::new( 0., *((Cs + Ds_z)*RAD/M2) );
-    let CiDi = Complex::new( 0., *((Ci + Di_z)*RAD/M2) );
+    let CsDs = Complex::new(0., *((Cs + Ds_z) * RAD / M2));
+    let CiDi = Complex::new(0., *((Ci + Di_z) * RAD / M2));
 
     // let A1R = As_r;
     // let A1I = As_i + Cs + Ds_z;
@@ -431,7 +427,7 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
 
     // let A6R = 0.;
     // let A6I = n * (1 + z);
-    let A6 = Complex::new(0., *(n/M) * (1. + z));
+    let A6 = Complex::new(0., *(n / M) * (1. + z));
 
     // let A8R = mx_real;
     // let A8I = mx_imag - m * z;
@@ -455,24 +451,15 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
     let invA2 = A2.inv();
     let term4 = -2. * A1 * A7 + A5 * A8;
     let term5 = -2. * A2 + A9;
-    let numerator = ((
-      4. * A10
-      - invA1 * (
-        A5sq
-        + (term4 * term4) / (4. * A1 * A3 - A8sq)
-      )
-      - invA2 * A6sq * (
-        1. + (term5 * term5) / (4. * A2 * A4 - A9sq)
-      )
-    ) / 4.).exp();
+    let numerator = ((4. * A10
+      - invA1 * (A5sq + (term4 * term4) / (4. * A1 * A3 - A8sq))
+      - invA2 * A6sq * (1. + (term5 * term5) / (4. * A2 * A4 - A9sq)))
+      / 4.)
+      .exp();
 
     // Now deal with the denominator in the integral:
     // Sqrt[A1 A2 (-4 A3 + A8^2/A1) (-4 A4 + A9^2/A2)]
-    let denominator = (
-      A1 * A2
-      * (-4. * A3 + A8sq * invA1)
-      * (-4. * A4 + A9sq * invA2)
-    ).sqrt();
+    let denominator = (A1 * A2 * (-4. * A3 + A8sq * invA1) * (-4. * A4 + A9sq * invA2)).sqrt();
 
     // dbg!(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10);
 
@@ -485,7 +472,12 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
   };
 
   let integrator = SimpsonIntegration::new(fn_z);
-  let result = 0.5 * integrator.integrate(-1., 1., steps.unwrap_or_else(|| integration_steps_best_guess(L)));
+  let result = 0.5
+    * integrator.integrate(
+      -1.,
+      1.,
+      steps.unwrap_or_else(|| integration_steps_best_guess(L)),
+    );
   PerMeter4::new(result)
 }
 
@@ -493,15 +485,15 @@ fn phasematch_fiber_coupling2(omega_s: Frequency, omega_i: Frequency, spdc : &SP
 mod tests {
   use super::*;
   extern crate float_cmp;
-  use dim::Dimensioned;
   use crate::utils::testing::assert_nearly_equal;
+  use dim::Dimensioned;
 
-  fn percent_diff(actual : f64, expected : f64) -> f64 {
+  fn percent_diff(actual: f64, expected: f64) -> f64 {
     100. * ((expected - actual) / expected).abs()
   }
 
   #[test]
-  fn phasematch_test(){
+  fn phasematch_test() {
     let json = serde_json::json!({
       "crystal": {
         "kind": "BBO_1",
@@ -528,17 +520,24 @@ mod tests {
       "deff_pm_per_volt": 1,
     });
 
-    let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
-    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+    let config: SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let spdc = config
+      .try_as_spdc()
+      .expect("Could not convert to SPDC instance");
 
     let expected = phasematch_gaussian(spdc.signal.frequency(), spdc.idler.frequency(), &spdc);
-    let actual = phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None);
+    let actual =
+      phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None);
 
-    assert_nearly_equal!(actual.value_unsafe().norm(), expected.value_unsafe().norm(), 0.1);
+    assert_nearly_equal!(
+      actual.value_unsafe().norm(),
+      expected.value_unsafe().norm(),
+      0.1
+    );
   }
 
   #[test]
-  fn phasematch_fiber_coupling_test(){
+  fn phasematch_fiber_coupling_test() {
     let mut spdc = SPDC::default();
     // spdc.signal.set_from_external_theta(3. * DEG, &spdc.crystal_setup);
     // spdc.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
@@ -546,23 +545,22 @@ mod tests {
 
     // println!("spdc: {:#?}", spdc);
     let jsa_units = JSAUnits::new(1.);
-    let amp = *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None) / jsa_units);
+    let amp =
+      *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
+        / jsa_units);
 
     let actual = amp;
-    let expected = *(phasematch_gaussian(spdc.signal.frequency(), spdc.idler.frequency(), &spdc) / jsa_units);
+    let expected =
+      *(phasematch_gaussian(spdc.signal.frequency(), spdc.idler.frequency(), &spdc) / jsa_units);
 
     // NOTE: this is not a great test anymore
     let accept_diff = 1e-4;
 
-    assert_nearly_equal!(
-      actual.norm(),
-      expected.norm(),
-      accept_diff
-    );
+    assert_nearly_equal!(actual.norm(), expected.norm(), accept_diff);
   }
 
   #[test]
-  fn phasematch_fiber_coupling_pp_test(){
+  fn phasematch_fiber_coupling_pp_test() {
     let mut spdc = SPDC::default();
     spdc.pp = PeriodicPoling::On {
       sign: Sign::NEGATIVE,
@@ -570,7 +568,7 @@ mod tests {
       apodization: Apodization::Off,
     };
     // spdc.signal.set_from_external_theta(3. * dim::ucum::DEG, &spdc.crystal_setup);
-    spdc.signal.set_angles(0. *RAD, 0. * RAD);
+    spdc.signal.set_angles(0. * RAD, 0. * RAD);
     // spdc.assign_optimum_theta();
 
     // FIXME This isn't matching.
@@ -585,7 +583,9 @@ mod tests {
     dbg!(&spdc);
 
     let jsa_units = JSAUnits::new(1.);
-    let amp = *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None) / jsa_units);
+    let amp =
+      *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
+        / jsa_units);
 
     let actual = amp;
     // let expected = Complex::new(-243675412686457.94, 411264607672255.2);
@@ -595,19 +595,9 @@ mod tests {
 
     let accept_diff = 1e-16;
 
-    assert_nearly_equal!(
-      "norm",
-      actual.norm(),
-      expected.norm(),
-      accept_diff
-    );
+    assert_nearly_equal!("norm", actual.norm(), expected.norm(), accept_diff);
 
-    assert_nearly_equal!(
-      "arg",
-      actual.arg(),
-      expected.arg(),
-      accept_diff
-    );
+    assert_nearly_equal!("arg", actual.arg(), expected.arg(), accept_diff);
   }
 
   #[test]
@@ -639,13 +629,18 @@ mod tests {
       "deff_pm_per_volt": 1.
     });
 
-    let config : SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
-    let spdc = config.try_as_spdc().expect("Could not convert to SPDC instance");
+    let config: SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let spdc = config
+      .try_as_spdc()
+      .expect("Could not convert to SPDC instance");
 
-    let old = *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None ) / JSAUnits::new(1.));
-    let new = *(phasematch_fiber_coupling2(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None ) / JSAUnits::new(1.));
+    let old =
+      *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
+        / JSAUnits::new(1.));
+    let new =
+      *(phasematch_fiber_coupling2(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
+        / JSAUnits::new(1.));
 
     assert_nearly_equal!("norm", new.norm(), old.norm(), 1e-10);
-
   }
 }

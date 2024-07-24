@@ -26,7 +26,7 @@ impl PMType {
     match self {
       PMType::Type2_e_eo => PMType::Type2_e_oe,
       PMType::Type2_e_oe => PMType::Type2_e_eo,
-      _ => *self
+      _ => *self,
     }
   }
 
@@ -43,28 +43,23 @@ impl PMType {
   pub fn pump_polarization(&self) -> PolarizationType {
     match self {
       PMType::Type0_o_oo => PolarizationType::Ordinary,
-      PMType::Type0_e_ee |
-      PMType::Type1_e_oo |
-      PMType::Type2_e_eo |
-      PMType::Type2_e_oe => PolarizationType::Extraordinary,
+      PMType::Type0_e_ee | PMType::Type1_e_oo | PMType::Type2_e_eo | PMType::Type2_e_oe => {
+        PolarizationType::Extraordinary
+      }
     }
   }
 
   pub fn signal_polarization(&self) -> PolarizationType {
     match self {
       PMType::Type0_e_ee | PMType::Type2_e_eo => PolarizationType::Extraordinary,
-      PMType::Type0_o_oo |
-      PMType::Type1_e_oo |
-      PMType::Type2_e_oe => PolarizationType::Ordinary,
+      PMType::Type0_o_oo | PMType::Type1_e_oo | PMType::Type2_e_oe => PolarizationType::Ordinary,
     }
   }
 
   pub fn idler_polarization(&self) -> PolarizationType {
     match self {
       PMType::Type2_e_oe | PMType::Type0_e_ee => PolarizationType::Extraordinary,
-      PMType::Type0_o_oo |
-      PMType::Type1_e_oo |
-      PMType::Type2_e_eo => PolarizationType::Ordinary,
+      PMType::Type0_o_oo | PMType::Type1_e_oo | PMType::Type2_e_eo => PolarizationType::Ordinary,
     }
   }
 }
@@ -95,21 +90,31 @@ impl FromStr for PMType {
   /// assert_eq!(PMType::from_str("Type_2_e_eo").unwrap(), PMType::Type2_e_eo);
   /// ```
   #[allow(non_upper_case_globals)]
-  fn from_str(s : &str) -> Result<Self, Self::Err> {
-    use regex::Regex;
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
     use lazy_static::lazy_static;
+    use regex::Regex;
     lazy_static! {
-      static ref type0_o_oo : Regex = Regex::new(r"(?i)^(type\s*0)?[\s_]*(o).{0,2}(o)(o)$").unwrap();
-      static ref type0_e_ee : Regex = Regex::new(r"(?i)^(type\s*0)?[\s_]*(e).{0,2}(e)(e)$").unwrap();
-      static ref type1_e_oo : Regex = Regex::new(r"(?i)^(type\s*1)?[\s_]*(e).{0,2}(o)(o)$").unwrap();
-      static ref type2_e_eo : Regex = Regex::new(r"(?i)^(type\s*2)?[\s_]*(e).{0,2}(e)(o)$").unwrap();
-      static ref type2_e_oe : Regex = Regex::new(r"(?i)^(type\s*2)?[\s_]*(e).{0,2}(o)(e)$").unwrap();
+      static ref type0_o_oo: Regex = Regex::new(r"(?i)^(type\s*0)?[\s_]*(o).{0,2}(o)(o)$").unwrap();
+      static ref type0_e_ee: Regex = Regex::new(r"(?i)^(type\s*0)?[\s_]*(e).{0,2}(e)(e)$").unwrap();
+      static ref type1_e_oo: Regex = Regex::new(r"(?i)^(type\s*1)?[\s_]*(e).{0,2}(o)(o)$").unwrap();
+      static ref type2_e_eo: Regex = Regex::new(r"(?i)^(type\s*2)?[\s_]*(e).{0,2}(e)(o)$").unwrap();
+      static ref type2_e_oe: Regex = Regex::new(r"(?i)^(type\s*2)?[\s_]*(e).{0,2}(o)(e)$").unwrap();
     }
-    if type0_o_oo.is_match(s) { return Ok(PMType::Type0_o_oo); }
-    if type0_e_ee.is_match(s) { return Ok(PMType::Type0_e_ee); }
-    if type1_e_oo.is_match(s) { return Ok(PMType::Type1_e_oo); }
-    if type2_e_eo.is_match(s) { return Ok(PMType::Type2_e_eo); }
-    if type2_e_oe.is_match(s) { return Ok(PMType::Type2_e_oe); }
+    if type0_o_oo.is_match(s) {
+      return Ok(PMType::Type0_o_oo);
+    }
+    if type0_e_ee.is_match(s) {
+      return Ok(PMType::Type0_e_ee);
+    }
+    if type1_e_oo.is_match(s) {
+      return Ok(PMType::Type1_e_oo);
+    }
+    if type2_e_eo.is_match(s) {
+      return Ok(PMType::Type2_e_eo);
+    }
+    if type2_e_oe.is_match(s) {
+      return Ok(PMType::Type2_e_oe);
+    }
 
     Err(crate::SPDCError(format!("PMType {} is not defined", s)))
   }

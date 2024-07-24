@@ -22,23 +22,23 @@ use dim::{
   ucum::{Kelvin, K, M},
 };
 
-pub const META : CrystalMeta = CrystalMeta {
-  id : "BBO_1",
-  name : "BBO ref 1",
-  reference_url : "http://www.newlightphotonics.com/v1/bbo-properties.html",
-  axis_type : OpticAxisType::NegativeUniaxial,
-  point_group : PointGroup::HM_3m,
+pub const META: CrystalMeta = CrystalMeta {
+  id: "BBO_1",
+  name: "BBO ref 1",
+  reference_url: "http://www.newlightphotonics.com/v1/bbo-properties.html",
+  axis_type: OpticAxisType::NegativeUniaxial,
+  point_group: PointGroup::HM_3m,
   transmission_range: Some(ValidWavelengthRange(189e-9, 3_500e-9)),
-  temperature_dependence_known : true,
+  temperature_dependence_known: true,
 };
 
 // from Newlight Photonics
-const DNO : f64 = -9.3e-6;
-const DNE : f64 = -16.6e-6;
+const DNO: f64 = -9.3e-6;
+const DNE: f64 = -16.6e-6;
 
 /// Get refractive Indices
 #[allow(clippy::unreadable_literal)]
-pub fn get_indices(wavelength : Wavelength, temperature : Kelvin<f64>) -> Indices {
+pub fn get_indices(wavelength: Wavelength, temperature: Kelvin<f64>) -> Indices {
   let l_sq = (wavelength / (MICRO * M)).powi(2); // Convert for Sellmeier Coefficients
 
   let mut no = (2.7359 + 0.01878 / (l_sq - 0.01822) - 0.01354 * l_sq).sqrt();

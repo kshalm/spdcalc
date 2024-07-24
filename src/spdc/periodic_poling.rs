@@ -1,20 +1,14 @@
-
-use core::f64::consts::PI;
+use crate::dim::ucum::{Meter, PerMeter, M, RAD};
 use crate::math::lerp;
-use crate::{IdlerBeam, Distance};
 use crate::{
   delta_k,
-  Sign,
-  CrystalSetup,
-  SignalBeam,
-  PumpBeam,
-  TWO_PI,
-  SPDCError,
-  math::{nelder_mead_1d, fwhm_to_sigma}
+  math::{fwhm_to_sigma, nelder_mead_1d},
+  CrystalSetup, PumpBeam, SPDCError, Sign, SignalBeam, TWO_PI,
 };
-use crate::dim::ucum::{M, RAD, PerMeter, Meter};
+use crate::{Distance, IdlerBeam};
+use core::f64::consts::PI;
 
-const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
+const IMPOSSIBLE_POLING_PERIOD: &str = "Could not determine poling period from specified values";
 
 pub type PolingPeriod = Meter<f64>;
 
@@ -27,7 +21,7 @@ pub enum Apodization {
   /// Gaussian
   Gaussian {
     /// Full-width half-max
-    fwhm : Distance,
+    fwhm: Distance,
   },
   Bartlett(f64),
   Blackman(f64),
@@ -47,26 +41,16 @@ impl Apodization {
       Apodization::Off => 1.,
       &Apodization::Gaussian { fwhm } => {
         let bw = 2. * fwhm_to_sigma(fwhm) / crystal_length;
-        f64::exp(-0.5 * (z/bw).powi(2))
-      },
-      Apodization::Bartlett(a) => {
-        1. - z.abs() / a
-      },
+        f64::exp(-0.5 * (z / bw).powi(2))
+      }
+      Apodization::Bartlett(a) => 1. - z.abs() / a,
       Apodization::Blackman(a) => {
         21. / 50. + 0.5 * (PI * z / a).cos() + (2. / 25.) * (TWO_PI * z / a).cos()
-      },
-      Apodization::Connes(a) => {
-        (1. - (z / a).powi(2)).powi(2)
-      },
-      Apodization::Cosine(a) => {
-        (0.5 * PI * z / a).cos()
-      },
-      Apodization::Hamming(a) => {
-        (27. + 23. * (PI * z / a).cos()) / 50.
-      },
-      Apodization::Welch(a) => {
-        1. - (z / a).powi(2)
-      },
+      }
+      Apodization::Connes(a) => (1. - (z / a).powi(2)).powi(2),
+      Apodization::Cosine(a) => (0.5 * PI * z / a).cos(),
+      Apodization::Hamming(a) => (27. + 23. * (PI * z / a).cos()) / 50.,
+      Apodization::Welch(a) => 1. - (z / a).powi(2),
       Apodization::Interpolate(values) => {
         // todo!("Interpolation not implemented yet")
         let n = values.len();
@@ -78,7 +62,7 @@ impl Apodization {
         let below = i.floor() as usize;
         let t = i - below as f64;
         lerp(values[below], values[above], t)
-      },
+      }
     }
   }
 }
@@ -89,9 +73,9 @@ pub enum PeriodicPoling {
   #[default]
   Off,
   On {
-    period : PolingPeriod,
-    sign :   Sign,
-    apodization : Apodization,
+    period: PolingPeriod,
+    sign: Sign,
+    apodization: Apodization,
   },
 }
 
@@ -106,7 +90,11 @@ impl PeriodicPoling {
   pub fn new(period: PolingPeriod, apodization: Apodization) -> Self {
     Self::On {
       period: if period > 0. * M { period } else { -period },
-      sign: if period > 0. * M { Sign::POSITIVE } else { Sign::NEGATIVE },
+      sign: if period > 0. * M {
+        Sign::POSITIVE
+      } else {
+        Sign::NEGATIVE
+      },
       apodization,
     }
   }
@@ -136,17 +124,19 @@ impl PeriodicPoling {
     if let Self::On { apodization, .. } = self {
       let num_domains = self.num_domains(crystal_length);
       // for each domain
-      (0..num_domains).map(|i| {
-        // 0.5 to get value in middle of domain
-        let z = lerp(-1., 1., (i as f64 + 0.5) / num_domains as f64);
-        let a = apodization.integration_constant(z, crystal_length);
-        let x = (1. - 2. * a.powi(2)).acos() / TWO_PI;
-        if z > 0. {
-          (1. - x, x)
-        } else {
-          (x, 1. - x)
-        }
-      }).collect()
+      (0..num_domains)
+        .map(|i| {
+          // 0.5 to get value in middle of domain
+          let z = lerp(-1., 1., (i as f64 + 0.5) / num_domains as f64);
+          let a = apodization.integration_constant(z, crystal_length);
+          let x = (1. - 2. * a.powi(2)).acos() / TWO_PI;
+          if z > 0. {
+            (1. - x, x)
+          } else {
+            (x, 1. - x)
+          }
+        })
+        .collect()
     } else {
       Vec::new()
     }
@@ -158,9 +148,11 @@ impl PeriodicPoling {
       Self::Off => 0. * M,
       Self::On { period, .. } => *period,
     };
-    self.poling_domains(crystal_length).iter().map(|&(z1, z2)| {
-      (z1 * period, z2 * period)
-    }).collect()
+    self
+      .poling_domains(crystal_length)
+      .iter()
+      .map(|&(z1, z2)| (z1 * period, z2 * period))
+      .collect()
   }
 
   /// Get the optimal periodic poling for the given signal and pump beams
@@ -168,15 +160,10 @@ impl PeriodicPoling {
     signal: &SignalBeam,
     pump: &PumpBeam,
     crystal_setup: &CrystalSetup,
-    apodization: Apodization
+    apodization: Apodization,
   ) -> Result<Self, SPDCError> {
     let period = optimum_poling_period(signal, pump, crystal_setup)?;
-    Ok(
-      Self::new(
-        period,
-        apodization
-      )
-    )
+    Ok(Self::new(period, apodization))
   }
 
   /// Get the optimal periodic poling for the given signal and pump beams
@@ -184,22 +171,31 @@ impl PeriodicPoling {
     self,
     signal: &SignalBeam,
     pump: &PumpBeam,
-    crystal_setup: &CrystalSetup
+    crystal_setup: &CrystalSetup,
   ) -> Result<Self, SPDCError> {
     match self {
       Self::Off => Self::try_new_optimum(signal, pump, crystal_setup, Apodization::Off),
-      Self::On { apodization, .. } => Self::try_new_optimum(signal, pump, crystal_setup, apodization),
+      Self::On { apodization, .. } => {
+        Self::try_new_optimum(signal, pump, crystal_setup, apodization)
+      }
     }
   }
 
   /// calculate the sign of periodic poling
-  pub fn compute_sign(
-    signal: &SignalBeam,
-    pump: &PumpBeam,
-    crystal_setup: &CrystalSetup
-  ) -> Sign {
-    let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, PeriodicPoling::Off).unwrap();
-    let delkz = (delta_k(signal.frequency(), idler.frequency(), signal, &idler, pump, crystal_setup, PeriodicPoling::Off) * M / RAD).z;
+  pub fn compute_sign(signal: &SignalBeam, pump: &PumpBeam, crystal_setup: &CrystalSetup) -> Sign {
+    let idler =
+      IdlerBeam::try_new_optimum(signal, pump, crystal_setup, PeriodicPoling::Off).unwrap();
+    let delkz = (delta_k(
+      signal.frequency(),
+      idler.frequency(),
+      signal,
+      &idler,
+      pump,
+      crystal_setup,
+      PeriodicPoling::Off,
+    ) * M
+      / RAD)
+      .z;
 
     // converts to sign
     delkz.into()
@@ -210,7 +206,7 @@ impl PeriodicPoling {
   /// Does nothing if off
   pub fn set_apodization(&mut self, apodization: Apodization) {
     match self {
-      Self::Off => {},
+      Self::Off => {}
       Self::On { period, sign, .. } => *self = Self::new(*sign * *period, apodization),
     }
   }
@@ -235,7 +231,7 @@ impl PeriodicPoling {
           "Periodic Poling Period must be greater than zero"
         );
         1. / (sign * period)
-      },
+      }
     }
   }
 
@@ -252,13 +248,20 @@ impl PeriodicPoling {
 pub fn optimum_poling_period(
   signal: &SignalBeam,
   pump: &PumpBeam,
-  crystal_setup: &CrystalSetup
+  crystal_setup: &CrystalSetup,
 ) -> Result<PolingPeriod, SPDCError> {
-
   // z component of delta k, based on periodic poling
   let delta_kz = |pp| {
     let idler = IdlerBeam::try_new_optimum(signal, pump, crystal_setup, &pp).unwrap();
-    let del_k = delta_k(signal.frequency(), idler.frequency(), signal, &idler, pump, crystal_setup, &pp);
+    let del_k = delta_k(
+      signal.frequency(),
+      idler.frequency(),
+      signal,
+      &idler,
+      pump,
+      crystal_setup,
+      &pp,
+    );
 
     let del_k_vec = *(del_k * M / RAD);
 
@@ -294,8 +297,8 @@ pub fn optimum_poling_period(
 
   // minimizable delta k function based on period (using predetermined sign)
   let pm = |period| {
-    let pp = PeriodicPoling::On{
-      period : period * M,
+    let pp = PeriodicPoling::On {
+      period: period * M,
       sign,
       apodization: Apodization::Off,
     };
@@ -338,26 +341,24 @@ pub fn optimum_poling_period(
   if max_period < period || period < min_period {
     Err(SPDCError::new(IMPOSSIBLE_POLING_PERIOD.to_string()))
   } else {
-    Ok(
-      sign * period * M
-    )
+    Ok(sign * period * M)
   }
 }
 
-
 #[cfg(test)]
 mod test {
-  use crate::{*, dim::ucum::*};
+  use crate::{dim::ucum::*, *};
 
   #[test]
-  fn test_poling_period(){
+  fn test_poling_period() {
     let signal = Beam::new(
       PolarizationType::Extraordinary,
       0. * RAD,
       0. * RAD,
       1550e-9 * M,
       30e-6 * M,
-    ).into();
+    )
+    .into();
 
     let pump = Beam::new(
       PolarizationType::Extraordinary,
@@ -365,20 +366,26 @@ mod test {
       0. * RAD,
       775e-9 * M,
       100e-6 * M,
-    ).into();
+    )
+    .into();
 
-    let mut crystal_setup : CrystalSetup = CrystalConfig::default().try_into().unwrap();
+    let mut crystal_setup: CrystalSetup = CrystalConfig::default().try_into().unwrap();
     crystal_setup.theta = 90. * DEG;
     crystal_setup.length = 20_000e-6 * M;
 
     let period = optimum_poling_period(&signal, &pump, &crystal_setup).unwrap();
 
-    assert!( approx_eq!(f64, *(period / M), -46.578592559e-6, ulps = 2, epsilon = 1e-12) );
-
+    assert!(approx_eq!(
+      f64,
+      *(period / M),
+      -46.578592559e-6,
+      ulps = 2,
+      epsilon = 1e-12
+    ));
   }
 
   #[test]
-  fn test_poling_domains(){
+  fn test_poling_domains() {
     let crystal_length = 1000e-6 * M;
     let pp = PeriodicPoling::new(10e-6 * M, Apodization::Off);
     let domains = pp.poling_domains(crystal_length);
@@ -386,22 +393,24 @@ mod test {
   }
 
   #[test]
-  fn test_poling_domains_step(){
+  fn test_poling_domains_step() {
     let crystal_length = 100e-6 * M;
-    let step_function = vec![
-      0., 0., 0., 0., 0., 0.,
-      1., 1., 1., 1., 1., 1.
-    ];
-    let pp = PeriodicPoling::new(
-      10e-6 * M,
-      Apodization::Interpolate(step_function)
-    );
+    let step_function = vec![0., 0., 0., 0., 0., 0., 1., 1., 1., 1., 1., 1.];
+    let pp = PeriodicPoling::new(10e-6 * M, Apodization::Interpolate(step_function));
     let domains = pp.poling_domains(crystal_length);
     assert_eq!(
       domains,
       vec![
-        (0., 1.),  (0., 1.),  (0., 1.),  (0., 1.),  (0., 1.),
-        (0.5, 0.5), (0.5, 0.5), (0.5, 0.5), (0.5, 0.5), (0.5, 0.5)
+        (0., 1.),
+        (0., 1.),
+        (0., 1.),
+        (0., 1.),
+        (0., 1.),
+        (0.5, 0.5),
+        (0.5, 0.5),
+        (0.5, 0.5),
+        (0.5, 0.5),
+        (0.5, 0.5)
       ]
     );
   }

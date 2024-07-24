@@ -1,8 +1,8 @@
+use crate::utils::{get_1d_index, Steps};
 use num::{Integer, Zero};
-use crate::utils::{Steps, get_1d_index};
 
 /// Get simpson weight for index
-fn get_simpson_weight( n : usize, divs : usize ) -> f64 {
+fn get_simpson_weight(n: usize, divs: usize) -> f64 {
   // n divs of...
   // 1, 4, 2, 4, 2, ..., 4, 1
   if n == 0 || n == divs {
@@ -64,69 +64,78 @@ fn get_simpson_weight( n : usize, divs : usize ) -> f64 {
 // }
 
 /// Integrator that implements Simpson's rule
-pub struct SimpsonIntegration<F : Fn(f64) -> T, T> {
-  function : F,
+pub struct SimpsonIntegration<F: Fn(f64) -> T, T> {
+  function: F,
 }
 
-impl<F : Fn(f64) -> T, T> SimpsonIntegration<F, T>
-where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
+impl<F: Fn(f64) -> T, T> SimpsonIntegration<F, T>
+where
+  T: Zero + std::ops::Mul<f64, Output = T> + std::ops::Add<T, Output = T>,
+{
   /// Creates a new integrable function by using the supplied `Fn(f64) -> T` in
   /// combination with numeric integration via simpson's rule to find the integral.
-  pub fn new(function : F) -> Self {
+  pub fn new(function: F) -> Self {
     SimpsonIntegration { function }
   }
 
   /// Get simpson weight for index
-  pub fn get_weight( n : usize, divs : usize ) -> f64 {
+  pub fn get_weight(n: usize, divs: usize) -> f64 {
     get_simpson_weight(n, divs)
   }
 
   /// Numerically integrate from `a` to `b`, in `divs` divisions
-  pub fn integrate(&self, a : f64, b : f64, divs : usize) -> T {
+  pub fn integrate(&self, a: f64, b: f64, divs: usize) -> T {
     let divs = divs + divs % 2 - 2; // nearest even
-    assert!( divs >= 4, "Steps too low" );
+    assert!(divs >= 4, "Steps too low");
 
     let dx = (b - a) / (divs as f64);
 
-    let result = (0..=divs).map(|n| Self::get_weight(n, divs)).enumerate().fold(T::zero(), |acc, (i, a_n)| {
-      let x = a + (i as f64) * dx;
+    let result = (0..=divs)
+      .map(|n| Self::get_weight(n, divs))
+      .enumerate()
+      .fold(T::zero(), |acc, (i, a_n)| {
+        let x = a + (i as f64) * dx;
 
-      acc + (self.function)( x ) * a_n
-    });
+        acc + (self.function)(x) * a_n
+      });
 
     result * (dx / 3.)
   }
 }
 
-pub struct SimpsonIntegration2D<F : Fn(f64, f64, usize) -> T, T> {
-  function : F,
+pub struct SimpsonIntegration2D<F: Fn(f64, f64, usize) -> T, T> {
+  function: F,
 }
 
-impl<F : Fn(f64, f64, usize) -> T, T> SimpsonIntegration2D<F, T>
-where T: Zero + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> {
+impl<F: Fn(f64, f64, usize) -> T, T> SimpsonIntegration2D<F, T>
+where
+  T: Zero + std::ops::Mul<f64, Output = T> + std::ops::Add<T, Output = T>,
+{
   /// Creates a new integrable function by using the supplied `Fn(f64, f64) -> T` in
   /// combination with numeric integration via simpson's rule to find the integral.
-  pub fn new(function : F) -> Self {
+  pub fn new(function: F) -> Self {
     SimpsonIntegration2D { function }
   }
 
   /// Get simpson weight for index
-  pub fn get_weight( nx : usize, ny : usize, divs : usize ) -> f64 {
+  pub fn get_weight(nx: usize, ny: usize, divs: usize) -> f64 {
     get_simpson_weight(nx, divs) * get_simpson_weight(ny, divs)
   }
 
   /// Numerically integrate from `a` to `b`, in `divs` divisions
-  pub fn integrate(&self, x_range: (f64, f64), y_range: (f64, f64), divs : usize) -> T {
-    assert!( divs.is_even() );
-    assert!( divs >= 4 );
+  pub fn integrate(&self, x_range: (f64, f64), y_range: (f64, f64), divs: usize) -> T {
+    assert!(divs.is_even());
+    assert!(divs >= 4);
 
     let steps = divs + 1;
     let dx = (x_range.1 - x_range.0) / (divs as f64);
     let dy = (y_range.1 - y_range.0) / (divs as f64);
-    let result = Steps(y_range.0, y_range.1, steps).into_iter()
+    let result = Steps(y_range.0, y_range.1, steps)
+      .into_iter()
       .enumerate()
       .fold(T::zero(), |acc, (ny, y)| {
-        let sy = Steps(x_range.0, x_range.1, steps).into_iter()
+        let sy = Steps(x_range.0, x_range.1, steps)
+          .into_iter()
           .enumerate()
           .fold(T::zero(), |acc, (nx, x)| {
             let a_n = get_simpson_weight(nx, divs);
@@ -186,7 +195,7 @@ mod tests {
     let actual = integrator.integrate((0., PI), (0., 2.), divs);
     // let actual = SimpsonIntegration2D::new(|x, y, _| {
     //   let zd = f64::cos(PI * f64::cos(x) / 2.0) * f64::cos(PI * (1.0 - f64::sin(x) * f64::cos(y)) / 4.0);
-	  //   (zd.powi(2)/f64::sin(x)).abs()
+    //   (zd.powi(2)/f64::sin(x)).abs()
     // }).integrate((0.1e-8, PI), (0.1e-8, 2. * PI), divs);
 
     let expected = (2_f64).powi(4) * 2. / 4.;

@@ -35,7 +35,9 @@ impl From<Apodization> for ApodizationConfig {
   fn from(apodization: Apodization) -> Self {
     match apodization {
       Apodization::Off => Self::Off,
-      Apodization::Gaussian { fwhm } => Self::Gaussian { fwhm_um: *(fwhm / (MICRO * M)) },
+      Apodization::Gaussian { fwhm } => Self::Gaussian {
+        fwhm_um: *(fwhm / (MICRO * M)),
+      },
       Apodization::Bartlett(a) => Self::Bartlett(a),
       Apodization::Blackman(a) => Self::Blackman(a),
       Apodization::Connes(a) => Self::Connes(a),
@@ -51,7 +53,9 @@ impl From<ApodizationConfig> for Apodization {
   fn from(apodization: ApodizationConfig) -> Self {
     match apodization {
       ApodizationConfig::Off => Self::Off,
-      ApodizationConfig::Gaussian { fwhm_um } => Self::Gaussian { fwhm: fwhm_um * MICRO * M },
+      ApodizationConfig::Gaussian { fwhm_um } => Self::Gaussian {
+        fwhm: fwhm_um * MICRO * M,
+      },
       ApodizationConfig::Bartlett(a) => Self::Bartlett(a),
       ApodizationConfig::Blackman(a) => Self::Blackman(a),
       ApodizationConfig::Connes(a) => Self::Connes(a),

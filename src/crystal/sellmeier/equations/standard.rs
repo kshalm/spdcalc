@@ -8,18 +8,18 @@ use dim::{
 /// > n² = a + b1 * λ² / (λ² - c1) + b2 * λ² / (λ² - c2) + b3 * λ² / (λ² - c3)
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct SellmeierStandard {
-  pub a :  [f64; 3],
-  pub b1 : [f64; 3],
-  pub b2 : [f64; 3],
-  pub b3 : [f64; 3],
+  pub a: [f64; 3],
+  pub b1: [f64; 3],
+  pub b2: [f64; 3],
+  pub b3: [f64; 3],
 
-  pub c1 : [f64; 3],
-  pub c2 : [f64; 3],
-  pub c3 : [f64; 3],
+  pub c1: [f64; 3],
+  pub c2: [f64; 3],
+  pub c3: [f64; 3],
 }
 
 impl SellmeierEquation for SellmeierStandard {
-  fn get_indices(&self, wavelength : Wavelength) -> Indices {
+  fn get_indices(&self, wavelength: Wavelength) -> Indices {
     let a = na::Vector3::from_column_slice(&self.a);
 
     let b1 = na::Vector3::from_column_slice(&self.b1);

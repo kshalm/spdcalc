@@ -100,8 +100,8 @@ pub use types::*;
 pub mod constants;
 pub use constants::*;
 
-pub mod utils;
 pub mod math;
+pub mod utils;
 
 pub mod spdc;
 pub use spdc::*;

@@ -1,14 +1,19 @@
 use dimensioned::f64prefixes::{MICRO, NANO};
-use spdcalc::{dim::ucum::{DEG, K, M}, Apodization, Beam, CrystalSetup, CrystalType, IdlerBeam, PMType, PeriodicPoling, PolarizationType, SignalBeam};
+use spdcalc::{
+  dim::ucum::{DEG, K, M},
+  Apodization, Beam, CrystalSetup, CrystalType, IdlerBeam, PMType, PeriodicPoling,
+  PolarizationType, SignalBeam,
+};
 
 fn main() {
-  let signal : SignalBeam = Beam::new(
+  let signal: SignalBeam = Beam::new(
     PolarizationType::Extraordinary,
     0. * DEG,
     180. * DEG,
     1550e-9 * M,
     100e-6 * M,
-  ).into();
+  )
+  .into();
 
   let pump = Beam::new(
     PolarizationType::Extraordinary,
@@ -16,7 +21,8 @@ fn main() {
     0. * DEG,
     775e-9 * M,
     100e-6 * M,
-  ).into();
+  )
+  .into();
 
   let mut crystal_setup = CrystalSetup {
     crystal: CrystalType::KTP,
@@ -28,17 +34,23 @@ fn main() {
     counter_propagation: true,
   };
 
-  let data: Vec<(_, _)> = (1..20).into_iter().map(|count| {
-    let crystal_length = (1000 * count) as f64 * MICRO * M;
-    crystal_setup.length = crystal_length;
-    let pp = PeriodicPoling::try_new_optimum(&signal, &pump, &crystal_setup, Apodization::Off).unwrap();
-    if let PeriodicPoling::On { period, sign, .. } = pp {
-      (
-        *(crystal_length / (MICRO * M))
-        , *(sign * period / (MICRO * M))
-      )
-    } else { (0., 0.) }
-  }).collect();
+  let data: Vec<(_, _)> = (1..20)
+    .into_iter()
+    .map(|count| {
+      let crystal_length = (1000 * count) as f64 * MICRO * M;
+      crystal_setup.length = crystal_length;
+      let pp =
+        PeriodicPoling::try_new_optimum(&signal, &pump, &crystal_setup, Apodization::Off).unwrap();
+      if let PeriodicPoling::On { period, sign, .. } = pp {
+        (
+          *(crystal_length / (MICRO * M)),
+          *(sign * period / (MICRO * M)),
+        )
+      } else {
+        (0., 0.)
+      }
+    })
+    .collect();
 
   // print as csv
   data.iter()
@@ -52,7 +64,8 @@ fn main() {
     println!("{},{},{}", length, period, diff);
   });
 
-  let pp = PeriodicPoling::try_new_optimum(&signal, &pump, &crystal_setup, Apodization::Off).unwrap();
+  let pp =
+    PeriodicPoling::try_new_optimum(&signal, &pump, &crystal_setup, Apodization::Off).unwrap();
   if let PeriodicPoling::On { period, sign, .. } = pp {
     let optimum_idler = IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, pp).unwrap();
     println!("Crystal Setup: {:#?}", crystal_setup);

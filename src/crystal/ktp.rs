@@ -23,24 +23,24 @@ use dim::{
   ucum::{Kelvin, K, M},
 };
 
-pub const META : CrystalMeta = CrystalMeta {
-  id : "KTP",
-  name : "KTP ref 1",
-  reference_url : "http://dx.doi.org/10.1063/1.1668320",
-  axis_type : OpticAxisType::PositiveBiaxial,
-  point_group : PointGroup::HM_mm2,
+pub const META: CrystalMeta = CrystalMeta {
+  id: "KTP",
+  name: "KTP ref 1",
+  reference_url: "http://dx.doi.org/10.1063/1.1668320",
+  axis_type: OpticAxisType::PositiveBiaxial,
+  point_group: PointGroup::HM_mm2,
   transmission_range: Some(ValidWavelengthRange(350e-9, 3500e-9)),
-  temperature_dependence_known : true,
+  temperature_dependence_known: true,
 };
 
 // from Newlight Photonics
-const DNX : f64 = 1.1e-5;
-const DNY : f64 = 1.3e-5;
-const DNZ : f64 = 1.6e-5;
+const DNX: f64 = 1.1e-5;
+const DNY: f64 = 1.3e-5;
+const DNZ: f64 = 1.6e-5;
 
 /// Get refractive Indices
 #[allow(clippy::unreadable_literal)]
-pub fn get_indices(wavelength : Wavelength, temperature : Kelvin<f64>) -> Indices {
+pub fn get_indices(wavelength: Wavelength, temperature: Kelvin<f64>) -> Indices {
   let lambda_sq = (wavelength / (MICRO * M)).powi(2);
 
   // http://www.redoptronics.com/KTP-crystal.html

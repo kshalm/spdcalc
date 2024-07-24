@@ -13,20 +13,20 @@ use temperature_dependence::*;
 #[derive(Debug)]
 pub struct SellmeierCrystal<Q, T>
 where
-  Q : SellmeierEquation,
-  T : TemperatureDependence,
+  Q: SellmeierEquation,
+  T: TemperatureDependence,
 {
-  pub eqn :                    Q,
-  pub temperature_dependence : T,
-  pub meta :                   CrystalMeta,
+  pub eqn: Q,
+  pub temperature_dependence: T,
+  pub meta: CrystalMeta,
 }
 
 impl<Q, T> SellmeierCrystal<Q, T>
 where
-  Q : SellmeierEquation,
-  T : TemperatureDependence,
+  Q: SellmeierEquation,
+  T: TemperatureDependence,
 {
-  pub fn get_indices(&self, wavelength : Wavelength, temperature : Kelvin<f64>) -> Indices {
+  pub fn get_indices(&self, wavelength: Wavelength, temperature: Kelvin<f64>) -> Indices {
     get_indices(
       &self.eqn,
       wavelength,
@@ -43,14 +43,14 @@ where
 // Calculate indices for a crystal based on sellmeier equation and temperature
 // dependence
 fn get_indices<Q, T>(
-  equation : &Q,
-  wavelength : Wavelength,
-  temperature_dependence : &T,
-  temperature : Kelvin<f64>,
+  equation: &Q,
+  wavelength: Wavelength,
+  temperature_dependence: &T,
+  temperature: Kelvin<f64>,
 ) -> Indices
 where
-  Q : SellmeierEquation,
-  T : TemperatureDependence,
+  Q: SellmeierEquation,
+  T: TemperatureDependence,
 {
   let n = equation.get_indices(wavelength);
   temperature_dependence.apply(n, temperature)

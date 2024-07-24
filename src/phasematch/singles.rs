@@ -1,16 +1,21 @@
-use crate::{math::*, utils::frequency_to_wavenumber};
-use crate::*;
 use super::*;
-use dim::ucum::{RAD, M};
+use crate::*;
+use crate::{math::*, utils::frequency_to_wavenumber};
+use dim::ucum::{M, RAD};
 use num::Complex;
 
 /// Evaluate the fiber coupled singles phasematching function for a given set of frequencies
 ///
 /// This places a "bucket collector" at the idler
 #[allow(non_snake_case)]
-pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency, spdc : &SPDC, steps: Option<usize>) -> PerMeter3<f64> {
+pub fn phasematch_singles_fiber_coupling(
+  omega_s: Frequency,
+  omega_i: Frequency,
+  spdc: &SPDC,
+  steps: Option<usize>,
+) -> PerMeter3<f64> {
   let M2 = M * M; // meters squared
-  // crystal length
+                  // crystal length
   let L = spdc.crystal_setup.length;
 
   let theta_s = spdc.signal.theta_internal();
@@ -58,29 +63,28 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
   let DEL2s = (0.5 / ks_f) * zhs; // 1e-9
   let DEL1s = DEL2s * PHI_s; // 1e-9
   let DEL3s = -hs - zhs * PHI_s * SIN_THETA_s_e * COS_PHI_s; // 1e-11
-  let KpKs = *(k_p * k_s*M2/RAD/RAD); // exact
+  let KpKs = *(k_p * k_s * M2 / RAD / RAD); // exact
   let pp_factor = spdc.pp.pp_factor();
 
   let dksi = k_s + k_i + TWO_PI * RAD * pp_factor;
   let C7 = k_p - dksi; // 1e-7
   let C3 = L * C7; // 1e-10
-  let C4 = L * (1./k_i - 1./k_p); // 1e-13
-  let C5 = k_s/k_p; // exact
+  let C4 = L * (1. / k_i - 1. / k_p); // 1e-13
+  let C5 = k_s / k_p; // exact
   let C9 = Complex::new(*(k_p * Wx_SQ / M / RAD), 0.); // exact
   let C10 = Complex::new(*(k_p * Wy_SQ / M / RAD), 0.); // exact
   let LRho = L * RHOpx; // DIFFERENT SIGN and 1e-5
   let LRho_sq = LRho * LRho;
 
-  let alpha1 = 4. * KpKs * Complex::new(*(GAM1s/M2), -*(DEL1s/M2*RAD));
-  let alpha2 = 4. * KpKs * Complex::new(*(GAM2s/M2), -*(DEL2s/M2*RAD));
-  let alpha3 = Complex::new(*(GAM3s/RAD/M), -*(DEL3s/M));
+  let alpha1 = 4. * KpKs * Complex::new(*(GAM1s / M2), -*(DEL1s / M2 * RAD));
+  let alpha2 = 4. * KpKs * Complex::new(*(GAM2s / M2), -*(DEL2s / M2 * RAD));
+  let alpha3 = Complex::new(*(GAM3s / RAD / M), -*(DEL3s / M));
 
   let k_p_L = k_p * L;
   let KpKs4inv = 1. / (4. * KpKs);
   let imag = Complex::i();
 
-  let fn_z = |z1 : f64, z2 : f64, _index| {
-
+  let fn_z = |z1: f64, z2: f64, _index| {
     let B0 = z1 - z2;
 
     // TODO: krister broke this out of the integral so that repeat calculations didn't happen
@@ -116,38 +120,31 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
 
     // Now to calculate the term EE
     // EE = 1/4*(-  2*Wx^2 + I B6a + C5/X11*(C9 - I A1)^2 - I C5/X12*(C9 + I A2)^2  )
-    let EE = 0.25 * (
-      - Complex::new(2. * (*(Wx_SQ / M2)), 0.)
-      + imag * B6a
-      + (*C5) / X11 * sq(C9 - imag * (*(A1/M)))
-      - imag * (*C5) / X12 * sq(C9 + imag * (*(A2/M)))
-    );
+    let EE = 0.25
+      * (-Complex::new(2. * (*(Wx_SQ / M2)), 0.)
+        + imag * B6a
+        + (*C5) / X11 * sq(C9 - imag * (*(A1 / M)))
+        - imag * (*C5) / X12 * sq(C9 + imag * (*(A2 / M))));
 
     // Now to calculate the term FF
     // FF = 1/4*(-2*Wy^2 + I B6a - C5/Y21 *(I C10 + A1)^2 + I C5/Y22 *(-I C10 + A2)^2)
-    let FF = 0.25 * (
-      - Complex::new(2. * (*(Wy_SQ / M2)), 0.)
-      + imag * B6a
-      - (*C5) / Y21 * sq(imag * C10 + (*(A1/M)))
-      + imag * (*C5) / Y22 * sq(-imag * C10 + (*(A2/M)))
-    );
+    let FF = 0.25
+      * (-Complex::new(2. * (*(Wy_SQ / M2)), 0.) + imag * B6a
+        - (*C5) / Y21 * sq(imag * C10 + (*(A1 / M)))
+        + imag * (*C5) / Y22 * sq(-imag * C10 + (*(A2 / M))));
 
     // Now to calculate the term GG
     // GG = ks*( \[Alpha]3c/X12 *(I C9 - A2)  +  \[Alpha]3/X11 *(-C9 + I A1));
-    let GG = ks * (
-      alpha3.conj() / X12 * (imag * C9 - (*(A2/M)))
-      + alpha3 / X11 * (-C9 + imag * (*(A1/M)))
-    );
+    let GG = ks
+      * (alpha3.conj() / X12 * (imag * C9 - (*(A2 / M)))
+        + alpha3 / X11 * (-C9 + imag * (*(A1 / M))));
 
     // Now to calculate the term HH
     // HH = L * \[Rho]/2 *(I B0 + ks*(B3/Y21 *(-I C10 - A1)  +  B4/Y22 *(C10 + I A2)));
-    let HH = 0.5 * (*(LRho / M)) * (
-      imag * B0
-      + ks * (
-        B3 / Y21 * (-imag * C10 - (*(A1/M)))
-        + B4 / Y22 * (C10 + imag * (*(A2/M)))
-      )
-    );
+    let HH = 0.5
+      * (*(LRho / M))
+      * (imag * B0
+        + ks * (B3 / Y21 * (-imag * C10 - (*(A1 / M))) + B4 / Y22 * (C10 + imag * (*(A2 / M)))));
 
     // Now to calculate the term II
     // IIrho = 1/4* ks*kp*L^2*\[Rho]^2 ( -B3^2/Y21 +I B4^2/Y22)
@@ -156,7 +153,7 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
     // II = IIrho + IIgam + IIdelk
     let IIrho = 0.25 * KpKs * (*(LRho_sq / M2)) * (-B3.powi(2) / Y21 + imag * B4.powi(2) / Y22);
     let IIgam = KpKs * (sq(alpha3) / X11 - imag * sq(alpha3.conj()) / X12);
-    let IIdelk = 2. * *(GAM4s/RAD/RAD) + 0.5 * imag * *(C3/RAD) * B0;
+    let IIdelk = 2. * *(GAM4s / RAD / RAD) + 0.5 * imag * *(C3 / RAD) * B0;
     let II = IIrho + IIgam + IIdelk;
 
     // Now calculate terms in the numerator
@@ -179,7 +176,14 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
   let integrator = SimpsonIntegration2D::new(fn_z);
 
   // h(\omega_s, \omega_i) = \frac{1}{4} \int_{-1}^{1} d\xi_1 \int_{-1}^{1} d\xi_2 \psi(\xi_1, \xi_2).
-  let result = 0.25 * integrator.integrate((-1., 1.), (-1., 1.), steps.unwrap_or_else(|| integration_steps_best_guess(L))).norm();
+  let result = 0.25
+    * integrator
+      .integrate(
+        (-1., 1.),
+        (-1., 1.),
+        steps.unwrap_or_else(|| integration_steps_best_guess(L)),
+      )
+      .norm();
 
   PerMeter3::new(result)
 }
@@ -188,16 +192,16 @@ pub fn phasematch_singles_fiber_coupling(omega_s: Frequency, omega_i: Frequency,
 mod tests {
   use super::*;
 
-  fn percent_diff(actual : f64, expected : f64) -> f64 {
+  fn percent_diff(actual: f64, expected: f64) -> f64 {
     100. * ((expected - actual) / expected).abs()
   }
 
   #[test]
-  fn phasematch_singles_test(){
+  fn phasematch_singles_test() {
     let mut spdc = SPDC::default();
     spdc.crystal_setup.theta = 0.5515891191131287 * RAD;
     // spdc.signal.set_from_external_theta(0.0523598775598298 * RAD, &spdc.crystal_setup);
-    spdc.signal.set_angles(0. *RAD, 0.03253866877817829 * RAD);
+    spdc.signal.set_angles(0. * RAD, 0.03253866877817829 * RAD);
     // spdc.assign_optimum_idler();
     // spdc.assign_optimum_theta();
     spdc.idler.set_angles(PI * RAD, 0.03178987094602039 * RAD);
@@ -205,7 +209,12 @@ mod tests {
     spdc.signal_waist_position = -0.0007348996031796276 * M;
     spdc.idler_waist_position = -0.0007348996031796276 * M;
 
-    let amp = *(phasematch_singles_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None) / PerMeter3::new(1.));
+    let amp = *(phasematch_singles_fiber_coupling(
+      spdc.signal.frequency(),
+      spdc.idler.frequency(),
+      &spdc,
+      None,
+    ) / PerMeter3::new(1.));
 
     let actual = amp;
     let expected = Complex::new(9.518572188658382e+23, 95667755.72451791).norm();
@@ -221,7 +230,7 @@ mod tests {
   }
 
   #[test]
-  fn phasematch_singles_pp_test(){
+  fn phasematch_singles_pp_test() {
     let mut spdc = SPDC::default();
     spdc.pp = PeriodicPoling::On {
       sign: Sign::NEGATIVE,
@@ -229,7 +238,7 @@ mod tests {
       apodization: Apodization::Off,
     };
     // spdc.signal.set_from_external_theta(3. * DEG, &spdc.crystal_setup);
-    spdc.signal.set_angles(0. *RAD, 0.0341877166429185 * RAD);
+    spdc.signal.set_angles(0. * RAD, 0.0341877166429185 * RAD);
     // spdc.assign_optimum_idler();
     // spdc.assign_optimum_theta();
 
@@ -239,7 +248,12 @@ mod tests {
     spdc.signal_waist_position = -0.0006311635856188344 * M;
     spdc.idler_waist_position = -0.0006311635856188344 * M;
 
-    let amp = *(phasematch_singles_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None) / PerMeter3::new(1.));
+    let amp = *(phasematch_singles_fiber_coupling(
+      spdc.signal.frequency(),
+      spdc.idler.frequency(),
+      &spdc,
+      None,
+    ) / PerMeter3::new(1.));
 
     let actual = amp;
     let expected = Complex::new(1.6675811413977128e+24, -126659122.3067034).norm();

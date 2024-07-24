@@ -6,10 +6,8 @@ fn foo<T>(a: T) -> T {
   a
 }
 
-fn criterion_benchmark(c : &mut Criterion) {
-  c.bench_function("bench", |b| {
-    b.iter(|| foo(black_box(10)))
-  });
+fn criterion_benchmark(c: &mut Criterion) {
+  c.bench_function("bench", |b| b.iter(|| foo(black_box(10))));
 }
 
 criterion_group!(benches, criterion_benchmark);

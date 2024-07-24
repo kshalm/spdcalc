@@ -1,8 +1,5 @@
 //! Types used by spdcalc
-use dim::ucum::{
-  self,
-  UCUM,
-};
+use dim::ucum::{self, UCUM};
 use na::*;
 
 pub use num::Complex;
@@ -63,10 +60,10 @@ pub enum Sign {
 
 impl<T> std::ops::Mul<T> for Sign
 where
-  T : std::ops::Mul<f64>,
+  T: std::ops::Mul<f64>,
 {
   type Output = <T as std::ops::Mul<f64>>::Output;
-  fn mul(self, rhs : T) -> Self::Output {
+  fn mul(self, rhs: T) -> Self::Output {
     match self {
       Sign::POSITIVE => rhs * 1.,
       Sign::NEGATIVE => rhs * (-1.),
@@ -76,9 +73,9 @@ where
 
 impl<T> From<T> for Sign
 where
-  T: num::Zero + std::cmp::PartialOrd
+  T: num::Zero + std::cmp::PartialOrd,
 {
-  fn from(item : T) -> Self {
+  fn from(item: T) -> Self {
     if item < T::zero() {
       Sign::NEGATIVE
     } else {

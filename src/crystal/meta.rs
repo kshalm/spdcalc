@@ -97,17 +97,17 @@ pub struct ValidWavelengthRange(pub f64, pub f64);
 #[derive(Debug, Serialize, PartialEq, Deserialize, Copy, Clone)]
 pub struct CrystalMeta {
   /// the internal enum name
-  pub id : &'static str,
+  pub id: &'static str,
   /// The name of the crystal
-  pub name : &'static str,
+  pub name: &'static str,
   /// A url to a reference for the crystal
-  pub reference_url : &'static str,
+  pub reference_url: &'static str,
   /// Optic axis type of the crystal
-  pub axis_type : OpticAxisType,
+  pub axis_type: OpticAxisType,
   /// Point Group (class) of the crystal
-  pub point_group : PointGroup,
+  pub point_group: PointGroup,
   /// The wavelength range within which the crystal transmits light
-  pub transmission_range : Option<ValidWavelengthRange>,
+  pub transmission_range: Option<ValidWavelengthRange>,
   /// Whether or not temperature dependence is known
-  pub temperature_dependence_known : bool,
+  pub temperature_dependence_known: bool,
 }

@@ -1,18 +1,18 @@
 use super::*;
-use na::Vector3;
 use dim::ucum::M;
+use na::Vector3;
 
 /// Calculate the difference in momentum for pump -> signal idler.
 ///
 /// Equation (15) of <https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf>
 pub fn delta_k<P: AsRef<PeriodicPoling>>(
-  omega_s : Frequency,
-  omega_i : Frequency,
-  signal : &SignalBeam,
-  idler : &IdlerBeam,
-  pump : &PumpBeam,
-  crystal_setup : &CrystalSetup,
-  pp : P,
+  omega_s: Frequency,
+  omega_i: Frequency,
+  signal: &SignalBeam,
+  idler: &IdlerBeam,
+  pump: &PumpBeam,
+  crystal_setup: &CrystalSetup,
+  pp: P,
 ) -> Wavevector {
   let ks = signal.wavevector(omega_s, crystal_setup);
   let ki = idler.wavevector(omega_i, crystal_setup);
@@ -25,39 +25,50 @@ pub fn delta_k<P: AsRef<PeriodicPoling>>(
     PeriodicPoling::On { .. } => {
       let zhat = Vector3::<f64>::z_axis();
       // 2PI / period
-      delta_k - Wavevector::new(
-        zhat.as_ref() *
-        *(TWO_PI * pp.as_ref().pp_factor() * M)
-      )
-    },
-    PeriodicPoling::Off => delta_k
+      delta_k - Wavevector::new(zhat.as_ref() * *(TWO_PI * pp.as_ref().pp_factor() * M))
+    }
+    PeriodicPoling::Off => delta_k,
   }
 }
 
 #[cfg(test)]
 mod test {
   use super::*;
+  use crate::dim::{f64prefixes::*, ucum::*};
   use crate::utils::from_celsius_to_kelvin;
-  use crate::dim::{ f64prefixes::*, ucum::* };
 
   #[test]
   fn delta_k_test() {
     let crystal_setup = CrystalSetup {
-      crystal :     CrystalType::BBO_1,
-      pm_type :     PMType::Type2_e_eo,
-      theta :       -3.0 * DEG,
-      phi :         1.0 * DEG,
-      length :      2_000.0 * MICRO * M,
-      temperature : from_celsius_to_kelvin(20.0),
-      counter_propagation : false,
+      crystal: CrystalType::BBO_1,
+      pm_type: PMType::Type2_e_eo,
+      theta: -3.0 * DEG,
+      phi: 1.0 * DEG,
+      length: 2_000.0 * MICRO * M,
+      temperature: from_celsius_to_kelvin(20.0),
+      counter_propagation: false,
     };
 
-    let signal = Beam::new(PolarizationType::Extraordinary, 15. * DEG, 10. * DEG, 1550. * NANO * M, 100.0 * MICRO * M).into();
-    let pump = Beam::new(PolarizationType::Extraordinary, 0. * DEG, 0. * DEG, 775. * NANO * M, 100.0 * MICRO * M).into();
+    let signal = Beam::new(
+      PolarizationType::Extraordinary,
+      15. * DEG,
+      10. * DEG,
+      1550. * NANO * M,
+      100.0 * MICRO * M,
+    )
+    .into();
+    let pump = Beam::new(
+      PolarizationType::Extraordinary,
+      0. * DEG,
+      0. * DEG,
+      775. * NANO * M,
+      100.0 * MICRO * M,
+    )
+    .into();
 
     let pp = PeriodicPoling::On {
-      period : 0.00004656366863331685 * M,
-      sign :   Sign::POSITIVE,
+      period: 0.00004656366863331685 * M,
+      sign: Sign::POSITIVE,
       apodization: Apodization::Off,
     };
 
@@ -68,7 +79,15 @@ mod test {
     // signal.get_index(&crystal_setup), idler.get_index(&crystal_setup),
     // pump.get_index(&crystal_setup));
 
-    let del_k = delta_k(signal.frequency(), idler.frequency(), &signal, &idler, &pump, &crystal_setup, pp) / Wavenumber::new(1.);
+    let del_k = delta_k(
+      signal.frequency(),
+      idler.frequency(),
+      &signal,
+      &idler,
+      &pump,
+      &crystal_setup,
+      pp,
+    ) / Wavenumber::new(1.);
     let expected = na::Vector3::new(-30851.482867892322, -8266.62991975434, 186669.0085568884);
     // println!("{}", del_k);
     assert!(

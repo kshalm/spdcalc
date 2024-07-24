@@ -6,20 +6,20 @@ use criterion::{black_box, Criterion};
 extern crate spdcalc;
 use spdcalc::{crystal::CrystalType, dim::ucum::M, *};
 
-fn bbo(n : Wavelength) -> Indices {
+fn bbo(n: Wavelength) -> Indices {
   CrystalType::BBO_1.get_indices(n, 293.0 * spdcalc::dim::ucum::K)
 }
 
-fn AgGaS2(n : Wavelength) -> Indices {
+fn AgGaS2(n: Wavelength) -> Indices {
   CrystalType::AgGaS2_1.get_indices(n, 293.0 * spdcalc::dim::ucum::K)
 }
 
-fn LiIO3_1(n : Wavelength) -> Indices {
+fn LiIO3_1(n: Wavelength) -> Indices {
   CrystalType::LiIO3_1.get_indices(n, 293.0 * spdcalc::dim::ucum::K)
 }
 
-fn criterion_benchmark(c : &mut Criterion) {
-  const lambda : f64 = 720e-9;
+fn criterion_benchmark(c: &mut Criterion) {
+  const lambda: f64 = 720e-9;
   c.bench_function("BBO Indices", |b| b.iter(|| bbo(black_box(lambda * M))));
   c.bench_function("LiIO3_1 Indices (no T dep)", |b| {
     b.iter(|| AgGaS2(black_box(lambda * M)))

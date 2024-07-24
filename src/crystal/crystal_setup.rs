@@ -1,8 +1,8 @@
 use super::*;
-use std::f64::consts::FRAC_PI_2;
 use crate::math::nelder_mead_1d;
 use dim::ucum::*;
 use na::{Rotation3, Vector3};
+use std::f64::consts::FRAC_PI_2;
 
 /// Crystal setup
 ///
@@ -10,19 +10,19 @@ use na::{Rotation3, Vector3};
 #[derive(Debug, Clone, PartialEq)]
 pub struct CrystalSetup {
   /// The type of the crystal that influences the refractive indices
-  pub crystal :     CrystalType,
+  pub crystal: CrystalType,
   /// The phasematching type through the crystal
-  pub pm_type :     PMType,
+  pub pm_type: PMType,
   /// The polar angle of the crystal optic axis
-  pub phi :         Angle,
+  pub phi: Angle,
   /// The azimuthal angle of the crystal optic axis
-  pub theta :       Angle,
+  pub theta: Angle,
   /// The length of the crystal
-  pub length :      Meter<f64>,
+  pub length: Meter<f64>,
   /// The temperature of the crystal
-  pub temperature : Kelvin<f64>,
+  pub temperature: Kelvin<f64>,
   /// Whether the signal beam is traveling in the opposite z direction as the idler
-  pub counter_propagation : bool,
+  pub counter_propagation: bool,
 }
 
 impl AsRef<CrystalSetup> for CrystalSetup {
@@ -33,7 +33,7 @@ impl AsRef<CrystalSetup> for CrystalSetup {
 
 impl CrystalSetup {
   /// Convert a direction relative to the pump beam to a direction relative to the crystal optic axes
-  pub fn to_crystal_frame(&self, direction : Direction) -> Direction {
+  pub fn to_crystal_frame(&self, direction: Direction) -> Direction {
     let crystal_rotation = Rotation3::from_euler_angles(0., *(self.theta / RAD), *(self.phi / RAD));
     crystal_rotation * direction
   }
@@ -41,12 +41,14 @@ impl CrystalSetup {
   /// get the refractive index along specified direction, with wavelength and polarization type
   pub fn index_along(
     &self,
-    vacuum_wavelength : Wavelength,
-    direction : Direction,
-    polarization : PolarizationType,
+    vacuum_wavelength: Wavelength,
+    direction: Direction,
+    polarization: PolarizationType,
   ) -> RIndex {
     // Calculation follows https://physics.nist.gov/Divisions/Div844/publications/migdall/phasematch.pdf
-    let indices = *self.crystal.get_indices(vacuum_wavelength, self.temperature);
+    let indices = *self
+      .crystal
+      .get_indices(vacuum_wavelength, self.temperature);
     let n_inv2 = indices.map(|i| i.powi(-2));
     let s = self.to_crystal_frame(direction);
     let s_squared = s.map(|i| i * i);
@@ -105,8 +107,17 @@ impl CrystalSetup {
       crystal_setup.theta = theta * RAD;
       signal.set_theta_external(theta_s_e, &crystal_setup);
 
-      let idler = IdlerBeam::try_new_optimum(&signal, pump, &crystal_setup, PeriodicPoling::Off).unwrap();
-      let del_k = delta_k(signal.frequency(), idler.frequency(), &signal, &idler, pump, &crystal_setup, PeriodicPoling::Off);
+      let idler =
+        IdlerBeam::try_new_optimum(&signal, pump, &crystal_setup, PeriodicPoling::Off).unwrap();
+      let del_k = delta_k(
+        signal.frequency(),
+        idler.frequency(),
+        &signal,
+        &idler,
+        pump,
+        &crystal_setup,
+        PeriodicPoling::Off,
+      );
 
       (del_k * M / RAD).z.abs()
       // let (ws, wi) = (signal.frequency(), idler.frequency());
@@ -146,14 +157,15 @@ impl CrystalSetup {
   /// z_{s,i} = -\frac{1}{2}\frac{L}{n_z(\lambda_{s,i})}
   pub fn optimal_waist_position(
     &self,
-    wavelength : Wavelength,
-    polarization : PolarizationType
+    wavelength: Wavelength,
+    polarization: PolarizationType,
   ) -> Distance {
-    -0.5 * self.length / self.index_along(
-      wavelength,
-      na::Unit::new_normalize(na::Vector3::z()),
-      polarization
-    )
+    -0.5 * self.length
+      / self.index_along(
+        wavelength,
+        na::Unit::new_normalize(na::Vector3::z()),
+        polarization,
+      )
   }
 }
 
@@ -162,7 +174,7 @@ mod test {
   use super::*;
 
   #[test]
-  fn index_along_test(){
+  fn index_along_test() {
     let mut spdc = SPDC::default();
     spdc.crystal_setup.phi = Angle::new(0.);
     spdc.crystal_setup.theta = Angle::new(PI / 2.);
@@ -171,7 +183,7 @@ mod test {
     let n = spdc.crystal_setup.index_along(
       spdc.signal.vacuum_wavelength(),
       spdc.signal.direction(),
-      spdc.signal.polarization()
+      spdc.signal.polarization(),
     );
 
     assert_eq!(n, Unitless::new(1.6017685463810718));

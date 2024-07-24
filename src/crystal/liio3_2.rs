@@ -21,23 +21,23 @@ use dim::{
   ucum::{Kelvin, M},
 };
 
-pub const META : CrystalMeta = CrystalMeta {
-  id : "LiIO3_2",
-  name : "LiIO3 ref 2",
-  reference_url : "http://www.newlightphotonics.com/v1/bbo-properties.html",
-  axis_type : OpticAxisType::NegativeUniaxial,
-  point_group : PointGroup::HM_622,
+pub const META: CrystalMeta = CrystalMeta {
+  id: "LiIO3_2",
+  name: "LiIO3 ref 2",
+  reference_url: "http://www.newlightphotonics.com/v1/bbo-properties.html",
+  axis_type: OpticAxisType::NegativeUniaxial,
+  point_group: PointGroup::HM_622,
   transmission_range: Some(ValidWavelengthRange(300e-9, 5_000e-9)),
-  temperature_dependence_known : false,
+  temperature_dependence_known: false,
 };
 
 /// Get refractive Indices
 #[allow(clippy::unreadable_literal)]
-pub fn get_indices(wavelength : Wavelength, _temperature : Kelvin<f64>) -> Indices {
+pub fn get_indices(wavelength: Wavelength, _temperature: Kelvin<f64>) -> Indices {
   let l_sq = (wavelength / (MICRO * M)).powi(2); // Convert for Sellmeier Coefficients
 
-  let no = (3.4095 + 0.047664/(l_sq - 0.033991)).sqrt();
-  let ne = (2.9163 + 0.034514/(l_sq - 0.031034)).sqrt();
+  let no = (3.4095 + 0.047664 / (l_sq - 0.033991)).sqrt();
+  let ne = (2.9163 + 0.034514 / (l_sq - 0.031034)).sqrt();
 
   Indices::new(na::Vector3::new(no, no, ne))
 }

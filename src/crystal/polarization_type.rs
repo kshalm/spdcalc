@@ -1,6 +1,6 @@
+use crate::SPDCError;
 use std::fmt;
 use std::str::FromStr;
-use crate::SPDCError;
 
 /// The polarization type (ordinary or extraordinary)
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
@@ -18,13 +18,15 @@ impl fmt::Display for PolarizationType {
 impl FromStr for PolarizationType {
   type Err = SPDCError;
 
-  fn from_str(s : &str) -> Result<Self, Self::Err> {
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
     let mut s = String::from(s);
     s.make_ascii_lowercase();
     match s.as_str() {
       "o" | "ordinary" => Ok(Self::Ordinary),
       "e" | "extraordinary" => Ok(Self::Extraordinary),
-      _ => Err(SPDCError::new("Can not parse polarization type".to_string())),
+      _ => Err(SPDCError::new(
+        "Can not parse polarization type".to_string(),
+      )),
     }
   }
 }

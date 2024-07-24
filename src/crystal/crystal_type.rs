@@ -1,8 +1,8 @@
+use super::*;
 use crate::SPDCError;
+use dim::ucum::Kelvin;
 use std::fmt;
 use std::str::FromStr;
-use super::*;
-use dim::ucum::Kelvin;
 
 /// The type of crystal
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
@@ -32,17 +32,16 @@ impl fmt::Display for CrystalType {
 impl FromStr for CrystalType {
   type Err = SPDCError;
 
-  fn from_str(s : &str) -> Result<Self, Self::Err> {
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
     CrystalType::from_string(s)
   }
 }
 
 impl CrystalType {
-
   /// Get the crystal from its id string.
   ///
   /// useful for external language bindings and serialization
-  pub fn from_string( id : &str ) -> Result<Self, SPDCError> {
+  pub fn from_string(id: &str) -> Result<Self, SPDCError> {
     match id {
       "BBO_1" => Ok(CrystalType::BBO_1),
       "KTP" => Ok(CrystalType::KTP),
@@ -55,12 +54,15 @@ impl CrystalType {
       "AgGaS2_1" => Ok(CrystalType::AgGaS2_1),
       "AgGaSe2_1" => Ok(CrystalType::AgGaSe2_1),
       "AgGaSe2_2" => Ok(CrystalType::AgGaSe2_2),
-      _ => Err(SPDCError::new(format!("Crystal Type {} is not defined", id))),
+      _ => Err(SPDCError::new(format!(
+        "Crystal Type {} is not defined",
+        id
+      ))),
     }
   }
 
   pub fn get_all_meta() -> Vec<CrystalMeta> {
-    vec!(
+    vec![
       bbo_1::META,
       ktp::META,
       bibo_1::META,
@@ -72,7 +74,7 @@ impl CrystalType {
       liio3_2::META,
       liio3_1::LiIO3_1.get_meta(),
       aggas2_1::AgGaS2_1.get_meta(),
-    )
+    ]
   }
 
   /// Get the crystal refraction indices for this crystal
@@ -90,7 +92,7 @@ impl CrystalType {
   /// ));
   /// assert_eq!(indices, expected)
   /// ```
-  pub fn get_indices(&self, vacuum_wavelength : Wavelength, temperature : Kelvin<f64>) -> Indices {
+  pub fn get_indices(&self, vacuum_wavelength: Wavelength, temperature: Kelvin<f64>) -> Indices {
     match &self {
       CrystalType::BBO_1 => bbo_1::get_indices(vacuum_wavelength, temperature),
       CrystalType::KTP => ktp::get_indices(vacuum_wavelength, temperature),

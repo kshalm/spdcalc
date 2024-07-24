@@ -6,16 +6,16 @@ pub use self::meta::*;
 
 // crystals
 mod aggas2_1;
+mod aggase2_1;
+mod aggase2_2;
 mod bbo_1;
 mod bibo_1;
+mod kdp_1;
 mod ktp;
 mod liio3_1;
 mod liio3_2;
-mod linbo3_1;
 mod linb_mgo;
-mod kdp_1;
-mod aggase2_1;
-mod aggase2_2;
+mod linbo3_1;
 
 /// useful for custom crystals
 pub mod sellmeier;

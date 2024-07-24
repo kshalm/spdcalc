@@ -1,5 +1,5 @@
-use crate::{SPDC, jsa::FrequencySpace};
-use dim::ucum::{S, Hertz};
+use crate::{jsa::FrequencySpace, SPDC};
+use dim::ucum::{Hertz, S};
 
 /// The efficiencies (and counts) result object
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -13,15 +13,28 @@ pub struct Efficiencies {
 }
 
 /// Calculate the efficiencies from the raw counts.
-pub fn efficiencies_from_counts(coincidences_rate: Hertz<f64>, signal_singles_rate: Hertz<f64>, idler_singles_rate: Hertz<f64>) -> Efficiencies {
-  let signal_efficiency = if idler_singles_rate == Hertz::new(0.) { 0. } else { *(coincidences_rate / idler_singles_rate) };
-  let idler_efficiency = if signal_singles_rate == Hertz::new(0.) { 0. } else { *(coincidences_rate / signal_singles_rate) };
-  let symmetric_efficiency = if signal_singles_rate == Hertz::new(0.) || idler_singles_rate == Hertz::new(0.) {
+pub fn efficiencies_from_counts(
+  coincidences_rate: Hertz<f64>,
+  signal_singles_rate: Hertz<f64>,
+  idler_singles_rate: Hertz<f64>,
+) -> Efficiencies {
+  let signal_efficiency = if idler_singles_rate == Hertz::new(0.) {
     0.
   } else {
-    let denom : f64 = *(signal_singles_rate * idler_singles_rate * S * S);
-    *(coincidences_rate * S / denom.sqrt())
+    *(coincidences_rate / idler_singles_rate)
   };
+  let idler_efficiency = if signal_singles_rate == Hertz::new(0.) {
+    0.
+  } else {
+    *(coincidences_rate / signal_singles_rate)
+  };
+  let symmetric_efficiency =
+    if signal_singles_rate == Hertz::new(0.) || idler_singles_rate == Hertz::new(0.) {
+      0.
+    } else {
+      let denom: f64 = *(signal_singles_rate * idler_singles_rate * S * S);
+      *(coincidences_rate * S / denom.sqrt())
+    };
   Efficiencies {
     symmetric: symmetric_efficiency,
     signal: signal_efficiency,
@@ -33,7 +46,11 @@ pub fn efficiencies_from_counts(coincidences_rate: Hertz<f64>, signal_singles_ra
 }
 
 /// Calculate the efficiencies from the SPDC object over the given ranges.
-pub fn efficiencies(spdc : &SPDC, ranges: FrequencySpace, integration_steps: Option<usize>) -> Efficiencies {
+pub fn efficiencies(
+  spdc: &SPDC,
+  ranges: FrequencySpace,
+  integration_steps: Option<usize>,
+) -> Efficiencies {
   let coincidences_rate = spdc.counts_coincidences(ranges, integration_steps);
   let signal_singles_rate = spdc.counts_singles_signal(ranges, integration_steps);
   let idler_singles_rate = spdc.counts_singles_idler(ranges, integration_steps);

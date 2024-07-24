@@ -10,14 +10,14 @@ use dim::{
   ucum::{self, M},
 };
 
-pub const META : CrystalMeta = CrystalMeta {
-  id : "KDP_1",
-  name : "KDP ref 1",
-  reference_url : "http://www.newlightphotonics.com/v1/KDP-crystal.html",
-  axis_type : OpticAxisType::NegativeUniaxial,
-  point_group : PointGroup::HM_i42m,
+pub const META: CrystalMeta = CrystalMeta {
+  id: "KDP_1",
+  name: "KDP ref 1",
+  reference_url: "http://www.newlightphotonics.com/v1/KDP-crystal.html",
+  axis_type: OpticAxisType::NegativeUniaxial,
+  point_group: PointGroup::HM_i42m,
   transmission_range: Some(ValidWavelengthRange(200e-9, 1_500e-9)),
-  temperature_dependence_known : false,
+  temperature_dependence_known: false,
 };
 
 // ... PROBABLY WRONG see below
@@ -43,12 +43,18 @@ pub const META : CrystalMeta = CrystalMeta {
 /// assert_eq!(indices, expected)
 /// ```
 #[allow(clippy::unreadable_literal)]
-pub fn get_indices(wavelength : Wavelength, _temperature : ucum::Kelvin<f64>) -> Indices {
+pub fn get_indices(wavelength: Wavelength, _temperature: ucum::Kelvin<f64>) -> Indices {
   let lambda_sq = (wavelength / (MICRO * M)).powi(2);
 
-  let nx = (2.259276 + 13.005522 * lambda_sq / (lambda_sq - 400.) + 0.01008956 / (lambda_sq - 0.012942625)).sqrt();
+  let nx = (2.259276
+    + 13.005522 * lambda_sq / (lambda_sq - 400.)
+    + 0.01008956 / (lambda_sq - 0.012942625))
+    .sqrt();
   let ny = nx;
-  let nz = (2.132668 + 3.2279924 * lambda_sq / (lambda_sq - 400.) + 0.008637494 / (lambda_sq - 0.012281043)).sqrt();
+  let nz = (2.132668
+    + 3.2279924 * lambda_sq / (lambda_sq - 400.)
+    + 0.008637494 / (lambda_sq - 0.012281043))
+    .sqrt();
 
   // NOTE: In the old version this was the temperature dependence... but i don't
   // see any reference of this in the documentation. so I don't think we know the T dependence

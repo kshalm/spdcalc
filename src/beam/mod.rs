@@ -1,15 +1,25 @@
 //! # Beam
 //!
 //! Used for pump, signal, idler beams
-use crate::{*, crystal::CrystalSetup, PeriodicPoling, math::*, utils::{vacuum_wavelength_to_frequency, frequency_to_vacuum_wavelength, frequency_to_wavenumber}};
+use crate::{
+  crystal::CrystalSetup,
+  math::*,
+  utils::{
+    frequency_to_vacuum_wavelength, frequency_to_wavenumber, vacuum_wavelength_to_frequency,
+  },
+  PeriodicPoling, *,
+};
 use dim::ucum::{self, C_, M, RAD};
 use na::*;
-use std::{f64::{self, consts::FRAC_PI_2}, ops::{Deref, DerefMut}};
+use std::{
+  f64::{self, consts::FRAC_PI_2},
+  ops::{Deref, DerefMut},
+};
 mod beam_waist;
 pub use beam_waist::*;
 
 /// Create a unit direction vector from polar coordinates
-pub fn direction_from_polar(phi : Angle, theta : Angle) -> Direction {
+pub fn direction_from_polar(phi: Angle, theta: Angle) -> Direction {
   let theta_rad = *(theta / ucum::RAD);
   let phi_rad = *(phi / ucum::RAD);
   Unit::new_normalize(Vector3::new(
@@ -25,8 +35,12 @@ pub fn direction_from_polar(phi : Angle, theta : Angle) -> Direction {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PumpBeam(Beam);
 impl PumpBeam {
-  pub fn new(beam: Beam) -> Self { Self(beam) }
-  pub fn as_beam(self) -> Beam { self.0 }
+  pub fn new(beam: Beam) -> Self {
+    Self(beam)
+  }
+  pub fn as_beam(self) -> Beam {
+    self.0
+  }
 }
 impl From<PumpBeam> for Beam {
   fn from(value: PumpBeam) -> Self {
@@ -59,8 +73,12 @@ impl DerefMut for PumpBeam {
 #[derive(Debug, Clone, PartialEq)]
 pub struct SignalBeam(Beam);
 impl SignalBeam {
-  pub fn new(beam: Beam) -> Self { Self(beam) }
-  pub fn as_beam(self) -> Beam { self.0 }
+  pub fn new(beam: Beam) -> Self {
+    Self(beam)
+  }
+  pub fn as_beam(self) -> Beam {
+    self.0
+  }
 }
 impl From<SignalBeam> for Beam {
   fn from(value: SignalBeam) -> Self {
@@ -91,22 +109,26 @@ impl DerefMut for SignalBeam {
 #[derive(Debug, Clone, PartialEq)]
 pub struct IdlerBeam(Beam);
 impl IdlerBeam {
-  pub fn new(beam: Beam) -> Self { Self(beam) }
-  pub fn as_beam(self) -> Beam { self.0 }
+  pub fn new(beam: Beam) -> Self {
+    Self(beam)
+  }
+  pub fn as_beam(self) -> Beam {
+    self.0
+  }
   /// Calculate the optimal idler beam for the given signal and pump beams.
   pub fn try_new_optimum<P: AsRef<PeriodicPoling>>(
-    signal : &SignalBeam,
-    pump : &PumpBeam,
-    crystal_setup : &CrystalSetup,
-    pp : P,
+    signal: &SignalBeam,
+    pump: &PumpBeam,
+    crystal_setup: &CrystalSetup,
+    pp: P,
   ) -> Result<Self, SPDCError> {
     let ls = signal.vacuum_wavelength();
     let lp = pump.vacuum_wavelength();
 
     if ls <= lp {
-      return Err(
-        SPDCError("Signal wavelength must be greater than Pump wavelength".into())
-      );
+      return Err(SPDCError(
+        "Signal wavelength must be greater than Pump wavelength".into(),
+      ));
     }
 
     let ns = signal.refractive_index(signal.frequency(), crystal_setup);
@@ -125,9 +147,7 @@ impl IdlerBeam {
 
     // simplified calculation
     let numerator = ns * sin(theta_s);
-    let arg =
-      (ns_z - np_by_ls_over_lp + k_pp).powi(2)
-      + ns.powi(2);
+    let arg = (ns_z - np_by_ls_over_lp + k_pp).powi(2) + ns.powi(2);
 
     let val = (*numerator) / arg.sqrt();
 
@@ -150,7 +170,8 @@ impl IdlerBeam {
         theta,
         wavelength,
         signal.waist(),
-      ).into()
+      )
+      .into(),
     )
   }
 }
@@ -182,26 +203,26 @@ impl DerefMut for IdlerBeam {
 /// Use with PumpBeam, SignalBeam, IdlerBeam
 #[derive(Debug, Clone, PartialEq)]
 pub struct Beam {
-  waist : BeamWaist,
-  frequency : Frequency,
+  waist: BeamWaist,
+  frequency: Frequency,
   // the polarization
-  polarization : PolarizationType,
+  polarization: PolarizationType,
   /// (internal) azimuthal angle [0, π]
-  theta : Angle,
+  theta: Angle,
   /// polar angle [0, 2π]
-  phi : Angle,
+  phi: Angle,
   /// direction of propagation
-  direction : Direction,
+  direction: Direction,
 }
 
 impl Beam {
   /// create a beam
-  pub fn new<W: Into<BeamWaist>> (
-    polarization : PolarizationType,
-    phi : Angle,
-    theta : Angle,
-    vacuum_wavelength : Wavelength,
-    waist : W,
+  pub fn new<W: Into<BeamWaist>>(
+    polarization: PolarizationType,
+    phi: Angle,
+    theta: Angle,
+    vacuum_wavelength: Wavelength,
+    waist: W,
   ) -> Self {
     assert!(
       *(theta / ucum::RAD) <= PI && *(theta / ucum::RAD) >= 0.,
@@ -215,13 +236,17 @@ impl Beam {
       waist: waist.into(),
       phi,
       theta,
-      direction : direction_from_polar(phi, theta),
+      direction: direction_from_polar(phi, theta),
     }
   }
 
   /// Effective index of refraction induced by periodic poling
   // TODO: double check this...
-  pub fn effective_index_of_refraction<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> RIndex {
+  pub fn effective_index_of_refraction<P: AsRef<PeriodicPoling>>(
+    &self,
+    crystal_setup: &CrystalSetup,
+    pp: P,
+  ) -> RIndex {
     let lambda_o = self.vacuum_wavelength();
     let n = self.refractive_index(self.frequency, crystal_setup);
     let pp_factor = pp.as_ref().pp_factor();
@@ -229,16 +254,24 @@ impl Beam {
   }
 
   /// Get the phase velocity of the beam through specified crystal setup
-  pub fn phase_velocity<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> Speed {
+  pub fn phase_velocity<P: AsRef<PeriodicPoling>>(
+    &self,
+    crystal_setup: &CrystalSetup,
+    pp: P,
+  ) -> Speed {
     C_ / self.effective_index_of_refraction(crystal_setup, pp)
   }
 
   /// Get the group velocity of the beam through specified crystal setup
-  pub fn group_velocity<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> Speed {
+  pub fn group_velocity<P: AsRef<PeriodicPoling>>(
+    &self,
+    crystal_setup: &CrystalSetup,
+    pp: P,
+  ) -> Speed {
     let lambda_o = self.vacuum_wavelength();
     let n_eff = self.effective_index_of_refraction(crystal_setup, pp);
     let vp = C_ / n_eff;
-    let n_of_lambda = move |lambda : f64| {
+    let n_of_lambda = move |lambda: f64| {
       *crystal_setup.index_along(lambda * M, self.direction(), self.polarization())
     };
     let dn_by_dlambda = derivative_at(n_of_lambda, *(lambda_o / M));
@@ -246,16 +279,20 @@ impl Beam {
   }
 
   /// Get the group index of the beam through specified crystal setup
-  pub fn group_index<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> RIndex {
+  pub fn group_index<P: AsRef<PeriodicPoling>>(
+    &self,
+    crystal_setup: &CrystalSetup,
+    pp: P,
+  ) -> RIndex {
     let vg = self.group_velocity(crystal_setup, pp);
     C_ / vg
   }
 
   /// Use snell's law to calculate the internal theta from external
   pub fn calc_internal_theta_from_external(
-    beam : &Self,
-    external : Angle,
-    crystal_setup : &CrystalSetup,
+    beam: &Self,
+    external: Angle,
+    crystal_setup: &CrystalSetup,
   ) -> Angle {
     assert!(*(external / ucum::RAD) <= PI && *(external / ucum::RAD) >= 0.);
 
@@ -277,9 +314,9 @@ impl Beam {
 
   /// Use snell's law to calculate the external theta from internal
   pub fn calc_external_theta_from_internal(
-    beam : &Self,
-    internal : Angle,
-    crystal_setup : &CrystalSetup,
+    beam: &Self,
+    internal: Angle,
+    crystal_setup: &CrystalSetup,
   ) -> Angle {
     let direction = direction_from_polar(beam.phi(), internal);
     let n = crystal_setup.index_along(beam.vacuum_wavelength(), direction, beam.polarization());
@@ -288,8 +325,11 @@ impl Beam {
   }
 
   /// make a copy of this photon with a new type
-  pub fn with_polarization(self, polarization : PolarizationType) -> Self {
-    Self { polarization, ..self }
+  pub fn with_polarization(self, polarization: PolarizationType) -> Self {
+    Self {
+      polarization,
+      ..self
+    }
   }
 
   /// Get the polarization type (ordinary or extraordinary)
@@ -298,13 +338,13 @@ impl Beam {
   }
 
   /// Set the polarization type (ordinary or extraordinary)
-  pub fn set_polarization(&mut self, polarization : PolarizationType) -> &mut Self {
+  pub fn set_polarization(&mut self, polarization: PolarizationType) -> &mut Self {
     self.polarization = polarization;
     self
   }
 
   /// Get index of refraction along direction of propagation at specified freuency
-  pub fn refractive_index(&self, omega: Frequency, crystal_setup : &CrystalSetup) -> RIndex {
+  pub fn refractive_index(&self, omega: Frequency, crystal_setup: &CrystalSetup) -> RIndex {
     let lambda_o = frequency_to_vacuum_wavelength(omega);
     crystal_setup.index_along(lambda_o, self.direction(), self.polarization())
   }
@@ -336,20 +376,22 @@ impl Beam {
   }
 
   /// Get the azimuthal angle relative to the z-axis (pump direction) external to the crystal
-  pub fn theta_external(&self, crystal_setup : &CrystalSetup) -> Angle {
+  pub fn theta_external(&self, crystal_setup: &CrystalSetup) -> Angle {
     // snells law
     Self::calc_external_theta_from_internal(self, self.theta, crystal_setup)
   }
 
   /// Get the wavevector of the beam
-  pub fn wavevector(&self, omega: Frequency, crystal_setup : &CrystalSetup) -> Wavevector {
+  pub fn wavevector(&self, omega: Frequency, crystal_setup: &CrystalSetup) -> Wavevector {
     let n = self.refractive_index(omega, crystal_setup);
     let k = frequency_to_wavenumber(omega, n);
     Wavevector::new(self.direction.into_inner() * *(k * M / RAD))
   }
 
   /// The center frequency of the beam
-  pub fn frequency(&self) -> Frequency { self.frequency }
+  pub fn frequency(&self) -> Frequency {
+    self.frequency
+  }
   /// Set the center frequency of the beam
   pub fn set_frequency(&mut self, omega: Frequency) -> &mut Self {
     self.frequency = omega;
@@ -362,20 +404,20 @@ impl Beam {
   }
 
   /// Set the vacuum wavelength at the center
-  pub fn set_vacuum_wavelength(&mut self, lambda_o : Wavelength) -> &mut Self {
+  pub fn set_vacuum_wavelength(&mut self, lambda_o: Wavelength) -> &mut Self {
     self.frequency = vacuum_wavelength_to_frequency(lambda_o);
     self
   }
 
   /// Set phi
-  pub fn set_phi(&mut self, phi : Angle) -> &mut Self {
+  pub fn set_phi(&mut self, phi: Angle) -> &mut Self {
     self.phi = phi;
     self.update_direction();
     self
   }
 
   /// Set theta internal
-  pub fn set_theta_internal(&mut self, theta : Angle) -> &mut Self {
+  pub fn set_theta_internal(&mut self, theta: Angle) -> &mut Self {
     assert!(*(theta / ucum::RAD) <= PI && *(theta / ucum::RAD) >= 0.);
     self.theta = theta;
     self.update_direction();
@@ -383,17 +425,21 @@ impl Beam {
   }
 
   /// Set the external azimuthal angle
-  pub fn set_theta_external(&mut self, external : Angle, crystal_setup : &CrystalSetup) -> &mut Self {
+  pub fn set_theta_external(&mut self, external: Angle, crystal_setup: &CrystalSetup) -> &mut Self {
     use dim::Abs;
     let theta = Self::calc_internal_theta_from_external(self, external.abs(), crystal_setup);
     // if angle is negative then turn by 180 deg along phi
-    let turn = if (external / ucum::RAD).is_sign_positive() { 0. } else { PI } * ucum::RAD;
+    let turn = if (external / ucum::RAD).is_sign_positive() {
+      0.
+    } else {
+      PI
+    } * ucum::RAD;
     self.set_angles(self.phi + turn, theta);
     self
   }
 
   /// Set both internal angles
-  pub fn set_angles(&mut self, phi : Angle, theta : Angle) -> &mut Self {
+  pub fn set_angles(&mut self, phi: Angle, theta: Angle) -> &mut Self {
     assert!(*(theta / ucum::RAD) <= PI && *(theta / ucum::RAD) >= 0.);
     self.phi = phi;
     self.theta = theta;
@@ -403,7 +449,7 @@ impl Beam {
 
   /// Calculate the spatial walk-off
   /// [See equation (37) of Couteau, Christophe. "Spontaneous parametric down-conversion"](https://arxiv.org/pdf/1809.00127.pdf)
-  pub fn walkoff_angle(&self, crystal_setup : &CrystalSetup) -> Angle {
+  pub fn walkoff_angle(&self, crystal_setup: &CrystalSetup) -> Angle {
     // ***
     // NOTE: in the original version of the program this was TOTALLY bugged
     // and gave the wrong values completely
@@ -426,7 +472,11 @@ impl Beam {
   }
 
   /// Get the average transit time through the crystal
-  pub fn average_transit_time<P: AsRef<PeriodicPoling>>(&self, crystal_setup : &CrystalSetup, pp : P) -> Time {
+  pub fn average_transit_time<P: AsRef<PeriodicPoling>>(
+    &self,
+    crystal_setup: &CrystalSetup,
+    pp: P,
+  ) -> Time {
     let crystal_length = crystal_setup.length;
     let delta_z = 0.5 * crystal_length;
     // beam direction in lab frame
@@ -461,16 +511,22 @@ mod tests {
     let wavelength = 1550. * NANO * M;
     let waist = BeamWaist::new(100.0 * MICRO * M);
     let crystal_setup = CrystalSetup {
-      crystal :     CrystalType::BBO_1,
-      pm_type :     PMType::Type2_e_eo,
-      theta :       -3.0 * DEG,
-      phi :         1.0 * DEG,
-      length :      2_000.0 * MICRO * M,
-      temperature : from_celsius_to_kelvin(20.0),
-      counter_propagation : false,
+      crystal: CrystalType::BBO_1,
+      pm_type: PMType::Type2_e_eo,
+      theta: -3.0 * DEG,
+      phi: 1.0 * DEG,
+      length: 2_000.0 * MICRO * M,
+      temperature: from_celsius_to_kelvin(20.0),
+      counter_propagation: false,
     };
 
-    let signal = Beam::new(PolarizationType::Extraordinary, phi, theta, wavelength, waist);
+    let signal = Beam::new(
+      PolarizationType::Extraordinary,
+      phi,
+      theta,
+      wavelength,
+      waist,
+    );
 
     (crystal_setup, signal)
   }
@@ -563,21 +619,35 @@ mod tests {
   #[test]
   fn optimum_idler_test() {
     let crystal_setup = CrystalSetup {
-      crystal :     CrystalType::BBO_1,
-      pm_type :     PMType::Type1_e_oo,
-      theta :       -3.0 * DEG,
-      phi :         1.0 * DEG,
-      length :      2_000.0 * MICRO * M,
-      temperature : from_celsius_to_kelvin(20.0),
-      counter_propagation : false,
+      crystal: CrystalType::BBO_1,
+      pm_type: PMType::Type1_e_oo,
+      theta: -3.0 * DEG,
+      phi: 1.0 * DEG,
+      length: 2_000.0 * MICRO * M,
+      temperature: from_celsius_to_kelvin(20.0),
+      counter_propagation: false,
     };
 
-    let signal = Beam::new(PolarizationType::Extraordinary, 15. * DEG, 10. * DEG, 1550. * NANO * M, 100. * MICRO * M).into();
-    let pump = Beam::new(PolarizationType::Extraordinary, 0. * DEG, 0. * DEG, 775. * NANO * M, 100. * MICRO * M).into();
+    let signal = Beam::new(
+      PolarizationType::Extraordinary,
+      15. * DEG,
+      10. * DEG,
+      1550. * NANO * M,
+      100. * MICRO * M,
+    )
+    .into();
+    let pump = Beam::new(
+      PolarizationType::Extraordinary,
+      0. * DEG,
+      0. * DEG,
+      775. * NANO * M,
+      100. * MICRO * M,
+    )
+    .into();
 
     let pp = PeriodicPoling::On {
-      period : 0.00004656366863331685 * ucum::M,
-      sign :   Sign::POSITIVE,
+      period: 0.00004656366863331685 * ucum::M,
+      sign: Sign::POSITIVE,
       apodization: Apodization::Off,
     };
 
@@ -617,7 +687,13 @@ mod tests {
     crystal_setup.crystal = CrystalType::BBO_1;
     crystal_setup.theta = 31.603728550521122 * ucum::DEG;
 
-    let pump = Beam::new(PolarizationType::Extraordinary, 0. * DEG, 0. * DEG, 775. * NANO * M, 100. * MICRO * M);
+    let pump = Beam::new(
+      PolarizationType::Extraordinary,
+      0. * DEG,
+      0. * DEG,
+      775. * NANO * M,
+      100. * MICRO * M,
+    );
 
     let expected = 0.06674608819804856;
     let actual = *(pump.walkoff_angle(&crystal_setup) / ucum::RAD);

@@ -8,14 +8,14 @@ use dim::{
   ucum::{self, M},
 };
 
-pub const META : CrystalMeta = CrystalMeta {
-  id : "BiBO_1",
-  name : "BiBO",
-  reference_url : "http://www.newlightphotonics.com/v1/bibo-properties.html",
-  axis_type : OpticAxisType::PositiveBiaxial,
-  point_group : PointGroup::HM_2,
+pub const META: CrystalMeta = CrystalMeta {
+  id: "BiBO_1",
+  name: "BiBO",
+  reference_url: "http://www.newlightphotonics.com/v1/bibo-properties.html",
+  axis_type: OpticAxisType::PositiveBiaxial,
+  point_group: PointGroup::HM_2,
   transmission_range: Some(ValidWavelengthRange(286e-9, 2_500e-9)),
-  temperature_dependence_known : false,
+  temperature_dependence_known: false,
 };
 
 /// Get refractive Indices
@@ -33,7 +33,7 @@ pub const META : CrystalMeta = CrystalMeta {
 /// assert_eq!(indices, expected)
 /// ```
 #[allow(clippy::unreadable_literal)]
-pub fn get_indices(wavelength : Wavelength, _temperature : ucum::Kelvin<f64>) -> Indices {
+pub fn get_indices(wavelength: Wavelength, _temperature: ucum::Kelvin<f64>) -> Indices {
   let wl_sq = (wavelength / (MICRO * M)).powi(2);
 
   let nx = (3.0740 + 0.0323 / (wl_sq - 0.0316) - 0.01337 * wl_sq).sqrt();

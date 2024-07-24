@@ -1,14 +1,14 @@
 //! General utilities
-use dim::{ucum::{self, C_, RAD, ONE}};
-use crate::math::{lerp};
-use crate::{Frequency, Wavenumber, RIndex, Wavelength, TWO_PI, Speed};
+use crate::math::lerp;
+use crate::{Frequency, RIndex, Speed, Wavelength, Wavenumber, TWO_PI};
+use dim::ucum::{self, C_, ONE, RAD};
 
 /// Create a dimensioned vector3
-pub fn dim_vector3<L, R>(unit_const : L, arr : &[R; 3]) -> na::Vector3<dim::typenum::Prod<L, R>>
+pub fn dim_vector3<L, R>(unit_const: L, arr: &[R; 3]) -> na::Vector3<dim::typenum::Prod<L, R>>
 where
-  L : std::ops::Mul<R> + Copy,
-  R : Copy,
-  dim::typenum::Prod<L, R> : na::Scalar,
+  L: std::ops::Mul<R> + Copy,
+  R: Copy,
+  dim::typenum::Prod<L, R>: na::Scalar,
 {
   na::Vector3::new(
     unit_const * arr[0],
@@ -18,12 +18,12 @@ where
 }
 
 /// convert from celsius to kelvin
-pub fn from_celsius_to_kelvin(c : f64) -> ucum::Kelvin<f64> {
+pub fn from_celsius_to_kelvin(c: f64) -> ucum::Kelvin<f64> {
   ucum::Kelvin::new(c + 273.15)
 }
 
 /// convert from kelvin to celsius
-pub fn from_kelvin_to_celsius(k : ucum::Kelvin<f64>) -> f64 {
+pub fn from_kelvin_to_celsius(k: ucum::Kelvin<f64>) -> f64 {
   *(k / ucum::K) - 273.15
 }
 
@@ -53,7 +53,7 @@ pub fn phase_velocity(omega: Frequency, k: Wavenumber) -> Speed {
 }
 
 /// Get the frequency of light from its vacuum wavelength
-pub fn vacuum_wavelength_to_frequency(lambda : Wavelength) -> Frequency {
+pub fn vacuum_wavelength_to_frequency(lambda: Wavelength) -> Frequency {
   wavelength_to_frequency(lambda, ONE)
 }
 
@@ -77,37 +77,49 @@ pub fn frequency_to_vacuum_wavelength(omega: Frequency) -> Wavelength {
 pub struct Steps<T>(pub T, pub T, pub usize);
 
 impl<T> From<(T, T, usize)> for Steps<T> {
-  fn from( args : (T, T, usize) ) -> Self {
+  fn from(args: (T, T, usize)) -> Self {
     Self(args.0, args.1, args.2)
   }
 }
 
 impl<T> Steps<T>
-where T:
-  std::ops::Mul<f64, Output=T> +
-  std::ops::Add<T, Output=T> +
-  std::ops::Div<f64, Output=T> +
-  std::ops::Sub<T, Output=T> +
-  Copy
+where
+  T: std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
 {
   /// Starting value
   #[inline(always)]
-  pub fn start(&self) -> T { self.0 }
+  pub fn start(&self) -> T {
+    self.0
+  }
   /// Ending value
   #[inline(always)]
-  pub fn end(&self) -> T { self.1 }
+  pub fn end(&self) -> T {
+    self.1
+  }
   /// Number of steps
   #[inline(always)]
-  pub fn steps(&self) -> usize { self.2 }
+  pub fn steps(&self) -> usize {
+    self.2
+  }
   /// Number of steps
   #[inline(always)]
-  pub fn len(&self) -> usize { self.steps() }
+  pub fn len(&self) -> usize {
+    self.steps()
+  }
   /// Is this empty?
   #[inline(always)]
-  pub fn is_empty(&self) -> bool { self.steps() == 0 }
+  pub fn is_empty(&self) -> bool {
+    self.steps() == 0
+  }
   /// Get the range as a tuple
   #[inline(always)]
-  pub fn range(&self) -> (T, T) { (self.start(), self.end()) }
+  pub fn range(&self) -> (T, T) {
+    (self.start(), self.end())
+  }
   /// Get the number of divisions (steps - 1)
   #[inline(always)]
   pub fn divisions(&self) -> usize {
@@ -115,10 +127,14 @@ where T:
   }
 
   /// Get the value at a given index
-  pub fn value(&self, index : usize) -> T {
+  pub fn value(&self, index: usize) -> T {
     let (start, end) = self.range();
     // if we have only one step... then just set progress to be zero
-    let progress = if self.steps() > 1 { (index as f64) / ((self.divisions()) as f64) } else { 0. };
+    let progress = if self.steps() > 1 {
+      (index as f64) / ((self.divisions()) as f64)
+    } else {
+      0.
+    };
     lerp(start, end, progress)
   }
 
@@ -138,12 +154,12 @@ where T:
 }
 
 impl<T> IntoIterator for Steps<T>
-where T:
-  std::ops::Mul<f64, Output=T> +
-  std::ops::Add<T, Output=T> +
-  std::ops::Div<f64, Output=T> +
-  std::ops::Sub<T, Output=T> +
-  Copy
+where
+  T: std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
 {
   type Item = T;
   type IntoIter = Iterator1D<T>;
@@ -163,12 +179,12 @@ pub struct Iterator1D<T> {
 }
 
 impl<T> Iterator for Iterator1D<T>
-where T:
-  std::ops::Mul<f64, Output=T> +
-  std::ops::Add<T, Output=T> +
-  std::ops::Div<f64, Output=T> +
-  std::ops::Sub<T, Output=T> +
-  Copy
+where
+  T: std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
 {
   type Item = T;
 
@@ -185,12 +201,12 @@ where T:
 }
 
 impl<T> ExactSizeIterator for Iterator1D<T>
-where T:
-  std::ops::Mul<f64, Output=T> +
-  std::ops::Add<T, Output=T> +
-  std::ops::Div<f64, Output=T> +
-  std::ops::Sub<T, Output=T> +
-  Copy
+where
+  T: std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
 {
   fn len(&self) -> usize {
     self.steps.len()
@@ -217,19 +233,28 @@ pub struct Steps2D<T>(pub (T, T, usize), pub (T, T, usize));
 // TODO: convert to use Steps
 
 impl<T> Steps2D<T>
-  where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where
+  T: std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + Copy,
+{
   pub fn new(x: (T, T, usize), y: (T, T, usize)) -> Self {
     Self(x, y)
   }
 
   /// Number of divisions for each axis
   pub fn divisions(&self) -> (usize, usize) {
-    (Steps::from(self.0).divisions(), Steps::from(self.1).divisions())
+    (
+      Steps::from(self.0).divisions(),
+      Steps::from(self.1).divisions(),
+    )
   }
 
   /// Range of each axis
   pub fn ranges(&self) -> ((T, T), (T, T)) {
-    ((self.0.0, self.0.1), (self.1.0, self.1.1))
+    ((self.0 .0, self.0 .1), (self.1 .0, self.1 .1))
   }
 
   /// Total number of steps
@@ -238,23 +263,33 @@ impl<T> Steps2D<T>
   }
 
   /// Is it empty?
-  pub fn is_empty(&self) -> bool { self.len() == 0 }
+  pub fn is_empty(&self) -> bool {
+    self.len() == 0
+  }
 
   /// Same number of steps for each axis?
   pub fn is_square(&self) -> bool {
-    self.0.2 == self.1.2
+    self.0 .2 == self.1 .2
   }
 
   /// Get the value at the given index
   pub fn value(&self, index: usize) -> (T, T) {
     // TODO: can optimize
-    let cols = self.0.2;
-    let rows = self.1.2;
+    let cols = self.0 .2;
+    let rows = self.1 .2;
     let (nx, ny) = get_2d_indices(index, cols);
-    let xt = if cols > 1 { (nx as f64) / ((cols - 1) as f64) } else { 0. };
-    let yt = if rows > 1 { (ny as f64) / ((rows - 1) as f64) } else { 0. };
-    let x = lerp(self.0.0, self.0.1, xt);
-    let y = lerp(self.1.0, self.1.1, yt);
+    let xt = if cols > 1 {
+      (nx as f64) / ((cols - 1) as f64)
+    } else {
+      0.
+    };
+    let yt = if rows > 1 {
+      (ny as f64) / ((rows - 1) as f64)
+    } else {
+      0.
+    };
+    let x = lerp(self.0 .0, self.0 .1, xt);
+    let y = lerp(self.1 .0, self.1 .1, yt);
     (x, y)
   }
 
@@ -276,12 +311,21 @@ impl<T> Steps2D<T>
   /// assert!((steps.division_widths().1 - dy).abs() < 1e-12);
   /// ```
   pub fn division_widths(&self) -> (T, T) {
-    (Steps::from(self.0).division_width(), Steps::from(self.1).division_width())
+    (
+      Steps::from(self.0).division_width(),
+      Steps::from(self.1).division_width(),
+    )
   }
 }
 
 impl<T> IntoIterator for Steps2D<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where
+  T: std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + Copy,
+{
   type Item = (T, T);
   type IntoIter = Iterator2D<T>;
 
@@ -291,15 +335,12 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 }
 
 /// get the 2d indices (column, row) from the linear index
-pub fn get_2d_indices( index : usize, cols : usize ) -> (usize, usize) {
-  (
-    (index % cols),
-    (index / cols)
-  )
+pub fn get_2d_indices(index: usize, cols: usize) -> (usize, usize) {
+  ((index % cols), (index / cols))
 }
 
 /// get the 1d index corresponding to a (col, row) of a 2d lattice
-pub fn get_1d_index( col: usize, row: usize, cols: usize ) -> usize {
+pub fn get_1d_index(col: usize, row: usize, cols: usize) -> usize {
   assert!(col < cols);
   row * cols + col
 }
@@ -321,21 +362,28 @@ pub fn get_1d_index( col: usize, row: usize, cols: usize ) -> usize {
 /// ```
 #[derive(Debug, Copy, Clone)]
 pub struct Iterator2D<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where
+  T: std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + Copy,
+{
   steps: Steps2D<T>,
-  index : usize,
+  index: usize,
 }
 
 impl<T> Iterator2D<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where
+  T: std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + Copy,
+{
   /// Create a new 2d iterator
-  pub fn new(
-    steps : Steps2D<T>
-  ) -> Self {
-    Iterator2D {
-      steps,
-      index: 0,
-    }
+  pub fn new(steps: Steps2D<T>) -> Self {
+    Iterator2D { steps, index: 0 }
   }
 
   pub fn get_xy(&self) -> (T, T) {
@@ -343,18 +391,28 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
   }
 
   /// Get the x step size
-  pub fn get_dx(&self) -> T { self.steps.division_widths().0 }
-  pub fn get_dy(&self) -> T { self.steps.division_widths().1 }
+  pub fn get_dx(&self) -> T {
+    self.steps.division_widths().0
+  }
+  pub fn get_dy(&self) -> T {
+    self.steps.division_widths().1
+  }
   pub fn swapped(self) -> Self {
     Self {
       steps: self.steps.swapped(),
-      index: self.index
+      index: self.index,
     }
   }
 }
 
 impl<T> Iterator for Iterator2D<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where
+  T: std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + Copy,
+{
   type Item = (T, T); // x, y
 
   fn next(&mut self) -> Option<Self::Item> {
@@ -369,7 +427,13 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 }
 
 impl<T> DoubleEndedIterator for Iterator2D<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where
+  T: std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + Copy,
+{
   fn next_back(&mut self) -> Option<Self::Item> {
     if self.index == 0 {
       return None;
@@ -382,26 +446,34 @@ where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::M
 }
 
 impl<T> ExactSizeIterator for Iterator2D<T>
-where T: std::ops::Div<f64, Output=T> + std::ops::Sub<T, Output=T> + std::ops::Mul<f64, Output=T> + std::ops::Add<T, Output=T> + Copy {
+where
+  T: std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + Copy,
+{
   fn len(&self) -> usize {
     self.steps.len()
   }
 }
 
 // TODO: could probably make this better with smart use of splice
-pub fn transpose_vec<T : Clone>(vec: Vec<T>, num_cols : usize) -> Vec<T> {
+pub fn transpose_vec<T: Clone>(vec: Vec<T>, num_cols: usize) -> Vec<T> {
   let len = vec.len();
   let num_rows = len / num_cols;
-  (0..len).map(|index| {
-    let (c, r) = get_2d_indices(index, num_cols);
-    let other = get_1d_index(r, c, num_rows);
-    vec[other].clone()
-  }).collect()
+  (0..len)
+    .map(|index| {
+      let (c, r) = get_2d_indices(index, num_cols);
+      let other = get_1d_index(r, c, num_rows);
+      vec[other].clone()
+    })
+    .collect()
 }
 
 #[cfg(test)]
 pub mod testing {
-  pub fn percent_diff(actual : f64, expected : f64) -> f64 {
+  pub fn percent_diff(actual: f64, expected: f64) -> f64 {
     100. * ((expected - actual).abs() / expected)
   }
 
@@ -429,33 +501,25 @@ pub mod testing {
 mod tests {
   use super::*;
   #[test]
-  fn single_step_test(){
-    let actual : Vec<f64> = Steps(3.3, 4., 1).into_iter().collect();
+  fn single_step_test() {
+    let actual: Vec<f64> = Steps(3.3, 4., 1).into_iter().collect();
     let expected = vec![3.3];
     assert_eq!(actual, expected);
   }
 
   #[test]
-  fn transpose_test(){
-    let actual : Vec<f64> = transpose_vec(Steps(1., 4., 4).into_iter().collect(), 2);
+  fn transpose_test() {
+    let actual: Vec<f64> = transpose_vec(Steps(1., 4., 4).into_iter().collect(), 2);
     let expected = vec![1., 3., 2., 4.];
     assert_eq!(actual, expected);
   }
 
   #[test]
   fn iterator_2d_test() {
-    let it = Iterator2D::new(
-      Steps2D::new(
-        (0., 1., 2),
-        (0., 1., 2)
-      )
-    );
+    let it = Iterator2D::new(Steps2D::new((0., 1., 2), (0., 1., 2)));
 
-    let actual : Vec<(f64, f64)> = it.collect();
-    let expected = vec![
-      (0., 0.), (1., 0.),
-      (0., 1.), (1., 1.)
-    ];
+    let actual: Vec<(f64, f64)> = it.collect();
+    let expected = vec![(0., 0.), (1., 0.), (0., 1.), (1., 1.)];
 
     assert!(
       actual.iter().zip(expected.iter()).all(|(a, b)| a == b),
@@ -467,18 +531,10 @@ mod tests {
 
   #[test]
   fn iterator_2d_rev_test() {
-    let it = Iterator2D::new(
-      Steps2D::new(
-        (0., 1., 2),
-        (0., 1., 2)
-      )
-    );
+    let it = Iterator2D::new(Steps2D::new((0., 1., 2), (0., 1., 2)));
 
-    let actual : Vec<(f64, f64)> = it.rev().collect();
-    let expected = vec![
-      (1., 1.), (0., 1.),
-      (1., 0.), (0., 0.)
-    ];
+    let actual: Vec<(f64, f64)> = it.rev().collect();
+    let expected = vec![(1., 1.), (0., 1.), (1., 0.), (0., 0.)];
 
     assert!(
       actual.iter().zip(expected.iter()).all(|(a, b)| a == b),

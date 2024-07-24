@@ -16,11 +16,11 @@ use std::f64::EPSILON;
 /// assert!(gradient_at(square, &[1.0])[0] > 1.0);
 /// assert!(gradient_at(square, &[-1.0])[0] < 1.0);
 /// ```
-pub fn gradient_at<T>(func : impl Fn(&[f64]) -> f64, position : T) -> Vec<f64>
-  where
-    T : AsRef<[f64]>
+pub fn gradient_at<T>(func: impl Fn(&[f64]) -> f64, position: T) -> Vec<f64>
+where
+  T: AsRef<[f64]>,
 {
-  let mut x : Vec<_> = position.as_ref().to_vec();
+  let mut x: Vec<_> = position.as_ref().to_vec();
 
   position
     .as_ref()
@@ -56,9 +56,8 @@ pub fn gradient_at<T>(func : impl Fn(&[f64]) -> f64, position : T) -> Vec<f64>
     .collect()
 }
 
-pub fn derivative_at(func : impl Fn(f64) -> f64, position : f64) -> f64
-{
-  gradient_at(|x : &[f64]| func(x[0]), [position])[0]
+pub fn derivative_at(func: impl Fn(f64) -> f64, position: f64) -> f64 {
+  gradient_at(|x: &[f64]| func(x[0]), [position])[0]
 }
 
 #[cfg(test)]
@@ -69,8 +68,8 @@ mod tests {
 
   #[test]
   fn derrivative_test() {
-    let func = |x : f64| x.sin();
-    let func_prime = |x : f64| x.cos();
+    let func = |x: f64| x.sin();
+    let func_prime = |x: f64| x.cos();
 
     let x = 0.4;
     let actual = derivative_at(func, x);

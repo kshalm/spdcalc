@@ -18,7 +18,7 @@ impl Error for SPDCError {
 }
 
 impl SPDCError {
-  pub fn new( message : String ) -> Self {
+  pub fn new(message: String) -> Self {
     Self(message)
   }
 }
