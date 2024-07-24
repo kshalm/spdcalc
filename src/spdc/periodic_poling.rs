@@ -1,8 +1,7 @@
-use std::sync::Mutex;
 
 use core::f64::consts::PI;
 use crate::math::lerp;
-use crate::{IdlerBeam, SPDC, PerMeter4, phasematch_fiber_coupling, Distance};
+use crate::{IdlerBeam, Distance};
 use crate::{
   delta_k,
   Sign,
@@ -13,7 +12,7 @@ use crate::{
   SPDCError,
   math::{nelder_mead_1d, fwhm_to_sigma}
 };
-use crate::dim::ucum::{M, W, V, RAD, PerMeter, Meter};
+use crate::dim::ucum::{M, RAD, PerMeter, Meter};
 
 const IMPOSSIBLE_POLING_PERIOD : &str = "Could not determine poling period from specified values";
 
@@ -42,7 +41,7 @@ pub enum Apodization {
 
 impl Apodization {
   pub fn integration_constant(&self, z: f64, crystal_length: Distance) -> f64 {
-    assert!(z >= -1. && z <= 1., "z must be between -1 and 1");
+    assert!((-1. ..=1.).contains(&z), "z must be between -1 and 1");
     match self {
       // https://mathworld.wolfram.com/ApodizationFunction.html
       Apodization::Off => 1.,

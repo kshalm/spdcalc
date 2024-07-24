@@ -3,7 +3,6 @@ use std::fmt;
 use std::str::FromStr;
 use super::*;
 use dim::ucum::Kelvin;
-use serde::{Serialize, Deserialize};
 
 /// The type of crystal
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]

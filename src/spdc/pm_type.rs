@@ -1,6 +1,5 @@
 use std::fmt;
 use std::str::FromStr;
-use serde::{Serialize, Deserialize};
 
 use crate::PolarizationType;
 
