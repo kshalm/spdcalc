@@ -40,6 +40,7 @@ impl BeamWaist {
     }
   }
 
+  #[deprecated(note = "Use x_by_y instead")]
   pub fn x_by_y(&self) -> Wavelength {
     if self.x == self.y {
       self.x
