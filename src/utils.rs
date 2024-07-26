@@ -5,6 +5,27 @@ use dim::ucum::{self, C_, ONE, RAD};
 use dim::{ucum::UCUM, Dimensioned};
 use na::{Unit, Vector3};
 
+/// Extension to facilitate getting the x, y, and z components of a dimensioned vector
+pub trait DimVector {
+  type Units;
+  fn x(&self) -> Self::Units;
+  fn y(&self) -> Self::Units;
+  fn z(&self) -> Self::Units;
+}
+
+impl<U> DimVector for UCUM<Vector3<f64>, U> {
+  type Units = UCUM<f64, U>;
+  fn x(&self) -> Self::Units {
+    UCUM::new(self.value_unsafe().x)
+  }
+  fn y(&self) -> Self::Units {
+    UCUM::new(self.value_unsafe().y)
+  }
+  fn z(&self) -> Self::Units {
+    UCUM::new(self.value_unsafe().z)
+  }
+}
+
 /// Get the dimensioned vector from a scalar value and a direction.
 pub fn dim_vector<U>(val: UCUM<f64, U>, dir: Unit<Vector3<f64>>) -> UCUM<Vector3<f64>, U> {
   UCUM::<Vector3<f64>, U>::new(*val.value_unsafe() * *dir)

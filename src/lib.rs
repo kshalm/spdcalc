@@ -102,6 +102,7 @@ pub use constants::*;
 
 pub mod math;
 pub mod utils;
+use utils::DimVector;
 
 pub mod spdc;
 pub use spdc::*;
