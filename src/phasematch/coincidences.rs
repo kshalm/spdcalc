@@ -1,6 +1,7 @@
 use super::*;
 use crate::utils::frequency_to_wavenumber;
-use dim::ucum::{M, RAD};
+use dim::ucum::{DEG, M, RAD};
+use dim::{ucum::UCUM, Dimensioned};
 
 /// Evaluate the phasematching function using a gaussian approximation
 #[allow(non_snake_case)]
@@ -53,6 +54,7 @@ pub fn phasematch_fiber_coupling(
   steps: Option<usize>,
 ) -> PerMeter4<Complex<f64>> {
   // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, steps);
+  // return phasematch_fiber_coupling_v3(omega_s, omega_i, spdc, steps);
   // return phasematch_sinc(omega_s, omega_i, spdc);
   // crystal length
   let L = spdc.crystal_setup.length;
@@ -87,11 +89,8 @@ pub fn phasematch_fiber_coupling(
   let z0i = spdc.idler_waist_position;
 
   // Height of the collected spots from the z axis.
-  // TODO: check
-  // let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
-  // let hi = L * 0.5 * tan(theta_i) * cos(phi_i);
-  let hs = spot_height(L, z0s, theta_s, phi_s);
-  let hi = spot_height(L, z0i, theta_i, phi_i);
+  let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
+  let hi = L * 0.5 * tan(theta_i) * cos(phi_i);
 
   let SIN_THETA_s_e = sin(theta_s_e);
   let SIN_THETA_i_e = sin(theta_i_e);
@@ -109,8 +108,8 @@ pub fn phasematch_fiber_coupling(
   let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
   // let k_s = frequency_to_wavenumber(omega_s, n_s);
   // let k_i = frequency_to_wavenumber(omega_i, n_i);
-  let k_s = (spdc.signal.wavevector(omega_s, &spdc.crystal_setup) * M / RAD).z * RAD / M;
-  let k_i = (spdc.idler.wavevector(omega_i, &spdc.crystal_setup) * M / RAD).z * RAD / M;
+  let k_s = spdc.signal.wavevector(omega_s, &spdc.crystal_setup).z();
+  let k_i = spdc.idler.wavevector(omega_i, &spdc.crystal_setup).z();
 
   // Now calculate the the coeficients that get repeatedly used.
   // This is from Karina's code.
@@ -277,16 +276,34 @@ pub fn phasematch_fiber_coupling(
   // ).unwrap().result.unwrap();
   PerMeter4::new(result)
 }
-#[allow(dead_code)]
+
+pub fn complex_dim<U>(re: UCUM<f64, U>, im: UCUM<f64, U>) -> UCUM<Complex<f64>, U> {
+  UCUM::<Complex<f64>, U>::new(Complex::new(*re.value_unsafe(), *im.value_unsafe()))
+}
+
+pub fn imag_dim<U>(im: UCUM<f64, U>) -> UCUM<Complex<f64>, U> {
+  UCUM::<Complex<f64>, U>::new(Complex::new(0., *im.value_unsafe()))
+}
+
+pub fn real_dim<U>(re: UCUM<f64, U>) -> UCUM<Complex<f64>, U> {
+  UCUM::<Complex<f64>, U>::new(Complex::new(*re.value_unsafe(), 0.))
+}
+
+/// Evaluate the phasematching function for fiber coupling
+///
+/// This is the secret sauce of spdcalc.
 #[allow(non_snake_case)]
-fn phasematch_fiber_coupling2(
+pub fn phasematch_fiber_coupling2(
   omega_s: Frequency,
   omega_i: Frequency,
   spdc: &SPDC,
   steps: Option<usize>,
 ) -> PerMeter4<Complex<f64>> {
+  // return phasematch_fiber_coupling_v3(omega_s, omega_i, spdc, steps);
+  // return phasematch_sinc(omega_s, omega_i, spdc);
   // crystal length
   let L = spdc.crystal_setup.length;
+  let half_L = L * 0.5;
 
   // TODO: ask krister. does this work to filter out lobes?
   // let delk = *(spdc_setup.calc_delta_k() / J / S);
@@ -297,30 +314,21 @@ fn phasematch_fiber_coupling2(
   //   return (Complex::new(0., 0.), 1.);
   // }
 
-  let theta_s = spdc.signal.theta_internal();
   let phi_s = spdc.signal.phi();
-  let theta_i = spdc.idler.theta_internal();
   let phi_i = spdc.idler.phi();
-  let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
-  let theta_i_e = spdc.idler.theta_external(&spdc.crystal_setup);
 
-  let SIN_THETA_s_e = sin(theta_s_e);
-  let SIN_THETA_i_e = sin(theta_i_e);
-  // let TAN_THETA_s_e = tan(theta_s_e);
-  // let TAN_THETA_i_e = tan(theta_i_e);
-  let COS_PHI_s = cos(phi_s);
-  let COS_PHI_i = cos(phi_i);
+  // NOTE: This implementation assumes you are in the Phi = 0 plane
+  // But we need to account for the directionality of the signal and idler
+  // in that plane.
+  // This accounts for the directionality of signal and idler
+  // by negating theta if the angle is greater than 90 degrees.
+  let sign_s = if phi_s > 90. * DEG { -1. } else { 1. };
+  let sign_i = if phi_i > 90. * DEG { -1. } else { 1. };
 
-  let z0 = 0. * M; //put pump in middle of the crystal
-  let z0s = spdc.signal_waist_position;
-  let z0i = spdc.idler_waist_position;
-  // Height of the collected spots from the z axis.
-  // TODO: this was L/2 not z0s in original... why...?
-  let hs = -z0s * tan(theta_s) * cos(phi_s);
-  let hi = -z0i * tan(theta_i) * cos(phi_i);
-
-  let zhs = z0s * sec(theta_s) + hs * SIN_THETA_s_e * COS_PHI_s;
-  let zhi = z0i * sec(theta_i) + hi * SIN_THETA_i_e * COS_PHI_i;
+  let theta_s = sign_s * spdc.signal.theta_internal();
+  let theta_i = sign_i * spdc.idler.theta_internal();
+  let theta_s_e = sign_s * spdc.signal.theta_external(&spdc.crystal_setup);
+  let theta_i_e = sign_i * spdc.idler.theta_external(&spdc.crystal_setup);
 
   let Ws_SQ = spdc.signal.waist().x_by_y_sqr();
   let Wi_SQ = spdc.idler.waist().x_by_y_sqr();
@@ -328,8 +336,21 @@ fn phasematch_fiber_coupling2(
   let Wx_SQ = sq(spdc.pump.waist().x);
   let Wy_SQ = sq(spdc.pump.waist().y);
 
-  let SEC_2_THETA_s = sec(theta_s_e).powi(2);
-  let SEC_2_THETA_i = sec(theta_i_e).powi(2);
+  let SEC_2_THETA_s = cos(theta_s_e).powi(-2);
+  let SEC_2_THETA_i = cos(theta_i_e).powi(-2);
+
+  let ζ = 0. * M; //put pump in middle of the crystal
+  let ζs = spdc.signal_waist_position;
+  let ζi = spdc.idler_waist_position;
+
+  // Height of the collected spots from the z axis.
+  let hs = half_L * tan(theta_s);
+  let hi = half_L * tan(theta_i);
+
+  let SIN_THETA_s_e = sin(theta_s_e);
+  let SIN_THETA_i_e = sin(theta_i_e);
+  let TAN_THETA_s_e = tan(theta_s_e);
+  let TAN_THETA_i_e = tan(theta_i_e);
 
   // TODO: Should i be doing this?
   let omega_p = omega_s + omega_i; // spdc.pump.frequency();
@@ -338,124 +359,98 @@ fn phasematch_fiber_coupling2(
   let k_p = frequency_to_wavenumber(omega_p, n_p);
   let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
   let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
-  let k_s = frequency_to_wavenumber(omega_s, n_s);
-  let k_i = frequency_to_wavenumber(omega_i, n_i);
-
-  let PSI_s = *(k_s * sin(theta_s_e) * M / RAD);
-  let PSI_i = *(k_i * sin(theta_i_e) * M / RAD);
+  // let k_s = frequency_to_wavenumber(omega_s, n_s);
+  // let k_i = frequency_to_wavenumber(omega_i, n_i);
+  let k_s = spdc.signal.wavevector(omega_s, &spdc.crystal_setup).z();
+  let k_i = spdc.idler.wavevector(omega_i, &spdc.crystal_setup).z();
 
   let rho = tan(spdc.pump.walkoff_angle(&spdc.crystal_setup));
 
-  let M2 = M * M; // meters squared
+  // Now calculate the the coeficients that get repeatedly used.
+  // This is from Karina's code.
+  let ks_free = k_s / n_s;
+  let ki_free = k_i / n_i;
 
-  // macro x, y, d
-  macro_rules! complex {
-    ($x:expr, $y:expr, $d:expr) => {
-      Complex::<f64>::new(*($x / $d), *($y / $d))
-    };
-  }
+  let Γ_s2 = -0.25 * Ws_SQ;
+  let Γ_i2 = -0.25 * Wi_SQ;
+  let Γ_s1 = Γ_s2 * SEC_2_THETA_s;
+  let Γ_i1 = Γ_i2 * SEC_2_THETA_i;
 
-  macro_rules! real {
-    ($x:expr, $d:expr) => {
-      complex!($x, 0. * $d, $d)
-    };
-  }
+  let Γ_s3 = -2. * ks_free * Γ_s1 * SIN_THETA_s_e / RAD;
+  let Γ_i3 = -2. * ki_free * Γ_i1 * SIN_THETA_i_e / RAD;
+  let Γ_s4 = -0.5 * ks_free * SIN_THETA_s_e * Γ_s3 / RAD;
+  let Γ_i4 = -0.5 * ki_free * SIN_THETA_i_e * Γ_i3 / RAD;
 
-  macro_rules! im {
-    ($y:expr, $d:expr) => {
-      complex!(0. * $d, $y, $d)
-    };
-  }
+  let zhs = ζs + hs * SIN_THETA_s_e;
+  let zhi = ζi + hi * SIN_THETA_i_e;
 
-  let ks_f = k_s / n_s;
-  let ki_f = k_i / n_i;
+  // zR in documentation = k W^2 / 2
+  //
+  // NOTE: v3 and v2 differ by a minus sign in the lambda terms
+  // seems to be the version 3 used the non-complex-conjugate version of the mode
+  let Λ_s2 = (0.5 / ks_free) * zhs * RAD;
+  let Λ_i2 = (0.5 / ki_free) * zhi * RAD;
+  let Λ_s1 = Λ_s2 * SEC_2_THETA_s;
+  let Λ_i1 = Λ_i2 * SEC_2_THETA_i;
+  // sec(a) tan(a) = sec^2(a) sin(a)
+  let Λ_s3 = -hs - zhs * SEC_2_THETA_s * SIN_THETA_s_e;
+  let Λ_i3 = -hi - zhi * SEC_2_THETA_i * SIN_THETA_i_e;
+  let Λ_s4 = 0.5 * ks_free * zhs * TAN_THETA_s_e.powi(2) / RAD - ks_free * ζs / RAD;
+  let Λ_i4 = 0.5 * ki_free * zhi * TAN_THETA_i_e.powi(2) / RAD - ki_free * ζi / RAD;
 
-  let Wfs_SQ = complex!(Ws_SQ, -2. * zhs / ks_f * RAD, M2);
-  let Wfi_SQ = complex!(Wi_SQ, -2. * zhi / ki_f * RAD, M2);
+  let zlks = 0.5 * (ζ / k_p - half_L / k_s) * RAD;
+  let zlki = 0.5 * (ζ / k_p - half_L / k_i) * RAD;
 
-  let As = -0.25 * (real!(Wx_SQ, M2) + Wfs_SQ * SEC_2_THETA_s);
-  let Ai = -0.25 * (real!(Wx_SQ, M2) + Wfi_SQ * SEC_2_THETA_i);
-  let Bs = -0.25 * (Wfs_SQ + real!(Wy_SQ, M2));
-  let Bi = -0.25 * (Wfi_SQ + real!(Wy_SQ, M2));
-  let Cs = -0.25 * (k_p * L - 2. * k_s * z0) / (k_s * k_p);
-  let Ci = -0.25 * (k_p * L - 2. * k_i * z0) / (k_i * k_p);
-  let Ds = 0.25 * L * (k_p - k_s) / (k_p * k_s);
-  let Di = 0.25 * L * (k_p - k_i) / (k_p * k_i);
-  let Es = 0.5 * Wfs_SQ * SEC_2_THETA_s * PSI_s;
-  let Ei = 0.5 * Wfi_SQ * SEC_2_THETA_i * PSI_i;
-  let mx = complex!(-0.5 * Wx_SQ, z0 / k_p * RAD, M2);
-  let my = complex!(-0.5 * Wy_SQ, z0 / k_p * RAD, M2);
-  let m = L / (2. * k_p);
-  let n = 0.5 * L * rho;
+  // The underscore terms lack the terms that depend on the integration parameter z
+  let A1_ = complex_dim(-0.25 * Wx_SQ + Γ_s1, zlks - Λ_s1);
+  let A2_ = complex_dim(-0.25 * Wy_SQ + Γ_s2, zlks - Λ_s2);
+  let A3_ = complex_dim(-0.25 * Wx_SQ + Γ_i1, zlki - Λ_i1);
+  let A4_ = complex_dim(-0.25 * Wy_SQ + Γ_i2, zlki - Λ_i2);
+  let A5 = complex_dim(Γ_s3, -Λ_s3);
+  let A7 = complex_dim(Γ_i3, -Λ_i3);
+  let A8_ = real_dim(-0.5 * Wx_SQ);
+  let A9_ = real_dim(-0.5 * Wy_SQ);
+  let ksip = k_s + k_i + spdc.pp.k_eff();
+  let A10_ = complex_dim(Γ_s4 + Γ_i4, -Λ_s4 - Λ_i4 + half_L * (k_p + ksip) / RAD);
 
-  let dksi = k_s + k_i + spdc.pp.k_eff();
-  let ee = 0.5 * L * (k_p + dksi);
-  let ff = 0.5 * L * (k_p - dksi);
-  let hh = -0.25 * (Wfi_SQ * SEC_2_THETA_i * sq(PSI_i) + Wfs_SQ * SEC_2_THETA_s * sq(PSI_s));
+  let Kps = 0.25 * L * (1. / k_p - 1. / k_s) * RAD;
+  let Kpi = 0.25 * L * (1. / k_p - 1. / k_i) * RAD;
+  let Lrho_by_2 = 0.5 * L * rho;
 
-  let A5 = Es + im!(hs, M);
-  let A5sq = A5 * A5;
-  let A7 = Ei + im!(hi, M);
-
-  // dbg!(As, Ai, Bs, Bi, Cs, Ci, Ds, Di, mx, my, m, n, hh, A5, A7, pp_factor, dksi, ee, ff);
+  let M2 = M * M;
 
   let fn_z = |z: f64| {
-    let Ds_z = Ds * z;
-    let Di_z = Di * z;
-    let CsDs = Complex::new(0., *((Cs + Ds_z) * RAD / M2));
-    let CiDi = Complex::new(0., *((Ci + Di_z) * RAD / M2));
+    let a = imag_dim(Kps * z);
+    let b = imag_dim(Kpi * z);
+    let A1 = A1_ - a;
+    let A2 = A2_ - a;
+    let A3 = A3_ - b;
+    let A4 = A4_ - b;
+    let c = imag_dim(Lrho_by_2 * (z + 1.));
+    let A6 = c;
+    let d = imag_dim((ζ - 0.5 * L * z) / k_p * RAD);
+    let A8 = A8_ + d;
+    let A9 = A9_ + d;
+    let A10 = A10_ + imag_dim(0.5 * L * z * (k_p - ksip) / RAD);
 
-    // let A1R = As_r;
-    // let A1I = As_i + Cs + Ds_z;
-    let A1 = As + CsDs;
-
-    // let A2R = Bs_r;
-    // let A2I = Bs_i + Cs + Ds_z;
-    let A2 = Bs + CsDs;
-
-    // let A3R = Ai_r;
-    // let A3I = Ai_i + Ci + Di_z;
-    let A3 = Ai + CiDi;
-
-    // let A4R = Bi_r;
-    // let A4I = Bi_i + Ci + Di_z;
-    let A4 = Bi + CiDi;
-
-    // let A6R = 0.;
-    // let A6I = n * (1 + z);
-    let A6 = Complex::new(0., *(n / M) * (1. + z));
-
-    // let A8R = mx_real;
-    // let A8I = mx_imag - m * z;
-    let mz = Complex::new(0., *(m * z * RAD / M2));
-    let A8 = mx - mz;
-
-    // let A9R = my_real;
-    // let A9I = my_imag - m * z;
-    let A9 = my - mz;
-
-    // let A10R = hh_r;
-    // let A10I = hh_i + ee + ff * z;
-    let A10 = hh + Complex::new(0., *((ee + ff * z) / RAD));
-
-    // First calculate terms in the exponential of the integral
-    // exp(1/4 (4 A10 - A5^2/A1 - A6^2/A2 - (-2 A1 A7 + A5 A8)^2/(A1 (4 A1 A3 - A8^2)) - (A6^2 (-2 A2 + A9)^2)/(A2 (4 A2 A4 - A9^2))))
     let A6sq = A6 * A6;
     let A8sq = A8 * A8;
     let A9sq = A9 * A9;
-    let invA1 = A1.inv();
-    let invA2 = A2.inv();
-    let term4 = -2. * A1 * A7 + A5 * A8;
-    let term5 = -2. * A2 + A9;
-    let numerator = ((4. * A10
-      - invA1 * (A5sq + (term4 * term4) / (4. * A1 * A3 - A8sq))
-      - invA2 * A6sq * (1. + (term5 * term5) / (4. * A2 * A4 - A9sq)))
-      / 4.)
+    let invA1 = 1. / A1;
+    let invA2 = 1. / A2;
+    let denom1 = 4. * A1 * A3 - A8sq;
+    let denom2 = 4. * A2 * A4 - A9sq;
+
+    let numerator = (A10
+      - 0.25
+        * (invA1 * (A6sq + sq(-2. * A1 * A7 + A5 * A8) / denom1)
+          + invA2 * A6sq * (1. + sq(-2. * A2 + A9) / denom2)))
       .exp();
 
     // Now deal with the denominator in the integral:
     // Sqrt[A1 A2 (-4 A3 + A8^2/A1) (-4 A4 + A9^2/A2)]
-    let denominator = (A1 * A2 * (-4. * A3 + A8sq * invA1) * (-4. * A4 + A9sq * invA2)).sqrt();
+    let denom_units = M2 * M2 * M2 * M2;
+    let denominator = (denom1 * denom2 / denom_units).sqrt();
 
     // dbg!(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10);
 
@@ -474,6 +469,223 @@ fn phasematch_fiber_coupling2(
       1.,
       steps.unwrap_or_else(|| integration_steps_best_guess(L)),
     );
+
+  // use quad_rs::Integrate;
+  // let integrator = GAUSS_KONROD.clone()
+  //   .with_absolute_tolerance(1e-18)
+  //   .with_relative_tolerance(1e2);
+  // let result = 0.5 * integrator.integrate(
+  //   &|f: Complex<f64>| fn_z(f.re),
+  //   std::ops::Range {
+  //     start: Complex::new(-1., 0.),
+  //     end: Complex::new(1., 0.)
+  //   },
+  //   None
+  // ).unwrap().result.unwrap();
+  PerMeter4::new(result)
+}
+
+// This implementation is based on Karina's FinalExpressions_Coincidence 2015-04-30.nb
+#[allow(dead_code)]
+#[allow(non_snake_case)]
+fn phasematch_fiber_coupling_v3(
+  omega_s: Frequency,
+  omega_i: Frequency,
+  spdc: &SPDC,
+  steps: Option<usize>,
+) -> PerMeter4<Complex<f64>> {
+  // crystal length
+  let L = spdc.crystal_setup.length;
+
+  let theta_s = spdc.signal.theta_internal();
+  let phi_s = spdc.signal.phi();
+  let theta_i = spdc.idler.theta_internal();
+  let phi_i = spdc.idler.phi();
+  let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
+  let theta_i_e = spdc.idler.theta_external(&spdc.crystal_setup);
+
+  let SIN_THETA_s_e = sin(theta_s_e);
+  let SIN_THETA_i_e = sin(theta_i_e);
+  let TAN_THETA_s_e = tan(theta_s_e);
+  let TAN_THETA_i_e = tan(theta_i_e);
+  let SIN_PHI_s = sin(phi_s);
+  let SIN_PHI_i = sin(phi_i);
+  let COS_PHI_s = cos(phi_s);
+  let COS_PHI_i = cos(phi_i);
+  let SEC_THETA_s_e = sec(theta_s_e);
+  let SEC_THETA_i_e = sec(theta_i_e);
+
+  let z0 = 0. * M; //put pump in middle of the crystal
+  let ζ_s = spdc.signal_waist_position;
+  let ζ_i = spdc.idler_waist_position;
+  // Height of the collected spots from the z axis.
+  let half_L = L / 2.;
+  let h_s = half_L * tan(theta_s) * cos(phi_s);
+  let h_i = half_L * tan(theta_i) * cos(phi_i);
+  let d_s = half_L * tan(theta_s) * sin(phi_s);
+  let d_i = half_L * tan(theta_i) * sin(phi_i);
+
+  let Ws_SQ = spdc.signal.waist().x_by_y_sqr();
+  let Wi_SQ = spdc.idler.waist().x_by_y_sqr();
+
+  let Wx_SQ = sq(spdc.pump.waist().x);
+  let Wy_SQ = sq(spdc.pump.waist().y);
+
+  let COS_2_PHI_s = cos(phi_s).powi(2);
+  let COS_2_PHI_i = cos(phi_i).powi(2);
+  let SIN_2_PHI_s = sin(phi_s).powi(2);
+  let SIN_2_PHI_i = sin(phi_i).powi(2);
+  let SEC_2_THETA_s = sec(theta_s_e).powi(2);
+  let SEC_2_THETA_i = sec(theta_i_e).powi(2);
+  let TAN_2_THETA_s = tan(theta_s_e).powi(2);
+  let TAN_2_THETA_i = tan(theta_i_e).powi(2);
+
+  let omega_p = omega_s + omega_i; // spdc.pump.frequency();
+
+  let n_p = spdc.pump.refractive_index(omega_p, &spdc.crystal_setup);
+  let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
+  let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
+
+  let k_p = frequency_to_wavenumber(omega_p, n_p);
+  let k_s = spdc.signal.wavevector(omega_s, &spdc.crystal_setup).z();
+  let k_i = spdc.idler.wavevector(omega_i, &spdc.crystal_setup).z();
+
+  let rho = tan(spdc.pump.walkoff_angle(&spdc.crystal_setup));
+
+  let M2 = M * M; // meters squared
+
+  let ks_free = k_s / n_s;
+  let ki_free = k_i / n_i;
+
+  let Γ_s1 = -0.25 * Ws_SQ * (COS_2_PHI_s * SEC_2_THETA_s + SIN_2_PHI_s);
+  let Γ_i1 = -0.25 * Wi_SQ * (COS_2_PHI_i * SEC_2_THETA_i + SIN_2_PHI_i);
+
+  let Γ_s2 = -0.25 * Ws_SQ * (SIN_2_PHI_s * SEC_2_THETA_s + COS_2_PHI_s);
+  let Γ_i2 = -0.25 * Wi_SQ * (SIN_2_PHI_i * SEC_2_THETA_i + COS_2_PHI_i);
+
+  let Γ_s3 = 0.5 * ks_free * Ws_SQ * COS_PHI_s * SEC_THETA_s_e * TAN_THETA_s_e / RAD;
+  let Γ_i3 = 0.5 * ki_free * Wi_SQ * COS_PHI_i * SEC_THETA_i_e * TAN_THETA_i_e / RAD;
+
+  let Γ_s4 = 0.5 * ks_free * Ws_SQ * SIN_PHI_s * SEC_THETA_s_e * TAN_THETA_s_e / RAD;
+  let Γ_i4 = 0.5 * ki_free * Wi_SQ * SIN_PHI_i * SEC_THETA_i_e * TAN_THETA_i_e / RAD;
+
+  let Γ_s5 = -0.25 * Ws_SQ * sin(2. * phi_s) * TAN_2_THETA_s;
+  let Γ_i5 = -0.25 * Wi_SQ * sin(2. * phi_i) * TAN_2_THETA_i;
+
+  let Γ_s6 = -0.25 * sq(ks_free) * Ws_SQ * TAN_2_THETA_s / RAD / RAD;
+  let Γ_i6 = -0.25 * sq(ki_free) * Wi_SQ * TAN_2_THETA_i / RAD / RAD;
+
+  // The lamda terms simplify quite a bit when you choose good intermediate variables:
+  let H_s = SIN_THETA_s_e * h_s * COS_PHI_s;
+  let H_i = SIN_THETA_i_e * h_i * COS_PHI_i;
+  let D_s = SIN_THETA_s_e * d_s * SIN_PHI_s;
+  let D_i = SIN_THETA_i_e * d_i * SIN_PHI_i;
+
+  let HDZ_s = H_s + D_s + ζ_s;
+  let HDZ_i = H_i + D_i + ζ_i;
+
+  let SIN_COS_SEC_s = SIN_2_PHI_s + COS_2_PHI_s * SEC_2_THETA_s;
+  let SIN_COS_SEC_i = SIN_2_PHI_i + COS_2_PHI_i * SEC_2_THETA_i;
+  let Λ_s1 = (0.5 / ks_free) * SIN_COS_SEC_s * HDZ_s * RAD;
+  let Λ_i1 = (0.5 / ki_free) * SIN_COS_SEC_i * HDZ_i * RAD;
+
+  let COS_SIN_SEC_s = COS_2_PHI_s + SIN_2_PHI_s * SEC_2_THETA_s;
+  let COS_SIN_SEC_i = COS_2_PHI_i + SIN_2_PHI_i * SEC_2_THETA_i;
+  let Λ_s2 = (0.5 / ks_free) * COS_SIN_SEC_s * HDZ_s * RAD;
+  let Λ_i2 = (0.5 / ki_free) * COS_SIN_SEC_i * HDZ_i * RAD;
+
+  let Λ_s3 = -SIN_COS_SEC_s * h_s - COS_PHI_s * TAN_THETA_s_e * SEC_THETA_s_e * (D_s + ζ_s);
+  let Λ_i3 = -SIN_COS_SEC_i * h_i - COS_PHI_i * TAN_THETA_i_e * SEC_THETA_s_e * (D_i + ζ_i);
+
+  let Λ_s4 = -SIN_PHI_s * TAN_THETA_s_e * SEC_THETA_s_e * (H_s + ζ_s) - COS_SIN_SEC_s * d_s;
+  let Λ_i4 = -SIN_PHI_i * TAN_THETA_i_e * SEC_THETA_s_e * (H_i + ζ_i) - COS_SIN_SEC_i * d_i;
+
+  let SIN_COS_TAN_s = SIN_PHI_s * COS_PHI_s * TAN_2_THETA_s;
+  let SIN_COS_TAN_i = SIN_PHI_i * COS_PHI_i * TAN_2_THETA_i;
+  let Λ_s5 = (1. / ks_free) * SIN_COS_TAN_s * HDZ_s * RAD;
+  let Λ_i5 = (1. / ki_free) * SIN_COS_TAN_i * HDZ_i * RAD;
+
+  let Λ_s6 = (0.5 * ks_free) * (TAN_2_THETA_s * HDZ_s - 2. * ζ_s) / RAD;
+  let Λ_i6 = (0.5 * ki_free) * (TAN_2_THETA_i * HDZ_i - 2. * ζ_i) / RAD;
+
+  let zlks = 0.5 * (z0 / k_p - half_L / k_s) * RAD;
+  let zlki = 0.5 * (z0 / k_p - half_L / k_i) * RAD;
+
+  // The omega terms lack the terms that depend on the integration parameter z
+  let Ω1_ = complex_dim(-0.25 * Wx_SQ + Γ_s1, zlks + Λ_s1);
+  let Ω2_ = complex_dim(-0.25 * Wy_SQ + Γ_s2, zlks + Λ_s2);
+  let Ω3_ = complex_dim(-0.25 * Wx_SQ + Γ_i1, zlki + Λ_i1);
+  let Ω4_ = complex_dim(-0.25 * Wy_SQ + Γ_i2, zlki + Λ_i2);
+  let Ω5 = complex_dim(Γ_s3, Λ_s3);
+  let Ω6 = complex_dim(Γ_i3, Λ_i3);
+  let Ω7_ = complex_dim(Γ_s4, Λ_s4);
+  let Ω8_ = complex_dim(Γ_i4, Λ_i4);
+  let Ω9 = complex_dim(Γ_s5, Λ_s5);
+  let Ω10 = complex_dim(Γ_i5, Λ_i5);
+  let Ω11_ = real_dim(-0.5 * Wx_SQ);
+  let Ω12_ = real_dim(-0.5 * Wy_SQ);
+  let ksip = k_s + k_i + spdc.pp.k_eff();
+  let Ω13_ = complex_dim(Γ_s6 + Γ_i6, Λ_s6 + Λ_i6 + half_L * (k_p + ksip) / RAD);
+
+  let Kps = 0.25 * L * (1. / k_p - 1. / k_s) * RAD;
+  let Kpi = 0.25 * L * (1. / k_p - 1. / k_i) * RAD;
+  let Lrho_by_2 = half_L * rho;
+
+  let fn_z = |z: f64| {
+    let a = imag_dim(Kps * z);
+    let b = imag_dim(Kpi * z);
+    let Ω1 = Ω1_ - a;
+    let Ω2 = Ω2_ - a;
+    let Ω3 = Ω3_ - b;
+    let Ω4 = Ω4_ - b;
+    let c = imag_dim(Lrho_by_2 * (z + 1.));
+    let Ω7 = Ω7_ + c;
+    let Ω8 = Ω8_ + c;
+    let d = imag_dim((z0 - half_L * z) / k_p * RAD);
+    let Ω11 = Ω11_ + d;
+    let Ω12 = Ω12_ + d;
+    let Ω13 = Ω13_ + imag_dim(half_L * z * (k_p - ksip) / RAD);
+
+    // -4 Ω1 Ω102 Ω2 + Ω112 - 4 Ω1 Ω3 Ω122 - 4 Ω2 Ω4 - 2 Ω10 Ω11 Ω12 Ω9 + Ω102 - 4 Ω3 Ω4 Ω92
+    let Δ = -4. * Ω1 * sq(Ω10) * Ω2 + (sq(Ω11) - 4. * Ω1 * Ω3) * (sq(Ω12) - 4. * Ω2 * Ω4)
+      - 2. * Ω10 * Ω11 * Ω12 * Ω9
+      + (sq(Ω10) - 4. * Ω3 * Ω4) * sq(Ω9);
+    // Ω112 -4Ω1Ω3(Ω12Ω7-2Ω2Ω8)+Ω12(2Ω3Ω5-Ω11Ω6)Ω9-2Ω3Ω8Ω92 +Ω102Ω11Ω2Ω5-4Ω1Ω2Ω6-Ω11Ω7Ω9+Ω6Ω922
+    let N = sq(
+      (sq(Ω11) - 4. * Ω1 * Ω3) * (Ω12 * Ω7 - 2. * Ω2 * Ω8) + Ω12 * (2. * Ω3 * Ω5 - Ω11 * Ω6) * Ω9
+        - 2. * Ω3 * Ω8 * sq(Ω9)
+        + Ω10 * (2. * Ω11 * Ω2 * Ω5 - 4. * Ω1 * Ω2 * Ω6 - Ω11 * Ω7 * Ω9 + Ω6 * sq(Ω9)),
+    );
+    // 4 Ω112 Ω13 Ω2 - 16 Ω1 Ω13 Ω2 Ω3 + 4 Ω2 Ω3 Ω52 - 4 Ω11 Ω2 Ω5 Ω6 + 4 Ω1 Ω2 Ω62 - Ω112 Ω72 +4Ω1Ω3Ω72 -4Ω3Ω5Ω7Ω9+2Ω11Ω6Ω7Ω9+4Ω13Ω3Ω92 -Ω62 Ω92
+    let m = 4. * sq(Ω11) * Ω13 * Ω2 - 16. * Ω1 * Ω13 * Ω2 * Ω3 + 4. * Ω2 * Ω3 * sq(Ω5)
+      - 4. * Ω11 * Ω2 * Ω5 * Ω6
+      + 4. * Ω1 * Ω2 * sq(Ω6)
+      - sq(Ω11) * sq(Ω7)
+      + 4. * Ω1 * Ω3 * sq(Ω7)
+      - 4. * Ω3 * Ω5 * Ω7 * Ω9
+      + 2. * Ω11 * Ω6 * Ω7 * Ω9
+      + 4. * Ω13 * Ω3 * sq(Ω9)
+      - sq(Ω6) * sq(Ω9);
+    // 4Ω112 Ω2+Ω3-4Ω1Ω2+Ω92
+    let P = 4. * (sq(Ω11) * Ω2 + Ω3 * (-4. * Ω1 * Ω2 + sq(Ω9)));
+
+    let denom_units = M2 * M2 * M2 * M2;
+    let ψ = ((m + N / Δ) / P).exp() / (Δ / denom_units).sqrt();
+
+    // Take into account apodized crystals
+    let pmzcoeff = spdc.pp.integration_constant(z, L);
+
+    // dbg!(pmzcoeff, z, numerator, denominator);
+    // Now calculate the full term in the integral.
+    return ψ * pmzcoeff;
+  };
+
+  let integrator = SimpsonIntegration::new(fn_z);
+  let result = integrator.integrate(
+    -1.,
+    1.,
+    steps.unwrap_or_else(|| integration_steps_best_guess(L)),
+  );
   PerMeter4::new(result)
 }
 
@@ -635,7 +847,7 @@ mod tests {
       *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
         / JSAUnits::new(1.));
     let new =
-      *(phasematch_fiber_coupling2(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
+      *(phasematch_fiber_coupling_v3(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
         / JSAUnits::new(1.));
 
     assert_nearly_equal!("norm", new.norm(), old.norm(), 1e-10);

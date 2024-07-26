@@ -1,7 +1,7 @@
 use super::*;
 use crate::utils::frequency_to_wavenumber;
+use crate::Complex;
 use dim::ucum::{M, RAD};
-use num::Complex;
 
 /// Evaluate the fiber coupled singles phasematching function for a given set of frequencies
 ///
@@ -43,9 +43,8 @@ pub fn phasematch_singles_fiber_coupling(
 
   // Height of the collected spots from the z axis.
   // TODO: check
-  // let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
+  let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
   // let hi = L * 0.5 * tan(theta_i) * cos(phi_i);
-  let hs = spot_height(L, z0s, theta_s, phi_s);
 
   let RHOpx = tan(spdc.pump.walkoff_angle(&spdc.crystal_setup));
 
