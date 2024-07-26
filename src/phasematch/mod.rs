@@ -44,6 +44,7 @@ pub fn pump_spectral_amplitude(omega: Frequency, spdc: &SPDC) -> f64 {
 
 /// Get the best guess of the number of integration steps for a specific crystal length
 pub fn integration_steps_best_guess(crystal_length: Distance) -> usize {
+  // return 50;
   use num::clamp;
   use std::cmp::max;
   // TODO: Improve this determination of integration steps

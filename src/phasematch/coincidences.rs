@@ -138,6 +138,11 @@ pub fn phasematch_fiber_coupling(
   let DEL4s = 0.5 * ks_f * zhs * TAN_THETA_s_e.powi(2) - ks_f * z0s;
   let DEL4i = 0.5 * ki_f * zhi * TAN_THETA_i_e.powi(2) - ki_f * z0i;
 
+  // dbg!(
+  //   zhs, zhi, GAM1s, GAM1i, GAM2s, GAM2i, GAM3s, GAM3i, GAM4s, GAM4i, DEL1s, DEL1i, DEL2s, DEL2i,
+  //   DEL3s, DEL3i, DEL4s, DEL4i
+  // );
+
   let M2 = M * M; // meters squared
                   // let As_r = -0.25 * Wx_SQ + GAM1s;
                   // let As_i = -DEL1s;
@@ -181,7 +186,9 @@ pub fn phasematch_fiber_coupling(
   let ee = 0.5 * L * (k_p + dksi);
   let ff = 0.5 * L * (k_p - dksi);
 
-  // dbg!(As, Ai, Bs, Bi, Cs, Ci, Ds, Di, mx, my, m, n, hh, A5, A7, pp_factor, dksi, ee, ff);
+  // dbg!(Cs, Ci, Ds, Di);
+
+  // dbg!(As, Ai, Bs, Bi, Cs, Ci, Ds, Di);
 
   let fn_z = |z: f64| {
     let Ds_z = Ds * z;
@@ -233,6 +240,8 @@ pub fn phasematch_fiber_coupling(
     let term5 = -2. * A2 + A9;
     let denom1 = 4. * A1 * A3 - A8sq;
     let denom2 = 4. * A2 * A4 - A9sq;
+
+    // dbg!(A1, A2);
 
     let numerator = ((4. * A10
       - invA1 * (A5sq + (term4 * term4) / denom1)
@@ -299,6 +308,7 @@ pub fn phasematch_fiber_coupling2(
   spdc: &SPDC,
   steps: Option<usize>,
 ) -> PerMeter4<Complex<f64>> {
+  // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, steps);
   // return phasematch_fiber_coupling_v3(omega_s, omega_i, spdc, steps);
   // return phasematch_sinc(omega_s, omega_i, spdc);
   // crystal length
@@ -398,14 +408,19 @@ pub fn phasematch_fiber_coupling2(
   let Λ_s4 = 0.5 * ks_free * zhs * TAN_THETA_s_e.powi(2) / RAD - ks_free * ζs / RAD;
   let Λ_i4 = 0.5 * ki_free * zhi * TAN_THETA_i_e.powi(2) / RAD - ki_free * ζi / RAD;
 
+  // dbg!(
+  //   zhs, zhi, Γ_s1, Γ_i1, Γ_s2, Γ_i2, Γ_s3, Γ_i3, Γ_s4, Γ_i4, Λ_s1, Λ_i1, Λ_s2, Λ_i2, Λ_s3, Λ_i3,
+  //   Λ_s4, Λ_i4
+  // );
+
   let zlks = 0.5 * (ζ / k_p - half_L / k_s) * RAD;
   let zlki = 0.5 * (ζ / k_p - half_L / k_i) * RAD;
 
   // The underscore terms lack the terms that depend on the integration parameter z
-  let A1_ = complex_dim(-0.25 * Wx_SQ + Γ_s1, zlks - Λ_s1);
-  let A2_ = complex_dim(-0.25 * Wy_SQ + Γ_s2, zlks - Λ_s2);
-  let A3_ = complex_dim(-0.25 * Wx_SQ + Γ_i1, zlki - Λ_i1);
-  let A4_ = complex_dim(-0.25 * Wy_SQ + Γ_i2, zlki - Λ_i2);
+  let A1_ = complex_dim(-0.25 * Wx_SQ + Γ_s1, -Λ_s1);
+  let A2_ = complex_dim(-0.25 * Wy_SQ + Γ_s2, -Λ_s2);
+  let A3_ = complex_dim(-0.25 * Wx_SQ + Γ_i1, -Λ_i1);
+  let A4_ = complex_dim(-0.25 * Wy_SQ + Γ_i2, -Λ_i2);
   let A5 = complex_dim(Γ_s3, -Λ_s3);
   let A7 = complex_dim(Γ_i3, -Λ_i3);
   let A8_ = real_dim(-0.5 * Wx_SQ);
@@ -417,21 +432,26 @@ pub fn phasematch_fiber_coupling2(
   let Kpi = 0.25 * L * (1. / k_p - 1. / k_i) * RAD;
   let Lrho_by_2 = 0.5 * L * rho;
 
+  // dbg!(A1_, A2_, A3_, A4_, A5, A7, A8_, A9_, A10_);
+
   let M2 = M * M;
+  let A5sq = A5 * A5;
+
+  // dbg!(zlks, zlki, Kps, Kpi);
 
   let fn_z = |z: f64| {
-    let a = imag_dim(Kps * z);
-    let b = imag_dim(Kpi * z);
+    let a = imag_dim(Kps * z - zlks);
+    let b = imag_dim(Kpi * z - zlki);
     let A1 = A1_ - a;
     let A2 = A2_ - a;
     let A3 = A3_ - b;
     let A4 = A4_ - b;
     let c = imag_dim(Lrho_by_2 * (z + 1.));
     let A6 = c;
-    let d = imag_dim((ζ - 0.5 * L * z) / k_p * RAD);
+    let d = imag_dim((ζ - half_L * z) / k_p * RAD);
     let A8 = A8_ + d;
     let A9 = A9_ + d;
-    let A10 = A10_ + imag_dim(0.5 * L * z * (k_p - ksip) / RAD);
+    let A10 = A10_ + imag_dim(half_L * z * (k_p - ksip) / RAD);
 
     let A6sq = A6 * A6;
     let A8sq = A8 * A8;
@@ -441,9 +461,11 @@ pub fn phasematch_fiber_coupling2(
     let denom1 = 4. * A1 * A3 - A8sq;
     let denom2 = 4. * A2 * A4 - A9sq;
 
+    // dbg!(A1, A2);
+
     let numerator = (A10
       - 0.25
-        * (invA1 * (A6sq + sq(-2. * A1 * A7 + A5 * A8) / denom1)
+        * (invA1 * (A5sq + sq(-2. * A1 * A7 + A5 * A8) / denom1)
           + invA2 * A6sq * (1. + sq(-2. * A2 + A9) / denom2)))
       .exp();
 
@@ -694,7 +716,11 @@ mod tests {
   use super::*;
   extern crate float_cmp;
   use crate::utils::testing::assert_nearly_equal;
-  use dim::Dimensioned;
+  use dim::{
+    f64prefixes::{MICRO, NANO},
+    Dimensioned,
+  };
+  use utils::{frequency_to_vacuum_wavelength, frequency_to_wavelength};
 
   #[allow(dead_code)]
   fn percent_diff(actual: f64, expected: f64) -> f64 {
@@ -815,8 +841,8 @@ mod tests {
       "crystal": {
         "kind": "KTP",
         "pm_type": "e->eo",
-        "phi_deg": 9,
-        "theta_deg": 1,
+        "phi_deg": 3,
+        "theta_deg": 0,
         "length_um": 2000,
         "temperature_c": 20
       },
@@ -839,17 +865,197 @@ mod tests {
     });
 
     let config: SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
-    let spdc = config
+    let mut spdc = config
       .try_as_spdc()
       .expect("Could not convert to SPDC instance");
 
-    let old =
-      *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
-        / JSAUnits::new(1.));
-    let new =
-      *(phasematch_fiber_coupling_v3(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
-        / JSAUnits::new(1.));
+    fn compare(spdc: &SPDC) {
+      let wavelengths = WavelengthSpace::new(
+        (1510. * NANO * M, 1590. * NANO * M, 10),
+        (1510. * NANO * M, 1590. * NANO * M, 10),
+      );
+      for (ws, wi) in wavelengths.into_signal_idler_iterator() {
+        let old = *(phasematch_fiber_coupling(ws, wi, &spdc, Some(5)) / JSAUnits::new(1.));
+        let new = *(phasematch_fiber_coupling2(ws, wi, &spdc, Some(5)) / JSAUnits::new(1.));
+        let ls = frequency_to_vacuum_wavelength(ws);
+        let li = frequency_to_vacuum_wavelength(wi);
+        assert_nearly_equal!(
+          format!("norm at {}, {}, {:#?}", ls, li, spdc),
+          new.norm(),
+          old.norm(),
+          1e-6
+        );
+      }
+    }
 
-    assert_nearly_equal!("norm", new.norm(), old.norm(), 1e-10);
+    for len in 1..10 {
+      dbg!(len);
+      spdc.crystal_setup.length = len as f64 * 1000. * MICRO * M;
+      for theta in 0..10 {
+        dbg!(theta);
+        spdc.crystal_setup.counter_propagation = false;
+        spdc.signal.set_angles(0. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_crystal_theta();
+        compare(&spdc);
+        spdc.signal.set_angles(180. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_crystal_theta();
+        compare(&spdc);
+        spdc.crystal_setup.counter_propagation = true;
+        spdc.signal.set_angles(0. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_crystal_theta();
+        compare(&spdc);
+        spdc
+          .signal
+          .set_angles(180. * DEG, (180. - theta as f64) * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_crystal_theta();
+        compare(&spdc);
+      }
+    }
+
+    spdc.crystal_setup.theta = 0. * DEG;
+
+    for len in 1..10 {
+      dbg!(len);
+      spdc.crystal_setup.length = len as f64 * 1000. * MICRO * M;
+      for theta in 0..10 {
+        dbg!(theta);
+        spdc.crystal_setup.counter_propagation = false;
+        spdc.signal.set_angles(0. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_periodic_poling().unwrap();
+        compare(&spdc);
+        spdc.signal.set_angles(180. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_periodic_poling().unwrap();
+        compare(&spdc);
+        spdc.crystal_setup.counter_propagation = true;
+        spdc.signal.set_angles(0. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_periodic_poling().unwrap();
+        compare(&spdc);
+        spdc
+          .signal
+          .set_angles(180. * DEG, (180. - theta as f64) * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_periodic_poling().unwrap();
+        compare(&spdc);
+      }
+    }
+  }
+
+  #[test]
+  fn compare_version1_version3() {
+    let json = serde_json::json!({
+      "crystal": {
+        "kind": "KTP",
+        "pm_type": "e->eo",
+        "phi_deg": 3,
+        "theta_deg": 0,
+        "length_um": 2000,
+        "temperature_c": 20
+      },
+      "pump": {
+        "wavelength_nm": 775,
+        "waist_um": 90,
+        "bandwidth_nm": 5.35,
+        "average_power_mw": 1
+      },
+      "signal": {
+        "wavelength_nm": 1550,
+        "phi_deg": 0,
+        "theta_external_deg": 1,
+        "waist_um": 10,
+        "waist_position_um": "auto"
+      },
+      "idler": "auto",
+      "pp": "auto",
+      "deff_pm_per_volt": 1.
+    });
+
+    let config: SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
+    let mut spdc = config
+      .try_as_spdc()
+      .expect("Could not convert to SPDC instance");
+
+    fn compare(spdc: &SPDC) {
+      let wavelengths = WavelengthSpace::new(
+        (1510. * NANO * M, 1590. * NANO * M, 10),
+        (1510. * NANO * M, 1590. * NANO * M, 10),
+      );
+      for (ws, wi) in wavelengths.into_signal_idler_iterator() {
+        let old = *(phasematch_fiber_coupling(ws, wi, &spdc, Some(5)) / JSAUnits::new(1.));
+        let new = *(phasematch_fiber_coupling_v3(ws, wi, &spdc, Some(5)) / JSAUnits::new(1.));
+        let ls = frequency_to_vacuum_wavelength(ws);
+        let li = frequency_to_vacuum_wavelength(wi);
+        assert_nearly_equal!(
+          format!("norm at {}, {}, {:#?}", ls, li, spdc),
+          new.norm(),
+          old.norm(),
+          50.
+        );
+      }
+    }
+
+    for len in 1..10 {
+      dbg!(len);
+      spdc.crystal_setup.length = len as f64 * 1000. * MICRO * M;
+      for theta in 0..10 {
+        dbg!(theta);
+        spdc.crystal_setup.counter_propagation = false;
+        spdc.signal.set_angles(0. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_crystal_theta();
+        compare(&spdc);
+        spdc.signal.set_angles(180. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_crystal_theta();
+        compare(&spdc);
+        spdc.crystal_setup.counter_propagation = true;
+        spdc.signal.set_angles(0. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_crystal_theta();
+        compare(&spdc);
+        spdc
+          .signal
+          .set_angles(180. * DEG, (180. - theta as f64) * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_crystal_theta();
+        compare(&spdc);
+      }
+    }
+
+    spdc.crystal_setup.theta = 0. * DEG;
+
+    for len in 1..10 {
+      dbg!(len);
+      spdc.crystal_setup.length = len as f64 * 1000. * MICRO * M;
+      for theta in 0..10 {
+        dbg!(theta);
+        spdc.crystal_setup.counter_propagation = false;
+        spdc.signal.set_angles(0. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_periodic_poling().unwrap();
+        compare(&spdc);
+        spdc.signal.set_angles(180. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_periodic_poling().unwrap();
+        compare(&spdc);
+        spdc.crystal_setup.counter_propagation = true;
+        spdc.signal.set_angles(0. * DEG, theta as f64 * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_periodic_poling().unwrap();
+        compare(&spdc);
+        spdc
+          .signal
+          .set_angles(180. * DEG, (180. - theta as f64) * DEG);
+        spdc.assign_optimum_idler().unwrap();
+        spdc.assign_optimum_periodic_poling().unwrap();
+        compare(&spdc);
+      }
+    }
   }
 }

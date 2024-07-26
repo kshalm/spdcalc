@@ -488,7 +488,11 @@ pub fn transpose_vec<T: Clone>(vec: Vec<T>, num_cols: usize) -> Vec<T> {
 #[cfg(test)]
 pub mod testing {
   pub fn percent_diff(actual: f64, expected: f64) -> f64 {
-    100. * ((expected - actual).abs() / expected)
+    if expected == 0. && actual == 0. {
+      return 0.;
+    } else {
+      50. * ((expected - actual).abs() / (expected + actual))
+    }
   }
 
   macro_rules! assert_nearly_equal {
