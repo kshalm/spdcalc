@@ -19,7 +19,6 @@ pub fn delta_k<P: AsRef<PeriodicPoling>>(
   let kp = pump.wavevector(pump.frequency(), crystal_setup);
 
   // k_eff is zero when no periodic poling is used
-
   // \vec{\Delta k} = \vec{k_{pulse}} - \vec{k_{signal}} - \vec{k_{idler}} - k_pp * \hat{z}
   kp - ks - ki - dim_vector(pp.as_ref().k_eff(), Vector3::<f64>::z_axis())
 }
