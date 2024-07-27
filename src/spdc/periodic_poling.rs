@@ -223,7 +223,7 @@ impl PeriodicPoling {
 
   pub fn signed_period(&self) -> PolingPeriod {
     match self {
-      Self::Off => 0. * M,
+      Self::Off => f64::INFINITY * M,
       Self::On { period, sign, .. } => *sign * *period,
     }
   }
