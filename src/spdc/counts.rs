@@ -1,5 +1,6 @@
 use super::SPDC;
 use crate::jsa::{FrequencySpace, JointSpectrum};
+use crate::math::Integrator;
 use crate::{math::sq, PeriodicPoling};
 use dim::ucum::Hertz;
 
@@ -33,9 +34,9 @@ pub fn get_counts_correction(spdc: &SPDC) -> f64 {
 pub fn counts_coincidences(
   spdc: &SPDC,
   ranges: FrequencySpace,
-  integration_steps: Option<usize>,
+  integrator: Integrator,
 ) -> Hertz<f64> {
-  let s = spdc.joint_spectrum(integration_steps);
+  let s = spdc.joint_spectrum(integrator);
   let (dws, dwi) = ranges.steps().division_widths();
   let dw2 = dws * dwi;
   let correction_factor = get_counts_correction(spdc);
@@ -51,9 +52,9 @@ pub fn counts_coincidences(
 pub fn counts_singles_signal(
   spdc: &SPDC,
   ranges: FrequencySpace,
-  integration_steps: Option<usize>,
+  integrator: Integrator,
 ) -> Hertz<f64> {
-  let s = spdc.joint_spectrum(integration_steps);
+  let s = spdc.joint_spectrum(integrator);
   let (dws, dwi) = ranges.steps().division_widths();
   let dw2 = dws * dwi;
   let correction_factor = get_counts_correction(spdc);
@@ -69,9 +70,9 @@ pub fn counts_singles_signal(
 pub fn counts_singles_idler(
   spdc: &SPDC,
   ranges: FrequencySpace,
-  integration_steps: Option<usize>,
+  integrator: Integrator,
 ) -> Hertz<f64> {
-  let s = JointSpectrum::new(spdc.clone().with_swapped_signal_idler(), integration_steps);
+  let s = JointSpectrum::new(spdc.clone().with_swapped_signal_idler(), integrator);
   let (dws, dwi) = ranges.steps().division_widths();
   let dw2 = dws * dwi;
   let correction_factor = get_counts_correction(spdc);

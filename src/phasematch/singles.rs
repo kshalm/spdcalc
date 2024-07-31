@@ -11,7 +11,7 @@ pub fn phasematch_singles_fiber_coupling(
   omega_s: Frequency,
   omega_i: Frequency,
   spdc: &SPDC,
-  steps: Option<usize>,
+  integrator: Integrator,
 ) -> PerMeter3<f64> {
   let M2 = M * M; // meters squared
                   // crystal length
@@ -81,7 +81,7 @@ pub fn phasematch_singles_fiber_coupling(
   let KpKs4inv = 1. / (4. * KpKs);
   let imag = Complex::i();
 
-  let fn_z = |z1: f64, z2: f64, _index| {
+  let fn_z = |z1: f64, z2: f64| {
     let B0 = z1 - z2;
 
     // TODO: krister broke this out of the integral so that repeat calculations didn't happen
@@ -170,17 +170,23 @@ pub fn phasematch_singles_fiber_coupling(
     pmzcoeff * numerator / denominator
   };
 
-  let integrator = SimpsonIntegration2D::new(fn_z);
+  // let integrator = SimpsonIntegration2D::new(|z1, z2, _| fn_z(z1, z2));
 
-  // h(\omega_s, \omega_i) = \frac{1}{4} \int_{-1}^{1} d\xi_1 \int_{-1}^{1} d\xi_2 \psi(\xi_1, \xi_2).
-  let result = 0.25
-    * integrator
-      .integrate(
-        (-1., 1.),
-        (-1., 1.),
-        steps.unwrap_or_else(|| integration_steps_best_guess(L)),
-      )
-      .norm();
+  // // h(\omega_s, \omega_i) = \frac{1}{4} \int_{-1}^{1} d\xi_1 \int_{-1}^{1} d\xi_2 \psi(\xi_1, \xi_2).
+  // let result = 0.25
+  //   * integrator
+  //     .integrate(
+  //       (-1., 1.),
+  //       (-1., 1.),
+  //       steps.unwrap_or_else(|| integration_steps_best_guess(L)),
+  //     )
+  //     .norm();
+
+  // let integrator = Integrator::AdaptiveSimpson {
+  //   tolerance: 1e-5,
+  //   max_depth: 1000,
+  // };
+  let result = integrator.integrate2d(&fn_z, -1., 1., -1., 1.).norm();
 
   PerMeter3::new(result)
 }
@@ -210,7 +216,7 @@ mod tests {
       spdc.signal.frequency(),
       spdc.idler.frequency(),
       &spdc,
-      None,
+      Integrator::default(),
     ) / PerMeter3::new(1.));
 
     let actual = amp;
@@ -249,7 +255,7 @@ mod tests {
       spdc.signal.frequency(),
       spdc.idler.frequency(),
       &spdc,
-      None,
+      Integrator::default(),
     ) / PerMeter3::new(1.));
 
     let actual = amp;

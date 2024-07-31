@@ -28,6 +28,7 @@ mod tests {
   use dim::ucum::M;
   extern crate float_cmp;
   use float_cmp::*;
+  use math::Integrator;
 
   #[test]
   fn shmidt_number_test() {
@@ -46,7 +47,7 @@ mod tests {
     // dbg!(wavelength_range);
     // dbg!(spdc_setup);
 
-    let spectrum = spdc.joint_spectrum(None);
+    let spectrum = spdc.joint_spectrum(Integrator::default());
     let amplitudes = spectrum.jsa_range(wavelength_range);
     let sn = schmidt_number(amplitudes).expect("Could not calc schmidt number");
 

@@ -1,4 +1,5 @@
 use crate::jsa::{FrequencySpace, JointSpectrum};
+use crate::math::Integrator;
 use crate::types::{Complex, Time};
 use crate::utils::{get_1d_index, get_2d_indices, Steps};
 use crate::SPDC;
@@ -86,9 +87,9 @@ pub fn hom_time_delay(spdc: &SPDC) -> Time {
 pub fn hom_visibility<T: Into<FrequencySpace> + Copy>(
   spdc: &SPDC,
   ranges: T,
-  integration_steps: Option<usize>,
+  integrator: Integrator,
 ) -> (Time, f64) {
-  let sp = spdc.joint_spectrum(integration_steps);
+  let sp = spdc.joint_spectrum(integrator);
   let ranges = ranges.into();
   let jsa_values = sp.jsa_range(ranges);
   let jsa_values_swapped: Vec<Complex<f64>> = ranges
@@ -255,13 +256,13 @@ pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
   spdc2: &SPDC,
   region1: T,
   region2: T,
-  integration_steps: Option<usize>,
+  integrator: Integrator,
 ) -> HomTwoSourceResult<(Time, f64)> {
   use dim::ucum::S;
   if spdc1 == spdc2 {
     let min_rate = hom_two_source_rate_series(
-      &spdc1.joint_spectrum(integration_steps),
-      &spdc2.joint_spectrum(integration_steps),
+      &spdc1.joint_spectrum(integrator),
+      &spdc2.joint_spectrum(integrator),
       region1,
       region2,
       Steps(0. * S, 0. * S, 1),
@@ -274,24 +275,24 @@ pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
   } else {
     let time_delays = hom_two_source_time_delays(spdc1, spdc2);
     let min_ss = hom_two_source_rate_series(
-      &spdc1.joint_spectrum(integration_steps),
-      &spdc2.joint_spectrum(integration_steps),
+      &spdc1.joint_spectrum(integrator),
+      &spdc2.joint_spectrum(integrator),
       region1,
       region2,
       Steps(time_delays.ss, time_delays.ss, 1),
     )
     .ss[0];
     let min_ii = hom_two_source_rate_series(
-      &spdc1.joint_spectrum(integration_steps),
-      &spdc2.joint_spectrum(integration_steps),
+      &spdc1.joint_spectrum(integrator),
+      &spdc2.joint_spectrum(integrator),
       region1,
       region2,
       Steps(time_delays.ii, time_delays.ii, 1),
     )
     .ii[0];
     let min_si = hom_two_source_rate_series(
-      &spdc1.joint_spectrum(integration_steps),
-      &spdc2.joint_spectrum(integration_steps),
+      &spdc1.joint_spectrum(integrator),
+      &spdc2.joint_spectrum(integrator),
       region1,
       region2,
       Steps(time_delays.si, time_delays.si, 1),

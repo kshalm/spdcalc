@@ -1,6 +1,6 @@
 use crate::{
-  phasematch::*, Complex, Frequency, FrequencySpace, IntoSignalIdlerIterator, JSIUnits, JsiNorm,
-  JsiSinglesNorm, PerMeter3, PerMeter4, SPDCError, SPDC,
+  math::Integrator, phasematch::*, Complex, Frequency, FrequencySpace, IntoSignalIdlerIterator,
+  JSIUnits, JsiNorm, JsiSinglesNorm, PerMeter3, PerMeter4, SPDCError, SPDC,
 };
 
 // This defines a more than reasonable box around frequency ranges to...
@@ -23,7 +23,7 @@ pub fn jsa_raw(
   omega_s: Frequency,
   omega_i: Frequency,
   spdc: &SPDC,
-  integration_steps: Option<usize>,
+  integrator: Integrator,
 ) -> Complex<f64> {
   if invalid_frequencies(omega_s, omega_i, spdc) {
     return Complex::new(0., 0.);
@@ -33,8 +33,7 @@ pub fn jsa_raw(
   if alpha < spdc.pump_spectrum_threshold {
     Complex::new(0., 0.)
   } else {
-    let f =
-      phasematch_fiber_coupling(omega_s, omega_i, spdc, integration_steps) / PerMeter4::new(1.);
+    let f = phasematch_fiber_coupling(omega_s, omega_i, spdc, integrator) / PerMeter4::new(1.);
     *(alpha * f)
   }
 }
@@ -46,7 +45,7 @@ pub fn jsi_singles_raw(
   omega_s: Frequency,
   omega_i: Frequency,
   spdc: &SPDC,
-  integration_steps: Option<usize>,
+  integrator: Integrator,
 ) -> f64 {
   if invalid_frequencies(omega_s, omega_i, spdc) {
     return 0.;
@@ -56,8 +55,8 @@ pub fn jsi_singles_raw(
   if alpha < spdc.pump_spectrum_threshold {
     0.
   } else {
-    let fs = phasematch_singles_fiber_coupling(omega_s, omega_i, spdc, integration_steps)
-      / PerMeter3::new(1.);
+    let fs =
+      phasematch_singles_fiber_coupling(omega_s, omega_i, spdc, integrator) / PerMeter3::new(1.);
     // use crate::utils::frequency_to_vacuum_wavelength;
     // let mut setup : SPDCSetup = spdc.clone().into();
     // setup.signal.set_wavelength(frequency_to_vacuum_wavelength(omega_s));
@@ -74,16 +73,14 @@ pub fn jsi_singles_raw(
 #[derive(Clone, Debug)]
 pub struct JointSpectrum {
   spdc: SPDC,
-  integration_steps: Option<usize>,
+  integrator: Integrator,
   jsa_center: f64,
   jsi_singles_center: f64,
 }
 
 impl JointSpectrum {
   /// Create a new instance
-  ///
-  /// If `integration_steps` is `None` then the appropriate number of steps is auto-calculated.
-  pub fn new(spdc: SPDC, integration_steps: Option<usize>) -> Self {
+  pub fn new(spdc: SPDC, integrator: Integrator) -> Self {
     let spdc_optimal = spdc.clone().try_as_optimum().unwrap();
     let jsa_center_norm = jsi_normalization(
       spdc_optimal.signal.frequency(),
@@ -95,7 +92,7 @@ impl JointSpectrum {
         spdc_optimal.signal.frequency(),
         spdc_optimal.idler.frequency(),
         &spdc_optimal,
-        integration_steps,
+        integrator,
       )
       .norm();
     let jsi_singles_center_norm = *(jsi_singles_normalization(
@@ -108,12 +105,12 @@ impl JointSpectrum {
         spdc_optimal.signal.frequency(),
         spdc_optimal.idler.frequency(),
         &spdc_optimal,
-        integration_steps,
+        integrator,
       );
 
     Self {
       spdc,
-      integration_steps,
+      integrator,
       jsa_center,
       jsi_singles_center,
     }
@@ -123,7 +120,7 @@ impl JointSpectrum {
   ///
   /// Technically the units should be 1/sqrt(s)/(rad/s)
   pub fn jsa(&self, omega_s: Frequency, omega_i: Frequency) -> Complex<f64> {
-    let jsa = jsa_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
+    let jsa = jsa_raw(omega_s, omega_i, &self.spdc, self.integrator);
     use num::Zero;
     if jsa == Complex::zero() {
       Complex::zero()
@@ -161,7 +158,7 @@ impl JointSpectrum {
   /// Units are: per second per (rad/s)^2, which when integrated over
   /// gives a value proportional to the count rate (counts/s)
   pub fn jsi(&self, omega_s: Frequency, omega_i: Frequency) -> JSIUnits<f64> {
-    let jsa = jsa_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
+    let jsa = jsa_raw(omega_s, omega_i, &self.spdc, self.integrator);
     use num::Zero;
     if jsa == Complex::zero() {
       JSIUnits::new(0.)
@@ -198,7 +195,7 @@ impl JointSpectrum {
   ///
   /// Technically the units should be 1/sqrt(s)/(rad/s)
   pub fn jsa_singles(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
-    let jsi = jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
+    let jsi = jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integrator);
     if jsi == 0. {
       0.
     } else {
@@ -235,7 +232,7 @@ impl JointSpectrum {
   /// Units are: per second per (rad/s)^2, which when integrated over
   /// gives a value proportional to the count rate (counts/s)
   pub fn jsi_singles(&self, omega_s: Frequency, omega_i: Frequency) -> JSIUnits<f64> {
-    let jsi = jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integration_steps);
+    let jsi = jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integrator);
     if jsi == 0. {
       JSIUnits::new(0.)
     } else {
@@ -258,7 +255,7 @@ impl JointSpectrum {
     range: T,
   ) -> Vec<JSIUnits<f64>> {
     let swapped = self.spdc.clone().with_swapped_signal_idler();
-    let idler_spectrum = Self::new(swapped, self.integration_steps);
+    let idler_spectrum = Self::new(swapped, self.integrator);
     range
       .into_signal_idler_iterator()
       .map(|(ws, wi)| idler_spectrum.jsi_singles(wi, ws))
@@ -286,7 +283,7 @@ impl JointSpectrum {
     range: T,
   ) -> Vec<f64> {
     let swapped = self.spdc.clone().with_swapped_signal_idler();
-    let idler_spectrum = Self::new(swapped, self.integration_steps);
+    let idler_spectrum = Self::new(swapped, self.integrator);
     range
       .into_signal_idler_iterator()
       .map(|(ws, wi)| idler_spectrum.jsi_singles_normalized(wi, ws))
@@ -377,7 +374,7 @@ mod tests {
   fn test_efficiency() {
     let spdc = get_spdc();
 
-    let spectrum = JointSpectrum::new(spdc.clone(), None);
+    let spectrum = JointSpectrum::new(spdc.clone(), Integrator::default());
     let frequencies = FrequencySpace::new(
       (
         vacuum_wavelength_to_frequency(1541.54 * NANO * M),
@@ -446,7 +443,7 @@ mod tests {
       // },
       "deff_pm_per_volt": 1.0
     });
-    let steps = None; //Some(10);
+    let integrator = Integrator::default();
     let config: SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
     let spdc = config
       .try_as_spdc()
@@ -455,12 +452,12 @@ mod tests {
     dbg!(&spdc);
     dbg!(&optimal);
     dbg!(spdc
-      .joint_spectrum(steps)
+      .joint_spectrum(integrator)
       .jsa(spdc.signal.frequency(), spdc.idler.frequency()));
     dbg!(optimal
-      .joint_spectrum(steps)
+      .joint_spectrum(integrator)
       .jsa(optimal.signal.frequency(), optimal.idler.frequency()));
-    let sp = optimal.joint_spectrum(steps);
+    let sp = optimal.joint_spectrum(integrator);
     let jsa = sp.jsa_normalized(spdc.signal.frequency(), spdc.idler.frequency());
     dbg!(jsa.norm());
     // assert!(float_cmp::approx_eq!(f64, jsa.norm(), 1.0));
@@ -474,7 +471,9 @@ mod tests {
       PeriodicPoling::Off
     ));
     let range = optimal.optimum_range(100);
-    let jsi = optimal.joint_spectrum(steps).jsi_normalized_range(range);
+    let jsi = optimal
+      .joint_spectrum(integrator)
+      .jsi_normalized_range(range);
     // dbg!(&jsi);
     // check the max value isn't > 1
     let steps = range.as_steps();

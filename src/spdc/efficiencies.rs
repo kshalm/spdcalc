@@ -1,4 +1,4 @@
-use crate::{jsa::FrequencySpace, SPDC};
+use crate::{jsa::FrequencySpace, math::Integrator, SPDC};
 use dim::ucum::{Hertz, S};
 
 /// The efficiencies (and counts) result object
@@ -46,13 +46,9 @@ pub fn efficiencies_from_counts(
 }
 
 /// Calculate the efficiencies from the SPDC object over the given ranges.
-pub fn efficiencies(
-  spdc: &SPDC,
-  ranges: FrequencySpace,
-  integration_steps: Option<usize>,
-) -> Efficiencies {
-  let coincidences_rate = spdc.counts_coincidences(ranges, integration_steps);
-  let signal_singles_rate = spdc.counts_singles_signal(ranges, integration_steps);
-  let idler_singles_rate = spdc.counts_singles_idler(ranges, integration_steps);
+pub fn efficiencies(spdc: &SPDC, ranges: FrequencySpace, integrator: Integrator) -> Efficiencies {
+  let coincidences_rate = spdc.counts_coincidences(ranges, integrator);
+  let signal_singles_rate = spdc.counts_singles_signal(ranges, integrator);
+  let idler_singles_rate = spdc.counts_singles_idler(ranges, integrator);
   efficiencies_from_counts(coincidences_rate, signal_singles_rate, idler_singles_rate)
 }

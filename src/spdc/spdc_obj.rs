@@ -1,6 +1,7 @@
 use crate::fwhm_to_spectral_width;
 use crate::jsa::SumDiffFrequencySpace;
 use crate::math::nelder_mead_1d;
+use crate::math::Integrator;
 use crate::types::Time;
 use crate::{
   jsa::{FrequencySpace, JointSpectrum},
@@ -90,10 +91,14 @@ impl SPDC {
     let waist = fwhm_to_spectral_width(lambda_p, fwhm);
     let dw_to_spectrum_edge = (-f64::ln(0.02)).sqrt() * waist;
     let d_sum = *(0.5 * dw_to_spectrum_edge / (RAD / S));
+    let integrator = Integrator::AdaptiveSimpson {
+      tolerance: 1e-5,
+      max_depth: 10_000,
+    };
 
     if self.crystal_setup.counter_propagation {
       // find radius of signal and idler range independently
-      let spectrum = self.joint_spectrum(None);
+      let spectrum = self.joint_spectrum(integrator);
 
       let ws = self.signal.frequency();
       let wi = self.idler.frequency();
@@ -126,7 +131,7 @@ impl SPDC {
       )
     } else {
       // find delta of jsi from peak to zero-ish
-      let spectrum = self.joint_spectrum(None);
+      let spectrum = self.joint_spectrum(integrator);
       let jsi = |d_diff| {
         let ws = 0.5 * wp - d_diff * (RAD / S);
         let wi = 0.5 * wp + d_diff * (RAD / S);
@@ -323,53 +328,53 @@ impl SPDC {
   }
 
   /// Get a new joint spectrum object for this SPDC
-  pub fn joint_spectrum(&self, integration_steps: Option<usize>) -> JointSpectrum {
-    JointSpectrum::new(self.clone(), integration_steps)
+  pub fn joint_spectrum(&self, integrator: Integrator) -> JointSpectrum {
+    JointSpectrum::new(self.clone(), integrator)
   }
 
   /// Get the coincidence counts over specified frequency ranges
   pub fn counts_coincidences<T: Into<FrequencySpace>>(
     &self,
     ranges: T,
-    integration_steps: Option<usize>,
+    integrator: Integrator,
   ) -> Hertz<f64> {
-    super::counts_coincidences(self, ranges.into(), integration_steps)
+    super::counts_coincidences(self, ranges.into(), integrator)
   }
 
   /// Get the singles counts for the signal over specified frequency ranges
   pub fn counts_singles_signal<T: Into<FrequencySpace>>(
     &self,
     ranges: T,
-    integration_steps: Option<usize>,
+    integrator: Integrator,
   ) -> Hertz<f64> {
-    super::counts_singles_signal(self, ranges.into(), integration_steps)
+    super::counts_singles_signal(self, ranges.into(), integrator)
   }
 
   /// Get the singles counts for the idler over specified frequency ranges
   pub fn counts_singles_idler<T: Into<FrequencySpace>>(
     &self,
     ranges: T,
-    integration_steps: Option<usize>,
+    integrator: Integrator,
   ) -> Hertz<f64> {
-    super::counts_singles_idler(self, ranges.into(), integration_steps)
+    super::counts_singles_idler(self, ranges.into(), integrator)
   }
 
   /// Get the symmetric, signal, and idler efficiencies (and counts) over specified frequency ranges
   pub fn efficiencies<T: Into<FrequencySpace>>(
     &self,
     ranges: T,
-    integration_steps: Option<usize>,
+    integrator: Integrator,
   ) -> super::Efficiencies {
-    super::efficiencies(self, ranges.into(), integration_steps)
+    super::efficiencies(self, ranges.into(), integrator)
   }
 
   /// get the HOM time delay, and visibility
   pub fn hom_visibility<T: Into<FrequencySpace>>(
     &self,
     ranges: T,
-    integration_steps: Option<usize>,
+    integrator: Integrator,
   ) -> (Time, f64) {
-    super::hom_visibility(self, ranges.into(), integration_steps)
+    super::hom_visibility(self, ranges.into(), integrator)
   }
 
   /// get the HOM rate for specified time delays
@@ -377,9 +382,9 @@ impl SPDC {
     &self,
     time_delays: T,
     ranges: R,
-    integration_steps: Option<usize>,
+    integrator: Integrator,
   ) -> Vec<f64> {
-    let sp = self.joint_spectrum(integration_steps);
+    let sp = self.joint_spectrum(integrator);
     let ranges = ranges.into();
     let jsa_values = sp.jsa_range(ranges);
     let jsa_values_swapped: Vec<Complex<f64>> = ranges
@@ -394,9 +399,9 @@ impl SPDC {
   pub fn hom_two_source_visibilities<T: Into<FrequencySpace> + Copy>(
     &self,
     ranges: T,
-    integration_steps: Option<usize>,
+    integrator: Integrator,
   ) -> super::HomTwoSourceResult<(Time, f64)> {
-    super::hom_two_source_visibilities(self, self, ranges, ranges, integration_steps)
+    super::hom_two_source_visibilities(self, self, ranges, ranges, integrator)
   }
 
   /// get the two source HOM rate over specified times
@@ -407,9 +412,9 @@ impl SPDC {
     &self,
     time_delays: T,
     ranges: R,
-    integration_steps: Option<usize>,
+    integrator: Integrator,
   ) -> super::HomTwoSourceResult<Vec<f64>> {
-    let sp = self.joint_spectrum(integration_steps);
+    let sp = self.joint_spectrum(integrator);
     super::hom_two_source_rate_series(&sp, &sp, ranges, ranges, time_delays)
   }
 }
@@ -469,7 +474,7 @@ mod test {
       (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
     )
     .into();
-    let counts = spdc.counts_coincidences(range, None);
+    let counts = spdc.counts_coincidences(range, crate::math::Integrator::default());
     let expected = 1883732. * HZ;
 
     assert!(approx_eq!(
@@ -488,7 +493,7 @@ mod test {
       (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
     )
     .into();
-    let counts = spdc.counts_singles_signal(range, None);
+    let counts = spdc.counts_singles_signal(range, crate::math::Integrator::default());
     let expected = 1924917. * HZ;
 
     assert!(approx_eq!(
@@ -507,7 +512,7 @@ mod test {
       (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
     )
     .into();
-    let counts = spdc.counts_singles_idler(range, None);
+    let counts = spdc.counts_singles_idler(range, crate::math::Integrator::default());
     let expected = 1925352. * HZ;
     assert!(approx_eq!(
       f64,
@@ -525,7 +530,7 @@ mod test {
       (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
     )
     .into();
-    let efficiencies = spdc.efficiencies(range, None);
+    let efficiencies = spdc.efficiencies(range, crate::math::Integrator::default());
     assert!(approx_eq!(
       f64,
       efficiencies.symmetric,

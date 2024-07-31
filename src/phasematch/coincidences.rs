@@ -51,7 +51,7 @@ pub fn phasematch_fiber_coupling(
   omega_s: Frequency,
   omega_i: Frequency,
   spdc: &SPDC,
-  steps: Option<usize>,
+  integrator: Integrator,
 ) -> PerMeter4<Complex<f64>> {
   // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, steps);
   // return phasematch_fiber_coupling_v3(omega_s, omega_i, spdc, steps);
@@ -263,13 +263,19 @@ pub fn phasematch_fiber_coupling(
     pmzcoeff * numerator / denominator
   };
 
-  let integrator = SimpsonIntegration::new(fn_z);
-  let result = 0.5
-    * integrator.integrate(
-      -1.,
-      1.,
-      steps.unwrap_or_else(|| integration_steps_best_guess(L)),
-    );
+  // let integrator = SimpsonIntegration::new(fn_z);
+  // let result = 0.5
+  //   * integrator.integrate(
+  //     -1.,
+  //     1.,
+  //     steps.unwrap_or_else(|| integration_steps_best_guess(L)),
+  //   );
+
+  // let integrator = Integrator::AdaptiveSimpson {
+  //   tolerance: 1e-5,
+  //   max_depth: 1000,
+  // };
+  let result = 0.5 * integrator.integrate(&fn_z, -1., 1.);
 
   // use quad_rs::Integrate;
   // let integrator = GAUSS_KONROD.clone()
@@ -306,7 +312,7 @@ pub fn phasematch_fiber_coupling2(
   omega_s: Frequency,
   omega_i: Frequency,
   spdc: &SPDC,
-  steps: Option<usize>,
+  integrator: Integrator,
 ) -> PerMeter4<Complex<f64>> {
   // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, steps);
   // return phasematch_fiber_coupling_v3(omega_s, omega_i, spdc, steps);
@@ -484,13 +490,19 @@ pub fn phasematch_fiber_coupling2(
     pmzcoeff * numerator / denominator
   };
 
-  let integrator = SimpsonIntegration::new(fn_z);
-  let result = 0.5
-    * integrator.integrate(
-      -1.,
-      1.,
-      steps.unwrap_or_else(|| integration_steps_best_guess(L)),
-    );
+  // let integrator = SimpsonIntegration::new(fn_z);
+  // let result = 0.5
+  //   * integrator.integrate(
+  //     -1.,
+  //     1.,
+  //     steps.unwrap_or_else(|| integration_steps_best_guess(L)),
+  //   );
+
+  // let integrator = Integrator::AdaptiveSimpson {
+  //   tolerance: 1e-5,
+  //   max_depth: 1000,
+  // };
+  let result = 0.5 * integrator.integrate(&fn_z, -1., 1.);
 
   // use quad_rs::Integrate;
   // let integrator = GAUSS_KONROD.clone()
@@ -514,7 +526,7 @@ fn phasematch_fiber_coupling_v3(
   omega_s: Frequency,
   omega_i: Frequency,
   spdc: &SPDC,
-  steps: Option<usize>,
+  integrator: Integrator,
 ) -> PerMeter4<Complex<f64>> {
   // crystal length
   let L = spdc.crystal_setup.length;
@@ -702,12 +714,14 @@ fn phasematch_fiber_coupling_v3(
     return ψ * pmzcoeff;
   };
 
-  let integrator = SimpsonIntegration::new(fn_z);
-  let result = integrator.integrate(
-    -1.,
-    1.,
-    steps.unwrap_or_else(|| integration_steps_best_guess(L)),
-  );
+  // let integrator = SimpsonIntegration::new(fn_z);
+  // let result = integrator.integrate(
+  //   -1.,
+  //   1.,
+  //   steps.unwrap_or_else(|| integration_steps_best_guess(L)),
+  // );
+
+  let result = integrator.integrate(&fn_z, -1., 1.);
   PerMeter4::new(result)
 }
 
@@ -720,7 +734,7 @@ mod tests {
     f64prefixes::{MICRO, NANO},
     Dimensioned,
   };
-  use utils::{frequency_to_vacuum_wavelength, frequency_to_wavelength};
+  use utils::frequency_to_vacuum_wavelength;
 
   #[allow(dead_code)]
   fn percent_diff(actual: f64, expected: f64) -> f64 {
@@ -761,8 +775,12 @@ mod tests {
       .expect("Could not convert to SPDC instance");
 
     let expected = phasematch_gaussian(spdc.signal.frequency(), spdc.idler.frequency(), &spdc);
-    let actual =
-      phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None);
+    let actual = phasematch_fiber_coupling(
+      spdc.signal.frequency(),
+      spdc.idler.frequency(),
+      &spdc,
+      Integrator::Simpson { divs: 50 },
+    );
 
     assert_nearly_equal!(
       actual.value_unsafe().norm(),
@@ -780,9 +798,12 @@ mod tests {
 
     // println!("spdc: {:#?}", spdc);
     let jsa_units = JSAUnits::new(1.);
-    let amp =
-      *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
-        / jsa_units);
+    let amp = *(phasematch_fiber_coupling(
+      spdc.signal.frequency(),
+      spdc.idler.frequency(),
+      &spdc,
+      Integrator::Simpson { divs: 50 },
+    ) / jsa_units);
 
     let actual = amp;
     let expected =
@@ -818,9 +839,12 @@ mod tests {
     dbg!(&spdc);
 
     let jsa_units = JSAUnits::new(1.);
-    let amp =
-      *(phasematch_fiber_coupling(spdc.signal.frequency(), spdc.idler.frequency(), &spdc, None)
-        / jsa_units);
+    let amp = *(phasematch_fiber_coupling(
+      spdc.signal.frequency(),
+      spdc.idler.frequency(),
+      &spdc,
+      Integrator::Simpson { divs: 50 },
+    ) / jsa_units);
 
     let actual = amp;
     // let expected = Complex::new(-243675412686457.94, 411264607672255.2);
@@ -875,8 +899,10 @@ mod tests {
         (1510. * NANO * M, 1590. * NANO * M, 10),
       );
       for (ws, wi) in wavelengths.into_signal_idler_iterator() {
-        let old = *(phasematch_fiber_coupling(ws, wi, &spdc, Some(5)) / JSAUnits::new(1.));
-        let new = *(phasematch_fiber_coupling2(ws, wi, &spdc, Some(5)) / JSAUnits::new(1.));
+        let old = *(phasematch_fiber_coupling(ws, wi, &spdc, Integrator::Simpson { divs: 5 })
+          / JSAUnits::new(1.));
+        let new = *(phasematch_fiber_coupling2(ws, wi, &spdc, Integrator::Simpson { divs: 5 })
+          / JSAUnits::new(1.));
         let ls = frequency_to_vacuum_wavelength(ws);
         let li = frequency_to_vacuum_wavelength(wi);
         assert_nearly_equal!(
@@ -987,8 +1013,10 @@ mod tests {
         (1510. * NANO * M, 1590. * NANO * M, 10),
       );
       for (ws, wi) in wavelengths.into_signal_idler_iterator() {
-        let old = *(phasematch_fiber_coupling(ws, wi, &spdc, Some(5)) / JSAUnits::new(1.));
-        let new = *(phasematch_fiber_coupling_v3(ws, wi, &spdc, Some(5)) / JSAUnits::new(1.));
+        let old = *(phasematch_fiber_coupling(ws, wi, &spdc, Integrator::Simpson { divs: 5 })
+          / JSAUnits::new(1.));
+        let new = *(phasematch_fiber_coupling_v3(ws, wi, &spdc, Integrator::Simpson { divs: 5 })
+          / JSAUnits::new(1.));
         let ls = frequency_to_vacuum_wavelength(ws);
         let li = frequency_to_vacuum_wavelength(wi);
         assert_nearly_equal!(

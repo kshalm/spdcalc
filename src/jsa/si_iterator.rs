@@ -305,12 +305,13 @@ impl IntoSignalIdlerIterator for SignalIdlerFrequencyArray {
 mod test {
   use super::*;
   use crate::dim::ucum::*;
+  use crate::math::Integrator;
   use crate::spdc::SPDC;
 
   #[test]
   fn test_si_arrays() {
     let spdc = SPDC::default();
-    let spectrum = spdc.joint_spectrum(None);
+    let spectrum = spdc.joint_spectrum(Integrator::default());
     let range = WavelengthSpace::new(
       (1400e-9 * M, 1600e-9 * M, 10),
       (1400e-9 * M, 1600e-9 * M, 10),

@@ -1,5 +1,50 @@
 use crate::utils::{get_1d_index, Steps};
+use crate::Complex;
 use num::{Integer, Zero};
+
+/// Various integration methods
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(tag = "method")]
+pub enum Integrator {
+  Simpson { divs: usize },
+  AdaptiveSimpson { tolerance: f64, max_depth: usize },
+}
+
+impl Default for Integrator {
+  fn default() -> Self {
+    Integrator::Simpson { divs: 50 }
+  }
+}
+
+impl Integrator {
+  pub fn integrate<F, Y>(&self, func: F, a: f64, b: f64) -> Complex<f64>
+  where
+    F: Fn(f64) -> Y,
+    Y: Into<Complex<f64>>,
+  {
+    match self {
+      Integrator::Simpson { divs } => simpson(func, a, b, *divs),
+      Integrator::AdaptiveSimpson {
+        tolerance,
+        max_depth,
+      } => simpson_adaptive(&func, a, b, *tolerance, *max_depth),
+    }
+  }
+
+  pub fn integrate2d<F, Y>(&self, func: F, a: f64, b: f64, c: f64, d: f64) -> Complex<f64>
+  where
+    F: Fn(f64, f64) -> Y,
+    Y: Into<Complex<f64>>,
+  {
+    match self {
+      Integrator::Simpson { divs } => simpson2d(func, a, b, c, d, *divs),
+      Integrator::AdaptiveSimpson {
+        tolerance,
+        max_depth,
+      } => simpson_adaptive_2d(&func, a, b, c, d, *tolerance, *max_depth),
+    }
+  }
+}
 
 /// Get simpson weight for index
 fn get_simpson_weight(n: usize, divs: usize) -> f64 {
@@ -13,55 +58,6 @@ fn get_simpson_weight(n: usize, divs: usize) -> f64 {
     2.
   }
 }
-
-// fn get_max_error_constant(func : &impl Fn(f64) -> f64, a : f64, b : f64) -> f64 {
-//   let df = NumericalDifferentiation::new(Func(|x| (*func)(x[0])));
-//   let d2f = NumericalDifferentiation::new(Func(|x| df.gradient(&x)[0]));
-//   let d3f = NumericalDifferentiation::new(Func(|x| d2f.gradient(&x)[0]));
-//   let d4f = NumericalDifferentiation::new(Func(|x| d3f.gradient(&x)[0]));
-//
-//   // fourth derrivative... yes a bit of a bad way to do this
-//   // hack way of maximizing using a minimizer
-//   let d4fabs = |x| 1./(1. + d4f.gradient(&[x])[0].abs());
-//   let xmax = nelder_mead_1d(
-//     d4fabs,
-//     a,
-//     1000,
-//     a,
-//     b,
-//     1e-12
-//   );
-//
-//   println!("xmax {}", xmax);
-//
-//   1./d4fabs(xmax) - 1.
-// }
-//
-// #[allow(non_snake_case)]
-// pub fn simpson_max_error(func : impl Fn(f64) -> f64, a : f64, b : f64, n : usize) -> f64 {
-//   let M = get_max_error_constant(&func, a, b);
-//   M * (b - a).abs().powi(5) / (n as f64).powi(4) / 180.
-// }
-//
-// #[allow(non_snake_case)]
-// pub fn calc_required_divisions_for_simpson_precision(func : impl Fn(f64) -> f64, a : f64, b : f64, precision : f64) -> usize {
-//   let M = get_max_error_constant(&func, a, b);
-//   let x_at_max = nelder_mead_1d(
-//     |x| 1./(1. + func(x).abs()),
-//     a,
-//     1000,
-//     a,
-//     b,
-//     1e-12
-//   );
-//
-//   let err = precision * (1./func(x_at_max).abs() - 1.);
-//   println!("err {}, M {}", err, M);
-//   let n = (M * (b - a).powi(5) / err / 180.).abs().sqrt().sqrt();
-//
-//   let divs = n.ceil() as usize;
-//   (divs + divs % 2).max(4) // even number >= 4
-// }
 
 /// Integrator that implements Simpson's rule
 pub struct SimpsonIntegration<F: Fn(f64) -> T, T> {
@@ -101,6 +97,58 @@ where
 
     result * (dx / 3.)
   }
+}
+
+pub fn simpson<F, Y>(func: F, a: f64, b: f64, divs: usize) -> Complex<f64>
+where
+  F: Fn(f64) -> Y,
+  Y: Into<Complex<f64>>,
+{
+  let divs = divs + divs % 2 - 2; // nearest even
+  assert!(divs >= 4, "Steps too low");
+  let dx = (b - a) / (divs as f64);
+
+  let result = (0..=divs)
+    .map(|n| get_simpson_weight(n, divs))
+    .enumerate()
+    .fold((0.).into(), |acc: Complex<f64>, (i, a_n)| {
+      let x = a + (i as f64) * dx;
+
+      acc + func(x).into() * a_n
+    });
+
+  result * (dx / 3.)
+}
+
+pub fn simpson2d<F, Y>(func: F, ax: f64, bx: f64, ay: f64, by: f64, divs: usize) -> Complex<f64>
+where
+  F: Fn(f64, f64) -> Y,
+  Y: Into<Complex<f64>>,
+{
+  assert!(divs.is_even());
+  assert!(divs >= 4);
+
+  let steps = divs + 1;
+  let dx = (bx - ax) / (divs as f64);
+  let dy = (by - ay) / (divs as f64);
+  let result =
+    Steps(ay, by, steps)
+      .into_iter()
+      .enumerate()
+      .fold((0.).into(), |acc: Complex<f64>, (ny, y)| {
+        let sy = Steps(ax, bx, steps).into_iter().enumerate().fold(
+          (0.).into(),
+          |acc: Complex<f64>, (nx, x)| {
+            let a_n = get_simpson_weight(nx, divs);
+            acc + func(x, y).into() * a_n
+          },
+        );
+
+        let a_n = get_simpson_weight(ny, divs);
+        acc + sy * a_n
+      });
+
+  result * (dx * dy / 9.)
 }
 
 pub struct SimpsonIntegration2D<F: Fn(f64, f64, usize) -> T, T> {
@@ -145,23 +193,95 @@ where
         let a_n = get_simpson_weight(ny, divs);
         acc + sy * a_n
       });
-    // Alternate implementation
-    // Seems to be slower
-    // let result = Iterator2D::new(
-    //   Steps(x_range.0, x_range.1, steps),
-    //   Steps(y_range.0, y_range.1, steps)
-    // )
-    // .enumerate()
-    // .fold(T::zero(), |acc, (index, coords)| {
-    //   let (nx, ny) = get_2d_indices(index as usize, steps);
-    //   let a_n = Self::get_weight(nx, ny, divs);
-    //   let (x, y) = coords;
-
-    //   acc + (self.function)( x, y, index ) * a_n
-    // });
 
     result * (dx * dy / 9.)
   }
+}
+
+//
+// Adaptive simpson's rule
+//
+/// Evaluates the Simpson's Rule, also returning m and f(m) to reuse
+fn quad_simpsons_mem<F, Y>(
+  f: F,
+  a: f64,
+  fa: Complex<f64>,
+  b: f64,
+  fb: Complex<f64>,
+) -> (f64, Complex<f64>, Complex<f64>)
+where
+  F: Fn(f64) -> Y,
+  Y: Into<Complex<f64>>,
+{
+  let m = (a + b) / 2.0;
+  let fm = f(m).into();
+  let simpson_value = (b - a).abs() / 6.0 * (fa + 4.0 * fm + fb);
+  (m, fm, simpson_value)
+}
+
+/// Efficient recursive implementation of adaptive Simpson's rule
+/// Function values at the start, middle, end of the intervals are retained
+fn quad_asr<F, Y>(
+  f: &F,
+  a: f64,
+  fa: Complex<f64>,
+  b: f64,
+  fb: Complex<f64>,
+  eps: f64,
+  whole: Complex<f64>,
+  m: f64,
+  fm: Complex<f64>,
+  max_depth: usize,
+) -> Complex<f64>
+where
+  F: Fn(f64) -> Y,
+  Y: Into<Complex<f64>>,
+{
+  if max_depth == 0 || (eps / 2.0) == eps || (b - a).abs() < f64::EPSILON {
+    return whole;
+  }
+
+  let (lm, flm, left) = quad_simpsons_mem(f, a, fa, m, fm);
+  let (rm, frm, right) = quad_simpsons_mem(f, m, fm, b, fb);
+  let delta = left + right - whole;
+
+  if delta.norm() <= 15.0 * eps {
+    left + right + delta / 15.0
+  } else {
+    quad_asr(f, a, fa, m, fm, eps / 2.0, left, lm, flm, max_depth - 1)
+      + quad_asr(f, m, fm, b, fb, eps / 2.0, right, rm, frm, max_depth - 1)
+  }
+}
+
+/// Integrate f from a to b using Adaptive Simpson's Rule with max error of eps
+pub fn simpson_adaptive<F, Y>(f: &F, a: f64, b: f64, eps: f64, max_depth: usize) -> Complex<f64>
+where
+  F: Fn(f64) -> Y,
+  Y: Into<Complex<f64>>,
+{
+  let fa = f(a).into();
+  let fb = f(b).into();
+  // change eps to be relative to function values
+  let eps = eps * (fa.norm() + fb.norm()) / 2.0;
+  let (m, fm, whole) = quad_simpsons_mem(f, a, fa, b, fb);
+  quad_asr(f, a, fa, b, fb, eps, whole, m, fm, max_depth)
+}
+
+pub fn simpson_adaptive_2d<F, Y>(
+  f: &F,
+  ax: f64,
+  bx: f64,
+  ay: f64,
+  by: f64,
+  eps: f64,
+  max_depth: usize,
+) -> Complex<f64>
+where
+  F: Fn(f64, f64) -> Y,
+  Y: Into<Complex<f64>>,
+{
+  let g = |x| simpson_adaptive(&|y| f(x, y), ay, by, eps, max_depth);
+  simpson_adaptive(&g, ax, bx, eps, max_depth)
 }
 
 #[cfg(test)]
@@ -202,6 +322,21 @@ mod tests {
 
     assert!(
       approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-11),
+      "actual: {}, expected: {}",
+      actual,
+      expected
+    );
+  }
+
+  #[test]
+  fn adaptive_simpsons_rule_test() {
+    let f = |x: f64| x.sin() * x.cos() * x.powi(2);
+    let actual = simpson_adaptive(&f, 0., PI, 1e-8, 1000).re;
+    let integrator = SimpsonIntegration::new(f);
+    let expected = integrator.integrate(0., PI, 1000);
+
+    assert!(
+      approx_eq!(f64, actual, expected, ulps = 2, epsilon = 1e-8),
       "actual: {}, expected: {}",
       actual,
       expected
