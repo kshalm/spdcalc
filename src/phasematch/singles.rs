@@ -186,7 +186,7 @@ pub fn phasematch_singles_fiber_coupling(
   //   tolerance: 1e-5,
   //   max_depth: 1000,
   // };
-  let result = integrator.integrate2d(&fn_z, -1., 1., -1., 1.).norm();
+  let result = 0.25 * integrator.integrate2d(&fn_z, -1., 1., -1., 1.).norm();
 
   PerMeter3::new(result)
 }
