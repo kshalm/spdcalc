@@ -26,7 +26,7 @@ serde_derive = "^1.0"
 serde_with = "3.8"
 regex = "1.7"
 lazy_static = "1.4"
-# quad-rs = { git = "https://github.com/wellcaffeinated/quad-rs", rev = "9d3d8618e39c499d92786d62af75804387af183a" }
+quad-rs = { git = "https://github.com/wellcaffeinated/quad-rs", rev = "9d3d8618e39c499d92786d62af75804387af183a" }
 
 [features]
 default = []

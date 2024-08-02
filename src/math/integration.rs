@@ -1,6 +1,9 @@
+use std::f64::consts::PI;
+
 use crate::utils::{get_1d_index, Steps};
 use crate::Complex;
 use num::{Integer, Zero};
+use quad_rs::GaussKronrod;
 
 /// Various integration methods
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -8,6 +11,7 @@ use num::{Integer, Zero};
 pub enum Integrator {
   Simpson { divs: usize },
   AdaptiveSimpson { tolerance: f64, max_depth: usize },
+  GaussKonrod { tolerance: f64, max_depth: usize },
 }
 
 impl Default for Integrator {
@@ -28,6 +32,23 @@ impl Integrator {
         tolerance,
         max_depth,
       } => simpson_adaptive(&func, a, b, *tolerance, *max_depth),
+      Integrator::GaussKonrod {
+        tolerance,
+        max_depth,
+      } => {
+        use quad_rs::prelude::*;
+        use quad_rs::Integrate;
+        let a = Complex::new(a, 0.);
+        let b = Complex::new(b, 0.);
+        let integrator = GaussKronrod::default()
+          .with_relative_tolerance(*tolerance)
+          .with_maximum_function_evaluations(*max_depth);
+        integrator
+          .integrate(|z| func(z.re).into(), a..b, None)
+          .unwrap()
+          .result
+          .unwrap()
+      }
     }
   }
 
@@ -42,6 +63,37 @@ impl Integrator {
         tolerance,
         max_depth,
       } => simpson_adaptive_2d(&func, a, b, c, d, *tolerance, *max_depth),
+      Integrator::GaussKonrod {
+        tolerance,
+        max_depth,
+      } => {
+        use quad_rs::prelude::*;
+        use quad_rs::Integrate;
+        let a = Complex::new(a, 0.);
+        let b = Complex::new(b, 0.);
+        let c = Complex::new(c, 0.);
+        let d = Complex::new(d, 0.);
+        let integrator = GaussKronrod::default()
+          .with_relative_tolerance(*tolerance)
+          .with_maximum_function_evaluations(*max_depth);
+        integrator
+          .integrate(
+            |z| {
+              GaussKronrod::default()
+                .with_relative_tolerance(*tolerance)
+                .with_maximum_function_evaluations(*max_depth)
+                .integrate(|w| func(z.re, w.re).into(), c..d, None)
+                .unwrap()
+                .result
+                .unwrap()
+            },
+            a..b,
+            None,
+          )
+          .unwrap()
+          .result
+          .unwrap()
+      }
     }
   }
 }
@@ -262,7 +314,7 @@ where
   let fa = f(a).into();
   let fb = f(b).into();
   // change eps to be relative to function values
-  let eps = eps * (fa.norm() + fb.norm()) / 2.0;
+  // let eps = eps * (fa.norm() + fb.norm()) / 2.0;
   let (m, fm, whole) = quad_simpsons_mem(f, a, fa, b, fb);
   quad_asr(f, a, fa, b, fb, eps, whole, m, fm, max_depth)
 }
