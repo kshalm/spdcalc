@@ -91,10 +91,7 @@ impl SPDC {
     let waist = fwhm_to_spectral_width(lambda_p, fwhm);
     let dw_to_spectrum_edge = (-f64::ln(0.02)).sqrt() * waist;
     let d_sum = *(0.5 * dw_to_spectrum_edge / (RAD / S));
-    let integrator = Integrator::AdaptiveSimpson {
-      tolerance: 1e-5,
-      max_depth: 10_000,
-    };
+    let integrator = Integrator::Simpson { divs: 50 };
 
     if self.crystal_setup.counter_propagation {
       // find radius of signal and idler range independently
