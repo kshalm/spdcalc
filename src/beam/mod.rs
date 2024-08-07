@@ -139,16 +139,12 @@ impl IdlerBeam {
     let ls_over_lp = ls / lp;
     let np_by_ls_over_lp = np * ls_over_lp;
 
-    // old code...
-    // let arg = (ns * ns)
-    //   + np_by_ls_over_lp.powi(2)
-    //   + 2. * (k_pp * ns_z - np_by_ls_over_lp * ns_z - k_pp * np_by_ls_over_lp)
-    //   + k_pp * k_pp;
+    let arg = (ns * ns)
+      + np_by_ls_over_lp.powi(2)
+      + 2. * (k_pp * ns_z - np_by_ls_over_lp * ns_z - k_pp * np_by_ls_over_lp)
+      + k_pp * k_pp;
 
-    // simplified calculation
     let numerator = ns * sin(theta_s);
-    let arg = (ns_z - np_by_ls_over_lp + k_pp).powi(2) + ns.powi(2);
-
     let val = (*numerator) / arg.sqrt();
 
     // if val > 1.0 || val < 0. {
