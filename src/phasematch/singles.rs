@@ -18,7 +18,6 @@ pub fn phasematch_singles_fiber_coupling(
   let L = spdc.crystal_setup.length;
 
   let theta_s = spdc.signal.theta_internal();
-  let theta_i = spdc.idler.theta_internal();
   let phi_s = spdc.signal.phi();
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
 
@@ -29,8 +28,8 @@ pub fn phasematch_singles_fiber_coupling(
 
   // Counter-propagation requires a sign change in the wavenumber but
   // not for the free propagation constants ks_f and ki_f.
-  let sign_ks = cos(theta_s).signum();
-  let sign_ki = cos(theta_i).signum();
+  let sign_ks = spdc.signal.direction().z.signum();
+  let sign_ki = spdc.idler.direction().z.signum();
 
   let omega_p = omega_s + omega_i; // spdc.pump.frequency();
   let n_p = spdc.pump.refractive_index(omega_p, &spdc.crystal_setup);

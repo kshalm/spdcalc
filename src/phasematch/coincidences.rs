@@ -90,8 +90,8 @@ pub fn get_pm_integrand<'a>(
 
   // Counter-propagation requires a sign change in the wavenumber but
   // not for the free propagation constants ks_f and ki_f.
-  let sign_ks = cos(theta_s).signum();
-  let sign_ki = cos(theta_i).signum();
+  let sign_ks = spdc.signal.direction().z.signum();
+  let sign_ki = spdc.idler.direction().z.signum();
 
   let n_p = spdc.pump.refractive_index(omega_p, &spdc.crystal_setup);
   let k_p = frequency_to_wavenumber(omega_p, n_p);
@@ -359,8 +359,8 @@ pub fn phasematch_fiber_coupling2(
 
   // Counter-propagation requires a sign change in the wavenumber but
   // not for the free propagation constants ks_f and ki_f.
-  let sign_ks = cos(theta_s).signum();
-  let sign_ki = cos(theta_i).signum();
+  let sign_ks = spdc.signal.direction().z.signum();
+  let sign_ki = spdc.idler.direction().z.signum();
   let k_s = sign_ks * frequency_to_wavenumber(omega_s, n_s);
   let k_i = sign_ki * frequency_to_wavenumber(omega_i, n_i);
 
@@ -574,16 +574,22 @@ fn phasematch_fiber_coupling_v3(
   let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
   let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
 
+  // Counter-propagation requires a sign change in the wavenumber but
+  // not for the free propagation constants ks_f and ki_f.
+  let sign_ks = spdc.signal.direction().z.signum();
+  let sign_ki = spdc.idler.direction().z.signum();
+
   let k_p = frequency_to_wavenumber(omega_p, n_p);
-  let k_s = spdc.signal.wavevector(omega_s, &spdc.crystal_setup).z();
-  let k_i = spdc.idler.wavevector(omega_i, &spdc.crystal_setup).z();
+  let k_s = sign_ks * frequency_to_wavenumber(omega_s, n_s);
+  let k_i = sign_ki * frequency_to_wavenumber(omega_i, n_i);
 
   let rho = tan(spdc.pump.walkoff_angle(&spdc.crystal_setup));
 
   let M2 = M * M; // meters squared
 
-  let ks_free = k_s / n_s;
-  let ki_free = k_i / n_i;
+  use dim::Abs;
+  let ks_free = k_s.abs() / n_s;
+  let ki_free = k_i.abs() / n_i;
 
   let Γ_s1 = -0.25 * Ws_SQ * (COS_2_PHI_s * SEC_2_THETA_s + SIN_2_PHI_s);
   let Γ_i1 = -0.25 * Wi_SQ * (COS_2_PHI_i * SEC_2_THETA_i + SIN_2_PHI_i);
