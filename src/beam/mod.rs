@@ -203,9 +203,9 @@ pub struct Beam {
   frequency: Frequency,
   // the polarization
   polarization: PolarizationType,
-  /// (internal) azimuthal angle [0, π]
+  /// (internal) azimuthal angle (-π, π]
   theta: Angle,
-  /// polar angle [0, 2π]
+  /// polar angle [0, 2π)
   phi: Angle,
   /// direction of propagation
   direction: Direction,
@@ -220,12 +220,8 @@ impl Beam {
     vacuum_wavelength: Wavelength,
     waist: W,
   ) -> Self {
-    assert!(
-      *(theta / ucum::RAD) <= PI && *(theta / ucum::RAD) >= 0.,
-      "theta: {}",
-      theta
-    );
-
+    let phi = normalize_angle(phi);
+    let theta = normalize_angle_signed(theta);
     Self {
       polarization,
       frequency: vacuum_wavelength_to_frequency(vacuum_wavelength),
@@ -289,8 +285,6 @@ impl Beam {
     external: Angle,
     crystal_setup: &CrystalSetup,
   ) -> Angle {
-    assert!(*(external / ucum::RAD) <= PI && *(external / ucum::RAD) >= 0.);
-
     let snell_external = f64::sin(*(external / ucum::RAD));
     let guess = *(external / ucum::RAD);
     let phi = beam.phi();
@@ -406,15 +400,14 @@ impl Beam {
 
   /// Set phi
   pub fn set_phi(&mut self, phi: Angle) -> &mut Self {
-    self.phi = phi;
+    self.phi = normalize_angle(phi);
     self.update_direction();
     self
   }
 
   /// Set theta internal
   pub fn set_theta_internal(&mut self, theta: Angle) -> &mut Self {
-    assert!(*(theta / ucum::RAD) <= PI && *(theta / ucum::RAD) >= 0.);
-    self.theta = theta;
+    self.theta = normalize_angle_signed(theta);
     self.update_direction();
     self
   }
@@ -423,21 +416,14 @@ impl Beam {
   pub fn set_theta_external(&mut self, external: Angle, crystal_setup: &CrystalSetup) -> &mut Self {
     use dim::Abs;
     let theta = Self::calc_internal_theta_from_external(self, external.abs(), crystal_setup);
-    // if angle is negative then turn by 180 deg along phi
-    let turn = if (external / ucum::RAD).is_sign_positive() {
-      0.
-    } else {
-      PI
-    } * ucum::RAD;
-    self.set_angles(self.phi + turn, theta);
+    self.set_angles(self.phi, theta);
     self
   }
 
   /// Set both internal angles
   pub fn set_angles(&mut self, phi: Angle, theta: Angle) -> &mut Self {
-    assert!(*(theta / ucum::RAD) <= PI && *(theta / ucum::RAD) >= 0.);
-    self.phi = phi;
-    self.theta = theta;
+    self.phi = normalize_angle(phi);
+    self.theta = normalize_angle_signed(theta);
     self.update_direction();
     self
   }

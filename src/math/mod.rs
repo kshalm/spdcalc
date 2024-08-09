@@ -1,7 +1,7 @@
 //! Mathematical helpers
 
 mod differentiation;
-use crate::constants::TWO_PI;
+use crate::constants::{PI, TWO_PI};
 use crate::{dim::ucum::RAD, Angle};
 pub use differentiation::*;
 
@@ -56,7 +56,19 @@ where
 
 /// Normalize an angle to [0, 2π)
 pub fn normalize_angle(ang: Angle) -> Angle {
-  (ang % TWO_PI + TWO_PI * RAD) % TWO_PI
+  let val = ang / RAD;
+  val.rem_euclid(TWO_PI) * RAD
+}
+
+/// Normalize an angle to (-π, π]
+pub fn normalize_angle_signed(ang: Angle) -> Angle {
+  let val = ang / RAD;
+  let rem = val.rem_euclid(TWO_PI);
+  if rem > PI {
+    (rem - TWO_PI) * RAD
+  } else {
+    rem * RAD
+  }
 }
 
 /// Simple implementation of linear interpolation
@@ -101,4 +113,47 @@ where
 pub fn sigfigs(x: f64, decimals: u8) -> f64 {
   let y = 10u32.pow(decimals as u32) as f64;
   (x * y).round() / y
+}
+
+#[cfg(test)]
+mod test {
+  use super::*;
+
+  #[test]
+  fn test_angle_normalizer() {
+    assert_approx_eq!(f64, *(normalize_angle(2. * RAD) / RAD), 2.);
+    assert_approx_eq!(f64, *(normalize_angle(2. * RAD + TWO_PI * RAD) / RAD), 2.);
+    assert_approx_eq!(f64, *(normalize_angle(-2. * RAD) / RAD), TWO_PI - 2.);
+    assert_approx_eq!(
+      f64,
+      *(normalize_angle(-2. * RAD - TWO_PI * RAD) / RAD),
+      TWO_PI - 2.
+    );
+  }
+
+  #[test]
+  fn test_angle_normalizer_signed() {
+    assert_approx_eq!(f64, *(normalize_angle_signed(1. * RAD) / RAD), 1.);
+    assert_approx_eq!(
+      f64,
+      *(normalize_angle_signed(1. * RAD + TWO_PI * RAD) / RAD),
+      1.
+    );
+    assert_approx_eq!(f64, *(normalize_angle_signed(-1. * RAD) / RAD), -1.);
+    assert_approx_eq!(
+      f64,
+      *(normalize_angle_signed(-1. * RAD - TWO_PI * RAD) / RAD),
+      -1.
+    );
+    assert_approx_eq!(
+      f64,
+      *(normalize_angle_signed(1. * RAD + PI * RAD) / RAD),
+      1. - PI
+    );
+    assert_approx_eq!(
+      f64,
+      *(normalize_angle_signed(-1. * RAD - PI * RAD) / RAD),
+      -1. + PI
+    );
+  }
 }
