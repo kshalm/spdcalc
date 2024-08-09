@@ -1,9 +1,6 @@
-use std::f64::consts::PI;
-
 use crate::utils::{get_1d_index, Steps};
 use crate::Complex;
 use num::{Integer, Zero};
-use quad_rs::GaussKronrod;
 
 /// Various integration methods
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -12,6 +9,8 @@ pub enum Integrator {
   Simpson { divs: usize },
   AdaptiveSimpson { tolerance: f64, max_depth: usize },
   GaussKonrod { tolerance: f64, max_depth: usize },
+  GaussLegendre { degree: usize },
+  ClenshawCurtis { tolerance: f64 },
 }
 
 impl Default for Integrator {
@@ -48,6 +47,19 @@ impl Integrator {
           .unwrap()
           .result
           .unwrap()
+      }
+      Integrator::ClenshawCurtis { tolerance } => {
+        let re =
+          quadrature::clenshaw_curtis::integrate(|z| func(z).into().re, a, b, *tolerance).integral;
+        let im =
+          quadrature::clenshaw_curtis::integrate(|z| func(z).into().im, a, b, *tolerance).integral;
+        Complex::new(re, im)
+      }
+      Integrator::GaussLegendre { degree } => {
+        let quad = gauss_quad::GaussLegendre::new(*degree.max(&2)).unwrap();
+        let re = quad.integrate(a, b, |z| func(z).into().re);
+        let im = quad.integrate(a, b, |z| func(z).into().im);
+        Complex::new(re, im)
       }
     }
   }
@@ -93,6 +105,35 @@ impl Integrator {
           .unwrap()
           .result
           .unwrap()
+      }
+      Integrator::ClenshawCurtis { tolerance } => {
+        let re = quadrature::clenshaw_curtis::integrate(
+          |z| {
+            quadrature::clenshaw_curtis::integrate(|w| func(z, w).into().re, c, d, *tolerance)
+              .integral
+          },
+          a,
+          b,
+          *tolerance,
+        )
+        .integral;
+        let im = quadrature::clenshaw_curtis::integrate(
+          |z| {
+            quadrature::clenshaw_curtis::integrate(|w| func(z, w).into().im, c, d, *tolerance)
+              .integral
+          },
+          a,
+          b,
+          *tolerance,
+        )
+        .integral;
+        Complex::new(re, im)
+      }
+      Integrator::GaussLegendre { degree } => {
+        let quad = gauss_quad::GaussLegendre::new(*degree.max(&2)).unwrap();
+        let re = quad.integrate(a, b, |z| quad.integrate(c, d, |w| func(z, w).into().re));
+        let im = quad.integrate(a, b, |z| quad.integrate(c, d, |w| func(z, w).into().im));
+        Complex::new(re, im)
       }
     }
   }
