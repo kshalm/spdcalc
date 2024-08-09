@@ -1,7 +1,7 @@
 use super::*;
 use crate::utils::frequency_to_wavenumber;
 use crate::Complex;
-use dim::ucum::{M, RAD};
+use dim::ucum::{DEG, M, RAD};
 
 /// Evaluate the fiber coupled singles phasematching function for a given set of frequencies
 ///
@@ -18,6 +18,7 @@ pub fn phasematch_singles_fiber_coupling(
   let L = spdc.crystal_setup.length;
 
   let theta_s = spdc.signal.theta_internal();
+  let theta_i = spdc.idler.theta_internal();
   let phi_s = spdc.signal.phi();
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
 
@@ -26,15 +27,20 @@ pub fn phasematch_singles_fiber_coupling(
   let Wx_SQ = sq(spdc.pump.waist().x);
   let Wy_SQ = sq(spdc.pump.waist().y);
 
+  // Counter-propagation requires a sign change in the wavenumber but
+  // not for the free propagation constants ks_f and ki_f.
+  let sign_ks = cos(theta_s).signum();
+  let sign_ki = cos(theta_i).signum();
+
   let omega_p = omega_s + omega_i; // spdc.pump.frequency();
   let n_p = spdc.pump.refractive_index(omega_p, &spdc.crystal_setup);
   let k_p = frequency_to_wavenumber(omega_p, n_p);
   let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
-  // let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
-  // let k_s = frequency_to_wavenumber(omega_s, n_s);
-  // let k_i = frequency_to_wavenumber(omega_i, n_i);
-  let k_s = (spdc.signal.wavevector(omega_s, &spdc.crystal_setup) * M / RAD).z * RAD / M;
-  let k_i = (spdc.idler.wavevector(omega_i, &spdc.crystal_setup) * M / RAD).z * RAD / M;
+  let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
+  let k_s = sign_ks * frequency_to_wavenumber(omega_s, n_s);
+  let k_i = sign_ki * frequency_to_wavenumber(omega_i, n_i);
+  // let k_s = (spdc.signal.wavevector(omega_s, &spdc.crystal_setup) * M / RAD).z * RAD / M;
+  // let k_i = (spdc.idler.wavevector(omega_i, &spdc.crystal_setup) * M / RAD).z * RAD / M;
 
   let PHI_s = cos(theta_s_e).powi(-2);
 
@@ -50,7 +56,8 @@ pub fn phasematch_singles_fiber_coupling(
 
   // Now calculate the the coeficients that get repeatedly used. This is from
   // Karina's code. Assume a symmetric pump waist (Wx = Wy)
-  let ks_f = k_s / n_s; // exact
+  use dim::Abs;
+  let ks_f = k_s.abs() / n_s; // exact
   let SIN_THETA_s_e = sin(theta_s_e); // 1e-9
   let COS_PHI_s = cos(phi_s);
   let GAM2s = -0.25 * Ws_SQ; // exact
@@ -186,6 +193,8 @@ pub fn phasematch_singles_fiber_coupling(
   //   tolerance: 1e-5,
   //   max_depth: 1000,
   // };
+  //
+  // TODO: Where does this factor of 0.25 come from?
   let result = 0.25 * integrator.integrate2d(&fn_z, -1., 1., -1., 1.).norm();
 
   PerMeter3::new(result)

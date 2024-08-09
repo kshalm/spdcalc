@@ -38,25 +38,12 @@ pub fn phasematch_sinc(
   PerMeter4::new(pmz * pmt)
 }
 
-// lazy_static::lazy_static! {
-//   static ref GAUSS_KONROD: quad_rs::GaussKronrod<f64> = quad_rs::GaussKronrod::new(5)
-//     .with_maximum_function_evaluations(1_000_000);
-// }
-
-/// Evaluate the phasematching function for fiber coupling
-///
-/// This is the secret sauce of spdcalc.
 #[allow(non_snake_case)]
-pub fn phasematch_fiber_coupling(
+pub fn get_pm_integrand<'a>(
   omega_s: Frequency,
   omega_i: Frequency,
-  spdc: &SPDC,
-  integrator: Integrator,
-) -> PerMeter4<Complex<f64>> {
-  // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, integrator);
-  // return phasematch_fiber_coupling_v3(omega_s, omega_i, spdc, integrator);
-  // return phasematch_sinc(omega_s, omega_i, spdc);
-  // crystal length
+  spdc: &'a SPDC,
+) -> impl Fn(f64) -> Complex<f64> + 'a {
   let L = spdc.crystal_setup.length;
 
   // TODO: ask krister. does this work to filter out lobes?
@@ -68,10 +55,10 @@ pub fn phasematch_fiber_coupling(
   //   return (Complex::new(0., 0.), 1.);
   // }
 
-  let theta_s = spdc.signal.theta_internal();
   let phi_s = spdc.signal.phi();
-  let theta_i = spdc.idler.theta_internal();
   let phi_i = spdc.idler.phi();
+  let theta_s = spdc.signal.theta_internal();
+  let theta_i = spdc.idler.theta_internal();
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
   let theta_i_e = spdc.idler.theta_external(&spdc.crystal_setup);
 
@@ -99,22 +86,26 @@ pub fn phasematch_fiber_coupling(
   let COS_PHI_s = cos(phi_s);
   let COS_PHI_i = cos(phi_i);
 
-  // TODO: Should i be doing this?
-  let omega_p = omega_s + omega_i; // spdc.pump.frequency();
+  let omega_p = omega_s + omega_i;
+
+  // Counter-propagation requires a sign change in the wavenumber but
+  // not for the free propagation constants ks_f and ki_f.
+  let sign_ks = cos(theta_s).signum();
+  let sign_ki = cos(theta_i).signum();
 
   let n_p = spdc.pump.refractive_index(omega_p, &spdc.crystal_setup);
   let k_p = frequency_to_wavenumber(omega_p, n_p);
   let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
   let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
-  // let k_s = frequency_to_wavenumber(omega_s, n_s);
-  // let k_i = frequency_to_wavenumber(omega_i, n_i);
-  let k_s = spdc.signal.wavevector(omega_s, &spdc.crystal_setup).z();
-  let k_i = spdc.idler.wavevector(omega_i, &spdc.crystal_setup).z();
+  let k_s = sign_ks * frequency_to_wavenumber(omega_s, n_s);
+  let k_i = sign_ki * frequency_to_wavenumber(omega_i, n_i);
 
   // Now calculate the the coeficients that get repeatedly used.
   // This is from Karina's code.
-  let ks_f = k_s / n_s;
-  let ki_f = k_i / n_i;
+
+  use dim::Abs;
+  let ks_f = k_s.abs() / n_s;
+  let ki_f = k_i.abs() / n_i;
 
   let GAM2s = -0.25 * Ws_SQ;
   let GAM2i = -0.25 * Wi_SQ;
@@ -133,8 +124,7 @@ pub fn phasematch_fiber_coupling(
   let DEL1i = DEL2i * SEC_2_THETA_i;
   let DEL3s = -hs - zhs * SEC_2_THETA_s * SIN_THETA_s_e * COS_PHI_s;
   let DEL3i = -hi - zhi * SEC_2_THETA_i * SIN_THETA_i_e * COS_PHI_i;
-  // TODO: when z0s and z0i are used we're assuming they exit the crystal at z0,
-  // but with counterpropagation what happens here?
+
   let DEL4s = 0.5 * ks_f * zhs * TAN_THETA_s_e.powi(2) - ks_f * z0s;
   let DEL4i = 0.5 * ki_f * zhi * TAN_THETA_i_e.powi(2) - ki_f * z0i;
 
@@ -190,7 +180,7 @@ pub fn phasematch_fiber_coupling(
 
   // dbg!(As, Ai, Bs, Bi, Cs, Ci, Ds, Di);
 
-  let fn_z = |z: f64| {
+  let fn_z = move |z: f64| {
     let Ds_z = Ds * z;
     let Di_z = Di * z;
     let CsDs = Complex::new(0., *((Cs + Ds_z) * RAD / M2));
@@ -263,32 +253,26 @@ pub fn phasematch_fiber_coupling(
     pmzcoeff * numerator / denominator
   };
 
-  // let integrator = SimpsonIntegration::new(fn_z);
-  // let result = 0.5
-  //   * integrator.integrate(
-  //     -1.,
-  //     1.,
-  //     steps.unwrap_or_else(|| integration_steps_best_guess(L)),
-  //   );
+  fn_z
+}
 
-  // let integrator = Integrator::AdaptiveSimpson {
-  //   tolerance: 1e-5,
-  //   max_depth: 1000,
-  // };
+/// Evaluate the phasematching function for fiber coupling
+///
+/// This is the secret sauce of spdcalc.
+#[allow(non_snake_case)]
+pub fn phasematch_fiber_coupling(
+  omega_s: Frequency,
+  omega_i: Frequency,
+  spdc: &SPDC,
+  integrator: Integrator,
+) -> PerMeter4<Complex<f64>> {
+  return phasematch_fiber_coupling2(omega_s, omega_i, spdc, integrator);
+  // return phasematch_fiber_coupling_v3(omega_s, omega_i, spdc, integrator);
+  // return phasematch_sinc(omega_s, omega_i, spdc);
+
+  let fn_z = get_pm_integrand(omega_s, omega_i, spdc);
+  // TODO: Where does this factor of 0.5 come from?
   let result = 0.5 * integrator.integrate(&fn_z, -1., 1.);
-
-  // use quad_rs::Integrate;
-  // let integrator = GAUSS_KONROD.clone()
-  //   .with_absolute_tolerance(1e-18)
-  //   .with_relative_tolerance(1e2);
-  // let result = 0.5 * integrator.integrate(
-  //   &|f: Complex<f64>| fn_z(f.re),
-  //   std::ops::Range {
-  //     start: Complex::new(-1., 0.),
-  //     end: Complex::new(1., 0.)
-  //   },
-  //   None
-  // ).unwrap().result.unwrap();
   PerMeter4::new(result)
 }
 
@@ -314,9 +298,6 @@ pub fn phasematch_fiber_coupling2(
   spdc: &SPDC,
   integrator: Integrator,
 ) -> PerMeter4<Complex<f64>> {
-  // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, steps);
-  // return phasematch_fiber_coupling_v3(omega_s, omega_i, spdc, steps);
-  // return phasematch_sinc(omega_s, omega_i, spdc);
   // crystal length
   let L = spdc.crystal_setup.length;
   let half_L = L * 0.5;
@@ -338,8 +319,8 @@ pub fn phasematch_fiber_coupling2(
   // in that plane.
   // This accounts for the directionality of signal and idler
   // by negating theta if the angle is greater than 90 degrees.
-  let sign_s = if phi_s > 90. * DEG { -1. } else { 1. };
-  let sign_i = if phi_i > 90. * DEG { -1. } else { 1. };
+  let sign_s = sin(phi_s).signum();
+  let sign_i = sin(phi_i).signum();
 
   let theta_s = sign_s * spdc.signal.theta_internal();
   let theta_i = sign_i * spdc.idler.theta_internal();
@@ -375,17 +356,21 @@ pub fn phasematch_fiber_coupling2(
   let k_p = frequency_to_wavenumber(omega_p, n_p);
   let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
   let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
-  // let k_s = frequency_to_wavenumber(omega_s, n_s);
-  // let k_i = frequency_to_wavenumber(omega_i, n_i);
-  let k_s = spdc.signal.wavevector(omega_s, &spdc.crystal_setup).z();
-  let k_i = spdc.idler.wavevector(omega_i, &spdc.crystal_setup).z();
+
+  // Counter-propagation requires a sign change in the wavenumber but
+  // not for the free propagation constants ks_f and ki_f.
+  let sign_ks = cos(theta_s).signum();
+  let sign_ki = cos(theta_i).signum();
+  let k_s = sign_ks * frequency_to_wavenumber(omega_s, n_s);
+  let k_i = sign_ki * frequency_to_wavenumber(omega_i, n_i);
 
   let rho = tan(spdc.pump.walkoff_angle(&spdc.crystal_setup));
 
   // Now calculate the the coeficients that get repeatedly used.
   // This is from Karina's code.
-  let ks_free = k_s / n_s;
-  let ki_free = k_i / n_i;
+  use dim::Abs;
+  let ks_free = k_s.abs() / n_s;
+  let ki_free = k_i.abs() / n_i;
 
   let Γ_s2 = -0.25 * Ws_SQ;
   let Γ_i2 = -0.25 * Wi_SQ;
@@ -400,20 +385,29 @@ pub fn phasematch_fiber_coupling2(
   let zhs = ζs + hs * SIN_THETA_s_e;
   let zhi = ζi + hi * SIN_THETA_i_e;
 
-  // zR in documentation = k W^2 / 2
+  // zR is rayleigh range = 0.5 * k * W^2
+  let zR_s = 0.5 * ks_free * Ws_SQ;
+  let zR_i = 0.5 * ki_free * Wi_SQ;
   //
   // NOTE: v3 and v2 differ by a minus sign in the lambda terms
   // seems to be the version 3 used the non-complex-conjugate version of the mode
-  let Λ_s2 = (0.5 / ks_free) * zhs * RAD;
-  let Λ_i2 = (0.5 / ki_free) * zhi * RAD;
+  // let Λ_s2 = (0.5 / ks_free) * zhs * RAD;
+  // let Λ_i2 = (0.5 / ki_free) * zhi * RAD;
+  let Λ_s2 = 0.25 * Ws_SQ * zhs / zR_s * RAD;
+  let Λ_i2 = 0.25 * Wi_SQ * zhi / zR_i * RAD;
   let Λ_s1 = Λ_s2 * SEC_2_THETA_s;
   let Λ_i1 = Λ_i2 * SEC_2_THETA_i;
   // sec(a) tan(a) = sec^2(a) sin(a)
-  let Λ_s3 = -hs - zhs * SEC_2_THETA_s * SIN_THETA_s_e;
-  let Λ_i3 = -hi - zhi * SEC_2_THETA_i * SIN_THETA_i_e;
-  let Λ_s4 = 0.5 * ks_free * zhs * TAN_THETA_s_e.powi(2) / RAD - ks_free * ζs / RAD;
-  let Λ_i4 = 0.5 * ki_free * zhi * TAN_THETA_i_e.powi(2) / RAD - ki_free * ζi / RAD;
-
+  // let Λ_s3 = -hs - zhs * SEC_2_THETA_s * SIN_THETA_s_e;
+  // let Λ_i3 = -hi - zhi * SEC_2_THETA_i * SIN_THETA_i_e;
+  // let Λ_s4 = 0.5 * ks_free * zhs * TAN_THETA_s_e.powi(2) / RAD - ks_free * ζs / RAD;
+  // let Λ_i4 = 0.5 * ki_free * zhi * TAN_THETA_i_e.powi(2) / RAD - ki_free * ζi / RAD;
+  let Λ_s3 = -hs - (0.5 * ks_free * Ws_SQ / zR_s) * zhs * SEC_2_THETA_s * SIN_THETA_s_e;
+  let Λ_i3 = -hi - (0.5 * ki_free * Wi_SQ / zR_i) * zhi * SEC_2_THETA_i * SIN_THETA_i_e;
+  let Λ_s4 =
+    0.25 * (sq(ks_free) * Ws_SQ / zR_s) * zhs * TAN_THETA_s_e.powi(2) / RAD - ks_free * ζs / RAD;
+  let Λ_i4 =
+    0.25 * (sq(ki_free) * Wi_SQ / zR_i) * zhi * TAN_THETA_i_e.powi(2) / RAD - ki_free * ζi / RAD;
   // dbg!(
   //   zhs, zhi, Γ_s1, Γ_i1, Γ_s2, Γ_i2, Γ_s3, Γ_i3, Γ_s4, Γ_i4, Λ_s1, Λ_i1, Λ_s2, Λ_i2, Λ_s3, Λ_i3,
   //   Λ_s4, Λ_i4
