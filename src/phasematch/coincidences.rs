@@ -266,7 +266,7 @@ pub fn phasematch_fiber_coupling(
   spdc: &SPDC,
   integrator: Integrator,
 ) -> PerMeter4<Complex<f64>> {
-  return phasematch_fiber_coupling2(omega_s, omega_i, spdc, integrator);
+  // return phasematch_fiber_coupling2(omega_s, omega_i, spdc, integrator);
   // return phasematch_fiber_coupling_v3(omega_s, omega_i, spdc, integrator);
   // return phasematch_sinc(omega_s, omega_i, spdc);
 
