@@ -736,45 +736,11 @@ mod tests {
   };
   use utils::frequency_to_vacuum_wavelength;
 
-  #[allow(dead_code)]
-  fn percent_diff(actual: f64, expected: f64) -> f64 {
-    100. * ((expected - actual) / expected).abs()
-  }
-
   #[test]
   fn phasematch_test() {
-    let json = serde_json::json!({
-      "crystal": {
-        "kind": "BBO_1",
-        "pm_type": "e->eo",
-        "phi_deg": 0,
-        "theta_deg": 0,
-        "length_um": 2000,
-        "temperature_c": 20
-      },
-      "pump": {
-        "wavelength_nm": 775,
-        "waist_um": 100,
-        "bandwidth_nm": 5.35,
-        "average_power_mw": 1
-      },
-      "signal": {
-        "wavelength_nm": 1550,
-        "phi_deg": 0,
-        "theta_external_deg": 0,
-        "waist_um": 100,
-        "waist_position_um": "auto"
-      },
-      "idler": "auto",
-      "deff_pm_per_volt": 1,
-    });
+    let spdc = crate::utils::testing::testing_props(false);
 
-    let config: SPDCConfig = serde_json::from_value(json).expect("Could not unwrap json");
-    let spdc = config
-      .try_as_spdc()
-      .expect("Could not convert to SPDC instance");
-
-    let expected = phasematch_gaussian(spdc.signal.frequency(), spdc.idler.frequency(), &spdc);
+    let expected = 132056158795971.14;
     let actual = phasematch_fiber_coupling(
       spdc.signal.frequency(),
       spdc.idler.frequency(),
@@ -783,8 +749,9 @@ mod tests {
     );
 
     assert_nearly_equal!(
+      "coincidences magnitude",
       actual.value_unsafe().norm(),
-      expected.value_unsafe().norm(),
+      expected,
       0.1
     );
   }

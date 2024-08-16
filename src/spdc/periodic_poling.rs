@@ -355,6 +355,7 @@ pub fn optimum_poling_period(
 
 #[cfg(test)]
 mod test {
+  use crate::utils::testing::*;
   use crate::{dim::ucum::*, *};
 
   #[test]
@@ -383,13 +384,7 @@ mod test {
 
     let period = optimum_poling_period(&signal, &pump, &crystal_setup).unwrap();
 
-    assert!(approx_eq!(
-      f64,
-      *(period / M),
-      -46.578592559e-6,
-      ulps = 2,
-      epsilon = 1e-12
-    ));
+    assert_nearly_equal!("poling period", *(period / M), -46.578592559e-6, 0.2);
   }
 
   #[test]

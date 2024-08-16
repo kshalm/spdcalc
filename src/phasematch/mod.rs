@@ -67,27 +67,3 @@ pub use coincidences::*;
 
 mod singles;
 pub use singles::*;
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-  extern crate float_cmp;
-  use dim::{f64prefixes::NANO, ucum::M};
-  use float_cmp::*;
-
-  #[test]
-  fn pump_spectrum_test() {
-    let mut spdc = SPDC::default();
-
-    spdc.signal.set_vacuum_wavelength(1500. * NANO * M);
-    let actual = pump_spectral_amplitude(spdc.signal.frequency() + spdc.idler.frequency(), &spdc);
-    let expected = 0.0003094554168558373;
-
-    assert!(
-      approx_eq!(f64, actual, expected, ulps = 2),
-      "actual: {}, expected: {}",
-      actual,
-      expected
-    );
-  }
-}

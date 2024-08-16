@@ -151,11 +151,13 @@ impl IdlerBeam {
     //   return Err(SPDCError("Invalid solution for optimal idler theta".into()));
     // }
 
-    let theta = if (theta_s > PI / 2. * RAD) ^ crystal_setup.counter_propagation {
+    let sign = (theta_s / RAD).signum();
+    let theta = if (cos(theta_s).signum() < 0.) ^ crystal_setup.counter_propagation {
       PI - f64::asin(val)
     } else {
       f64::asin(val)
-    } * ucum::RAD;
+    } * sign
+      * ucum::RAD;
     let wavelength = ls * lp / (ls - lp);
     let phi = normalize_angle(signal.phi() + PI * RAD);
 
@@ -285,7 +287,7 @@ impl Beam {
     external: Angle,
     crystal_setup: &CrystalSetup,
   ) -> Angle {
-    let snell_external = f64::sin(*(external / ucum::RAD));
+    let snell_external = sin(external);
     let guess = *(external / ucum::RAD);
     let phi = beam.phi();
 
@@ -296,9 +298,12 @@ impl Beam {
       num::abs(snell_external - (*n) * f64::sin(internal))
     };
 
+    let sign = guess.signum();
+    // TODO: THIS IS BROKEN FOR BACKWARD PROPAGATION
+    // THINK ABOUT LIMITS
     let theta = math::nelder_mead_1d(curve, (guess, guess + 1.), 100, 0., FRAC_PI_2, 1e-12);
 
-    theta * ucum::RAD
+    sign * theta * ucum::RAD
   }
 
   /// Use snell's law to calculate the external theta from internal
@@ -599,40 +604,8 @@ mod tests {
 
   #[test]
   fn optimum_idler_test() {
-    let crystal_setup = CrystalSetup {
-      crystal: CrystalType::BBO_1,
-      pm_type: PMType::Type1_e_oo,
-      theta: -3.0 * DEG,
-      phi: 1.0 * DEG,
-      length: 2_000.0 * MICRO * M,
-      temperature: from_celsius_to_kelvin(20.0),
-      counter_propagation: false,
-    };
-
-    let signal = Beam::new(
-      PolarizationType::Extraordinary,
-      15. * DEG,
-      10. * DEG,
-      1550. * NANO * M,
-      100. * MICRO * M,
-    )
-    .into();
-    let pump = Beam::new(
-      PolarizationType::Extraordinary,
-      0. * DEG,
-      0. * DEG,
-      775. * NANO * M,
-      100. * MICRO * M,
-    )
-    .into();
-
-    let pp = PeriodicPoling::On {
-      period: 0.00004656366863331685 * ucum::M,
-      sign: Sign::POSITIVE,
-      apodization: Apodization::Off,
-    };
-
-    let idler = IdlerBeam::try_new_optimum(&signal, &pump, &crystal_setup, pp).unwrap();
+    let spdc = crate::utils::testing::testing_props(false);
+    let idler = spdc.idler;
 
     let li = *(idler.vacuum_wavelength() / ucum::M);
     let li_expected = 1550. * NANO;
@@ -653,7 +626,7 @@ mod tests {
     );
 
     let theta_i = *(idler.theta_internal() / ucum::DEG);
-    let theta_i_expected = 7.;
+    let theta_i_expected = 0.4912283553443823;
     assert!(
       approx_eq!(f64, theta_i, theta_i_expected, ulps = 2, epsilon = 1e-3),
       "actual: {}, expected: {}",

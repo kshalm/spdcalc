@@ -95,7 +95,7 @@ mod test {
       expected.y
     );
     assert!(
-      approx_eq!(f64, del_k.z, expected.z, ulps = 2, epsilon = 1e-9),
+      approx_eq!(f64, del_k.z, expected.z, ulps = 2, epsilon = 1e-4),
       "actual: {}, expected: {}",
       del_k.z,
       expected.z

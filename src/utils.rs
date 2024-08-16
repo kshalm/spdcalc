@@ -486,12 +486,16 @@ pub fn transpose_vec<T: Clone>(vec: Vec<T>, num_cols: usize) -> Vec<T> {
 }
 
 #[cfg(test)]
-pub mod testing {
+pub(crate) mod testing {
+  use crate::dim::f64prefixes::*;
+  use crate::dim::ucum::*;
+  use crate::{Apodization, PeriodicPoling, SPDC};
+
   pub fn percent_diff(actual: f64, expected: f64) -> f64 {
     if expected == 0. && actual == 0. {
       return 0.;
     } else {
-      50. * ((expected - actual).abs() / (expected + actual))
+      200. * ((expected - actual).abs() / (expected + actual))
     }
   }
 
@@ -513,6 +517,38 @@ pub mod testing {
   }
 
   pub(crate) use assert_nearly_equal;
+
+  pub fn testing_props(pp: bool) -> SPDC {
+    let mut spdc = SPDC::from_json(serde_json::json!({
+      "crystal": {
+        "kind": "BBO_1",
+        "pm_type": "Type2_e_eo",
+        "theta_deg": -3.0,
+        "phi_deg": 1.0,
+        "length_um": 2_000.0,
+        "temperature_c": 20.0,
+        "counter_propagation": false
+      },
+      "signal": {
+        "phi_deg": 15.0,
+        "theta_deg": 0.5,
+        "wavelength_nm": 1550.0,
+        "waist_um": 100.0
+      },
+      "pump": {
+        "wavelength_nm": 775.0,
+        "waist_um": 100.0,
+        "bandwidth_nm": 5.35,
+        "average_power_mw": 1,
+      },
+      "deff_pm_per_volt": 1
+    }))
+    .unwrap();
+    if pp {
+      spdc.pp = PeriodicPoling::new(28.5 * MICRO * M, Apodization::Off)
+    }
+    spdc
+  }
 }
 
 #[cfg(test)]

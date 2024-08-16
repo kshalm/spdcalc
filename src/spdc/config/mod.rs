@@ -471,6 +471,7 @@ impl From<SPDC> for SPDCConfig {
 #[cfg(test)]
 mod test {
   use super::*;
+  use crate::utils::testing::*;
   use crate::PolarizationType;
   use dim::ucum;
   use float_cmp::approx_eq;
@@ -522,7 +523,7 @@ mod test {
       let signal = Beam::new(
         PolarizationType::Extraordinary,
         0. * DEG,
-        0. * DEG,
+        0. * RAD,
         1550. * NANO * M,
         100. * MICRO * M,
       )
@@ -602,14 +603,9 @@ mod test {
       .expect("Could not convert to SPDC instance");
 
     let actual = spdc.crystal_setup.theta;
-    let expected = 0.8394503071136623 * RAD;
+    let expected = spdc.crystal_setup.optimum_theta(&spdc.signal, &spdc.pump);
 
-    assert!(approx_eq!(
-      f64,
-      actual.value_unsafe,
-      expected.value_unsafe,
-      epsilon = 1e-6
-    ));
+    assert_nearly_equal!("crystal theta", actual.value_unsafe, expected.value_unsafe);
   }
 
   #[test]

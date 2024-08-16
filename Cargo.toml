@@ -24,6 +24,7 @@ ndarray = "0.15"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_with = "3.8"
+serde_json = "1.0"
 regex = "1.7"
 lazy_static = "1.4"
 quad-rs = { git = "https://github.com/wellcaffeinated/quad-rs", rev = "9d3d8618e39c499d92786d62af75804387af183a" }

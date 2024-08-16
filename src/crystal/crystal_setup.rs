@@ -172,6 +172,7 @@ impl CrystalSetup {
 #[cfg(test)]
 mod test {
   use super::*;
+  use crate::utils::testing::*;
 
   #[test]
   fn index_along_test() {
@@ -187,5 +188,12 @@ mod test {
     );
 
     assert_eq!(n, Unitless::new(1.6017685463810718));
+  }
+
+  #[test]
+  fn optimum_theta_test() {
+    let mut spdc = testing_props(false);
+    spdc.assign_optimum_crystal_theta();
+    assert_eq!(spdc.crystal_setup.theta, Angle::new(0.502595179579299));
   }
 }
