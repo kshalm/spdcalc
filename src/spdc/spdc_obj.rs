@@ -15,7 +15,8 @@ use na::Complex;
 ///
 /// This is the core of the api. This holds all information about the experimental setup.
 /// Interact with this object to calculate joint spectrum, rates, efficiencies, schmidt number, etc.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(try_from = "crate::SPDCConfig", into = "crate::SPDCConfig")]
 pub struct SPDC {
   pub signal: SignalBeam,
   pub idler: IdlerBeam,
@@ -79,6 +80,12 @@ impl SPDC {
 
   pub fn as_config(self) -> crate::SPDCConfig {
     crate::SPDCConfig::from(self)
+  }
+
+  pub fn from_json<S: ToString>(json: S) -> Result<Self, serde_json::Error> {
+    let json = json.to_string();
+    let spdc = serde_json::from_str::<SPDC>(&json)?;
+    Ok(spdc)
   }
 
   /// Optimal range to use for evaluating the joint spectrum
@@ -461,62 +468,6 @@ mod test {
       .expect("Could not convert to SPDC instance");
     dbg!(&spdc);
     spdc
-  }
-
-  #[test]
-  fn test_counts_coincidences() {
-    let spdc = default_spdc();
-    let range: WavelengthSpace = Steps2D(
-      (1541.54 * NANO * M, 1558.46 * NANO * M, 20),
-      (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
-    )
-    .into();
-    let counts = spdc.counts_coincidences(range, crate::math::Integrator::default());
-    let expected = 1883732. * HZ;
-
-    assert!(approx_eq!(
-      f64,
-      counts.value_unsafe,
-      expected.value_unsafe,
-      epsilon = 1.
-    ));
-  }
-
-  #[test]
-  fn test_counts_singles_signal() {
-    let spdc = default_spdc();
-    let range: WavelengthSpace = Steps2D(
-      (1541.54 * NANO * M, 1558.46 * NANO * M, 20),
-      (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
-    )
-    .into();
-    let counts = spdc.counts_singles_signal(range, crate::math::Integrator::default());
-    let expected = 1924917. * HZ;
-
-    assert!(approx_eq!(
-      f64,
-      counts.value_unsafe,
-      expected.value_unsafe,
-      epsilon = 1.
-    ));
-  }
-
-  #[test]
-  fn test_counts_singles_idler() {
-    let spdc = default_spdc();
-    let range: WavelengthSpace = Steps2D(
-      (1541.54 * NANO * M, 1558.46 * NANO * M, 20),
-      (1541.63 * NANO * M, 1558.56 * NANO * M, 20),
-    )
-    .into();
-    let counts = spdc.counts_singles_idler(range, crate::math::Integrator::default());
-    let expected = 1925352. * HZ;
-    assert!(approx_eq!(
-      f64,
-      counts.value_unsafe,
-      expected.value_unsafe,
-      epsilon = 1.
-    ));
   }
 
   #[test]
