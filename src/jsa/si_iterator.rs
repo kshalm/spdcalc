@@ -22,6 +22,17 @@ impl FrequencySpace {
     self.0
   }
 
+  pub fn set_resolution(&mut self, res: usize) -> &mut Self {
+    self.0 .0 .2 = res;
+    self.0 .1 .2 = res;
+    self
+  }
+
+  pub fn with_resolution(mut self, res: usize) -> Self {
+    self.set_resolution(res);
+    self
+  }
+
   pub fn from_wavelength_space(ws: WavelengthSpace) -> Self {
     let ws_min = vacuum_wavelength_to_frequency(ws.0 .0 .1);
     let ws_max = vacuum_wavelength_to_frequency(ws.0 .0 .0);
@@ -94,6 +105,17 @@ impl SumDiffFrequencySpace {
 
   pub fn as_steps(self) -> Steps2D<Frequency> {
     self.0
+  }
+
+  pub fn set_resolution(&mut self, res: usize) -> &mut Self {
+    self.0 .0 .2 = res;
+    self.0 .1 .2 = res;
+    self
+  }
+
+  pub fn with_resolution(mut self, res: usize) -> Self {
+    self.set_resolution(res);
+    self
   }
 
   pub fn from_frequency_space(frequencies: FrequencySpace) -> Self {
@@ -209,6 +231,17 @@ impl WavelengthSpace {
 
   pub fn as_steps(self) -> Steps2D<Wavelength> {
     self.0
+  }
+
+  pub fn set_resolution(&mut self, res: usize) -> &mut Self {
+    self.0 .0 .2 = res;
+    self.0 .1 .2 = res;
+    self
+  }
+
+  pub fn with_resolution(mut self, res: usize) -> Self {
+    self.set_resolution(res);
+    self
   }
 
   pub fn from_frequency_space(fs: FrequencySpace) -> Self {
