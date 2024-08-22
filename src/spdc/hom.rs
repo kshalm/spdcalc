@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::jsa::{FrequencySpace, JointSpectrum};
 use crate::math::Integrator;
 use crate::types::{Complex, Time};
@@ -111,6 +113,26 @@ pub struct HomTwoSourceResult<T> {
   pub ss: T,
   pub ii: T,
   pub si: T,
+}
+
+impl<T> From<HomTwoSourceResult<T>> for HashMap<String, T> {
+  fn from(result: HomTwoSourceResult<T>) -> Self {
+    let mut map = HashMap::new();
+    map.insert("ss".to_string(), result.ss);
+    map.insert("ii".to_string(), result.ii);
+    map.insert("si".to_string(), result.si);
+    map
+  }
+}
+
+impl<T: Default + Clone> From<HashMap<String, T>> for HomTwoSourceResult<T> {
+  fn from(map: HashMap<String, T>) -> Self {
+    HomTwoSourceResult {
+      ss: map.get("ss").cloned().unwrap_or(T::default()),
+      ii: map.get("ii").cloned().unwrap_or(T::default()),
+      si: map.get("si").cloned().unwrap_or(T::default()),
+    }
+  }
 }
 
 /// Hong–Ou–Mandel coincidence rate for two sources for a series of time delays
