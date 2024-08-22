@@ -13,7 +13,11 @@ const IMPOSSIBLE_POLING_PERIOD: &str = "Could not determine poling period from s
 pub type PolingPeriod = Meter<f64>;
 
 /// Apodization for periodic poling
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[serde(
+  try_from = "crate::ApodizationConfig",
+  into = "crate::ApodizationConfig"
+)]
 pub enum Apodization {
   /// None
   #[default]
@@ -34,6 +38,20 @@ pub enum Apodization {
 }
 
 impl Apodization {
+  pub fn kind(&self) -> &'static str {
+    match self {
+      Apodization::Off => "Off",
+      Apodization::Gaussian { .. } => "Gaussian",
+      Apodization::Bartlett(_) => "Bartlett",
+      Apodization::Blackman(_) => "Blackman",
+      Apodization::Connes(_) => "Connes",
+      Apodization::Cosine(_) => "Cosine",
+      Apodization::Hamming(_) => "Hamming",
+      Apodization::Welch(_) => "Welch",
+      Apodization::Interpolate(_) => "Interpolate",
+    }
+  }
+
   pub fn integration_constant(&self, z: f64, crystal_length: Distance) -> f64 {
     assert!((-1. ..=1.).contains(&z), "z must be between -1 and 1");
     match self {
@@ -218,6 +236,14 @@ impl PeriodicPoling {
     match self {
       Self::Off => Self::Off,
       Self::On { period, sign, .. } => Self::new(sign * period, apodization),
+    }
+  }
+
+  /// Get the apodization
+  pub fn apodization(&self) -> &Apodization {
+    match self {
+      Self::Off => &Apodization::Off,
+      Self::On { apodization, .. } => apodization,
     }
   }
 
