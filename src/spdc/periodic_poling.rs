@@ -137,7 +137,7 @@ impl PeriodicPoling {
 
   /// Get the poling domains
   ///
-  /// They are a list of fractions of polilng period
+  /// They are a list of fractions of poling period
   pub fn poling_domains(&self, crystal_length: Distance) -> Vec<(f64, f64)> {
     if let Self::On { apodization, .. } = self {
       let num_domains = self.num_domains(crystal_length);
@@ -376,6 +376,100 @@ pub fn optimum_poling_period(
     Err(SPDCError::new(IMPOSSIBLE_POLING_PERIOD.to_string()))
   } else {
     Ok(sign * period * M)
+  }
+}
+
+#[cfg(feature = "pyo3")]
+mod pyo3_impls {
+  use super::*;
+  use dim::f64prefixes::*;
+  use pyo3::{
+    exceptions::{PyKeyError, PyValueError},
+    prelude::*,
+    types::PyDict,
+  };
+
+  impl FromPyObject<'_> for Apodization {
+    fn extract_bound(obj: &Bound<'_, PyAny>) -> PyResult<Self> {
+      let dict = obj.downcast::<PyDict>()?;
+      let kind = dict
+        .get_item("kind")?
+        .ok_or(PyKeyError::new_err(
+          "Expecting 'kind' key in apodization config.",
+        ))?
+        .extract::<String>()?;
+
+      let param = dict.get_item("parameter")?.ok_or(PyKeyError::new_err(
+        "Expecting 'parameter' key in apodization config.",
+      ))?;
+
+      match kind.to_lowercase().as_str() {
+        "off" => Ok(Apodization::Off),
+        "gaussian" => {
+          let fwhm = param
+            .downcast::<PyDict>()?
+            .get_item("fwhm_um")?
+            .ok_or(PyKeyError::new_err(
+              "Expecting dictionary with 'fwhm_um' key as gaussian apodization parameter value.",
+            ))?
+            .extract::<f64>()?;
+          Ok(Apodization::Gaussian {
+            fwhm: fwhm * MICRO * M,
+          })
+        }
+        "interpolate" => {
+          let points = param.extract::<Vec<f64>>()?;
+          Ok(Apodization::Interpolate(points))
+        }
+        _ => serde_json::from_value(serde_json::json! {
+          {
+            "kind": kind,
+            "parameter": param.extract::<f64>()?
+          }
+        })
+        .map_err(|e| PyValueError::new_err(e.to_string())),
+      }
+    }
+  }
+
+  impl ToPyObject for Apodization {
+    fn to_object(&self, py: Python<'_>) -> PyObject {
+      let dict = PyDict::new_bound(py);
+
+      match self {
+        &Apodization::Off => {
+          dict.set_item("kind", "off").unwrap();
+        }
+        &Apodization::Gaussian { fwhm } => {
+          let fwhm_um = *(fwhm / MICRO / M);
+          let param = PyDict::new_bound(py);
+          param.set_item("fwhm_um", fwhm_um).unwrap();
+          dict.set_item("kind", "gaussian").unwrap();
+          dict.set_item("parameter", param).unwrap();
+        }
+        Apodization::Interpolate(points) => {
+          dict.set_item("kind", "interpolate").unwrap();
+          dict.set_item("parameter", points.clone()).unwrap();
+        }
+        &Apodization::Bartlett(p)
+        | &Apodization::Blackman(p)
+        | &Apodization::Connes(p)
+        | &Apodization::Cosine(p)
+        | &Apodization::Hamming(p)
+        | &Apodization::Welch(p) => {
+          dict.set_item("kind", self.kind()).unwrap();
+          dict.set_item("parameter", p).unwrap();
+        }
+      }
+
+      dict.into()
+    }
+  }
+
+  impl IntoPy<PyObject> for Apodization {
+    fn into_py(self, py: Python<'_>) -> PyObject {
+      self.to_object(py).into_py(py)
+    }
   }
 }
 

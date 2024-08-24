@@ -191,41 +191,41 @@ impl JointSpectrum {
       .collect()
   }
 
-  /// Get the value of the JSA Singles at specified signal/idler frequencies
-  ///
-  /// Technically the units should be 1/sqrt(s)/(rad/s)
-  pub fn jsa_singles(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
-    let jsi = jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integrator);
-    if jsi == 0. {
-      0.
-    } else {
-      let n = jsi_singles_normalization(omega_s, omega_i, &self.spdc) / JsiSinglesNorm::new(1.);
-      (n * jsi).sqrt()
-    }
-  }
+  // /// Get the value of the JSA Singles at specified signal/idler frequencies
+  // ///
+  // /// Technically the units should be 1/sqrt(s)/(rad/s)
+  // pub fn jsa_singles(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
+  //   let jsi = jsi_singles_raw(omega_s, omega_i, &self.spdc, self.integrator);
+  //   if jsi == 0. {
+  //     0.
+  //   } else {
+  //     let n = jsi_singles_normalization(omega_s, omega_i, &self.spdc) / JsiSinglesNorm::new(1.);
+  //     (n * jsi).sqrt()
+  //   }
+  // }
 
-  /// Get the JSA Singles over a specified range of signal/idler frequencies
-  pub fn jsa_singles_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<f64> {
-    range
-      .into_signal_idler_iterator()
-      .map(|(ws, wi)| self.jsa_singles(ws, wi))
-      .collect()
-  }
+  // /// Get the JSA Singles over a specified range of signal/idler frequencies
+  // pub fn jsa_singles_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<f64> {
+  //   range
+  //     .into_signal_idler_iterator()
+  //     .map(|(ws, wi)| self.jsa_singles(ws, wi))
+  //     .collect()
+  // }
 
-  /// Get the normalized value of the JSA Singles at specified signal/idler frequencies
-  ///
-  /// This is unitless and normalized to the optimal setup
-  pub fn jsa_singles_normalized(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
-    self.jsi_singles_normalized(omega_s, omega_i).sqrt()
-  }
+  // /// Get the normalized value of the JSA Singles at specified signal/idler frequencies
+  // ///
+  // /// This is unitless and normalized to the optimal setup
+  // pub fn jsa_singles_normalized(&self, omega_s: Frequency, omega_i: Frequency) -> f64 {
+  //   self.jsi_singles_normalized(omega_s, omega_i).sqrt()
+  // }
 
-  /// Get the normalized value of the JSA Singles at specified signal/idler frequencies
-  pub fn jsa_singles_normalized_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<f64> {
-    range
-      .into_signal_idler_iterator()
-      .map(|(ws, wi)| self.jsa_singles_normalized(ws, wi))
-      .collect()
-  }
+  // /// Get the normalized value of the JSA Singles at specified signal/idler frequencies
+  // pub fn jsa_singles_normalized_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<f64> {
+  //   range
+  //     .into_signal_idler_iterator()
+  //     .map(|(ws, wi)| self.jsa_singles_normalized(ws, wi))
+  //     .collect()
+  // }
 
   /// Get the value of the JSI Singles at specified signal/idler frequencies
   ///

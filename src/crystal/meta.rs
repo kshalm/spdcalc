@@ -1,5 +1,9 @@
+use strum_macros::EnumString;
+
 /// Type of Optic Axis the crystal has
-#[derive(Debug, Serialize, PartialEq, Deserialize, Copy, Clone)]
+#[derive(
+  Debug, Serialize, PartialEq, Deserialize, Copy, Clone, EnumString, strum_macros::Display,
+)]
 pub enum OpticAxisType {
   PositiveUniaxial,
   NegativeUniaxial,
@@ -16,7 +20,9 @@ pub enum OpticAxisType {
 ///
 /// [General Information](https://en.wikipedia.org/wiki/Crystallographic_point_group)
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, PartialEq, Deserialize, Copy, Clone)]
+#[derive(
+  Debug, Serialize, PartialEq, Deserialize, Copy, Clone, EnumString, strum_macros::Display,
+)]
 pub enum PointGroup {
   /// Triclinic 1
   HM_1,
@@ -110,4 +116,52 @@ pub struct CrystalMeta {
   pub transmission_range: Option<ValidWavelengthRange>,
   /// Whether or not temperature dependence is known
   pub temperature_dependence_known: bool,
+}
+
+#[cfg(feature = "pyo3")]
+mod pyo3_impls {
+  use super::*;
+  use pyo3::{
+    prelude::*,
+    types::{PyDict, PyTuple},
+  };
+
+  impl ToPyObject for ValidWavelengthRange {
+    fn to_object(&self, py: Python<'_>) -> PyObject {
+      let tuple = PyTuple::new_bound(py, &[self.0, self.1]);
+      tuple.into()
+    }
+  }
+
+  impl ToPyObject for CrystalMeta {
+    fn to_object(&self, py: Python<'_>) -> PyObject {
+      let dict = PyDict::new_bound(py);
+      dict.set_item("id", self.id).unwrap();
+      dict.set_item("name", self.name).unwrap();
+      dict.set_item("reference_url", self.reference_url).unwrap();
+      dict
+        .set_item("axis_type", self.axis_type.to_string())
+        .unwrap();
+      dict
+        .set_item("point_group", self.point_group.to_string())
+        .unwrap();
+      dict
+        .set_item("transmission_range", self.transmission_range)
+        .unwrap();
+      dict
+        .set_item(
+          "temperature_dependence_known",
+          self.temperature_dependence_known,
+        )
+        .unwrap();
+
+      dict.into()
+    }
+  }
+
+  impl IntoPy<PyObject> for CrystalMeta {
+    fn into_py(self, py: Python<'_>) -> PyObject {
+      self.to_object(py)
+    }
+  }
 }

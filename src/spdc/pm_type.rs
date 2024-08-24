@@ -119,3 +119,28 @@ impl FromStr for PMType {
     Err(crate::SPDCError(format!("PMType {} is not defined", s)))
   }
 }
+
+#[cfg(feature = "pyo3")]
+mod pyo3_impls {
+  use super::*;
+  use pyo3::{exceptions::PyValueError, prelude::*};
+
+  impl FromPyObject<'_> for PMType {
+    fn extract_bound(ob: &Bound<'_, pyo3::PyAny>) -> PyResult<Self> {
+      let s: &str = ob.extract()?;
+      PMType::from_str(s).map_err(|e| PyErr::new::<PyValueError, _>(e.to_string()))
+    }
+  }
+
+  impl ToPyObject for PMType {
+    fn to_object(&self, py: Python<'_>) -> PyObject {
+      self.to_string().to_object(py)
+    }
+  }
+
+  impl IntoPy<PyObject> for PMType {
+    fn into_py(self, py: Python<'_>) -> PyObject {
+      self.to_string().into_py(py)
+    }
+  }
+}

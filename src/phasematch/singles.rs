@@ -1,7 +1,7 @@
 use super::*;
 use crate::utils::frequency_to_wavenumber;
 use crate::Complex;
-use dim::ucum::{DEG, M, RAD};
+use dim::ucum::{M, RAD};
 
 /// Evaluate the fiber coupled singles phasematching function for a given set of frequencies
 ///

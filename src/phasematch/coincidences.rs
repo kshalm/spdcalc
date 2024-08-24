@@ -1,6 +1,6 @@
 use super::*;
 use crate::utils::frequency_to_wavenumber;
-use dim::ucum::{DEG, M, RAD};
+use dim::ucum::{M, RAD};
 use dim::{ucum::UCUM, Dimensioned};
 
 /// Evaluate the phasematching function using a gaussian approximation

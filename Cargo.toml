@@ -31,10 +31,14 @@ quad-rs = { git = "https://github.com/wellcaffeinated/quad-rs", rev = "9d3d8618e
 # rustfft = "6.2"
 quadrature = "0.1"
 gauss-quad = "0.2"
+strum = "0.26"
+strum_macros = "0.26"
+pyo3 = { version = "0.22.2", features = ["num-complex"], optional = true }
 
 [features]
 default = []
 wasm-bindgen = ["argmin/wasm-bindgen"]
+pyo3 = ["dep:pyo3"]
 
 [dev-dependencies]
 criterion = "0.5"
