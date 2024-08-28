@@ -732,6 +732,7 @@ mod tests {
   use crate::utils::testing::assert_nearly_equal;
   use dim::{
     f64prefixes::{MICRO, NANO},
+    ucum::DEG,
     Dimensioned,
   };
   use utils::frequency_to_vacuum_wavelength;
