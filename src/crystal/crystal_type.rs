@@ -1,11 +1,33 @@
 use super::*;
 use crate::SPDCError;
-use dim::ucum::Kelvin;
+use dim::ucum::{Kelvin, K, M};
+use dim::f64prefixes::MICRO;
+use utils::from_celsius_to_kelvin;
 use std::fmt;
 use std::str::FromStr;
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum CrystalExpr {
+  Uniaxial {
+    #[serde(skip_serializing)]
+    no: meval::Expr,
+    #[serde(skip_serializing)]
+    ne: meval::Expr,
+  },
+
+  Biaxial {
+    #[serde(skip_serializing)]
+    nx: meval::Expr,
+    #[serde(skip_serializing)]
+    ny: meval::Expr,
+    #[serde(skip_serializing)]
+    nz: meval::Expr,
+  },
+}
+
 /// The type of crystal
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[allow(non_camel_case_types)]
 pub enum CrystalType {
   BBO_1,
@@ -21,6 +43,8 @@ pub enum CrystalType {
   LiIO3_1,
   AgGaS2_1,
   // Sellmeier(sellmeier::SellmeierCrystal<Q, T>),
+  #[serde(untagged)]
+  Expr(CrystalExpr),
 }
 
 impl fmt::Display for CrystalType {
@@ -54,10 +78,9 @@ impl CrystalType {
       "AgGaS2_1" => Ok(CrystalType::AgGaS2_1),
       "AgGaSe2_1" => Ok(CrystalType::AgGaSe2_1),
       "AgGaSe2_2" => Ok(CrystalType::AgGaSe2_2),
-      _ => Err(SPDCError::new(format!(
-        "Crystal Type {} is not defined",
-        id
-      ))),
+      _ => {
+        Ok(CrystalType::Expr(serde_json::from_str(id).map_err(|e| SPDCError(e.to_string()))?))
+      }
     }
   }
 
@@ -106,6 +129,23 @@ impl CrystalType {
       CrystalType::LiIO3_1 => liio3_1::LiIO3_1.get_indices(vacuum_wavelength, temperature),
       CrystalType::AgGaS2_1 => aggas2_1::AgGaS2_1.get_indices(vacuum_wavelength, temperature),
       // CrystalType::Sellmeier(crystal) => crystal.get_indices(vacuum_wavelength, temperature),
+      CrystalType::Expr(expr) => {
+        let mut ctx = meval::Context::new();
+        ctx.var("T", *((temperature - from_celsius_to_kelvin(20.0)) / K));
+        match expr {
+          CrystalExpr::Uniaxial { no, ne } => {
+            let no = no.clone().bind_with_context(ctx.clone(), "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
+            let ne = ne.clone().bind_with_context(ctx, "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
+            Indices::new(na::Vector3::new(no, no, ne))
+          }
+          CrystalExpr::Biaxial { nx, ny, nz } => {
+            let nx = nx.clone().bind_with_context(ctx.clone(), "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
+            let ny = ny.clone().bind_with_context(ctx.clone(), "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
+            let nz = nz.clone().bind_with_context(ctx, "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
+            Indices::new(na::Vector3::new(nx, ny, nz))
+          }
+        }
+      }
     }
   }
 
@@ -124,6 +164,17 @@ impl CrystalType {
       CrystalType::LiIO3_1 => liio3_1::LiIO3_1.get_meta(),
       CrystalType::AgGaS2_1 => aggas2_1::AgGaS2_1.get_meta(),
       // CrystalType::Sellmeier(crystal) => crystal.get_meta(),
+      CrystalType::Expr(_) => {
+        CrystalMeta {
+          id: "Expr",
+          name: "Expr",
+          reference_url: "Expr",
+          axis_type: OpticAxisType::PositiveUniaxial,
+          point_group: PointGroup::HM_mm2,
+          transmission_range: None,
+          temperature_dependence_known: false,
+        }
+      }
     }
   }
 }
@@ -156,6 +207,8 @@ mod pyo3_impls {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use dim::ucum::M;
+  use dim::f64prefixes::NANO;
 
   #[test]
   fn test_crystal_ids() {
@@ -163,5 +216,23 @@ mod tests {
       let crystal = CrystalType::from_string(meta.id).unwrap();
       assert_eq!(meta, crystal.get_meta());
     }
+  }
+
+  #[test]
+  fn test_crystal_expr() {
+    // BBO
+    // no2=2.7359+0.01878/(λ2-0.01822)-0.01354λ2
+    // ne2=2.3753+0.01224/(λ2-0.01667)-0.01516λ2
+    // dno/dT = -9.3 x 10-6/°C
+    // dne/dT = -16.6 x 10-6/°C
+    let expr = r#" {
+      "no": "sqrt(2.7359+0.01878/(l^2-0.01822)-0.01354*l^2) - 9.3e-6 * T",
+      "ne": "sqrt(2.3753+0.01224/(l^2-0.01667)-0.01516*l^2) - 16.6e-6 * T"
+    }"#;
+
+    let crystal: CrystalType = serde_json::from_str(expr).unwrap();
+    let indices = crystal.get_indices(1064.0 * NANO * M, from_celsius_to_kelvin(45.0));
+    let expected = CrystalType::BBO_1.get_indices(1064.0 * NANO * M, from_celsius_to_kelvin(45.0));
+    assert_eq!(indices, expected);
   }
 }

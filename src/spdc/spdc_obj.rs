@@ -429,7 +429,7 @@ mod test {
   use crate::{jsa::WavelengthSpace, utils::Steps2D};
   use dim::{
     f64prefixes::NANO,
-    ucum::{HZ, M},
+    ucum::M,
   };
 
   fn default_spdc() -> SPDC {

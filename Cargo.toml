@@ -34,6 +34,7 @@ gauss-quad = "0.2"
 strum = "0.26"
 strum_macros = "0.26"
 pyo3 = { version = "0.22.2", features = ["num-complex"], optional = true }
+meval = { version = "0.2", features = ["serde"] }
 
 [features]
 default = []
