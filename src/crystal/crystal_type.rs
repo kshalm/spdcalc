@@ -79,7 +79,12 @@ impl CrystalType {
       "AgGaSe2_1" => Ok(CrystalType::AgGaSe2_1),
       "AgGaSe2_2" => Ok(CrystalType::AgGaSe2_2),
       _ => {
-        Ok(CrystalType::Expr(serde_json::from_str(id).map_err(|e| SPDCError(e.to_string()))?))
+        // we replace all = with : since we're using hjson as a hack
+        let mut s = id.replace("=", ":");
+        if !s.trim().starts_with("{") {
+          s = format!("{{{}}}", s);
+        }
+        Ok(CrystalType::Expr(deser_hjson::from_str(&s).map_err(|e| SPDCError(e.to_string()))?))
       }
     }
   }
@@ -225,12 +230,19 @@ mod tests {
     // ne2=2.3753+0.01224/(λ2-0.01667)-0.01516λ2
     // dno/dT = -9.3 x 10-6/°C
     // dne/dT = -16.6 x 10-6/°C
-    let expr = r#" {
+    let expr = r#"{
       "no": "sqrt(2.7359+0.01878/(l^2-0.01822)-0.01354*l^2) - 9.3e-6 * T",
       "ne": "sqrt(2.3753+0.01224/(l^2-0.01667)-0.01516*l^2) - 16.6e-6 * T"
     }"#;
 
     let crystal: CrystalType = serde_json::from_str(expr).unwrap();
+    let other = CrystalType::from_string(r#"
+      no = sqrt(2.7359+0.01878/(l^2-0.01822)-0.01354*l^2) - 9.3e-6 * T
+      ne = sqrt(2.3753+0.01224/(l^2-0.01667)-0.01516*l^2) - 16.6e-6 * T
+    "#).unwrap();
+
+    assert_eq!(crystal, other);
+
     let indices = crystal.get_indices(1064.0 * NANO * M, from_celsius_to_kelvin(45.0));
     let expected = CrystalType::BBO_1.get_indices(1064.0 * NANO * M, from_celsius_to_kelvin(45.0));
     assert_eq!(indices, expected);
