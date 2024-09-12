@@ -13,6 +13,9 @@ pub use config::*;
 mod spdc_obj;
 pub use spdc_obj::*;
 
+mod spdc_iter;
+pub use spdc_iter::*;
+
 mod counts;
 pub use counts::*;
 
