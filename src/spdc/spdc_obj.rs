@@ -11,6 +11,8 @@ use crate::{
 use dim::ucum::{Hertz, MilliWatt, DEG};
 use na::Complex;
 
+use super::PolingPeriod;
+
 /// SPDC setup
 ///
 /// This is the core of the api. This holds all information about the experimental setup.
@@ -205,7 +207,7 @@ impl SPDC {
     })
   }
 
-  /// New setup with optimum waist positions for signal and idler
+  /// Get a version with optimum waist positions for signal and idler
   pub fn with_optimal_waist_positions(mut self) -> Self {
     self.assign_optimal_waist_positions();
     self
@@ -222,7 +224,7 @@ impl SPDC {
     self
   }
 
-  /// New setup wtih optimum idler
+  /// Get a version with optimum idler
   pub fn with_optimum_idler(mut self) -> Result<Self, SPDCError> {
     self.assign_optimum_idler()?;
     Ok(self)
@@ -247,10 +249,24 @@ impl SPDC {
     Ok(self)
   }
 
-  /// New setup with optimum periodic poling
+  /// Get a version with the optimum periodic poling
   pub fn with_optimum_periodic_poling(mut self) -> Result<Self, SPDCError> {
     self.assign_optimum_periodic_poling()?;
     Ok(self)
+  }
+
+  /// Assign the unsigned period, automatically computing the sign
+  pub fn assign_poling_period(&mut self, period: PolingPeriod) -> &mut Self {
+    let sign = PeriodicPoling::compute_sign(&self.signal, &self.pump, &self.crystal_setup);
+    use dim::Abs;
+    self.pp.assign_period(sign * period.abs());
+    self
+  }
+
+  /// Sets the unsigned period, automatically computing the sign
+  pub fn with_poling_period(mut self, period: PolingPeriod) -> Self {
+    self.assign_poling_period(period);
+    self
   }
 
   /// Assign the optimum crystal theta to this SPDC
@@ -262,7 +278,7 @@ impl SPDC {
     self
   }
 
-  /// New setup with optimum crystal theta
+  /// Get a version with optimum crystal theta
   pub fn with_optimum_crystal_theta(mut self) -> Self {
     self.pp = PeriodicPoling::Off;
     self.assign_optimum_crystal_theta();
@@ -427,10 +443,7 @@ impl SPDC {
 mod test {
   use super::*;
   use crate::{jsa::WavelengthSpace, utils::Steps2D};
-  use dim::{
-    f64prefixes::NANO,
-    ucum::M,
-  };
+  use dim::{f64prefixes::NANO, ucum::M};
 
   fn default_spdc() -> SPDC {
     let json = serde_json::json!({

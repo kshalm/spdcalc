@@ -125,6 +125,23 @@ impl PeriodicPoling {
     }
   }
 
+  /// Set the period
+  pub fn assign_period(&mut self, period: PolingPeriod) -> &mut Self {
+    if let Self::On {
+      period: p, sign, ..
+    } = self
+    {
+      use dim::Abs;
+      *p = period.abs();
+      *sign = if period > 0. * M {
+        Sign::POSITIVE
+      } else {
+        Sign::NEGATIVE
+      };
+    };
+    self
+  }
+
   /// Get the number of domains for a given crystal length
   pub fn num_domains(&self, crystal_length: Distance) -> usize {
     if let Self::On { period, .. } = self {
@@ -256,7 +273,7 @@ impl PeriodicPoling {
 
   /// Get the contribution of periodic poling to to delta_k
   pub fn k_eff(&self) -> Wavenumber {
-    let m = 1.; // QPM order
+    let m = 1.; // TODO: QPM order
     match self {
       Self::Off => 0. * RAD / M,
       &Self::On { period, sign, .. } => {
