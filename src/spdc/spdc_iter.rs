@@ -90,7 +90,7 @@ fn get_setter(prop: String) -> Result<Box<PropSetter>, String> {
     }),
     // polling
     "periodic_poling.poling_period_um" => Box::new(|spdc: &mut SPDC, v: f64| {
-      spdc.pp = spdc.pp.clone().with_period(v * MICRO * M);
+      spdc.assign_poling_period(v * MICRO * M);
     }),
     // deff
     "deff_pm_per_volt" => Box::new(|spdc: &mut SPDC, v: f64| {
