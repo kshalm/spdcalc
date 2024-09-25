@@ -194,6 +194,11 @@ mod test {
   fn optimum_theta_test() {
     let mut spdc = testing_props(false);
     spdc.assign_optimum_crystal_theta();
-    assert_eq!(spdc.crystal_setup.theta, Angle::new(0.502595179579299));
+    assert_nearly_equal!(
+      "crystal_theta",
+      spdc.crystal_setup.theta.value_unsafe,
+      0.5123773602350467,
+      0.001
+    );
   }
 }

@@ -34,6 +34,7 @@ function defaultProps(pp = false) {
     });
   }
   props.update_all_angles();
+  props.theta_s_e = spdc.find_external_angle(props, "signal");
   props.optimum_idler();
   props.auto_calc_collection_focus();
   return props;
@@ -52,6 +53,7 @@ function optimum_idler() {
 
 function optimum_theta() {
   const props = defaultProps();
+  show(props);
   props.auto_calc_Theta();
   console.log("theta", props.theta);
 }
@@ -75,16 +77,16 @@ function show(props) {
   // console.log(`Indices (${props.lambda_i})`, props.crystal.indicies(props.lambda_i, props.temp))
 
   console.log(
-    `Pump: φ(${props.phi}), θ(${props.theta}), λ(${print_nm(props.lambda_p)})`,
+    `Pump: φ(${props.phi / deg} deg), θ(${props.theta / deg} deg), λ(${print_nm(props.lambda_p)})`,
   );
   console.log(
-    `Signal: φ(${props.phi_s}), θ(${props.theta_s}), λ(${print_nm(props.lambda_s)})`,
+    `Signal: φ(${props.phi_s / deg} deg), θ(${props.theta_s / deg} deg), λ(${print_nm(props.lambda_s)})`,
   );
-  console.log(`Signal (external): θ(${props.theta_s_e})`);
+  console.log(`Signal (external): θ(${props.theta_s_e / deg} deg)`);
   console.log(
-    `Idler: φ(${props.phi_i}), θ(${props.theta_i}), λ(${print_nm(props.lambda_i)})`,
+    `Idler: φ(${props.phi_i / deg} deg), θ(${props.theta_i / deg} deg), λ(${print_nm(props.lambda_i)})`,
   );
-  console.log(`Idler (external): θ(${props.theta_i_e})`);
+  console.log(`Idler (external): θ(${props.theta_i_e / deg} deg)`);
   console.log(`n_p: ${props.n_p}, n_s: ${props.n_s}, n_i: ${props.n_i}`);
   console.log(
     `pp: ${props.enable_pp}, period: ${props.poling_sign * props.poling_period}, apodization: ${props.calc_apodization}, fwhm: ${props.apodization_FWHM}`,
@@ -577,7 +579,7 @@ function test_2HOM() {
   console.log("calcuation took", Date.now() - start + "ms");
 }
 
-optimum_theta();
+// optimum_theta();
 // optimum_idler();
 // crystal_indices()
 // print_index_signal()
@@ -587,7 +589,7 @@ optimum_theta();
 // derrivativeTest()
 
 // phasematch();
-// phasematch_pp();
+phasematch_pp();
 // pump_spectrum();
 // phasematch_norm()
 // autorange_lambda()
