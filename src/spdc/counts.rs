@@ -3,6 +3,7 @@ use crate::jsa::{FrequencySpace, JointSpectrum};
 use crate::math::Integrator;
 use crate::{math::sq, PeriodicPoling};
 use dim::ucum::Hertz;
+use rayon::prelude::*;
 
 /// Get the correction factor for the counts
 ///
@@ -43,7 +44,7 @@ pub fn counts_coincidences(
   correction_factor
     * ranges
       .as_steps()
-      .into_iter()
+      .into_par_iter()
       .map(|(ws, wi)| s.jsi(ws, wi) * dw2)
       .sum::<Hertz<f64>>()
 }
@@ -61,7 +62,7 @@ pub fn counts_singles_signal(
   correction_factor
     * ranges
       .as_steps()
-      .into_iter()
+      .into_par_iter()
       .map(|(ws, wi)| s.jsi_singles(ws, wi) * dw2)
       .sum::<Hertz<f64>>()
 }
@@ -79,7 +80,7 @@ pub fn counts_singles_idler(
   correction_factor
     * ranges
       .as_steps()
-      .into_iter()
+      .into_par_iter()
       .map(|(ws, wi)| s.jsi_singles(wi, ws) * dw2)
       .sum::<Hertz<f64>>()
 }

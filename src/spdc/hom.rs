@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::jsa::{FrequencySpace, JointSpectrum};
 use crate::math::Integrator;
 use crate::types::{Complex, Time};
@@ -7,6 +5,8 @@ use crate::utils::{get_1d_index, get_2d_indices, Steps};
 use crate::SPDC;
 use dim::ucum::RAD;
 use na::Vector3;
+use rayon::prelude::*;
+use std::collections::HashMap;
 
 /// The "integral" of the JSI
 pub fn jsi_norm(jsa_values: &[Complex<f64>]) -> f64 {
@@ -30,7 +30,7 @@ pub fn hom_rate<T: Into<FrequencySpace>>(
   // TODO: use integrator rather than block integration
   let result: f64 = ranges
     .as_steps()
-    .into_iter()
+    .into_par_iter()
     .enumerate()
     .map(|(index, (ws, wi))| {
       let delta_w = wi - ws;

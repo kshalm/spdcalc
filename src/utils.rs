@@ -321,6 +321,10 @@ where
   {
     rayon::iter::plumbing::bridge(self, consumer)
   }
+
+  fn opt_len(&self) -> Option<usize> {
+    Some(self.steps.steps())
+  }
 }
 
 impl<T> rayon::iter::IndexedParallelIterator for ParIterator1D<T>
@@ -509,6 +513,7 @@ where
     + Copy,
 {
   steps: Steps2D<T>,
+  partition: (usize, usize),
   index: usize,
   index_back: usize,
 }
@@ -523,10 +528,21 @@ where
 {
   /// Create a new 2d iterator
   pub fn new(steps: Steps2D<T>) -> Self {
-    Iterator2D {
+    Self::new_partition(steps, 0, steps.len())
+  }
+
+  pub fn new_partition(steps: Steps2D<T>, start: usize, end: usize) -> Self {
+    assert!(
+      start <= end,
+      "start is greater than end, start {}, end {}",
+      start,
+      end
+    );
+    Self {
       steps,
-      index: 0,
-      index_back: steps.len(),
+      partition: (start, end),
+      index: start,
+      index_back: end,
     }
   }
 
@@ -542,12 +558,23 @@ where
   pub fn get_dy(&self) -> T {
     self.steps.division_widths().1
   }
+}
 
-  pub fn swapped(self) -> Self {
-    Self {
-      steps: self.steps.swapped(),
-      index: self.index,
-      index_back: self.index_back,
+impl<T> rayon::iter::IntoParallelIterator for Steps2D<T>
+where
+  T: Send
+    + Sync
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + Copy,
+{
+  type Item = (T, T);
+  type Iter = ParIterator2D<T>;
+  fn into_par_iter(self) -> Self::Iter {
+    ParIterator2D {
+      it: self.into_iter(),
     }
   }
 }
@@ -601,7 +628,105 @@ where
     + Copy,
 {
   fn len(&self) -> usize {
-    self.steps.len()
+    self.partition.1 - self.partition.0
+  }
+}
+
+pub struct ParIterator2D<T>
+where
+  T: Send
+    + Sync
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
+{
+  it: Iterator2D<T>,
+}
+
+impl<T> rayon::iter::plumbing::Producer for ParIterator2D<T>
+where
+  T: Send
+    + Sync
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
+{
+  type Item = (T, T);
+  type IntoIter = Iterator2D<T>;
+
+  fn into_iter(self) -> Self::IntoIter {
+    self.it
+  }
+
+  fn split_at(self, index: usize) -> (Self, Self) {
+    let left = Iterator2D::new_partition(
+      self.it.steps,
+      self.it.partition.0,
+      self.it.partition.0 + index,
+    );
+    let right = Iterator2D::new_partition(
+      self.it.steps,
+      self.it.partition.0 + index,
+      self.it.partition.1,
+    );
+    (ParIterator2D { it: left }, ParIterator2D { it: right })
+  }
+}
+
+impl<T> rayon::iter::ParallelIterator for ParIterator2D<T>
+where
+  T: Send
+    + Sync
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
+{
+  type Item = (T, T);
+
+  fn drive_unindexed<C>(self, consumer: C) -> C::Result
+  where
+    C: rayon::iter::plumbing::UnindexedConsumer<Self::Item>,
+  {
+    rayon::iter::plumbing::bridge(self, consumer)
+  }
+
+  fn opt_len(&self) -> Option<usize> {
+    Some(self.it.len())
+  }
+}
+
+impl<T> rayon::iter::IndexedParallelIterator for ParIterator2D<T>
+where
+  T: Send
+    + Sync
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
+{
+  fn len(&self) -> usize {
+    self.it.len()
+  }
+
+  fn drive<C>(self, consumer: C) -> C::Result
+  where
+    C: rayon::iter::plumbing::Consumer<Self::Item>,
+  {
+    rayon::iter::plumbing::bridge(self, consumer)
+  }
+
+  fn with_producer<CB: rayon::iter::plumbing::ProducerCallback<Self::Item>>(
+    self,
+    callback: CB,
+  ) -> CB::Output {
+    callback.callback(self)
   }
 }
 
@@ -740,5 +865,13 @@ mod tests {
     let b: Vec<f64> = b.into_iter().collect();
     assert_eq!(a, vec![0., 0.1, 0.2, 0.30000000000000004, 0.4]);
     assert_eq!(b, vec![0.5, 0.6, 0.7, 0.8, 0.9]);
+  }
+
+  #[test]
+  fn test_par_iter_2d() {
+    use rayon::prelude::*;
+    let s = Steps2D::new((2., 3., 2), (2., 3., 2));
+    let actual: f64 = s.into_par_iter().map(|(x, y)| x + y).sum();
+    assert_eq!(actual, 20.);
   }
 }

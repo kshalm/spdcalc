@@ -60,3 +60,7 @@ harness = false
 [[bench]]
 name = "heralding"
 harness = false
+
+[[bench]]
+name = "hom"
+harness = false
