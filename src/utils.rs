@@ -225,7 +225,7 @@ where
   type Item = T;
 
   fn next(&mut self) -> Option<Self::Item> {
-    if self.index >= self.steps.steps() {
+    if self.index >= self.index_back {
       return None;
     }
 
@@ -258,7 +258,7 @@ where
     + Copy,
 {
   fn next_back(&mut self) -> Option<Self::Item> {
-    if self.index_back == 0 {
+    if self.index_back <= self.index {
       return None;
     }
 
@@ -510,6 +510,7 @@ where
 {
   steps: Steps2D<T>,
   index: usize,
+  index_back: usize,
 }
 
 impl<T> Iterator2D<T>
@@ -522,24 +523,31 @@ where
 {
   /// Create a new 2d iterator
   pub fn new(steps: Steps2D<T>) -> Self {
-    Iterator2D { steps, index: 0 }
+    Iterator2D {
+      steps,
+      index: 0,
+      index_back: steps.len(),
+    }
   }
 
-  pub fn get_xy(&self) -> (T, T) {
-    self.steps.value(self.index)
+  pub fn get_xy(&self, index: usize) -> (T, T) {
+    self.steps.value(index)
   }
 
   /// Get the x step size
   pub fn get_dx(&self) -> T {
     self.steps.division_widths().0
   }
+
   pub fn get_dy(&self) -> T {
     self.steps.division_widths().1
   }
+
   pub fn swapped(self) -> Self {
     Self {
       steps: self.steps.swapped(),
       index: self.index,
+      index_back: self.index_back,
     }
   }
 }
@@ -555,11 +563,11 @@ where
   type Item = (T, T); // x, y
 
   fn next(&mut self) -> Option<Self::Item> {
-    if self.index >= self.steps.len() {
+    if self.index >= self.index_back {
       return None;
     }
 
-    let item = self.get_xy();
+    let item = self.get_xy(self.index);
     self.index += 1;
     Some(item)
   }
@@ -574,12 +582,12 @@ where
     + Copy,
 {
   fn next_back(&mut self) -> Option<Self::Item> {
-    if self.index == 0 {
+    if self.index_back <= self.index {
       return None;
     }
 
-    let item = self.get_xy();
-    self.index -= 1;
+    self.index_back -= 1;
+    let item = self.get_xy(self.index_back);
     Some(item)
   }
 }
