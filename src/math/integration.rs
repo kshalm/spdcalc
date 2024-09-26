@@ -1,6 +1,9 @@
+use std::iter::Sum;
+
 use crate::utils::{get_1d_index, Steps};
 use crate::Complex;
 use num::{Integer, Zero};
+use rayon::prelude::*;
 
 /// Various integration methods
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -22,7 +25,7 @@ impl Default for Integrator {
 impl Integrator {
   pub fn integrate<F, Y>(&self, func: F, a: f64, b: f64) -> Complex<f64>
   where
-    F: Fn(f64) -> Y,
+    F: Send + Sync + Fn(f64) -> Y,
     Y: Into<Complex<f64>>,
   {
     match self {
@@ -66,7 +69,7 @@ impl Integrator {
 
   pub fn integrate2d<F, Y>(&self, func: F, a: f64, b: f64, c: f64, d: f64) -> Complex<f64>
   where
-    F: Fn(f64, f64) -> Y,
+    F: Send + Sync + Fn(f64, f64) -> Y,
     Y: Into<Complex<f64>>,
   {
     match self {
@@ -194,28 +197,38 @@ where
 
 pub fn simpson<F, Y>(func: F, a: f64, b: f64, divs: usize) -> Complex<f64>
 where
-  F: Fn(f64) -> Y,
+  F: Send + Sync + Fn(f64) -> Y,
   Y: Into<Complex<f64>>,
 {
   let divs = divs + divs % 2 - 2; // nearest even
   assert!(divs >= 4, "Steps too low");
   let dx = (b - a) / (divs as f64);
 
-  let result = (0..=divs)
-    .map(|n| get_simpson_weight(n, divs))
-    .enumerate()
-    .fold((0.).into(), |acc: Complex<f64>, (i, a_n)| {
-      let x = a + (i as f64) * dx;
+  let intg = |acc: Complex<f64>, (i, a_n)| {
+    let x = a + (i as f64) * dx;
 
-      acc + func(x).into() * a_n
-    });
+    acc + func(x).into() * a_n
+  };
+
+  // Parallelize if divs is large
+  let result: Complex<f64> = if divs < 128 {
+    (0..=divs)
+      .map(|n| (n, get_simpson_weight(n, divs)))
+      .fold(Complex::zero(), intg)
+  } else {
+    (0..=divs)
+      .into_par_iter()
+      .map(|n| (n, get_simpson_weight(n, divs)))
+      .fold(|| Complex::zero(), intg)
+      .sum()
+  };
 
   result * (dx / 3.)
 }
 
 pub fn simpson2d<F, Y>(func: F, ax: f64, bx: f64, ay: f64, by: f64, divs: usize) -> Complex<f64>
 where
-  F: Fn(f64, f64) -> Y,
+  F: Send + Sync + Fn(f64, f64) -> Y,
   Y: Into<Complex<f64>>,
 {
   assert!(divs.is_even());
@@ -224,72 +237,97 @@ where
   let steps = divs + 1;
   let dx = (bx - ax) / (divs as f64);
   let dy = (by - ay) / (divs as f64);
-  let result =
-    Steps(ay, by, steps)
-      .into_iter()
-      .enumerate()
-      .fold((0.).into(), |acc: Complex<f64>, (ny, y)| {
-        let sy = Steps(ax, bx, steps).into_iter().enumerate().fold(
-          (0.).into(),
-          |acc: Complex<f64>, (nx, x)| {
-            let a_n = get_simpson_weight(nx, divs);
-            acc + func(x, y).into() * a_n
-          },
-        );
+
+  let result: Complex<f64> = Steps(ay, by, steps)
+    .into_par_iter()
+    .enumerate()
+    .fold(
+      || Complex::zero(),
+      |acc: Complex<f64>, (ny, y)| {
+        let sy: Complex<f64> = Steps(ax, bx, steps)
+          .into_par_iter()
+          .enumerate()
+          .fold(
+            || Complex::zero(),
+            |acc: Complex<f64>, (nx, x)| {
+              let a_n = get_simpson_weight(nx, divs);
+              acc + func(x, y).into() * a_n
+            },
+          )
+          .sum();
 
         let a_n = get_simpson_weight(ny, divs);
         acc + sy * a_n
-      });
+      },
+    )
+    .sum();
 
   result * (dx * dy / 9.)
 }
 
-pub struct SimpsonIntegration2D<F: Fn(f64, f64, usize) -> T, T> {
-  function: F,
-}
+// pub struct SimpsonIntegration2D<F: Fn(f64, f64, usize) -> T, T> {
+//   function: F,
+// }
 
-impl<F: Fn(f64, f64, usize) -> T, T> SimpsonIntegration2D<F, T>
-where
-  T: Zero + std::ops::Mul<f64, Output = T> + std::ops::Add<T, Output = T>,
-{
-  /// Creates a new integrable function by using the supplied `Fn(f64, f64) -> T` in
-  /// combination with numeric integration via simpson's rule to find the integral.
-  pub fn new(function: F) -> Self {
-    SimpsonIntegration2D { function }
-  }
+// impl<F, T> SimpsonIntegration2D<F, T>
+// where
+//   T: Zero + std::ops::Mul<f64, Output = T> + std::ops::Add<T, Output = T> + Send + Sync + Sum<T>,
+//   F: Send + Sync + Fn(f64, f64, usize) -> T,
+// {
+//   /// Creates a new integrable function by using the supplied `Fn(f64, f64) -> T` in
+//   /// combination with numeric integration via simpson's rule to find the integral.
+//   pub fn new(function: F) -> Self {
+//     SimpsonIntegration2D { function }
+//   }
 
-  /// Get simpson weight for index
-  pub fn get_weight(nx: usize, ny: usize, divs: usize) -> f64 {
-    get_simpson_weight(nx, divs) * get_simpson_weight(ny, divs)
-  }
+//   /// Get simpson weight for index
+//   pub fn get_weight(nx: usize, ny: usize, divs: usize) -> f64 {
+//     get_simpson_weight(nx, divs) * get_simpson_weight(ny, divs)
+//   }
 
-  /// Numerically integrate from `a` to `b`, in `divs` divisions
-  pub fn integrate(&self, x_range: (f64, f64), y_range: (f64, f64), divs: usize) -> T {
-    assert!(divs.is_even());
-    assert!(divs >= 4);
+//   /// Numerically integrate from `a` to `b`, in `divs` divisions
+//   pub fn integrate(&self, x_range: (f64, f64), y_range: (f64, f64), divs: usize) -> T {
+//     assert!(divs.is_even());
+//     assert!(divs >= 4);
 
-    let steps = divs + 1;
-    let dx = (x_range.1 - x_range.0) / (divs as f64);
-    let dy = (y_range.1 - y_range.0) / (divs as f64);
-    let result = Steps(y_range.0, y_range.1, steps)
-      .into_iter()
-      .enumerate()
-      .fold(T::zero(), |acc, (ny, y)| {
-        let sy = Steps(x_range.0, x_range.1, steps)
-          .into_iter()
-          .enumerate()
-          .fold(T::zero(), |acc, (nx, x)| {
-            let a_n = get_simpson_weight(nx, divs);
-            acc + (self.function)(x, y, get_1d_index(ny, nx, steps)) * a_n
-          });
+//     let steps = divs + 1;
+//     let dx = (x_range.1 - x_range.0) / (divs as f64);
+//     let dy = (y_range.1 - y_range.0) / (divs as f64);
 
-        let a_n = get_simpson_weight(ny, divs);
-        acc + sy * a_n
-      });
+//     let y_vals: Vec<_> = Steps(y_range.0, y_range.1, steps)
+//       .into_iter()
+//       .enumerate()
+//       .collect();
+//     let x_vals: Vec<_> = Steps(x_range.0, x_range.1, steps)
+//       .into_iter()
+//       .enumerate()
+//       .collect();
 
-    result * (dx * dy / 9.)
-  }
-}
+//     let result: T = y_vals
+//       .par_iter()
+//       .fold(
+//         || T::zero(),
+//         |acc, (ny, y)| {
+//           let sy: T = x_vals
+//             .par_iter()
+//             .fold(
+//               || T::zero(),
+//               |acc, (nx, x)| {
+//                 let a_n = get_simpson_weight(*nx, divs);
+//                 acc + (self.function)(*x, *y, get_1d_index(*ny, *nx, steps)) * a_n
+//               },
+//             )
+//             .sum();
+
+//           let a_n = get_simpson_weight(*ny, divs);
+//           acc + sy * a_n
+//         },
+//       )
+//       .sum();
+
+//     result * (dx * dy / 9.)
+//   }
+// }
 
 //
 // Adaptive simpson's rule
@@ -404,8 +442,7 @@ mod tests {
   #[test]
   fn integrator_2d_test() {
     let divs = 1000;
-    let integrator = SimpsonIntegration2D::new(|x, y, _index| x.sin() * y.powi(3));
-    let actual = integrator.integrate((0., PI), (0., 2.), divs);
+    let actual = simpson2d(|x, y| x.sin() * y.powi(3), 0., PI, 0., 2., divs).re;
     // let actual = SimpsonIntegration2D::new(|x, y, _| {
     //   let zd = f64::cos(PI * f64::cos(x) / 2.0) * f64::cos(PI * (1.0 - f64::sin(x) * f64::cos(y)) / 4.0);
     //   (zd.powi(2)/f64::sin(x)).abs()

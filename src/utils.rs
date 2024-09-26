@@ -4,6 +4,7 @@ use crate::{Frequency, RIndex, Speed, Wavelength, Wavenumber, TWO_PI};
 use dim::ucum::{self, C_, ONE, RAD};
 use dim::{ucum::UCUM, Dimensioned};
 use na::{Unit, Vector3};
+use rayon::iter::IntoParallelIterator;
 
 /// Extension to facilitate getting the x, y, and z components of a dimensioned vector
 pub trait DimVector {
@@ -144,12 +145,13 @@ where
   pub fn value(&self, index: usize) -> T {
     let (start, end) = self.range();
     // if we have only one step... then just set progress to be zero
-    let progress = if self.steps() > 1 {
-      (index as f64) / ((self.divisions()) as f64)
+    if self.steps() > 1 {
+      let index = index as f64;
+      let d = self.divisions() as f64;
+      (start * (d - index) + end * index) / d
     } else {
-      0.
-    };
-    lerp(start, end, progress)
+      start
+    }
   }
 
   /// Get the width of the gap between each step.
@@ -182,7 +184,26 @@ where
     Iterator1D {
       steps: self,
       index: 0,
+      index_back: self.steps(),
     }
+  }
+}
+
+impl<T> IntoParallelIterator for Steps<T>
+where
+  T: Send
+    + Sync
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
+{
+  type Item = T;
+  type Iter = ParIterator1D<T>;
+
+  fn into_par_iter(self) -> Self::Iter {
+    ParIterator1D { steps: self }
   }
 }
 
@@ -190,6 +211,7 @@ where
 pub struct Iterator1D<T> {
   steps: Steps<T>,
   index: usize,
+  index_back: usize,
 }
 
 impl<T> Iterator for Iterator1D<T>
@@ -224,6 +246,109 @@ where
 {
   fn len(&self) -> usize {
     self.steps.len()
+  }
+}
+
+impl<T> DoubleEndedIterator for Iterator1D<T>
+where
+  T: std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
+{
+  fn next_back(&mut self) -> Option<Self::Item> {
+    if self.index_back == 0 {
+      return None;
+    }
+
+    self.index_back -= 1;
+    Some(self.steps.value(self.index_back))
+  }
+}
+
+pub struct ParIterator1D<T> {
+  steps: Steps<T>,
+}
+
+impl<T> rayon::iter::plumbing::Producer for ParIterator1D<T>
+where
+  T: Send
+    + Sync
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
+{
+  type Item = T;
+  type IntoIter = Iterator1D<T>;
+
+  fn into_iter(self) -> Self::IntoIter {
+    self.steps.into_iter()
+  }
+
+  fn split_at(self, index: usize) -> (Self, Self) {
+    let (start, end) = self.steps.range();
+    let s1 = self.steps.value(index - 1);
+    let s2 = self.steps.value(index);
+    (
+      ParIterator1D {
+        steps: Steps(start, s1, index),
+      },
+      ParIterator1D {
+        steps: Steps(s2, end, self.steps.steps() - index),
+      },
+    )
+  }
+}
+
+impl<T> rayon::iter::ParallelIterator for ParIterator1D<T>
+where
+  T: Send
+    + Sync
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
+{
+  type Item = T;
+
+  fn drive_unindexed<C>(self, consumer: C) -> C::Result
+  where
+    C: rayon::iter::plumbing::UnindexedConsumer<Self::Item>,
+  {
+    rayon::iter::plumbing::bridge(self, consumer)
+  }
+}
+
+impl<T> rayon::iter::IndexedParallelIterator for ParIterator1D<T>
+where
+  T: Send
+    + Sync
+    + std::ops::Mul<f64, Output = T>
+    + std::ops::Add<T, Output = T>
+    + std::ops::Div<f64, Output = T>
+    + std::ops::Sub<T, Output = T>
+    + Copy,
+{
+  fn len(&self) -> usize {
+    self.steps.steps()
+  }
+
+  fn drive<C>(self, consumer: C) -> C::Result
+  where
+    C: rayon::iter::plumbing::Consumer<Self::Item>,
+  {
+    rayon::iter::plumbing::bridge(self, consumer)
+  }
+
+  fn with_producer<CB: rayon::iter::plumbing::ProducerCallback<Self::Item>>(
+    self,
+    callback: CB,
+  ) -> CB::Output {
+    callback.callback(self)
   }
 }
 
@@ -596,5 +721,16 @@ mod tests {
       actual,
       expected
     );
+  }
+
+  #[test]
+  fn test_split_at() {
+    let s = Steps(0., 0.9, 10);
+    use rayon::iter::plumbing::Producer;
+    let (a, b) = ParIterator1D { steps: s }.split_at(5);
+    let a: Vec<f64> = a.into_iter().collect();
+    let b: Vec<f64> = b.into_iter().collect();
+    assert_eq!(a, vec![0., 0.1, 0.2, 0.30000000000000004, 0.4]);
+    assert_eq!(b, vec![0.5, 0.6, 0.7, 0.8, 0.9]);
   }
 }
