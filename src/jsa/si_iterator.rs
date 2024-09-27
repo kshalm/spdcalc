@@ -1,9 +1,10 @@
 //! Various iterators over the signal and idler in frequency/wavelength space
 //!
 use crate::{
-  utils::{frequency_to_vacuum_wavelength, vacuum_wavelength_to_frequency, Iterator2D, Steps2D},
+  utils::{frequency_to_vacuum_wavelength, vacuum_wavelength_to_frequency, Steps2D},
   Frequency, Wavelength,
 };
+use rayon::prelude::*;
 
 /// A range of signal and idler frequencies
 #[derive(Debug, Clone, Copy)]
@@ -79,11 +80,16 @@ impl From<SumDiffFrequencySpace> for FrequencySpace {
 
 pub trait IntoSignalIdlerIterator {
   fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)>;
+  fn into_signal_idler_par_iterator(self) -> impl ParallelIterator<Item = (Frequency, Frequency)>;
 }
 
 impl IntoSignalIdlerIterator for FrequencySpace {
   fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
     self.0.into_iter()
+  }
+
+  fn into_signal_idler_par_iterator(self) -> impl ParallelIterator<Item = (Frequency, Frequency)> {
+    self.0.into_par_iter()
   }
 }
 
@@ -179,36 +185,20 @@ impl From<FrequencySpace> for SumDiffFrequencySpace {
   }
 }
 
-pub struct SumDiffSIIterator(Iterator2D<Frequency>);
-
-impl Iterator for SumDiffSIIterator {
-  type Item = (Frequency, Frequency);
-  fn next(&mut self) -> Option<Self::Item> {
-    self.0.next().map(|(s, d)| {
+impl IntoSignalIdlerIterator for SumDiffFrequencySpace {
+  fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
+    self.0.into_iter().map(|(s, d)| {
       let w_s = s - d;
       let w_i = s + d;
       (w_s, w_i)
     })
   }
-}
 
-impl IntoSignalIdlerIterator for SumDiffFrequencySpace {
-  fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
-    SumDiffSIIterator(self.0.into_iter())
-  }
-}
-
-/// Iterator over wavelength space
-pub struct WavelengthSIIterator(Iterator2D<Wavelength>);
-
-impl Iterator for WavelengthSIIterator {
-  type Item = (Frequency, Frequency);
-  fn next(&mut self) -> Option<Self::Item> {
-    self.0.next().map(|(ls, li)| {
-      (
-        vacuum_wavelength_to_frequency(ls),
-        vacuum_wavelength_to_frequency(li),
-      )
+  fn into_signal_idler_par_iterator(self) -> impl ParallelIterator<Item = (Frequency, Frequency)> {
+    self.0.into_par_iter().map(|(s, d)| {
+      let w_s = s - d;
+      let w_i = s + d;
+      (w_s, w_i)
     })
   }
 }
@@ -281,7 +271,21 @@ impl From<SumDiffFrequencySpace> for WavelengthSpace {
 
 impl IntoSignalIdlerIterator for WavelengthSpace {
   fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
-    WavelengthSIIterator(self.0.into_iter())
+    self.0.into_iter().map(|(ls, li)| {
+      (
+        vacuum_wavelength_to_frequency(ls),
+        vacuum_wavelength_to_frequency(li),
+      )
+    })
+  }
+
+  fn into_signal_idler_par_iterator(self) -> impl ParallelIterator<Item = (Frequency, Frequency)> {
+    self.0.into_par_iter().map(|(ls, li)| {
+      (
+        vacuum_wavelength_to_frequency(ls),
+        vacuum_wavelength_to_frequency(li),
+      )
+    })
   }
 }
 
@@ -289,25 +293,33 @@ impl IntoSignalIdlerIterator for WavelengthSpace {
 #[derive(Debug, Clone)]
 pub struct SignalIdlerWavelengthArray(pub Vec<Wavelength>);
 
-pub struct SignalIdlerWavelengthArrayIterator(<Vec<Wavelength> as IntoIterator>::IntoIter);
-
-impl<'a> Iterator for SignalIdlerWavelengthArrayIterator {
-  type Item = (Frequency, Frequency);
-  fn next(&mut self) -> Option<Self::Item> {
-    if let (Some(ls), Some(li)) = (self.0.next(), self.0.next()) {
-      Some((
-        vacuum_wavelength_to_frequency(ls),
-        vacuum_wavelength_to_frequency(li),
-      ))
-    } else {
-      None
-    }
-  }
-}
-
 impl IntoSignalIdlerIterator for SignalIdlerWavelengthArray {
   fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
-    SignalIdlerWavelengthArrayIterator(self.0.into_iter())
+    let chunked = self
+      .0
+      .chunks_exact(2)
+      .map(|a| (a[0], a[1]))
+      .collect::<Vec<_>>();
+    chunked.into_iter().map(|(ls, li)| {
+      (
+        vacuum_wavelength_to_frequency(ls),
+        vacuum_wavelength_to_frequency(li),
+      )
+    })
+  }
+
+  fn into_signal_idler_par_iterator(self) -> impl ParallelIterator<Item = (Frequency, Frequency)> {
+    let chunked = self
+      .0
+      .chunks_exact(2)
+      .map(|a| (a[0], a[1]))
+      .collect::<Vec<_>>();
+    chunked.into_par_iter().map(|(ls, li)| {
+      (
+        vacuum_wavelength_to_frequency(ls),
+        vacuum_wavelength_to_frequency(li),
+      )
+    })
   }
 }
 
@@ -315,22 +327,23 @@ impl IntoSignalIdlerIterator for SignalIdlerWavelengthArray {
 #[derive(Debug, Clone)]
 pub struct SignalIdlerFrequencyArray(pub Vec<Frequency>);
 
-pub struct SignalIdlerFrequencyArrayIterator(<Vec<Frequency> as IntoIterator>::IntoIter);
-
-impl<'a> Iterator for SignalIdlerFrequencyArrayIterator {
-  type Item = (Frequency, Frequency);
-  fn next(&mut self) -> Option<Self::Item> {
-    if let (Some(ws), Some(wi)) = (self.0.next(), self.0.next()) {
-      Some((ws, wi))
-    } else {
-      None
-    }
-  }
-}
-
 impl IntoSignalIdlerIterator for SignalIdlerFrequencyArray {
   fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)> {
-    SignalIdlerFrequencyArrayIterator(self.0.into_iter())
+    let chunked = self
+      .0
+      .chunks_exact(2)
+      .map(|a| (a[0], a[1]))
+      .collect::<Vec<_>>();
+    chunked.into_iter()
+  }
+
+  fn into_signal_idler_par_iterator(self) -> impl ParallelIterator<Item = (Frequency, Frequency)> {
+    let chunked = self
+      .0
+      .chunks_exact(2)
+      .map(|a| (a[0], a[1]))
+      .collect::<Vec<_>>();
+    chunked.into_par_iter()
   }
 }
 

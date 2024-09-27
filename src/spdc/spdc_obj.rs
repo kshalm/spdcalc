@@ -10,6 +10,7 @@ use crate::{
 };
 use dim::ucum::{Hertz, MilliWatt, DEG};
 use na::Complex;
+use rayon::prelude::*;
 
 use super::PolingPeriod;
 
@@ -409,7 +410,7 @@ impl SPDC {
     let jsa_values = sp.jsa_range(ranges);
     let jsa_values_swapped: Vec<Complex<f64>> = ranges
       .as_steps()
-      .into_iter()
+      .into_par_iter()
       .map(|(ws, wi)| sp.jsa(wi, ws))
       .collect();
     super::hom_rate_series(ranges, &jsa_values, &jsa_values_swapped, time_delays)

@@ -11,7 +11,7 @@ use crate::JsiNorm;
 
 use super::*;
 
-type PropSetter = dyn Fn(&mut SPDC, f64);
+type PropSetter = dyn Fn(&mut SPDC, f64) + Send + Sync;
 
 fn get_setter(prop: String) -> Result<Box<PropSetter>, String> {
   Ok(match prop.as_str() {
@@ -103,7 +103,7 @@ fn get_setter(prop: String) -> Result<Box<PropSetter>, String> {
 pub struct SPDCIter {
   spdc: SPDC,
   setters: (Box<PropSetter>, Box<PropSetter>),
-  it2d: Iterator2D<f64>,
+  steps: Steps2D<f64>,
 }
 
 impl SPDCIter {
@@ -111,7 +111,7 @@ impl SPDCIter {
     Self {
       spdc,
       setters,
-      it2d: steps.into_iter(),
+      steps,
     }
   }
 
@@ -185,17 +185,20 @@ impl SPDCIter {
   }
 }
 
-impl Iterator for SPDCIter {
+impl IntoIterator for SPDCIter {
   type Item = SPDC;
+  type IntoIter = std::iter::Map<Iterator2D<f64>, Box<dyn FnMut((f64, f64)) -> SPDC>>;
 
-  fn next(&mut self) -> Option<Self::Item> {
-    let (setter1, setter2) = &self.setters;
-    let (v1, v2) = self.it2d.next()?;
+  fn into_iter(self) -> Self::IntoIter {
+    self.steps.into_iter().map(Box::new(move |(v1, v2)| {
+      let (setter1, setter2) = &self.setters;
+      let mut spdc = self.spdc.clone();
 
-    setter1(&mut self.spdc, v1);
-    setter2(&mut self.spdc, v2);
+      setter1(&mut spdc, v1);
+      setter2(&mut spdc, v2);
 
-    Some(self.spdc.clone())
+      spdc
+    }))
   }
 }
 

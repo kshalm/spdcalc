@@ -2,6 +2,7 @@ use crate::{
   math::Integrator, phasematch::*, Complex, Frequency, FrequencySpace, IntoSignalIdlerIterator,
   JSIUnits, JsiNorm, JsiSinglesNorm, PerMeter3, PerMeter4, SPDCError, SPDC,
 };
+use rayon::prelude::*;
 
 // This defines a more than reasonable box around frequency ranges to...
 // 1. speed up calculations
@@ -133,7 +134,7 @@ impl JointSpectrum {
   /// Get the JSA over a specified range of signal/idler frequencies
   pub fn jsa_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<Complex<f64>> {
     range
-      .into_signal_idler_iterator()
+      .into_signal_idler_par_iterator()
       .map(|(ws, wi)| self.jsa(ws, wi))
       .collect()
   }
@@ -148,7 +149,7 @@ impl JointSpectrum {
   /// Get the normalized value of the JSA at specified signal/idler frequencies
   pub fn jsa_normalized_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<Complex<f64>> {
     range
-      .into_signal_idler_iterator()
+      .into_signal_idler_par_iterator()
       .map(|(ws, wi)| self.jsa_normalized(ws, wi))
       .collect()
   }
@@ -171,7 +172,7 @@ impl JointSpectrum {
   /// Get the JSI over a specified range of signal/idler frequencies
   pub fn jsi_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<JSIUnits<f64>> {
     range
-      .into_signal_idler_iterator()
+      .into_signal_idler_par_iterator()
       .map(|(ws, wi)| self.jsi(ws, wi))
       .collect()
   }
@@ -186,7 +187,7 @@ impl JointSpectrum {
   /// Get the normalized value of the JSI at specified signal/idler frequencies
   pub fn jsi_normalized_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<f64> {
     range
-      .into_signal_idler_iterator()
+      .into_signal_idler_par_iterator()
       .map(|(ws, wi)| self.jsi_normalized(ws, wi))
       .collect()
   }
@@ -207,7 +208,7 @@ impl JointSpectrum {
   // /// Get the JSA Singles over a specified range of signal/idler frequencies
   // pub fn jsa_singles_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<f64> {
   //   range
-  //     .into_signal_idler_iterator()
+  //     .into_signal_idler_par_iterator()
   //     .map(|(ws, wi)| self.jsa_singles(ws, wi))
   //     .collect()
   // }
@@ -222,7 +223,7 @@ impl JointSpectrum {
   // /// Get the normalized value of the JSA Singles at specified signal/idler frequencies
   // pub fn jsa_singles_normalized_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<f64> {
   //   range
-  //     .into_signal_idler_iterator()
+  //     .into_signal_idler_par_iterator()
   //     .map(|(ws, wi)| self.jsa_singles_normalized(ws, wi))
   //     .collect()
   // }
@@ -244,7 +245,7 @@ impl JointSpectrum {
   /// Get the JSI Singles over a specified range of signal/idler frequencies
   pub fn jsi_singles_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<JSIUnits<f64>> {
     range
-      .into_signal_idler_iterator()
+      .into_signal_idler_par_iterator()
       .map(|(ws, wi)| self.jsi_singles(ws, wi))
       .collect()
   }
@@ -257,7 +258,7 @@ impl JointSpectrum {
     let swapped = self.spdc.clone().with_swapped_signal_idler();
     let idler_spectrum = Self::new(swapped, self.integrator);
     range
-      .into_signal_idler_iterator()
+      .into_signal_idler_par_iterator()
       .map(|(ws, wi)| idler_spectrum.jsi_singles(wi, ws))
       .collect()
   }
@@ -272,7 +273,7 @@ impl JointSpectrum {
   /// Get the normalized value of the JSI Singles at specified signal/idler frequencies
   pub fn jsi_singles_normalized_range<T: IntoSignalIdlerIterator>(&self, range: T) -> Vec<f64> {
     range
-      .into_signal_idler_iterator()
+      .into_signal_idler_par_iterator()
       .map(|(ws, wi)| self.jsi_singles_normalized(ws, wi))
       .collect()
   }
@@ -285,7 +286,7 @@ impl JointSpectrum {
     let swapped = self.spdc.clone().with_swapped_signal_idler();
     let idler_spectrum = Self::new(swapped, self.integrator);
     range
-      .into_signal_idler_iterator()
+      .into_signal_idler_par_iterator()
       .map(|(ws, wi)| idler_spectrum.jsi_singles_normalized(wi, ws))
       .collect()
   }
