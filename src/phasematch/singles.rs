@@ -21,7 +21,7 @@ pub fn phasematch_singles_fiber_coupling(
   let phi_s = spdc.signal.phi();
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
 
-  let Ws_SQ = spdc.signal.waist().x_by_y_sqr();
+  let Ws_SQ = spdc.signal.waist().x_by_y();
 
   let Wx_SQ = sq(spdc.pump.waist().x);
   let Wy_SQ = sq(spdc.pump.waist().y);

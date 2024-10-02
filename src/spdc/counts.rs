@@ -5,6 +5,7 @@ use crate::{math::sq, PeriodicPoling};
 use dim::ucum::Hertz;
 use rayon::prelude::*;
 
+// TODO: Check if we should still use this
 /// Get the correction factor for the counts
 ///
 /// ref: <https://iopscience.iop.org/article/10.1088/2040-8986/ab05a8/pdf>

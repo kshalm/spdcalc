@@ -10,6 +10,7 @@ use core::f64::consts::PI;
 
 const IMPOSSIBLE_POLING_PERIOD: &str = "Could not determine poling period from specified values";
 
+/// Units for the poling period (meters)
 pub type PolingPeriod = Meter<f64>;
 
 /// Apodization for periodic poling

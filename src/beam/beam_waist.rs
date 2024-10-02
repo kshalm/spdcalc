@@ -1,4 +1,4 @@
-use dim::ucum::{Meter2, M};
+use dim::ucum::Meter2;
 
 use crate::Wavelength;
 
@@ -26,10 +26,15 @@ impl BeamWaist {
     Self { x: wx, y: wx }
   }
 
+  /// Create a new elliptic beam waist
+  ///
+  /// Note elliptic beams are not supported in the calculations yet.
+  #[cfg(feature = "elliptic")]
   pub fn new_elliptic(wx: Wavelength, wy: Wavelength) -> Self {
     Self { x: wx, y: wy }
   }
 
+  #[cfg(feature = "elliptic")]
   pub fn ellipticity(&self) -> f64 {
     if self.x == self.y {
       1.
@@ -40,16 +45,7 @@ impl BeamWaist {
     }
   }
 
-  #[deprecated(note = "Use x_by_y instead")]
-  pub fn x_by_y(&self) -> Wavelength {
-    if self.x == self.y {
-      self.x
-    } else {
-      (self.x_by_y_sqr() / Meter2::new(1.)).sqrt() * M
-    }
-  }
-
-  pub fn x_by_y_sqr(&self) -> Meter2<f64> {
+  pub fn x_by_y(&self) -> Meter2<f64> {
     self.x * self.y
   }
 }
@@ -60,6 +56,7 @@ impl From<Wavelength> for BeamWaist {
   }
 }
 
+#[cfg(feature = "elliptic")]
 impl From<(Wavelength, Wavelength)> for BeamWaist {
   fn from(wxwy: (Wavelength, Wavelength)) -> Self {
     Self::new_elliptic(wxwy.0, wxwy.1)

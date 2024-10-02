@@ -24,7 +24,7 @@ fn common_norm(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC) -> CommonNor
   let pump_power = spdc.pump_average_power;
   let deff = spdc.deff;
 
-  let wp_sq = spdc.pump.waist().x_by_y_sqr();
+  let wp_sq = spdc.pump.waist().x_by_y();
 
   let n_s = spdc.signal.refractive_index(omega_s, &spdc.crystal_setup);
   let n_i = spdc.idler.refractive_index(omega_i, &spdc.crystal_setup);
@@ -51,8 +51,8 @@ pub fn jsi_normalization(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC) ->
   let sec_i = sec(theta_i_e);
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
   let sec_s = sec(theta_s_e);
-  let ws_sq = spdc.signal.waist().x_by_y_sqr();
-  let wi_sq = spdc.idler.waist().x_by_y_sqr();
+  let ws_sq = spdc.signal.waist().x_by_y();
+  let wi_sq = spdc.idler.waist().x_by_y();
 
   let chi = common_norm(omega_s, omega_i, spdc);
 
@@ -69,7 +69,7 @@ pub fn jsi_singles_normalization(
 ) -> JsiSinglesNorm<f64> {
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
   let sec_s = sec(theta_s_e);
-  let ws_sq = spdc.signal.waist().x_by_y_sqr();
+  let ws_sq = spdc.signal.waist().x_by_y();
 
   let chi = common_norm(omega_s, omega_i, spdc);
 

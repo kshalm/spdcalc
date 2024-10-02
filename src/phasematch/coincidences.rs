@@ -38,6 +38,7 @@ pub fn phasematch_sinc(
   PerMeter4::new(pmz * pmt)
 }
 
+/// Get the phasematching function integrand for a given setup at given frequencies
 #[allow(non_snake_case)]
 pub fn get_pm_integrand<'a>(
   omega_s: Frequency,
@@ -53,8 +54,8 @@ pub fn get_pm_integrand<'a>(
   let theta_s_e = spdc.signal.theta_external(&spdc.crystal_setup);
   let theta_i_e = spdc.idler.theta_external(&spdc.crystal_setup);
 
-  let Ws_SQ = spdc.signal.waist().x_by_y_sqr();
-  let Wi_SQ = spdc.idler.waist().x_by_y_sqr();
+  let Ws_SQ = spdc.signal.waist().x_by_y();
+  let Wi_SQ = spdc.idler.waist().x_by_y();
 
   let Wx_SQ = sq(spdc.pump.waist().x);
   let Wy_SQ = sq(spdc.pump.waist().y);
@@ -309,8 +310,8 @@ pub fn phasematch_fiber_coupling2(
   let theta_s_e = sign_s * spdc.signal.theta_external(&spdc.crystal_setup);
   let theta_i_e = sign_i * spdc.idler.theta_external(&spdc.crystal_setup);
 
-  let Ws_SQ = spdc.signal.waist().x_by_y_sqr();
-  let Wi_SQ = spdc.idler.waist().x_by_y_sqr();
+  let Ws_SQ = spdc.signal.waist().x_by_y();
+  let Wi_SQ = spdc.idler.waist().x_by_y();
 
   let Wx_SQ = sq(spdc.pump.waist().x);
   let Wy_SQ = sq(spdc.pump.waist().y);
@@ -534,8 +535,8 @@ fn phasematch_fiber_coupling_v3(
   let d_s = half_L * tan(theta_s) * sin(phi_s);
   let d_i = half_L * tan(theta_i) * sin(phi_i);
 
-  let Ws_SQ = spdc.signal.waist().x_by_y_sqr();
-  let Wi_SQ = spdc.idler.waist().x_by_y_sqr();
+  let Ws_SQ = spdc.signal.waist().x_by_y();
+  let Wi_SQ = spdc.idler.waist().x_by_y();
 
   let Wx_SQ = sq(spdc.pump.waist().x);
   let Wy_SQ = sq(spdc.pump.waist().y);

@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use dim::f64prefixes::*;
 use dim::ucum::*;
 
@@ -100,6 +102,28 @@ fn get_setter(prop: String) -> Result<Box<PropSetter>, String> {
   })
 }
 
+/// A helper to iterate over SPDC setups by varying two properties
+///
+/// Useful for creating phasematching curves.
+///
+/// # Example
+///
+/// ```
+/// use spdcalc::prelude::*;
+///
+/// let spdc = SPDC::default();
+/// let iter = SPDCIter::try_new(
+///   spdc,
+///   "periodic_poling.poling_period_um",
+///   "crystal.theta_deg",
+///   Steps2D((30., 50., 10).into(), (80., 100., 10).into()),
+/// )
+/// .unwrap();
+///
+/// let histogram_values = iter.jsi_values(Integrator::default());
+///
+/// ```
+///
 pub struct SPDCIter {
   spdc: SPDC,
   setters: (Box<PropSetter>, Box<PropSetter>),
@@ -107,6 +131,9 @@ pub struct SPDCIter {
 }
 
 impl SPDCIter {
+  /// Create a new SPDCIter from raw setter functions.
+  ///
+  /// It is nicer to use `try_new` instead.
   pub fn new(spdc: SPDC, setters: (Box<PropSetter>, Box<PropSetter>), steps: Steps2D<f64>) -> Self {
     Self {
       spdc,
@@ -115,19 +142,39 @@ impl SPDCIter {
     }
   }
 
-  pub fn try_new(
+  /// Create a new SPDCIter from property paths.
+  ///
+  /// Paths are based on `SPDCConfig` paths, IE: JSON configuration paths.
+  ///
+  /// # Example
+  /// ```
+  /// use spdcalc::prelude::*;
+  ///
+  /// let spdc = SPDC::default();
+  /// let iter = SPDCIter::try_new(
+  ///   spdc,
+  ///   "signal.waist_um",
+  ///   "deff_pm_per_volt",
+  ///   Steps2D((30., 50., 10).into(), (80., 100., 10).into()),
+  /// ).unwrap();
+  /// ```
+  pub fn try_new<S: Display>(
     spdc: SPDC,
-    prop1: String,
-    prop2: String,
+    prop1: S,
+    prop2: S,
     steps: Steps2D<f64>,
   ) -> Result<Self, String> {
     Ok(Self::new(
       spdc,
-      (get_setter(prop1)?, get_setter(prop2)?),
+      (
+        get_setter(prop1.to_string())?,
+        get_setter(prop2.to_string())?,
+      ),
       steps,
     ))
   }
 
+  /// Get the raw jsi values at signal/idler center frequencies for each SPDC setup.
   pub fn jsi_values(self, integrator: Integrator) -> Vec<f64> {
     self
       .into_iter()
@@ -151,6 +198,7 @@ impl SPDCIter {
       .collect()
   }
 
+  /// Get the normalized (to optimum setup) jsi values at signal/idler center frequencies for each SPDC setup.
   pub fn jsi_values_normalized(self, integrator: Integrator) -> Vec<f64> {
     let opt = self.spdc.clone().try_as_optimum().unwrap();
     let jsi_center = jsa_raw(
@@ -199,26 +247,5 @@ impl IntoIterator for SPDCIter {
 
       spdc
     }))
-  }
-}
-
-#[cfg(test)]
-mod test {
-  use super::*;
-
-  #[test]
-  fn test_spdc_iter() {
-    let spdc = SPDC::default();
-    let iter = SPDCIter::try_new(
-      spdc,
-      "signal.theta_external_deg".to_string(),
-      "signal.theta_external_deg".to_string(),
-      Steps2D((0., 1., 10).into(), (0., 1., 10).into()),
-    )
-    .unwrap();
-
-    for spdc in iter {
-      println!("{:?}", spdc.signal.theta_external(&spdc.crystal_setup));
-    }
   }
 }

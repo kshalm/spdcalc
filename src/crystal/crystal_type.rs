@@ -1,10 +1,10 @@
 use super::*;
 use crate::SPDCError;
-use dim::ucum::{Kelvin, K, M};
 use dim::f64prefixes::MICRO;
-use utils::from_celsius_to_kelvin;
+use dim::ucum::{Kelvin, K, M};
 use std::fmt;
 use std::str::FromStr;
+use utils::from_celsius_to_kelvin;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -62,9 +62,41 @@ impl FromStr for CrystalType {
 }
 
 impl CrystalType {
-  /// Get the crystal from its id string.
+  /// Get the crystal from its id string or expression
   ///
-  /// useful for external language bindings and serialization
+  /// To create a crystal from an expression, use either a JSON (or HJSON) string,
+  /// or an equation string. Expressions for biaxial crystals should have properties
+  /// `nx`, `ny`, and `nz`, while uniaxial crystals should have `no` and `ne`.
+  ///
+  /// The JSON string should be of the form:
+  ///
+  /// ```
+  /// use spdcalc::prelude::*;
+  /// // BBO
+  /// // no2=2.7359+0.01878/(λ2-0.01822)-0.01354λ2
+  /// // ne2=2.3753+0.01224/(λ2-0.01667)-0.01516λ2
+  /// // dno/dT = -9.3 x 10-6/°C
+  /// // dne/dT = -16.6 x 10-6/°C
+  ///
+  /// let json = r#"
+  /// {
+  ///   "no": "sqrt(2.7359+0.01878/(l^2-0.01822)-0.01354*l^2) - 9.3e-6 * T",
+  ///   "ne": "sqrt(2.3753+0.01224/(l^2-0.01667)-0.01516*l^2) - 16.6e-6 * T"
+  /// }
+  /// "#;
+  /// let crystal = CrystalType::from_string(json).unwrap();
+  /// ```
+  ///
+  /// The equation string should be of the form:
+  ///
+  /// ```
+  /// use spdcalc::prelude::*;
+  /// let expr = r#"
+  ///   no = sqrt(2.7359+0.01878/(l^2-0.01822)-0.01354*l^2) - 9.3e-6 * T
+  ///   ne = sqrt(2.3753+0.01224/(l^2-0.01667)-0.01516*l^2) - 16.6e-6 * T
+  /// "#;
+  /// let crystal = CrystalType::from_string(expr).unwrap();
+  /// ```
   pub fn from_string(id: &str) -> Result<Self, SPDCError> {
     match id {
       "BBO_1" => Ok(CrystalType::BBO_1),
@@ -84,7 +116,9 @@ impl CrystalType {
         if !s.trim().starts_with("{") {
           s = format!("{{{}}}", s);
         }
-        Ok(CrystalType::Expr(deser_hjson::from_str(&s).map_err(|e| SPDCError(e.to_string()))?))
+        Ok(CrystalType::Expr(
+          deser_hjson::from_str(&s).map_err(|e| SPDCError(e.to_string()))?,
+        ))
       }
     }
   }
@@ -139,14 +173,22 @@ impl CrystalType {
         ctx.var("T", *((temperature - from_celsius_to_kelvin(20.0)) / K));
         match expr {
           CrystalExpr::Uniaxial { no, ne } => {
-            let no = no.clone().bind_with_context(ctx.clone(), "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
-            let ne = ne.clone().bind_with_context(ctx, "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
+            let no = no.clone().bind_with_context(ctx.clone(), "l").unwrap()(
+              *(vacuum_wavelength / (MICRO * M)),
+            );
+            let ne =
+              ne.clone().bind_with_context(ctx, "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
             Indices::new(na::Vector3::new(no, no, ne))
           }
           CrystalExpr::Biaxial { nx, ny, nz } => {
-            let nx = nx.clone().bind_with_context(ctx.clone(), "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
-            let ny = ny.clone().bind_with_context(ctx.clone(), "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
-            let nz = nz.clone().bind_with_context(ctx, "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
+            let nx = nx.clone().bind_with_context(ctx.clone(), "l").unwrap()(
+              *(vacuum_wavelength / (MICRO * M)),
+            );
+            let ny = ny.clone().bind_with_context(ctx.clone(), "l").unwrap()(
+              *(vacuum_wavelength / (MICRO * M)),
+            );
+            let nz =
+              nz.clone().bind_with_context(ctx, "l").unwrap()(*(vacuum_wavelength / (MICRO * M)));
             Indices::new(na::Vector3::new(nx, ny, nz))
           }
         }
@@ -169,17 +211,15 @@ impl CrystalType {
       CrystalType::LiIO3_1 => liio3_1::LiIO3_1.get_meta(),
       CrystalType::AgGaS2_1 => aggas2_1::AgGaS2_1.get_meta(),
       // CrystalType::Sellmeier(crystal) => crystal.get_meta(),
-      CrystalType::Expr(_) => {
-        CrystalMeta {
-          id: "Expr",
-          name: "Expr",
-          reference_url: "Expr",
-          axis_type: OpticAxisType::PositiveUniaxial,
-          point_group: PointGroup::HM_mm2,
-          transmission_range: None,
-          temperature_dependence_known: false,
-        }
-      }
+      CrystalType::Expr(_) => CrystalMeta {
+        id: "Expr",
+        name: "Expr",
+        reference_url: "Expr",
+        axis_type: OpticAxisType::PositiveUniaxial,
+        point_group: PointGroup::HM_mm2,
+        transmission_range: None,
+        temperature_dependence_known: false,
+      },
     }
   }
 }
@@ -212,8 +252,8 @@ mod pyo3_impls {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use dim::ucum::M;
   use dim::f64prefixes::NANO;
+  use dim::ucum::M;
 
   #[test]
   fn test_crystal_ids() {
@@ -236,10 +276,13 @@ mod tests {
     }"#;
 
     let crystal: CrystalType = serde_json::from_str(expr).unwrap();
-    let other = CrystalType::from_string(r#"
+    let other = CrystalType::from_string(
+      r#"
       no = sqrt(2.7359+0.01878/(l^2-0.01822)-0.01354*l^2) - 9.3e-6 * T
       ne = sqrt(2.3753+0.01224/(l^2-0.01667)-0.01516*l^2) - 16.6e-6 * T
-    "#).unwrap();
+    "#,
+    )
+    .unwrap();
 
     assert_eq!(crystal, other);
 

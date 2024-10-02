@@ -40,6 +40,7 @@ impl PMType {
     }
   }
 
+  /// Polarization type of the pump
   pub fn pump_polarization(&self) -> PolarizationType {
     match self {
       PMType::Type0_o_oo => PolarizationType::Ordinary,
@@ -49,6 +50,7 @@ impl PMType {
     }
   }
 
+  /// Polarization type of the signal
   pub fn signal_polarization(&self) -> PolarizationType {
     match self {
       PMType::Type0_e_ee | PMType::Type2_e_eo => PolarizationType::Extraordinary,
@@ -56,6 +58,7 @@ impl PMType {
     }
   }
 
+  /// Polarization type of the idler
   pub fn idler_polarization(&self) -> PolarizationType {
     match self {
       PMType::Type2_e_oe | PMType::Type0_e_ee => PolarizationType::Extraordinary,

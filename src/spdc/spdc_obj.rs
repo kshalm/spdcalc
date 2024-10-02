@@ -18,6 +18,52 @@ use super::PolingPeriod;
 ///
 /// This is the core of the api. This holds all information about the experimental setup.
 /// Interact with this object to calculate joint spectrum, rates, efficiencies, schmidt number, etc.
+///
+/// Generally it is easier to either create a default SPDC object and modify it
+/// or deserialize from serde.
+///
+/// # Example
+///
+/// ```
+/// use spdcalc::prelude::*;
+///
+/// let mut spdc = SPDC::default();
+/// spdc.crystal_setup.phi = 1. * DEG;
+///
+/// // or
+///
+/// let config = r#"
+/// {
+///   "crystal": {
+///     "kind": "KTP",
+///     "pm_type": "e->eo",
+///     "phi_deg": 0,
+///     "theta_deg": 90,
+///     "length_um": 14000,
+///     "temperature_c": 20
+///   },
+///   "pump": {
+///     "wavelength_nm": 775,
+///     "waist_um": 200,
+///     "bandwidth_nm": 0.5,
+///     "average_power_mw": 300
+///   },
+///   "signal": {
+///     "wavelength_nm": 1550,
+///     "phi_deg": 0,
+///     "theta_external_deg": 0,
+///     "waist_um": 100,
+///     "waist_position_um": "auto"
+///   },
+///   "idler": "auto",
+///   "periodic_poling": {
+///     "poling_period_um": "auto"
+///   },
+///   "deff_pm_per_volt": 7.6
+/// }
+/// "#;
+/// let spdc = SPDC::from_json(config).expect("Could not parse json");
+/// ```
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(try_from = "crate::SPDCConfig", into = "crate::SPDCConfig")]
 pub struct SPDC {
@@ -81,10 +127,12 @@ impl SPDC {
     }
   }
 
+  /// Get this SPDC object as a config object
   pub fn as_config(self) -> crate::SPDCConfig {
     crate::SPDCConfig::from(self)
   }
 
+  /// Create a new SPDC object from a config object as a JSON string
   pub fn from_json<S: ToString>(json: S) -> Result<Self, serde_json::Error> {
     let json = json.to_string();
     let spdc = serde_json::from_str::<SPDC>(&json)?;
@@ -398,7 +446,7 @@ impl SPDC {
     super::hom_visibility(self, ranges.into(), integrator)
   }
 
-  /// get the HOM rate for specified time delays
+  /// get the Hong Ou Mandel interference rate for specified time delays
   pub fn hom_rate_series<R: Into<FrequencySpace>, T: IntoIterator<Item = Time>>(
     &self,
     time_delays: T,

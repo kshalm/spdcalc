@@ -729,6 +729,7 @@ where
   }
 }
 
+/// Transpose a 2D matrix represented as a 1D vector.
 pub fn transpose_vec<T: Clone>(vec: Vec<T>, num_cols: usize) -> Vec<T> {
   // use swap to transpose in place
   let mut vec = vec;

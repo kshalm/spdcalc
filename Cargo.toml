@@ -43,6 +43,7 @@ rayon = "1.10"
 default = []
 wasm-bindgen = ["argmin/wasm-bindgen"]
 pyo3 = ["dep:pyo3"]
+elliptic = []
 
 [dev-dependencies]
 criterion = "0.5"
