@@ -64,35 +64,30 @@ impl CrystalSetup {
       n_inv2.x * n_inv2.y,
     );
 
-    let sign = match polarization {
-      // fast
-      PolarizationType::Ordinary => Sign::NEGATIVE,
-      // slow
-      PolarizationType::Extraordinary => Sign::POSITIVE,
-    };
-
     // Equation (11)
     // x² + bx + c = 0
     let b = s_squared.dot(&sum_recip);
     let c = s_squared.dot(&prod_recip);
 
-    let d = b * b - 4.0 * c;
-    let n = if d < 0. {
-      // this means the index is imaginary => decay
-      // return the real part of the index, which is zero
-      0.
-    } else {
-      // TODO: solving quadratic formula this way can have floating point errors
-      let denom = b + sign * d.sqrt();
-      if denom < 0. {
-        // again... imaginary solution
-        0.
-      } else {
-        (2.0 / denom).sqrt()
+    let invxsq = match roots::find_roots_quadratic(1., b, c) {
+      roots::Roots::One([n]) => -n,
+      // n1 is < n2
+      roots::Roots::Two([n1, n2]) => {
+        match polarization {
+          // fast
+          PolarizationType::Ordinary => -n2,
+          // slow
+          PolarizationType::Extraordinary => -n1,
+        }
       }
+      _ => return RIndex::new(0.), // imaginary index
     };
 
-    RIndex::new(n)
+    if invxsq < 0. {
+      RIndex::new(0.)
+    } else {
+      RIndex::new(1. / invxsq.sqrt())
+    }
   }
 
   /// calculate the optimal crystal theta
@@ -188,6 +183,31 @@ mod test {
     );
 
     assert_eq!(n, Unitless::new(1.6017685463810718));
+  }
+
+  #[test]
+  fn index_along_angle_test() {
+    let mut spdc = SPDC::default();
+    spdc.crystal_setup.phi = Angle::new(0.);
+    spdc.crystal_setup.theta = Angle::new(0.1);
+    spdc.crystal_setup.crystal = CrystalType::KTP;
+    spdc.signal.set_angles(0. * DEG, 5. * DEG);
+    let no = spdc.crystal_setup.index_along(
+      spdc.signal.vacuum_wavelength(),
+      spdc.signal.direction(),
+      PolarizationType::Ordinary,
+    );
+    let ne = spdc.crystal_setup.index_along(
+      spdc.signal.vacuum_wavelength(),
+      spdc.signal.direction(),
+      PolarizationType::Extraordinary,
+    );
+
+    let actual = (*no, *ne);
+    let expected = (1.7340844750789677, 1.7319709938216157);
+
+    assert_nearly_equal!("index_along_angle no", actual.0, expected.0, 1e-12);
+    assert_nearly_equal!("index_along_angle ne", actual.1, expected.1, 1e-12);
   }
 
   #[test]
