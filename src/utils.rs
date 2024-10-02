@@ -729,17 +729,19 @@ where
   }
 }
 
-// TODO: could probably make this better with smart use of splice
 pub fn transpose_vec<T: Clone>(vec: Vec<T>, num_cols: usize) -> Vec<T> {
+  // use swap to transpose in place
+  let mut vec = vec;
   let len = vec.len();
-  let num_rows = len / num_cols;
-  (0..len)
-    .map(|index| {
-      let (c, r) = get_2d_indices(index, num_cols);
-      let other = get_1d_index(r, c, num_rows);
-      vec[other].clone()
-    })
-    .collect()
+  let num_rows = len.div_ceil(num_cols);
+  for row in 0..num_rows {
+    for col in (row + 1)..num_cols {
+      let index1 = get_1d_index(row, col, num_cols);
+      let index2 = get_1d_index(col, row, num_cols);
+      vec.swap(index1, index2);
+    }
+  }
+  vec
 }
 
 #[cfg(test)]
@@ -822,6 +824,14 @@ mod tests {
   fn transpose_test() {
     let actual: Vec<f64> = transpose_vec(Steps(1., 4., 4).into_iter().collect(), 2);
     let expected = vec![1., 3., 2., 4.];
+    assert_eq!(actual, expected);
+
+    let actual = transpose_vec(
+      vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+      4,
+    );
+    let expected = vec![1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16];
+
     assert_eq!(actual, expected);
   }
 
