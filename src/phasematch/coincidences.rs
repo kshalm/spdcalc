@@ -46,15 +46,6 @@ pub fn get_pm_integrand<'a>(
 ) -> impl Fn(f64) -> Complex<f64> + 'a {
   let L = spdc.crystal_setup.length;
 
-  // TODO: ask krister. does this work to filter out lobes?
-  // let delk = *(spdc_setup.calc_delta_k() / J / S);
-  // let arg = *(L * 0.5 * delk.z / M);
-  // let limit = 10. * TWO_PI;
-
-  // if arg > limit || arg < -limit {
-  //   return (Complex::new(0., 0.), 1.);
-  // }
-
   let phi_s = spdc.signal.phi();
   let phi_i = spdc.idler.phi();
   let theta_s = spdc.signal.theta_internal();
@@ -302,15 +293,6 @@ pub fn phasematch_fiber_coupling2(
   let L = spdc.crystal_setup.length;
   let half_L = L * 0.5;
 
-  // TODO: ask krister. does this work to filter out lobes?
-  // let delk = *(spdc_setup.calc_delta_k() / J / S);
-  // let arg = *(L * 0.5 * delk.z / M);
-  // let limit = 10. * TWO_PI;
-
-  // if arg > limit || arg < -limit {
-  //   return (Complex::new(0., 0.), 1.);
-  // }
-
   let phi_s = spdc.signal.phi();
   let phi_i = spdc.idler.phi();
 
@@ -349,7 +331,6 @@ pub fn phasematch_fiber_coupling2(
   let TAN_THETA_s_e = tan(theta_s_e);
   let TAN_THETA_i_e = tan(theta_i_e);
 
-  // TODO: Should i be doing this?
   let omega_p = omega_s + omega_i; // spdc.pump.frequency();
 
   let n_p = spdc.pump.refractive_index(omega_p, &spdc.crystal_setup);

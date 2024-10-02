@@ -47,7 +47,6 @@ pub fn phasematch_singles_fiber_coupling(
   let z0s = spdc.signal_waist_position;
 
   // Height of the collected spots from the z axis.
-  // TODO: check
   let hs = L * 0.5 * tan(theta_s) * cos(phi_s);
   // let hi = L * 0.5 * tan(theta_i) * cos(phi_i);
 
@@ -90,7 +89,7 @@ pub fn phasematch_singles_fiber_coupling(
   let fn_z = |z1: f64, z2: f64| {
     let B0 = z1 - z2;
 
-    // TODO: krister broke this out of the integral so that repeat calculations didn't happen
+    // krister broke this out of the integral so that repeat calculations didn't happen
     // over z1. Might not be necessary though.
     let A1 = 2. * z0 - L * z1;
     let B1 = 1. - z1;
@@ -169,7 +168,6 @@ pub fn phasematch_singles_fiber_coupling(
 
     // Take into account apodized crystals
     // Apodization 1/e^2
-    // @TODO: From krister: Not sure how to correctly handle the apodization in the double length integral
     let pmzcoeff = spdc.pp.integration_constant(z1, L) * spdc.pp.integration_constant(z2, L);
 
     // Now calculate the full term in the integral.

@@ -373,7 +373,6 @@ where
 /// ```
 #[derive(Debug, Copy, Clone, Hash, Serialize, Deserialize)]
 pub struct Steps2D<T>(pub (T, T, usize), pub (T, T, usize));
-// TODO: convert to use Steps
 
 impl<T> Steps2D<T>
 where
@@ -417,7 +416,6 @@ where
 
   /// Get the value at the given index
   pub fn value(&self, index: usize) -> (T, T) {
-    // TODO: can optimize
     let cols = self.0 .2;
     let rows = self.1 .2;
     let (nx, ny) = get_2d_indices(index, cols);
