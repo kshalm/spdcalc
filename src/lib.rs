@@ -39,8 +39,8 @@
 //! or similar.
 //!
 //! ```
-//! use serde::json;
-//! use spdcalc::SPDCConfig;
+//! use serde_json::json;
+//! use spdcalc::prelude::*;
 //!
 //! let json = serde_json::json!({
 //!   "crystal": {
@@ -76,13 +76,12 @@
 //!
 //! // Now you can use the spdc instance to calculate things like the jsa
 //!
-//! use spdcalc::dim::ucum::M;
 //! let range = WavelengthSpace::new(
 //!   (1400e-9 * M, 1600e-9 * M, 100),
 //!   (1400e-9 * M, 1600e-9 * M, 100)
 //! );
-//! let spectrum = spdc.joint_spectrum(None);
-//! let resuts = spectrum.jsa_range(range);
+//! let spectrum = spdc.joint_spectrum(Integrator::default());
+//! let results = spectrum.jsa_range(range);
 //! ```
 
 #[macro_use]
@@ -123,3 +122,5 @@ pub use jsa::*;
 #[cfg(test)]
 #[macro_use]
 extern crate float_cmp;
+
+pub mod prelude;

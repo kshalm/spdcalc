@@ -80,9 +80,10 @@ impl FromStr for PMType {
   /// "o-oo" -> Type0_o_oo
   /// "Type2 e eo" -> Type2_e_eo
   /// "type 2 e->eo" -> Type2_e_eo
+  ///
   /// # Examples
   /// ```
-  /// use spdcalc::{PMType};
+  /// use spdcalc::prelude::*;
   /// use std::str::FromStr;
   /// assert_eq!(PMType::from_str("ooo").unwrap(), PMType::Type0_o_oo);
   /// assert_eq!(PMType::from_str("o-oo").unwrap(), PMType::Type0_o_oo);
@@ -94,11 +95,16 @@ impl FromStr for PMType {
     use lazy_static::lazy_static;
     use regex::Regex;
     lazy_static! {
-      static ref type0_o_oo: Regex = Regex::new(r"(?i)^(type\s*0)?[\s_]*(o).{0,2}(o)(o)$").unwrap();
-      static ref type0_e_ee: Regex = Regex::new(r"(?i)^(type\s*0)?[\s_]*(e).{0,2}(e)(e)$").unwrap();
-      static ref type1_e_oo: Regex = Regex::new(r"(?i)^(type\s*1)?[\s_]*(e).{0,2}(o)(o)$").unwrap();
-      static ref type2_e_eo: Regex = Regex::new(r"(?i)^(type\s*2)?[\s_]*(e).{0,2}(e)(o)$").unwrap();
-      static ref type2_e_oe: Regex = Regex::new(r"(?i)^(type\s*2)?[\s_]*(e).{0,2}(o)(e)$").unwrap();
+      static ref type0_o_oo: Regex =
+        Regex::new(r"(?i)^(type((\s*)|_?)0)?[\s_]*(o).{0,2}(o)(o)$").unwrap();
+      static ref type0_e_ee: Regex =
+        Regex::new(r"(?i)^(type((\s*)|_?)0)?[\s_]*(e).{0,2}(e)(e)$").unwrap();
+      static ref type1_e_oo: Regex =
+        Regex::new(r"(?i)^(type((\s*)|_?)1)?[\s_]*(e).{0,2}(o)(o)$").unwrap();
+      static ref type2_e_eo: Regex =
+        Regex::new(r"(?i)^(type((\s*)|_?)2)?[\s_]*(e).{0,2}(e)(o)$").unwrap();
+      static ref type2_e_oe: Regex =
+        Regex::new(r"(?i)^(type((\s*)|_?)2)?[\s_]*(e).{0,2}(o)(e)$").unwrap();
     }
     if type0_o_oo.is_match(s) {
       return Ok(PMType::Type0_o_oo);

@@ -494,11 +494,12 @@ pub fn get_1d_index(col: usize, row: usize, cols: usize) -> usize {
 /// ## Example
 ///
 /// ```
-/// use spdcalc::utils::{Steps, Iterator2D};
+/// use spdcalc::utils::{Steps2D, Iterator2D};
 ///
-/// let x_steps = Steps(0., 100., 11); // 0-100 in 10 steps = [0, 10, 20, ..., 100]
-/// let y_steps = Steps(0., 10., 6); // 0-10 in 5 steps = [0, 2, 4, 6, 8, 10]
-/// let grid : Vec<f64> = Iterator2D::new(x_steps, y_steps).map(|(x, y)| {
+/// let x_steps = (0., 100., 11); // 0-100 in 10 steps = [0, 10, 20, ..., 100]
+/// let y_steps = (0., 10., 6); // 0-10 in 5 steps = [0, 2, 4, 6, 8, 10]
+/// let steps = Steps2D::new(x_steps, y_steps);
+/// let grid : Vec<f64> = Iterator2D::new(steps).map(|(x, y)| {
 ///    x * y
 /// }).collect();
 /// assert_eq!(grid[12], 20.);
