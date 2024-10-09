@@ -3,7 +3,7 @@ node_modules
 dist/*
 _SpecRunner.html
 
-**/target
+**/target/
 **/*.rs.bk
 Cargo.lock
 bin/
