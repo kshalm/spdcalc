@@ -33,7 +33,7 @@ handle periodically-poled crystals that have been apodized with a Gaussian
 function.
 
 **There is also a web-based application that uses this library available at
-[spdcalc.org](https://spdcalc.org).**
+[app.spdcalc.org](https://app.spdcalc.org).**
 
 # Usage
 
