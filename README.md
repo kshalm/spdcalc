@@ -53,7 +53,7 @@ let json = serde_json::json!({
     "pm_type": "e->eo",
     "phi_deg": 0,
     "theta_deg": 90,
-    "length_um": 14_000,
+    "length_um": 14000,
     "temperature_c": 20
   },
   "pump": {
