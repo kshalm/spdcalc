@@ -19,7 +19,7 @@ license = "MIT"
 homepage = "https://app.spdcalc.org"
 repository = "https://github.com/spdcalc/spdcalc"
 readme = "README.md"
-exclude = ["_scratchwork"]
+exclude = ["_scratchwork", "test"]
 
 [lib]
 crate-type = ["rlib"]
