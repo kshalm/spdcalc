@@ -1,7 +1,27 @@
 use crate::utils::Steps;
 use crate::Complex;
 use num::Integer;
+use quad_rs::Integrable;
 use rayon::prelude::*;
+
+struct Problem<F, Y>(pub F)
+where
+  F: Fn(Complex<f64>) -> Y;
+
+impl<F, Y> Integrable for Problem<F, Y>
+where
+  Y: Into<Complex<f64>>,
+  F: Fn(Complex<f64>) -> Y,
+{
+  type Input = Complex<f64>;
+  type Output = Complex<f64>;
+  fn integrand(
+    &self,
+    input: &Self::Input,
+  ) -> Result<Self::Output, quad_rs::EvaluationError<Self::Input>> {
+    Ok((self.0)(*input).into())
+  }
+}
 
 /// Various integration methods
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -36,16 +56,15 @@ impl Integrator {
         tolerance,
         max_depth,
       } => {
-        use quad_rs::prelude::*;
-        use quad_rs::Integrate;
         let a = Complex::new(a, 0.);
         let b = Complex::new(b, 0.);
-        let integrator = GaussKronrod::default()
-          .with_relative_tolerance(*tolerance)
-          .with_maximum_function_evaluations(*max_depth);
+        let integrator = quad_rs::Integrator::default()
+          .relative_tolerance(*tolerance)
+          .with_maximum_iter(*max_depth);
         integrator
-          .integrate(|z| func(z.re).into(), a..b, None)
+          .integrate(Problem(|z| func(z.re)), a..b)
           .unwrap()
+          .result
           .result
           .unwrap()
       }
@@ -80,30 +99,29 @@ impl Integrator {
         tolerance,
         max_depth,
       } => {
-        use quad_rs::prelude::*;
-        use quad_rs::Integrate;
         let a = Complex::new(a, 0.);
         let b = Complex::new(b, 0.);
         let c = Complex::new(c, 0.);
         let d = Complex::new(d, 0.);
-        let integrator = GaussKronrod::default()
-          .with_relative_tolerance(*tolerance)
-          .with_maximum_function_evaluations(*max_depth);
+        let integrator = quad_rs::Integrator::default()
+          .relative_tolerance(*tolerance)
+          .with_maximum_iter(*max_depth);
         integrator
           .integrate(
-            |z| {
-              GaussKronrod::default()
-                .with_relative_tolerance(*tolerance)
-                .with_maximum_function_evaluations(*max_depth)
-                .integrate(|w| func(z.re, w.re).into(), c..d, None)
+            Problem(|z: Complex<f64>| {
+              quad_rs::Integrator::default()
+                .relative_tolerance(*tolerance)
+                .with_maximum_iter(*max_depth)
+                .integrate(Problem(|w: Complex<f64>| func(z.re, w.re)), c..d)
                 .unwrap()
                 .result
+                .result
                 .unwrap()
-            },
+            }),
             a..b,
-            None,
           )
           .unwrap()
+          .result
           .result
           .unwrap()
       }
