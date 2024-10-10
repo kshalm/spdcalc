@@ -1,8 +1,10 @@
 use dimensioned::f64prefixes::{MICRO, NANO};
 use spdcalc::{
+  beam::Beam,
+  beam::IdlerBeam,
+  beam::SignalBeam,
   dim::ucum::{DEG, K, M},
-  Apodization, Beam, CrystalSetup, CrystalType, IdlerBeam, PMType, PeriodicPoling,
-  PolarizationType, SignalBeam,
+  Apodization, CrystalSetup, CrystalType, PMType, PeriodicPoling, PolarizationType,
 };
 
 fn main() {

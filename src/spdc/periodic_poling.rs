@@ -1,11 +1,14 @@
 use crate::dim::ucum::{Meter, M, RAD};
 use crate::math::lerp;
 use crate::{
+  beam::IdlerBeam,
+  beam::PumpBeam,
+  beam::SignalBeam,
   delta_k,
   math::{fwhm_to_sigma, nelder_mead_1d},
-  CrystalSetup, PumpBeam, SPDCError, Sign, SignalBeam, TWO_PI,
+  CrystalSetup, SPDCError, Sign, TWO_PI,
 };
-use crate::{Distance, IdlerBeam, Wavenumber};
+use crate::{Distance, Wavenumber};
 use core::f64::consts::PI;
 
 const IMPOSSIBLE_POLING_PERIOD: &str = "Could not determine poling period from specified values";
@@ -507,6 +510,7 @@ mod pyo3_impls {
 
 #[cfg(test)]
 mod test {
+  use crate::beam::*;
   use crate::utils::testing::*;
   use crate::{dim::ucum::*, *};
 

@@ -1,4 +1,5 @@
 use super::*;
+use crate::beam::*;
 use na::Vector3;
 use utils::dim_vector;
 

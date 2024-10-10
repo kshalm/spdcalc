@@ -1,12 +1,16 @@
 use super::*;
 use crate::{
+  beam::Beam,
+  beam::IdlerBeam,
+  beam::PumpBeam,
+  beam::SignalBeam,
   dim::{
     f64prefixes::{MICRO, NANO, PICO},
     ucum::{DEG, M, MILLIW, RAD, V},
   },
   math::sigfigs,
   utils::{self, from_kelvin_to_celsius},
-  Beam, CrystalSetup, CrystalType, IdlerBeam, PMType, PumpBeam, SPDCError, SignalBeam,
+  CrystalSetup, CrystalType, PMType, SPDCError,
 };
 
 mod periodic_poling_config;

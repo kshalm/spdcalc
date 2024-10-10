@@ -1,4 +1,5 @@
 //! Useful imports
+pub use crate::beam::{Beam, IdlerBeam, PumpBeam, SignalBeam};
 pub use crate::constants::*;
 pub use crate::exceptions::*;
 pub use crate::jsa::{
@@ -11,6 +12,5 @@ pub use crate::Complex;
 pub use crate::CrystalType;
 pub use crate::PolarizationType;
 pub use crate::{Apodization, PMType, PolingPeriod};
-pub use crate::{Beam, IdlerBeam, PumpBeam, SignalBeam};
 pub use crate::{SPDCConfig, SPDCIter, SPDC};
 pub use dim::{f64prefixes::*, ucum::*};

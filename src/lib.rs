@@ -1,6 +1,6 @@
 #![deny(missing_docs)]
 #![doc(html_favicon_url = "https://app.spdcalc.org/favicon.ico")]
-#![doc(html_logo_url = "https://app.spdcalc.org/spdcalc-logo.png")]
+#![doc(html_logo_url = "https://app.spdcalc.org/favicon.png")]
 #![doc = include_str!("../README.md")]
 
 #[macro_use]
@@ -28,8 +28,7 @@ pub use spdc::*;
 pub mod crystal;
 pub use crystal::*;
 
-mod beam;
-pub use beam::*;
+pub mod beam;
 
 pub mod phasematch;
 pub use phasematch::*;

@@ -4,9 +4,11 @@ use crate::math::nelder_mead_1d;
 use crate::math::Integrator;
 use crate::types::Time;
 use crate::{
+  beam::IdlerBeam,
+  beam::PumpBeam,
+  beam::SignalBeam,
   jsa::{FrequencySpace, JointSpectrum},
-  Angle, CrystalSetup, Distance, Frequency, IdlerBeam, PeriodicPoling, PumpBeam, SPDCError,
-  SignalBeam, Wavelength, Wavevector,
+  Angle, CrystalSetup, Distance, Frequency, PeriodicPoling, SPDCError, Wavelength, Wavevector,
 };
 use dim::ucum::{Hertz, MilliWatt, DEG};
 use na::Complex;

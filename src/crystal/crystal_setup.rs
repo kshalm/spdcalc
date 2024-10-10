@@ -1,4 +1,5 @@
 use super::*;
+use crate::beam::*;
 use crate::math::nelder_mead_1d;
 use dim::ucum::*;
 use na::{Rotation3, Vector3};
