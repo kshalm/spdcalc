@@ -6,21 +6,28 @@ use std::fmt;
 use std::str::FromStr;
 use utils::from_celsius_to_kelvin;
 
+/// A mathematical expression for a crystal's refractive indices
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum CrystalExpr {
+  /// A Uniaxial crystal
   Uniaxial {
+    /// The ordinary refractive index
     #[serde(skip_serializing)]
     no: meval::Expr,
+    /// The extraordinary refractive index
     #[serde(skip_serializing)]
     ne: meval::Expr,
   },
-
+  /// A Biaxial crystal
   Biaxial {
+    /// The x refractive index
     #[serde(skip_serializing)]
     nx: meval::Expr,
+    /// The y refractive index
     #[serde(skip_serializing)]
     ny: meval::Expr,
+    /// The z refractive index
     #[serde(skip_serializing)]
     nz: meval::Expr,
   },
@@ -30,19 +37,32 @@ pub enum CrystalExpr {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[allow(non_camel_case_types)]
 pub enum CrystalType {
+  /// BBO (ref 1)
   BBO_1,
+  /// KTP
   KTP,
+
+  /// BiBO_1
   BiBO_1,
+  /// LiNbO3_1
   LiNbO3_1,
+  /// LiNb_MgO
   LiNb_MgO,
+  /// KDP_1
   KDP_1,
+  /// AgGaSe2_1
   AgGaSe2_1,
+  /// AgGaSe2_2
   AgGaSe2_2,
 
+  /// LiIO3_2
   LiIO3_2,
+  /// LiIO3_1
   LiIO3_1,
+  /// AgGaS2_1
   AgGaS2_1,
   // Sellmeier(sellmeier::SellmeierCrystal<Q, T>),
+  /// Crystal Expression
   #[serde(untagged)]
   Expr(CrystalExpr),
 }
@@ -123,6 +143,7 @@ impl CrystalType {
     }
   }
 
+  /// Get all crystal meta information
   pub fn get_all_meta() -> Vec<CrystalMeta> {
     vec![
       bbo_1::META,

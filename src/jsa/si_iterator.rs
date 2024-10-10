@@ -11,29 +11,35 @@ use rayon::prelude::*;
 pub struct FrequencySpace(Steps2D<Frequency>);
 
 impl FrequencySpace {
+  /// Create a new frequency space
   pub fn new(xsteps: (Frequency, Frequency, usize), ysteps: (Frequency, Frequency, usize)) -> Self {
     Self(Steps2D(xsteps, ysteps))
   }
 
+  /// Get the steps
   pub fn steps(&self) -> &Steps2D<Frequency> {
     &self.0
   }
 
+  /// Convert to steps
   pub fn as_steps(self) -> Steps2D<Frequency> {
     self.0
   }
 
+  /// Set the resolution
   pub fn set_resolution(&mut self, res: usize) -> &mut Self {
     self.0 .0 .2 = res;
     self.0 .1 .2 = res;
     self
   }
 
+  /// Set the resolution by consuming self
   pub fn with_resolution(mut self, res: usize) -> Self {
     self.set_resolution(res);
     self
   }
 
+  /// Iterate over the signal and idler frequencies
   pub fn from_wavelength_space(ws: WavelengthSpace) -> Self {
     let ws_min = vacuum_wavelength_to_frequency(ws.0 .0 .1);
     let ws_max = vacuum_wavelength_to_frequency(ws.0 .0 .0);
@@ -42,6 +48,7 @@ impl FrequencySpace {
     Self::new((ws_min, ws_max, ws.0 .0 .2), (wi_min, wi_max, ws.0 .1 .2))
   }
 
+  /// Convert to wavelength space
   pub fn as_wavelength_space(self) -> WavelengthSpace {
     let fs = self.as_steps();
     let ls_min = frequency_to_vacuum_wavelength(fs.0 .1);
@@ -51,10 +58,12 @@ impl FrequencySpace {
     WavelengthSpace::new((ls_min, ls_max, fs.0 .2), (li_min, li_max, fs.1 .2))
   }
 
+  /// Create a new frequency space from a sum-difference frequency space
   pub fn from_sum_diff_space(sdfs: SumDiffFrequencySpace) -> Self {
     sdfs.as_frequency_space()
   }
 
+  /// Convert to sum-difference frequency space
   pub fn as_sum_diff_space(self) -> SumDiffFrequencySpace {
     SumDiffFrequencySpace::from_frequency_space(self)
   }
@@ -78,8 +87,11 @@ impl From<SumDiffFrequencySpace> for FrequencySpace {
   }
 }
 
+/// Provides an iterator over the signal and idler frequencies
 pub trait IntoSignalIdlerIterator {
+  /// Get an iterator over the signal and idler frequencies
   fn into_signal_idler_iterator(self) -> impl Iterator<Item = (Frequency, Frequency)>;
+  /// Get a parallel iterator over the signal and idler frequencies
   fn into_signal_idler_par_iterator(self) -> impl ParallelIterator<Item = (Frequency, Frequency)>;
 }
 
@@ -101,29 +113,35 @@ impl IntoSignalIdlerIterator for FrequencySpace {
 pub struct SumDiffFrequencySpace(Steps2D<Frequency>);
 
 impl SumDiffFrequencySpace {
+  /// Create a new sum-difference frequency space
   pub fn new(xsteps: (Frequency, Frequency, usize), ysteps: (Frequency, Frequency, usize)) -> Self {
     Self(Steps2D(xsteps, ysteps))
   }
 
+  /// Get the steps
   pub fn steps(&self) -> &Steps2D<Frequency> {
     &self.0
   }
 
+  /// Convert to steps
   pub fn as_steps(self) -> Steps2D<Frequency> {
     self.0
   }
 
+  /// Set the resolution
   pub fn set_resolution(&mut self, res: usize) -> &mut Self {
     self.0 .0 .2 = res;
     self.0 .1 .2 = res;
     self
   }
 
+  /// Set the resolution by consuming self
   pub fn with_resolution(mut self, res: usize) -> Self {
     self.set_resolution(res);
     self
   }
 
+  /// Create a new sum-difference frequency space from a frequency space
   pub fn from_frequency_space(frequencies: FrequencySpace) -> Self {
     let steps = frequencies.as_steps();
     let ws_min = steps.0 .0;
@@ -143,6 +161,7 @@ impl SumDiffFrequencySpace {
     ))
   }
 
+  /// Convert to frequency space
   pub fn as_frequency_space(self) -> FrequencySpace {
     let s_min = self.0 .0 .0;
     let s_max = self.0 .0 .1;
@@ -158,10 +177,12 @@ impl SumDiffFrequencySpace {
     )
   }
 
+  /// Create a new sum-difference frequency space from a wavelength space
   pub fn from_wavelength_space(ws: WavelengthSpace) -> Self {
     Self::from_frequency_space(ws.as_frequency_space())
   }
 
+  /// Convert to wavelength space
   pub fn as_wavelength_space(self) -> WavelengthSpace {
     WavelengthSpace::from_frequency_space(self.as_frequency_space())
   }
@@ -208,6 +229,7 @@ impl IntoSignalIdlerIterator for SumDiffFrequencySpace {
 pub struct WavelengthSpace(Steps2D<Wavelength>);
 
 impl WavelengthSpace {
+  /// Create a new wavelength space
   pub fn new(
     xsteps: (Wavelength, Wavelength, usize),
     ysteps: (Wavelength, Wavelength, usize),
@@ -215,37 +237,45 @@ impl WavelengthSpace {
     Self(Steps2D(xsteps, ysteps))
   }
 
+  /// Get the steps
   pub fn steps(&self) -> &Steps2D<Wavelength> {
     &self.0
   }
 
+  /// Convert to steps
   pub fn as_steps(self) -> Steps2D<Wavelength> {
     self.0
   }
 
+  /// Set the resolution
   pub fn set_resolution(&mut self, res: usize) -> &mut Self {
     self.0 .0 .2 = res;
     self.0 .1 .2 = res;
     self
   }
 
+  /// Set the resolution by consuming self
   pub fn with_resolution(mut self, res: usize) -> Self {
     self.set_resolution(res);
     self
   }
 
+  /// Create a new WavelengthSpace from a FrequencySpace
   pub fn from_frequency_space(fs: FrequencySpace) -> Self {
     fs.as_wavelength_space()
   }
 
+  /// Convert to FrequencySpace
   pub fn as_frequency_space(self) -> FrequencySpace {
     FrequencySpace::from_wavelength_space(self)
   }
 
+  /// Create a new WavelengthSpace from a SumDiffFrequencySpace
   pub fn from_sum_diff_space(sd: SumDiffFrequencySpace) -> Self {
     Self::from_frequency_space(sd.as_frequency_space())
   }
 
+  /// Convert to SumDiffFrequencySpace
   pub fn as_sum_diff_space(self) -> SumDiffFrequencySpace {
     SumDiffFrequencySpace::from_wavelength_space(self)
   }

@@ -18,21 +18,28 @@ lazy_static::lazy_static! {
   static ref FWHM_OVER_WAIST :f64 = f64::sqrt(2. * f64::ln(2.));
 }
 
+/// The sin function for dimensioned angles
 pub fn sin(a: Angle) -> f64 {
   (a / RAD).sin()
 }
+
+/// The cos function for dimensioned angles
 pub fn cos(a: Angle) -> f64 {
   (a / RAD).cos()
 }
+/// The tan function for dimensioned angles
 pub fn tan(a: Angle) -> f64 {
   (a / RAD).tan()
 }
+/// The sec function for dimensioned angles
 pub fn sec(a: Angle) -> f64 {
   1. / cos(a)
 }
+/// The csc function for dimensioned angles
 pub fn csc(a: Angle) -> f64 {
   1. / sin(a)
 }
+/// The cot function for dimensioned angles
 pub fn cot(a: Angle) -> f64 {
   1. / tan(a)
 }
@@ -85,7 +92,7 @@ where
 }
 
 // http://mathworld.wolfram.com/GaussianFunction.html
-// FWHM / sigma = 2 * sqrt(2 * ln(2))
+/// FWHM / sigma = 2 * sqrt(2 * ln(2))
 pub fn fwhm_to_sigma<T>(fwhm: T) -> <T as std::ops::Div<f64>>::Output
 where
   T: std::ops::Div<f64>,

@@ -1,5 +1,8 @@
+//! No temperature dependence
 use super::*;
 use dim::ucum::Kelvin;
+
+/// No temperature dependence
 pub struct None;
 
 impl TemperatureDependence for None {

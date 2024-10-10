@@ -5,7 +5,9 @@ use std::str::FromStr;
 /// The polarization type (ordinary or extraordinary)
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
 pub enum PolarizationType {
+  /// Ordinary polarization
   Ordinary,
+  /// Extraordinary polarization
   Extraordinary,
 }
 

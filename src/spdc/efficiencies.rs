@@ -6,11 +6,17 @@ use dim::ucum::{Hertz, HZ, S};
 /// The efficiencies (and counts) result object
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Efficiencies {
+  /// Symmetric efficiency
   pub symmetric: f64,
+  /// Signal efficiency
   pub signal: f64,
+  /// Idler efficiency
   pub idler: f64,
+  /// Coincidences rate
   pub coincidences: Hertz<f64>,
+  /// Signal singles rate
   pub signal_singles: Hertz<f64>,
+  /// Idler singles rate
   pub idler_singles: Hertz<f64>,
 }
 

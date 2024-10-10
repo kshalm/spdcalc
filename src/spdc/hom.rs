@@ -110,8 +110,11 @@ pub fn hom_visibility<T: Into<FrequencySpace> + Copy>(
 /// A result from a hom calculation (signal-signal, idler-idler, signal-idler)
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct HomTwoSourceResult<T> {
+  /// The signal-signal coincidence rate
   pub ss: T,
+  /// The idler-idler coincidence rate
   pub ii: T,
+  /// The signal-idler coincidence rate
   pub si: T,
 }
 

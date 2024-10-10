@@ -1,13 +1,18 @@
 use super::*;
 
+/// Configuration for periodic poling.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 #[serde(untagged)]
 pub enum PeriodicPolingConfig {
+  /// No periodic poling.
   #[serde(alias = "off", alias = "none", alias = "None")]
   #[default]
   Off,
+  /// Periodic poling with a specified period.
   Config {
+    /// The poling period in micrometers or "auto" to calculate the optimum period.
     poling_period_um: AutoCalcParam<f64>,
+    /// Apodization configuration.
     #[serde(default)]
     apodization: ApodizationConfig,
   },
@@ -33,6 +38,7 @@ impl From<PeriodicPoling> for PeriodicPolingConfig {
 }
 
 impl PeriodicPolingConfig {
+  /// Converts the configuration into a [`PeriodicPoling`] instance.
   pub fn try_as_periodic_poling(
     self,
     signal: &SignalBeam,

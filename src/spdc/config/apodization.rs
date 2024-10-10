@@ -1,6 +1,6 @@
 use super::*;
 
-/// Flat config for apoization
+/// Flat config for [`Apodization`]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 #[serde(tag = "kind", content = "parameter")]
 pub enum ApodizationConfig {
@@ -14,16 +14,22 @@ pub enum ApodizationConfig {
     /// FWHM of the Gaussian apodization
     fwhm_um: f64,
   },
+  /// Bartlett Apodization
   #[serde(alias = "bartlett", alias = "Bartlett")]
   Bartlett(f64),
+  /// Blackman Apodization
   #[serde(alias = "blackman", alias = "Blackman")]
   Blackman(f64),
+  /// Connes Apodization
   #[serde(alias = "connes", alias = "Connes")]
   Connes(f64),
+  /// Cosine Apodization
   #[serde(alias = "cosine", alias = "Cosine")]
   Cosine(f64),
+  /// Hamming Apodization
   #[serde(alias = "hamming", alias = "Hamming")]
   Hamming(f64),
+  /// Welch Apodization
   #[serde(alias = "welch", alias = "Welch")]
   Welch(f64),
   /// Custom apodization by specifying profile values directly

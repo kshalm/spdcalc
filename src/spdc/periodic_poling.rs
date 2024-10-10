@@ -28,17 +28,24 @@ pub enum Apodization {
     /// Full-width half-max
     fwhm: Distance,
   },
+  /// Bartlett apodization
   Bartlett(f64),
+  /// Blackman apodization
   Blackman(f64),
+  /// Connes apodization
   Connes(f64),
+  /// Cosine apodization
   Cosine(f64),
+  /// Hamming apodization
   Hamming(f64),
+  /// Welch apodization
   Welch(f64),
   /// Custom apodization by specifying profile values directly
   Interpolate(Vec<f64>),
 }
 
 impl Apodization {
+  /// Get the kind of apodization as a string
   pub fn kind(&self) -> &'static str {
     match self {
       Apodization::Off => "Off",
@@ -53,6 +60,7 @@ impl Apodization {
     }
   }
 
+  /// The integration constant for the apodization function at a given z position
   pub fn integration_constant(&self, z: f64, crystal_length: Distance) -> f64 {
     assert!((-1. ..=1.).contains(&z), "z must be between -1 and 1");
     match self {
@@ -89,11 +97,16 @@ impl Apodization {
 /// Periodic Poling settings
 #[derive(Debug, Clone, PartialEq, Default)]
 pub enum PeriodicPoling {
+  /// Off
   #[default]
   Off,
+  /// On
   On {
+    /// Period of the poling
     period: PolingPeriod,
+    /// Sign of the poling
     sign: Sign,
+    /// Apodization
     apodization: Apodization,
   },
 }
@@ -265,6 +278,7 @@ impl PeriodicPoling {
     }
   }
 
+  /// Get the signed period
   pub fn signed_period(&self) -> PolingPeriod {
     match self {
       Self::Off => f64::INFINITY * M,

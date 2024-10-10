@@ -35,9 +35,11 @@ pub fn direction_from_polar(phi: Angle, theta: Angle) -> Direction {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PumpBeam(Beam);
 impl PumpBeam {
+  /// Create a new PumpBeam
   pub fn new(beam: Beam) -> Self {
     Self(beam)
   }
+  /// Get the inner Beam
   pub fn as_beam(self) -> Beam {
     self.0
   }
@@ -73,9 +75,11 @@ impl DerefMut for PumpBeam {
 #[derive(Debug, Clone, PartialEq)]
 pub struct SignalBeam(Beam);
 impl SignalBeam {
+  /// Create a new SignalBeam
   pub fn new(beam: Beam) -> Self {
     Self(beam)
   }
+  /// Get the inner Beam
   pub fn as_beam(self) -> Beam {
     self.0
   }
@@ -109,9 +113,11 @@ impl DerefMut for SignalBeam {
 #[derive(Debug, Clone, PartialEq)]
 pub struct IdlerBeam(Beam);
 impl IdlerBeam {
+  /// Create a new IdlerBeam
   pub fn new(beam: Beam) -> Self {
     Self(beam)
   }
+  /// Get the inner Beam
   pub fn as_beam(self) -> Beam {
     self.0
   }

@@ -27,11 +27,35 @@ where
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(tag = "method")]
 pub enum Integrator {
-  Simpson { divs: usize },
-  AdaptiveSimpson { tolerance: f64, max_depth: usize },
-  GaussKonrod { tolerance: f64, max_depth: usize },
-  GaussLegendre { degree: usize },
-  ClenshawCurtis { tolerance: f64 },
+  /// Simpson integration with specified divisions
+  Simpson {
+    /// Divisions (slices) to use for integration
+    divs: usize,
+  },
+  /// Adaptive Simpson integration
+  AdaptiveSimpson {
+    /// Relative tolerance
+    tolerance: f64,
+    /// Maximum depth
+    max_depth: usize,
+  },
+  /// Gauss-Konrod integration
+  GaussKonrod {
+    /// Relative tolerance
+    tolerance: f64,
+    /// Maximum depth
+    max_depth: usize,
+  },
+  /// Gauss-Legendre Integration
+  GaussLegendre {
+    /// Degree parameter
+    degree: usize,
+  },
+  /// Clenshaw-Curtis integration
+  ClenshawCurtis {
+    /// Relative tolerance
+    tolerance: f64,
+  },
 }
 
 impl Default for Integrator {
@@ -41,6 +65,7 @@ impl Default for Integrator {
 }
 
 impl Integrator {
+  /// Calculate the integral of function from x -> [a, b]
   pub fn integrate<F, Y>(&self, func: F, a: f64, b: f64) -> Complex<f64>
   where
     F: Send + Sync + Fn(f64) -> Y,
@@ -84,6 +109,7 @@ impl Integrator {
     }
   }
 
+  /// Perform a 2d integration of specified function over x -> [a, b] and y -> [c, d]
   pub fn integrate2d<F, Y>(&self, func: F, a: f64, b: f64, c: f64, d: f64) -> Complex<f64>
   where
     F: Send + Sync + Fn(f64, f64) -> Y,
@@ -211,6 +237,7 @@ fn get_simpson_weight(n: usize, divs: usize) -> f64 {
 //   }
 // }
 
+/// Simpson integration of function from x -> [a, b] using `divs` slices
 pub fn simpson<F, Y>(func: F, a: f64, b: f64, divs: usize) -> Complex<f64>
 where
   F: Send + Sync + Fn(f64) -> Y,
@@ -243,6 +270,7 @@ where
   result * (dx / 3.)
 }
 
+/// Two dimensional simpson integration in x -> [a, b] and y -> [c, d] with `divs` slices on each axis
 pub fn simpson2d<F, Y>(func: F, ax: f64, bx: f64, ay: f64, by: f64, divs: usize) -> Complex<f64>
 where
   F: Send + Sync + Fn(f64, f64) -> Y,
@@ -409,7 +437,7 @@ where
   quad_asr(f, a, fa, b, fb, eps, whole, m, fm, max_depth)
 }
 
-pub fn simpson_adaptive_2d<F, Y>(
+fn simpson_adaptive_2d<F, Y>(
   f: &F,
   ax: f64,
   bx: f64,

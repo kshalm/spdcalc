@@ -8,9 +8,13 @@ use rayon::iter::IntoParallelIterator;
 
 /// Extension to facilitate getting the x, y, and z components of a dimensioned vector
 pub trait DimVector {
+  /// The type of the units
   type Units;
+  /// Get the x component as a dimensioned value
   fn x(&self) -> Self::Units;
+  /// Get the y component as a dimensioned value
   fn y(&self) -> Self::Units;
+  /// Get the z component as a dimensioned value
   fn z(&self) -> Self::Units;
 }
 
@@ -267,6 +271,7 @@ where
   }
 }
 
+/// Parallel iterator for 1D steps
 pub struct ParIterator1D<T> {
   steps: Steps<T>,
 }
@@ -382,6 +387,7 @@ where
     + std::ops::Add<T, Output = T>
     + Copy,
 {
+  /// Create a new instance
   pub fn new(x: (T, T, usize), y: (T, T, usize)) -> Self {
     Self(x, y)
   }
@@ -530,6 +536,7 @@ where
     Self::new_partition(steps, 0, steps.len())
   }
 
+  /// Create a new 2d iterator over a portion of the grid
   pub fn new_partition(steps: Steps2D<T>, start: usize, end: usize) -> Self {
     assert!(
       start <= end,
@@ -545,6 +552,7 @@ where
     }
   }
 
+  /// get the x and y coordinates corresponding to the specified index
   pub fn get_xy(&self, index: usize) -> (T, T) {
     self.steps.value(index)
   }
@@ -554,6 +562,7 @@ where
     self.steps.division_widths().0
   }
 
+  /// Get the y step size
   pub fn get_dy(&self) -> T {
     self.steps.division_widths().1
   }
@@ -631,6 +640,7 @@ where
   }
 }
 
+/// Parallel iterator for 2D grid
 pub struct ParIterator2D<T>
 where
   T: Send

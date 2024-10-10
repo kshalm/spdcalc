@@ -30,6 +30,7 @@ impl PMType {
     }
   }
 
+  /// Convert the PMType to a string
   pub fn to_str(&self) -> &'static str {
     match self {
       PMType::Type0_o_oo => "Type0_o_oo",

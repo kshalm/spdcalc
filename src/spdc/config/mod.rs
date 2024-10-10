@@ -24,11 +24,14 @@ pub enum AutoCalcParam<T>
 where
   T: 'static,
 {
+  /// "auto"
   Auto(String),
+  /// A parameter
   Param(T),
 }
 
 impl<T> AutoCalcParam<T> {
+  /// Returns true if the parameter is set to be automatically calculated
   pub fn is_auto(&self) -> bool {
     matches!(self, Self::Auto(_))
   }
@@ -62,15 +65,22 @@ impl<T> From<Option<T>> for AutoCalcParam<T> {
 #[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CrystalConfig {
+  /// The type of crystal
   pub kind: CrystalType,
+  /// The type of phase matching
   #[serde_as(as = "DisplayFromStr")]
   pub pm_type: PMType,
+  /// The polar angle of the crystal in degrees
   #[serde(default)]
   pub phi_deg: f64,
+  /// The azimuthal angle of the crystal in degrees
   #[serde(default)]
   pub theta_deg: AutoCalcParam<f64>,
+  /// The length of the crystal in micrometers
   pub length_um: f64,
+  /// The temperature of the crystal in degrees Celsius
   pub temperature_c: f64,
+  /// Whether the downconversion is counter-propagating
   #[serde(default)]
   pub counter_propagation: bool,
 }
@@ -129,9 +139,13 @@ impl From<CrystalSetup> for CrystalConfig {
 /// Flat configuration of pump for ease of import/export
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct PumpConfig {
+  /// The wavelength of the pump in nanometers
   pub wavelength_nm: f64,
+  /// The waist of the pump in micrometers
   pub waist_um: f64,
+  /// The bandwidth of the pump in nanometers
   pub bandwidth_nm: f64,
+  /// The average power of the pump in milliwatts
   pub average_power_mw: f64,
   /// If unset, defaults to 1e-2
   pub spectrum_threshold: Option<f64>,
@@ -150,6 +164,7 @@ impl Default for PumpConfig {
 }
 
 impl PumpConfig {
+  /// Converts to a [`PumpBeam`] with the given [`CrystalSetup`]
   pub fn as_beam(self, crystal_setup: &CrystalSetup) -> PumpBeam {
     Beam::new(
       crystal_setup.pm_type.pump_polarization(),
@@ -165,14 +180,19 @@ impl PumpConfig {
 /// Flat configuration of signal for ease of import/export
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SignalConfig {
+  /// The wavelength of the signal in nanometers
   pub wavelength_nm: f64,
+  /// The polar angle of the signal in degrees
   #[serde(default)]
   pub phi_deg: f64,
   // one of...
+  /// The azimuthal angle of the signal in degrees (conflicts with `theta_external_deg`)
   pub theta_deg: Option<f64>,
+  /// The azimuthal angle of the signal in degrees outside the crystal (conflicts with `theta_deg`)
   pub theta_external_deg: Option<f64>,
-  //
+  /// The waist of the signal in micrometers
   pub waist_um: f64,
+  /// The position of the waist of the signal in micrometers
   #[serde(default)]
   pub waist_position_um: AutoCalcParam<f64>,
 }
@@ -191,6 +211,7 @@ impl Default for SignalConfig {
 }
 
 impl SignalConfig {
+  /// Converts to a [`SignalBeam`] with the given [`CrystalSetup`]
   pub fn try_as_beam(self, crystal_setup: &CrystalSetup) -> Result<SignalBeam, SPDCError> {
     let phi = self.phi_deg * DEG;
     let mut beam = Beam::new(
@@ -217,19 +238,25 @@ impl SignalConfig {
 /// Flat configuration of idler for ease of import/export
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct IdlerConfig {
+  /// The wavelength of the idler in nanometers
   pub wavelength_nm: f64,
+  /// The polar angle of the idler in degrees
   #[serde(default)]
   pub phi_deg: f64,
   // one of...
+  /// The azimuthal angle of the idler in degrees (conflicts with `theta_external_deg`)
   pub theta_deg: Option<f64>,
+  /// The azimuthal angle of the idler in degrees outside the crystal (conflicts with `theta_deg`)
   pub theta_external_deg: Option<f64>,
-  //
+  /// The waist of the idler in micrometers
   pub waist_um: f64,
+  /// The position of the waist of the idler in micrometers
   #[serde(default)]
   pub waist_position_um: AutoCalcParam<f64>,
 }
 
 impl IdlerConfig {
+  /// Converts to a [`IdlerBeam`] with the given [`CrystalSetup`]
   pub fn try_as_beam(self, crystal_setup: &CrystalSetup) -> Result<IdlerBeam, SPDCError> {
     let phi = self.phi_deg * DEG;
     let mut beam = Beam::new(
@@ -256,13 +283,19 @@ impl IdlerConfig {
 /// Flat configuration of SPDC for ease of import/export
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SPDCConfig {
+  /// The crystal configuration
   pub crystal: CrystalConfig,
+  /// The pump configuration
   pub pump: PumpConfig,
+  /// The signal configuration
   pub signal: SignalConfig,
+  /// The idler configuration
   #[serde(default)]
   pub idler: AutoCalcParam<IdlerConfig>,
+  /// The configuration for the periodic poling
   #[serde(default)]
   pub periodic_poling: PeriodicPolingConfig,
+  /// The deff of the crystal in pm/V
   pub deff_pm_per_volt: f64,
 }
 
@@ -275,6 +308,7 @@ impl TryFrom<SPDCConfig> for SPDC {
 }
 
 impl SPDCConfig {
+  /// Converts to a [`SPDC`] with the given [`CrystalSetup`]
   pub fn try_as_spdc(self) -> Result<SPDC, SPDCError> {
     let deff = self.deff_pm_per_volt * PICO * M / V;
     let pump_spectrum_threshold = self.pump.spectrum_threshold.unwrap_or(1e-2);

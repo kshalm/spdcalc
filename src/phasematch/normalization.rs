@@ -1,7 +1,12 @@
 use super::*;
 use dim::ucum::{self, EPS_0, RAD, UCUM};
 
-derived!(ucum, UCUM: CommonNorm = Second * Meter * Meter * Meter * Meter / Radian / Radian);
+pub use units::*;
+#[doc(hidden)]
+mod units {
+  use super::*;
+  derived!(ucum, UCUM: CommonNorm = Second * Meter * Meter * Meter * Meter / Radian / Radian);
+}
 
 fn common_norm(omega_s: Frequency, omega_i: Frequency, spdc: &SPDC) -> CommonNorm<f64> {
   // K degeneracy factor (nonlinear polarization).

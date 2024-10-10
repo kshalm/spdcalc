@@ -22,6 +22,7 @@ pub struct BeamWaist {
 }
 
 impl BeamWaist {
+  /// Create a new circular beam waist
   pub fn new(wx: Wavelength) -> Self {
     Self { x: wx, y: wx }
   }
@@ -35,6 +36,7 @@ impl BeamWaist {
   }
 
   #[cfg(feature = "elliptic")]
+  /// Create a new elliptic beam waist
   pub fn ellipticity(&self) -> f64 {
     if self.x == self.y {
       1.
@@ -45,6 +47,7 @@ impl BeamWaist {
     }
   }
 
+  /// Calculate the beam waist x by y
   pub fn x_by_y(&self) -> Meter2<f64> {
     self.x * self.y
   }

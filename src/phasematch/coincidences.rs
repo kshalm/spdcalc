@@ -268,14 +268,17 @@ pub fn phasematch_fiber_coupling(
   PerMeter4::new(result)
 }
 
+/// Get a dimensioned complex number
 pub fn complex_dim<U>(re: UCUM<f64, U>, im: UCUM<f64, U>) -> UCUM<Complex<f64>, U> {
   UCUM::<Complex<f64>, U>::new(Complex::new(*re.value_unsafe(), *im.value_unsafe()))
 }
 
+/// Get a dimensioned complex number with zero real part
 pub fn imag_dim<U>(im: UCUM<f64, U>) -> UCUM<Complex<f64>, U> {
   UCUM::<Complex<f64>, U>::new(Complex::new(0., *im.value_unsafe()))
 }
 
+/// Get a dimensioned complex number with zero imaginary part
 pub fn real_dim<U>(re: UCUM<f64, U>) -> UCUM<Complex<f64>, U> {
   UCUM::<Complex<f64>, U>::new(Complex::new(*re.value_unsafe(), 0.))
 }
@@ -466,32 +469,8 @@ pub fn phasematch_fiber_coupling2(
     pmzcoeff * numerator / denominator
   };
 
-  // let integrator = SimpsonIntegration::new(fn_z);
-  // let result = 0.5
-  //   * integrator.integrate(
-  //     -1.,
-  //     1.,
-  //     steps.unwrap_or_else(|| integration_steps_best_guess(L)),
-  //   );
-
-  // let integrator = Integrator::AdaptiveSimpson {
-  //   tolerance: 1e-5,
-  //   max_depth: 1000,
-  // };
   let result = 0.5 * integrator.integrate(&fn_z, -1., 1.);
 
-  // use quad_rs::Integrate;
-  // let integrator = GAUSS_KONROD.clone()
-  //   .with_absolute_tolerance(1e-18)
-  //   .with_relative_tolerance(1e2);
-  // let result = 0.5 * integrator.integrate(
-  //   &|f: Complex<f64>| fn_z(f.re),
-  //   std::ops::Range {
-  //     start: Complex::new(-1., 0.),
-  //     end: Complex::new(1., 0.)
-  //   },
-  //   None
-  // ).unwrap().result.unwrap();
   PerMeter4::new(result)
 }
 

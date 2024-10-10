@@ -1,3 +1,4 @@
+//! Standard temperature dependence definition
 use super::*;
 use crate::utils::*;
 use dim::ucum::{self, Kelvin};
@@ -5,6 +6,7 @@ use dim::ucum::{self, Kelvin};
 /// Coefficients to calculate temperature dependence of crystals
 /// > n = n + (T - 20°K) * dn
 pub struct Standard {
+  /// dn/dT
   pub dn: [f64; 3],
 }
 

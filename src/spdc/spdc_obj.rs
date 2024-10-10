@@ -67,22 +67,28 @@ use super::PolingPeriod;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(try_from = "crate::SPDCConfig", into = "crate::SPDCConfig")]
 pub struct SPDC {
+  /// Signal configuration
   pub signal: SignalBeam,
+  /// Idler configuration
   pub idler: IdlerBeam,
+  /// Pump configuration
   pub pump: PumpBeam,
+  /// Crystal configuration
   pub crystal_setup: CrystalSetup,
+  /// Periodic poling configuration
   pub pp: PeriodicPoling,
-
+  /// Average pump power in mW
   pub pump_average_power: MilliWatt<f64>,
+  /// Pump bandwidth
   pub pump_bandwidth: Wavelength,
   /// Cutoff amplitude for the pump below which the phasematching will be considered zero
   pub pump_spectrum_threshold: f64,
 
-  // Signal collection focus location on z axis.
+  /// Signal collection focus location on z axis.
   pub signal_waist_position: Distance,
-  // Idler collection focus location on z axis.
+  /// Idler collection focus location on z axis.
   pub idler_waist_position: Distance,
-  // effective nonlinear coefficient in m / mV
+  /// effective nonlinear coefficient in m / mV
   pub deff: crate::MetersPerMilliVolt<f64>,
 }
 
@@ -99,6 +105,7 @@ impl AsRef<SPDC> for SPDC {
 }
 
 impl SPDC {
+  /// Create a new SPDC object
   pub fn new(
     crystal_setup: CrystalSetup,
     signal: SignalBeam,

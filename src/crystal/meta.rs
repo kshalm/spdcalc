@@ -5,9 +5,13 @@ use strum_macros::EnumString;
   Debug, Serialize, PartialEq, Deserialize, Copy, Clone, EnumString, strum_macros::Display,
 )]
 pub enum OpticAxisType {
+  /// Uniaxial crystal with positive birifringence
   PositiveUniaxial,
+  /// Uniaxial crystal with negative birifringence
   NegativeUniaxial,
+  /// Biaxial crystal with positive birifringence
   PositiveBiaxial,
+  /// Biaxial crystal with negative birifringence
   NegativeBiaxial,
 }
 
@@ -96,6 +100,7 @@ pub enum PointGroup {
   HM_mi3m,
 }
 
+/// A valid wavelength range for a crystal
 #[derive(Debug, Serialize, PartialEq, Deserialize, Copy, Clone)]
 pub struct ValidWavelengthRange(pub f64, pub f64);
 

@@ -16,8 +16,11 @@ where
   Q: SellmeierEquation,
   T: TemperatureDependence,
 {
+  /// Sellmeier equation
   pub eqn: Q,
+  /// Temperature dependence
   pub temperature_dependence: T,
+  /// Metadata about the crystal
   pub meta: CrystalMeta,
 }
 
@@ -26,6 +29,7 @@ where
   Q: SellmeierEquation,
   T: TemperatureDependence,
 {
+  /// Get the indices of refraction for a given wavelength
   pub fn get_indices(&self, wavelength: Wavelength, temperature: Kelvin<f64>) -> Indices {
     get_indices(
       &self.eqn,
@@ -35,6 +39,7 @@ where
     )
   }
 
+  /// Get the metadata for the crystal
   pub fn get_meta(&self) -> CrystalMeta {
     self.meta
   }

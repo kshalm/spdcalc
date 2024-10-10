@@ -1,3 +1,4 @@
+//! Sellmeier standard form
 use super::*;
 use dim::{
   f64prefixes::MICRO,
@@ -8,13 +9,20 @@ use dim::{
 /// > n² = a + b1 * λ² / (λ² - c1) + b2 * λ² / (λ² - c2) + b3 * λ² / (λ² - c3)
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct SellmeierStandard {
+  /// a
   pub a: [f64; 3],
+  /// b1
   pub b1: [f64; 3],
+  /// b2
   pub b2: [f64; 3],
+  /// b3
   pub b3: [f64; 3],
 
+  /// c1
   pub c1: [f64; 3],
+  /// c2
   pub c2: [f64; 3],
+  /// c3
   pub c3: [f64; 3],
 }
 
